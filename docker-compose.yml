@@ -1,0 +1,36 @@
+services:
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "2001:2000"
+    environment:
+      - PORT=2000
+      - CS=mongodb://mongo:27017/fbdb
+    depends_on:
+      - mongo
+    volumes:
+      - ./Backend/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://backend:2000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
