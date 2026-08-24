@@ -10,7 +10,7 @@ const routes = createBrowserRouter(ROUTES)
 
 function App() {
   const [products, setProducts] = useState<Product[]>([])
-  const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:2000"
+  const API_URL = import.meta.env.VITE_API_URL ?? "http://sweet-turkeys-stick.loca.lt"
 
   const fetchProducts = async (): Promise<void> => {
     try {
