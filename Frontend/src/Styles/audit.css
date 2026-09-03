@@ -1,0 +1,19 @@
+.audit-trend-mini {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 60px;
+  margin-top: 6px;
+}
+.audit-trend-mini__bar {
+  flex: 1;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, #8b5cf6, #6366f1);
+  min-height: 4px;
+  transition: height 0.3s ease;
+}
+.audit-trend-mini__label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
