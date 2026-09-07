@@ -4,13 +4,13 @@ Bu repo frontend və backend ilə tam işlək bir `product showcase` layihəsidi
 
 ## Nə var burada?
 
-- `Backend/` — Express + MongoDB API, `multer` ilə şəkil yükləmə dəstəyi
+- `Backend/` — Spring Boot + MongoDB API, multipart şəkil yükləmə dəstəyi
 - `Frontend/` — React + Vite + TypeScript tətbiqi, admin və sayt üzəri görünüşləri
 - `docker-compose.yml` — Mongo, backend və frontend üçün konteynerləşdirmə
 
 ## Texnologiya stəqi
 
-- Backend: Node.js, Express, Mongoose, multer, dotenv, cors
+- Backend: Java 21, Spring Boot, Spring Data MongoDB
 - Frontend: React, React Router, TypeScript, Vite, Axios
 - Containerization: Docker, Docker Compose
 
@@ -65,9 +65,9 @@ docker compose down
 
 ## Layihənin strukturuna qısa baxış
 
-- `Backend/routes/route.js` — məhsul routeları
-- `Backend/controllers/products.controller.js` — CRUD məntiqi
-- `Backend/models/products.model.js` — məhsul modeli
+- `Backend/src/main/java/com/inop/backend/controller/ProductController.java` — məhsul API routeları
+- `Backend/src/main/java/com/inop/backend/service/impl/ProductServiceImpl.java` — CRUD məntiqi
+- `Backend/src/main/java/com/inop/backend/model/Product.java` — məhsul modeli
 - `Frontend/src/Context/Context.tsx` — qlobal state və API funksiyaları
 - `Frontend/src/Pages/Admin/` — admin səhifələri
 - `Frontend/src/Pages/Site/` — istifadəçi-facing səhifələr
@@ -214,3 +214,32 @@ Hər bir üzv öz səhifəsini və ya API funksiyasını ayrıca tamamlaya bilə
 
 ---
 
+
+
+## Spring Boot backend
+
+Backend artıq Spring Boot 3.3.4 + Java 21 ilə işləyir. MongoDB bağlantısı və port üçün `CS` və `PORT` environment variable-ları istifadə olunur; şəkillər üçün `UPLOAD_DIR` dəstəklənir.
+
+Backend-i ayrıca işə salmaq üçün `Backend` qovluğunda:
+
+```bash
+./gradlew bootRun
+```
+
+Windows PowerShell-də environment variable nümunəsi:
+
+```powershell
+$env:PORT="2000"
+$env:CS="mongodb://localhost:27017/fbdb"
+$env:UPLOAD_DIR="uploads"
+./gradlew bootRun
+```
+
+Docker ilə bütün sistem:
+
+```bash
+docker compose up --build
+```
+
+Frontend: `http://localhost:3000`  
+Backend API: `http://localhost:2001`

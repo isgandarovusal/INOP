@@ -1,7 +1,11 @@
-FROM node:20-alpine
+FROM gradle:8.10-jdk21 AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+COPY build.gradle settings.gradle ./
+COPY src ./src
+RUN gradle bootJar --no-daemon
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 2000
-CMD ["node", "server.js"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
