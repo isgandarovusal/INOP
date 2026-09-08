@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Candidate = require('../models/Candidate');
+const Candidate = require("../models/candidate.model");
 
 // Bütün namizədləri gətir
 router.get('/', async (req, res) => {
