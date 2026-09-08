@@ -17,18 +17,18 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Rate Limiting (Brute-force/DDoS protection)
+// Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dəqiqə
-  max: 100, // IP başına maks 100 sorğu
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: { message: 'Çoxlu sorğu göndərildi, xahiş olunur 15 dəqiqə sonra yenidən cəhd edin.' }
 });
 app.use('/api/', limiter);
 
-// Uploads static directory
+// Static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Swagger Documentation UI
+// Swagger
 setupSwagger(app);
 
 // API Routes

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowRight, FileText, Loader2, UploadCloud, X } from "lucide-react";
+import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
 import {
@@ -11,8 +12,11 @@ import {
 
 const ACCEPTED_CV_TYPES = [
   "application/pdf",
+  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const CandidateForm: React.FC = () => {
   const { id } = useParams();
@@ -37,31 +41,51 @@ const CandidateForm: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    getCandidateById(id).then((candidate) => {
-      if (!candidate) return;
-      setName(candidate.name);
-      setEmail(candidate.email);
-      setPhone(candidate.phone);
-      setEducation(candidate.education);
-      setExperience(candidate.experience);
-      setSkills(candidate.skills);
-      setLanguages(candidate.languages);
-      setCertificates(candidate.certificates);
-      setExistingCvName(candidate.cv?.name ?? null);
-      setLoading(false);
-    });
+    getCandidateById(id)
+      .then((candidate) => {
+        if (!candidate) return;
+        setName(candidate.name);
+        setEmail(candidate.email);
+        setPhone(candidate.phone);
+        setEducation(candidate.education);
+        setExperience(candidate.experience);
+        setSkills(candidate.skills);
+        setLanguages(candidate.languages);
+        setCertificates(candidate.certificates);
+        setExistingCvName(candidate.cv?.name ?? null);
+      })
+      .catch(() => {
+        toast.error("Namizəd məlumatları yüklənərkən xəta baş verdi.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [id]);
 
   const addFile = (fileList: FileList | null) => {
     const file = fileList?.[0];
     if (!file) return;
+
+    // 1. Format Yoxlanışı (.pdf, .doc, .docx)
     if (!ACCEPTED_CV_TYPES.includes(file.type)) {
-      setError("Only PDF or DOCX files are supported for CVs.");
+      const msg = "Yalnız PDF və ya DOCX formatlı CV faylları qəbul olunur.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
+
+    // 2. Fayl Ölçüsü Yoxlanışı (Max 5MB)
+    if (file.size > MAX_FILE_SIZE) {
+      const msg = "CV faylının ölçüsü 5MB-dan çox ola bilməz.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+
     setError(null);
     setCvFile(file);
     setExistingCvName(null);
+    toast.success("CV faylı uğurla seçildi.");
   };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -70,6 +94,7 @@ const CandidateForm: React.FC = () => {
     if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
     else if (e.type === "dragleave") setDragActive(false);
   };
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,9 +105,12 @@ const CandidateForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) {
-      setError("Name and email are required.");
+      const msg = "Ad və e-poçt xanaları mütləq doldurulmalıdır.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
+
     setSaving(true);
     setError(null);
     try {
@@ -99,12 +127,16 @@ const CandidateForm: React.FC = () => {
       };
       if (isEdit && id) {
         await updateCandidate(id, cvFile ? input : { ...input, cvFile: undefined });
+        toast.success("Namizəd məlumatları uğurla yeniləndi!");
       } else {
         await createCandidate(input);
+        toast.success("Yeni namizəd uğurla əlavə olundu!");
       }
       navigate("/app/recruitment/candidates");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      const msg = err instanceof Error ? err.message : "Şəbəkə və ya server xətası baş verdi.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -196,7 +228,7 @@ const CandidateForm: React.FC = () => {
           />
 
           <div className="form-group form-group--images">
-            <label className="form-label">CV (PDF or DOCX)</label>
+            <label className="form-label">CV (PDF, DOCX - Max 5MB)</label>
             {existingCvName && !cvFile && (
               <div className="file-list" style={{ marginBottom: 10 }}>
                 <div className="file-chip">
@@ -217,11 +249,11 @@ const CandidateForm: React.FC = () => {
                 <UploadCloud size={18} color="#a5b4fc" />
               </div>
               <p className="drop-zone__title">Drag & drop a CV here</p>
-              <p className="drop-zone__hint">or click to browse · PDF, DOCX</p>
+              <p className="drop-zone__hint">or click to browse · PDF, DOCX (Max 5MB)</p>
               <input
                 id="cv-input"
                 type="file"
-                accept=".pdf,.docx"
+                accept=".pdf,.doc,.docx"
                 className="drop-zone__input"
                 onChange={(e) => addFile(e.target.files)}
               />

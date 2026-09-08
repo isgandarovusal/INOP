@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
-const candidateSchema = new mongoose.Schema({
+const CandidateSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String },
-  education: { type: String },
-  experienceYears: { type: Number, default: 0 },
+  role: { type: String, required: true },
+  status: { 
+    type: String, 
+    enum: ['applied', 'interview', 'offer', 'rejected'], 
+    default: 'applied' 
+  },
   skills: [{ type: String }],
-  languages: [{ type: String }],
-  cvUrl: { type: String },
-  status: { type: String, enum: ['New', 'Reviewed', 'Shortlisted', 'Rejected', 'Hired'], default: 'New' }
+  experience: { type: Number, default: 0 },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Candidate', candidateSchema);
+module.exports = mongoose.models.Candidate || mongoose.model('Candidate', CandidateSchema);

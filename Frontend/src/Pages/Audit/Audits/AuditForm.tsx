@@ -5,6 +5,7 @@ import PageHeader from "../../../Components/PageHeader";
 import { createAudit } from "../../../Services/auditsService";
 import { getRestaurants } from "../../../Services/restaurantsService";
 import type { Restaurant, AuditScores } from "../../../Types/audit";
+import { validateCVFile } from "../../../utils/fileValidation";
 
 const AUDIT_TYPES = ["Routine", "Follow-up", "Surprise", "Complaint-driven"];
 
@@ -36,6 +37,19 @@ const AuditForm: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const validFiles = files.filter((file) => validateCVFile(file));
+
+    if (validFiles.length > 0) {
+      setAttachments((prev) => [...prev, ...validFiles]);
+    } else {
+      e.target.value = "";
+    }
+  };
 
   useEffect(() => {
     getRestaurants().then((result) => {
@@ -197,15 +211,14 @@ const AuditForm: React.FC = () => {
                 <Paperclip size={18} color="#a5b4fc" />
               </div>
               <p className="drop-zone__title">Click to add files</p>
-              <p className="drop-zone__hint">Reports, spreadsheets, PDFs</p>
+              <p className="drop-zone__hint">PDF, DOCX (Max 5MB)</p>
               <input
                 id="attachment-input"
                 type="file"
+                accept=".pdf,.doc,.docx"
                 multiple
                 className="drop-zone__input"
-                onChange={(e) =>
-                  setAttachments((prev) => [...prev, ...Array.from(e.target.files ?? [])])
-                }
+                onChange={handleAttachmentChange}
               />
             </div>
             {attachments.length > 0 && (

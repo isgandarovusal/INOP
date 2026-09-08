@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 
+const candidateRoutes = require('./candidate.routes');
 const jobsController = require('../controllers/jobs.controller');
 const candidatesController = require('../controllers/candidates.controller');
 const applicationsController = require('../controllers/applications.controller');
@@ -13,6 +14,9 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
 const upload = multer({ storage });
+
+// Sub-routes
+router.use('/candidates-api', candidateRoutes);
 
 // Jobs Endpoints
 router.get('/jobs', jobsController.getJobs);
