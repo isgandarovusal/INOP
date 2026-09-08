@@ -1,24 +1,36 @@
-const express = require("express")
-const { productsController } = require("../controllers/products.controller")
-const { upload } = require("../middleware/multer.middleware")
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 
-const router = express.Router()
+const jobsController = require('../controllers/jobs.controller');
+const candidatesController = require('../controllers/candidates.controller');
+const applicationsController = require('../controllers/applications.controller');
 
-router.get("/", productsController.getAll)
-router.get("/:id", productsController.getOne)
+// Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+const upload = multer({ storage });
 
-router.post(
-    "/",
-    upload.array("images", 5),
-    productsController.add
-)
+// Jobs Endpoints
+router.get('/jobs', jobsController.getJobs);
+router.get('/jobs/:id', jobsController.getJobById);
+router.post('/jobs', jobsController.createJob);
+router.put('/jobs/:id', jobsController.updateJob);
+router.delete('/jobs/:id', jobsController.deleteJob);
 
-router.put(
-    "/:id",
-    upload.array("images", 5),
-    productsController.edit
-)
+// Candidates Endpoints
+router.get('/candidates', candidatesController.getCandidates);
+router.get('/candidates/:id', candidatesController.getCandidateById);
+router.post('/candidates', upload.single('cv'), candidatesController.createCandidate);
+router.delete('/candidates/:id', candidatesController.deleteCandidate);
 
-router.delete("/:id", productsController.delete)
+// Applications Endpoints
+router.get('/applications', applicationsController.getApplications);
+router.post('/applications', applicationsController.createApplication);
+router.patch('/applications/:id/status', applicationsController.updateApplicationStatus);
+router.delete('/applications/:id', applicationsController.deleteApplication);
 
-module.exports = { router }
+module.exports = router;

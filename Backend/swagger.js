@@ -1,200 +1,73 @@
-const swaggerJsdoc = require("swagger-jsdoc")
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const options = {
-    definition: {
-        openapi: "3.0.0",
-        info: {
-            title: "INOP API",
-            version: "1.0.0",
-            description: "INOP Product Management API"
-        },
-        servers: [
-            {
-                url: "http://localhost:3001"
-            }
-        ],
-        components: {
-            schemas: {
-                Product: {
-                    type: "object",
-                    required: ["title", "description"],
-                    properties: {
-                        _id: {
-                            type: "string",
-                            example: "66c123456789abcdef123456"
-                        },
-                        title: {
-                            type: "string",
-                            example: "Arthur"
-                        },
-                        description: {
-                            type: "string",
-                            example: "Product description"
-                        },
-                        images: {
-                            type: "array",
-                            items: {
-                                type: "string"
-                            },
-                            example: [
-                                "uploads/image1.jpg",
-                                "uploads/image2.jpg"
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        paths: {
-            "/products": {
-                get: {
-                    summary: "Get all products",
-                    responses: {
-                        200: {
-                            description: "List of products",
-                            content: {
-                                "application/json": {
-                                    schema: {
-                                        type: "array",
-                                        items: {
-                                            $ref: "#/components/schemas/Product"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                post: {
-                    summary: "Create a product",
-                    requestBody: {
-                        required: true,
-                        content: {
-                            "multipart/form-data": {
-                                schema: {
-                                    type: "object",
-                                    required: ["title", "description"],
-                                    properties: {
-                                        title: {
-                                            type: "string"
-                                        },
-                                        description: {
-                                            type: "string"
-                                        },
-                                        images: {
-                                            type: "array",
-                                            items: {
-                                                type: "string",
-                                                format: "binary"
-                                            },
-                                            maxItems: 5
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    responses: {
-                        200: {
-                            description: "Product created successfully"
-                        }
-                    }
-                }
-            },
-
-            "/products/{id}": {
-                get: {
-                    summary: "Get one product",
-                    parameters: [
-                        {
-                            name: "id",
-                            in: "path",
-                            required: true,
-                            schema: {
-                                type: "string"
-                            }
-                        }
-                    ],
-                    responses: {
-                        200: {
-                            description: "Product found"
-                        },
-                        404: {
-                            description: "Product not found"
-                        }
-                    }
-                },
-
-                put: {
-                    summary: "Update a product",
-                    parameters: [
-                        {
-                            name: "id",
-                            in: "path",
-                            required: true,
-                            schema: {
-                                type: "string"
-                            }
-                        }
-                    ],
-                    requestBody: {
-                        required: true,
-                        content: {
-                            "multipart/form-data": {
-                                schema: {
-                                    type: "object",
-                                    properties: {
-                                        title: {
-                                            type: "string"
-                                        },
-                                        description: {
-                                            type: "string"
-                                        },
-                                        images: {
-                                            type: "array",
-                                            items: {
-                                                type: "string",
-                                                format: "binary"
-                                            },
-                                            maxItems: 5
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    responses: {
-                        200: {
-                            description: "Product updated successfully"
-                        }
-                    }
-                },
-
-                delete: {
-                    summary: "Delete a product",
-                    parameters: [
-                        {
-                            name: "id",
-                            in: "path",
-                            required: true,
-                            schema: {
-                                type: "string"
-                            }
-                        }
-                    ],
-                    responses: {
-                        200: {
-                            description: "Product deleted successfully"
-                        },
-                        404: {
-                            description: "Product not found"
-                        }
-                    }
-                }
-            }
-        }
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'INOP Recruitment API',
+      version: '1.0.0',
+      description: 'INOP Recruitment & Operations Module API Documentation',
     },
-    apis: []
-}
+    servers: [
+      {
+        url: 'http://localhost:3001/api',
+        description: 'Local Server',
+      },
+    ],
+    components: {
+      schemas: {
+        Job: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '66c123456789abcdef123456' },
+            title: { type: 'string', example: 'Frontend Developer' },
+            department: { type: 'string', example: 'Engineering' },
+            description: { type: 'string', example: 'React & TypeScript developer' },
+          },
+        },
+        Candidate: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '66c123456789abcdef654321' },
+            name: { type: 'string', example: 'Əli Məmmədov' },
+            email: { type: 'string', example: 'ali@example.com' },
+            cvUrl: { type: 'string', example: '/uploads/cv.pdf' },
+          },
+        },
+        Application: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '66c123456789abcdef999999' },
+            jobId: { type: 'string', example: '66c123456789abcdef123456' },
+            candidateId: { type: 'string', example: '66c123456789abcdef654321' },
+            status: { type: 'string', example: 'Applied' },
+          },
+        },
+      },
+    },
+    paths: {
+      '/jobs': {
+        get: { summary: 'Bütün vakansiyaları gətir', responses: { 200: { description: 'Uğurlu' } } },
+        post: { summary: 'Yeni vakansiya yarat', responses: { 201: { description: 'Yaradıldı' } } },
+      },
+      '/candidates': {
+        get: { summary: 'Bütün namizədləri gətir', responses: { 200: { description: 'Uğurlu' } } },
+        post: { summary: 'Yeni namizəd əlavə et', responses: { 201: { description: 'Yaradıldı' } } },
+      },
+      '/applications': {
+        get: { summary: 'Bütün müraciətləri gətir', responses: { 200: { description: 'Uğurlu' } } },
+        post: { summary: 'Yeni müraciət yarat', responses: { 201: { description: 'Yaradıldı' } } },
+      },
+    },
+  },
+  apis: [], // Otomatik skanı söndürmək üçün boş saxlayırıq
+};
 
-module.exports = swaggerJsdoc(options)
+const swaggerSpec = swaggerJSDoc(options);
+
+const setupSwagger = (app) => {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+};
+
+module.exports = setupSwagger;

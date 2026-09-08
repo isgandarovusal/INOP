@@ -1,73 +1,44 @@
-const express = require("express")
-const mongoose = require("mongoose")
-const cors = require("cors")
-const multer = require("multer")
-const swaggerUi = require("swagger-ui-express")
-const swaggerSpec = require("./swagger")
-const { router } = require("./routes/route")
-const { uploadsDir } = require("./middleware/multer.middleware")
-require("dotenv").config()
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
-const app = express()
+const routes = require('./routes/route');
+const setupSwagger = require('./swagger');
 
-app.use(express.json())
-app.use(cors())
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-app.use("/uploads", express.static(uploadsDir))
+// Security Middlewares
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+// Rate Limiting (Brute-force/DDoS protection)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dəqiqə
+  max: 100, // IP başına maks 100 sorğu
+  message: { message: 'Çoxlu sorğu göndərildi, xahiş olunur 15 dəqiqə sonra yenidən cəhd edin.' }
+});
+app.use('/api/', limiter);
 
-app.get("/", (req, res) => {
-    res.status(200).send({
-        status: "ok",
-        message: "INOP Backend is running",
-    })
-})
+// Uploads static directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use("/products", router)
+// Swagger Documentation UI
+setupSwagger(app);
 
-app.use((err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        return res.status(400).send({
-            message: err.message,
-        })
-    }
+// API Routes
+app.use('/api', routes);
 
-    if (err) {
-        return res.status(500).send({
-            message: err.message || "Something went wrong",
-        })
-    }
-
-    next()
-})
-
-app.use((req, res) => {
-    res.status(404).send({
-        message: "Route not found",
-    })
-})
-
-const PORT = process.env.PORT || 2000
-const CS = process.env.CS
-
-if (!CS) {
-    console.error(
-        "Missing CS (MongoDB connection string) environment variable. Check your .env file."
-    )
-    process.exit(1)
-}
-
-mongoose
-    .connect(CS)
-    .then(() => {
-        console.log("db connected")
-
-        app.listen(PORT, () => {
-            console.log(`Port is listening in ${PORT}`)
-        })
-    })
-    .catch((err) => {
-        console.error("Failed to connect to MongoDB:", err.message)
-        process.exit(1)
-    })
+// MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI || process.env.CS;
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('db connected');
+    app.listen(PORT, () => console.log(`Port is listening in ${PORT}`));
+  })
+  .catch((err) => console.error('Failed to connect to MongoDB:', err));
