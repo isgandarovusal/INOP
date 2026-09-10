@@ -11,13 +11,10 @@ const JobForm: React.FC = () => {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState("");
-  const [department, setDepartment] = useState("");
-  const [location, setLocation] = useState("");
-  const [type, setType] = useState<"full-time" | "part-time" | "contract">("full-time");
+  const [position, setPosition] = useState("");
   const [description, setDescription] = useState("");
   const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
-  const [requiredExperience, setRequiredExperience] = useState(1);
+  const [experience, setExperience] = useState(1);
   const [status, setStatus] = useState<"open" | "closed" | "draft">("open");
 
   const [loading, setLoading] = useState(isEdit);
@@ -30,13 +27,10 @@ const JobForm: React.FC = () => {
     getJobById(id)
       .then((job) => {
         if (job) {
-          setTitle(job.title || "");
-          setDepartment(job.department || "");
-          setLocation(job.location || "");
-          setType(job.type || "full-time");
+          setPosition(job.position || "");
           setDescription(job.description || "");
           setRequiredSkills(job.requiredSkills || []);
-          setRequiredExperience(job.requiredExperience || 1);
+          setExperience(job.experience || 1);
           setStatus(job.status || "open");
         }
       })
@@ -44,14 +38,14 @@ const JobForm: React.FC = () => {
   }, [id]);
 
   const handleAiSuggestRequirements = () => {
-    if (!title.trim()) {
+    if (!position.trim()) {
       toast.error("Zəhmət olmasa əvvəlcə Vakansiyanın Adını daxil edin");
       return;
     }
     setAiGenerating(true);
     setTimeout(() => {
       let suggestedSkills = ["Git", "Problem Solving", "Teamwork"];
-      const titleLower = title.toLowerCase();
+      const titleLower = position.toLowerCase();
 
       if (titleLower.includes("react") || titleLower.includes("frontend")) {
         suggestedSkills = ["React", "TypeScript", "JavaScript", "Tailwind CSS", "REST API"];
@@ -69,7 +63,7 @@ const JobForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) {
+    if (!position.trim()) {
       setError("Vakansiya adı mütləqdir");
       return;
     }
@@ -79,13 +73,11 @@ const JobForm: React.FC = () => {
 
     try {
       const payload = {
-        title,
-        department,
-        location,
-        type,
+        position,
         description,
         requiredSkills,
-        requiredExperience,
+        preferredSkills: [],
+        experience,
         status,
       };
 
@@ -132,20 +124,10 @@ const JobForm: React.FC = () => {
           <input
             type="text"
             className="input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
             placeholder="məs: Senior React Developer"
             required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Departament</label>
-          <input
-            type="text"
-            className="input"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
           />
         </div>
 
@@ -155,8 +137,8 @@ const JobForm: React.FC = () => {
             type="number"
             className="input"
             min={0}
-            value={requiredExperience}
-            onChange={(e) => setRequiredExperience(Number(e.target.value))}
+            value={experience}
+            onChange={(e) => setExperience(Number(e.target.value))}
           />
         </div>
 
@@ -172,7 +154,7 @@ const JobForm: React.FC = () => {
               {aiGenerating ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />} AI ilə Tələbləri Generator Et
             </button>
           </div>
-          <TagInput tags={requiredSkills} onChange={setRequiredSkills} placeholder="Tələb olunan bacarıq..." />
+          <TagInput label="Tələb olunan bacarıqlar" values={requiredSkills} onChange={setRequiredSkills} placeholder="Tələb olunan bacarıq..." />
         </div>
 
         <div className="form-group form-group--full">

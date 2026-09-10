@@ -52,3 +52,10 @@ export async function updateCandidate(
   }
   return crud.update(id, fieldPatch);
 }
+
+export async function updateCandidateStatus(
+  id: string,
+  status: CandidateStatus,
+): Promise<Candidate | undefined> {
+  return crud.update(id, { status });
+}

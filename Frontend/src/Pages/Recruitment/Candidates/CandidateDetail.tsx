@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertCircle, ArrowLeft, CheckCircle2, FileText, Loader2, Sparkles, XCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, Sparkles, XCircle } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import { getCandidateById } from "../../../Services/candidatesService";
@@ -53,7 +53,7 @@ const CandidateDetail: React.FC = () => {
       <PageHeader
         title={candidate.name}
         subtitle={candidate.email || "İctimai Namizəd Profili"}
-        action={
+        actions={
           <button className="btn btn--secondary" onClick={() => navigate(-1)}>
             <ArrowLeft size={16} /> Geri
           </button>

@@ -39,6 +39,6 @@ const MONGO_URI = process.env.MONGO_URI || process.env.CS;
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('db connected');
-    app.listen(PORT, () => console.log(`Port is listening in ${PORT}`));
+    app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
   })
   .catch((err) => console.error('Failed to connect to MongoDB:', err));

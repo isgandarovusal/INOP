@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LayoutGrid, List, Plus, Search, Loader2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import KanbanBoard from "../../../Components/KanbanBoard";
-import type { Candidate } from "../../../Components/KanbanBoard";
+import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { calculateMatchScore } from "../../../Services/aiMatchService";
 import { getCandidates, updateCandidateStatus } from "../../../Services/candidatesService";
@@ -25,7 +25,7 @@ const CandidatesList: React.FC = () => {
     try {
       setLoading(true);
       const data = await getCandidates();
-      setCandidates(data as Candidate[]);
+      setCandidates(data);
     } catch (err) {
       toast.error("Namizədlər yüklənərkən xəta baş verdi.");
     } finally {
@@ -37,7 +37,7 @@ const CandidatesList: React.FC = () => {
     fetchCandidates();
   }, []);
 
-  const handleStatusChange = async (candidateId: string, newStatus: string) => {
+  const handleStatusChange = async (candidateId: string, newStatus: CandidateStatus) => {
     try {
       await updateCandidateStatus(candidateId, newStatus);
       setCandidates((prev) =>
@@ -52,9 +52,8 @@ const CandidatesList: React.FC = () => {
   const filteredCandidates = candidates.filter((c) => {
     const query = searchQuery.toLowerCase();
     const nameMatch = c.name.toLowerCase().includes(query);
-    const roleMatch = c.role.toLowerCase().includes(query);
     const skillMatch = c.skills?.some((s) => s.toLowerCase().includes(query));
-    return nameMatch || roleMatch || skillMatch;
+    return nameMatch || skillMatch;
   });
 
   return (
@@ -62,7 +61,7 @@ const CandidatesList: React.FC = () => {
       <PageHeader
         title="Namizədlər"
         subtitle="Bütün müraciət edən namizədlərin siyahısı və status idarəetməsi"
-        action={
+        actions={
           <button
             className="btn-primary"
             onClick={() => navigate("/app/recruitment/candidates/new")}
@@ -128,7 +127,7 @@ const CandidatesList: React.FC = () => {
             </thead>
             <tbody>
               {filteredCandidates.map((candidate) => {
-                const score = calculateMatchScore(candidate, targetRequirements);
+                const score = calculateMatchScore(candidate, targetRequirements).score;
                 return (
                   <tr
                     key={candidate.id}
@@ -136,7 +135,7 @@ const CandidatesList: React.FC = () => {
                     style={{ cursor: "pointer" }}
                   >
                     <td style={{ fontWeight: 500 }}>{candidate.name}</td>
-                    <td>{candidate.role}</td>
+                    <td>{candidate.education}</td>
                     <td>{candidate.experience} il</td>
                     <td>
                       <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>

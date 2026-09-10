@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertCircle, ArrowRight, FileText, Loader2, Sparkles, UploadCloud, X } from "lucide-react";
+import { AlertCircle, FileText, Loader2, Sparkles, UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
@@ -10,6 +10,7 @@ import {
   updateCandidate,
 } from "../../../Services/candidatesService";
 import { parseCVText, calculateMatchScore } from "../../../Services/aiMatchService";
+import type { CandidateStatus } from "../../../Types/recruitment";
 
 const ACCEPTED_CV_TYPES = [
   "application/pdf",
@@ -34,8 +35,6 @@ const CandidateForm: React.FC = () => {
   const [certificates, setCertificates] = useState<string[]>([]);
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [existingCvName, setExistingCvName] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState(false);
-  
   // AI Raw Text Extraction State
   const [rawCvText, setRawCvText] = useState("");
   const [aiParsing, setAiParsing] = useState(false);
@@ -57,11 +56,37 @@ const CandidateForm: React.FC = () => {
           setSkills(candidate.skills || []);
           setLanguages(candidate.languages || []);
           setCertificates(candidate.certificates || []);
-          setExistingCvName(candidate.cvUrl ? "Mövcut CV Faylı" : null);
+          setExistingCvName(candidate.cv?.name || null);
         }
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const validateCvFile = (file: File): boolean => {
+    if (!ACCEPTED_CV_TYPES.includes(file.type)) {
+      toast.error("CV yalnız PDF, DOC və ya DOCX formatında ola bilər");
+      return false;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("CV faylının ölçüsü maksimum 5 MB ola bilər");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleCvChange = (file: File | null) => {
+    if (!file) {
+      setCvFile(null);
+      return;
+    }
+
+    if (validateCvFile(file)) {
+      setCvFile(file);
+      setExistingCvName(null);
+    }
+  };
 
   const handleAiParse = () => {
     if (!rawCvText.trim()) {
@@ -105,15 +130,19 @@ const CandidateForm: React.FC = () => {
         skills,
         languages,
         certificates,
-        status: matchResult.suggestedStatus,
-        aiScore: matchResult.score,
+        cvFile,
+        status: (
+          matchResult.suggestedStatus === "applied"
+            ? "new"
+            : matchResult.suggestedStatus
+        ) as CandidateStatus,
       };
 
       if (isEdit && id) {
         await updateCandidate(id, payload);
         toast.success("Namizəd məlumatları yeniləndi");
       } else {
-        await createCandidate(payload as any);
+        await createCandidate(payload);
         toast.success("Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!");
       }
       navigate("/app/recruitment/candidates");
@@ -170,6 +199,72 @@ const CandidateForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-group form-group--full">
+          <label>CV faylı</label>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCvChange(e.dataTransfer.files?.[0] || null);
+            }}
+            style={{
+              border: "1px dashed var(--border-color)",
+              borderRadius: "8px",
+              padding: "18px",
+              textAlign: "center",
+            }}
+          >
+            {cvFile ? (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <FileText size={20} />
+                  <span>{cvFile.name}</span>
+                  <small>({(cvFile.size / 1024 / 1024).toFixed(2)} MB)</small>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn--secondary"
+                  onClick={() => setCvFile(null)}
+                  aria-label="CV faylını sil"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : existingCvName ? (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "10px" }}>
+                <FileText size={20} />
+                <span>{existingCvName}</span>
+              </div>
+            ) : null}
+
+            <label
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+              }}
+            >
+              <UploadCloud size={18} />
+              {cvFile || existingCvName ? "Başqa CV seç" : "CV seç"}
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                style={{ display: "none" }}
+                onChange={(e) => handleCvChange(e.target.files?.[0] || null)}
+              />
+            </label>
+
+            <div style={{ marginTop: "8px", fontSize: "12px", opacity: 0.7 }}>
+              PDF, DOC və DOCX — maksimum 5 MB
+            </div>
+          </div>
+        </div>
+
         <div className="form-group">
           <label>Ad və Soyad *</label>
           <input
@@ -214,7 +309,7 @@ const CandidateForm: React.FC = () => {
 
         <div className="form-group form-group--full">
           <label>Bacarıqlar (Skills)</label>
-          <TagInput tags={skills} onChange={setSkills} placeholder="Bacarıq əlavə et..." />
+          <TagInput label="Bacarıqlar" values={skills} onChange={setSkills} placeholder="Bacarıq əlavə et..." />
         </div>
 
         <div className="form-actions" style={{ marginTop: "20px" }}>
