@@ -2,14 +2,8 @@ import React, { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2, LogIn, Sparkles } from "lucide-react";
 import { useAuth } from "../../../Context/AuthContext";
-import { ROLE_LABELS } from "../../../Utils/permissions";
 
-const DEMO_ACCOUNTS = [
-  { role: "admin" as const, email: "admin@inop.com", password: "password123" },
-  { role: "hr" as const, email: "hr@inop.com", password: "password123" },
-  { role: "auditor" as const, email: "auditor@inop.com", password: "password123" },
-  { role: "manager" as const, email: "manager@inop.com", password: "password123" },
-];
+
 
 const Login: React.FC = () => {
   const { user, isLoading, login } = useAuth();
@@ -40,11 +34,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const fillDemo = (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setError(null);
-  };
+  
 
   return (
     <div className="auth-page">
@@ -117,25 +107,7 @@ const Login: React.FC = () => {
           </form>
         </div>
 
-        <div className="demo-card anim-in" style={{ animationDelay: "0.14s" }}>
-          <p className="demo-card__title">Demo accounts</p>
-          <p className="demo-card__hint">
-            No backend yet — data lives in this browser. Pick a role to explore its view.
-          </p>
-          <div className="demo-card__list">
-            {DEMO_ACCOUNTS.map((acc) => (
-              <button
-                type="button"
-                key={acc.role}
-                className="demo-account"
-                onClick={() => fillDemo(acc.email, acc.password)}
-              >
-                <span className="demo-account__role">{ROLE_LABELS[acc.role]}</span>
-                <span className="demo-account__email">{acc.email}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        
       </div>
     </div>
   );

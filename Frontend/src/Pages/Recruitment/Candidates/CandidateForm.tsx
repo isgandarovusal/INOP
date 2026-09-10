@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertCircle, ArrowRight, FileText, Loader2, UploadCloud, X } from "lucide-react";
+import { AlertCircle, ArrowRight, FileText, Loader2, Sparkles, UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
@@ -9,6 +9,7 @@ import {
   getCandidateById,
   updateCandidate,
 } from "../../../Services/candidatesService";
+import { parseCVText, calculateMatchScore } from "../../../Services/aiMatchService";
 
 const ACCEPTED_CV_TYPES = [
   "application/pdf",
@@ -16,7 +17,7 @@ const ACCEPTED_CV_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const CandidateForm: React.FC = () => {
   const { id } = useParams();
@@ -34,6 +35,10 @@ const CandidateForm: React.FC = () => {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [existingCvName, setExistingCvName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  
+  // AI Raw Text Extraction State
+  const [rawCvText, setRawCvText] = useState("");
+  const [aiParsing, setAiParsing] = useState(false);
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -43,78 +48,55 @@ const CandidateForm: React.FC = () => {
     if (!id) return;
     getCandidateById(id)
       .then((candidate) => {
-        if (!candidate) return;
-        setName(candidate.name);
-        setEmail(candidate.email);
-        setPhone(candidate.phone);
-        setEducation(candidate.education);
-        setExperience(candidate.experience);
-        setSkills(candidate.skills);
-        setLanguages(candidate.languages);
-        setCertificates(candidate.certificates);
-        setExistingCvName(candidate.cv?.name ?? null);
+        if (candidate) {
+          setName(candidate.name || "");
+          setEmail(candidate.email || "");
+          setPhone(candidate.phone || "");
+          setEducation(candidate.education || "");
+          setExperience(candidate.experience || 0);
+          setSkills(candidate.skills || []);
+          setLanguages(candidate.languages || []);
+          setCertificates(candidate.certificates || []);
+          setExistingCvName(candidate.cvUrl ? "Mövcut CV Faylı" : null);
+        }
       })
-      .catch(() => {
-        toast.error("Namizəd məlumatları yüklənərkən xəta baş verdi.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, [id]);
 
-  const addFile = (fileList: FileList | null) => {
-    const file = fileList?.[0];
-    if (!file) return;
-
-    // 1. Format Yoxlanışı (.pdf, .doc, .docx)
-    if (!ACCEPTED_CV_TYPES.includes(file.type)) {
-      const msg = "Yalnız PDF və ya DOCX formatlı CV faylları qəbul olunur.";
-      setError(msg);
-      toast.error(msg);
+  const handleAiParse = () => {
+    if (!rawCvText.trim()) {
+      toast.error("Zəhmət olmasa təhlil üçün CV mətnini daxil edin");
       return;
     }
-
-    // 2. Fayl Ölçüsü Yoxlanışı (Max 5MB)
-    if (file.size > MAX_FILE_SIZE) {
-      const msg = "CV faylının ölçüsü 5MB-dan çox ola bilməz.";
-      setError(msg);
-      toast.error(msg);
-      return;
-    }
-
-    setError(null);
-    setCvFile(file);
-    setExistingCvName(null);
-    toast.success("CV faylı uğurla seçildi.");
-  };
-
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
-    else if (e.type === "dragleave") setDragActive(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    addFile(e.dataTransfer.files);
+    setAiParsing(true);
+    setTimeout(() => {
+      const parsed = parseCVText(rawCvText);
+      if (parsed.extractedSkills.length > 0) {
+        setSkills((prev) => Array.from(new Set([...prev, ...parsed.extractedSkills])));
+      }
+      if (parsed.extractedExperience) {
+        setExperience(parsed.extractedExperience);
+      }
+      setAiParsing(false);
+      toast.success("AI CV-ni uğurla analiz etdi və sahələri doldurdu!");
+    }, 600);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      const msg = "Ad və e-poçt xanaları mütləq doldurulmalıdır.";
-      setError(msg);
-      toast.error(msg);
+    if (!name.trim()) {
+      setError("Ad və soyad mütləqdir");
       return;
     }
 
     setSaving(true);
     setError(null);
+
     try {
-      const input = {
+      // AI Auto-Status Routing Calculation
+      const matchResult = calculateMatchScore({ skills, experience }, { skills: ["React", "TypeScript"], experience: 2 });
+      
+      const payload = {
         name,
         email,
         phone,
@@ -123,20 +105,20 @@ const CandidateForm: React.FC = () => {
         skills,
         languages,
         certificates,
-        cvFile,
+        status: matchResult.suggestedStatus,
+        aiScore: matchResult.score,
       };
+
       if (isEdit && id) {
-        await updateCandidate(id, cvFile ? input : { ...input, cvFile: undefined });
-        toast.success("Namizəd məlumatları uğurla yeniləndi!");
+        await updateCandidate(id, payload);
+        toast.success("Namizəd məlumatları yeniləndi");
       } else {
-        await createCandidate(input);
-        toast.success("Yeni namizəd uğurla əlavə olundu!");
+        await createCandidate(payload as any);
+        toast.success("Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!");
       }
       navigate("/app/recruitment/candidates");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Şəbəkə və ya server xətası baş verdi.";
-      setError(msg);
-      toast.error(msg);
+    } catch (err: any) {
+      setError(err.message || "Xəta baş verdi");
     } finally {
       setSaving(false);
     }
@@ -144,161 +126,107 @@ const CandidateForm: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
-        <Loader2 size={24} className="spin" />
+      <div className="page-loading">
+        <Loader2 className="spin" size={32} />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="candidate-form-page">
       <PageHeader
-        title={isEdit ? "Edit candidate" : "Add candidate"}
-        subtitle="Structured profile used for search, filtering and ranking."
+        title={isEdit ? "Namizədi Redaktə Et" : "Yeni Namizəd / CV Analizi"}
+        subtitle="Mənbələrdən gələn CV-ləri AI ilə təhlil edin və avtomatik ATS-ə yerləşdirin"
       />
 
-      <div className="form-card">
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Full name</label>
-              <input
-                className="input-field"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Elvin Guliyev"
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="input-field"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-              />
-            </div>
-          </div>
+      {error && (
+        <div className="alert alert--danger">
+          <AlertCircle size={18} />
+          <span>{error}</span>
+        </div>
+      )}
 
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Phone</label>
-              <input
-                className="input-field"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+994 50 000 00 00"
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Experience (years)</label>
-              <input
-                type="number"
-                min={0}
-                className="input-field"
-                value={experience}
-                onChange={(e) => setExperience(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Education</label>
-            <input
-              className="input-field"
-              value={education}
-              onChange={(e) => setEducation(e.target.value)}
-              placeholder="e.g. BSc Computer Science, ADA University"
-            />
-          </div>
-
-          <TagInput label="Skills" values={skills} onChange={setSkills} placeholder="Add a skill" />
-          <TagInput
-            label="Languages"
-            values={languages}
-            onChange={setLanguages}
-            placeholder="Add a language"
-          />
-          <TagInput
-            label="Certificates"
-            values={certificates}
-            onChange={setCertificates}
-            placeholder="Add a certificate"
-          />
-
-          <div className="form-group form-group--images">
-            <label className="form-label">CV (PDF, DOCX - Max 5MB)</label>
-            {existingCvName && !cvFile && (
-              <div className="file-list" style={{ marginBottom: 10 }}>
-                <div className="file-chip">
-                  <FileText size={14} />
-                  <span>{existingCvName} (current)</span>
-                </div>
-              </div>
-            )}
-            <div
-              onDragEnter={handleDrag}
-              onDragOver={handleDrag}
-              onDragLeave={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("cv-input")?.click()}
-              className={`drop-zone ${dragActive ? "drop-zone--active" : ""}`}
-            >
-              <div className="drop-zone__icon">
-                <UploadCloud size={18} color="#a5b4fc" />
-              </div>
-              <p className="drop-zone__title">Drag & drop a CV here</p>
-              <p className="drop-zone__hint">or click to browse · PDF, DOCX (Max 5MB)</p>
-              <input
-                id="cv-input"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                className="drop-zone__input"
-                onChange={(e) => addFile(e.target.files)}
-              />
-            </div>
-            {cvFile && (
-              <div className="file-list">
-                <div className="file-chip">
-                  <FileText size={14} />
-                  <span>{cvFile.name}</span>
-                  <button type="button" onClick={() => setCvFile(null)} aria-label="Remove file">
-                    <X size={13} />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {error && (
-            <p className="form-error form-error--submit">
-              <AlertCircle size={12} /> {error}
-            </p>
-          )}
-
-          <div className="form-actions">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => navigate("/app/recruitment/candidates")}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? (
-                <>
-                  <Loader2 size={16} className="spin" /> Saving…
-                </>
-              ) : (
-                <>
-                  {isEdit ? "Save changes" : "Add candidate"} <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+      {/* AI Quick Paste Section */}
+      <div style={{ background: "var(--bg-card)", padding: "16px", borderRadius: "8px", marginBottom: "20px", border: "1px solid var(--border-color)" }}>
+        <h3 style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: 0, fontSize: "16px" }}>
+          <Sparkles size={18} color="var(--primary-color)" /> AI CV İdxalı & Analizi
+        </h3>
+        <textarea
+          rows={4}
+          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)" }}
+          placeholder="CV mətnini (LinkedIn profili, email və ya mətni) bura yapışdırın..."
+          value={rawCvText}
+          onChange={(e) => setRawCvText(e.target.value)}
+        />
+        <button
+          type="button"
+          onClick={handleAiParse}
+          disabled={aiParsing}
+          style={{ marginTop: "8px", padding: "8px 16px", background: "var(--primary-color)", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+        >
+          {aiParsing ? <Loader2 size={16} className="spin" /> : <Sparkles size={16} />}
+          AI ilə CV-ni Analiz Et
+        </button>
       </div>
+
+      <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-group">
+          <label>Ad və Soyad *</label>
+          <input
+            type="text"
+            className="input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            className="input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Telefon</label>
+          <input
+            type="text"
+            className="input"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Təcrübə (İl)</label>
+          <input
+            type="number"
+            className="input"
+            min={0}
+            value={experience}
+            onChange={(e) => setExperience(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="form-group form-group--full">
+          <label>Bacarıqlar (Skills)</label>
+          <TagInput tags={skills} onChange={setSkills} placeholder="Bacarıq əlavə et..." />
+        </div>
+
+        <div className="form-actions" style={{ marginTop: "20px" }}>
+          <button type="button" className="btn btn--secondary" onClick={() => navigate(-1)}>
+            Ləğv Et
+          </button>
+          <button type="submit" className="btn btn--primary" disabled={saving}>
+            {saving ? <Loader2 size={16} className="spin" /> : null}
+            {isEdit ? "Yenilə" : "AI Analizi İlə Saxla & ATS-ə Yönləndir"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
