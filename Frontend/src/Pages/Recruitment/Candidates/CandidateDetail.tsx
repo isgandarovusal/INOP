@@ -54,9 +54,18 @@ const CandidateDetail: React.FC = () => {
         title={candidate.name}
         subtitle={candidate.email || "İctimai Namizəd Profili"}
         actions={
-          <button className="btn btn--secondary" onClick={() => navigate(-1)}>
-            <ArrowLeft size={16} /> Geri
-          </button>
+          <>
+            <button
+              className="btn-primary"
+              onClick={() => navigate(`/app/recruitment/candidates/${candidate.id}/edit`)}
+            >
+              Redaktə et
+            </button>
+
+            <button className="btn-primary" onClick={() => navigate(-1)}>
+              <ArrowLeft size={16} /> Geri
+            </button>
+          </>
         }
       />
 

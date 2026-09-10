@@ -118,9 +118,6 @@ const CandidateForm: React.FC = () => {
     setError(null);
 
     try {
-      // AI Auto-Status Routing Calculation
-      const matchResult = calculateMatchScore({ skills, experience }, { skills: ["React", "TypeScript"], experience: 2 });
-      
       const payload = {
         name,
         email,
@@ -131,18 +128,30 @@ const CandidateForm: React.FC = () => {
         languages,
         certificates,
         cvFile,
-        status: (
-          matchResult.suggestedStatus === "applied"
-            ? "new"
-            : matchResult.suggestedStatus
-        ) as CandidateStatus,
       };
 
       if (isEdit && id) {
+        // Edit zamanı mövcud ATS statusunu qoruyuruq.
         await updateCandidate(id, payload);
         toast.success("Namizəd məlumatları yeniləndi");
       } else {
-        await createCandidate(payload);
+        // Yeni namizəd üçün AI uyğunlaşdırma ilə ilkin ATS statusu təyin olunur.
+        const matchResult = calculateMatchScore(
+          { skills, experience },
+          {
+            skills: ["React", "TypeScript", "Node.js", "SQL"],
+            experience: 2,
+          },
+        );
+
+        await createCandidate({
+          ...payload,
+          status: (
+            matchResult.suggestedStatus === "applied"
+              ? "new"
+              : matchResult.suggestedStatus
+          ) as CandidateStatus,
+        });
         toast.success("Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!");
       }
       navigate("/app/recruitment/candidates");
@@ -175,153 +184,254 @@ const CandidateForm: React.FC = () => {
         </div>
       )}
 
-      {/* AI Quick Paste Section */}
-      <div style={{ background: "var(--bg-card)", padding: "16px", borderRadius: "8px", marginBottom: "20px", border: "1px solid var(--border-color)" }}>
-        <h3 style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: 0, fontSize: "16px" }}>
-          <Sparkles size={18} color="var(--primary-color)" /> AI CV İdxalı & Analizi
-        </h3>
-        <textarea
-          rows={4}
-          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)" }}
-          placeholder="CV mətnini (LinkedIn profili, email və ya mətni) bura yapışdırın..."
-          value={rawCvText}
-          onChange={(e) => setRawCvText(e.target.value)}
-        />
-        <button
-          type="button"
-          onClick={handleAiParse}
-          disabled={aiParsing}
-          style={{ marginTop: "8px", padding: "8px 16px", background: "var(--primary-color)", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
-        >
-          {aiParsing ? <Loader2 size={16} className="spin" /> : <Sparkles size={16} />}
-          AI ilə CV-ni Analiz Et
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="form-grid">
-        <div className="form-group form-group--full">
-          <label>CV faylı</label>
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleCvChange(e.dataTransfer.files?.[0] || null);
-            }}
-            style={{
-              border: "1px dashed var(--border-color)",
-              borderRadius: "8px",
-              padding: "18px",
-              textAlign: "center",
-            }}
-          >
-            {cvFile ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FileText size={20} />
-                  <span>{cvFile.name}</span>
-                  <small>({(cvFile.size / 1024 / 1024).toFixed(2)} MB)</small>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn--secondary"
-                  onClick={() => setCvFile(null)}
-                  aria-label="CV faylını sil"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ) : existingCvName ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "10px" }}>
-                <FileText size={20} />
-                <span>{existingCvName}</span>
-              </div>
-            ) : null}
-
-            <label
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                cursor: "pointer",
-              }}
-            >
-              <UploadCloud size={18} />
-              {cvFile || existingCvName ? "Başqa CV seç" : "CV seç"}
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                style={{ display: "none" }}
-                onChange={(e) => handleCvChange(e.target.files?.[0] || null)}
-              />
-            </label>
-
-            <div style={{ marginTop: "8px", fontSize: "12px", opacity: 0.7 }}>
-              PDF, DOC və DOCX — maksimum 5 MB
+      {/* AI CV Import & Analysis */}
+      <div className="candidate-form-card">
+        <section className="candidate-form-section">
+          <div className="candidate-form-section__header">
+            <div className="candidate-form-section__icon">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="candidate-form-section__title">
+                AI CV İdxalı & Analizi
+              </h3>
+              <p className="candidate-form-section__description">
+                CV mətnini daxil edin və namizəd məlumatlarını AI ilə avtomatik çıxarın.
+              </p>
             </div>
           </div>
-        </div>
 
-        <div className="form-group">
-          <label>Ad və Soyad *</label>
-          <input
-            type="text"
-            className="input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
+          <div className="candidate-ai-card">
+            <div className="candidate-ai-card__header">
+              <Sparkles size={18} />
+              <h4 className="candidate-ai-card__title">
+                CV mətnini AI ilə analiz edin
+              </h4>
+            </div>
 
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            className="input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+            <textarea
+              className="candidate-ai-textarea"
+              rows={4}
+              placeholder="CV mətnini (LinkedIn profili, email və ya mətni) bura yapışdırın..."
+              value={rawCvText}
+              onChange={(e) => setRawCvText(e.target.value)}
+            />
 
-        <div className="form-group">
-          <label>Telefon</label>
-          <input
-            type="text"
-            className="input"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+            <button
+              type="button"
+              className="btn-primary candidate-ai-button"
+              onClick={handleAiParse}
+              disabled={aiParsing}
+            >
+              {aiParsing ? (
+                <Loader2 size={16} className="spin" />
+              ) : (
+                <Sparkles size={16} />
+              )}
+              AI ilə CV-ni Analiz Et
+            </button>
+          </div>
+        </section>
 
-        <div className="form-group">
-          <label>Təcrübə (İl)</label>
-          <input
-            type="number"
-            className="input"
-            min={0}
-            value={experience}
-            onChange={(e) => setExperience(Number(e.target.value))}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          {/* CV Upload */}
+          <section className="candidate-form-section">
+            <div className="candidate-form-section__header">
+              <div className="candidate-form-section__icon">
+                <FileText size={20} />
+              </div>
+              <div>
+                <h3 className="candidate-form-section__title">CV sənədi</h3>
+                <p className="candidate-form-section__description">
+                  Namizədin CV faylını əlavə edin və ya mövcud faylı dəyişdirin.
+                </p>
+              </div>
+            </div>
 
-        <div className="form-group form-group--full">
-          <label>Bacarıqlar (Skills)</label>
-          <TagInput label="Bacarıqlar" values={skills} onChange={setSkills} placeholder="Bacarıq əlavə et..." />
-        </div>
+            <div
+              className="candidate-cv-upload"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleCvChange(e.dataTransfer.files?.[0] || null);
+              }}
+            >
+              {cvFile ? (
+                <div className="candidate-cv-upload__file">
+                  <div className="candidate-cv-upload__file-info">
+                    <FileText size={20} />
+                    <span className="candidate-cv-upload__file-name">
+                      {cvFile.name}
+                    </span>
+                    <small>
+                      ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </small>
+                  </div>
 
-        <div className="form-actions" style={{ marginTop: "20px" }}>
-          <button type="button" className="btn btn--secondary" onClick={() => navigate(-1)}>
-            Ləğv Et
-          </button>
-          <button type="submit" className="btn btn--primary" disabled={saving}>
-            {saving ? <Loader2 size={16} className="spin" /> : null}
-            {isEdit ? "Yenilə" : "AI Analizi İlə Saxla & ATS-ə Yönləndir"}
-          </button>
-        </div>
-      </form>
+                  <button
+                    type="button"
+                    className="btn-secondary candidate-cv-upload__remove"
+                    onClick={() => setCvFile(null)}
+                    aria-label="CV faylını sil"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : existingCvName ? (
+                <div className="candidate-cv-upload__file">
+                  <div className="candidate-cv-upload__file-info">
+                    <FileText size={20} />
+                    <span className="candidate-cv-upload__file-name">
+                      {existingCvName}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="candidate-cv-upload__empty">
+                  <div className="candidate-cv-upload__icon">
+                    <UploadCloud size={22} />
+                  </div>
+                  <p className="candidate-cv-upload__title">
+                    CV faylını buraya sürükləyin
+                  </p>
+                  <p className="candidate-cv-upload__hint">
+                    PDF, DOC və DOCX — maksimum 5 MB
+                  </p>
+                </div>
+              )}
+
+              <div style={{ textAlign: "center", marginTop: "14px" }}>
+                <label className="btn-secondary" style={{ cursor: "pointer" }}>
+                  <UploadCloud size={16} />
+                  {cvFile || existingCvName ? "Başqa CV seç" : "CV seç"}
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    style={{ display: "none" }}
+                    onChange={(e) =>
+                      handleCvChange(e.target.files?.[0] || null)
+                    }
+                  />
+                </label>
+              </div>
+
+              {(cvFile || existingCvName) && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    textAlign: "center",
+                    fontSize: "12px",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  PDF, DOC və DOCX — maksimum 5 MB
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Candidate Information */}
+          <section className="candidate-form-section">
+            <div className="candidate-form-section__header">
+              <div className="candidate-form-section__icon">
+                <FileText size={20} />
+              </div>
+              <div>
+                <h3 className="candidate-form-section__title">
+                  Namizəd məlumatları
+                </h3>
+                <p className="candidate-form-section__description">
+                  Əsas namizəd məlumatlarını daxil edin və ya AI tərəfindən çıxarılan məlumatları yoxlayın.
+                </p>
+              </div>
+            </div>
+
+            <div className="candidate-fields">
+              <div className="form-group">
+                <label className="candidate-field-label">
+                  Ad və Soyad <span className="candidate-field-required">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="input"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="candidate-field-label">Email</label>
+                <input
+                  type="email"
+                  className="input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="candidate-field-label">Telefon</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="candidate-field-label">Təcrübə (İl)</label>
+                <input
+                  type="number"
+                  className="input"
+                  min={0}
+                  value={experience}
+                  onChange={(e) => setExperience(Number(e.target.value))}
+                />
+              </div>
+
+              <div className="form-group form-group--full">
+                <label className="candidate-field-label">
+                  Bacarıqlar (Skills)
+                </label>
+                <TagInput
+                  label="Bacarıqlar"
+                  values={skills}
+                  onChange={setSkills}
+                  placeholder="Bacarıq əlavə et..."
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Actions */}
+          <div className="candidate-form-actions">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => navigate(-1)}
+            >
+              Ləğv Et
+            </button>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={saving}
+            >
+              {saving ? <Loader2 size={16} className="spin" /> : null}
+              {isEdit
+                ? "Yenilə"
+                : "AI Analizi İlə Saxla & ATS-ə Yönləndir"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

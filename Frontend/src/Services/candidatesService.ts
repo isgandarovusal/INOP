@@ -18,6 +18,7 @@ export interface CandidateInput {
   languages: string[];
   certificates: string[];
   cvFile?: File | null;
+  status?: CandidateStatus;
 }
 
 function toCandidateFile(file?: File | null): CandidateFile | null {
@@ -29,7 +30,7 @@ export async function createCandidate(input: CandidateInput): Promise<Candidate>
   const { cvFile, ...rest } = input;
   const candidate: Candidate = {
     id: generateId("cand"),
-    status: "new",
+    status: input.status ?? "new",
     createdAt: new Date().toISOString(),
     cv: toCandidateFile(cvFile),
     ...rest,
