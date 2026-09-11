@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import azFlag from "../../assets/flags/az.svg";
+import gbFlag from "../../assets/flags/gb.svg";
+import ruFlag from "../../assets/flags/ru.svg";
+
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -16,7 +20,6 @@ import {
   Menu,
   X,
   Sparkles,
-  Languages,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Context/AuthContext";
@@ -26,6 +29,7 @@ import {
   type Section,
 } from "../../Utils/permissions";
 import i18n, { changeLanguage } from "../../i18n";
+import "../../Styles/admin.css";
 
 interface NavItem {
   to: string;
@@ -228,51 +232,88 @@ const Sidebar: React.FC = () => {
           INOP
         </h2>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "8px 12px 14px",
-          }}
-        >
-          <Languages size={16} />
-          <label
-            htmlFor="inop-language"
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              flex: 1,
-            }}
-          >
-            {t("language.label")}
-          </label>
+          <div className="admin-language-panel">
+            <button
+              type="button"
+              className={`admin-language-option ${
+                currentLanguage === "az"
+                  ? "admin-language-option--active"
+                  : ""
+              }`}
+              onClick={() => changeLanguage("az")}
+              aria-pressed={currentLanguage === "az"}
+            >
+              <img
+                src={azFlag}
+                alt=""
+                className="admin-language-flag"
+              />
+              <span
+                style={{
+                  color: "#ffffff",
+                  opacity: 1,
+                  visibility: "visible",
+                  fontWeight: 800,
+                }}
+              >
+                AZE
+              </span>
+            </button>
 
-          <select
-            id="inop-language"
-            value={currentLanguage}
-            onChange={(event) =>
-              changeLanguage(
-                event.target.value as "az" | "en" | "ru"
-              )
-            }
-            aria-label={t("language.label")}
-            style={{
-              border: "1px solid rgba(255,255,255,0.15)",
-              borderRadius: "6px",
-              padding: "4px 6px",
-              background: "transparent",
-              color: "inherit",
-              fontSize: "12px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            <option value="az">{t("language.az")}</option>
-            <option value="en">{t("language.en")}</option>
-            <option value="ru">{t("language.ru")}</option>
-          </select>
-        </div>
+            <button
+              type="button"
+              className={`admin-language-option ${
+                currentLanguage === "en"
+                  ? "admin-language-option--active"
+                  : ""
+              }`}
+              onClick={() => changeLanguage("en")}
+              aria-pressed={currentLanguage === "en"}
+            >
+              <img
+                src={gbFlag}
+                alt=""
+                className="admin-language-flag"
+              />
+              <span
+                style={{
+                  color: "#ffffff",
+                  opacity: 1,
+                  visibility: "visible",
+                  fontWeight: 800,
+                }}
+              >
+                ENG
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={`admin-language-option ${
+                currentLanguage === "ru"
+                  ? "admin-language-option--active"
+                  : ""
+              }`}
+              onClick={() => changeLanguage("ru")}
+              aria-pressed={currentLanguage === "ru"}
+            >
+              <img
+                src={ruFlag}
+                alt=""
+                className="admin-language-flag"
+              />
+              <span
+                style={{
+                  color: "#ffffff",
+                  opacity: 1,
+                  visibility: "visible",
+                  fontWeight: 800,
+                }}
+              >
+                RUS
+              </span>
+            </button>
+          </div>
 
         {visibleGroups.map((group) => (
           <div className="admin-sidebar__group" key={group.titleKey}>
