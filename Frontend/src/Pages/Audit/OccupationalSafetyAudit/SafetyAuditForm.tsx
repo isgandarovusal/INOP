@@ -73,7 +73,7 @@ export default function SafetyAuditForm() {
     });
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!restaurantId.trim()) {
@@ -99,9 +99,14 @@ export default function SafetyAuditForm() {
       scorePercentage,
     };
 
-    createOccupationalSafetyAudit(audit);
-
-    navigate("/app/audit/safety");
+    try {
+      await createOccupationalSafetyAudit(audit);
+      navigate("/app/audit/safety");
+    } catch (error) {
+      console.error("Safety audit creation failed:", error);
+      window.alert("Audit yadda saxlanarkən xəta baş verdi.");
+      setSubmitting(false);
+    }
   }
 
   return (

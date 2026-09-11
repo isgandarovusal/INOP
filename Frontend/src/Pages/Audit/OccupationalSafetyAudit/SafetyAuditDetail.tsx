@@ -11,6 +11,7 @@ import {
 import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
 import { getOccupationalSafetyAuditById } from "../../../Services/occupationalSafetyAuditsService";
+import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
 export default function SafetyAuditDetail() {
   const { id } = useParams();
@@ -277,6 +278,8 @@ export default function SafetyAuditDetail() {
           </div>
         </div>
       </section>
+
+      <AuditLifecyclePanel auditId={id ?? audit?.id ?? ""} />
     </div>
   );
 }

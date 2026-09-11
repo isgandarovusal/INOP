@@ -120,7 +120,7 @@ export default function StandardAuditForm() {
     );
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!restaurantId.trim()) {
@@ -179,7 +179,14 @@ export default function StandardAuditForm() {
       passed,
     };
 
-    createStandardAudit(audit);
+    try {
+      await createStandardAudit(audit);
+    } catch (error) {
+      console.error("Standard audit creation failed:", error);
+      window.alert("Audit yadda saxlanarkən xəta baş verdi.");
+      setSubmitting(false);
+      return;
+    }
 
     navigate("/app/audit/standard");
   }

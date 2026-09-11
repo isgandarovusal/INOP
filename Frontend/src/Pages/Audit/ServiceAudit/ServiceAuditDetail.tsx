@@ -12,6 +12,7 @@ import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
 import { getServiceAuditById } from "../../../Services/serviceAuditsService";
 import type { ServiceAudit } from "../../../Types/Audit";
+import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
 const answerLabel = {
   yes: "Bəli",
@@ -266,6 +267,8 @@ if (!id) return;
           </div>
         </div>
       </section>
+
+      <AuditLifecyclePanel auditId={id ?? audit?.id ?? ""} />
     </div>
   );
 }

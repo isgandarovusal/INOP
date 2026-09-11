@@ -10,13 +10,18 @@ const AuditApproval =
 const AuditClosure =
   require("../models/auditClosure.model");
 
+const {
+  createAuditActivity,
+} = require("./auditActivity.controller");
 
+
+// CLOSE AUDIT
 exports.closeAudit = async (req, res) => {
   try {
     const {
       auditId,
       executionId,
-      comment
+      comment,
     } = req.body;
 
     const audit =
@@ -25,7 +30,7 @@ exports.closeAudit = async (req, res) => {
     if (!audit) {
       return res.status(404).json({
         success: false,
-        message: "Audit not found"
+        message: "Audit not found",
       });
     }
 
@@ -33,22 +38,22 @@ exports.closeAudit = async (req, res) => {
       await AuditFinding.countDocuments({
         auditId,
         status: {
-          $ne: "closed"
-        }
+          $ne: "closed",
+        },
       });
 
     if (openFindings > 0) {
       return res.status(400).json({
         success: false,
-        message: "Open findings exist"
+        message: "Open findings exist",
       });
     }
 
     const approval =
       await AuditApproval.findOne({
-        auditId
+        auditId,
       }).sort({
-        createdAt: -1
+        createdAt: -1,
       });
 
     if (
@@ -57,7 +62,7 @@ exports.closeAudit = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "Approval required"
+        message: "Approval required",
       });
     }
 
@@ -68,47 +73,64 @@ exports.closeAudit = async (req, res) => {
         approvalStatus:
           approval?.status || "approved",
         comment,
-        closedBy: req.user?.id
+        closedBy: req.user?.id || null,
       });
 
     audit.status = "completed";
 
     await audit.save();
 
-    return res.json({
+    await createAuditActivity({
+      auditId: audit._id,
+      action: "closed",
+      resource: "closure",
+      description: "Audit bağlandı",
+      metadata: {
+        closureId: closure._id,
+        approvalStatus: closure.approvalStatus,
+        finalStatus: closure.finalStatus,
+        comment: closure.comment,
+      },
+    });
+
+    return res.status(201).json({
       success: true,
-      data: closure
+      data: closure,
     });
 
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
 
+// GET CLOSURE
 exports.getClosure = async (req, res) => {
   try {
     const data =
       await AuditClosure.find({
-        auditId: req.params.auditId
+        auditId: req.params.auditId,
       })
-      .populate("closedBy")
       .sort({
-        createdAt: -1
+        createdAt: -1,
       });
 
     return res.json({
       success: true,
-      data
+      data,
     });
 
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };

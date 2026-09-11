@@ -1,3 +1,4 @@
+const auditActivityRoutes = require("./auditActivity.routes");
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -130,5 +131,7 @@ router.get('/applications', applicationsController.getApplications);
 router.post('/applications', applicationsController.createApplication);
 router.patch('/applications/:id/status', applicationsController.updateApplicationStatus);
 router.delete('/applications/:id', applicationsController.deleteApplication);
+
+router.use("/audit-activity", auditActivityRoutes);
 
 module.exports = router;

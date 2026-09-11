@@ -11,6 +11,7 @@ import {
 import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
 import { getStandardAuditById } from "../../../Services/standardAuditsService";
+import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
 const resultLabels = {
   compliant: "Uyğundur",
@@ -262,7 +263,7 @@ export default function StandardAuditDetail() {
 
         {audit.results.length === 0 ? (
           <div className="audit-empty-state">
-            Bu auditdə hələ nəticə yoxdur. Real 175 checklist sualı əlavə
+            Bu auditdə hələ nəticə yoxdur. Real 159 checklist sualı əlavə
             edildikdən sonra nəticələr burada göstəriləcək.
           </div>
         ) : (
@@ -328,6 +329,8 @@ export default function StandardAuditDetail() {
           </div>
         </div>
       </section>
+
+      <AuditLifecyclePanel auditId={id ?? audit?.id ?? ""} />
     </div>
   );
 }

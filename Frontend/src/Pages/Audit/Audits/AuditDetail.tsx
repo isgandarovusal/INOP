@@ -4,6 +4,7 @@ import AuditTimeline from "../AuditTimeline/AuditTimeline";
 import AuditApprovalPanel from "../AuditApproval/AuditApprovalPanel";
 import AuditClosurePanel from "../AuditClosure/AuditClosurePanel";
 import AuditExportPanel from "../AuditExport/AuditExportPanel";
+import AuditHistoryPanel from "../AuditHistory/AuditHistoryPanel";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -265,6 +266,10 @@ const AuditDetail: React.FC = () => {
         />
 
         <AuditExportPanel
+          auditId={id ?? ""}
+        />
+
+        <AuditHistoryPanel
           auditId={id ?? ""}
         />
 

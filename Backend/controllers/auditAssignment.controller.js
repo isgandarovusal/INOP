@@ -1,57 +1,63 @@
 const AuditAssignment =
-require("../models/auditAssignment.model");
+  require("../models/auditAssignment.model");
+
+const {
+  createAuditActivity,
+} = require("./auditActivity.controller");
 
 
-exports.assignAudit=async(req,res)=>{
+exports.assignAudit = async (req, res) => {
+  try {
+    const assignment =
+      await AuditAssignment.create(req.body);
 
-try{
+    await createAuditActivity({
+      auditId: assignment.auditId,
+      action: "created",
+      resource: "assignment",
+      description: "Audit auditor-a təyin edildi",
+      metadata: {
+        assignmentId: assignment._id,
+        auditor: assignment.auditor,
+        assignedBy: assignment.assignedBy || null,
+        status: assignment.status,
+      },
+    });
 
+    res.status(201).json({
+      success: true,
+      data: assignment,
+    });
 
-const assignment =
-await AuditAssignment.create(req.body);
+  } catch (e) {
+    console.error(e);
 
-
-res.json({
- success:true,
- data:assignment
-});
-
-
-}catch(e){
-
-res.status(500).json({
- success:false
-});
-
-}
-
+    res.status(500).json({
+      success: false,
+      message: "Assignment creation error",
+    });
+  }
 };
 
 
+exports.getAssignments = async (req, res) => {
+  try {
+    const data =
+      await AuditAssignment.find({
+        auditId: req.params.auditId,
+      });
 
-exports.getAssignments=async(req,res)=>{
+    res.json({
+      success: true,
+      data,
+    });
 
-try{
+  } catch (e) {
+    console.error(e);
 
-const data =
-await AuditAssignment.find({
- auditId:req.params.auditId
-})
-.populate("auditor");
-
-
-res.json({
- success:true,
- data
-});
-
-
-}catch(e){
-
-res.status(500).json({
- success:false
-});
-
-}
-
+    res.status(500).json({
+      success: false,
+      message: "Assignment fetch error",
+    });
+  }
 };

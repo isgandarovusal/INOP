@@ -16,10 +16,7 @@ function getOptionalModel(name) {
 }
 
 async function buildAuditData(auditId) {
-  const audit = await Audit.findById(auditId)
-    .populate("createdBy")
-    .populate("auditor")
-    .populate("restaurant");
+  const audit = await Audit.findById(auditId);
 
   if (!audit) {
     const error = new Error("Audit not found");
@@ -32,13 +29,10 @@ async function buildAuditData(auditId) {
     .lean();
 
   const approvals = await AuditApproval.find({ auditId })
-    .populate("requestedBy")
-    .populate("reviewer")
     .sort({ createdAt: 1 })
     .lean();
 
   const closures = await AuditClosure.find({ auditId })
-    .populate("closedBy")
     .sort({ createdAt: 1 })
     .lean();
 
@@ -48,8 +42,6 @@ async function buildAuditData(auditId) {
 
   if (AuditAction) {
     actions = await AuditAction.find({ auditId })
-      .populate("responsibleUser")
-      .populate("assignedTo")
       .sort({ createdAt: 1 })
       .lean();
   }
