@@ -1,169 +1,154 @@
 import "../auditModern.css";
 import "../auditAnalytics.css";
-import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import {
-  AlertCircle,
-  BarChart3,
-  CheckCircle2,
-  ShieldAlert,
-} from "lucide-react";
-import PageHeader from "../../../Components/PageHeader";
-import { getStandardAudits } from "../../../Services/standardAuditsService";
-import type { StandardAudit } from "../../../Types/Audit";
 
-export default function StandardAuditAnalytics() {
-  const [audits, setAudits] = useState<StandardAudit[]>([]);
+import React, { useEffect, useState } from "react";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+} from "recharts";
+
+import {
+  BarChart3,
+  CircleCheck,
+  AlertTriangle,
+  TrendingUp,
+} from "lucide-react";
+
+import PageHeader from "../../../Components/PageHeader";
+
+import { getStandardAnalytics } from "../../../Services/auditAnalyticsService";
+import type { StandardAnalyticsData } from "../../../Services/auditAnalyticsService";
+
+const StandardAuditAnalytics: React.FC = () => {
+  const [data, setData] =
+    useState<StandardAnalyticsData | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    getStandardAudits()
-      .then(setAudits)
-      .catch(() => setAudits([]));
+    getStandardAnalytics()
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Standard analytics could not be loaded.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const stats = useMemo(() => {
-    const total = audits.length;
-
-    return {
-      total,
-      average:
-        total > 0
-          ? audits.reduce(
-              (sum, audit) => sum + audit.compliancePercentage,
-              0
-            ) / total
-          : 0,
-      critical: audits.reduce(
-        (sum, audit) => sum + audit.foundCritical,
-        0
-      ),
-      major: audits.reduce((sum, audit) => sum + audit.foundMajor, 0),
-      minor: audits.reduce((sum, audit) => sum + audit.foundMinor, 0),
-      passed: audits.filter((audit) => audit.passed).length,
-    };
-  }, [audits]);
-
-  const trend = [...audits]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-8);
+  const findings = data
+    ? [
+        {
+          name: "Critical",
+          value: data.findings.critical,
+        },
+        {
+          name: "Major",
+          value: data.findings.major,
+        },
+        {
+          name: "Minor",
+          value: data.findings.minor,
+        },
+      ]
+    : [];
 
   return (
-    <div className="audit-page">
+    <div>
       <PageHeader
-        title="Standart Audit Analitikası"
-        subtitle="Uyğunluq və uyğunsuzluqların severity analizi"
-        actions={
-          <Link to="/app/audit/standard" className="btn btn-secondary">
-            Auditlərə bax
-          </Link>
-        }
+        title="Standard Audit Analytics"
+        subtitle="MongoDB aggregation based standard audit statistics"
       />
 
-      <div className="audit-kpi-grid">
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <BarChart3 size={20} />
-          </div>
-          <span>Audit sayı</span>
-          <strong>{stats.total}</strong>
+      {loading && (
+        <div className="empty-state">
+          Loading analytics...
         </div>
+      )}
 
-        <div className="audit-kpi-card audit-severity-kpi--compliant">
-          <div className="audit-kpi-icon">
-            <CheckCircle2 size={20} />
-          </div>
-          <span>Orta uyğunluq</span>
-          <strong>{stats.average.toFixed(1)}%</strong>
+      {!loading && error && (
+        <div className="empty-state">
+          {error}
         </div>
+      )}
 
-        <div className="audit-kpi-card audit-severity-kpi--critical">
-          <div className="audit-kpi-icon">
-            <ShieldAlert size={20} />
-          </div>
-          <span>Critical</span>
-          <strong>{stats.critical}</strong>
-        </div>
+      {!loading && !error && data && (
+        <>
+          <div className="kpi-grid">
+            <div className="kpi-card">
+              <BarChart3 size={22} />
+              <p>Total standard audits</p>
+              <h2>{data.total}</h2>
+            </div>
 
-        <div className="audit-kpi-card audit-severity-kpi--major">
-          <div className="audit-kpi-icon">
-            <AlertCircle size={20} />
-          </div>
-          <span>Major</span>
-          <strong>{stats.major}</strong>
-        </div>
-      </div>
+            <div className="kpi-card">
+              <TrendingUp size={22} />
+              <p>Average compliance</p>
+              <h2>
+                {data.averageCompliancePercentage.toFixed(1)}%
+              </h2>
+            </div>
 
-      <div className="audit-detail-grid">
-        <section className="audit-card">
-          <div className="audit-card-header">
-            <div>
-              <h3>Uyğunluq trendi</h3>
-              <p>Son 8 audit üzrə nəticələr</p>
+            <div className="kpi-card">
+              <CircleCheck size={22} />
+              <p>Passed audits</p>
+              <h2>{data.passed}</h2>
+            </div>
+
+            <div className="kpi-card">
+              <AlertTriangle size={22} />
+              <p>Failed audits</p>
+              <h2>{data.failed}</h2>
             </div>
           </div>
 
-          {trend.length === 0 ? (
-            <div className="audit-empty-state">
-              Trend yaratmaq üçün audit məlumatı yoxdur.
+          <div className="charts-grid">
+            <div className="chart-card">
+              <h3>Findings Distribution</h3>
+
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={findings}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="value" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ) : (
-            <div className="audit-analytics-bars">
-              {trend.map((audit) => (
-                <div className="audit-analytics-bar-item" key={audit.id}>
-                  <div className="audit-analytics-bar-value">
-                    {audit.compliancePercentage.toFixed(0)}%
-                  </div>
 
-                  <div className="audit-analytics-bar-track">
-                    <div
-                      className="audit-analytics-bar audit-analytics-bar--standard"
-                      style={{
-                        height: `${Math.max(
-                          5,
-                          Math.min(100, audit.compliancePercentage)
-                        )}%`,
-                      }}
-                    />
-                  </div>
+            <div className="chart-card">
+              <h3>Compliance Trend</h3>
 
-                  <span>{audit.date.slice(5)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="audit-card">
-          <div className="audit-card-header">
-            <div>
-              <h3>Severity xülasəsi</h3>
-              <p>Bütün standart auditlər</p>
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={data.trend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
-
-          <div className="audit-analytics-stat-list">
-            <div>
-              <span>Critical</span>
-              <strong>{stats.critical}</strong>
-            </div>
-
-            <div>
-              <span>Major</span>
-              <strong>{stats.major}</strong>
-            </div>
-
-            <div>
-              <span>Minor</span>
-              <strong>{stats.minor}</strong>
-            </div>
-
-            <div>
-              <span>Passed</span>
-              <strong>{stats.passed}</strong>
-            </div>
-          </div>
-        </section>
-      </div>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default StandardAuditAnalytics;

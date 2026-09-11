@@ -1,204 +1,130 @@
 import "../auditModern.css";
 import "../auditAnalytics.css";
-import { useEffect, useMemo, useState } from "react";
-import type { ServiceAudit } from "../../../Types/Audit";
-import { Link } from "react-router-dom";
+
+import React, { useEffect, useState } from "react";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+} from "recharts";
+
 import {
   BarChart3,
-  CheckCircle2,
   Clock3,
-  XCircle,
+  TrendingUp,
 } from "lucide-react";
-import PageHeader from "../../../Components/PageHeader";
-import { getServiceAudits } from "../../../Services/serviceAuditsService";
 
-export default function ServiceAuditAnalytics() {
-  const [audits, setAudits] = useState<ServiceAudit[]>([]);
+import PageHeader from "../../../Components/PageHeader";
+
+import { getServiceAnalytics } from "../../../Services/auditAnalyticsService";
+import type { ServiceAnalyticsData } from "../../../Services/auditAnalyticsService";
+
+const ServiceAuditAnalytics: React.FC = () => {
+  const [data, setData] = useState<ServiceAnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const load = async () => {
-try {
-        const data = await getServiceAudits();
-        setAudits(data);
-      } catch {
-        setAudits([]);
-      }
-    };
-
-    load();
+    getServiceAnalytics()
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Service analytics could not be loaded.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const stats = useMemo(() => {
-    const total = audits.length;
-    const average =
-      total > 0
-        ? audits.reduce((sum, audit) => sum + audit.overallPercentage, 0) /
-          total
-        : 0;
-
-    const yes = audits.reduce(
-      (sum, audit) =>
-        sum + audit.checks.filter((item) => item.answer === "yes").length,
-      0
-    );
-
-    const no = audits.reduce(
-      (sum, audit) =>
-        sum + audit.checks.filter((item) => item.answer === "no").length,
-      0
-    );
-
-    const observations = audits.flatMap(
-      (audit) => audit.serviceTimeObservations
-    );
-
-    const validTimes = observations
-      .map((item) => item.seconds)
-      .filter((value): value is number => value !== null && value >= 0);
-
-    const averageTime =
-      validTimes.length > 0
-        ? validTimes.reduce((sum, value) => sum + value, 0) /
-          validTimes.length
-        : 0;
-
-    return {
-      total,
-      average,
-      yes,
-      no,
-      averageTime,
-    };
-  }, [audits]);
-
-  const trend = [...audits]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-8);
-
   return (
-    <div className="audit-page">
+    <div>
       <PageHeader
-        title="Servis Auditi Analitikası"
-        subtitle="Servis keyfiyyəti, cavablar və xidmət vaxtının analizi"
-        actions={
-          <Link to="/app/audit/service" className="btn btn-secondary">
-            Audİtlərə bax
-          </Link>
-        }
+        title="Service Audit Analytics"
+        subtitle="MongoDB aggregation based service audit statistics"
       />
 
-      <div className="audit-kpi-grid">
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <BarChart3 size={20} />
-          </div>
-          <span>Audit sayı</span>
-          <strong>{stats.total}</strong>
+      {loading && (
+        <div className="empty-state">
+          Loading analytics...
         </div>
+      )}
 
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <CheckCircle2 size={20} />
-          </div>
-          <span>Orta nəticə</span>
-          <strong>{stats.average.toFixed(1)}%</strong>
+      {!loading && error && (
+        <div className="empty-state">
+          {error}
         </div>
+      )}
 
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <XCircle size={20} />
-          </div>
-          <span>Xeyr cavabları</span>
-          <strong>{stats.no}</strong>
-        </div>
+      {!loading && !error && data && (
+        <>
+          <div className="kpi-grid">
+            <div className="kpi-card">
+              <BarChart3 size={22} />
+              <p>Total service audits</p>
+              <h2>{data.total}</h2>
+            </div>
 
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <Clock3 size={20} />
-          </div>
-          <span>Orta xidmət vaxtı</span>
-          <strong>
-            {stats.averageTime > 0
-              ? `${stats.averageTime.toFixed(1)} san`
-              : "—"}
-          </strong>
-        </div>
-      </div>
+            <div className="kpi-card">
+              <TrendingUp size={22} />
+              <p>Average score</p>
+              <h2>
+                {data.averageOverallPercentage.toFixed(1)}%
+              </h2>
+            </div>
 
-      <div className="audit-detail-grid">
-        <section className="audit-card">
-          <div className="audit-card-header">
-            <div>
-              <h3>Audit nəticələrinin trendi</h3>
-              <p>Son auditlər üzrə ümumi faiz</p>
+            <div className="kpi-card">
+              <Clock3 size={22} />
+              <p>Average service time</p>
+              <h2>
+                {data.averageServiceTimeSeconds.toFixed(0)}s
+              </h2>
             </div>
           </div>
 
-          {trend.length === 0 ? (
-            <div className="audit-empty-state">
-              Trend yaratmaq üçün hələ audit məlumatı yoxdur.
+          <div className="charts-grid">
+            <div className="chart-card">
+              <h3>Service Answers</h3>
+
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={data.answerDistribution}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="value" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ) : (
-            <div className="audit-analytics-bars">
-              {trend.map((audit) => (
-                <div className="audit-analytics-bar-item" key={audit.id}>
-                  <div className="audit-analytics-bar-value">
-                    {audit.overallPercentage.toFixed(0)}%
-                  </div>
 
-                  <div className="audit-analytics-bar-track">
-                    <div
-                      className="audit-analytics-bar"
-                      style={{
-                        height: `${Math.max(
-                          5,
-                          Math.min(100, audit.overallPercentage)
-                        )}%`,
-                      }}
-                    />
-                  </div>
+            <div className="chart-card">
+              <h3>Service Audit Trend</h3>
 
-                  <span>{audit.date.slice(5)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="audit-card">
-          <div className="audit-card-header">
-            <div>
-              <h3>Cavab paylanması</h3>
-              <p>Bütün servis auditlərindəki nəticələr</p>
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={data.trend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
-
-          <div className="audit-analytics-stat-list">
-            <div>
-              <span>Bəli</span>
-              <strong>{stats.yes}</strong>
-            </div>
-
-            <div>
-              <span>Xeyr</span>
-              <strong>{stats.no}</strong>
-            </div>
-
-            <div>
-              <span>N/A</span>
-              <strong>
-                {audits.reduce(
-                  (sum, audit) =>
-                    sum +
-                    audit.checks.filter((item) => item.answer === "na")
-                      .length,
-                  0
-                )}
-              </strong>
-            </div>
-          </div>
-        </section>
-      </div>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default ServiceAuditAnalytics;

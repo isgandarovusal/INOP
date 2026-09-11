@@ -1,147 +1,132 @@
 import "../auditModern.css";
 import "../auditAnalytics.css";
-import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+
+import React, { useEffect, useState } from "react";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+} from "recharts";
+
 import {
   BarChart3,
   CheckCircle2,
-  Gauge,
-  ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
-import PageHeader from "../../../Components/PageHeader";
-import { getOccupationalSafetyAudits } from "../../../Services/occupationalSafetyAuditsService";
-import type { OccupationalSafetyAudit } from "../../../Types/Audit";
 
-export default function SafetyAuditAnalytics() {
-  const [audits, setAudits] = useState<OccupationalSafetyAudit[]>([]);
+import PageHeader from "../../../Components/PageHeader";
+
+import { getSafetyAnalytics } from "../../../Services/auditAnalyticsService";
+import type { SafetyAnalyticsData } from "../../../Services/auditAnalyticsService";
+
+const SafetyAuditAnalytics: React.FC = () => {
+  const [data, setData] =
+    useState<SafetyAnalyticsData | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    getOccupationalSafetyAudits()
-      .then(setAudits)
-      .catch(() => setAudits([]));
+    getSafetyAnalytics()
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Safety analytics could not be loaded.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const stats = useMemo(() => {
-    const total = audits.length;
-
-    const answered = audits.reduce(
-      (sum, audit) =>
-        sum +
-        audit.checks.filter((item) => item.score !== null).length,
-      0
-    );
-
-    return {
-      total,
-      average:
-        total > 0
-          ? audits.reduce(
-              (sum, audit) => sum + audit.scorePercentage,
-              0
-            ) / total
-          : 0,
-      totalScore: audits.reduce(
-        (sum, audit) => sum + audit.totalScore,
-        0
-      ),
-      maxScore: audits.reduce(
-        (sum, audit) => sum + audit.maxScore,
-        0
-      ),
-      answered,
-    };
-  }, [audits]);
-
-  const trend = [...audits]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-8);
-
   return (
-    <div className="audit-page">
+    <div>
       <PageHeader
-        title="Əməyin Mühafizəsi Analitikası"
-        subtitle="Təhlükəsizlik balları və uyğunluq göstəriciləri"
-        actions={
-          <Link to="/app/audit/safety" className="btn btn-secondary">
-            Auditlərə bax
-          </Link>
-        }
+        title="Occupational Safety Analytics"
+        subtitle="MongoDB aggregation based safety audit statistics"
       />
 
-      <div className="audit-kpi-grid">
-        <div className="audit-kpi-card">
-          <div className="audit-kpi-icon">
-            <BarChart3 size={20} />
-          </div>
-          <span>Audit sayı</span>
-          <strong>{stats.total}</strong>
+      {loading && (
+        <div className="empty-state">
+          Loading analytics...
         </div>
+      )}
 
-        <div className="audit-kpi-card audit-safety-kpi">
-          <div className="audit-kpi-icon">
-            <ShieldCheck size={20} />
-          </div>
-          <span>Orta nəticə</span>
-          <strong>{stats.average.toFixed(1)}%</strong>
+      {!loading && error && (
+        <div className="empty-state">
+          {error}
         </div>
+      )}
 
-        <div className="audit-kpi-card audit-safety-kpi">
-          <div className="audit-kpi-icon">
-            <Gauge size={20} />
+      {!loading && !error && data && (
+        <>
+          <div className="kpi-grid">
+            <div className="kpi-card">
+              <BarChart3 size={22} />
+              <p>Total safety audits</p>
+              <h2>{data.total}</h2>
+            </div>
+
+            <div className="kpi-card">
+              <TrendingUp size={22} />
+              <p>Average score</p>
+              <h2>
+                {data.averageScorePercentage.toFixed(1)}%
+              </h2>
+            </div>
+
+            <div className="kpi-card">
+              <CheckCircle2 size={22} />
+              <p>Answered checks</p>
+              <h2>
+                {data.answered}/{data.totalChecks}
+              </h2>
+            </div>
           </div>
-          <span>Toplam bal</span>
-          <strong>
-            {stats.totalScore} / {stats.maxScore}
-          </strong>
-        </div>
 
-        <div className="audit-kpi-card audit-safety-kpi">
-          <div className="audit-kpi-icon">
-            <CheckCircle2 size={20} />
-          </div>
-          <span>Cavablandırılan yoxlama</span>
-          <strong>{stats.answered}</strong>
-        </div>
-      </div>
+          <div className="charts-grid">
+            <div className="chart-card">
+              <h3>Safety Score Distribution</h3>
 
-      <section className="audit-card">
-        <div className="audit-card-header">
-          <div>
-            <h3>Bal trendi</h3>
-            <p>Son 8 əməyin mühafizəsi auditi üzrə nəticələr</p>
-          </div>
-        </div>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={data.distribution}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="value" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-        {trend.length === 0 ? (
-          <div className="audit-empty-state">
-            Trend yaratmaq üçün audit məlumatı yoxdur.
-          </div>
-        ) : (
-          <div className="audit-analytics-bars">
-            {trend.map((audit) => (
-              <div className="audit-analytics-bar-item" key={audit.id}>
-                <div className="audit-analytics-bar-value">
-                  {audit.scorePercentage.toFixed(0)}%
-                </div>
+            <div className="chart-card">
+              <h3>Safety Audit Trend</h3>
 
-                <div className="audit-analytics-bar-track">
-                  <div
-                    className="audit-analytics-bar audit-analytics-bar--safety"
-                    style={{
-                      height: `${Math.max(
-                        5,
-                        Math.min(100, audit.scorePercentage)
-                      )}%`,
-                    }}
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={data.trend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
                   />
-                </div>
-
-                <span>{audit.date.slice(5)}</span>
-              </div>
-            ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        )}
-      </section>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default SafetyAuditAnalytics;
