@@ -368,11 +368,22 @@ if (id) {
 
       if (id) {
         await updateAuditTemplate(id, template);
-      } else {
-        const created = await createAuditTemplate(template);
-        navigate(`/app/audit/checklists/${created.id}`, {
-          replace: true,
+
+        navigate("/app/audit/checklists", {
+          replace: true
         });
+
+        return;
+      } else {
+        console.log("CREATE START");
+        await createAuditTemplate(template);
+        console.log("CREATE DONE");
+
+        console.log("NAVIGATE LIST");
+        navigate("/app/audit/checklists", {
+          replace: true
+        });
+
         return;
       }
 
@@ -394,6 +405,7 @@ if (id) {
 
   return (
     <div className="audit-page">
+
       <div className="audit-page-header">
         <div>
           <Link

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   ClipboardList,
   Plus,
@@ -19,6 +19,8 @@ const typeLabels = {
 } as const;
 
 export default function AuditTemplatesList() {
+  const location = useLocation();
+  const message = location.state?.message;
   const [templates, setTemplates] = useState<AuditTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +46,11 @@ export default function AuditTemplatesList() {
 
   return (
     <div className="audit-page">
+      {message && (
+        <div className="audit-success-message">
+          {message}
+        </div>
+      )}
       <div className="audit-page-header">
         <div>
           <h1>Audit Checklistləri</h1>
@@ -60,6 +67,12 @@ export default function AuditTemplatesList() {
           Yeni checklist
         </Link>
       </div>
+
+      {message && (
+        <div className="audit-success-message">
+          {message}
+        </div>
+      )}
 
       {loading ? (
         <div className="audit-card">
