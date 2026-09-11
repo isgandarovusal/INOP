@@ -18,6 +18,10 @@ const occupationalSafetyDetailsRoutes = require('./occupationalSafetyDetails.rou
 const auditReportRoutes = require('./auditReport.routes');
 const auditScoreRoutes = require('./auditScore.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
+
+const auditFindingRoutes = require('./auditFinding.routes');
+const auditAssignmentRoutes = require('./auditAssignment.routes');
+const auditTimelineRoutes = require('./auditTimeline.routes');
 const auditDashboardRoutes = require('./auditDashboard.routes');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
@@ -42,6 +46,22 @@ router.use('/audit-report', auditReportRoutes);
 router.use('/audit-score', auditScoreRoutes);
 
 router.use('/audit-dashboard', auditDashboardRoutes);
+
+router.use(
+'/audit-findings',
+auditFindingRoutes
+);
+
+router.use(
+'/audit-assignments',
+auditAssignmentRoutes
+);
+
+router.use(
+'/audit-timeline',
+auditTimelineRoutes
+);
+
 
 // Audit API
 router.get('/audits/analytics', auditsController.getAuditAnalytics);
