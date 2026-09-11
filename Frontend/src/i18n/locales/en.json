@@ -158,7 +158,8 @@
     "password": "Password",
     "signingIn": "Signing in…",
     "somethingWentWrong": "Something went wrong.",
-    "emailPlaceholder": "you@inop.com"
+    "emailPlaceholder": "you@inop.com",
+    "language": "Language"
   },
   "unauthorized": {
     "title": "Access restricted",

@@ -3,6 +3,10 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2, LogIn, Sparkles } from "lucide-react";
 import { useAuth } from "../../../Context/AuthContext";
 import { useTranslation } from "react-i18next";
+import i18n, { changeLanguage } from "../../../i18n";
+import azFlag from "../../../assets/flags/az.svg";
+import gbFlag from "../../../assets/flags/gb.svg";
+import ruFlag from "../../../assets/flags/ru.svg";
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -51,10 +55,43 @@ const Login: React.FC = () => {
 
         <p
           className="auth-page__tagline anim-in"
-          style={{ animationDelay: "0.04s" }}
+          style={{ animationDelay: "0.06s" }}
         >
           Internal Operations Platform
         </p>
+
+        <div
+          className="auth-language-switcher anim-in"
+          style={{ animationDelay: "0.1s" }}
+          aria-label={t("auth.language")}
+        >
+          {[
+            { code: "az" as const, label: "AZE", flag: azFlag, name: "Azərbaycan" },
+            { code: "en" as const, label: "ENG", flag: gbFlag, name: "English" },
+            { code: "ru" as const, label: "RUS", flag: ruFlag, name: "Русский" },
+          ].map((language) => (
+            <button
+              key={language.code}
+              type="button"
+              className={`auth-language-switcher__option ${
+                i18n.language === language.code
+                  ? "auth-language-switcher__option--active"
+                  : ""
+              }`}
+              onClick={() => changeLanguage(language.code)}
+              aria-pressed={i18n.language === language.code}
+              aria-label={language.name}
+            >
+              <img
+                src={language.flag}
+                alt=""
+                className="auth-language-switcher__flag"
+                aria-hidden="true"
+              />
+              <span>{language.label}</span>
+            </button>
+          ))}
+        </div>
 
         <div
           className="auth-card anim-in"

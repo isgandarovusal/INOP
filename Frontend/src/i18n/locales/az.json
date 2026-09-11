@@ -158,7 +158,8 @@
     "password": "Şifrə",
     "signingIn": "Daxil olunur…",
     "somethingWentWrong": "Nəsə xəta baş verdi.",
-    "emailPlaceholder": "you@inop.com"
+    "emailPlaceholder": "you@inop.com",
+    "language": "Dil"
   },
   "unauthorized": {
     "title": "Giriş məhdudlaşdırılıb",

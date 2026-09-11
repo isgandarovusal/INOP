@@ -29,9 +29,85 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.5rem;
+  font-size: 29px;
   font-weight: 700;
   color: var(--accent);
+}
+
+.auth-language-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: fit-content;
+  margin: 18px auto 24px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px);
+}
+
+.auth-language-switcher__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 82px;
+  height: 37px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.88);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.auth-language-switcher__option:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.auth-language-switcher__option:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+/* Active language — deliberately NOT black */
+.auth-language-switcher__option--active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.auth-language-switcher__flag {
+  display: block;
+  width: 24px;
+  height: 16px;
+  flex: 0 0 24px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 .auth-page__tagline {
@@ -121,4 +197,1181 @@
 .demo-account__email {
   font-size: 0.7rem;
   color: var(--text-secondary);
+}
+
+/* ============================================================
+   FINAL LOGIN VISUAL OVERRIDES
+   ============================================================ */
+
+/* INOP — slightly stronger brand presence */
+.auth-page .auth-page__brand {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.035em !important;
+  color: #ffffff !important;
+  text-shadow:
+    0 0 24px rgba(255, 255, 255, 0.08),
+    0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Language selector — clean, light glass */
+.auth-page .auth-language-switcher {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+
+  width: fit-content !important;
+  margin: 18px auto 24px !important;
+  padding: 4px !important;
+
+  background: rgba(255, 255, 255, 0.045) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  border-radius: 14px !important;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+/* Language buttons */
+.auth-page .auth-language-switcher__option {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  min-width: 84px !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+
+  color: rgba(255, 255, 255, 0.94) !important;
+
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.08em !important;
+
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.30) !important;
+
+  cursor: pointer !important;
+
+  opacity: 1 !important;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease !important;
+}
+
+/* Make sure the actual text span cannot become transparent */
+.auth-page .auth-language-switcher__option span {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Active language */
+.auth-page .auth-language-switcher__option--active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.auth-page .auth-language-switcher__option--active span {
+  color: #ffffff !important;
+}
+
+/* Flags */
+.auth-page .auth-language-switcher__flag {
+  display: block !important;
+  width: 25px !important;
+  height: 17px !important;
+  flex: 0 0 25px !important;
+
+  object-fit: cover !important;
+  border-radius: 3px !important;
+
+  opacity: 1 !important;
+
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.16) !important;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .auth-page .auth-page__brand {
+    font-size: 29px !important;
+  }
+
+  .auth-page .auth-language-switcher__option {
+    min-width: 76px !important;
+    padding: 0 9px !important;
+  }
+}
+
+
+/* ============================================================
+   LOGIN — FINAL COLOR CORRECTION
+   ============================================================ */
+
+/*
+ * INOP:
+ * Logo rənginə toxunmuruq.
+ * Sadəcə əvvəlki ölçüsünə qaytarırıq.
+ */
+.auth-page .auth-page__brand {
+  font-size: 29px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+/*
+ * Language selector:
+ * Rəngli/şəffaf görünüş əvəzinə tünd, neytral graphite.
+ */
+.auth-page .auth-language-switcher {
+  background: rgba(17, 24, 39, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+/* AZE / ENG / RUS */
+.auth-page .auth-language-switcher__option {
+  color: #e5e7eb !important;
+  background: transparent !important;
+  border-color: transparent !important;
+
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+
+  text-shadow: none !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Active */
+.auth-page .auth-language-switcher__option--active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.auth-page .auth-language-switcher__option span {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* Flags stay clean and neutral */
+.auth-page .auth-language-switcher__flag {
+  opacity: 1 !important;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+/* INOP — original logo color, slightly larger */
+.auth-page .auth-page__brand {
+  font-size: 31px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+.auth-page .auth-page__brand {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+/* FINAL INOP BRAND — ORIGINAL COLOR + LARGER SIZE */
+.auth-page .auth-page__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+
+/* FINAL LANGUAGE SELECTOR */
+.auth-page .auth-language-switcher__option--active {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+.auth-page .auth-language-switcher__option--active span {
+  color: #ffffff !important;
+}
+
+.auth-page .auth-language-switcher__option:hover {
+  background: color-mix(in srgb, var(--accent) 82%, transparent) !important;
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   LANGUAGE SELECTOR — OUTER CONTAINER
+   ============================================================ */
+
+/* AZE / ENG / RUS-un hamısını əhatə edən əsas kapsul */
+.auth-page .auth-language-switcher {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+/* İçəridəki dillər — outer accent fonun üzərində */
+.auth-page .auth-language-switcher__option {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* Aktiv dil yalnız yüngül fərqlə seçilsin */
+.auth-page .auth-language-switcher__option--active {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+}
+
+
+/* ============================================================
+   FINAL — INOP + LANGUAGE SELECTOR
+   ============================================================ */
+
+/* INOP — original logo color + slightly larger */
+.auth-page .auth-page__brand {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: var(--accent) !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+/* AZE / ENG / RUS — outer container */
+.auth-page .auth-language-switcher {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Individual languages */
+.auth-page .auth-language-switcher__option {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+/* Selected language */
+.auth-page .auth-language-switcher__option--active {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   FINAL — ONLY SIZE + LANGUAGE TAB COLOR
+   ============================================================ */
+
+/* INOP: rəngə toxunma, yalnız bir az böyüt */
+.auth-page .auth-page__brand {
+  font-size: 32px !important;
+}
+
+/* Language selector: Daxil ol düyməsinin tünd yaşıl rəngi */
+.auth-page .auth-language-switcher {
+  background: #0f5132 !important;
+  border-color: #0f5132 !important;
+
+  box-shadow:
+    0 8px 20px rgba(15, 81, 50, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* AZE / ENG / RUS */
+.auth-page .auth-language-switcher__option {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Seçilmiş dil */
+.auth-page .auth-language-switcher__option--active {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   FINAL LOGIN DESIGN
+   ============================================================ */
+
+/* INOP — yalnız böyüdülür, mövcud rənginə toxunulmur */
+.auth-page .auth-page__brand {
+  font-size: 36px !important;
+}
+
+/*
+ * Language selector OUTER TAB.
+ * Bu, AZE + ENG + RUS-un hamısını əhatə edən hissədir.
+ *
+ * Daxil ol düyməsinin accent rəngindən istifadə edir.
+ */
+.auth-page .auth-language-switcher {
+  background: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Dil yazıları */
+.auth-page .auth-language-switcher__option {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, 0.90) !important;
+}
+
+/* Seçilmiş dil */
+.auth-page .auth-language-switcher__option--active {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+  color: #ffffff !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.11) !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   FINAL FINAL LOGIN
+   ============================================================ */
+
+/* INOP — rənginə toxunmuruq, yalnız nəzərəçarpacaq böyüdürük */
+.auth-page .auth-page__brand {
+  font-size: 40px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+/*
+ * LANGUAGE PANEL
+ * INOP-dan fərqli, ayrıca tünd yaşıl.
+ * "Daxil ol" düyməsinin tünd görünüşünə uyğun.
+ */
+.auth-page .auth-language-switcher {
+  background: #14532d !important;
+  border: 1px solid #14532d !important;
+
+  box-shadow:
+    0 8px 20px rgba(20, 83, 45, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* AZE / ENG / RUS */
+.auth-page .auth-language-switcher__option {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, 0.90) !important;
+}
+
+/* Seçilmiş dil */
+.auth-page .auth-language-switcher__option--active {
+  background: rgba(255, 255, 255, 0.17) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+  color: #ffffff !important;
+}
+
+/* Hover */
+.auth-page .auth-language-switcher__option:hover {
+  background: rgba(255, 255, 255, 0.11) !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   INOP — PREMIUM ENTERPRISE LOGIN
+   Final visual layer
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   PAGE
+   ------------------------------------------------------------ */
+
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(16, 185, 129, 0.10),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 12% 82%,
+      rgba(16, 185, 129, 0.055),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(255, 255, 255, 0.035),
+      transparent 25%
+    ),
+    #07100d;
+}
+
+/* Subtle premium atmosphere */
+.auth-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    );
+
+  background-size: 56px 56px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7),
+    transparent 85%
+  );
+
+  opacity: 0.35;
+}
+
+/* ------------------------------------------------------------
+   MAIN CONTENT
+   ------------------------------------------------------------ */
+
+.auth-page__content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------
+   BRAND
+   ------------------------------------------------------------ */
+
+.auth-page .auth-page__brand {
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+
+  /* Keep existing INOP accent color */
+  color: var(--accent) !important;
+
+  text-shadow:
+    0 0 32px rgba(16, 185, 129, 0.16),
+    0 8px 30px rgba(0, 0, 0, 0.30) !important;
+
+  transform: translateZ(0);
+}
+
+/* ------------------------------------------------------------
+   TAGLINE
+   ------------------------------------------------------------ */
+
+.auth-page .auth-page__tagline {
+  margin-top: 8px !important;
+
+  color: rgba(255, 255, 255, 0.52) !important;
+
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+}
+
+/* ------------------------------------------------------------
+   LANGUAGE SWITCHER
+   ------------------------------------------------------------ */
+
+.auth-page .auth-language-switcher {
+  position: relative;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 3px !important;
+
+  width: fit-content !important;
+
+  margin: 22px auto 28px !important;
+  padding: 4px !important;
+
+  background: rgba(255, 255, 255, 0.045) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  border-radius: 13px !important;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+}
+
+/* Soft accent glow behind selector */
+.auth-page .auth-language-switcher::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+
+  border-radius: 18px;
+
+  background: rgba(16, 185, 129, 0.035);
+
+  filter: blur(14px);
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ------------------------------------------------------------
+   LANGUAGE OPTIONS
+   ------------------------------------------------------------ */
+
+.auth-page .auth-language-switcher__option {
+  position: relative;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 8px !important;
+
+  min-width: 82px !important;
+  height: 36px !important;
+
+  padding: 0 12px !important;
+
+  background: transparent !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+
+  color: rgba(255, 255, 255, 0.58) !important;
+
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.10em !important;
+
+  cursor: pointer;
+
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease !important;
+}
+
+.auth-page .auth-language-switcher__option:hover {
+  color: rgba(255, 255, 255, 0.94) !important;
+
+  background: rgba(255, 255, 255, 0.055) !important;
+
+  border-color: rgba(255, 255, 255, 0.08) !important;
+
+  transform: translateY(-1px) !important;
+}
+
+/* Active language — restrained premium accent */
+.auth-page .auth-language-switcher__option--active {
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.13),
+      rgba(255, 255, 255, 0.075)
+    ) !important;
+
+  border-color: rgba(255, 255, 255, 0.13) !important;
+
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Flags */
+.auth-page .auth-language-switcher__flag {
+  width: 23px !important;
+  height: 15px !important;
+
+  border-radius: 3px !important;
+
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+
+  transition: transform 180ms ease !important;
+}
+
+.auth-page .auth-language-switcher__option:hover
+.auth-language-switcher__flag {
+  transform: scale(1.04);
+}
+
+/* ------------------------------------------------------------
+   LOGIN CARD
+   ------------------------------------------------------------ */
+
+.auth-page .auth-card {
+  position: relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.075),
+      rgba(255, 255, 255, 0.035)
+    ) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.105) !important;
+
+  border-radius: 22px !important;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.34),
+    0 8px 28px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+
+  backdrop-filter: blur(24px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(135%) !important;
+}
+
+/* ------------------------------------------------------------
+   INPUTS
+   ------------------------------------------------------------ */
+
+.auth-page input {
+  background: rgba(0, 0, 0, 0.17) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+
+  border-radius: 11px !important;
+
+  color: #ffffff !important;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease !important;
+}
+
+.auth-page input::placeholder {
+  color: rgba(255, 255, 255, 0.34) !important;
+}
+
+.auth-page input:hover {
+  background: rgba(0, 0, 0, 0.21) !important;
+
+  border-color: rgba(255, 255, 255, 0.13) !important;
+}
+
+.auth-page input:focus {
+  background: rgba(0, 0, 0, 0.20) !important;
+
+  border-color: rgba(16, 185, 129, 0.52) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.09),
+    0 8px 24px rgba(0, 0, 0, 0.12) !important;
+
+  outline: none !important;
+}
+
+/* ------------------------------------------------------------
+   LOGIN BUTTON
+   ------------------------------------------------------------ */
+
+.auth-page button[type="submit"] {
+  position: relative;
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+
+  border-radius: 11px !important;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease !important;
+}
+
+.auth-page button[type="submit"]::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.13) 50%,
+    transparent 80%
+  );
+
+  transform: translateX(-120%);
+
+  transition: transform 550ms ease;
+
+  pointer-events: none;
+}
+
+.auth-page button[type="submit"]:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+
+  filter: brightness(1.045);
+}
+
+.auth-page button[type="submit"]:hover::before {
+  transform: translateX(120%);
+}
+
+.auth-page button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------
+   LABELS
+   ------------------------------------------------------------ */
+
+.auth-page label {
+  color: rgba(255, 255, 255, 0.68) !important;
+
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.015em !important;
+}
+
+/* ------------------------------------------------------------
+   SMALL DETAILS
+   ------------------------------------------------------------ */
+
+.auth-page .auth-card svg {
+  transition: transform 180ms ease;
+}
+
+/* ------------------------------------------------------------
+   ENTRANCE ANIMATION
+   ------------------------------------------------------------ */
+
+@keyframes inopPremiumReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-page__brand,
+.auth-page__tagline,
+.auth-language-switcher,
+.auth-card {
+  animation: inopPremiumReveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-page__tagline {
+  animation-delay: 70ms;
+}
+
+.auth-language-switcher {
+  animation-delay: 130ms;
+}
+
+.auth-card {
+  animation-delay: 190ms;
+}
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 520px) {
+  .auth-page .auth-page__brand {
+    font-size: 32px !important;
+  }
+
+  .auth-page .auth-language-switcher__option {
+    min-width: 74px !important;
+    padding: 0 9px !important;
+  }
+
+  .auth-page .auth-card {
+    border-radius: 18px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page__brand,
+  .auth-page__tagline,
+  .auth-language-switcher,
+  .auth-card {
+    animation: none !important;
+  }
+
+  .auth-page button[type="submit"],
+  .auth-page .auth-language-switcher__option {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   INOP — LIGHT PREMIUM ENTERPRISE
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   PAGE
+   ------------------------------------------------------------ */
+
+.auth-page {
+  background:
+    radial-gradient(
+      circle at 50% 8%,
+      rgba(16, 185, 129, 0.10),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 8% 85%,
+      rgba(16, 185, 129, 0.055),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 92% 15%,
+      rgba(255, 255, 255, 0.95),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #f7faf8 0%,
+      #eef4f0 52%,
+      #f8faf9 100%
+    ) !important;
+
+  color: #17211c !important;
+}
+
+/* Soft architectural grid */
+.auth-page::before {
+  background:
+    linear-gradient(
+      rgba(25, 65, 48, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(25, 65, 48, 0.025) 1px,
+      transparent 1px
+    ) !important;
+
+  background-size: 64px 64px !important;
+
+  opacity: 0.55 !important;
+
+  mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      transparent 76%
+    ) !important;
+}
+
+/* ------------------------------------------------------------
+   BRAND
+   ------------------------------------------------------------ */
+
+.auth-page .auth-page__brand {
+  color: var(--accent) !important;
+
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+
+  text-shadow:
+    0 4px 18px rgba(16, 185, 129, 0.10) !important;
+}
+
+/* ------------------------------------------------------------
+   TAGLINE
+   ------------------------------------------------------------ */
+
+.auth-page .auth-page__tagline {
+  color: #64736b !important;
+
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ------------------------------------------------------------
+   LANGUAGE SELECTOR
+   ------------------------------------------------------------ */
+
+.auth-page .auth-language-switcher {
+  background: rgba(255, 255, 255, 0.72) !important;
+
+  border: 1px solid rgba(27, 55, 42, 0.10) !important;
+
+  border-radius: 13px !important;
+
+  box-shadow:
+    0 12px 30px rgba(31, 59, 45, 0.08),
+    0 2px 8px rgba(31, 59, 45, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+
+  backdrop-filter: blur(18px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%) !important;
+}
+
+/* Individual language */
+.auth-page .auth-language-switcher__option {
+  color: #68766e !important;
+
+  background: transparent !important;
+  border-color: transparent !important;
+
+  font-weight: 800 !important;
+}
+
+.auth-page .auth-language-switcher__option:hover {
+  color: #1f3027 !important;
+
+  background: rgba(16, 185, 129, 0.055) !important;
+
+  border-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+/* Active language */
+.auth-page .auth-language-switcher__option--active {
+  color: #17352a !important;
+
+  background: rgba(16, 185, 129, 0.105) !important;
+
+  border-color: rgba(16, 185, 129, 0.15) !important;
+
+  box-shadow:
+    0 3px 10px rgba(16, 185, 129, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Flags */
+.auth-page .auth-language-switcher__flag {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(30, 50, 40, 0.08) !important;
+}
+
+/* ------------------------------------------------------------
+   LOGIN CARD
+   ------------------------------------------------------------ */
+
+.auth-page .auth-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(250, 252, 251, 0.91)
+    ) !important;
+
+  border: 1px solid rgba(30, 58, 45, 0.09) !important;
+
+  border-radius: 22px !important;
+
+  box-shadow:
+    0 28px 70px rgba(31, 59, 45, 0.12),
+    0 8px 24px rgba(31, 59, 45, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+
+  backdrop-filter: blur(22px) !important;
+  -webkit-backdrop-filter: blur(22px) !important;
+}
+
+/* ------------------------------------------------------------
+   LABELS
+   ------------------------------------------------------------ */
+
+.auth-page label {
+  color: #526159 !important;
+
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+/* ------------------------------------------------------------
+   INPUTS
+   ------------------------------------------------------------ */
+
+.auth-page input {
+  background: rgba(247, 250, 248, 0.88) !important;
+
+  border: 1px solid rgba(32, 58, 45, 0.11) !important;
+
+  color: #18251f !important;
+
+  border-radius: 11px !important;
+
+  box-shadow:
+    inset 0 1px 2px rgba(30, 50, 40, 0.025) !important;
+}
+
+.auth-page input::placeholder {
+  color: #9aa59f !important;
+}
+
+.auth-page input:hover {
+  background: #ffffff !important;
+
+  border-color: rgba(16, 185, 129, 0.22) !important;
+}
+
+.auth-page input:focus {
+  background: #ffffff !important;
+
+  border-color: rgba(16, 185, 129, 0.52) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.09),
+    0 8px 22px rgba(31, 59, 45, 0.06) !important;
+
+  outline: none !important;
+}
+
+/* ------------------------------------------------------------
+   LOGIN BUTTON
+   ------------------------------------------------------------ */
+
+.auth-page button[type="submit"] {
+  border-radius: 11px !important;
+
+  box-shadow:
+    0 10px 24px rgba(16, 90, 57, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.auth-page button[type="submit"]:hover {
+  box-shadow:
+    0 14px 30px rgba(16, 90, 57, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20) !important;
+}
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 520px) {
+  .auth-page .auth-page__brand {
+    font-size: 32px !important;
+  }
+
+  .auth-page .auth-card {
+    border-radius: 18px !important;
+  }
 }
