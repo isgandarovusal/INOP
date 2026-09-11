@@ -1,109 +1,94 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  getServiceAudits,
-  deleteServiceAudit,
-} from "../../../Services/serviceAuditsService";
-import type { ServiceAudit } from "../../../Types/Audit";
+import React, {useEffect,useState} from "react";
 
-export default function ServiceAuditsList() {
-  const [audits, setAudits] = useState<ServiceAudit[]>([]);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getServiceAudits();
-        setAudits(data);
-      } catch {
-        setAudits([]);
-      }
-    };
+const API =
+ import.meta.env.VITE_API_BASE_URL ||
+ "http://localhost:3001/api";
 
-    load();
-  }, []);
 
-  const sortedAudits = useMemo(
-    () =>
-      [...audits].sort(
-        (a, b) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-      ),
-    [audits]
-  );
+export default function ServiceAuditsList(){
 
-  async function handleDelete(id: string) {
-    if (!window.confirm("Bu Service Audit silinsin?")) return;
+ const [audits,setAudits] = useState<any[]>([]);
+ const [loading,setLoading] = useState(true);
 
-    try {
-      await deleteServiceAudit(id);
-      const data = await getServiceAudits();
-      setAudits(data);
-    } catch {
-      setAudits([]);
+
+
+ useEffect(()=>{
+
+  fetch(`${API}/audit-module/service`)
+  .then(r=>r.json())
+  .then(res=>{
+    setAudits(res.data || []);
+  })
+  .finally(()=>{
+    setLoading(false);
+  });
+
+
+ },[]);
+
+
+
+ if(loading){
+  return <div>Loading...</div>;
+ }
+
+
+
+ return (
+
+  <div>
+
+   <h2>
+    Service Audit
+   </h2>
+
+
+   <table>
+
+    <thead>
+
+     <tr>
+      <th>Status</th>
+      <th>Type</th>
+      <th>Date</th>
+     </tr>
+
+    </thead>
+
+
+    <tbody>
+
+    {
+     audits.map(a=>(
+
+      <tr key={a._id}>
+
+       <td>
+        {a.status}
+       </td>
+
+       <td>
+        {a.auditType}
+       </td>
+
+       <td>
+        {new Date(a.createdAt)
+        .toLocaleDateString()}
+       </td>
+
+      </tr>
+
+     ))
     }
-  }
 
-  return (
-    <div className="audit-page">
-      <div className="audit-page-header">
-        <div>
-          <h1>Servis Auditi</h1>
-          <p>Servis keyfiyyəti və qonaq təcrübəsinin qiymətləndirilməsi.</p>
-        </div>
+    </tbody>
 
-        <Link to="/app/audit/service/new" className="btn btn-primary">
-          Yeni Servis Auditi
-        </Link>
-      </div>
+   </table>
 
-      {sortedAudits.length === 0 ? (
-        <div className="audit-empty-state">
-          Hələ heç bir Servis Auditi yaradılmayıb.
-        </div>
-      ) : (
-        <div className="audit-table-wrapper">
-          <table className="audit-table">
-            <thead>
-              <tr>
-                <th>Tarix</th>
-                <th>Növbə</th>
-                <th>Restoran</th>
-                <th>Auditor</th>
-                <th>Nəticə</th>
-                <th>Status</th>
-                <th />
-              </tr>
-            </thead>
 
-            <tbody>
-              {sortedAudits.map((audit) => (
-                <tr key={audit.id}>
-                  <td>{audit.date}</td>
-                  <td>{audit.shift}</td>
-                  <td>{audit.restaurantId}</td>
-                  <td>{audit.auditorId}</td>
-                  <td>{audit.overallPercentage.toFixed(1)}%</td>
-                  <td>{audit.status}</td>
-                  <td>
-                    <div className="audit-actions">
-                      <Link to={`/app/audit/service/${audit.id}`}>
-                        Bax
-                      </Link>
+  </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(audit.id)}
-                      >
-                        Sil
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
+ );
+
 }

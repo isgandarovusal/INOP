@@ -1,93 +1,88 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  getStandardAudits,
-  deleteStandardAudit,
-} from "../../../Services/standardAuditsService";
-import type { StandardAudit } from "../../../Types/Audit";
+import React, { useEffect, useState } from "react";
 
-export default function StandardAuditsList() {
-  const [audits, setAudits] = useState<StandardAudit[]>([]);
+const API =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
 
-  const sortedAudits = useMemo(
-    () =>
-      [...audits].sort(
-        (a, b) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-      ),
-    [audits]
-  );
 
-  async function handleDelete(id: string) {
-    if (!window.confirm("Bu Standart Audit silinsin?")) return;
+export default function StandardAuditsList(){
 
-    deleteStandardAudit(id);
-    setAudits(await getStandardAudits());
-  }
+ const [audits,setAudits] = useState<any[]>([]);
+ const [loading,setLoading] = useState(true);
 
-  return (
-    <div className="audit-page">
-      <div className="audit-page-header">
-        <div>
-          <h1>Standart Audit</h1>
-          <p>
-            Qida təhlükəsizliyi və brend standartları üzrə audit.
-          </p>
-        </div>
 
-        <Link to="/app/audit/standard/new" className="btn btn-primary">
-          Yeni Standart Audit
-        </Link>
-      </div>
+ useEffect(()=>{
 
-      {sortedAudits.length === 0 ? (
-        <div className="audit-empty-state">
-          Hələ heç bir Standart Audit yaradılmayıb.
-        </div>
-      ) : (
-        <div className="audit-table-wrapper">
-          <table className="audit-table">
-            <thead>
-              <tr>
-                <th>Tarix</th>
-                <th>Növbə</th>
-                <th>Restoran</th>
-                <th>Auditor</th>
-                <th>Uyğunluq</th>
-                <th>Status</th>
-                <th />
-              </tr>
-            </thead>
+  fetch(`${API}/audit-module/standard`)
+   .then(r=>r.json())
+   .then(res=>{
+     setAudits(res.data || []);
+   })
+   .finally(()=>{
+     setLoading(false);
+   });
 
-            <tbody>
-              {sortedAudits.map((audit) => (
-                <tr key={audit.id}>
-                  <td>{audit.date}</td>
-                  <td>{audit.shift}</td>
-                  <td>{audit.restaurantId}</td>
-                  <td>{audit.auditorId}</td>
-                  <td>{audit.compliancePercentage.toFixed(1)}%</td>
-                  <td>{audit.passed ? "PASSED" : "FAILED"}</td>
-                  <td>
-                    <div className="audit-actions">
-                      <Link to={`/app/audit/standard/${audit.id}`}>
-                        Bax
-                      </Link>
+ },[]);
 
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(audit.id)}
-                      >
-                        Sil
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
+
+
+ if(loading){
+  return <div>Loading...</div>;
+ }
+
+
+ return (
+
+  <div>
+
+   <h2>
+    Standard Audit
+   </h2>
+
+
+   <table>
+
+    <thead>
+     <tr>
+      <th>Status</th>
+      <th>Type</th>
+      <th>Date</th>
+     </tr>
+    </thead>
+
+
+    <tbody>
+
+    {
+     audits.map(a=>(
+
+      <tr key={a._id}>
+
+       <td>
+        {a.status}
+       </td>
+
+       <td>
+        {a.auditType}
+       </td>
+
+       <td>
+        {new Date(a.createdAt)
+        .toLocaleDateString()}
+       </td>
+
+      </tr>
+
+     ))
+    }
+
+    </tbody>
+
+   </table>
+
+
+  </div>
+
+ );
+
 }
