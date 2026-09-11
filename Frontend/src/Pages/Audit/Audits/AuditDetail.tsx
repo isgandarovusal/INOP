@@ -1,6 +1,7 @@
 import AuditFindingsList from "../AuditFindings/AuditFindingsList";
 import AuditAssignmentsList from "../AuditAssignments/AuditAssignmentsList";
 import AuditTimeline from "../AuditTimeline/AuditTimeline";
+import AuditApprovalPanel from "../AuditApproval/AuditApprovalPanel";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -250,6 +251,10 @@ const AuditDetail: React.FC = () => {
         />
 
         <AuditTimeline
+          auditId={id ?? ""}
+        />
+
+        <AuditApprovalPanel
           auditId={id ?? ""}
         />
 
