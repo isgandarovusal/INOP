@@ -18,6 +18,7 @@ import RestaurantDetail from "../Pages/Audit/Restaurants/RestaurantDetail";
 import AuditsList from "../Pages/Audit/Audits/AuditsList";
 import AuditForm from "../Pages/Audit/Audits/AuditForm";
 import AuditDetail from "../Pages/Audit/Audits/AuditDetail";
+import AuditEdit from "../Pages/Audit/Audits/AuditEdit";
 import AuditAnalytics from "../Pages/Audit/Analytics/AuditAnalytics";
 import SafetyAuditAnalytics from "../Pages/Audit/Analytics/SafetyAuditAnalytics";
 import ServiceAuditAnalytics from "../Pages/Audit/Analytics/ServiceAuditAnalytics";
@@ -77,6 +78,7 @@ const ROUTES: RouteObject[] = [
               { path: "audit/audits", element: <AuditsList /> },
               { path: "audit/audits/new", element: <AuditForm /> },
               { path: "audit/audits/:id", element: <AuditDetail /> },
+              { path: "audit/audits/:id/edit", element: <AuditEdit /> },
               { path: "audit/checklists", element: <AuditTemplatesList /> },
               { path: "audit/checklists/new", element: <AuditTemplateBuilder /> },
               { path: "audit/checklists/:id", element: <AuditTemplateBuilder /> },

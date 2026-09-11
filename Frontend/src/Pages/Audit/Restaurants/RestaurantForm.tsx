@@ -24,37 +24,67 @@ const RestaurantForm: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    getRestaurantById(id).then((restaurant) => {
-      if (!restaurant) return;
-      setName(restaurant.name);
-      setLocation(restaurant.location);
-      setStatus(restaurant.status);
-      setLoading(false);
-    });
+
+    setLoading(true);
+
+    getRestaurantById(id)
+      .then((restaurant) => {
+        if (!restaurant) {
+          setError("Restaurant not found.");
+          return;
+        }
+
+        setName(restaurant.name ?? "");
+        setLocation(restaurant.location ?? "");
+        setStatus(restaurant.status ?? "active");
+      })
+      .catch(() => {
+        setError("Failed to load restaurant.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
   }, [id]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!name.trim() || !location.trim()) {
       setError("Name and location are required.");
       return;
     }
+
     setSaving(true);
     setError(null);
+
     try {
-      const input = { name, location, status };
+      const payload = {
+        name: name.trim(),
+        location: location.trim(),
+        status,
+      };
+
       if (isEdit && id) {
-        await updateRestaurant(id, input);
+        await updateRestaurant(id, payload);
       } else {
-        await createRestaurant(input);
+        await createRestaurant(payload);
       }
+
       navigate("/app/audit/restaurants");
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong."
+      );
     } finally {
       setSaving(false);
     }
   };
+
 
   if (loading) {
     return (
@@ -64,72 +94,139 @@ const RestaurantForm: React.FC = () => {
     );
   }
 
+
   return (
     <div>
-      <PageHeader title={isEdit ? "Edit restaurant" : "Add restaurant"} />
+
+      <PageHeader
+        title={isEdit ? "Edit restaurant" : "Add restaurant"}
+        subtitle={
+          isEdit
+            ? "Update restaurant information."
+            : "Create a new restaurant for audits."
+        }
+      />
+
 
       <div className="form-card">
+
         <form onSubmit={handleSubmit} noValidate>
+
+
           <div className="form-group">
-            <label className="form-label">Name</label>
+            <label className="form-label">
+              Name
+            </label>
+
             <input
               className="input-field"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Restaurant A - Nizami"
+              onChange={(e)=>setName(e.target.value)}
+              placeholder="Restaurant name"
             />
+
           </div>
+
+
+
           <div className="form-group">
-            <label className="form-label">Location</label>
+            <label className="form-label">
+              Location
+            </label>
+
             <input
               className="input-field"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. Baku, Nizami Street"
+              onChange={(e)=>setLocation(e.target.value)}
+              placeholder="Baku, Nizami Street"
             />
+
           </div>
+
+
+
           <div className="form-group">
-            <label className="form-label">Status</label>
+            <label className="form-label">
+              Status
+            </label>
+
             <select
               className="input-field"
               value={status}
-              onChange={(e) => setStatus(e.target.value as RestaurantStatus)}
+              onChange={(e)=>
+                setStatus(e.target.value as RestaurantStatus)
+              }
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+
+              <option value="active">
+                Active
+              </option>
+
+              <option value="inactive">
+                Inactive
+              </option>
+
             </select>
+
           </div>
+
+
 
           {error && (
             <p className="form-error form-error--submit">
-              <AlertCircle size={12} /> {error}
+              <AlertCircle size={12}/>
+              {error}
             </p>
           )}
 
+
+
           <div className="form-actions">
+
             <button
               type="button"
               className="btn-secondary"
-              onClick={() => navigate("/app/audit/restaurants")}
+              onClick={() =>
+                navigate("/app/audit/restaurants")
+              }
             >
               Cancel
             </button>
-            <button type="submit" className="btn-primary" disabled={saving}>
+
+
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={saving}
+            >
+
               {saving ? (
                 <>
-                  <Loader2 size={16} className="spin" /> Saving…
+                  <Loader2 size={16} className="spin"/>
+                  Saving...
                 </>
               ) : (
                 <>
-                  {isEdit ? "Save changes" : "Add restaurant"} <ArrowRight size={16} />
+                  {isEdit
+                    ? "Save changes"
+                    : "Add restaurant"}
+
+                  <ArrowRight size={16}/>
                 </>
               )}
+
             </button>
+
           </div>
+
+
         </form>
+
       </div>
+
     </div>
   );
 };
+
 
 export default RestaurantForm;

@@ -33,13 +33,29 @@ export async function createAudit(
   input: AuditInput
 ): Promise<Audit> {
 
-  const { photos, attachments, ...rest } = input;
+  const {
+    photos,
+    attachments,
+    ...rest
+  } = input;
 
   const payload = {
     id: `aud-${Date.now()}`,
-    auditorId: "unknown",
+    auditorId: "test-user",
+    status: "completed",
+    overallPercentage:
+      (
+        input.scores.cleanliness +
+        input.scores.service +
+        input.scores.food +
+        input.scores.staff
+      ) * 2.5,
     photos: toAuditFiles(photos),
     attachments: toAuditFiles(attachments),
+    findings: [],
+    recommendations: [],
+    checks: [],
+    serviceTimeObservations: [],
     ...rest,
   };
 
@@ -48,22 +64,28 @@ export async function createAudit(
   return res.data;
 }
 
+export async function updateAudit(
+  id: string,
+  input: Partial<AuditInput>
+) {
+  const res = await API.put(`/audits/${id}`, input);
+  return res.data;
+}
+
 export async function deleteAudit(id: string) {
   await API.delete(`/audits/${id}`);
 }
 
 export function overallScore(audit: Audit): number {
-  const {
-    cleanliness,
-    service,
-    food,
-    staff,
-  } = audit.scores;
+
+  if (audit.overallPercentage && audit.overallPercentage > 0) {
+    return audit.overallPercentage / 10;
+  }
 
   return (
-    cleanliness +
-    service +
-    food +
-    staff
+    audit.scores.cleanliness +
+    audit.scores.service +
+    audit.scores.food +
+    audit.scores.staff
   ) / 4;
 }

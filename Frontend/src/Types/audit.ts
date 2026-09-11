@@ -31,5 +31,10 @@ export interface Audit {
   comments: string;
   photos: AuditFile[];
   attachments: AuditFile[];
+  overallPercentage?: number;
+  status?: string;
+  checks?: unknown[];
+  findings?: unknown[];
+  recommendations?: unknown[];
   createdAt: string;
 }

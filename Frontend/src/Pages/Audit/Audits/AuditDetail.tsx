@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
-import { getAuditById, overallScore } from "../../../Services/auditsService";
+import { getAuditById } from "../../../Services/auditsService";
 import { getRestaurantById } from "../../../Services/restaurantsService";
 import { getUsers } from "../../../Services/usersService";
 import type { Audit } from "../../../Types/audit";
 import type { Restaurant } from "../../../Types/audit";
 import type { PublicUser } from "../../../Types/auth";
+import { useAuth } from "../../../Context/AuthContext";
+import { canManageAudit } from "../../../Utils/permissions";
 
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
 const AuditDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const canManage = user ? canManageAudit(user.role) : false;
 
   const [audit, setAudit] = useState<Audit | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -53,7 +58,15 @@ const AuditDetail: React.FC = () => {
     return <EmptyState icon={<ClipboardCheck size={28} />} title="Audit not found" hint="It may have been deleted." />;
   }
 
-  const overall = overallScore(audit);
+  const overall =
+    audit.overallPercentage && audit.overallPercentage > 0
+      ? audit.overallPercentage / 10
+      : (
+          audit.scores.cleanliness +
+          audit.scores.service +
+          audit.scores.food +
+          audit.scores.staff
+        ) / 4;
 
   return (
     <div>
@@ -61,9 +74,20 @@ const AuditDetail: React.FC = () => {
         title={restaurant?.name ?? "Audit"}
         subtitle={`${audit.auditType} · ${audit.date} · by ${auditor?.name ?? "Unknown"}`}
         actions={
-          <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
-            <ArrowLeft size={15} /> Back
-          </button>
+          <>
+            <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
+              <ArrowLeft size={15} /> Back
+            </button>
+
+            {canManage && (
+              <button
+                className="btn-secondary"
+                onClick={() => navigate(`/app/audit/audits/${audit.id}/edit`)}
+              >
+                <Pencil size={15} /> Edit
+              </button>
+            )}
+          </>
         }
       />
 
@@ -80,6 +104,47 @@ const AuditDetail: React.FC = () => {
                 <strong>{value}</strong>
               </div>
             ))}
+          </div>
+
+          <div className="detail-card">
+            <h3>Status</h3>
+            <Badge tone={audit.status === "completed" ? "success" : "warning"}>
+              {audit.status ?? "unknown"}
+            </Badge>
+          </div>
+
+          <div className="detail-card">
+            <h3>Findings</h3>
+            {audit.findings && audit.findings.length > 0 ? (
+              <ul>
+                {audit.findings.map((item, index) => (
+                  <li key={index}>
+                    {typeof item === "string"
+                      ? item
+                      : JSON.stringify(item)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No findings recorded.</p>
+            )}
+          </div>
+
+          <div className="detail-card">
+            <h3>Recommendations</h3>
+            {audit.recommendations && audit.recommendations.length > 0 ? (
+              <ul>
+                {audit.recommendations.map((item, index) => (
+                  <li key={index}>
+                    {typeof item === "string"
+                      ? item
+                      : JSON.stringify(item)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No recommendations recorded.</p>
+            )}
           </div>
 
           <div className="detail-card">

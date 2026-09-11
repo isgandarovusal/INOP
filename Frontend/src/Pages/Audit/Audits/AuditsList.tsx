@@ -5,7 +5,7 @@ import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/ConfirmDialog";
 import Badge from "../../../Components/Badge";
-import { getAudits, deleteAudit, overallScore } from "../../../Services/auditsService";
+import { getAudits, deleteAudit } from "../../../Services/auditsService";
 import { getRestaurants } from "../../../Services/restaurantsService";
 import { getUsers } from "../../../Services/usersService";
 import type { Audit } from "../../../Types/audit";
@@ -54,7 +54,15 @@ const AuditsList: React.FC = () => {
         audit,
         restaurant: restaurants.find((r) => r.id === audit.restaurantId),
         auditor: users.find((u) => u.id === audit.auditorId),
-        overall: overallScore(audit),
+        overall:
+          audit.overallPercentage && audit.overallPercentage > 0
+            ? audit.overallPercentage / 10
+            : (
+                audit.scores.cleanliness +
+                audit.scores.service +
+                audit.scores.food +
+                audit.scores.staff
+              ) / 4,
       }))
       .filter((r) => restaurantFilter === "all" || r.audit.restaurantId === restaurantFilter)
       .filter((r) => auditorFilter === "all" || r.audit.auditorId === auditorFilter)

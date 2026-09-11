@@ -5,7 +5,7 @@ import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
 import { getRestaurantById } from "../../../Services/restaurantsService";
-import { getAudits, overallScore } from "../../../Services/auditsService";
+import { getAudits } from "../../../Services/auditsService";
 import type { Restaurant, Audit } from "../../../Types/audit";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
@@ -28,13 +28,29 @@ const RestaurantDetail: React.FC = () => {
       setAudits(
         auditResult
           .filter((a) => a.restaurantId === id)
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
       );
       setLoading(false);
     });
   }, [id]);
 
-  const history = useMemo(() => audits.map((a) => ({ ...a, overall: overallScore(a) })), [audits]);
+  const history = useMemo(
+    () =>
+      audits.map((a) => ({
+        ...a,
+        overall:
+          (a.overallPercentage ?? 0) > 0
+            ? (a.overallPercentage ?? 0) / 10
+            : (
+                a.scores.cleanliness +
+                a.scores.service +
+                a.scores.food +
+                a.scores.staff
+              ) / 4,
+      })),
+    [audits]
+  );
+
   const maxScore = 10;
 
   if (loading) {

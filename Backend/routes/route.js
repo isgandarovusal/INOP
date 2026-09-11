@@ -10,6 +10,7 @@ const applicationsController = require('../controllers/applications.controller')
 const auditsController = require('../controllers/audits.controller');
 const auditTemplatesController = require('../controllers/auditTemplates.controller');
 const auditSourceDocumentsController = require('../controllers/auditSourceDocuments.controller');
+const restaurantsController = require('../controllers/restaurants.controller');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
 const storage = multer.diskStorage({
@@ -28,6 +29,14 @@ router.get('/audits/:id', auditsController.getAuditById);
 router.post('/audits', auditsController.createAudit);
 router.put('/audits/:id', auditsController.updateAudit);
 router.delete('/audits/:id', auditsController.deleteAudit);
+
+
+// Restaurants API
+router.get('/restaurants', restaurantsController.getRestaurants);
+router.get('/restaurants/:id', restaurantsController.getRestaurantById);
+router.post('/restaurants', restaurantsController.createRestaurant);
+router.put('/restaurants/:id', restaurantsController.updateRestaurant);
+router.delete('/restaurants/:id', restaurantsController.deleteRestaurant);
 
 // Audit Template API
 router.get('/audit-templates', auditTemplatesController.getTemplates);

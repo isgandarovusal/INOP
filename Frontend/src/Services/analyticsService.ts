@@ -1,6 +1,6 @@
-import { getCollection, delay } from "./storage";
+import { getAudits } from "./auditsService";
+import { getRestaurants } from "./restaurantsService";
 import type { Audit } from "../Types/audit";
-import type { Restaurant } from "../Types/audit";
 import { overallScore } from "./auditsService";
 
 const CRITICAL_THRESHOLD = 7;
@@ -36,11 +36,13 @@ function round1(n: number): number {
 }
 
 export async function getAuditAnalytics(): Promise<AuditAnalytics> {
-  const audits = getCollection<Audit>("audits");
-  const restaurants = getCollection<Restaurant>("restaurants");
+  const [audits, restaurants] = await Promise.all([
+    getAudits(),
+    getRestaurants(),
+  ]);
 
   if (audits.length === 0) {
-    return delay({
+    return {
       overallScore: 0,
       totalAudits: 0,
       restaurantsAudited: 0,
@@ -48,7 +50,7 @@ export async function getAuditAnalytics(): Promise<AuditAnalytics> {
       restaurantComparison: [],
       categoryAnalysis: [],
       historicalTrend: [],
-    });
+    };
   }
 
   const overall = round1(
@@ -95,7 +97,7 @@ export async function getAuditAnalytics(): Promise<AuditAnalytics> {
     .sort((a, b) => a[1].order - b[1].order)
     .map(([label, { sum, count }]) => ({ label, score: round1(sum / count) }));
 
-  return delay({
+  return {
     overallScore: overall,
     totalAudits: audits.length,
     restaurantsAudited: restaurantIds.size,
@@ -103,5 +105,5 @@ export async function getAuditAnalytics(): Promise<AuditAnalytics> {
     restaurantComparison,
     categoryAnalysis,
     historicalTrend,
-  });
+  };
 }
