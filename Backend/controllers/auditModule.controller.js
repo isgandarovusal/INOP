@@ -1,60 +1,81 @@
 const Audit = require("../models/audit.model");
 
+function buildAuditFilter(req, auditType) {
+  const filter = {
+    auditType,
+  };
 
-exports.getStandardAudits = async (req,res)=>{
-  try{
+  const { status, restaurantId, from, to } = req.query;
 
-    const audits = await Audit.find({
-      auditType:"standard"
-    })
-    .sort({
-      createdAt:-1
+  if (status) {
+    filter.status = status;
+  }
+
+  if (restaurantId) {
+    filter.restaurantId = restaurantId;
+  }
+
+  if (from || to) {
+    filter.date = {};
+
+    if (from) {
+      filter.date.$gte = from;
+    }
+
+    if (to) {
+      filter.date.$lte = to;
+    }
+  }
+
+  return filter;
+}
+
+exports.getStandardAudits = async (req, res) => {
+  try {
+    const filter = buildAuditFilter(req, "standard");
+
+    const audits = await Audit.find(filter).sort({
+      date: -1,
+      createdAt: -1,
     });
 
     res.json({
-      success:true,
-      data:audits
+      success: true,
+      auditType: "standard",
+      count: audits.length,
+      data: audits,
     });
-
-  }catch(error){
-
-    console.error(error);
+  } catch (error) {
+    console.error("Standard audit error:", error);
 
     res.status(500).json({
-      success:false,
-      message:"Standard audit error"
+      success: false,
+      message: "Standard audit error",
     });
-
   }
 };
 
+exports.getServiceAudits = async (req, res) => {
+  try {
+    const filter = buildAuditFilter(req, "service");
 
-
-exports.getServiceAudits = async (req,res)=>{
-  try{
-
-    const audits = await Audit.find({
-      auditType:"service"
-    })
-    .sort({
-      createdAt:-1
+    const audits = await Audit.find(filter).sort({
+      date: -1,
+      createdAt: -1,
     });
-
 
     res.json({
-      success:true,
-      data:audits
+      success: true,
+      auditType: "service",
+      count: audits.length,
+      data: audits,
     });
-
-
-  }catch(error){
-
-    console.error(error);
+  } catch (error) {
+    console.error("Service audit error:", error);
 
     res.status(500).json({
-      success:false,
-      message:"Service audit error"
+      success: false,
+      message: "Service audit error",
     });
-
   }
 };
