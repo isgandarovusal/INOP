@@ -1,4 +1,3 @@
-import "../auditModern.css";
 import "../auditAnalytics.css";
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";

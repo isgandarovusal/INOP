@@ -1,4 +1,3 @@
-import "../auditModern.css";
 import "../auditAnalytics.css";
 import { useEffect, useMemo, useState } from "react";
 import type { ServiceAudit } from "../../../Types/Audit";

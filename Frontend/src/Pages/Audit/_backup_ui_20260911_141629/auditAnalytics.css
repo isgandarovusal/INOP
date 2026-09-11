@@ -1,0 +1,366 @@
+
+/* =========================================================
+   INOP — AUDIT ANALYTICS
+   Modern dashboard visual layer
+   ========================================================= */
+
+.audit-analytics,
+.audit-analytics-page,
+.auditAnalytics,
+.audit-analytics-container {
+  width: 100%;
+  min-height: 100%;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(37, 99, 235, .08), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, .07), transparent 25%),
+    #f6f8fc;
+  color: #172033;
+  box-sizing: border-box;
+}
+
+.audit-analytics h1,
+.audit-analytics-page h1,
+.auditAnalytics h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -.6px;
+  color: #111827;
+}
+
+.audit-analytics h2,
+.audit-analytics-page h2,
+.auditAnalytics h2 {
+  margin-top: 28px;
+  margin-bottom: 14px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.audit-analytics h3,
+.audit-analytics-page h3,
+.auditAnalytics h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* subtitle / description */
+
+.audit-analytics p,
+.audit-analytics-page p,
+.auditAnalytics p {
+  color: #6b7280;
+}
+
+/* =========================================================
+   ALL DIRECT CHILD BLOCKS
+   ========================================================= */
+
+.audit-analytics > div,
+.audit-analytics-page > div,
+.auditAnalytics > div {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.audit-analytics .card,
+.audit-analytics .stat-card,
+.audit-analytics .metric-card,
+.audit-analytics .analytics-card,
+.audit-analytics-page .card,
+.audit-analytics-page .stat-card,
+.audit-analytics-page .metric-card,
+.audit-analytics-page .analytics-card,
+.auditAnalytics .card,
+.auditAnalytics .stat-card,
+.auditAnalytics .metric-card,
+.auditAnalytics .analytics-card {
+  background: rgba(255,255,255,.94);
+  border: 1px solid #e7ebf2;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 1px 2px rgba(15,23,42,.03),
+    0 8px 28px rgba(15,23,42,.06);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.audit-analytics .card:hover,
+.audit-analytics .stat-card:hover,
+.audit-analytics .metric-card:hover,
+.audit-analytics .analytics-card:hover,
+.audit-analytics-page .card:hover,
+.audit-analytics-page .stat-card:hover,
+.audit-analytics-page .metric-card:hover,
+.audit-analytics .analytics-card:hover {
+  transform: translateY(-2px);
+  border-color: #d8e0ed;
+  box-shadow:
+    0 4px 8px rgba(15,23,42,.04),
+    0 16px 36px rgba(15,23,42,.08);
+}
+
+/* =========================================================
+   KPI NUMBERS
+   ========================================================= */
+
+.audit-analytics strong,
+.audit-analytics-page strong,
+.auditAnalytics strong {
+  color: #111827;
+}
+
+.audit-analytics .stat-value,
+.audit-analytics .metric-value,
+.audit-analytics .value,
+.audit-analytics-page .stat-value,
+.audit-analytics-page .metric-value,
+.auditAnalytics .stat-value,
+.auditAnalytics .metric-value {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #111827;
+}
+
+/* =========================================================
+   BUTTONS / FILTERS
+   ========================================================= */
+
+.audit-analytics button,
+.audit-analytics-page button,
+.auditAnalytics button {
+  border: 1px solid #dbe2ec;
+  background: #fff;
+  color: #374151;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .16s ease;
+}
+
+.audit-analytics button:hover,
+.audit-analytics-page button:hover,
+.auditAnalytics button:hover {
+  background: #f3f6fb;
+  border-color: #b9c7da;
+  transform: translateY(-1px);
+}
+
+.audit-analytics select,
+.audit-analytics input,
+.audit-analytics-page select,
+.audit-analytics-page input,
+.auditAnalytics select,
+.auditAnalytics input {
+  border: 1px solid #dce3ed;
+  background: #fff;
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #374151;
+  outline: none;
+  font-size: 13px;
+}
+
+.audit-analytics select:focus,
+.audit-analytics input:focus,
+.audit-analytics-page select:focus,
+.audit-analytics-page input:focus,
+.auditAnalytics select:focus,
+.auditAnalytics input:focus {
+  border-color: #7aa2ff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.audit-analytics table,
+.audit-analytics-page table,
+.auditAnalytics table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(15,23,42,.04);
+}
+
+.audit-analytics th,
+.audit-analytics-page th,
+.auditAnalytics th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 13px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.audit-analytics td,
+.audit-analytics-page td,
+.auditAnalytics td {
+  padding: 14px 15px;
+  color: #374151;
+  font-size: 13px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.audit-analytics tr:last-child td,
+.audit-analytics-page tr:last-child td,
+.auditAnalytics tr:last-child td {
+  border-bottom: none;
+}
+
+.audit-analytics tbody tr:hover,
+.audit-analytics-page tbody tr:hover,
+.auditAnalytics tbody tr:hover {
+  background: #f8fbff;
+}
+
+/* =========================================================
+   CHART CONTAINERS
+   ========================================================= */
+
+.audit-analytics svg,
+.audit-analytics-page svg,
+.auditAnalytics svg {
+  max-width: 100%;
+}
+
+.audit-analytics canvas,
+.audit-analytics-page canvas,
+.auditAnalytics canvas {
+  max-width: 100%;
+}
+
+/* Recharts */
+
+.audit-analytics .recharts-wrapper,
+.audit-analytics-page .recharts-wrapper,
+.auditAnalytics .recharts-wrapper {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.audit-analytics .recharts-cartesian-axis-tick-value,
+.audit-analytics-page .recharts-cartesian-axis-tick-value,
+.auditAnalytics .recharts-cartesian-axis-tick-value {
+  fill: #94a3b8;
+  font-size: 11px;
+}
+
+.audit-analytics .recharts-cartesian-grid line,
+.audit-analytics-page .recharts-cartesian-grid line,
+.auditAnalytics .recharts-cartesian-grid line {
+  stroke: #edf1f6;
+}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.audit-analytics .badge,
+.audit-analytics .status,
+.audit-analytics-page .badge,
+.audit-analytics-page .status,
+.auditAnalytics .badge,
+.auditAnalytics .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   PROGRESS BARS
+   ========================================================= */
+
+.audit-analytics progress,
+.audit-analytics-page progress,
+.auditAnalytics progress {
+  width: 100%;
+  height: 7px;
+  border: none;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.audit-analytics progress::-webkit-progress-bar,
+.audit-analytics-page progress::-webkit-progress-bar,
+.auditAnalytics progress::-webkit-progress-bar {
+  background: #e9eef5;
+  border-radius: 99px;
+}
+
+.audit-analytics progress::-webkit-progress-value,
+.audit-analytics-page progress::-webkit-progress-value,
+.auditAnalytics progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #2563eb, #14b8a6);
+  border-radius: 99px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .audit-analytics,
+  .audit-analytics-page,
+  .auditAnalytics,
+  .audit-analytics-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .audit-analytics,
+  .audit-analytics-page,
+  .auditAnalytics,
+  .audit-analytics-container {
+    padding: 14px;
+  }
+
+  .audit-analytics h1,
+  .audit-analytics-page h1,
+  .auditAnalytics h1 {
+    font-size: 23px;
+  }
+
+  .audit-analytics .stat-value,
+  .audit-analytics .metric-value,
+  .audit-analytics-page .stat-value,
+  .audit-analytics-page .metric-value {
+    font-size: 25px;
+  }
+
+  .audit-analytics table,
+  .audit-analytics-page table,
+  .auditAnalytics table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+

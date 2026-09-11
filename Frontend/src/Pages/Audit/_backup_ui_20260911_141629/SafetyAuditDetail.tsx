@@ -1,4 +1,3 @@
-import "../auditModern.css";
 import { useEffect, useState } from "react";
 import type { OccupationalSafetyAudit } from "../../../Types/Audit/occupationalSafetyAudit";
 import { Link, useParams } from "react-router-dom";

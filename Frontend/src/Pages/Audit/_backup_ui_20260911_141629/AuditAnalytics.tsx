@@ -1,4 +1,3 @@
-import "../auditModern.css";
 import "../auditAnalytics.css";
 import React, { useEffect, useState } from "react";
 

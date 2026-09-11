@@ -1,4 +1,3 @@
-import "../auditModern.css";
 import { useEffect, useState } from "react";
 import type { StandardAudit } from "../../../Types/Audit/standardAudit";
 import { Link, useParams } from "react-router-dom";

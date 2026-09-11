@@ -1,5 +1,4 @@
-import "../auditModern.css";
-import {useEffect,useState} from "react";
+import { useEffect, useState } from "react";
 
 
 const API =
@@ -7,22 +6,33 @@ const API =
  "http://localhost:3001/api";
 
 
-export default function ServiceAuditsList(){
 
- const [audits,setAudits] = useState<any[]>([]);
- const [loading,setLoading] = useState(true);
+export default function OccupationalSafetyAuditsList(){
+
+
+ const [audits,setAudits]=useState<any[]>([]);
+
+ const [loading,setLoading]=useState(true);
 
 
 
  useEffect(()=>{
 
-  fetch(`${API}/audit-module/service`)
+
+  fetch(`${API}/occupational-safety-audits`)
+
   .then(r=>r.json())
+
   .then(res=>{
+
     setAudits(res.data || []);
+
   })
+
   .finally(()=>{
+
     setLoading(false);
+
   });
 
 
@@ -31,7 +41,9 @@ export default function ServiceAuditsList(){
 
 
  if(loading){
+
   return <div>Loading...</div>;
+
  }
 
 
@@ -41,7 +53,7 @@ export default function ServiceAuditsList(){
   <div>
 
    <h2>
-    Service Audit
+    Occupational Safety Audit
    </h2>
 
 
@@ -50,15 +62,20 @@ export default function ServiceAuditsList(){
     <thead>
 
      <tr>
+
       <th>Status</th>
-      <th>Type</th>
+
+      <th>Audit Type</th>
+
       <th>Date</th>
+
      </tr>
 
     </thead>
 
 
     <tbody>
+
 
     {
      audits.map(a=>(
@@ -69,21 +86,26 @@ export default function ServiceAuditsList(){
         {a.status}
        </td>
 
+
        <td>
         {a.auditType}
        </td>
+
 
        <td>
         {new Date(a.createdAt)
         .toLocaleDateString()}
        </td>
 
+
       </tr>
 
      ))
     }
 
+
     </tbody>
+
 
    </table>
 
@@ -91,5 +113,6 @@ export default function ServiceAuditsList(){
   </div>
 
  );
+
 
 }
