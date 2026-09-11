@@ -17,6 +17,7 @@ const auditWorkflowRoutes = require('./auditWorkflow.routes');
 const occupationalSafetyDetailsRoutes = require('./occupationalSafetyDetails.routes');
 const auditReportRoutes = require('./auditReport.routes');
 const auditScoreRoutes = require('./auditScore.routes');
+const auditPermissionRoutes = require('./auditPermission.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
 
 const auditFindingRoutes = require('./auditFinding.routes');
@@ -62,6 +63,8 @@ router.use(
 auditTimelineRoutes
 );
 
+
+router.use('/audit-permission', auditPermissionRoutes);
 
 // Audit API
 router.get('/audits/analytics', auditsController.getAuditAnalytics);
