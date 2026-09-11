@@ -3,6 +3,7 @@ import AuditAssignmentsList from "../AuditAssignments/AuditAssignmentsList";
 import AuditTimeline from "../AuditTimeline/AuditTimeline";
 import AuditApprovalPanel from "../AuditApproval/AuditApprovalPanel";
 import AuditClosurePanel from "../AuditClosure/AuditClosurePanel";
+import AuditExportPanel from "../AuditExport/AuditExportPanel";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -260,6 +261,10 @@ const AuditDetail: React.FC = () => {
         />
 
         <AuditClosurePanel
+          auditId={id ?? ""}
+        />
+
+        <AuditExportPanel
           auditId={id ?? ""}
         />
 

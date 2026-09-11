@@ -1,22 +1,20 @@
 const router =
-require("express").Router();
-
+  require("express").Router();
 
 const controller =
-require("../controllers/auditClosure.controller");
+  require("../controllers/auditClosure.controller");
 
 
 router.post(
- "/",
- controller.closeAudit
+  "/",
+  controller.closeAudit
 );
 
 
 router.get(
- "/:auditId",
- controller.getClosure
+  "/:auditId",
+  controller.getClosure
 );
 
 
-module.exports =
-router;
+module.exports = router;

@@ -1,87 +1,72 @@
-import {
- useState
-} from "react";
-
+import { useState } from "react";
 
 import {
- closeAudit
-}
-from "../../../Services/auditClosureService";
+  closeAudit
+} from "../../../Services/auditClosureService";
 
 
+export default function AuditClosurePanel({
+  auditId
+}: {
+  auditId: string;
+}) {
+  const [
+    message,
+    setMessage
+  ] = useState("");
 
-export default function AuditClosurePanel(
-{
- auditId
-}:{
- auditId:string
-}){
-
-
-const [
- message,
- setMessage
-]=useState("");
-
-
-
-async function close(){
-
-try{
+  const [
+    loading,
+    setLoading
+  ] = useState(false);
 
 
-await closeAudit({
+  async function close() {
+    try {
+      setLoading(true);
+      setMessage("");
 
- auditId,
+      await closeAudit({
+        auditId,
+        comment: "Audit completed"
+      });
 
- comment:
- "Audit completed"
+      setMessage(
+        "Audit closed successfully"
+      );
 
-});
+    } catch (error: any) {
+      setMessage(
+        error.message ||
+        "Audit close failed"
+      );
 
-
-setMessage(
-"Audit closed successfully"
-);
-
-
-}
-catch(e:any){
-
-setMessage(
-e.message
-);
-
-}
-
-
-}
+    } finally {
+      setLoading(false);
+    }
+  }
 
 
+  return (
+    <div className="detail-card">
+      <h3>
+        Audit Closure
+      </h3>
 
-return (
+      <button
+        onClick={close}
+        disabled={loading}
+      >
+        {loading
+          ? "Closing..."
+          : "Close Audit"}
+      </button>
 
-<div className="detail-card">
-
-<h3>
-Audit Closure
-</h3>
-
-
-<button
-onClick={close}
->
-Close Audit
-</button>
-
-
-<p>
-{message}
-</p>
-
-
-</div>
-
-);
-
+      {message && (
+        <p>
+          {message}
+        </p>
+      )}
+    </div>
+  );
 }
