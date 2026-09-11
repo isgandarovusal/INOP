@@ -7,6 +7,9 @@ const candidateRoutes = require('./candidate.routes');
 const jobsController = require('../controllers/jobs.controller');
 const candidatesController = require('../controllers/candidates.controller');
 const applicationsController = require('../controllers/applications.controller');
+const auditsController = require('../controllers/audits.controller');
+const auditTemplatesController = require('../controllers/auditTemplates.controller');
+const auditSourceDocumentsController = require('../controllers/auditSourceDocuments.controller');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
 const storage = multer.diskStorage({
@@ -17,6 +20,36 @@ const upload = multer({ storage });
 
 // Sub-routes
 router.use('/candidates-api', candidateRoutes);
+
+// Audit API
+router.get('/audits/analytics', auditsController.getAuditAnalytics);
+router.get('/audits', auditsController.getAudits);
+router.get('/audits/:id', auditsController.getAuditById);
+router.post('/audits', auditsController.createAudit);
+router.put('/audits/:id', auditsController.updateAudit);
+router.delete('/audits/:id', auditsController.deleteAudit);
+
+// Audit Template API
+router.get('/audit-templates', auditTemplatesController.getTemplates);
+router.get('/audit-templates/:id', auditTemplatesController.getTemplateById);
+router.post('/audit-templates', auditTemplatesController.createTemplate);
+router.put('/audit-templates/:id', auditTemplatesController.updateTemplate);
+router.delete('/audit-templates/:id', auditTemplatesController.deleteTemplate);
+
+// Audit Source Documents
+router.get(
+  '/audit-source-documents',
+  auditSourceDocumentsController.getDocuments
+);
+router.post(
+  '/audit-source-documents',
+  upload.single('file'),
+  auditSourceDocumentsController.uploadDocument
+);
+router.delete(
+  '/audit-source-documents/:id',
+  auditSourceDocumentsController.deleteDocument
+);
 
 // Jobs Endpoints
 router.get('/jobs', jobsController.getJobs);

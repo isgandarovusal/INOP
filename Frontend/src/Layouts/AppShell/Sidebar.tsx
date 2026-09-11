@@ -49,6 +49,13 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
       { to: "/app/audit/restaurants", label: "Restaurants", icon: Store, section: "audit" },
       { to: "/app/audit/audits", label: "Audits", icon: ClipboardCheck, section: "audit" },
       { to: "/app/audit/analytics", label: "Analytics", icon: BarChart3, section: "audit" },
+      { to: "/app/audit/checklists", label: "Checklistlər", icon: ClipboardList, section: "audit" },
+      { to: "/app/audit/service", label: "Servis Auditi", icon: ClipboardCheck, section: "audit" },
+      { to: "/app/audit/service/analytics", label: "Servis Analitikası", icon: BarChart3, section: "audit" },
+      { to: "/app/audit/standard", label: "Standart Audit", icon: ClipboardCheck, section: "audit" },
+      { to: "/app/audit/standard/analytics", label: "Standart Analitikası", icon: BarChart3, section: "audit" },
+      { to: "/app/audit/safety", label: "Əməyin Mühafizəsi", icon: ClipboardCheck, section: "audit" },
+      { to: "/app/audit/safety/analytics", label: "ƏM Analitikası", icon: BarChart3, section: "audit" },
     ],
   },
   {

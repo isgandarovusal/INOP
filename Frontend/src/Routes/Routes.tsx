@@ -19,6 +19,19 @@ import AuditsList from "../Pages/Audit/Audits/AuditsList";
 import AuditForm from "../Pages/Audit/Audits/AuditForm";
 import AuditDetail from "../Pages/Audit/Audits/AuditDetail";
 import AuditAnalytics from "../Pages/Audit/Analytics/AuditAnalytics";
+import SafetyAuditAnalytics from "../Pages/Audit/Analytics/SafetyAuditAnalytics";
+import ServiceAuditAnalytics from "../Pages/Audit/Analytics/ServiceAuditAnalytics";
+import StandardAuditAnalytics from "../Pages/Audit/Analytics/StandardAuditAnalytics";
+import AuditTemplatesList from "../Pages/Audit/ChecklistBuilder/AuditTemplatesList";
+import AuditTemplateBuilder from "../Pages/Audit/ChecklistBuilder/AuditTemplateBuilder";
+import ServiceAuditsList from "../Pages/Audit/ServiceAudit/ServiceAuditsList";
+import ServiceAuditForm from "../Pages/Audit/ServiceAudit/ServiceAuditForm";
+import StandardAuditsList from "../Pages/Audit/StandardAudit/StandardAuditsList";
+import StandardAuditForm from "../Pages/Audit/StandardAudit/StandardAuditForm";
+import StandardAuditDetail from "../Pages/Audit/StandardAudit/StandardAuditDetail";
+import SafetyAuditsList from "../Pages/Audit/OccupationalSafetyAudit/SafetyAuditsList";
+import SafetyAuditForm from "../Pages/Audit/OccupationalSafetyAudit/SafetyAuditForm";
+import SafetyAuditDetail from "../Pages/Audit/OccupationalSafetyAudit/SafetyAuditDetail";
 import UsersList from "../Pages/Users/UsersList";
 import UserForm from "../Pages/Users/UserForm";
 import DepartmentsList from "../Pages/Departments/DepartmentsList";
@@ -64,6 +77,21 @@ const ROUTES: RouteObject[] = [
               { path: "audit/audits", element: <AuditsList /> },
               { path: "audit/audits/new", element: <AuditForm /> },
               { path: "audit/audits/:id", element: <AuditDetail /> },
+              { path: "audit/checklists", element: <AuditTemplatesList /> },
+              { path: "audit/checklists/new", element: <AuditTemplateBuilder /> },
+              { path: "audit/checklists/:id", element: <AuditTemplateBuilder /> },
+
+{ path: "audit/service", element: <ServiceAuditsList /> },
+              { path: "audit/service/new", element: <ServiceAuditForm /> },
+{ path: "audit/service/analytics", element: <ServiceAuditAnalytics /> },
+              { path: "audit/standard", element: <StandardAuditsList /> },
+              { path: "audit/standard/new", element: <StandardAuditForm /> },
+              { path: "audit/standard/:id", element: <StandardAuditDetail /> },
+              { path: "audit/standard/analytics", element: <StandardAuditAnalytics /> },
+              { path: "audit/safety", element: <SafetyAuditsList /> },
+              { path: "audit/safety/new", element: <SafetyAuditForm /> },
+              { path: "audit/safety/:id", element: <SafetyAuditDetail /> },
+              { path: "audit/safety/analytics", element: <SafetyAuditAnalytics /> },
               { path: "audit/analytics", element: <AuditAnalytics /> },
             ],
           },
