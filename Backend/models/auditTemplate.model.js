@@ -86,6 +86,11 @@ const AuditTemplateSchema = new mongoose.Schema(
       default: "1.0",
     },
 
+    visitCount: {
+      type: Number,
+      default: 0,
+    },
+
     status: {
       type: String,
       enum: ["draft", "active", "archived"],

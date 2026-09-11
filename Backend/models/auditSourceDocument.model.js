@@ -2,6 +2,18 @@ const mongoose = require("mongoose");
 
 const AuditSourceDocumentSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      default: "",
+      index: true,
+    },
+
+    templateId: {
+      type: String,
+      default: "",
+      index: true,
+    },
+
     organizationId: {
       type: String,
       default: "",
@@ -16,15 +28,24 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
 
     auditType: {
       type: String,
-      enum: ["service", "standard", "occupational-safety"],
-      required: true,
+      enum: [
+        "service",
+        "standard",
+        "occupational-safety",
+      ],
+      default: "service",
       index: true,
     },
 
     fileName: {
       type: String,
-      required: true,
+      default: "",
       trim: true,
+    },
+
+    name: {
+      type: String,
+      default: "",
     },
 
     originalName: {
@@ -43,6 +64,11 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
       default: 0,
     },
 
+    filePath: {
+      type: String,
+      default: "",
+    },
+
     storageKey: {
       type: String,
       default: "",
@@ -50,7 +76,12 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["uploaded", "processing", "processed", "failed"],
+      enum: [
+        "uploaded",
+        "processing",
+        "processed",
+        "failed",
+      ],
       default: "uploaded",
     },
 
@@ -69,12 +100,17 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
   }
 );
 
+
 AuditSourceDocumentSchema.index({
   brandId: 1,
   auditType: 1,
   createdAt: -1,
 });
 
+
 module.exports =
   mongoose.models.AuditSourceDocument ||
-  mongoose.model("AuditSourceDocument", AuditSourceDocumentSchema);
+  mongoose.model(
+    "AuditSourceDocument",
+    AuditSourceDocumentSchema
+  );

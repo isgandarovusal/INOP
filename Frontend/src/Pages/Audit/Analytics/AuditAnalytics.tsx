@@ -24,6 +24,10 @@ const EMPTY: AuditAnalyticsData = {
   historicalTrend: [],
 };
 
+const formatScore = (score:number,total:number) =>
+  total > 0 ? `${score.toFixed(1)} / 10` : "—";
+
+
 const AuditAnalytics: React.FC = () => {
   const [data, setData] = useState<AuditAnalyticsData>(EMPTY);
   const [loading, setLoading] = useState(true);
@@ -37,7 +41,7 @@ const AuditAnalytics: React.FC = () => {
   const kpis = [
     {
       label: "Overall score",
-      value: `${data.overallScore.toFixed(1)} / 10`,
+      value: formatScore(data.overallScore, data.totalAudits),
       icon: Gauge,
       accent: "#6366f1",
       accentBg: "rgba(99,102,241,0.12)",

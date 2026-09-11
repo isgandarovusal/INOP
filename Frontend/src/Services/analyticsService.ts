@@ -36,10 +36,15 @@ function round1(n: number): number {
 }
 
 export async function getAuditAnalytics(): Promise<AuditAnalytics> {
-  const [audits, restaurants] = await Promise.all([
+  const [auditResult, restaurantResult] = await Promise.all([
     getAudits(),
     getRestaurants(),
   ]);
+
+  const audits = Array.isArray(auditResult) ? auditResult : [];
+  const restaurants = Array.isArray(restaurantResult)
+    ? restaurantResult
+    : [];
 
   if (audits.length === 0) {
     return {

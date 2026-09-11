@@ -1057,3 +1057,316 @@
   width: 100px;
 }
 
+
+
+/* =====================================================
+   INOP AUDIT ENTERPRISE THEME
+   ===================================================== */
+
+.audit-card,
+.audit-detail-hero {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+}
+
+
+.audit-card {
+  border-radius: 18px;
+}
+
+
+.audit-card-header h3,
+.audit-detail-hero h2,
+.audit-builder-title-input,
+.audit-result-main strong {
+  color: #0f172a;
+}
+
+
+.audit-card-header p,
+.audit-detail-hero p,
+.audit-detail-eyebrow {
+  color: #64748b;
+}
+
+
+/* Primary audit identity */
+
+.audit-kpi-icon {
+  background: rgba(15,118,110,0.12);
+  color:#0f766e;
+}
+
+
+.audit-score-ring {
+  border-color: rgba(15,118,110,0.18);
+  border-top-color:#0f766e;
+}
+
+
+/* Builder sections */
+
+.audit-builder-section {
+  border-color:#dbe4ea;
+  border-radius:16px;
+}
+
+
+.audit-builder-section-header {
+  background:#f8fafc;
+}
+
+
+.audit-builder-subsection {
+  border-left-color:rgba(15,118,110,0.25);
+  background:#f8fafc;
+}
+
+
+/* Inputs */
+
+.audit-builder-title-input,
+.audit-builder-subsection-header input,
+.audit-builder-question > input,
+.audit-builder-question > select {
+  background:#ffffff;
+  border-color:#dbe4ea;
+}
+
+
+.audit-builder-question {
+  border-color:#e2e8f0;
+}
+
+
+/* Buttons */
+
+.audit-builder-add {
+  background:rgba(15,118,110,0.10);
+  color:#0f766e;
+}
+
+
+.audit-icon-danger {
+  color:#dc2626;
+}
+
+
+/* Upload/checklist area */
+
+.audit-builder-check {
+  color:#475569;
+}
+
+
+.audit-builder-empty {
+  background:#f8fafc;
+  border-color:#cbd5e1;
+}
+
+
+/* Trend */
+
+.audit-trend-mini__bar {
+  background:linear-gradient(
+    180deg,
+    #14b8a6,
+    #0f766e
+  );
+}
+
+
+
+
+
+
+/* =====================================================
+   INOP AUDIT UI STANDARD
+   ===================================================== */
+
+
+.audit-page-header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:24px;
+}
+
+
+.audit-page-header .btn-primary {
+  margin-top:32px;
+  min-width:140px;
+  height:42px;
+  border-radius:12px;
+}
+
+
+.audit-card {
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+
+
+.btn,
+.btn-primary,
+.btn-secondary {
+  border-radius:10px;
+  height:40px;
+  padding:0 16px;
+  font-weight:600;
+}
+
+
+.btn-primary {
+  background:#0f766e;
+  border-color:#0f766e;
+}
+
+
+.btn-secondary {
+  background:#f8fafc;
+  border-color:#cbd5e1;
+  color:#334155;
+}
+
+
+.audit-delete-button {
+  color:#dc2626;
+  background:transparent;
+}
+
+
+
+
+/* =====================================================
+   AUDIT ACTION STANDARD
+   ===================================================== */
+
+
+.audit-delete-button {
+  background:#fee2e2;
+  color:#b91c1c;
+  border:1px solid #fecaca;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+
+.audit-delete-button:hover {
+  background:#fecaca;
+}
+
+
+.btn,
+button.btn {
+  min-height:40px;
+  border-radius:10px;
+  font-weight:600;
+  transition:.2s ease;
+}
+
+
+.btn-secondary {
+  background:#f8fafc;
+  border:1px solid #cbd5e1;
+  color:#334155;
+}
+
+
+.btn-secondary:hover {
+  background:#e2e8f0;
+}
+
+
+.btn-primary {
+  background:#0f766e;
+  border:1px solid #0f766e;
+  color:white;
+}
+
+
+.btn-primary:hover {
+  background:#115e59;
+}
+
+
+
+
+/* =====================================================
+   AUDIT BUTTON SYSTEM
+   ===================================================== */
+
+
+.audit-page .btn,
+.audit-page button.btn,
+.audit-page-header .btn {
+
+  height:42px;
+  padding:0 18px;
+  border-radius:10px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+}
+
+
+.audit-page .btn-primary {
+
+ background:#0f766e;
+ border:1px solid #0f766e;
+ color:white;
+
+}
+
+
+.audit-page .btn-primary:hover {
+
+ background:#115e59;
+
+}
+
+
+
+.audit-page .btn-secondary {
+
+ background:#ffffff;
+ border:1px solid #cbd5e1;
+ color:#334155;
+
+}
+
+
+
+.audit-page .btn-secondary:hover {
+
+ background:#f8fafc;
+
+}
+
+
+
+.audit-page .btn-danger,
+.audit-delete-button {
+
+ background:#fee2e2;
+ border:1px solid #fecaca;
+ color:#b91c1c;
+
+}
+
+
+
+.audit-delete-button {
+
+ height:38px;
+ padding:0 14px;
+
+}

@@ -35,7 +35,7 @@ const emptyTemplate = (): Partial<AuditTemplate> => ({
   brandName: "",
   auditType: "service",
   name: "",
-  version: "1.0",
+  version: "",
   status: "draft",
   sections: [],
   sourceDocumentIds: [],
@@ -105,7 +105,7 @@ if (id) {
         .finally(() => setLoading(false));
     }
 
-    getAuditSourceDocuments()
+    getAuditSourceDocuments(id)
       .then((data) => setDocuments(data))
       .catch(() => setDocuments([]));
     };
@@ -126,6 +126,7 @@ if (id) {
       const uploaded = await uploadAuditSourceDocument(
         file,
         {
+          templateId: id,
           organizationId: template.organizationId || "",
           brandId: template.brandId || "",
           auditType:
@@ -507,13 +508,15 @@ if (id) {
             </label>
 
             <label>
-              Versiya
+              Səfər sayı
               <input
-                value={template.version || "1.0"}
+                value={template.version ?? ""}
                 onChange={(event) =>
                   setTemplate({
                     ...template,
-                    version: event.target.value,
+                    version: event.target.value
+                      ? String(Math.round(Number(event.target.value)))
+                      : "",
                   })
                 }
               />
@@ -576,7 +579,7 @@ if (id) {
                     toggleSourceDocument(document.id)
                   }
                 />
-                <span>{document.originalName}</span>
+                <span>{document.originalName || document.name}</span>
 
                 <button
                   type="button"

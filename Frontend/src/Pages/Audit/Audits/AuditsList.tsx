@@ -31,19 +31,42 @@ const AuditsList: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Audit | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = () => {
-    setLoading(true);
-    Promise.all([getAudits(), getRestaurants(), getUsers()]).then(
-      ([auditResult, restaurantResult, userResult]) => {
-        setAudits(auditResult.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-        setRestaurants(restaurantResult);
-        setUsers(userResult);
-        setLoading(false);
-      },
-    );
+  const load = async () => {
+    try {
+      setLoading(true);
+
+      const [
+        auditResult,
+        restaurantResult,
+        userResult,
+      ] = await Promise.all([
+        getAudits(),
+        getRestaurants(),
+        getUsers(),
+      ]);
+
+      setAudits(
+        auditResult.sort(
+          (a, b) =>
+            new Date(b.date).getTime() -
+            new Date(a.date).getTime()
+        )
+      );
+
+      setRestaurants(restaurantResult);
+      setUsers(userResult);
+
+    } catch (error) {
+      console.error("Failed loading audits:", error);
+
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const auditors = useMemo(() => users.filter((u) => u.role === "auditor"), [users]);
 
