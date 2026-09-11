@@ -32,9 +32,7 @@ export default function AuditTemplatesList() {
   }
 
   useEffect(() => {
-    const load = async () => {
-void load();
-    };
+    void load();
   }, []);
 
   async function removeTemplate(id: string) {
