@@ -11,6 +11,7 @@ const auditsController = require('../controllers/audits.controller');
 const auditTemplatesController = require('../controllers/auditTemplates.controller');
 const auditSourceDocumentsController = require('../controllers/auditSourceDocuments.controller');
 const auditAnalyticsRoutes = require('./auditAnalytics.routes');
+const auditModuleRoutes = require('./auditModule.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
@@ -25,6 +26,9 @@ router.use('/candidates-api', candidateRoutes);
 
 // Audit Analytics API
 router.use('/audit-analytics', auditAnalyticsRoutes);
+
+// Audit Module Routes
+router.use('/audit-module', auditModuleRoutes);
 
 // Audit API
 router.get('/audits/analytics', auditsController.getAuditAnalytics);
