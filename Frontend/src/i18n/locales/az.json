@@ -206,12 +206,12 @@
   },
   "departments": {
     "title": "Şöbələr",
-    "total": "{{count}} ümumi",
+    "total": "Cəmi: {{count}}",
     "newDepartment": "Yeni şöbə",
     "name": "Ad",
     "description": "Təsvir",
     "actions": "Əməliyyatlar",
-    "noDepartments": "Hələ şöbə yoxdur",
+    "noDepartments": "Heç bir şöbə yoxdur",
     "addFirst": "İlk şöbənizi əlavə edin.",
     "edit": "Redaktə et",
     "delete": "Sil",
@@ -222,7 +222,13 @@
     "create": "Yarat",
     "cancel": "Ləğv et",
     "deleteTitle": "Bu şöbə silinsin?",
-    "deleteMessage": "\"{{name}}\" həmişəlik silinəcək."
+    "deleteMessage": "\"{{name}}\" həmişəlik silinəcək.",
+    "save": "Yadda saxla",
+    "confirmDelete": "Bu şöbəni silmək istədiyinizə əminsiniz?",
+    "humanResources": "İnsan Resursları",
+    "humanResourcesDescription": "İşə qəbul, adaptasiya və insan resurslarının idarə edilməsi.",
+    "operations": "Əməliyyatlar",
+    "operationsDescription": "Restoran şəbəkəsinin fəaliyyəti, audit və keyfiyyətə nəzarət."
   },
   "roles": {
     "title": "Rollar",

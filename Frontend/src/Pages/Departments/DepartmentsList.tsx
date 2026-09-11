@@ -21,6 +21,30 @@ import type { Department } from "../../Types/core";
 
 const DepartmentsList: React.FC = () => {
   const { t } = useTranslation();
+  const getDepartmentName = (name: string) => {
+    const normalized = name.trim().toLowerCase();
+
+    if (
+      normalized === "human resources" ||
+      normalized === "hr" ||
+      normalized === "insan resursları" ||
+      normalized === "отдел кадров"
+    ) {
+      return t("departments.humanResources");
+    }
+
+    if (
+      normalized === "operations" ||
+      normalized === "əməliyyatlar" ||
+      normalized === "операционный отдел"
+    ) {
+      return t("departments.operations");
+    }
+
+    return name;
+  };
+
+
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +186,7 @@ const DepartmentsList: React.FC = () => {
                       : ""
                   }
                 >
-                  <td className="cell-title">{dept.name}</td>
+                  <td className="cell-title">{getDepartmentName(dept.name)}</td>
                   <td className="cell-muted">
                     {dept.description || "—"}
                   </td>
