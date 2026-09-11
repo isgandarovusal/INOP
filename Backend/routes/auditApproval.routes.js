@@ -1,21 +1,25 @@
-const express=require("express");
+const router = require("express").Router();
 
-const router=express.Router();
+const controller =
+ require("../controllers/auditApproval.controller");
 
 
-const {
- approveAudit
-}=require(
-"../controllers/auditApproval.controller"
+router.post(
+ "/",
+ controller.createApproval
 );
 
 
-
-router.put(
-"/:id/approve",
-approveAudit
+router.get(
+ "/:auditId",
+ controller.getApprovals
 );
 
 
+router.patch(
+ "/:id",
+ controller.updateApproval
+);
 
-module.exports=router;
+
+module.exports = router;

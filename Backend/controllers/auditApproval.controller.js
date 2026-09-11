@@ -1,58 +1,117 @@
-const AuditExecution =
-require("../models/auditExecution.model");
+const AuditApproval =
+ require("../models/auditApproval.model");
 
 
 
-exports.approveAudit =
-async(req,res)=>{
+exports.createApproval = async(req,res)=>{
+
+ try{
+
+  const approval =
+   await AuditApproval.create({
+    ...req.body,
+    requestedBy:req.user?.id
+   });
 
 
-try{
+  res.json({
+   success:true,
+   data:approval
+  });
 
 
-const execution =
-await AuditExecution.findByIdAndUpdate(
+ }catch(error){
 
-req.params.id,
+  res.status(500).json({
+   success:false,
+   message:error.message
+  });
 
-{
- status:"approved",
+ }
 
- approvedBy:req.body.approvedBy,
-
- approvedAt:new Date()
-},
-
-{
- new:true
-}
-
-);
-
-
-
-res.json({
-
- success:true,
-
- data:execution
-
-});
+};
 
 
 
-}catch(error){
+
+exports.getApprovals = async(req,res)=>{
+
+ try{
+
+  const approvals =
+   await AuditApproval.find({
+    auditId:req.params.auditId
+   })
+   .populate(
+    "reviewer requestedBy"
+   )
+   .sort({
+    createdAt:-1
+   });
 
 
-res.status(500).json({
-
- success:false,
-
- message:"Approval error"
-
-});
+  res.json({
+   success:true,
+   data:approvals
+  });
 
 
-}
+ }catch(error){
+
+  res.status(500).json({
+   success:false,
+   message:error.message
+  });
+
+ }
+
+};
+
+
+
+
+exports.updateApproval = async(req,res)=>{
+
+ try{
+
+  const {
+   status,
+   comment
+  }=req.body;
+
+
+  const approval =
+   await AuditApproval.findByIdAndUpdate(
+    req.params.id,
+    {
+     status,
+     comment,
+     approvedAt:
+      status==="approved"
+      ?
+      new Date()
+      :
+      null
+    },
+    {
+     new:true
+    }
+   );
+
+
+  res.json({
+   success:true,
+   data:approval
+  });
+
+
+ }catch(error){
+
+  res.status(500).json({
+   success:false,
+   message:error.message
+  });
+
+ }
 
 };
