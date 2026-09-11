@@ -1,3 +1,7 @@
+import AuditFindingsList from "../AuditFindings/AuditFindingsList";
+import AuditAssignmentsList from "../AuditAssignments/AuditAssignmentsList";
+import AuditTimeline from "../AuditTimeline/AuditTimeline";
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
@@ -236,3 +240,21 @@ const AuditDetail: React.FC = () => {
 };
 
 export default AuditDetail;
+
+
+
+
+{/* AUDIT BUSINESS MODULES */}
+
+<AuditFindingsList
+ auditId={id}
+/>
+
+<AuditAssignmentsList
+ auditId={id}
+/>
+
+<AuditTimeline
+ auditId={id}
+/>
+
