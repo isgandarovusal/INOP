@@ -21,6 +21,7 @@ import AuditDetail from "../Pages/Audit/Audits/AuditDetail";
 import AuditEdit from "../Pages/Audit/Audits/AuditEdit";
 import AuditAnalytics from "../Pages/Audit/Analytics/AuditAnalytics";
 import AuditReportDetail from "../Pages/Audit/AuditReport/AuditReportDetail";
+import AuditExecutionPage from "../Pages/Audit/AuditExecution/AuditExecutionPage";
 import SafetyAuditAnalytics from "../Pages/Audit/Analytics/SafetyAuditAnalytics";
 import ServiceAuditAnalytics from "../Pages/Audit/Analytics/ServiceAuditAnalytics";
 import StandardAuditAnalytics from "../Pages/Audit/Analytics/StandardAuditAnalytics";
@@ -97,6 +98,7 @@ const ROUTES: RouteObject[] = [
               { path: "audit/safety/analytics", element: <SafetyAuditAnalytics /> },
               { path: "audit/analytics", element: <AuditAnalytics /> },
               { path: "audit/report/:id", element: <AuditReportDetail /> },
+              { path: "audit/execution/:id", element: <AuditExecutionPage /> },
             ],
           },
           {
