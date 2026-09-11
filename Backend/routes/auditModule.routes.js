@@ -2,15 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const {
  getStandardAudits,
- getServiceAudits,
- getAuditFilters
-}
-=
-require("../controllers/auditModule.controller");
-
+ getServiceAudits
+}=require("../controllers/auditModule.controller");
 
 
 router.get(
@@ -19,19 +14,10 @@ router.get(
 );
 
 
-
 router.get(
  "/service",
  getServiceAudits
 );
-
-
-
-router.get(
- "/filters",
- getAuditFilters
-);
-
 
 
 module.exports = router;
