@@ -24,6 +24,7 @@ const auditFindingRoutes = require('./auditFinding.routes');
 const auditAssignmentRoutes = require('./auditAssignment.routes');
 const auditTimelineRoutes = require('./auditTimeline.routes');
 const auditDashboardRoutes = require('./auditDashboard.routes');
+const auditNotificationRoutes = require('./auditNotification.routes');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
 const storage = multer.diskStorage({
@@ -47,6 +48,7 @@ router.use('/audit-report', auditReportRoutes);
 router.use('/audit-score', auditScoreRoutes);
 
 router.use('/audit-dashboard', auditDashboardRoutes);
+router.use('/audit-notification', auditNotificationRoutes);
 
 router.use(
 '/audit-findings',
