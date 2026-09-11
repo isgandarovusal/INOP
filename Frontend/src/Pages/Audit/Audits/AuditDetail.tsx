@@ -235,26 +235,30 @@ const AuditDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+
+      {/* AUDIT BUSINESS MODULES */}
+
+      <div className="audit-business-modules">
+
+        <AuditFindingsList
+          auditId={id ?? ""}
+        />
+
+        <AuditAssignmentsList
+          auditId={id ?? ""}
+        />
+
+        <AuditTimeline
+          auditId={id ?? ""}
+        />
+
+      </div>
+
+
     </div>
   );
 };
 
 export default AuditDetail;
-
-
-
-
-{/* AUDIT BUSINESS MODULES */}
-
-<AuditFindingsList
- auditId={id}
-/>
-
-<AuditAssignmentsList
- auditId={id}
-/>
-
-<AuditTimeline
- auditId={id}
-/>
 
