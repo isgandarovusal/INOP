@@ -18,6 +18,7 @@ const occupationalSafetyDetailsRoutes = require('./occupationalSafetyDetails.rou
 const auditReportRoutes = require('./auditReport.routes');
 const auditScoreRoutes = require('./auditScore.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
+const auditDashboardRoutes = require('./auditDashboard.routes');
 
 // Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
 const storage = multer.diskStorage({
@@ -39,6 +40,8 @@ router.use('/audit-workflow', auditWorkflowRoutes);
 router.use('/occupational-safety-details', occupationalSafetyDetailsRoutes);
 router.use('/audit-report', auditReportRoutes);
 router.use('/audit-score', auditScoreRoutes);
+
+router.use('/audit-dashboard', auditDashboardRoutes);
 
 // Audit API
 router.get('/audits/analytics', auditsController.getAuditAnalytics);
