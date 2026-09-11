@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,7 @@ import type {
 
 export default function SafetyAuditForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [restaurantId, setRestaurantId] = useState("");
   const [date, setDate] = useState(
@@ -78,7 +80,7 @@ export default function SafetyAuditForm() {
     event.preventDefault();
 
     if (!restaurantId.trim()) {
-      window.alert("Restoran seçilməlidir.");
+      window.alert(t("audit.safety.form.restaurantRequired"));
       return;
     }
 
@@ -105,7 +107,7 @@ export default function SafetyAuditForm() {
       navigate("/app/audit/safety");
     } catch (error) {
       console.error("Safety audit creation failed:", error);
-      window.alert("Audit yadda saxlanarkən xəta baş verdi.");
+      window.alert(t("audit.safety.form.saveError"));
       setSubmitting(false);
     }
   }
@@ -114,10 +116,8 @@ export default function SafetyAuditForm() {
     <div className="audit-page">
       <div className="audit-page-header">
         <div>
-          <h1>Yeni Əməyin Mühafizəsi Auditi</h1>
-          <p>
-            Təhlükəsizlik və əməyin mühafizəsi standartlarını yoxlayın.
-          </p>
+          <h1>{t("audit.safety.form.newTitle")}</h1>
+          <p>{t("audit.safety.form.subtitle")}</p>
         </div>
 
         <strong>
@@ -127,38 +127,38 @@ export default function SafetyAuditForm() {
 
       <form onSubmit={handleSubmit}>
         <section className="audit-card">
-          <h2>Audit məlumatları</h2>
+          <h2>{t("audit.safety.form.auditInformation")}</h2>
 
           <div className="audit-form-grid">
             <label>
-              Restoran
+              {t("audit.safety.form.restaurant")}
               <input
                 value={restaurantId}
                 onChange={(event) =>
                   setRestaurantId(event.target.value)
                 }
-                placeholder="Restoran ID və ya adı"
+                placeholder={t("audit.safety.form.restaurantPlaceholder")}
                 required
               />
             </label>
 
             <label>
-              Növbə
+              {t("audit.safety.form.shift")}
               <select
                 value={shift}
                 onChange={(event) =>
                   setShift(event.target.value)
                 }
               >
-                <option>Səhər</option>
-                <option>Günorta</option>
-                <option>Axşam</option>
-                <option>Gecə</option>
+                <option value="Səhər">{t("audit.safety.form.morning")}</option>
+                <option value="Günorta">{t("audit.safety.form.afternoon")}</option>
+                <option value="Axşam">{t("audit.safety.form.evening")}</option>
+                <option value="Gecə">{t("audit.safety.form.night")}</option>
               </select>
             </label>
 
             <label>
-              Audit tarixi
+              {t("audit.safety.form.auditDate")}
               <input
                 type="date"
                 value={date}
@@ -174,9 +174,9 @@ export default function SafetyAuditForm() {
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Yoxlamalar</h2>
+              <h2>{t("audit.safety.form.checks")}</h2>
               <p>
-                Hər yoxlama üçün Qeyd və BAL daxil edin.
+                {t("audit.safety.form.checksDescription")}
               </p>
             </div>
 
@@ -194,16 +194,16 @@ export default function SafetyAuditForm() {
 
               {section.items.length === 0 ? (
                 <div className="audit-empty-state">
-                  Bu bölmə üçün yoxlama kriteriyaları hələ əlavə edilməyib.
+                  {t("audit.safety.form.criteriaMissing")}
                 </div>
               ) : (
                 <div className="audit-safety-table-wrapper">
                   <table className="audit-table">
                     <thead>
                       <tr>
-                        <th>Əlavə yoxlamalar və suallar</th>
-                        <th>Qeyd</th>
-                        <th>BAL</th>
+                        <th>{t("audit.safety.form.additionalQuestions")}</th>
+                        <th>{t("audit.safety.form.note")}</th>
+                        <th>{t("audit.safety.form.score")}</th>
                       </tr>
                     </thead>
 
@@ -227,7 +227,7 @@ export default function SafetyAuditForm() {
                                     event.target.value
                                   )
                                 }
-                                placeholder="Qeyd"
+                                placeholder={t("audit.safety.form.notePlaceholder")}
                                 className="audit-table-input"
                               />
                             </td>
@@ -246,7 +246,7 @@ export default function SafetyAuditForm() {
                                     event.target.value
                                   )
                                 }
-                                placeholder="0–5"
+                                placeholder={t("audit.safety.form.scorePlaceholder")}
                               />
                             </td>
                           </tr>
@@ -261,13 +261,13 @@ export default function SafetyAuditForm() {
         </section>
 
         <section className="audit-card">
-          <h2>Bal sistemi</h2>
+          <h2>{t("audit.safety.form.scoreSystem")}</h2>
 
-          <p>0 — Uyğun deyil</p>
-          <p>1–2 — Zəif</p>
-          <p>3 — Qismən uyğun</p>
-          <p>4 — Yaxşı</p>
-          <p>5 — Tam uyğun</p>
+          <p>0 — {t("audit.safety.form.notCompliant")}</p>
+          <p>1–2 — {t("audit.safety.form.weak")}</p>
+          <p>3 — {t("audit.safety.form.partiallyCompliant")}</p>
+          <p>4 — {t("audit.safety.form.good")}</p>
+          <p>5 — {t("audit.safety.form.fullyCompliant")}</p>
         </section>
 
         <div className="audit-form-actions">

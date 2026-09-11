@@ -6,8 +6,10 @@ import Badge from "../../../Components/Badge";
 import { getCandidateById } from "../../../Services/candidatesService";
 import { calculateMatchScore, type MatchResult } from "../../../Services/aiMatchService";
 import type { Candidate } from "../../../Types/recruitment";
+import { useTranslation } from "react-i18next";
 
 const CandidateDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
@@ -43,7 +45,7 @@ const CandidateDetail: React.FC = () => {
     return (
       <div className="alert alert--danger">
         <AlertCircle size={18} />
-        <span>Namizəd tapılmadı</span>
+        <span>{t("recruitment.candidateDetail.notFound")}</span>
       </div>
     );
   }
@@ -52,7 +54,7 @@ const CandidateDetail: React.FC = () => {
     <div className="candidate-detail-page">
       <PageHeader
         title={candidate.name}
-        subtitle={candidate.email || "İctimai Namizəd Profili"}
+        subtitle={candidate.email || t("recruitment.candidateDetail.publicProfile")}
         actions={
           <>
             <button
@@ -63,7 +65,7 @@ const CandidateDetail: React.FC = () => {
             </button>
 
             <button className="btn-primary" onClick={() => navigate(-1)}>
-              <ArrowLeft size={16} /> Geri
+              <ArrowLeft size={16} /> {t("recruitment.candidateDetail.back")}
             </button>
           </>
         }
@@ -74,40 +76,40 @@ const CandidateDetail: React.FC = () => {
         <div style={{ background: "var(--bg-card)", padding: "20px", borderRadius: "8px", marginBottom: "24px", border: "1px solid var(--border-color)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
             <h3 style={{ margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-              <Sparkles color="var(--primary-color)" size={20} /> AI Analiz & Uyğunlaşdırma Hesabatı
+              <Sparkles color="var(--primary-color)" size={20} /> {t("recruitment.candidateDetail.aiAnalysis")}
             </h3>
             <span style={{ fontSize: "20px", fontWeight: "bold", color: matchResult.score >= 70 ? "#22c55e" : "#f59e0b" }}>
-              {matchResult.score}% Match
+              {matchResult.score}% {t("recruitment.candidateDetail.match")}
             </span>
           </div>
 
           <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "16px" }}>
-            <strong>AI Xülasəsi:</strong> {matchResult.aiSummary}
+            <strong>{t("recruitment.candidateDetail.aiSummary")}:</strong> {matchResult.aiSummary}
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             <div>
               <h4 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#22c55e", display: "flex", alignItems: "center", gap: "6px" }}>
-                <CheckCircle2 size={16} /> Uyğun Gələn Bacarıqlar
+                <CheckCircle2 size={16} /> {t("recruitment.candidateDetail.matchedSkills")}
               </h4>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {matchResult.matchedSkills.length > 0 ? (
                   matchResult.matchedSkills.map((s) => <Badge key={s} tone="success">{s}</Badge>)
                 ) : (
-                  <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>Eyniləşən bacarıq tapılmadı</span>
+                  <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t("recruitment.candidateDetail.noMatchedSkills")}</span>
                 )}
               </div>
             </div>
 
             <div>
               <h4 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#ef4444", display: "flex", alignItems: "center", gap: "6px" }}>
-                <XCircle size={16} /> Çatışmayan Bacarıqlar
+                <XCircle size={16} /> {t("recruitment.candidateDetail.missingSkills")}
               </h4>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {matchResult.missingSkills.length > 0 ? (
                   matchResult.missingSkills.map((s) => <Badge key={s} tone="danger">{s}</Badge>)
                 ) : (
-                  <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>Bütün tələb olunan bacarıqlar mövcuddur</span>
+                  <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t("recruitment.candidateDetail.allRequiredSkills")}</span>
                 )}
               </div>
             </div>
@@ -117,11 +119,11 @@ const CandidateDetail: React.FC = () => {
 
       {/* Profil Detalları */}
       <div style={{ background: "var(--bg-card)", padding: "20px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
-        <h4>Əsas Məlumatlar</h4>
-        <p><strong>Telefon:</strong> {candidate.phone || "Qeyd edilməyib"}</p>
-        <p><strong>Təcrübə:</strong> {candidate.experience} il</p>
-        <p><strong>Təhsil:</strong> {candidate.education || "Qeyd edilməyib"}</p>
-        <p><strong>Cari ATS Statusu:</strong> <Badge tone="info">{candidate.status}</Badge></p>
+        <h4>{t("recruitment.candidateDetail.mainInformation")}</h4>
+        <p><strong>{t("recruitment.candidateDetail.phone")}:</strong> {candidate.phone || t("recruitment.candidateDetail.notProvided")}</p>
+        <p><strong>{t("recruitment.candidateDetail.experience")}:</strong> {candidate.experience} {t("recruitment.candidateDetail.years")}</p>
+        <p><strong>{t("recruitment.candidateDetail.education")}:</strong> {candidate.education || t("recruitment.candidateDetail.notProvided")}</p>
+        <p><strong>{t("recruitment.candidateDetail.currentAtsStatus")}:</strong> <Badge tone="info">{t(`recruitment.candidateStatus.${candidate.status}`)}</Badge></p>
       </div>
     </div>
   );

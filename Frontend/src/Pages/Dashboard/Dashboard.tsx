@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase,
@@ -32,6 +33,7 @@ const STATUS_COLORS: Record<CandidateStatus, string> = {
 };
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -77,42 +79,42 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <PageHeader title={`Welcome, ${user.name.split(" ")[0]}`} subtitle="Here's what's happening across INOP." />
+      <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
       {loading ? (
-        <div className="empty-state">Loading…</div>
+        <div className="empty-state">{t("dashboard.loading")}</div>
       ) : (
         <>
           {showRecruitment && (
             <>
-              <h3 className="dashboard-section-title">Recruitment</h3>
+              <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
               <div className="kpi-grid">
                 <div className="kpi-card anim-in">
                   <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
                     <Briefcase size={18} color="#6366f1" />
                   </div>
-                  <p className="kpi-card__label">Total jobs</p>
+                  <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
                   <p className="kpi-card__value">{jobs.length}</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
                     <UserSquare2 size={18} color="#0ea5e9" />
                   </div>
-                  <p className="kpi-card__label">Total candidates</p>
+                  <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
                   <p className="kpi-card__value">{candidates.length}</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
                     <ClipboardList size={18} color="#22c55e" />
                   </div>
-                  <p className="kpi-card__label">Applications</p>
+                  <p className="kpi-card__label">{t("dashboard.applications")}</p>
                   <p className="kpi-card__value">{applications.length}</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
                     <Star size={18} color="#f59e0b" />
                   </div>
-                  <p className="kpi-card__label">Shortlisted</p>
+                  <p className="kpi-card__label">{t("dashboard.shortlisted")}</p>
                   <p className="kpi-card__value">
                     {candidates.filter((c) => c.status === "shortlisted").length}
                   </p>
@@ -122,7 +124,7 @@ const Dashboard: React.FC = () => {
               <div className="charts-grid">
                 <div className="recent-card anim-in">
                   <div className="chart-card__header">
-                    <h3>Recent candidates</h3>
+                    <h3>{t("dashboard.recentCandidates")}</h3>
                     <button className="recent-card__link" onClick={() => navigate("/app/recruitment/candidates")}>
                       View all <ArrowUpRight size={13} />
                     </button>
@@ -130,7 +132,7 @@ const Dashboard: React.FC = () => {
                   {recentCandidates.length === 0 ? (
                     <div className="chart-empty">
                       <PackageOpen size={22} />
-                      <p>No candidates yet — add your first one to see it here.</p>
+                      <p>{t("dashboard.noCandidates")}</p>
                     </div>
                   ) : (
                     <div className="recent-list">
@@ -153,12 +155,12 @@ const Dashboard: React.FC = () => {
 
                 <div className="chart-card anim-in" style={{ animationDelay: "0.06s" }}>
                   <div className="chart-card__header">
-                    <h3>Candidates by status</h3>
+                    <h3>{t("dashboard.candidatesByStatus")}</h3>
                   </div>
                   {statusBreakdown.length === 0 ? (
                     <div className="chart-empty">
                       <UserSquare2 size={22} />
-                      <p>Add candidates to see the status breakdown.</p>
+                      <p>{t("dashboard.addCandidates")}</p>
                     </div>
                   ) : (
                     <div className="donut-wrap">
@@ -184,7 +186,7 @@ const Dashboard: React.FC = () => {
                       </ResponsiveContainer>
                       <div className="donut-center">
                         <span className="donut-center__value">{candidates.length}</span>
-                        <span className="donut-center__label">candidates</span>
+                        <span className="donut-center__label">{candidates.length === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>
                       </div>
                     </div>
                   )}
@@ -195,47 +197,47 @@ const Dashboard: React.FC = () => {
 
           {showAudit && analytics && (
             <>
-              <h3 className="dashboard-section-title">Audit &amp; Operations</h3>
+              <h3 className="dashboard-section-title">{t("dashboard.auditOperations")}</h3>
               <div className="kpi-grid">
                 <div className="kpi-card anim-in">
                   <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
                     <Gauge size={18} color="#6366f1" />
                   </div>
-                  <p className="kpi-card__label">Overall score</p>
+                  <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
                   <p className="kpi-card__value">{analytics.overallScore.toFixed(1)} / 10</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
                     <ClipboardCheck size={18} color="#0ea5e9" />
                   </div>
-                  <p className="kpi-card__label">Total audits</p>
+                  <p className="kpi-card__label">{t("dashboard.totalAudits")}</p>
                   <p className="kpi-card__value">{analytics.totalAudits}</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
                     <Store size={18} color="#22c55e" />
                   </div>
-                  <p className="kpi-card__label">Restaurants audited</p>
+                  <p className="kpi-card__label">{t("dashboard.restaurantsAudited")}</p>
                   <p className="kpi-card__value">{analytics.restaurantsAudited}</p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
                     <AlertTriangle size={18} color="#f59e0b" />
                   </div>
-                  <p className="kpi-card__label">Critical / low scores</p>
+                  <p className="kpi-card__label">{t("dashboard.criticalLowScores")}</p>
                   <p className="kpi-card__value">{analytics.criticalCount}</p>
                 </div>
               </div>
 
               <div className="recent-card anim-in">
                 <div className="chart-card__header">
-                  <h3>Restaurant comparison</h3>
+                  <h3>{t("dashboard.restaurantComparison")}</h3>
                   <button className="recent-card__link" onClick={() => navigate("/app/audit/analytics")}>
-                    Full analytics <ArrowUpRight size={13} />
+                    <>{t("dashboard.fullAnalytics")} <ArrowUpRight size={13} /></>
                   </button>
                 </div>
                 {analytics.restaurantComparison.length === 0 ? (
-                  <EmptyState icon={<Store size={26} />} title="No audits yet" hint="Submit an audit to see comparisons." />
+                  <EmptyState icon={<Store size={26} />} title={t("dashboard.noAudits")} hint={t("dashboard.submitAudit")} />
                 ) : (
                   <div className="recent-list">
                     {analytics.restaurantComparison.map((r) => (

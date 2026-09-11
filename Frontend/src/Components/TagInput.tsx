@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TagInputProps {
   label: string;
@@ -8,14 +9,22 @@ interface TagInputProps {
   placeholder?: string;
 }
 
-const TagInput: React.FC<TagInputProps> = ({ label, values, onChange, placeholder }) => {
+const TagInput: React.FC<TagInputProps> = ({
+  label,
+  values,
+  onChange,
+  placeholder,
+}) => {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState("");
 
   const commit = () => {
     const trimmed = draft.trim();
+
     if (trimmed && !values.includes(trimmed)) {
       onChange([...values, trimmed]);
     }
+
     setDraft("");
   };
 
@@ -35,22 +44,25 @@ const TagInput: React.FC<TagInputProps> = ({ label, values, onChange, placeholde
   return (
     <div className="form-group">
       <label className="form-label">{label}</label>
+
       <div className="tag-input" onClick={commit}>
         {values.map((tag, idx) => (
           <span className="tag-chip" key={`${tag}-${idx}`}>
             {tag}
+
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 removeAt(idx);
               }}
-              aria-label={`Remove ${tag}`}
+              aria-label={`${t("components.tagInput.remove")} ${tag}`}
             >
               <X size={11} />
             </button>
           </span>
         ))}
+
         <input
           type="text"
           value={draft}

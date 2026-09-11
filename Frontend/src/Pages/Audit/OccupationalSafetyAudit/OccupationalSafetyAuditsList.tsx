@@ -1,5 +1,6 @@
 import "../auditModern.css";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 
 const API =
@@ -9,6 +10,7 @@ const API =
 
 
 export default function OccupationalSafetyAuditsList(){
+  const { t } = useTranslation();
 
 
  const [audits,setAudits]=useState<any[]>([]);
@@ -43,7 +45,7 @@ export default function OccupationalSafetyAuditsList(){
 
  if(loading){
 
-  return <div>Loading...</div>;
+  return <div>{t("audit.safety.list.loading")}</div>;
 
  }
 
@@ -64,11 +66,11 @@ export default function OccupationalSafetyAuditsList(){
 
      <tr>
 
-      <th>Status</th>
+      <th>{t("audit.safety.list.status")}</th>
 
-      <th>Audit Type</th>
+      <th>{t("audit.safety.list.auditType")}</th>
 
-      <th>Date</th>
+      <th>{t("audit.safety.list.date")}</th>
 
      </tr>
 

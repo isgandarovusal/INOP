@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import "../auditAnalytics.css";
 
 import React, { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ import { getStandardAnalytics } from "../../../Services/auditAnalyticsService";
 import type { StandardAnalyticsData } from "../../../Services/auditAnalyticsService";
 
 const StandardAuditAnalytics: React.FC = () => {
+  const { t } = useTranslation();
   const [data, setData] =
     useState<StandardAnalyticsData | null>(null);
 
@@ -41,7 +43,7 @@ const StandardAuditAnalytics: React.FC = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Standard analytics could not be loaded.");
+        setError(t("audit.standard.analytics.error"));
       })
       .finally(() => {
         setLoading(false);
@@ -51,15 +53,15 @@ const StandardAuditAnalytics: React.FC = () => {
   const findings = data
     ? [
         {
-          name: "Critical",
+          name: t("audit.standard.analytics.critical"),
           value: data.findings.critical,
         },
         {
-          name: "Major",
+          name: t("audit.standard.analytics.major"),
           value: data.findings.major,
         },
         {
-          name: "Minor",
+          name: t("audit.standard.analytics.minor"),
           value: data.findings.minor,
         },
       ]
@@ -68,13 +70,13 @@ const StandardAuditAnalytics: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Standard Audit Analytics"
-        subtitle="MongoDB aggregation based standard audit statistics"
+        title={t("audit.standard.analytics.title")}
+        subtitle={t("audit.standard.analytics.subtitle")}
       />
 
       {loading && (
         <div className="empty-state">
-          Loading analytics...
+          {t("audit.standard.analytics.loading")}
         </div>
       )}
 
@@ -89,13 +91,13 @@ const StandardAuditAnalytics: React.FC = () => {
           <div className="kpi-grid">
             <div className="kpi-card">
               <BarChart3 size={22} />
-              <p>Total standard audits</p>
+              <p>{t("audit.standard.analytics.totalAudits")}</p>
               <h2>{data.total}</h2>
             </div>
 
             <div className="kpi-card">
               <TrendingUp size={22} />
-              <p>Average compliance</p>
+              <p>{t("audit.standard.analytics.averageCompliance")}</p>
               <h2>
                 {data.averageCompliancePercentage.toFixed(1)}%
               </h2>
@@ -103,20 +105,20 @@ const StandardAuditAnalytics: React.FC = () => {
 
             <div className="kpi-card">
               <CircleCheck size={22} />
-              <p>Passed audits</p>
+              <p>{t("audit.standard.analytics.passedAudits")}</p>
               <h2>{data.passed}</h2>
             </div>
 
             <div className="kpi-card">
               <AlertTriangle size={22} />
-              <p>Failed audits</p>
+              <p>{t("audit.standard.analytics.failedAudits")}</p>
               <h2>{data.failed}</h2>
             </div>
           </div>
 
           <div className="charts-grid">
             <div className="chart-card">
-              <h3>Findings Distribution</h3>
+              <h3>{t("audit.standard.analytics.findingsDistribution")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={findings}>
@@ -129,7 +131,7 @@ const StandardAuditAnalytics: React.FC = () => {
             </div>
 
             <div className="chart-card">
-              <h3>Compliance Trend</h3>
+              <h3>{t("audit.standard.analytics.complianceTrend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={data.trend}>

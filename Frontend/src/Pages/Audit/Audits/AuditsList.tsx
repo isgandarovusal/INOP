@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCheck, Loader2, Plus, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -17,6 +18,7 @@ import { canManageAudit } from "../../../Utils/permissions";
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
 const AuditsList: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const canManage = user ? canManageAudit(user.role) : false;
@@ -104,7 +106,7 @@ const AuditsList: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Audits"
+        title={t("audit.generic.list.title")}
         subtitle={`${audits.length} total · ${rows.length} shown`}
         actions={
           canManage && (
@@ -123,7 +125,7 @@ const AuditsList: React.FC = () => {
           value={restaurantFilter}
           onChange={(e) => setRestaurantFilter(e.target.value)}
         >
-          <option value="all">All restaurants</option>
+          <option value="all">{t("audit.generic.list.allRestaurants")}</option>
           {restaurants.map((r) => (
             <option key={r.id} value={r.id}>
               {r.name}
@@ -136,7 +138,7 @@ const AuditsList: React.FC = () => {
           value={auditorFilter}
           onChange={(e) => setAuditorFilter(e.target.value)}
         >
-          <option value="all">All auditors</option>
+          <option value="all">{t("audit.generic.list.allAuditors")}</option>
           {auditors.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
@@ -149,7 +151,7 @@ const AuditsList: React.FC = () => {
           max={10}
           className="input-field"
           style={{ width: 140 }}
-          placeholder="Min score"
+          placeholder={t("audit.generic.list.minScore")}
           value={minScore}
           onChange={(e) => setMinScore(e.target.value)}
         />
@@ -159,12 +161,12 @@ const AuditsList: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>Restaurant</th>
-              <th>Auditor</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Score</th>
-              {canManage && <th className="col-actions">Actions</th>}
+              <th>{t("audit.generic.list.restaurant")}</th>
+              <th>{t("audit.generic.list.auditor")}</th>
+              <th>{t("audit.generic.list.date")}</th>
+              <th>{t("audit.generic.list.type")}</th>
+              <th>{t("audit.generic.list.score")}</th>
+              {canManage && <th className="col-actions">{t("audit.generic.list.actions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -181,7 +183,7 @@ const AuditsList: React.FC = () => {
                 <td colSpan={6}>
                   <EmptyState
                     icon={<ClipboardCheck size={28} />}
-                    title="No audits yet"
+                    title={t("audit.generic.list.noAudits")}
                     hint="Audits you submit will show up here."
                   />
                 </td>
@@ -206,7 +208,7 @@ const AuditsList: React.FC = () => {
                       <div className="row-actions">
                         <button
                           className="icon-btn icon-btn--danger"
-                          title="Delete"
+                          title={t("common.actions.delete")}
                           disabled={deletingId === audit.id}
                           onClick={() => setDeleteTarget(audit)}
                         >
@@ -228,7 +230,7 @@ const AuditsList: React.FC = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title="Delete this audit?"
+          title={t("audit.generic.list.deleteTitle")}
           message="This audit record will be permanently removed."
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}

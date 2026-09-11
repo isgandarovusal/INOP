@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Pencil, Plus, Store, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -12,6 +13,7 @@ import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
 const RestaurantsList: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const canManage = user ? canManageAudit(user.role) : false;
@@ -54,7 +56,7 @@ const RestaurantsList: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Restaurants"
+        title={t("audit.restaurants.list.title")}
         subtitle={`${restaurants.length} total · ${filtered.length} shown`}
         actions={
           canManage && (
@@ -67,16 +69,16 @@ const RestaurantsList: React.FC = () => {
       />
 
       <div className="filter-bar">
-        <SearchInput value={query} onChange={setQuery} placeholder="Search name or location…" />
+        <SearchInput value={query} onChange={setQuery} placeholder={t("audit.restaurants.list.searchPlaceholder")} />
         <select
           className="input-field"
           style={{ width: 160 }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "all" | RestaurantStatus)}
         >
-          <option value="all">All statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="all">{t("audit.restaurants.list.allStatuses")}</option>
+          <option value="active">{t("common.status.active")}</option>
+          <option value="inactive">{t("common.status.inactive")}</option>
         </select>
       </div>
 
@@ -84,10 +86,10 @@ const RestaurantsList: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th className="col-actions">Actions</th>
+              <th>{t("audit.restaurants.list.name")}</th>
+              <th>{t("audit.restaurants.list.location")}</th>
+              <th>{t("audit.restaurants.list.status")}</th>
+              <th className="col-actions">{t("audit.restaurants.list.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -133,14 +135,14 @@ const RestaurantsList: React.FC = () => {
                         <>
                           <button
                             className="icon-btn icon-btn--edit"
-                            title="Edit"
+                            title={t("common.actions.edit")}
                             onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}/edit`)}
                           >
                             <Pencil size={15} />
                           </button>
                           <button
                             className="icon-btn icon-btn--danger"
-                            title="Delete"
+                            title={t("common.actions.delete")}
                             disabled={deletingId === restaurant.id}
                             onClick={() => setDeleteTarget(restaurant)}
                           >
@@ -163,7 +165,7 @@ const RestaurantsList: React.FC = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title="Delete this restaurant?"
+          title={t("audit.restaurants.list.deleteTitle")}
           message={`"${deleteTarget.name}" and its history will be permanently removed.`}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}

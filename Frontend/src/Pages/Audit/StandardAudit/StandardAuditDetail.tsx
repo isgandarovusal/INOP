@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import type { StandardAudit } from "../../../Types/Audit/standardAudit";
 import { Link, useParams } from "react-router-dom";
@@ -14,15 +15,16 @@ import EmptyState from "../../../Components/EmptyState";
 import { getStandardAuditById } from "../../../Services/standardAuditsService";
 import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
-const resultLabels = {
-  compliant: "Uyğundur",
-  minor: "MINOR",
-  major: "MAJOR",
-  critical: "CRITICAL",
+const resultLabelKeys = {
+  compliant: "audit.standard.detail.compliant",
+  minor: "audit.standard.detail.resultMinor",
+  major: "audit.standard.detail.resultMajor",
+  critical: "audit.standard.detail.resultCritical",
 } as const;
 
 export default function StandardAuditDetail() {
   const { id } = useParams();
+  const { t } = useTranslation();
 
   const [audit, setAudit] =
     useState<StandardAudit | undefined>();
@@ -38,8 +40,8 @@ export default function StandardAuditDetail() {
     return (
       <EmptyState
         icon={<ShieldAlert size={28} />}
-        title="Standart audit tapılmadı"
-        hint="Audit silinmiş və ya mövcud deyil."
+        title={t("audit.standard.detail.notFound")}
+        hint={t("audit.standard.detail.deletedHint")}
       />
     );
   }
@@ -96,7 +98,7 @@ export default function StandardAuditDetail() {
   return (
     <div className="audit-page">
       <PageHeader
-        title="Standart Audit"
+        title={t("audit.standard.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
           <Link to="/app/audit/standard" className="btn btn-secondary">
@@ -109,21 +111,21 @@ export default function StandardAuditDetail() {
       <div className="audit-detail-hero">
         <div>
           <span className="audit-detail-eyebrow">
-            FOOD SAFETY · OPERATIONS · HYGIENE · BRAND STANDARDS
+            {t("audit.standard.detail.eyebrow")}
           </span>
 
-          <h2>Audit nəticəsi</h2>
+          <h2>{t("audit.standard.detail.result")}</h2>
 
           <p>
-            Restoran ID: <strong>{audit.restaurantId}</strong>
+            {t("audit.standard.detail.restaurantId")}: <strong>{audit.restaurantId}</strong>
             {" · "}
-            Auditor: <strong>{audit.auditorId}</strong>
+            {t("audit.standard.detail.auditor")}: <strong>{audit.auditorId}</strong>
           </p>
         </div>
 
         <div className="audit-score-ring">
           <strong>{audit.compliancePercentage.toFixed(1)}%</strong>
-          <span>Uyğunluq</span>
+          <span>{t("audit.standard.detail.compliance")}</span>
         </div>
       </div>
 
@@ -144,8 +146,8 @@ export default function StandardAuditDetail() {
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Uyğunsuzluqların paylanması</h3>
-              <p>Audit zamanı aşkar edilmiş nəticələr</p>
+              <h3>{t("audit.standard.detail.incompatibilities")}</h3>
+              <p>{t("audit.standard.detail.findingsDescription")}</p>
             </div>
           </div>
 
@@ -178,8 +180,8 @@ export default function StandardAuditDetail() {
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Audit statusu</h3>
-              <p>Ümumi audit qərarı</p>
+              <h3>{t("audit.standard.detail.auditStatus")}</h3>
+              <p>{t("audit.standard.detail.decisionDescription")}</p>
             </div>
           </div>
 
@@ -198,13 +200,13 @@ export default function StandardAuditDetail() {
 
             <div>
               <strong>
-                {audit.passed ? "AUDİT UĞURLU / PASSED" : "AUDİT UĞURSUZ / FAILED"}
+                {audit.passed ? t("audit.standard.detail.passed") : t("audit.standard.detail.failed")}
               </strong>
 
               <p>
                 {audit.passed
-                  ? "Kritik və major uyğunsuzluq aşkar edilməyib."
-                  : "Aşkar edilmiş kritik və ya major uyğunsuzluqlar mövcuddur."}
+                  ? t("audit.standard.detail.passedDescription")
+                  : t("audit.standard.detail.failedDescription")}
               </p>
             </div>
           </div>
@@ -214,26 +216,26 @@ export default function StandardAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Kateqoriya və bölmələr</h3>
-            <p>Konfiqurasiya edilmiş audit strukturu üzrə nəticələr</p>
+            <h3>{t("audit.standard.detail.categories")}</h3>
+            <p>{t("audit.standard.detail.categoriesDescription")}</p>
           </div>
         </div>
 
         {categoryRows.length === 0 ? (
           <div className="audit-empty-state">
-            Bu audit üçün hələ checklist nəticəsi yoxdur.
+            {t("audit.standard.detail.noChecklistResults")}
           </div>
         ) : (
           <div className="audit-standard-table-wrapper">
             <table className="audit-table">
               <thead>
                 <tr>
-                  <th>Kateqoriya</th>
-                  <th>Bölmə</th>
-                  <th>Ümumi</th>
-                  <th>Critical</th>
-                  <th>Major</th>
-                  <th>Minor</th>
+                  <th>{t("audit.standard.detail.category")}</th>
+                  <th>{t("audit.standard.detail.section")}</th>
+                  <th>{t("audit.standard.detail.total")}</th>
+                  <th>{t("audit.standard.detail.critical")}</th>
+                  <th>{t("audit.standard.detail.major")}</th>
+                  <th>{t("audit.standard.detail.minor")}</th>
                 </tr>
               </thead>
 
@@ -257,15 +259,14 @@ export default function StandardAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Tapılan nəticələr</h3>
-            <p>{audit.foundTotal} uyğunsuzluq qeydə alınıb</p>
+            <h3>{t("audit.standard.detail.foundResults")}</h3>
+            <p>{t("audit.standard.detail.findingCount", { count: audit.foundTotal })}</p>
           </div>
         </div>
 
         {audit.results.length === 0 ? (
           <div className="audit-empty-state">
-            Bu auditdə hələ nəticə yoxdur. Real 159 checklist sualı əlavə
-            edildikdən sonra nəticələr burada göstəriləcək.
+            {t("audit.standard.detail.noResults")}
           </div>
         ) : (
           <div className="audit-result-list">
@@ -278,7 +279,7 @@ export default function StandardAuditDetail() {
 
                   {item.correctiveAction && (
                     <p>
-                      <strong>Düzəldici tədbir:</strong>{" "}
+                      <strong>{t("audit.standard.detail.correctiveAction")}</strong>{" "}
                       {item.correctiveAction}
                     </p>
                   )}
@@ -287,7 +288,7 @@ export default function StandardAuditDetail() {
                 <span
                   className={`audit-answer audit-answer--${item.result}`}
                 >
-                  {resultLabels[item.result]}
+                  {t(resultLabelKeys[item.result])}
                 </span>
               </div>
             ))}
@@ -298,34 +299,34 @@ export default function StandardAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Audit məlumatları</h3>
-            <p>Əsas metadata məlumatları</p>
+            <h3>{t("audit.standard.detail.auditInformation")}</h3>
+            <p>{t("audit.standard.detail.metadata")}</p>
           </div>
         </div>
 
         <div className="audit-meta-grid">
           <div>
-            <span>Restoran</span>
+            <span>{t("audit.standard.detail.restaurantId")}</span>
             <strong>{audit.restaurantId}</strong>
           </div>
 
           <div>
-            <span>Auditor</span>
+            <span>{t("audit.standard.detail.auditor")}</span>
             <strong>{audit.auditorId}</strong>
           </div>
 
           <div>
-            <span>Tarix</span>
+            <span>{t("audit.standard.detail.date")}</span>
             <strong>{audit.date}</strong>
           </div>
 
           <div>
-            <span>Növbə</span>
+            <span>{t("audit.standard.detail.shift")}</span>
             <strong>{audit.shift}</strong>
           </div>
 
           <div>
-            <span>Status</span>
+            <span>{t("audit.standard.detail.status")}</span>
             <strong>{audit.status}</strong>
           </div>
         </div>

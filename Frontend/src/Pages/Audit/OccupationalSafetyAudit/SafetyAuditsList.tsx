@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   getOccupationalSafetyAudits,
@@ -7,6 +8,7 @@ import {
 import type { OccupationalSafetyAudit } from "../../../Types/Audit";
 
 export default function SafetyAuditsList() {
+  const { t } = useTranslation();
   const [audits, setAudits] = useState<OccupationalSafetyAudit[]>([]);
 
   const sortedAudits = useMemo(
@@ -19,7 +21,7 @@ export default function SafetyAuditsList() {
   );
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Bu Əməyin Mühafizəsi Auditi silinsin?")) return;
+    if (!window.confirm(t("audit.safety.list.deleteConfirm"))) return;
 
     deleteOccupationalSafetyAudit(id);
     setAudits(await getOccupationalSafetyAudits());
@@ -29,30 +31,30 @@ export default function SafetyAuditsList() {
     <div className="audit-page">
       <div className="audit-page-header">
         <div>
-          <h1>Əməyin Mühafizəsi Auditi</h1>
-          <p>Təhlükəsizlik və əməyin mühafizəsi yoxlamaları.</p>
+          <h1>{t("audit.safety.list.title")}</h1>
+          <p>{t("audit.safety.list.subtitle")}</p>
         </div>
 
         <Link to="/app/audit/safety/new" className="btn btn-primary">
-          Yeni Təhlükəsizlik Auditi
+          {t("audit.safety.list.newAudit")}
         </Link>
       </div>
 
       {sortedAudits.length === 0 ? (
         <div className="audit-empty-state">
-          Hələ heç bir Əməyin Mühafizəsi Auditi yaradılmayıb.
+          {t("audit.safety.list.noAudits")}
         </div>
       ) : (
         <div className="audit-table-wrapper">
           <table className="audit-table">
             <thead>
               <tr>
-                <th>Tarix</th>
-                <th>Növbə</th>
-                <th>Restoran</th>
-                <th>Auditor</th>
-                <th>Bal</th>
-                <th>Status</th>
+                <th>{t("audit.safety.list.date")}</th>
+                <th>{t("audit.safety.list.shift")}</th>
+                <th>{t("audit.safety.list.restaurant")}</th>
+                <th>{t("audit.safety.list.auditor")}</th>
+                <th>{t("audit.safety.list.score")}</th>
+                <th>{t("audit.safety.list.status")}</th>
                 <th />
               </tr>
             </thead>

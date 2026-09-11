@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Pencil, Plus, PowerOff, Power, UserCog } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../../Components/PageHeader";
 import SearchInput from "../../Components/SearchInput";
 import EmptyState from "../../Components/EmptyState";
@@ -12,7 +13,9 @@ import type { Department } from "../../Types/core";
 import { ROLE_LABELS } from "../../Utils/permissions";
 
 const UsersList: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,22 +24,32 @@ const UsersList: React.FC = () => {
 
   const load = () => {
     setLoading(true);
-    Promise.all([getUsers(), getDepartments()]).then(([userResult, deptResult]) => {
-      setUsers(userResult);
-      setDepartments(deptResult);
-      setLoading(false);
-    });
+
+    Promise.all([getUsers(), getDepartments()]).then(
+      ([userResult, deptResult]) => {
+        setUsers(userResult);
+        setDepartments(deptResult);
+        setLoading(false);
+      },
+    );
   };
 
   useEffect(load, []);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return users;
+
     const q = query.toLowerCase();
-    return users.filter((u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+
+    return users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q),
+    );
   }, [users, query]);
 
-  const departmentName = (id: string) => departments.find((d) => d.id === id)?.name ?? "—";
+  const departmentName = (id: string) =>
+    departments.find((d) => d.id === id)?.name ?? "—";
 
   const toggleActive = async (user: PublicUser) => {
     setTogglingId(user.id);
@@ -48,31 +61,42 @@ const UsersList: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Users"
-        subtitle={`${users.length} total · ${filtered.length} shown`}
+        title={t("users.title")}
+        subtitle={t("users.totalShown", {
+          total: users.length,
+          shown: filtered.length,
+        })}
         actions={
-          <button className="btn-add" onClick={() => navigate("/app/users/new")}>
+          <button
+            className="btn-add"
+            onClick={() => navigate("/app/users/new")}
+          >
             <Plus size={16} />
-            New user
+            {t("users.newUser")}
           </button>
         }
       />
 
       <div className="filter-bar">
-        <SearchInput value={query} onChange={setQuery} placeholder="Search name or email…" />
+        <SearchInput
+          value={query}
+          onChange={setQuery}
+          placeholder={t("users.search")}
+        />
       </div>
 
       <div className="admin-table-container glass">
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Department</th>
-              <th>Status</th>
-              <th className="col-actions">Actions</th>
+              <th>{t("users.name")}</th>
+              <th>{t("users.role")}</th>
+              <th>{t("users.department")}</th>
+              <th>{t("users.status")}</th>
+              <th className="col-actions">{t("users.actions")}</th>
             </tr>
           </thead>
+
           <tbody>
             {loading ? (
               <tr>
@@ -85,7 +109,11 @@ const UsersList: React.FC = () => {
             ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={5}>
-                  <EmptyState icon={<UserCog size={28} />} title="No users found" hint="Try a different search." />
+                  <EmptyState
+                    icon={<UserCog size={28} />}
+                    title={t("users.noUsers")}
+                    hint={t("users.tryDifferentSearch")}
+                  />
                 </td>
               </tr>
             ) : (
@@ -93,31 +121,53 @@ const UsersList: React.FC = () => {
                 <tr key={user.id}>
                   <td className="cell-title">
                     {user.name}
-                    <div className="cell-muted" style={{ fontSize: "0.78rem" }}>
+                    <div
+                      className="cell-muted"
+                      style={{ fontSize: "0.78rem" }}
+                    >
                       {user.email}
                     </div>
                   </td>
+
                   <td>
-                    <Badge tone="accent">{ROLE_LABELS[user.role]}</Badge>
-                  </td>
-                  <td className="cell-muted">{departmentName(user.departmentId)}</td>
-                  <td>
-                    <Badge tone={user.isActive ? "success" : "neutral"}>
-                      {user.isActive ? "active" : "inactive"}
+                    <Badge tone="accent">
+                      {ROLE_LABELS[user.role]}
                     </Badge>
                   </td>
+
+                  <td className="cell-muted">
+                    {departmentName(user.departmentId)}
+                  </td>
+
+                  <td>
+                    <Badge
+                      tone={user.isActive ? "success" : "neutral"}
+                    >
+                      {user.isActive
+                        ? t("common.status.active")
+                        : t("common.status.inactive")}
+                    </Badge>
+                  </td>
+
                   <td>
                     <div className="row-actions">
                       <button
                         className="icon-btn icon-btn--edit"
-                        title="Edit"
-                        onClick={() => navigate(`/app/users/${user.id}/edit`)}
+                        title={t("users.edit")}
+                        onClick={() =>
+                          navigate(`/app/users/${user.id}/edit`)
+                        }
                       >
                         <Pencil size={15} />
                       </button>
+
                       <button
                         className="icon-btn icon-btn--danger"
-                        title={user.isActive ? "Deactivate" : "Activate"}
+                        title={
+                          user.isActive
+                            ? t("users.deactivate")
+                            : t("users.activate")
+                        }
                         disabled={togglingId === user.id}
                         onClick={() => toggleActive(user)}
                       >

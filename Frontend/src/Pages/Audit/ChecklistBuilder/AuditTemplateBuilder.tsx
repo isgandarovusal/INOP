@@ -28,6 +28,7 @@ import type {
   AuditTemplateSubsection,
   AuditTemplateType,
 } from "../../../Types/Audit";
+import { useTranslation } from "react-i18next";
 
 const emptyTemplate = (): Partial<AuditTemplate> => ({
   organizationId: "",
@@ -47,10 +48,10 @@ function makeId(prefix: string) {
     .slice(2, 8)}`;
 }
 
-function newQuestion(order: number): AuditTemplateQuestion {
+function newQuestion(order: number, labels?: { newQuestion: string }): AuditTemplateQuestion {
   return {
     id: makeId("question"),
-    label: "Yeni sual",
+    label: labels?.newQuestion ?? "New question",
     answerType: "yes-no-na",
     required: true,
     active: true,
@@ -58,28 +59,29 @@ function newQuestion(order: number): AuditTemplateQuestion {
   };
 }
 
-function newSubsection(order: number): AuditTemplateSubsection {
+function newSubsection(order: number, labels?: { newQuestion: string; newSubsection: string }): AuditTemplateSubsection {
   return {
     id: makeId("subsection"),
-    title: "Yeni alt bölmə",
+    title: labels?.newSubsection ?? "New subsection",
     active: true,
     order,
-    questions: [newQuestion(0)],
+    questions: [newQuestion(0, labels)],
   };
 }
 
-function newSection(order: number): AuditTemplateSection {
+function newSection(order: number, labels?: { newQuestion: string; newSubsection: string; newSection: string }): AuditTemplateSection {
   return {
     id: makeId("section"),
-    title: "Yeni bölmə",
+    title: labels?.newSection ?? "New section",
     active: true,
     order,
-    subsections: [newSubsection(0)],
+    subsections: [newSubsection(0, labels)],
     questions: [],
   };
 }
 
 export default function AuditTemplateBuilder() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -201,7 +203,11 @@ if (id) {
 
   function addSection() {
     const sections = template.sections || [];
-    const section = newSection(sections.length);
+    const section = newSection(sections.length, {
+      newQuestion: t("audit.checklist.builder.newQuestion"),
+      newSubsection: t("audit.checklist.builder.newSubsection"),
+      newSection: t("audit.checklist.builder.newSection"),
+    });
 
     setTemplate({
       ...template,
@@ -233,7 +239,10 @@ if (id) {
           ...section,
           subsections: [
             ...section.subsections,
-            newSubsection(section.subsections.length),
+            newSubsection(section.subsections.length, {
+              newQuestion: t("audit.checklist.builder.newQuestion"),
+              newSubsection: t("audit.checklist.builder.newSubsection"),
+            }),
           ],
         };
       }),
@@ -273,7 +282,9 @@ if (id) {
             ...section,
             questions: [
               ...section.questions,
-              newQuestion(section.questions.length),
+              newQuestion(section.questions.length, {
+              newQuestion: t("audit.checklist.builder.newQuestion"),
+            }),
             ],
           };
         }
@@ -286,7 +297,9 @@ if (id) {
                   ...subsection,
                   questions: [
                     ...subsection.questions,
-                    newQuestion(subsection.questions.length),
+                    newQuestion(subsection.questions.length, {
+                      newQuestion: t("audit.checklist.builder.newQuestion"),
+                    }),
                   ],
                 }
               : subsection
@@ -355,12 +368,12 @@ if (id) {
     event.preventDefault();
 
     if (!template.name?.trim()) {
-      window.alert("Checklist adı daxil edilməlidir.");
+      window.alert(t("audit.checklist.builder.validationName"));
       return;
     }
 
     if (!template.brandName?.trim()) {
-      window.alert("Brend adı daxil edilməlidir.");
+      window.alert(t("audit.checklist.builder.validationBrand"));
       return;
     }
 
@@ -388,7 +401,7 @@ if (id) {
         return;
       }
 
-      window.alert("Checklist yadda saxlanıldı.");
+      window.alert(t("audit.checklist.builder.saved"));
     } finally {
       setSaving(false);
     }
@@ -398,7 +411,7 @@ if (id) {
     return (
       <div className="audit-page">
         <div className="audit-card">
-          Checklist yüklənir...
+          {t("audit.checklist.builder.loading")}
         </div>
       </div>
     );
@@ -414,15 +427,15 @@ if (id) {
             className="audit-back-link"
           >
             <ArrowLeft size={16} />
-            Checklistlər
+            {t("audit.checklist.builder.back")}
           </Link>
 
           <h1>
-            {id ? "Checklist redaktəsi" : "Yeni Audit Checklist"}
+            {id ? t("audit.checklist.builder.editTitle") : t("audit.checklist.builder.newTitle")}
           </h1>
 
           <p>
-            Bölmələri, alt bölmələri və audit suallarını idarə edin.
+            {t("audit.checklist.builder.subtitle")}
           </p>
         </div>
 
@@ -432,7 +445,7 @@ if (id) {
           className="btn btn-primary"
           disabled={saving}
         >
-          {saving ? "Yadda saxlanılır..." : "Yadda saxla"}
+          {saving ? t("audit.checklist.builder.saving") : t("audit.checklist.builder.save")}
         </button>
       </div>
 
@@ -440,14 +453,14 @@ if (id) {
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Template məlumatları</h2>
-              <p>Bu məlumat audit checklist-in kimə aid olduğunu müəyyən edir.</p>
+              <h2>{t("audit.checklist.builder.templateInformation")}</h2>
+              <p>{t("audit.checklist.builder.templateInformationHint")}</p>
             </div>
           </div>
 
           <div className="audit-form-grid">
             <label>
-              Şirkət / sahibkar
+              {t("audit.checklist.builder.organization")}
               <input
                 value={template.organizationId || ""}
                 onChange={(event) =>
@@ -456,12 +469,12 @@ if (id) {
                     organizationId: event.target.value,
                   })
                 }
-                placeholder="Məsələn: GFC"
+                placeholder={t("audit.checklist.builder.organizationPlaceholder")}
               />
             </label>
 
             <label>
-              Brend
+              {t("audit.checklist.builder.brand")}
               <input
                 value={template.brandName || ""}
                 onChange={(event) =>
@@ -470,12 +483,12 @@ if (id) {
                     brandName: event.target.value,
                   })
                 }
-                placeholder="Məsələn: KFC"
+                placeholder={t("audit.checklist.builder.brandPlaceholder")}
               />
             </label>
 
             <label>
-              Checklist adı
+              {t("audit.checklist.builder.checklistName")}
               <input
                 value={template.name || ""}
                 onChange={(event) =>
@@ -484,12 +497,12 @@ if (id) {
                     name: event.target.value,
                   })
                 }
-                placeholder="Məsələn: KFC Servis Checklist"
+                placeholder={t("audit.checklist.builder.checklistNamePlaceholder")}
               />
             </label>
 
             <label>
-              Audit növü
+              {t("audit.checklist.builder.auditType")}
               <select
                 value={template.auditType}
                 onChange={(event) =>
@@ -499,16 +512,16 @@ if (id) {
                   })
                 }
               >
-                <option value="service">Servis Auditi</option>
-                <option value="standard">Standart Audit</option>
+                <option value="service">{t("audit.checklist.builder.serviceAudit")}</option>
+                <option value="standard">{t("audit.checklist.builder.standardAudit")}</option>
                 <option value="occupational-safety">
-                  Əməyin Mühafizəsi
+                  {t("audit.checklist.builder.occupationalSafety")}
                 </option>
               </select>
             </label>
 
             <label>
-              Səfər sayı
+              {t("audit.checklist.builder.visitCount")}
               <input
                 value={template.version ?? ""}
                 onChange={(event) =>
@@ -523,7 +536,7 @@ if (id) {
             </label>
 
             <label>
-              Status
+              {t("audit.checklist.builder.status")}
               <select
                 value={template.status}
                 onChange={(event) =>
@@ -533,9 +546,9 @@ if (id) {
                   })
                 }
               >
-                <option value="draft">Draft</option>
-                <option value="active">Aktiv</option>
-                <option value="archived">Arxiv</option>
+                <option value="draft">{t("audit.checklist.builder.draft")}</option>
+                <option value="active">{t("audit.checklist.builder.active")}</option>
+                <option value="archived">{t("audit.checklist.builder.archived")}</option>
               </select>
             </label>
           </div>
@@ -544,16 +557,16 @@ if (id) {
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Source sənədlər</h2>
+              <h2>{t("audit.checklist.builder.sourceDocuments")}</h2>
               <p>
-                Audit üçün istifadə ediləcək PDF və digər sənədləri əlavə edin.
+                {t("audit.checklist.builder.sourceDocumentsHint")}
               </p>
             </div>
           </div>
 
           <div className="audit-form-grid">
             <label>
-              Sənəd yüklə
+              {t("audit.checklist.builder.uploadDocument")}
               <input
                 type="file"
                 onChange={handleDocumentUpload}
@@ -598,7 +611,7 @@ if (id) {
 
             {documents.length === 0 && (
               <div className="audit-builder-empty">
-                Hələ source sənəd yoxdur.
+                {t("audit.checklist.builder.noSourceDocuments")}
               </div>
             )}
           </div>
@@ -607,9 +620,9 @@ if (id) {
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Checklist strukturu</h2>
+              <h2>{t("audit.checklist.builder.checklistStructure")}</h2>
               <p>
-                Bölmələri istədiyiniz kimi yaradın və sonradan dəyişdirin.
+                {t("audit.checklist.builder.checklistStructureHint")}
               </p>
             </div>
 
@@ -619,7 +632,7 @@ if (id) {
               onClick={addSection}
             >
               <Plus size={17} />
-              Bölmə əlavə et
+              {t("audit.checklist.builder.addSection")}
             </button>
           </div>
 
@@ -664,7 +677,7 @@ if (id) {
                       type="button"
                       className="audit-icon-danger"
                       onClick={() => removeSection(section.id)}
-                      title="Bölməni sil"
+                      title={t("audit.checklist.builder.deleteSection")}
                     >
                       <Trash2 size={17} />
                     </button>
@@ -776,7 +789,7 @@ if (id) {
                             }
                           >
                             <Plus size={15} />
-                            Sual əlavə et
+                            {t("audit.checklist.builder.addQuestion")}
                           </button>
                         </div>
                       ))}
@@ -790,7 +803,7 @@ if (id) {
                           }
                         >
                           <Plus size={15} />
-                          Alt bölmə
+                          {t("audit.checklist.builder.addSubsection")}
                         </button>
 
                         <button
@@ -801,7 +814,7 @@ if (id) {
                           }
                         >
                           <Plus size={15} />
-                          Birbaşa sual
+                          {t("audit.checklist.builder.addDirectQuestion")}
                         </button>
                       </div>
                     </div>
@@ -812,7 +825,7 @@ if (id) {
 
             {(template.sections || []).length === 0 && (
               <div className="audit-builder-empty">
-                Hələ bölmə yoxdur. Yuxarıdakı düymə ilə ilk bölməni əlavə edin.
+                {t("audit.checklist.builder.noSections")}
               </div>
             )}
           </div>
@@ -831,6 +844,8 @@ function QuestionEditor({
   onChange: (patch: Partial<AuditTemplateQuestion>) => void;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="audit-builder-question">
       <input
@@ -838,7 +853,7 @@ function QuestionEditor({
         onChange={(event) =>
           onChange({ label: event.target.value })
         }
-        placeholder="Audit sualı"
+        placeholder={t("audit.checklist.builder.questionPlaceholder")}
       />
 
       <select
@@ -850,12 +865,12 @@ function QuestionEditor({
           })
         }
       >
-        <option value="yes-no-na">Bəli / Xeyr / N/A</option>
+        <option value="yes-no-na">{t("audit.checklist.builder.yesNoNa")}</option>
         <option value="severity">
           Compliant / Minor / Major / Critical
         </option>
-        <option value="score">BAL</option>
-        <option value="text">Mətn</option>
+        <option value="score">{t("audit.checklist.builder.score")}</option>
+        <option value="text">{t("audit.checklist.builder.text")}</option>
       </select>
 
       <label className="audit-builder-check">
@@ -866,7 +881,7 @@ function QuestionEditor({
             onChange({ required: event.target.checked })
           }
         />
-        Məcburi
+        {t("audit.checklist.builder.required")}
       </label>
 
       <label className="audit-builder-check">
@@ -877,14 +892,14 @@ function QuestionEditor({
             onChange({ active: event.target.checked })
           }
         />
-        Aktiv
+        {t("audit.checklist.builder.activeQuestion")}
       </label>
 
       <button
         type="button"
         className="audit-icon-danger"
         onClick={onDelete}
-        title="Sualı deaktiv et"
+        title={t("audit.checklist.builder.deactivateQuestion")}
       >
         <Trash2 size={16} />
       </button>

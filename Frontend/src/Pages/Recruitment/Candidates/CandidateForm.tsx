@@ -11,6 +11,7 @@ import {
 } from "../../../Services/candidatesService";
 import { parseCVText, calculateMatchScore } from "../../../Services/aiMatchService";
 import type { CandidateStatus } from "../../../Types/recruitment";
+import { useTranslation } from "react-i18next";
 
 const ACCEPTED_CV_TYPES = [
   "application/pdf",
@@ -21,6 +22,7 @@ const ACCEPTED_CV_TYPES = [
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const CandidateForm: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -64,12 +66,12 @@ const CandidateForm: React.FC = () => {
 
   const validateCvFile = (file: File): boolean => {
     if (!ACCEPTED_CV_TYPES.includes(file.type)) {
-      toast.error("CV yalnız PDF, DOC və ya DOCX formatında ola bilər");
+      toast.error(t("recruitment.candidateForm.cvFormatError"));
       return false;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("CV faylının ölçüsü maksimum 5 MB ola bilər");
+      toast.error(t("recruitment.candidateForm.cvSizeError"));
       return false;
     }
 
@@ -90,7 +92,7 @@ const CandidateForm: React.FC = () => {
 
   const handleAiParse = () => {
     if (!rawCvText.trim()) {
-      toast.error("Zəhmət olmasa təhlil üçün CV mətnini daxil edin");
+      toast.error(t("recruitment.candidateForm.enterCvText"));
       return;
     }
     setAiParsing(true);
@@ -103,14 +105,14 @@ const CandidateForm: React.FC = () => {
         setExperience(parsed.extractedExperience);
       }
       setAiParsing(false);
-      toast.success("AI CV-ni uğurla analiz etdi və sahələri doldurdu!");
+      toast.success(t("recruitment.candidateForm.aiSuccess"));
     }, 600);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError("Ad və soyad mütləqdir");
+      setError(t("recruitment.candidateForm.nameRequired"));
       return;
     }
 
@@ -133,7 +135,7 @@ const CandidateForm: React.FC = () => {
       if (isEdit && id) {
         // Edit zamanı mövcud ATS statusunu qoruyuruq.
         await updateCandidate(id, payload);
-        toast.success("Namizəd məlumatları yeniləndi");
+        toast.success(t("recruitment.candidateForm.updated"));
       } else {
         // Yeni namizəd üçün AI uyğunlaşdırma ilə ilkin ATS statusu təyin olunur.
         const matchResult = calculateMatchScore(
@@ -152,11 +154,11 @@ const CandidateForm: React.FC = () => {
               : matchResult.suggestedStatus
           ) as CandidateStatus,
         });
-        toast.success("Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!");
+        toast.success(t("recruitment.candidateForm.created"));
       }
       navigate("/app/recruitment/candidates");
     } catch (err: any) {
-      setError(err.message || "Xəta baş verdi");
+      setError(err.message || t("recruitment.candidateForm.genericError"));
     } finally {
       setSaving(false);
     }
@@ -173,8 +175,8 @@ const CandidateForm: React.FC = () => {
   return (
     <div className="candidate-form-page">
       <PageHeader
-        title={isEdit ? "Namizədi Redaktə Et" : "Yeni Namizəd / CV Analizi"}
-        subtitle="Mənbələrdən gələn CV-ləri AI ilə təhlil edin və avtomatik ATS-ə yerləşdirin"
+        title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}
+        subtitle={t("recruitment.candidateForm.subtitle")}
       />
 
       {error && (
@@ -193,10 +195,10 @@ const CandidateForm: React.FC = () => {
             </div>
             <div>
               <h3 className="candidate-form-section__title">
-                AI CV İdxalı & Analizi
+                {t("recruitment.candidateForm.aiImportTitle")}
               </h3>
               <p className="candidate-form-section__description">
-                CV mətnini daxil edin və namizəd məlumatlarını AI ilə avtomatik çıxarın.
+                {t("recruitment.candidateForm.aiImportDescription")}
               </p>
             </div>
           </div>
@@ -205,14 +207,14 @@ const CandidateForm: React.FC = () => {
             <div className="candidate-ai-card__header">
               <Sparkles size={18} />
               <h4 className="candidate-ai-card__title">
-                CV mətnini AI ilə analiz edin
+                {t("recruitment.candidateForm.aiAnalyzeTitle")}
               </h4>
             </div>
 
             <textarea
               className="candidate-ai-textarea"
               rows={4}
-              placeholder="CV mətnini (LinkedIn profili, email və ya mətni) bura yapışdırın..."
+              placeholder={t("recruitment.candidateForm.aiPlaceholder")}
               value={rawCvText}
               onChange={(e) => setRawCvText(e.target.value)}
             />
@@ -228,7 +230,7 @@ const CandidateForm: React.FC = () => {
               ) : (
                 <Sparkles size={16} />
               )}
-              AI ilə CV-ni Analiz Et
+              {t("recruitment.candidateForm.analyzeCv")}
             </button>
           </div>
         </section>
@@ -241,9 +243,9 @@ const CandidateForm: React.FC = () => {
                 <FileText size={20} />
               </div>
               <div>
-                <h3 className="candidate-form-section__title">CV sənədi</h3>
+                <h3 className="candidate-form-section__title">{t("recruitment.candidateForm.cvDocument")}</h3>
                 <p className="candidate-form-section__description">
-                  Namizədin CV faylını əlavə edin və ya mövcud faylı dəyişdirin.
+                  {t("recruitment.candidateForm.cvDescription")}
                 </p>
               </div>
             </div>
@@ -276,7 +278,7 @@ const CandidateForm: React.FC = () => {
                     type="button"
                     className="btn-secondary candidate-cv-upload__remove"
                     onClick={() => setCvFile(null)}
-                    aria-label="CV faylını sil"
+                    aria-label={t("recruitment.candidateForm.removeCv")}
                   >
                     <X size={16} />
                   </button>
@@ -296,10 +298,10 @@ const CandidateForm: React.FC = () => {
                     <UploadCloud size={22} />
                   </div>
                   <p className="candidate-cv-upload__title">
-                    CV faylını buraya sürükləyin
+                    {t("recruitment.candidateForm.dragCv")}
                   </p>
                   <p className="candidate-cv-upload__hint">
-                    PDF, DOC və DOCX — maksimum 5 MB
+                    {t("recruitment.candidateForm.cvFormats")}
                   </p>
                 </div>
               )}
@@ -307,7 +309,7 @@ const CandidateForm: React.FC = () => {
               <div style={{ textAlign: "center", marginTop: "14px" }}>
                 <label className="btn-secondary" style={{ cursor: "pointer" }}>
                   <UploadCloud size={16} />
-                  {cvFile || existingCvName ? "Başqa CV seç" : "CV seç"}
+                  {cvFile || existingCvName ? t("recruitment.candidateForm.chooseAnotherCv") : t("recruitment.candidateForm.chooseCv")}
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -328,7 +330,7 @@ const CandidateForm: React.FC = () => {
                     color: "var(--text-secondary)",
                   }}
                 >
-                  PDF, DOC və DOCX — maksimum 5 MB
+                  {t("recruitment.candidateForm.cvFormats")}
                 </div>
               )}
             </div>
@@ -342,10 +344,10 @@ const CandidateForm: React.FC = () => {
               </div>
               <div>
                 <h3 className="candidate-form-section__title">
-                  Namizəd məlumatları
+                  {t("recruitment.candidateForm.candidateInformation")}
                 </h3>
                 <p className="candidate-form-section__description">
-                  Əsas namizəd məlumatlarını daxil edin və ya AI tərəfindən çıxarılan məlumatları yoxlayın.
+                  {t("recruitment.candidateForm.candidateInformationDescription")}
                 </p>
               </div>
             </div>
@@ -353,7 +355,7 @@ const CandidateForm: React.FC = () => {
             <div className="candidate-fields">
               <div className="form-group">
                 <label className="candidate-field-label">
-                  Ad və Soyad <span className="candidate-field-required">*</span>
+                  {t("recruitment.candidateForm.fullName")} <span className="candidate-field-required">*</span>
                 </label>
                 <input
                   type="text"
@@ -365,7 +367,7 @@ const CandidateForm: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">Email</label>
+                <label className="candidate-field-label">{t("recruitment.candidateForm.email")}</label>
                 <input
                   type="email"
                   className="input"
@@ -375,7 +377,7 @@ const CandidateForm: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">Telefon</label>
+                <label className="candidate-field-label">{t("recruitment.candidateForm.phone")}</label>
                 <input
                   type="text"
                   className="input"
@@ -385,7 +387,7 @@ const CandidateForm: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">Təcrübə (İl)</label>
+                <label className="candidate-field-label">{t("recruitment.candidateForm.experience")}</label>
                 <input
                   type="number"
                   className="input"
@@ -397,13 +399,13 @@ const CandidateForm: React.FC = () => {
 
               <div className="form-group form-group--full">
                 <label className="candidate-field-label">
-                  Bacarıqlar (Skills)
+                  {t("recruitment.candidateForm.skillsEnglish")}
                 </label>
                 <TagInput
-                  label="Bacarıqlar"
+                  label={t("recruitment.candidateForm.skills")}
                   values={skills}
                   onChange={setSkills}
-                  placeholder="Bacarıq əlavə et..."
+                  placeholder={t("recruitment.candidateForm.skillPlaceholder")}
                 />
               </div>
             </div>
@@ -426,8 +428,8 @@ const CandidateForm: React.FC = () => {
             >
               {saving ? <Loader2 size={16} className="spin" /> : null}
               {isEdit
-                ? "Yenilə"
-                : "AI Analizi İlə Saxla & ATS-ə Yönləndir"}
+                ? t("recruitment.candidateForm.update")
+                : t("recruitment.candidateForm.saveAndRedirect")}
             </button>
           </div>
         </form>

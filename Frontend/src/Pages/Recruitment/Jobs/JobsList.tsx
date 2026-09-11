@@ -10,6 +10,7 @@ import { getJobs, deleteJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageRecruitment } from "../../../Utils/permissions";
+import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Record<JobStatus, BadgeTone> = {
   open: "success",
@@ -18,6 +19,7 @@ const STATUS_TONE: Record<JobStatus, BadgeTone> = {
 };
 
 const JobsList: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const canManage = user ? canManageRecruitment(user.role) : false;
@@ -64,30 +66,37 @@ const JobsList: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Jobs"
-        subtitle={`${jobs.length} total · ${filtered.length} shown`}
+        title={t("recruitment.jobs.title")}
+        subtitle={t("recruitment.jobs.totalShown", {
+          total: jobs.length,
+          shown: filtered.length,
+        })}
         actions={
           canManage && (
             <button className="btn-add" onClick={() => navigate("/app/recruitment/jobs/new")}>
               <Plus size={16} />
-              New job
+              {t("recruitment.jobs.newJob")}
             </button>
           )
         }
       />
 
       <div className="filter-bar">
-        <SearchInput value={query} onChange={setQuery} placeholder="Search position or skill…" />
+        <SearchInput
+          value={query}
+          onChange={setQuery}
+          placeholder={t("recruitment.jobs.searchPlaceholder")}
+        />
         <select
           className="input-field"
           style={{ width: 160 }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "all" | JobStatus)}
         >
-          <option value="all">All statuses</option>
-          <option value="open">Open</option>
-          <option value="closed">Closed</option>
-          <option value="draft">Draft</option>
+          <option value="all">{t("recruitment.jobs.allStatuses")}</option>
+          <option value="open">{t("recruitment.jobs.open")}</option>
+          <option value="closed">{t("recruitment.jobs.closed")}</option>
+          <option value="draft">{t("recruitment.jobs.draft")}</option>
         </select>
       </div>
 
@@ -95,11 +104,11 @@ const JobsList: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>Position</th>
-              <th>Required skills</th>
-              <th>Experience</th>
-              <th>Status</th>
-              <th className="col-actions">Actions</th>
+              <th>{t("recruitment.jobs.position")}</th>
+              <th>{t("recruitment.jobs.requiredSkills")}</th>
+              <th>{t("recruitment.jobs.experience")}</th>
+              <th>{t("recruitment.jobs.status")}</th>
+              <th className="col-actions">{t("recruitment.jobs.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -116,8 +125,16 @@ const JobsList: React.FC = () => {
                 <td colSpan={5}>
                   <EmptyState
                     icon={<Briefcase size={28} />}
-                    title={query ? "No jobs match your search" : "No jobs yet"}
-                    hint={query ? "Try a different keyword." : "Jobs you create will show up here."}
+                    title={
+                      query
+                        ? t("recruitment.jobs.noSearchResults")
+                        : t("recruitment.jobs.noJobs")
+                    }
+                    hint={
+                      query
+                        ? t("recruitment.jobs.tryDifferentKeyword")
+                        : t("recruitment.jobs.jobsWillAppear")
+                    }
                   />
                 </td>
               </tr>
@@ -145,9 +162,13 @@ const JobsList: React.FC = () => {
                       )}
                     </div>
                   </td>
-                  <td>{job.experience}+ yrs</td>
                   <td>
-                    <Badge tone={STATUS_TONE[job.status]}>{job.status}</Badge>
+                    {job.experience}+ {t("recruitment.jobs.years")}
+                  </td>
+                  <td>
+                    <Badge tone={STATUS_TONE[job.status]}>
+                      {t(`recruitment.jobStatus.${job.status}`)}
+                    </Badge>
                   </td>
                   <td>
                     <div className="row-actions">
@@ -155,14 +176,16 @@ const JobsList: React.FC = () => {
                         <>
                           <button
                             className="icon-btn icon-btn--edit"
-                            title="Edit"
-                            onClick={() => navigate(`/app/recruitment/jobs/${job.id}/edit`)}
+                            title={t("recruitment.jobs.edit")}
+                            onClick={() =>
+                              navigate(`/app/recruitment/jobs/${job.id}/edit`)
+                            }
                           >
                             <Pencil size={15} />
                           </button>
                           <button
                             className="icon-btn icon-btn--danger"
-                            title="Delete"
+                            title={t("recruitment.jobs.delete")}
                             disabled={deletingId === job.id}
                             onClick={() => setDeleteTarget(job)}
                           >
@@ -185,8 +208,10 @@ const JobsList: React.FC = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title="Delete this job?"
-          message={`"${deleteTarget.position}" will be permanently removed. This can't be undone.`}
+          title={t("recruitment.jobs.deleteTitle")}
+          message={t("recruitment.jobs.deleteMessage", {
+            position: deleteTarget.position,
+          })}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

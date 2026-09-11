@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 
 const API =
@@ -8,6 +9,7 @@ const API =
 
 export default function StandardAuditsList(){
 
+ const { t } = useTranslation();
  const [audits,setAudits] = useState<any[]>([]);
  const [loading,setLoading] = useState(true);
 
@@ -28,7 +30,7 @@ export default function StandardAuditsList(){
 
 
  if(loading){
-  return <div>Loading...</div>;
+  return <div>{t("audit.standard.list.loading")}</div>;
  }
 
 
@@ -36,18 +38,16 @@ export default function StandardAuditsList(){
 
   <div>
 
-   <h2>
-    Standard Audit
-   </h2>
+   <h2>{t("audit.standard.list.title")}</h2>
 
 
    <table>
 
     <thead>
      <tr>
-      <th>Status</th>
-      <th>Type</th>
-      <th>Date</th>
+      <th>{t("audit.standard.list.status")}</th>
+      <th>{t("audit.standard.list.type")}</th>
+      <th>{t("audit.standard.list.date")}</th>
      </tr>
     </thead>
 

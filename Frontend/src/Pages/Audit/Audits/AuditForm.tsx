@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AlertCircle, ArrowRight, Camera, Loader2, Paperclip, X } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -17,6 +18,7 @@ const SCORE_FIELDS: { key: keyof AuditScores; label: string }[] = [
 ];
 
 const AuditForm: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -86,19 +88,19 @@ const AuditForm: React.FC = () => {
 
   return (
     <div>
-      <PageHeader title="New audit" subtitle="Scores, comments and evidence for a restaurant visit." />
+      <PageHeader title={t("audit.generic.form.title")} subtitle={t("audit.generic.form.subtitle")} />
 
       <div className="form-card">
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
             <div className="form-group">
-              <label className="form-label">Restaurant</label>
+              <label className="form-label">{t("audit.generic.form.restaurant")}</label>
               <select
                 className="input-field"
                 value={restaurantId}
                 onChange={(e) => setRestaurantId(e.target.value)}
               >
-                <option value="">Select a restaurant…</option>
+                <option value="">{t("audit.generic.form.selectRestaurant")}</option>
                 {restaurants.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -107,7 +109,7 @@ const AuditForm: React.FC = () => {
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Audit type</label>
+              <label className="form-label">{t("audit.generic.form.auditType")}</label>
               <select
                 className="input-field"
                 value={auditType}
@@ -123,7 +125,7 @@ const AuditForm: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Date</label>
+            <label className="form-label">{t("audit.generic.form.date")}</label>
             <input
               type="date"
               className="input-field"
@@ -133,7 +135,7 @@ const AuditForm: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Scores (1–10)</label>
+            <label className="form-label">{t("audit.generic.form.scores")}</label>
             {SCORE_FIELDS.map(({ key, label }) => (
               <div className="score-field" key={key}>
                 <label>{label}</label>
@@ -152,18 +154,18 @@ const AuditForm: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Comments</label>
+            <label className="form-label">{t("audit.generic.form.comments")}</label>
             <textarea
               className="input-field input-field--textarea"
               rows={4}
               value={comments}
               onChange={(e) => setComments(e.target.value)}
-              placeholder="Observations, issues found, follow-up needed…"
+              placeholder={t("audit.generic.form.commentsPlaceholder")}
             />
           </div>
 
           <div className="form-group form-group--images">
-            <label className="form-label">Photos</label>
+            <label className="form-label">{t("audit.generic.form.photos")}</label>
             <div
               className="drop-zone"
               onClick={() => document.getElementById("photo-input")?.click()}
@@ -171,8 +173,8 @@ const AuditForm: React.FC = () => {
               <div className="drop-zone__icon">
                 <Camera size={18} color="#a5b4fc" />
               </div>
-              <p className="drop-zone__title">Click to add photos</p>
-              <p className="drop-zone__hint">JPG, PNG</p>
+              <p className="drop-zone__title">{t("audit.generic.form.addPhotos")}</p>
+              <p className="drop-zone__hint">{t("audit.generic.form.photoFormats")}</p>
               <input
                 id="photo-input"
                 type="file"
@@ -191,7 +193,7 @@ const AuditForm: React.FC = () => {
                       type="button"
                       className="thumb__remove"
                       onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== idx))}
-                      aria-label="Remove photo"
+                      aria-label={t("audit.generic.form.removePhoto")}
                     >
                       <X size={12} color="white" />
                     </button>
@@ -202,7 +204,7 @@ const AuditForm: React.FC = () => {
           </div>
 
           <div className="form-group form-group--images">
-            <label className="form-label">Attachments</label>
+            <label className="form-label">{t("audit.generic.form.attachments")}</label>
             <div
               className="drop-zone"
               onClick={() => document.getElementById("attachment-input")?.click()}
@@ -210,8 +212,8 @@ const AuditForm: React.FC = () => {
               <div className="drop-zone__icon">
                 <Paperclip size={18} color="#a5b4fc" />
               </div>
-              <p className="drop-zone__title">Click to add files</p>
-              <p className="drop-zone__hint">PDF, DOCX (Max 5MB)</p>
+              <p className="drop-zone__title">{t("audit.generic.form.addFiles")}</p>
+              <p className="drop-zone__hint">{t("audit.generic.form.fileFormats")}</p>
               <input
                 id="attachment-input"
                 type="file"
@@ -230,7 +232,7 @@ const AuditForm: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
-                      aria-label="Remove attachment"
+                      aria-label={t("audit.generic.form.removeAttachment")}
                     >
                       <X size={13} />
                     </button>

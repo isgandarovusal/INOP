@@ -5,6 +5,7 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
+import { useTranslation } from "react-i18next";
 import MatchScoreBadge from "./MatchScoreBadge";
 import { calculateMatchScore } from "../Services/aiMatchService";
 import type {
@@ -26,15 +27,12 @@ interface KanbanBoardProps {
   targetRequirements: TargetRequirements;
 }
 
-const COLUMNS: {
-  id: CandidateStatus;
-  title: string;
-}[] = [
-  { id: "new", title: "Yeni" },
-  { id: "screening", title: "Screening" },
-  { id: "shortlisted", title: "Seçilmiş" },
-  { id: "rejected", title: "İmtina edildi" },
-  { id: "hired", title: "İşə qəbul" },
+const COLUMNS: CandidateStatus[] = [
+  "new",
+  "screening",
+  "shortlisted",
+  "rejected",
+  "hired",
 ];
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -42,6 +40,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onStatusChange,
   targetRequirements,
 }) => {
+  const { t } = useTranslation();
+
+  const columnTitle = (status: CandidateStatus) =>
+    t(`components.kanban.${status}`);
+
   const handleOnDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
@@ -69,9 +72,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       }}
     >
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        {COLUMNS.map((column) => {
+        {COLUMNS.map((status) => {
           const columnCandidates = candidates
-            .filter((candidate) => candidate.status === column.id)
+            .filter((candidate) => candidate.status === status)
             .sort((a, b) => {
               const scoreA = calculateMatchScore(
                 a,
@@ -88,7 +91,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
           return (
             <div
-              key={column.id}
+              key={status}
               style={{
                 flex: "1",
                 minWidth: "260px",
@@ -104,10 +107,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   color: "#374151",
                 }}
               >
-                {column.title} ({columnCandidates.length})
+                {columnTitle(status)} ({columnCandidates.length})
               </h3>
 
-              <Droppable droppableId={column.id}>
+              <Droppable droppableId={status}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
@@ -160,7 +163,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                   color: "#6b7280",
                                 }}
                               >
-                                {candidate.experience} il təcrübə
+                                {candidate.experience}{" "}
+                                {t("components.kanban.yearsExperience")}
                               </span>
 
                               <div style={{ marginTop: "4px" }}>

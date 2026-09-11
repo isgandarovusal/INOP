@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,15 +18,16 @@ const RESULTS: StandardResult[] = [
   "critical",
 ];
 
-const RESULT_LABELS: Record<StandardResult, string> = {
-  compliant: "COMPLIANT",
-  minor: "MINOR",
-  major: "MAJOR",
-  critical: "CRITICAL",
+const RESULT_LABEL_KEYS: Record<StandardResult, string> = {
+  compliant: "audit.standard.detail.compliant",
+  minor: "audit.standard.detail.resultMinor",
+  major: "audit.standard.detail.resultMajor",
+  critical: "audit.standard.detail.resultCritical",
 };
 
 export default function StandardAuditForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [restaurantId, setRestaurantId] = useState("");
   const [date, setDate] = useState(
@@ -125,7 +127,7 @@ export default function StandardAuditForm() {
     event.preventDefault();
 
     if (!restaurantId.trim()) {
-      window.alert("Restoran seçilməlidir.");
+      window.alert(t("audit.standard.form.restaurantRequired"));
       return;
     }
 
@@ -184,7 +186,7 @@ export default function StandardAuditForm() {
       await createStandardAudit(audit);
     } catch (error) {
       console.error("Standard audit creation failed:", error);
-      window.alert("Audit yadda saxlanarkən xəta baş verdi.");
+      window.alert(t("audit.standard.form.saveError"));
       setSubmitting(false);
       return;
     }
@@ -196,15 +198,13 @@ export default function StandardAuditForm() {
     <div className="audit-page">
       <div className="audit-page-header">
         <div>
-          <h1>Yeni Standart Audit</h1>
-          <p>
-            Qida təhlükəsizliyi və brend standartlarını yoxlayın.
-          </p>
+          <h1>{t("audit.standard.form.newTitle")}</h1>
+          <p>{t("audit.standard.form.subtitle")}</p>
         </div>
 
         <div>
           <strong>
-            {passed ? "PASSED" : "FAILED"}
+            {passed ? t("audit.standard.form.passed") : t("audit.standard.form.failed")}
           </strong>
           {" · "}
           {compliancePercentage.toFixed(1)}%
@@ -213,38 +213,38 @@ export default function StandardAuditForm() {
 
       <form onSubmit={handleSubmit}>
         <section className="audit-card">
-          <h2>Restoran məlumatları</h2>
+          <h2>{t("audit.standard.form.restaurantInformation")}</h2>
 
           <div className="audit-form-grid">
             <label>
-              Restoran
+              {t("audit.standard.form.restaurant")}
               <input
                 value={restaurantId}
                 onChange={(event) =>
                   setRestaurantId(event.target.value)
                 }
-                placeholder="Restoran ID və ya adı"
+                placeholder={t("audit.standard.form.restaurantPlaceholder")}
                 required
               />
             </label>
 
             <label>
-              Növbə
+              {t("audit.standard.form.shift")}
               <select
                 value={shift}
                 onChange={(event) =>
                   setShift(event.target.value)
                 }
               >
-                <option>Səhər</option>
-                <option>Günorta</option>
-                <option>Axşam</option>
-                <option>Gecə</option>
+                <option value="Səhər">{t("audit.standard.form.morning")}</option>
+                <option value="Günorta">{t("audit.standard.form.afternoon")}</option>
+                <option value="Axşam">{t("audit.standard.form.evening")}</option>
+                <option value="Gecə">{t("audit.standard.form.night")}</option>
               </select>
             </label>
 
             <label>
-              Audit tarixi
+              {t("audit.standard.form.auditDate")}
               <input
                 type="date"
                 value={date}
@@ -258,39 +258,39 @@ export default function StandardAuditForm() {
         </section>
 
         <section className="audit-card">
-          <h2>Uyğunsuzluq xülasəsi</h2>
+          <h2>{t("audit.standard.form.findingSummary")}</h2>
 
           <div className="audit-summary-grid">
             <div>
               <strong>{allItems.length}</strong>
-              <span>Ümumi</span>
+              <span>{t("audit.standard.form.total")}</span>
             </div>
 
             <div>
               <strong>{foundCritical}</strong>
-              <span>🔴 CRITICAL</span>
+              <span>🔴 {t("audit.standard.form.critical")}</span>
             </div>
 
             <div>
               <strong>{foundMajor}</strong>
-              <span>🟠 MAJOR</span>
+              <span>🟠 {t("audit.standard.form.major")}</span>
             </div>
 
             <div>
               <strong>{foundMinor}</strong>
-              <span>🟡 MINOR</span>
+              <span>🟡 {t("audit.standard.form.minor")}</span>
             </div>
 
             <div>
               <strong>{foundTotal}</strong>
-              <span>Tapılan cəmi</span>
+              <span>{t("audit.standard.form.totalFound")}</span>
             </div>
 
             <div>
               <strong>
                 {compliancePercentage.toFixed(1)}%
               </strong>
-              <span>Uyğunluq</span>
+              <span>{t("audit.standard.form.compliance")}</span>
             </div>
           </div>
         </section>
@@ -311,16 +311,16 @@ export default function StandardAuditForm() {
                   <h3>{subsection.title}</h3>
 
                   <span>
-                    {subsection.expected.total} sual ·{" "}
-                    {subsection.expected.critical} Critical ·{" "}
-                    {subsection.expected.major} Major ·{" "}
-                    {subsection.expected.minor} Minor
+                    {subsection.expected.total} {t("audit.standard.form.questions")} ·{" "}
+                    {subsection.expected.critical} {t("audit.standard.form.critical")} ·{" "}
+                    {subsection.expected.major} {t("audit.standard.form.major")} ·{" "}
+                    {subsection.expected.minor} {t("audit.standard.form.minor")}
                   </span>
                 </div>
 
                 {subsection.items.length === 0 ? (
                   <div className="audit-empty-state">
-                    Bu bölmənin kriteriyaları hələ əlavə edilməyib.
+                    {t("audit.standard.form.sectionCriteriaMissing")}
                   </div>
                 ) : (
                   subsection.items.map((item) => {
@@ -356,7 +356,7 @@ export default function StandardAuditForm() {
                                 }
                               />
 
-                              {RESULT_LABELS[value]}
+                              {t(RESULT_LABEL_KEYS[value])}
                             </label>
                           ))}
                         </div>
@@ -373,7 +373,7 @@ export default function StandardAuditForm() {
                                     event.target.value
                                   )
                                 }
-                                placeholder="Aşkar edilmiş uyğunsuzluq"
+                                placeholder={t("audit.standard.form.findingPlaceholder")}
                               />
 
                               <input
@@ -385,7 +385,7 @@ export default function StandardAuditForm() {
                                     event.target.value
                                   )
                                 }
-                                placeholder="Düzəldici tədbir"
+                                placeholder={t("audit.standard.form.correctiveActionPlaceholder")}
                               />
                             </>
                           )}
@@ -399,19 +399,19 @@ export default function StandardAuditForm() {
         ))}
 
         <section className="audit-card">
-          <h2>Qiymətləndirmə</h2>
+          <h2>{t("audit.standard.form.evaluation")}</h2>
 
           <p>
-            🔴 Critical — dərhal fəaliyyət tələb olunur
+            🔴 {t("audit.standard.form.critical")} — {t("audit.standard.form.criticalDescription")}
           </p>
           <p>
-            🟠 Major — sistemli uyğunsuzluq
+            🟠 {t("audit.standard.form.major")} — {t("audit.standard.form.majorDescription")}
           </p>
           <p>
-            🟡 Minor — aşağı riskli uyğunsuzluq
+            🟡 {t("audit.standard.form.minor")} — {t("audit.standard.form.minorDescription")}
           </p>
           <p>
-            🟢 Compliant — standarta uyğundur
+            🟢 {t("audit.standard.detail.compliant")} — {t("audit.standard.form.compliantDescription")}
           </p>
         </section>
 

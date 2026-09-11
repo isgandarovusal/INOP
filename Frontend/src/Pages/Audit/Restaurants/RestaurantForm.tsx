@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowRight, Loader2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -10,6 +11,7 @@ import {
 import type { RestaurantStatus } from "../../../Types/audit";
 
 const RestaurantForm: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -122,7 +124,7 @@ const RestaurantForm: React.FC = () => {
               className="input-field"
               value={name}
               onChange={(e)=>setName(e.target.value)}
-              placeholder="Restaurant name"
+              placeholder={t("audit.restaurants.form.restaurantName")}
             />
 
           </div>
@@ -138,7 +140,7 @@ const RestaurantForm: React.FC = () => {
               className="input-field"
               value={location}
               onChange={(e)=>setLocation(e.target.value)}
-              placeholder="Baku, Nizami Street"
+              placeholder={t("audit.restaurants.form.locationPlaceholder")}
             />
 
           </div>

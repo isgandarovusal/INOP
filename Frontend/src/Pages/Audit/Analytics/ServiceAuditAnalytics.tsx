@@ -2,6 +2,7 @@ import "../auditModern.css";
 import "../auditAnalytics.css";
 
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   ResponsiveContainer,
@@ -27,6 +28,7 @@ import { getServiceAnalytics } from "../../../Services/auditAnalyticsService";
 import type { ServiceAnalyticsData } from "../../../Services/auditAnalyticsService";
 
 const ServiceAuditAnalytics: React.FC = () => {
+  const { t } = useTranslation();
   const [data, setData] = useState<ServiceAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,7 +40,7 @@ const ServiceAuditAnalytics: React.FC = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Service analytics could not be loaded.");
+        setError(t("audit.service.analytics.error"));
       })
       .finally(() => {
         setLoading(false);
@@ -48,13 +50,13 @@ const ServiceAuditAnalytics: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Service Audit Analytics"
-        subtitle="MongoDB aggregation based service audit statistics"
+        title={t("audit.service.analytics.title")}
+        subtitle={t("audit.service.analytics.subtitle")}
       />
 
       {loading && (
         <div className="empty-state">
-          Loading analytics...
+          {t("audit.service.analytics.loading")}
         </div>
       )}
 
@@ -69,13 +71,13 @@ const ServiceAuditAnalytics: React.FC = () => {
           <div className="kpi-grid">
             <div className="kpi-card">
               <BarChart3 size={22} />
-              <p>Total service audits</p>
+              <p>{t("audit.service.analytics.totalAudits")}</p>
               <h2>{data.total}</h2>
             </div>
 
             <div className="kpi-card">
               <TrendingUp size={22} />
-              <p>Average score</p>
+              <p>{t("audit.service.analytics.averageScore")}</p>
               <h2>
                 {data.averageOverallPercentage.toFixed(1)}%
               </h2>
@@ -83,16 +85,16 @@ const ServiceAuditAnalytics: React.FC = () => {
 
             <div className="kpi-card">
               <Clock3 size={22} />
-              <p>Average service time</p>
+              <p>{t("audit.service.analytics.averageServiceTime")}</p>
               <h2>
-                {data.averageServiceTimeSeconds.toFixed(0)}s
+                {data.averageServiceTimeSeconds.toFixed(0)}{t("audit.service.analytics.secondsShort")}
               </h2>
             </div>
           </div>
 
           <div className="charts-grid">
             <div className="chart-card">
-              <h3>Service Answers</h3>
+              <h3>{t("audit.service.analytics.answers")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={data.answerDistribution}>
@@ -105,7 +107,7 @@ const ServiceAuditAnalytics: React.FC = () => {
             </div>
 
             <div className="chart-card">
-              <h3>Service Audit Trend</h3>
+              <h3>{t("audit.service.analytics.trend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={data.trend}>

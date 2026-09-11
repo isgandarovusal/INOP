@@ -1,17 +1,26 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
 import { getJobById } from "../../../Services/jobsService";
-import { getApplications, createApplication } from "../../../Services/applicationsService";
+import {
+  getApplications,
+  createApplication,
+} from "../../../Services/applicationsService";
 import { getCandidates } from "../../../Services/candidatesService";
-import type { Job, Application, Candidate } from "../../../Types/recruitment";
+import type {
+  Job,
+  Application,
+  Candidate,
+} from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageRecruitment } from "../../../Utils/permissions";
 
 const JobDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -26,7 +35,9 @@ const JobDetail: React.FC = () => {
 
   const load = () => {
     if (!id) return;
+
     setLoading(true);
+
     Promise.all([getJobById(id), getApplications(), getCandidates()]).then(
       ([jobResult, appResult, candidateResult]) => {
         setJob(jobResult ?? null);
@@ -41,20 +52,30 @@ const JobDetail: React.FC = () => {
 
   const ranked = useMemo(() => {
     return applications
-      .map((app) => ({ app, candidate: candidates.find((c) => c.id === app.candidateId) }))
+      .map((app) => ({
+        app,
+        candidate: candidates.find((c) => c.id === app.candidateId),
+      }))
       .filter((r) => r.candidate)
       .sort((a, b) => b.app.score - a.app.score);
   }, [applications, candidates]);
 
   const applicableCandidates = useMemo(
-    () => candidates.filter((c) => !applications.some((a) => a.candidateId === c.id)),
+    () =>
+      candidates.filter(
+        (c) => !applications.some((a) => a.candidateId === c.id),
+      ),
     [candidates, applications],
   );
 
   const handleLink = async () => {
     if (!id || !selectedCandidate) return;
+
     setLinking(true);
-    await createApplication({ jobId: id, candidateId: selectedCandidate });
+    await createApplication({
+      jobId: id,
+      candidateId: selectedCandidate,
+    });
     setSelectedCandidate("");
     setLinking(false);
     load();
@@ -72,8 +93,8 @@ const JobDetail: React.FC = () => {
     return (
       <EmptyState
         icon={<UserSquare2 size={28} />}
-        title="Job not found"
-        hint="It may have been deleted."
+        title={t("recruitment.jobDetail.notFound")}
+        hint={t("recruitment.jobDetail.deletedHint")}
       />
     );
   }
@@ -82,18 +103,26 @@ const JobDetail: React.FC = () => {
     <div>
       <PageHeader
         title={job.position}
-        subtitle={`${job.experience}+ years experience · ${job.status}`}
+        subtitle={`${t("recruitment.jobDetail.yearsExperience", {
+          years: job.experience,
+        })} · ${t(`recruitment.jobStatus.${job.status}`)}`}
         actions={
           <>
-            <button className="btn-secondary" onClick={() => navigate("/app/recruitment/jobs")}>
-              <ArrowLeft size={15} /> Back
+            <button
+              className="btn-secondary"
+              onClick={() => navigate("/app/recruitment/jobs")}
+            >
+              <ArrowLeft size={15} /> {t("recruitment.jobDetail.back")}
             </button>
+
             {canManage && (
               <button
                 className="btn-add"
-                onClick={() => navigate(`/app/recruitment/jobs/${job.id}/edit`)}
+                onClick={() =>
+                  navigate(`/app/recruitment/jobs/${job.id}/edit`)
+                }
               >
-                <Pencil size={15} /> Edit
+                <Pencil size={15} /> {t("recruitment.jobDetail.edit")}
               </button>
             )}
           </>
@@ -103,19 +132,30 @@ const JobDetail: React.FC = () => {
       <div className="detail-grid">
         <div>
           <div className="detail-card">
-            <h3>Description</h3>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", whiteSpace: "pre-wrap" }}>
-              {job.description || "No description provided."}
+            <h3>{t("recruitment.jobDetail.description")}</h3>
+            <p
+              style={{
+                color: "var(--text-secondary)",
+                fontSize: "0.9rem",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {job.description || t("recruitment.jobDetail.noDescription")}
             </p>
           </div>
 
           <div className="detail-card">
-            <h3>Ranked candidates ({ranked.length})</h3>
+            <h3>
+              {t("recruitment.jobDetail.rankedCandidates", {
+                count: ranked.length,
+              })}
+            </h3>
+
             {ranked.length === 0 ? (
               <EmptyState
                 icon={<UserSquare2 size={26} />}
-                title="No applications yet"
-                hint="Link a candidate to this job to see their screening score."
+                title={t("recruitment.jobDetail.noApplications")}
+                hint={t("recruitment.jobDetail.noApplicationsHint")}
               />
             ) : (
               <div className="ranking-list">
@@ -123,17 +163,32 @@ const JobDetail: React.FC = () => {
                   <div
                     key={app.id}
                     className="ranking-row"
-                    onClick={() => navigate(`/app/recruitment/candidates/${candidate!.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/app/recruitment/candidates/${candidate!.id}`,
+                      )
+                    }
                     style={{ cursor: "pointer" }}
                   >
                     <span className="ranking-row__rank">{idx + 1}</span>
+
                     <div className="ranking-row__info">
-                      <p className="ranking-row__name">{candidate!.name}</p>
+                      <p className="ranking-row__name">
+                        {candidate!.name}
+                      </p>
+
                       <p className="ranking-row__meta">
-                        {candidate!.experience} yrs · <Badge tone="accent">{app.status}</Badge>
+                        {candidate!.experience}{" "}
+                        {t("recruitment.jobs.years")} ·{" "}
+                        <Badge tone="accent">
+                          {t(`recruitment.applicationStatus.${app.status}`)}
+                        </Badge>
                       </p>
                     </div>
-                    <span className="ranking-row__score">{app.score}</span>
+
+                    <span className="ranking-row__score">
+                      {app.score}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -143,11 +198,20 @@ const JobDetail: React.FC = () => {
 
         <div>
           <div className="detail-card">
-            <h3>Required skills</h3>
+            <h3>{t("recruitment.jobDetail.requiredSkills")}</h3>
+
             <div className="tag-list">
               {job.requiredSkills.length === 0 && (
-                <span style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>None specified</span>
+                <span
+                  style={{
+                    color: "var(--text-secondary)",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {t("recruitment.jobDetail.noneSpecified")}
+                </span>
               )}
+
               {job.requiredSkills.map((s) => (
                 <Badge tone="accent" key={s}>
                   {s}
@@ -157,11 +221,20 @@ const JobDetail: React.FC = () => {
           </div>
 
           <div className="detail-card">
-            <h3>Preferred skills</h3>
+            <h3>{t("recruitment.jobDetail.preferredSkills")}</h3>
+
             <div className="tag-list">
               {job.preferredSkills.length === 0 && (
-                <span style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>None specified</span>
+                <span
+                  style={{
+                    color: "var(--text-secondary)",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {t("recruitment.jobDetail.noneSpecified")}
+                </span>
               )}
+
               {job.preferredSkills.map((s) => (
                 <Badge tone="neutral" key={s}>
                   {s}
@@ -172,10 +245,16 @@ const JobDetail: React.FC = () => {
 
           {canManage && (
             <div className="detail-card">
-              <h3>Link a candidate</h3>
+              <h3>{t("recruitment.jobDetail.linkCandidate")}</h3>
+
               {applicableCandidates.length === 0 ? (
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                  All candidates have already applied to this job.
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  {t("recruitment.jobDetail.allCandidatesApplied")}
                 </p>
               ) : (
                 <>
@@ -183,9 +262,14 @@ const JobDetail: React.FC = () => {
                     <select
                       className="input-field"
                       value={selectedCandidate}
-                      onChange={(e) => setSelectedCandidate(e.target.value)}
+                      onChange={(e) =>
+                        setSelectedCandidate(e.target.value)
+                      }
                     >
-                      <option value="">Select a candidate…</option>
+                      <option value="">
+                        {t("recruitment.jobDetail.selectCandidate")}
+                      </option>
+
                       {applicableCandidates.map((c) => (
                         <option key={c.id} value={c.id}>
                           {c.name}
@@ -193,14 +277,19 @@ const JobDetail: React.FC = () => {
                       ))}
                     </select>
                   </div>
+
                   <button
                     className="btn-primary"
                     style={{ width: "100%" }}
                     disabled={!selectedCandidate || linking}
                     onClick={handleLink}
                   >
-                    {linking ? <Loader2 size={16} className="spin" /> : <Plus size={16} />}
-                    Add application
+                    {linking ? (
+                      <Loader2 size={16} className="spin" />
+                    ) : (
+                      <Plus size={16} />
+                    )}
+                    {t("recruitment.jobDetail.addApplication")}
                   </button>
                 </>
               )}

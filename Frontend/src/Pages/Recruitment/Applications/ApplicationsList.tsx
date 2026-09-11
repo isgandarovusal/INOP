@@ -15,6 +15,7 @@ import { getCandidates } from "../../../Services/candidatesService";
 import type { Application, ApplicationStatus, Job, Candidate } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageRecruitment } from "../../../Utils/permissions";
+import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Record<ApplicationStatus, BadgeTone> = {
   applied: "info",
@@ -25,6 +26,7 @@ const STATUS_TONE: Record<ApplicationStatus, BadgeTone> = {
 };
 
 const ApplicationsList: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const canManage = user ? canManageRecruitment(user.role) : false;
@@ -82,13 +84,13 @@ const ApplicationsList: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Applications"
-        subtitle={`${applications.length} total · ${rows.length} shown`}
+        title={t("recruitment.applications.title")}
+        subtitle={t("recruitment.applications.totalShown", { total: applications.length, shown: rows.length })}
       />
 
       <div className="filter-bar">
         <select className="input-field" style={{ width: 220 }} value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
-          <option value="all">All jobs</option>
+          <option value="all">{t("recruitment.applications.allJobs")}</option>
           {jobs.map((j) => (
             <option key={j.id} value={j.id}>
               {j.position}
@@ -101,12 +103,12 @@ const ApplicationsList: React.FC = () => {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "all" | ApplicationStatus)}
         >
-          <option value="all">All statuses</option>
-          <option value="applied">Applied</option>
-          <option value="screening">Screening</option>
-          <option value="shortlisted">Shortlisted</option>
-          <option value="rejected">Rejected</option>
-          <option value="hired">Hired</option>
+          <option value="all">{t("recruitment.applications.allStatuses")}</option>
+          <option value="applied">{t("recruitment.applications.applied")}</option>
+          <option value="screening">{t("recruitment.applications.screening")}</option>
+          <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
+          <option value="rejected">{t("recruitment.applications.rejected")}</option>
+          <option value="hired">{t("recruitment.applications.hired")}</option>
         </select>
       </div>
 
@@ -114,11 +116,11 @@ const ApplicationsList: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>Candidate</th>
-              <th>Job</th>
-              <th>Score</th>
-              <th>Status</th>
-              {canManage && <th className="col-actions">Actions</th>}
+              <th>{t("recruitment.applications.candidate")}</th>
+              <th>{t("recruitment.applications.job")}</th>
+              <th>{t("recruitment.applications.score")}</th>
+              <th>{t("recruitment.applications.status")}</th>
+              {canManage && <th className="col-actions">{t("recruitment.applications.actions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -135,8 +137,8 @@ const ApplicationsList: React.FC = () => {
                 <td colSpan={5}>
                   <EmptyState
                     icon={<ClipboardList size={28} />}
-                    title="No applications yet"
-                    hint="Link candidates to jobs from a job's detail page."
+                    title={t("recruitment.applications.noApplications")}
+                    hint={t("recruitment.applications.noApplicationsHint")}
                   />
                 </td>
               </tr>
@@ -166,14 +168,14 @@ const ApplicationsList: React.FC = () => {
                           handleStatusChange(app.id, e.target.value as ApplicationStatus)
                         }
                       >
-                        <option value="applied">Applied</option>
-                        <option value="screening">Screening</option>
-                        <option value="shortlisted">Shortlisted</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="hired">Hired</option>
+                        <option value="applied">{t("recruitment.applications.applied")}</option>
+                        <option value="screening">{t("recruitment.applications.screening")}</option>
+                        <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
+                        <option value="rejected">{t("recruitment.applications.rejected")}</option>
+                        <option value="hired">{t("recruitment.applications.hired")}</option>
                       </select>
                     ) : (
-                      <Badge tone={STATUS_TONE[app.status]}>{app.status}</Badge>
+                      <Badge tone={STATUS_TONE[app.status]}>{t(`recruitment.applications.${app.status}`)}</Badge>
                     )}
                   </td>
                   {canManage && (
@@ -181,7 +183,7 @@ const ApplicationsList: React.FC = () => {
                       <div className="row-actions">
                         <button
                           className="icon-btn icon-btn--danger"
-                          title="Delete"
+                          title={t("recruitment.applications.delete")}
                           disabled={deletingId === app.id}
                           onClick={() => setDeleteTarget(app)}
                         >
@@ -203,8 +205,8 @@ const ApplicationsList: React.FC = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title="Remove this application?"
-          message="This link between the candidate and job will be removed."
+          title={t("recruitment.applications.removeTitle")}
+          message={t("recruitment.applications.removeMessage")}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

@@ -7,6 +7,7 @@ import AuditExportPanel from "../AuditExport/AuditExportPanel";
 import AuditHistoryPanel from "../AuditHistory/AuditHistoryPanel";
 
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -24,6 +25,7 @@ import { canManageAudit } from "../../../Utils/permissions";
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
 const AuditDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -63,7 +65,7 @@ const AuditDetail: React.FC = () => {
   }
 
   if (!audit) {
-    return <EmptyState icon={<ClipboardCheck size={28} />} title="Audit not found" hint="It may have been deleted." />;
+    return <EmptyState icon={<ClipboardCheck size={28} />} title={t("audit.generic.detail.notFound")} hint="It may have been deleted." />;
   }
 
   const overall =
@@ -102,7 +104,7 @@ const AuditDetail: React.FC = () => {
       <div className="detail-grid">
         <div>
           <div className="detail-card">
-            <h3>Scores</h3>
+            <h3>{t("audit.generic.detail.scores")}</h3>
             {(Object.entries(audit.scores) as [string, number][]).map(([key, value]) => (
               <div className="score-bar-row" key={key}>
                 <span style={{ textTransform: "capitalize" }}>{key}</span>
@@ -115,14 +117,14 @@ const AuditDetail: React.FC = () => {
           </div>
 
           <div className="detail-card">
-            <h3>Status</h3>
+            <h3>{t("audit.generic.detail.status")}</h3>
             <Badge tone={audit.status === "completed" ? "success" : "warning"}>
               {audit.status ?? "unknown"}
             </Badge>
           </div>
 
           <div className="detail-card">
-            <h3>Findings</h3>
+            <h3>{t("audit.generic.detail.findings")}</h3>
             {audit.findings && audit.findings.length > 0 ? (
               <ul>
                 {audit.findings.map((item, index) => (
@@ -134,12 +136,12 @@ const AuditDetail: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p>No findings recorded.</p>
+              <p>{t("audit.generic.detail.noFindings")}</p>
             )}
           </div>
 
           <div className="detail-card">
-            <h3>Recommendations</h3>
+            <h3>{t("audit.generic.detail.recommendations")}</h3>
             {audit.recommendations && audit.recommendations.length > 0 ? (
               <ul>
                 {audit.recommendations.map((item, index) => (
@@ -151,21 +153,21 @@ const AuditDetail: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p>No recommendations recorded.</p>
+              <p>{t("audit.generic.detail.noRecommendations")}</p>
             )}
           </div>
 
           <div className="detail-card">
-            <h3>Comments</h3>
+            <h3>{t("audit.generic.detail.comments")}</h3>
             <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>
               {audit.comments || "No comments provided."}
             </p>
           </div>
 
           <div className="detail-card">
-            <h3>Photos</h3>
+            <h3>{t("audit.generic.detail.photos")}</h3>
             {audit.photos.length === 0 ? (
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>No photos attached.</p>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{t("audit.generic.detail.noPhotos")}</p>
             ) : (
               <div className="thumb-grid">
                 {audit.photos.map((photo, idx) =>
@@ -186,7 +188,7 @@ const AuditDetail: React.FC = () => {
 
           {audit.attachments.length > 0 && (
             <div className="detail-card">
-              <h3>Attachments</h3>
+              <h3>{t("audit.generic.detail.attachments")}</h3>
               <div className="file-list">
                 {audit.attachments.map((file, idx) =>
                   file.blobUrl ? (
@@ -215,11 +217,11 @@ const AuditDetail: React.FC = () => {
 
         <div>
           <div className="detail-card">
-            <h3>Overall score</h3>
+            <h3>{t("audit.generic.detail.overallScore")}</h3>
             <Badge tone={scoreTone(overall)}>{overall.toFixed(1)} / 10</Badge>
           </div>
           <div className="detail-card">
-            <h3>Details</h3>
+            <h3>{t("audit.generic.detail.details")}</h3>
             <div className="detail-row">
               <dt>Restaurant</dt>
               <dd>{restaurant?.name ?? "Unknown"}</dd>

@@ -1,6 +1,7 @@
 import "../auditModern.css";
 import "../auditAnalytics.css";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
  ResponsiveContainer,
@@ -29,6 +30,7 @@ import {
 
 
 const AuditAnalytics:React.FC = ()=>{
+  const { t } = useTranslation();
 
 
  const [statusData,setStatusData] = useState<any[]>([]);
@@ -85,8 +87,8 @@ const AuditAnalytics:React.FC = ()=>{
 
 
  <PageHeader
-  title="Audit Analytics"
-  subtitle="Real MongoDB based audit statistics"
+  title={t("audit.analytics.title")}
+  subtitle={t("audit.analytics.subtitle")}
  />
 
 
@@ -109,7 +111,7 @@ const AuditAnalytics:React.FC = ()=>{
 
    <BarChart3 size={22}/>
 
-   <p>Total audits</p>
+   <p>{t("audit.analytics.totalAudits")}</p>
 
    <h2>
     {total}
@@ -122,7 +124,7 @@ const AuditAnalytics:React.FC = ()=>{
 
    <TrendingUp size={22}/>
 
-   <p>Status groups</p>
+   <p>{t("audit.analytics.statusGroups")}</p>
 
    <h2>
     {statusData.length}

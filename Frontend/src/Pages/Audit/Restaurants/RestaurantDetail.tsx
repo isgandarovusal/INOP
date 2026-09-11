@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, Loader2, Pencil, Plus, Store } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -11,6 +12,7 @@ import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
 const RestaurantDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -62,7 +64,7 @@ const RestaurantDetail: React.FC = () => {
   }
 
   if (!restaurant) {
-    return <EmptyState icon={<Store size={28} />} title="Restaurant not found" hint="It may have been deleted." />;
+    return <EmptyState icon={<Store size={28} />} title={t("audit.restaurants.detail.notFound")} hint="It may have been deleted." />;
   }
 
   return (
@@ -96,18 +98,18 @@ const RestaurantDetail: React.FC = () => {
       />
 
       <div className="detail-card">
-        <h3>Status</h3>
+        <h3>{t("audit.restaurants.detail.status")}</h3>
         <Badge tone={restaurant.status === "active" ? "success" : "neutral"}>
           {restaurant.status}
         </Badge>
       </div>
 
       <div className="detail-card">
-        <h3>Audit history ({history.length})</h3>
+        <h3>{t("audit.restaurants.detail.auditHistory", { count: history.length })}</h3>
         {history.length === 0 ? (
           <EmptyState
             icon={<ClipboardCheck size={26} />}
-            title="No audits yet"
+            title={t("audit.restaurants.detail.noAudits")}
             hint="Audits conducted at this restaurant will appear here."
           />
         ) : (
@@ -134,9 +136,9 @@ const RestaurantDetail: React.FC = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Overall score</th>
+                    <th>{t("audit.restaurants.detail.date")}</th>
+                    <th>{t("audit.restaurants.detail.type")}</th>
+                    <th>{t("audit.restaurants.detail.overallScore")}</th>
                   </tr>
                 </thead>
                 <tbody>

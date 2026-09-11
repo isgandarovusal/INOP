@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import type { OccupationalSafetyAudit } from "../../../Types/Audit/occupationalSafetyAudit";
 import { Link, useParams } from "react-router-dom";
@@ -16,6 +17,7 @@ import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
 export default function SafetyAuditDetail() {
   const { id } = useParams();
+  const { t } = useTranslation();
 
   const [audit, setAudit] =
     useState<OccupationalSafetyAudit | undefined>();
@@ -31,8 +33,8 @@ export default function SafetyAuditDetail() {
     return (
       <EmptyState
         icon={<ClipboardCheck size={28} />}
-        title="Əməyin mühafizəsi auditi tapılmadı"
-        hint="Audit silinmiş və ya mövcud deyil."
+        title={t("audit.safety.detail.notFound")}
+        hint={t("audit.safety.detail.deletedHint")}
       />
     );
   }
@@ -52,12 +54,12 @@ export default function SafetyAuditDetail() {
       : 0;
 
   const scoreScale = [
-    { value: 0, label: "Uyğun deyil" },
-    { value: 1, label: "Zəif" },
-    { value: 2, label: "Zəif" },
-    { value: 3, label: "Qismən uyğun" },
-    { value: 4, label: "Yaxşı" },
-    { value: 5, label: "Tam uyğun" },
+    { value: 0, label: t("audit.safety.detail.notCompliant") },
+    { value: 1, label: t("audit.safety.detail.weak") },
+    { value: 2, label: t("audit.safety.detail.weak") },
+    { value: 3, label: t("audit.safety.detail.partiallyCompliant") },
+    { value: 4, label: t("audit.safety.detail.good") },
+    { value: 5, label: t("audit.safety.detail.fullyCompliant") },
   ];
 
   const scoreDistribution = scoreScale.map((item) => ({
@@ -68,7 +70,7 @@ export default function SafetyAuditDetail() {
   return (
     <div className="audit-page">
       <PageHeader
-        title="Əməyin Mühafizəsi Auditi"
+        title={t("audit.safety.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
           <Link to="/app/audit/safety" className="btn btn-secondary">
@@ -81,21 +83,21 @@ export default function SafetyAuditDetail() {
       <div className="audit-detail-hero">
         <div>
           <span className="audit-detail-eyebrow">
-            ƏMƏYİN MÜHAFİZƏSİ · TƏHLÜKƏSİZLİK
+            {t("audit.safety.detail.eyebrow")}
           </span>
 
-          <h2>Audit nəticəsi</h2>
+          <h2>{t("audit.safety.detail.result")}</h2>
 
           <p>
-            Restoran ID: <strong>{audit.restaurantId}</strong>
+            {t("audit.safety.detail.restaurantId")}: <strong>{audit.restaurantId}</strong>
             {" · "}
-            Auditor: <strong>{audit.auditorId}</strong>
+            {t("audit.safety.detail.auditor")}: <strong>{audit.auditorId}</strong>
           </p>
         </div>
 
         <div className="audit-score-ring audit-safety-score-ring">
           <strong>{audit.scorePercentage.toFixed(1)}%</strong>
-          <span>Ümumi bal</span>
+          <span>{t("audit.safety.detail.totalScore")}</span>
         </div>
       </div>
 
@@ -104,7 +106,7 @@ export default function SafetyAuditDetail() {
           <div className="audit-kpi-icon">
             <Gauge size={20} />
           </div>
-          <span>Toplam bal</span>
+          <span>{t("audit.safety.detail.total")}</span>
           <strong>
             {audit.totalScore} / {audit.maxScore}
           </strong>
@@ -114,7 +116,7 @@ export default function SafetyAuditDetail() {
           <div className="audit-kpi-icon">
             <CheckCircle2 size={20} />
           </div>
-          <span>Cavablandırılıb</span>
+          <span>{t("audit.safety.detail.answered")}</span>
           <strong>{answered}</strong>
         </div>
 
@@ -122,7 +124,7 @@ export default function SafetyAuditDetail() {
           <div className="audit-kpi-icon">
             <AlertTriangle size={20} />
           </div>
-          <span>Cavabsız</span>
+          <span>{t("audit.safety.detail.unanswered")}</span>
           <strong>{unanswered}</strong>
         </div>
 
@@ -130,7 +132,7 @@ export default function SafetyAuditDetail() {
           <div className="audit-kpi-icon">
             <ClipboardCheck size={20} />
           </div>
-          <span>Orta bal</span>
+          <span>{t("audit.safety.detail.averageScore")}</span>
           <strong>{averageScore.toFixed(1)} / 5</strong>
         </div>
       </div>
@@ -139,8 +141,8 @@ export default function SafetyAuditDetail() {
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Bal paylanması</h3>
-              <p>Yoxlamalar üzrə verilmiş balların sayı</p>
+              <h3>{t("audit.safety.detail.scoreDistribution")}</h3>
+              <p>{t("audit.safety.detail.scoreDistributionDescription")}</p>
             </div>
           </div>
 
@@ -180,8 +182,8 @@ export default function SafetyAuditDetail() {
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Qiymətləndirmə şkalası</h3>
-              <p>Əməyin mühafizəsi üzrə bal sistemi</p>
+              <h3>{t("audit.safety.detail.evaluationScale")}</h3>
+              <p>{t("audit.safety.detail.evaluationScaleDescription")}</p>
             </div>
           </div>
 
@@ -201,14 +203,14 @@ export default function SafetyAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Yoxlama nəticələri</h3>
-            <p>{audit.checks.length} yoxlama maddəsi</p>
+            <h3>{t("audit.safety.detail.results")}</h3>
+            <p>{t("audit.safety.detail.checkCount", { count: audit.checks.length })}</p>
           </div>
         </div>
 
         {audit.checks.length === 0 ? (
           <div className="audit-empty-state">
-            Bu auditdə yoxlama nəticəsi yoxdur.
+            {t("audit.safety.detail.noResults")}
           </div>
         ) : (
           <div className="audit-safety-results">
@@ -224,7 +226,7 @@ export default function SafetyAuditDetail() {
                   {item.note ? (
                     <p>{item.note}</p>
                   ) : (
-                    <p className="audit-muted">Qeyd əlavə edilməyib.</p>
+                    <p className="audit-muted">{t("audit.safety.detail.notAdded")}</p>
                   )}
                 </div>
 
@@ -235,7 +237,7 @@ export default function SafetyAuditDetail() {
                       : ""
                   }`}
                 >
-                  <span>BAL</span>
+                  <span>{t("audit.safety.detail.score")}</span>
                   <strong>{item.score ?? "—"}</strong>
                 </div>
               </div>
@@ -247,34 +249,34 @@ export default function SafetyAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Audit məlumatları</h3>
-            <p>Əsas metadata məlumatları</p>
+            <h3>{t("audit.safety.detail.auditInformation")}</h3>
+            <p>{t("audit.safety.detail.metadata")}</p>
           </div>
         </div>
 
         <div className="audit-meta-grid">
           <div>
-            <span>Restoran</span>
+            <span>{t("audit.safety.detail.restaurant")}</span>
             <strong>{audit.restaurantId}</strong>
           </div>
 
           <div>
-            <span>Auditor</span>
+            <span>{t("audit.safety.detail.auditorLabel")}</span>
             <strong>{audit.auditorId}</strong>
           </div>
 
           <div>
-            <span>Tarix</span>
+            <span>{t("audit.safety.detail.date")}</span>
             <strong>{audit.date}</strong>
           </div>
 
           <div>
-            <span>Növbə</span>
+            <span>{t("audit.safety.detail.shift")}</span>
             <strong>{audit.shift}</strong>
           </div>
 
           <div>
-            <span>Status</span>
+            <span>{t("audit.safety.detail.status")}</span>
             <strong>{audit.status}</strong>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import "../auditModern.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -15,13 +16,14 @@ import { getServiceAuditById } from "../../../Services/serviceAuditsService";
 import type { ServiceAudit } from "../../../Types/Audit";
 import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
-const answerLabel = {
-  yes: "Bəli",
-  no: "Xeyr",
-  na: "N/A",
+const answerKeys = {
+  yes: "audit.service.detail.yes",
+  no: "audit.service.detail.no",
+  na: "audit.service.detail.notApplicable",
 } as const;
 
 export default function ServiceAuditDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
 
   const [audit, setAudit] = useState<ServiceAudit | undefined>();
@@ -41,8 +43,8 @@ if (!id) return;
     return (
       <EmptyState
         icon={<MessageSquareText size={28} />}
-        title="Servis auditi tapılmadı"
-        hint="Audit silinmiş və ya mövcud deyil."
+        title={t("audit.service.detail.notFound")}
+        hint={t("audit.service.detail.notFoundHint")}
       />
     );
   }
@@ -70,7 +72,7 @@ if (!id) return;
   return (
     <div className="audit-page">
       <PageHeader
-        title="Servis Auditi"
+        title={t("audit.service.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
           <Link to="/app/audit/service" className="btn btn-secondary">
@@ -82,18 +84,18 @@ if (!id) return;
 
       <div className="audit-detail-hero">
         <div>
-          <span className="audit-detail-eyebrow">SERVİS KEYFİYYƏTİ</span>
-          <h2>Audit nəticəsi</h2>
+          <span className="audit-detail-eyebrow">{t("audit.service.detail.eyebrow")}</span>
+          <h2>{t("audit.service.detail.result")}</h2>
           <p>
-            Restoran ID: <strong>{audit.restaurantId}</strong>
+            {t("audit.service.detail.restaurantId")}: <strong>{audit.restaurantId}</strong>
             {" · "}
-            Auditor: <strong>{audit.auditorId}</strong>
+            {t("audit.service.detail.auditor")}: <strong>{audit.auditorId}</strong>
           </p>
         </div>
 
         <div className="audit-score-ring">
           <strong>{audit.overallPercentage.toFixed(1)}%</strong>
-          <span>Ümumi nəticə</span>
+          <span>{t("audit.service.detail.overallResult")}</span>
         </div>
       </div>
 
@@ -102,7 +104,7 @@ if (!id) return;
           <div className="audit-kpi-icon">
             <CheckCircle2 size={20} />
           </div>
-          <span>Bəli</span>
+          <span>{t("audit.service.detail.yes")}</span>
           <strong>{yesCount}</strong>
         </div>
 
@@ -110,7 +112,7 @@ if (!id) return;
           <div className="audit-kpi-icon">
             <XCircle size={20} />
           </div>
-          <span>Xeyr</span>
+          <span>{t("audit.service.detail.no")}</span>
           <strong>{noCount}</strong>
         </div>
 
@@ -126,11 +128,11 @@ if (!id) return;
           <div className="audit-kpi-icon">
             <Clock3 size={20} />
           </div>
-          <span>Orta xidmət vaxtı</span>
+          <span>{t("audit.service.detail.averageServiceTime")}</span>
           <strong>
             {averageServiceTime === null
               ? "—"
-              : `${averageServiceTime.toFixed(1)} san`}
+              : `${averageServiceTime.toFixed(1)} ${t("audit.service.detail.secondsShort")}`}
           </strong>
         </div>
       </div>
@@ -139,14 +141,14 @@ if (!id) return;
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Yoxlama nəticələri</h3>
-              <p>{answered.length} cavablandırılmış kriteriya</p>
+              <h3>{t("audit.service.detail.checkResults")}</h3>
+              <p>{t("audit.service.detail.answeredCriteria", { count: answered.length })}</p>
             </div>
           </div>
 
           {audit.checks.length === 0 ? (
             <div className="audit-empty-state">
-              Bu auditdə hələ kriteriya nəticəsi yoxdur.
+              {t("audit.service.detail.noCriteria")}
             </div>
           ) : (
             <div className="audit-result-list">
@@ -160,7 +162,7 @@ if (!id) return;
                   <span
                     className={`audit-answer audit-answer--${item.answer}`}
                   >
-                    {answerLabel[item.answer]}
+                    {t(answerKeys[item.answer])}
                   </span>
                 </div>
               ))}
@@ -171,14 +173,14 @@ if (!id) return;
         <section className="audit-card">
           <div className="audit-card-header">
             <div>
-              <h3>Xidmət vaxtı</h3>
-              <p>Qonaq müşahidələrinin real nəticələri</p>
+              <h3>{t("audit.service.detail.serviceTime")}</h3>
+              <p>{t("audit.service.detail.guestObservations")}</p>
             </div>
           </div>
 
           {audit.serviceTimeObservations.length === 0 ? (
             <div className="audit-empty-state">
-              Xidmət vaxtı müşahidəsi yoxdur.
+              {t("audit.service.detail.noServiceTime")}
             </div>
           ) : (
             <div className="audit-service-time-chart">
@@ -194,7 +196,7 @@ if (!id) return;
                     className="audit-service-time-row"
                     key={observation.guestNumber}
                   >
-                    <span>Qonaq {observation.guestNumber}</span>
+                    <span>{t("audit.service.detail.guest", { number: observation.guestNumber })}</span>
 
                     <div className="audit-service-time-track">
                       <div
@@ -206,7 +208,7 @@ if (!id) return;
                     <strong>
                       {observation.seconds === null
                         ? "—"
-                        : `${observation.seconds} san`}
+                        : `${observation.seconds} ${t("audit.service.detail.secondsShort")}`}
                     </strong>
                   </div>
                 );
@@ -219,14 +221,14 @@ if (!id) return;
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Tövsiyələr</h3>
-            <p>Audit nəticələrinə əsaslanan inkişaf istiqamətləri</p>
+            <h3>{t("audit.service.detail.recommendations")}</h3>
+            <p>{t("audit.service.detail.recommendationsHint")}</p>
           </div>
         </div>
 
         {audit.recommendations.length === 0 ? (
           <div className="audit-empty-state">
-            Tövsiyə əlavə edilməyib.
+            {t("audit.service.detail.noRecommendations")}
           </div>
         ) : (
           <ol className="audit-recommendation-list">
@@ -240,30 +242,30 @@ if (!id) return;
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>Audit məlumatları</h3>
-            <p>Auditin əsas metadata məlumatları</p>
+            <h3>{t("audit.service.detail.auditInformation")}</h3>
+            <p>{t("audit.service.detail.metadataHint")}</p>
           </div>
         </div>
 
         <div className="audit-meta-grid">
           <div>
-            <span>Restoran</span>
+            <span>{t("audit.service.detail.restaurant")}</span>
             <strong>{audit.restaurantId}</strong>
           </div>
           <div>
-            <span>Auditor</span>
+            <span>{t("audit.service.detail.auditor")}</span>
             <strong>{audit.auditorId}</strong>
           </div>
           <div>
-            <span>Tarix</span>
+            <span>{t("audit.service.detail.date")}</span>
             <strong>{audit.date}</strong>
           </div>
           <div>
-            <span>Növbə</span>
+            <span>{t("audit.service.detail.shift")}</span>
             <strong>{audit.shift}</strong>
           </div>
           <div>
-            <span>Status</span>
+            <span>{t("audit.service.detail.status")}</span>
             <strong>{audit.status}</strong>
           </div>
         </div>

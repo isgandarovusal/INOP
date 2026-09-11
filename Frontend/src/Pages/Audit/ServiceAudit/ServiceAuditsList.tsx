@@ -1,5 +1,6 @@
 import "../auditModern.css";
 import {useEffect,useState} from "react";
+import { useTranslation } from "react-i18next";
 
 
 const API =
@@ -9,6 +10,7 @@ const API =
 
 export default function ServiceAuditsList(){
 
+ const { t } = useTranslation();
  const [audits,setAudits] = useState<any[]>([]);
  const [loading,setLoading] = useState(true);
 
@@ -31,7 +33,7 @@ export default function ServiceAuditsList(){
 
 
  if(loading){
-  return <div>Loading...</div>;
+  return <div>{t("audit.service.list.loading")}</div>;
  }
 
 
@@ -41,7 +43,7 @@ export default function ServiceAuditsList(){
   <div>
 
    <h2>
-    Service Audit
+    {t("audit.service.list.title")}
    </h2>
 
 
@@ -50,9 +52,9 @@ export default function ServiceAuditsList(){
     <thead>
 
      <tr>
-      <th>Status</th>
-      <th>Type</th>
-      <th>Date</th>
+      <th>{t("audit.service.list.status")}</th>
+      <th>{t("audit.service.list.type")}</th>
+      <th>{t("audit.service.list.date")}</th>
      </tr>
 
     </thead>
@@ -66,11 +68,11 @@ export default function ServiceAuditsList(){
       <tr key={a._id}>
 
        <td>
-        {a.status}
+        {t(`common.status.${a.status}`, { defaultValue: a.status })}
        </td>
 
        <td>
-        {a.auditType}
+        {t("audit.types.service")}
        </td>
 
        <td>

@@ -8,6 +8,7 @@ import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { calculateMatchScore } from "../../../Services/aiMatchService";
 import { getCandidates, updateCandidateStatus } from "../../../Services/candidatesService";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const targetRequirements = {
   skills: ["React", "TypeScript", "Node.js", "Tailwind"],
@@ -15,6 +16,7 @@ const targetRequirements = {
 };
 
 const CandidatesList: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +29,7 @@ const CandidatesList: React.FC = () => {
       const data = await getCandidates();
       setCandidates(data);
     } catch (err) {
-      toast.error("Namizədlər yüklənərkən xəta baş verdi.");
+      toast.error(t("recruitment.candidates.loadingError"));
     } finally {
       setLoading(false);
     }
@@ -43,9 +45,9 @@ const CandidatesList: React.FC = () => {
       setCandidates((prev) =>
         prev.map((c) => (c.id === candidateId ? { ...c, status: newStatus as Candidate["status"] } : c))
       );
-      toast.success("Status yeniləndi");
+      toast.success(t("recruitment.candidates.statusUpdated"));
     } catch (err) {
-      toast.error("Status yenilənərkən xəta baş verdi.");
+      toast.error(t("recruitment.candidates.statusUpdateError"));
     }
   };
 
@@ -59,14 +61,14 @@ const CandidatesList: React.FC = () => {
   return (
     <div className="page-container">
       <PageHeader
-        title="Namizədlər"
-        subtitle="Bütün müraciət edən namizədlərin siyahısı və status idarəetməsi"
+        title={t("recruitment.candidates.title")}
+        subtitle={t("recruitment.candidates.subtitle")}
         actions={
           <button
             className="btn-primary"
             onClick={() => navigate("/app/recruitment/candidates/new")}
           >
-            <Plus size={16} /> Yeni Namizəd
+            <Plus size={16} /> {t("recruitment.candidates.newCandidate")}
           </button>
         }
       />
@@ -76,7 +78,7 @@ const CandidatesList: React.FC = () => {
           <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#6b7280" }} />
           <input
             type="text"
-            placeholder="Axtarış (ad, vəzifə, bacarıq)…"
+            placeholder={t("recruitment.candidates.searchPlaceholder")}
             className="input-field"
             style={{ paddingLeft: "36px" }}
             value={searchQuery}
@@ -88,14 +90,14 @@ const CandidatesList: React.FC = () => {
           <button
             className={"btn-icon " + (viewMode === "grid" ? "active" : "")}
             onClick={() => setViewMode("grid")}
-            title="Kanban Rejimi"
+            title={t("recruitment.candidates.kanbanMode")}
           >
             <LayoutGrid size={18} />
           </button>
           <button
             className={"btn-icon " + (viewMode === "list" ? "active" : "")}
             onClick={() => setViewMode("list")}
-            title="Siyahı Rejimi"
+            title={t("recruitment.candidates.listMode")}
           >
             <List size={18} />
           </button>
@@ -117,12 +119,12 @@ const CandidatesList: React.FC = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Ad Soyad</th>
-                <th>Vəzifə</th>
-                <th>Təcrübə</th>
-                <th>Bacarıqlar</th>
-                <th>Match Score</th>
-                <th>Status</th>
+                <th>{t("recruitment.candidates.fullName")}</th>
+                <th>{t("recruitment.candidates.position")}</th>
+                <th>{t("recruitment.candidates.experience")}</th>
+                <th>{t("recruitment.candidates.skills")}</th>
+                <th>{t("recruitment.candidates.matchScore")}</th>
+                <th>{t("recruitment.candidates.status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -136,7 +138,7 @@ const CandidatesList: React.FC = () => {
                   >
                     <td style={{ fontWeight: 500 }}>{candidate.name}</td>
                     <td>{candidate.education}</td>
-                    <td>{candidate.experience} il</td>
+                    <td>{candidate.experience} {t("recruitment.candidates.years")}</td>
                     <td>
                       <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                         {candidate.skills?.slice(0, 3).map((s, idx) => (

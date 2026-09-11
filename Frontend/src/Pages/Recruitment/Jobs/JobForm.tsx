@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
 import { createJob, getJobById, updateJob } from "../../../Services/jobsService";
 
 const JobForm: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -39,10 +41,12 @@ const JobForm: React.FC = () => {
 
   const handleAiSuggestRequirements = () => {
     if (!position.trim()) {
-      toast.error("Zəhmət olmasa əvvəlcə Vakansiyanın Adını daxil edin");
+      toast.error(t("recruitment.jobForm.aiPositionRequired"));
       return;
     }
+
     setAiGenerating(true);
+
     setTimeout(() => {
       let suggestedSkills = ["Git", "Problem Solving", "Teamwork"];
       const titleLower = position.toLowerCase();
@@ -55,16 +59,19 @@ const JobForm: React.FC = () => {
         suggestedSkills = ["Figma", "UI/UX", "Prototyping", "Design Systems"];
       }
 
-      setRequiredSkills((prev) => Array.from(new Set([...prev, ...suggestedSkills])));
+      setRequiredSkills((prev) =>
+        Array.from(new Set([...prev, ...suggestedSkills])),
+      );
       setAiGenerating(false);
-      toast.success("AI vakansiya üçün uyğun bacarıq tələblərini yaratdı!");
+      toast.success(t("recruitment.jobForm.aiSuccess"));
     }, 600);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!position.trim()) {
-      setError("Vakansiya adı mütləqdir");
+      setError(t("recruitment.jobForm.positionRequired"));
       return;
     }
 
@@ -83,14 +90,15 @@ const JobForm: React.FC = () => {
 
       if (isEdit && id) {
         await updateJob(id, payload);
-        toast.success("Vakansiya yeniləndi");
+        toast.success(t("recruitment.jobForm.updated"));
       } else {
         await createJob(payload as any);
-        toast.success("Yeni vakansiya yaradıldı!");
+        toast.success(t("recruitment.jobForm.created"));
       }
+
       navigate("/app/recruitment/jobs");
     } catch (err: any) {
-      setError(err.message || "Xəta baş verdi");
+      setError(err.message || t("recruitment.jobForm.genericError"));
     } finally {
       setSaving(false);
     }
@@ -107,8 +115,12 @@ const JobForm: React.FC = () => {
   return (
     <div className="job-form-page">
       <PageHeader
-        title={isEdit ? "Vakansiyanı Redaktə Et" : "Yeni Vakansiya Yaradın"}
-        subtitle="AI tələb generatoru ilə vakansiya şərtlərini müəyyən edin"
+        title={
+          isEdit
+            ? t("recruitment.jobForm.editTitle")
+            : t("recruitment.jobForm.newTitle")
+        }
+        subtitle={t("recruitment.jobForm.subtitle")}
       />
 
       {error && (
@@ -120,19 +132,19 @@ const JobForm: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="form-grid">
         <div className="form-group">
-          <label>Vakansiyanın Adı *</label>
+          <label>{t("recruitment.jobForm.position")}</label>
           <input
             type="text"
             className="input"
             value={position}
             onChange={(e) => setPosition(e.target.value)}
-            placeholder="məs: Senior React Developer"
+            placeholder={t("recruitment.jobForm.positionPlaceholder")}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Tələb Olunan Təcrübə (İl)</label>
+          <label>{t("recruitment.jobForm.experience")}</label>
           <input
             type="number"
             className="input"
@@ -143,22 +155,53 @@ const JobForm: React.FC = () => {
         </div>
 
         <div className="form-group form-group--full">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-            <label style={{ margin: 0 }}>Tələb Olunan Bacarıqlar (Skills)</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "6px",
+            }}
+          >
+            <label style={{ margin: 0 }}>
+              {t("recruitment.jobForm.requiredSkills")}
+            </label>
+
             <button
               type="button"
               onClick={handleAiSuggestRequirements}
               disabled={aiGenerating}
-              style={{ background: "none", border: "none", color: "var(--primary-color)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 500 }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--primary-color)",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "13px",
+                fontWeight: 500,
+              }}
             >
-              {aiGenerating ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />} AI ilə Tələbləri Generator Et
+              {aiGenerating ? (
+                <Loader2 size={14} className="spin" />
+              ) : (
+                <Sparkles size={14} />
+              )}
+              {t("recruitment.jobForm.generateRequirements")}
             </button>
           </div>
-          <TagInput label="Tələb olunan bacarıqlar" values={requiredSkills} onChange={setRequiredSkills} placeholder="Tələb olunan bacarıq..." />
+
+          <TagInput
+            label={t("recruitment.jobForm.tagLabel")}
+            values={requiredSkills}
+            onChange={setRequiredSkills}
+            placeholder={t("recruitment.jobForm.skillPlaceholder")}
+          />
         </div>
 
         <div className="form-group form-group--full">
-          <label>Vakansiya Haqqında</label>
+          <label>{t("recruitment.jobForm.description")}</label>
           <textarea
             rows={4}
             className="input"
@@ -168,12 +211,23 @@ const JobForm: React.FC = () => {
         </div>
 
         <div className="form-actions" style={{ marginTop: "20px" }}>
-          <button type="button" className="btn btn--secondary" onClick={() => navigate(-1)}>
-            Ləğv Et
+          <button
+            type="button"
+            className="btn btn--secondary"
+            onClick={() => navigate(-1)}
+          >
+            {t("recruitment.jobForm.cancel")}
           </button>
-          <button type="submit" className="btn btn--primary" disabled={saving}>
+
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={saving}
+          >
             {saving ? <Loader2 size={16} className="spin" /> : null}
-            {isEdit ? "Yenilə" : "Vakansiyanı Dərc Et"}
+            {isEdit
+              ? t("recruitment.jobForm.update")
+              : t("recruitment.jobForm.publish")}
           </button>
         </div>
       </form>

@@ -1,5 +1,6 @@
 import "../auditModern.css";
 import type { FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -25,6 +26,7 @@ const emptyObservation = (): ServiceTimeObservation => ({
 });
 
 export default function ServiceAuditForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [restaurantId, setRestaurantId] = useState("");
@@ -190,14 +192,14 @@ getAuditTemplates({
     event.preventDefault();
 
     if (!restaurantId.trim()) {
-      window.alert("Restoran seçilməlidir.");
+      window.alert(t("audit.service.form.restaurantRequired"));
       return;
     }
 
     setSubmitting(true);
 
     if (!template) {
-      window.alert("Aktiv checklist template tapılmadı.");
+      window.alert(t("audit.service.form.templateNotFound"));
       setSubmitting(false);
       return;
     }
@@ -252,32 +254,30 @@ getAuditTemplates({
     <div className="audit-page">
       <div className="audit-page-header">
         <div>
-          <h1>Yeni Servis Auditi</h1>
-          <p>
-            Servis standartlarını və qonaq təcrübəsini qiymətləndirin.
-          </p>
+          <h1>{t("audit.service.form.title")}</h1>
+          <p>{t("audit.service.form.subtitle")}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
         <section className="audit-card">
-          <h2>Audit məlumatları</h2>
+          <h2>{t("audit.service.form.auditInformation")}</h2>
 
           <div className="audit-form-grid">
             <label>
-              Restoran
+              {t("audit.service.form.restaurant")}
               <input
                 value={restaurantId}
                 onChange={(event) =>
                   setRestaurantId(event.target.value)
                 }
-                placeholder="Restoran ID və ya adı"
+                placeholder={t("audit.service.form.restaurantPlaceholder")}
                 required
               />
             </label>
 
             <label>
-              Audit tarixi
+              {t("audit.service.form.auditDate")}
               <input
                 type="date"
                 value={date}
@@ -289,17 +289,17 @@ getAuditTemplates({
             </label>
 
             <label>
-              Növbə
+              {t("audit.service.form.shift")}
               <select
                 value={shift}
                 onChange={(event) =>
                   setShift(event.target.value)
                 }
               >
-                <option>Səhər</option>
-                <option>Günorta</option>
-                <option>Axşam</option>
-                <option>Gecə</option>
+                <option value="Səhər">{t("audit.service.form.morning")}</option>
+                <option value="Günorta">{t("audit.service.form.afternoon")}</option>
+                <option value="Axşam">{t("audit.service.form.evening")}</option>
+                <option value="Gecə">{t("audit.service.form.night")}</option>
               </select>
             </label>
           </div>
@@ -308,9 +308,9 @@ getAuditTemplates({
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Servis yoxlamaları</h2>
+              <h2>{t("audit.service.form.serviceChecks")}</h2>
               <p>
-                Hər kriteriya üçün Bəli, Xeyr və ya N/A seçin.
+                {t("audit.service.form.serviceChecksHint")}
               </p>
             </div>
 
@@ -323,7 +323,7 @@ getAuditTemplates({
 
               {section.items.length === 0 ? (
                 <div className="audit-empty-state">
-                  Bu bölmə üçün kriteriyalar hələ konfiqurasiya edilməyib.
+                  {t("audit.service.form.noCriteriaConfigured")}
                 </div>
               ) : (
                 section.items.map((item) => {
@@ -354,10 +354,10 @@ getAuditTemplates({
                               />
 
                               {answer === "yes"
-                                ? "Bəli"
+                                ? t("audit.service.detail.yes")
                                 : answer === "no"
-                                ? "Xeyr"
-                                : "N/A"}
+                                ? t("audit.service.detail.no")
+                                : t("audit.service.detail.notApplicable")}
                             </label>
                           )
                         )}
@@ -368,7 +368,7 @@ getAuditTemplates({
                         onChange={(event) =>
                           setComment(item.id, event.target.value)
                         }
-                        placeholder="Şərh"
+                        placeholder={t("audit.service.form.comment")}
                       />
                     </div>
                   );
@@ -381,9 +381,9 @@ getAuditTemplates({
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
-              <h2>Xidmət vaxtı</h2>
+              <h2>{t("audit.service.form.serviceTime")}</h2>
               <p>
-                Qonaq müşahidələrinin sayı məhdud deyil.
+                {t("audit.service.form.serviceTimeHint")}
               </p>
             </div>
 
@@ -392,7 +392,7 @@ getAuditTemplates({
               className="btn btn-secondary"
               onClick={addObservation}
             >
-              + Qonaq əlavə et
+              {t("audit.service.form.addGuest")}
             </button>
           </div>
 
@@ -401,10 +401,10 @@ getAuditTemplates({
               key={`${index}-${observation.guestNumber}`}
               className="audit-observation-row"
             >
-              <strong>Qonaq {index + 1}</strong>
+              <strong>{t("audit.service.detail.guest", { number: index + 1 })}</strong>
 
               <label>
-                Vaxt (saniyə)
+                {t("audit.service.form.timeSeconds")}
                 <input
                   type="number"
                   min="0"
@@ -420,7 +420,7 @@ getAuditTemplates({
               </label>
 
               <label>
-                Şərh
+                {t("audit.service.form.comment")}
                 <input
                   value={observation.comment}
                   onChange={(event) =>
@@ -447,7 +447,7 @@ getAuditTemplates({
         </section>
 
         <section className="audit-card">
-          <h2>Tövsiyələr</h2>
+          <h2>{t("audit.service.form.recommendations")}</h2>
 
           <textarea
             rows={5}
@@ -455,7 +455,7 @@ getAuditTemplates({
             onChange={(event) =>
               setRecommendations(event.target.value)
             }
-            placeholder="Hər sətrə bir tövsiyə yazın..."
+            placeholder={t("audit.service.form.recommendationsPlaceholder")}
           />
         </section>
 

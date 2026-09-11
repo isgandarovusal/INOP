@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import { useTranslation } from "react-i18next";
 import "../auditAnalytics.css";
 
 import React, { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ import { getSafetyAnalytics } from "../../../Services/auditAnalyticsService";
 import type { SafetyAnalyticsData } from "../../../Services/auditAnalyticsService";
 
 const SafetyAuditAnalytics: React.FC = () => {
+  const { t } = useTranslation();
   const [data, setData] =
     useState<SafetyAnalyticsData | null>(null);
 
@@ -40,7 +42,7 @@ const SafetyAuditAnalytics: React.FC = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Safety analytics could not be loaded.");
+        setError(t("audit.safety.analytics.error"));
       })
       .finally(() => {
         setLoading(false);
@@ -50,13 +52,13 @@ const SafetyAuditAnalytics: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title="Occupational Safety Analytics"
-        subtitle="MongoDB aggregation based safety audit statistics"
+        title={t("audit.safety.analytics.title")}
+        subtitle={t("audit.safety.analytics.subtitle")}
       />
 
       {loading && (
         <div className="empty-state">
-          Loading analytics...
+          {t("audit.safety.analytics.loading")}
         </div>
       )}
 
@@ -71,13 +73,13 @@ const SafetyAuditAnalytics: React.FC = () => {
           <div className="kpi-grid">
             <div className="kpi-card">
               <BarChart3 size={22} />
-              <p>Total safety audits</p>
+              <p>{t("audit.safety.analytics.totalAudits")}</p>
               <h2>{data.total}</h2>
             </div>
 
             <div className="kpi-card">
               <TrendingUp size={22} />
-              <p>Average score</p>
+              <p>{t("audit.safety.analytics.averageScore")}</p>
               <h2>
                 {data.averageScorePercentage.toFixed(1)}%
               </h2>
@@ -85,7 +87,7 @@ const SafetyAuditAnalytics: React.FC = () => {
 
             <div className="kpi-card">
               <CheckCircle2 size={22} />
-              <p>Answered checks</p>
+              <p>{t("audit.safety.analytics.answeredChecks")}</p>
               <h2>
                 {data.answered}/{data.totalChecks}
               </h2>
@@ -94,7 +96,7 @@ const SafetyAuditAnalytics: React.FC = () => {
 
           <div className="charts-grid">
             <div className="chart-card">
-              <h3>Safety Score Distribution</h3>
+              <h3>{t("audit.safety.analytics.scoreDistribution")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={data.distribution}>
@@ -107,7 +109,7 @@ const SafetyAuditAnalytics: React.FC = () => {
             </div>
 
             <div className="chart-card">
-              <h3>Safety Audit Trend</h3>
+              <h3>{t("audit.safety.analytics.trend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={data.trend}>

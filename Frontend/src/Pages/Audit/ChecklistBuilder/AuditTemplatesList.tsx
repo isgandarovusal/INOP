@@ -11,14 +11,10 @@ import {
   deleteAuditTemplate,
 } from "../../../Services/auditTemplatesService";
 import type { AuditTemplate } from "../../../Types/Audit";
-
-const typeLabels = {
-  service: "Servis Auditi",
-  standard: "Standart Audit",
-  "occupational-safety": "Əməyin Mühafizəsi",
-} as const;
+import { useTranslation } from "react-i18next";
 
 export default function AuditTemplatesList() {
+  const { t } = useTranslation();
   const location = useLocation();
   const message = location.state?.message;
   const [templates, setTemplates] = useState<AuditTemplate[]>([]);
@@ -38,7 +34,7 @@ export default function AuditTemplatesList() {
   }, []);
 
   async function removeTemplate(id: string) {
-    if (!window.confirm("Bu checklist template-i silinsin?")) return;
+    if (!window.confirm(t("audit.checklist.list.deleteConfirm"))) return;
 
     await deleteAuditTemplate(id);
     await load();
@@ -53,9 +49,9 @@ export default function AuditTemplatesList() {
       )}
       <div className="audit-page-header">
         <div>
-          <h1>Audit Checklistləri</h1>
+          <h1>{t("audit.checklist.list.title")}</h1>
           <p>
-            Brend və audit növünə görə checklist strukturlarını idarə edin.
+            {t("audit.checklist.list.subtitle")}
           </p>
         </div>
 
@@ -76,17 +72,16 @@ export default function AuditTemplatesList() {
 
       {loading ? (
         <div className="audit-card">
-          Checklistlər yüklənir...
+          {t("audit.checklist.list.loading")}
         </div>
       ) : templates.length === 0 ? (
         <div className="audit-empty-state">
           <div className="audit-empty-icon">
             <ClipboardList size={30} />
           </div>
-          <h2>Hələ checklist yoxdur</h2>
+          <h2>{t("audit.checklist.list.emptyTitle")}</h2>
           <p>
-            İlk audit template-ini yaradaraq bölmələri və sualları
-            qurmağa başlayın.
+            {t("audit.checklist.list.emptyHint")}
           </p>
           <Link
             to="/app/audit/checklists/new"
@@ -109,9 +104,9 @@ export default function AuditTemplatesList() {
                 </div>
 
                 <span
-                  className={`audit-status-badge ${template.status}`}
+                  className={`audit-status-badge ${t(`audit.checklist.status.${template.status}`, { defaultValue: template.status })}`}
                 >
-                  {template.status}
+                  {t(`audit.checklist.status.${template.status}`, { defaultValue: template.status })}
                 </span>
               </div>
 
@@ -120,27 +115,29 @@ export default function AuditTemplatesList() {
               <div className="audit-template-meta">
                 <strong>{template.brandName}</strong>
                 <span>
-                  {typeLabels[template.auditType]}
+                  {t(`audit.checklist.types.${template.auditType === "occupational-safety" ? "occupationalSafety" : template.auditType}`)}
                 </span>
                 <span>v{template.version}</span>
               </div>
 
               <div className="audit-template-counts">
                 <span>
-                  {template.sections.length} bölmə
+                  {t("audit.checklist.list.sectionCount", { count: template.sections.length })}
                 </span>
                 <span>
-                  {template.sections.reduce(
-                    (total, section) =>
-                      total +
-                      section.questions.length +
-                      section.subsections.reduce(
-                        (sum, subsection) =>
-                          sum + subsection.questions.length,
-                        0
-                      ),
-                    0
-                  )} sual
+                  {t("audit.checklist.list.questionCount", {
+                    count: template.sections.reduce(
+                      (total, section) =>
+                        total +
+                        section.questions.length +
+                        section.subsections.reduce(
+                          (sum, subsection) =>
+                            sum + subsection.questions.length,
+                          0
+                        ),
+                      0
+                    ),
+                  })}
                 </span>
               </div>
 

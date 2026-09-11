@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../../Components/PageHeader";
 import { Loader2 } from "lucide-react";
@@ -6,6 +7,7 @@ import { getAuditById, updateAudit } from "../../../Services/auditsService";
 import type { AuditScores } from "../../../Types/audit";
 
 const AuditEdit: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -59,7 +61,7 @@ const AuditEdit: React.FC = () => {
   return (
     <div>
 
-      <PageHeader title="Edit audit"/>
+      <PageHeader title={t("audit.generic.edit.title")}/>
 
 
       <form className="form-card" onSubmit={submit}>
