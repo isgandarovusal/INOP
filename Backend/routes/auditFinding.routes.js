@@ -1,19 +1,24 @@
-const router=require("express").Router();
+const router = require("express").Router();
 
-const controller =
-require("../controllers/auditFinding.controller");
+const controller = require("../controllers/auditFinding.controller");
 
+const { authorize } = require("../middleware/authorization.middleware");
+const {
+  requireAssignedAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
 router.get(
-"/:auditId",
-controller.getFindings
+  "/:auditId",
+  ...authorize("audit.finding", "read"),
+  requireAssignedAuditAccess,
+  controller.getFindings
 );
-
 
 router.post(
-"/",
-controller.createFinding
+  "/",
+  ...authorize("audit.finding", "create"),
+  requireAssignedAuditAccess,
+  controller.createFinding
 );
 
-
-module.exports=router;
+module.exports = router;

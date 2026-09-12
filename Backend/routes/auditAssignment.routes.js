@@ -1,19 +1,24 @@
-const router=require("express").Router();
+const router = require("express").Router();
 
-const controller =
-require("../controllers/auditAssignment.controller");
+const controller = require("../controllers/auditAssignment.controller");
 
+const { authorize } = require("../middleware/authorization.middleware");
+const {
+  requireAssignedAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
 router.post(
-"/",
-controller.assignAudit
+  "/",
+  ...authorize("audit.assignment", "create"),
+  requireAssignedAuditAccess,
+  controller.assignAudit
 );
-
 
 router.get(
-"/:auditId",
-controller.getAssignments
+  "/:auditId",
+  ...authorize("audit.assignment", "read"),
+  requireAssignedAuditAccess,
+  controller.getAssignments
 );
 
-
-module.exports=router;
+module.exports = router;

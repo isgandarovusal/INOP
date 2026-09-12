@@ -1,5 +1,4 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
@@ -7,8 +6,23 @@ const {
   updateSafetyDetails,
 } = require("../controllers/occupationalSafetyDetails.controller");
 
-router.get("/:id/details", getSafetyDetails);
+const { authorize } = require("../middleware/authorization.middleware");
+const {
+  requireAssignedAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
-router.patch("/:id/details", updateSafetyDetails);
+router.get(
+  "/:id/details",
+  ...authorize("occupational_safety_details", "read"),
+  requireAssignedAuditAccess,
+  getSafetyDetails
+);
+
+router.patch(
+  "/:id/details",
+  ...authorize("occupational_safety_details", "update"),
+  requireAssignedAuditAccess,
+  updateSafetyDetails
+);
 
 module.exports = router;

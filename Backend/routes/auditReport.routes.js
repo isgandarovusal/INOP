@@ -1,17 +1,20 @@
-const express=require("express");
-
-const router=express.Router();
-
+const express = require("express");
+const router = express.Router();
 
 const {
- getAuditReport
-}=require("../controllers/auditReport.controller");
+  getAuditReport,
+} = require("../controllers/auditReport.controller");
 
+const { authorize } = require("../middleware/authorization.middleware");
+const {
+  requireAssignedAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
 router.get(
- "/:id",
- getAuditReport
+  "/:id",
+  ...authorize("audit.report", "read"),
+  requireAssignedAuditAccess,
+  getAuditReport
 );
 
-
-module.exports=router;
+module.exports = router;

@@ -1,25 +1,17 @@
-const express =
-require("express");
+const express = require("express");
 
-
-const router =
-express.Router();
-
+const router = express.Router();
 
 const {
-getAuditDashboard
-}=require(
-"../controllers/auditDashboard.controller"
-);
+  getAuditDashboard,
+} = require("../controllers/auditDashboard.controller");
 
-
+const { authorize } = require("../middleware/authorization.middleware");
 
 router.get(
-"/",
-getAuditDashboard
+  "/",
+  ...authorize("dashboard", "read"),
+  getAuditDashboard
 );
 
-
-
-module.exports =
-router;
+module.exports = router;

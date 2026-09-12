@@ -1,23 +1,23 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
- getStandardAudits,
- getServiceAudits
-}=require("../controllers/auditModule.controller");
+  getStandardAudits,
+  getServiceAudits,
+} = require("../controllers/auditModule.controller");
 
-
-router.get(
- "/standard",
- getStandardAudits
-);
-
+const { authorize } = require("../middleware/authorization.middleware");
 
 router.get(
- "/service",
- getServiceAudits
+  "/standard",
+  ...authorize("audit", "read"),
+  getStandardAudits
 );
 
+router.get(
+  "/service",
+  ...authorize("audit", "read"),
+  getServiceAudits
+);
 
 module.exports = router;

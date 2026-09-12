@@ -1,27 +1,26 @@
 const express = require("express");
-
 const router = express.Router();
 
-const controller =
-require("../controllers/auditNotification.controller");
+const controller = require("../controllers/auditNotification.controller");
 
+const { authorize } = require("../middleware/authorization.middleware");
 
 router.get(
- "/",
- controller.getNotifications
+  "/",
+  ...authorize("audit.notification", "read"),
+  controller.getNotifications
 );
-
 
 router.post(
- "/",
- controller.createNotification
+  "/",
+  ...authorize("audit.notification", "create"),
+  controller.createNotification
 );
-
 
 router.patch(
- "/:id/read",
- controller.markRead
+  "/:id/read",
+  ...authorize("audit.notification", "update"),
+  controller.markRead
 );
-
 
 module.exports = router;
