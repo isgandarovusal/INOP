@@ -1,78 +1,169 @@
-const Audit = require('../models/audit.model');
+const mongoose = require("mongoose");
+const Audit = require("../models/audit.model");
+const {
+  getAssignedAuditFilter,
+} = require("../middleware/auditScope.middleware");
 
-function normalizeAuditPayload(body) {
+function buildAuditIdentifierFilter(identifier) {
+  const conditions = [{ id: String(identifier) }];
+
+  if (mongoose.Types.ObjectId.isValid(identifier)) {
+    conditions.push({
+      _id: new mongoose.Types.ObjectId(identifier),
+    });
+  }
+
+  return {
+    $or: conditions,
+  };
+}
+
+function normalizeAuditPayload(body, req) {
   return {
     ...body,
     id: body.id,
     restaurantId: body.restaurantId,
-    auditorId: body.auditorId || 'unknown',
+    auditorId: body.auditorId || req.user?.id || "unknown",
     auditType: body.auditType,
     date: body.date,
   };
 }
 
+async function getAuditFilter(req, extra = {}) {
+  const scopeFilter = await getAssignedAuditFilter(req);
+
+  if (scopeFilter === null) {
+    return null;
+  }
+
+  const filters = [];
+
+  if (Object.keys(extra).length > 0) {
+    filters.push(extra);
+  }
+
+  if (Object.keys(scopeFilter).length > 0) {
+    filters.push(scopeFilter);
+  }
+
+  if (filters.length === 0) {
+    return {};
+  }
+
+  if (filters.length === 1) {
+    return filters[0];
+  }
+
+  return {
+    $and: filters,
+  };
+}
+
 async function getAudits(req, res) {
   try {
-    const audits = await Audit.find().sort({ date: -1, createdAt: -1 });
+    const filter = await getAuditFilter(req);
+
+    if (filter === null) {
+      return res.status(403).json({
+        message: "Audit məlumatlarına giriş icazəsi yoxdur.",
+      });
+    }
+
+    const audits = await Audit.find(filter).sort({
+      date: -1,
+      createdAt: -1,
+    });
+
     res.json(audits);
   } catch (error) {
-    console.error('Failed to fetch audits:', error);
-    res.status(500).json({ message: 'Failed to fetch audits' });
+    console.error("Failed to fetch audits:", error);
+    res.status(500).json({
+      message: "Failed to fetch audits",
+    });
   }
 }
 
 async function getAuditById(req, res) {
   try {
-    const audit = await Audit.findOne({ id: req.params.id });
+    const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
+
+    if (filter === null) {
+      return res.status(403).json({
+        message: "Audit məlumatlarına giriş icazəsi yoxdur.",
+      });
+    }
+
+    const audit = await Audit.findOne(filter);
 
     if (!audit) {
-      return res.status(404).json({ message: 'Audit not found' });
+      return res.status(404).json({
+        message:
+          "Audit tapılmadı və ya bu Audit-ə giriş icazəniz yoxdur.",
+      });
     }
 
     res.json(audit);
   } catch (error) {
-    console.error('Failed to fetch audit:', error);
-    res.status(500).json({ message: 'Failed to fetch audit' });
+    console.error("Failed to fetch audit:", error);
+    res.status(500).json({
+      message: "Failed to fetch audit",
+    });
   }
 }
 
 async function createAudit(req, res) {
   try {
-    const payload = normalizeAuditPayload(req.body);
+    const payload = normalizeAuditPayload(req.body, req);
 
     if (!payload.id) {
-      return res.status(400).json({ message: 'Audit id is required' });
+      return res.status(400).json({
+        message: "Audit id is required",
+      });
     }
 
     const audit = await Audit.create(payload);
 
     res.status(201).json(audit);
   } catch (error) {
-    console.error('Failed to create audit:', error);
+    console.error("Failed to create audit:", error);
 
     if (error.code === 11000) {
-      return res.status(409).json({ message: 'Audit id already exists' });
+      return res.status(409).json({
+        message: "Audit id already exists",
+      });
     }
 
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: 'Invalid audit data',
+        message: "Invalid audit data",
         errors: error.errors,
       });
     }
 
-    res.status(500).json({ message: 'Failed to create audit' });
+    res.status(500).json({
+      message: "Failed to create audit",
+    });
   }
 }
 
 async function updateAudit(req, res) {
   try {
-    const payload = normalizeAuditPayload(req.body);
+    const payload = normalizeAuditPayload(req.body, req);
 
     delete payload.id;
 
+    const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
+
+    if (filter === null) {
+      return res.status(403).json({
+        message: "Audit məlumatlarına giriş icazəsi yoxdur.",
+      });
+    }
+
+    delete payload.auditorId;
+
     const audit = await Audit.findOneAndUpdate(
-      { id: req.params.id },
+      filter,
       { $set: payload },
       {
         new: true,
@@ -81,53 +172,84 @@ async function updateAudit(req, res) {
     );
 
     if (!audit) {
-      return res.status(404).json({ message: 'Audit not found' });
+      return res.status(404).json({
+        message:
+          "Audit tapılmadı və ya bu Audit-i dəyişmək üçün icazəniz yoxdur.",
+      });
     }
 
     res.json(audit);
   } catch (error) {
-    console.error('Failed to update audit:', error);
+    console.error("Failed to update audit:", error);
 
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: 'Invalid audit data',
+        message: "Invalid audit data",
         errors: error.errors,
       });
     }
 
-    res.status(500).json({ message: 'Failed to update audit' });
+    res.status(500).json({
+      message: "Failed to update audit",
+    });
   }
 }
 
 async function deleteAudit(req, res) {
   try {
-    const audit = await Audit.findOneAndDelete({ id: req.params.id });
+    const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
 
-    if (!audit) {
-      return res.status(404).json({ message: 'Audit not found' });
+    if (filter === null) {
+      return res.status(403).json({
+        message: "Audit məlumatlarına giriş icazəsi yoxdur.",
+      });
     }
 
-    res.json({ message: 'Audit deleted successfully' });
+    const audit = await Audit.findOneAndDelete(filter);
+
+    if (!audit) {
+      return res.status(404).json({
+        message:
+          "Audit tapılmadı və ya bu Audit-i silmək üçün icazəniz yoxdur.",
+      });
+    }
+
+    res.json({
+      message: "Audit deleted successfully",
+    });
   } catch (error) {
-    console.error('Failed to delete audit:', error);
-    res.status(500).json({ message: 'Failed to delete audit' });
+    console.error("Failed to delete audit:", error);
+
+    res.status(500).json({
+      message: "Failed to delete audit",
+    });
   }
 }
 
-
 async function getAuditAnalytics(req, res) {
   try {
+    const filter = await getAuditFilter(req);
+
+    if (filter === null) {
+      return res.status(403).json({
+        message: "Audit analytics məlumatlarına giriş icazəsi yoxdur.",
+      });
+    }
+
     const [summary] = await Audit.aggregate([
+      {
+        $match: filter,
+      },
       {
         $addFields: {
           calculatedOverallScore: {
             $divide: [
               {
                 $add: [
-                  '$scores.cleanliness',
-                  '$scores.service',
-                  '$scores.food',
-                  '$scores.staff',
+                  "$scores.cleanliness",
+                  "$scores.service",
+                  "$scores.food",
+                  "$scores.staff",
                 ],
               },
               4,
@@ -138,13 +260,24 @@ async function getAuditAnalytics(req, res) {
       {
         $group: {
           _id: null,
-          overallScore: { $avg: '$calculatedOverallScore' },
-          totalAudits: { $sum: 1 },
-          restaurants: { $addToSet: '$restaurantId' },
+          overallScore: {
+            $avg: "$calculatedOverallScore",
+          },
+          totalAudits: {
+            $sum: 1,
+          },
+          restaurants: {
+            $addToSet: "$restaurantId",
+          },
           criticalCount: {
             $sum: {
               $cond: [
-                { $lt: ['$calculatedOverallScore', 7] },
+                {
+                  $lt: [
+                    "$calculatedOverallScore",
+                    7,
+                  ],
+                },
                 1,
                 0,
               ],
@@ -166,158 +299,218 @@ async function getAuditAnalytics(req, res) {
       });
     }
 
-    const [restaurantComparison, categoryAnalysis, historicalTrend] =
-      await Promise.all([
-        Audit.aggregate([
-          {
-            $group: {
-              _id: '$restaurantId',
-              score: {
-                $avg: {
-                  $divide: [
-                    {
-                      $add: [
-                        '$scores.cleanliness',
-                        '$scores.service',
-                        '$scores.food',
-                        '$scores.staff',
-                      ],
-                    },
-                    4,
-                  ],
-                },
+    const [
+      restaurantComparison,
+      categoryAnalysis,
+      historicalTrend,
+    ] = await Promise.all([
+      Audit.aggregate([
+        {
+          $match: filter,
+        },
+        {
+          $group: {
+            _id: "$restaurantId",
+            score: {
+              $avg: {
+                $divide: [
+                  {
+                    $add: [
+                      "$scores.cleanliness",
+                      "$scores.service",
+                      "$scores.food",
+                      "$scores.staff",
+                    ],
+                  },
+                  4,
+                ],
               },
             },
           },
-          {
-            $project: {
-              _id: 0,
-              restaurantId: '$_id',
-              name: '$_id',
-              score: { $round: ['$score', 1] },
+        },
+        {
+          $project: {
+            _id: 0,
+            restaurantId: "$_id",
+            name: "$_id",
+            score: {
+              $round: ["$score", 1],
             },
           },
-          { $sort: { score: -1 } },
-        ]),
+        },
+        {
+          $sort: {
+            score: -1,
+          },
+        },
+      ]),
 
-        Audit.aggregate([
-          {
-            $group: {
-              _id: null,
-              food: { $avg: '$scores.food' },
-              cleanliness: { $avg: '$scores.cleanliness' },
-              staff: { $avg: '$scores.staff' },
-              service: { $avg: '$scores.service' },
+      Audit.aggregate([
+        {
+          $match: filter,
+        },
+        {
+          $group: {
+            _id: null,
+            food: {
+              $avg: "$scores.food",
+            },
+            cleanliness: {
+              $avg: "$scores.cleanliness",
+            },
+            staff: {
+              $avg: "$scores.staff",
+            },
+            service: {
+              $avg: "$scores.service",
             },
           },
-          {
-            $project: {
-              _id: 0,
-              categories: [
-                {
-                  category: 'Food',
-                  score: { $round: ['$food', 1] },
+        },
+        {
+          $project: {
+            _id: 0,
+            categories: [
+              {
+                category: "Food",
+                score: {
+                  $round: ["$food", 1],
                 },
-                {
-                  category: 'Cleanliness',
-                  score: { $round: ['$cleanliness', 1] },
+              },
+              {
+                category: "Cleanliness",
+                score: {
+                  $round: ["$cleanliness", 1],
                 },
-                {
-                  category: 'Staff',
-                  score: { $round: ['$staff', 1] },
+              },
+              {
+                category: "Staff",
+                score: {
+                  $round: ["$staff", 1],
                 },
-                {
-                  category: 'Service',
-                  score: { $round: ['$service', 1] },
+              },
+              {
+                category: "Service",
+                score: {
+                  $round: ["$service", 1],
                 },
-              ],
-            },
+              },
+            ],
           },
-          { $unwind: '$categories' },
-          { $replaceRoot: { newRoot: '$categories' } },
-          { $sort: { score: -1 } },
-        ]),
+        },
+        {
+          $unwind: "$categories",
+        },
+        {
+          $replaceRoot: {
+            newRoot: "$categories",
+          },
+        },
+        {
+          $sort: {
+            score: -1,
+          },
+        },
+      ]),
 
-        Audit.aggregate([
-          {
-            $addFields: {
-              auditDate: {
-                $dateFromString: {
-                  dateString: '$date',
-                  format: '%Y-%m-%d',
-                  onError: null,
-                  onNull: null,
-                },
+      Audit.aggregate([
+        {
+          $match: filter,
+        },
+        {
+          $addFields: {
+            auditDate: {
+              $dateFromString: {
+                dateString: "$date",
+                format: "%Y-%m-%d",
+                onError: null,
+                onNull: null,
               },
             },
           },
-          {
-            $match: {
-              auditDate: { $ne: null },
+        },
+        {
+          $match: {
+            auditDate: {
+              $ne: null,
             },
           },
-          {
-            $group: {
-              _id: {
-                year: { $year: '$auditDate' },
-                month: { $month: '$auditDate' },
+        },
+        {
+          $group: {
+            _id: {
+              year: {
+                $year: "$auditDate",
               },
-              score: {
-                $avg: {
-                  $divide: [
-                    {
-                      $add: [
-                        '$scores.cleanliness',
-                        '$scores.service',
-                        '$scores.food',
-                        '$scores.staff',
-                      ],
-                    },
-                    4,
-                  ],
-                },
+              month: {
+                $month: "$auditDate",
               },
             },
-          },
-          {
-            $sort: {
-              '_id.year': 1,
-              '_id.month': 1,
+            score: {
+              $avg: {
+                $divide: [
+                  {
+                    $add: [
+                      "$scores.cleanliness",
+                      "$scores.service",
+                      "$scores.food",
+                      "$scores.staff",
+                    ],
+                  },
+                  4,
+                ],
+              },
             },
           },
-          {
-            $project: {
-              _id: 0,
-              label: {
-                $dateToString: {
-                  format: '%b %y',
-                  date: {
-                    $dateFromParts: {
-                      year: '$_id.year',
-                      month: '$_id.month',
-                      day: 1,
-                    },
+        },
+        {
+          $sort: {
+            "_id.year": 1,
+            "_id.month": 1,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            label: {
+              $dateToString: {
+                format: "%b %y",
+                date: {
+                  $dateFromParts: {
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    day: 1,
                   },
                 },
               },
-              score: { $round: ['$score', 1] },
+            },
+            score: {
+              $round: ["$score", 1],
             },
           },
-        ]),
-      ]);
+        },
+      ]),
+    ]);
 
     res.json({
-      overallScore: Math.round(summary.overallScore * 10) / 10,
+      overallScore:
+        Math.round(summary.overallScore * 10) / 10,
       totalAudits: summary.totalAudits,
-      restaurantsAudited: summary.restaurants.length,
+      restaurantsAudited:
+        summary.restaurants.length,
       criticalCount: summary.criticalCount,
       restaurantComparison,
       categoryAnalysis,
       historicalTrend,
     });
   } catch (error) {
-    console.error('Failed to calculate audit analytics:', error);
-    res.status(500).json({ message: 'Failed to calculate audit analytics' });
+    console.error(
+      "Failed to calculate audit analytics:",
+      error
+    );
+
+    res.status(500).json({
+      message: "Failed to calculate audit analytics",
+    });
   }
 }
 

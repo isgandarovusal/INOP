@@ -7,9 +7,6 @@ const {
 } = require("../controllers/occupationalSafetyAudit.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
-const {
-  requireAssignedAuditAccess,
-} = require("../middleware/auditScope.middleware");
 
 router.get(
   "/",
@@ -20,7 +17,6 @@ router.get(
 router.post(
   "/",
   ...authorize("occupational_safety_audit", "create"),
-  requireAssignedAuditAccess,
   createOccupationalSafetyAudit
 );
 

@@ -112,7 +112,7 @@ const roles = [
     permissions: [
       permission("dashboard", "read", "all"),
 
-      permission("audit", "read", "all"),
+      permission("audit", "read", "assigned"),
       permission("audit", "create", "all"),
       permission("audit", "update", "assigned"),
       permission("audit", "delete", "assigned"),

@@ -1,17 +1,37 @@
 const Audit = require("../models/audit.model");
+const {
+  findAuditByIdentifier,
+  userHasAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
 exports.getSafetyDetails = async (req, res) => {
   try {
-    const audit = await Audit.findById(req.params.id);
+    const auditId = req.params.id;
 
-    if (!audit) {
+    const auditInfo = await findAuditByIdentifier(auditId);
+
+    if (!auditInfo) {
       return res.status(404).json({
         success: false,
         message: "Audit not found",
       });
     }
 
-    res.json({
+    if (req.permission?.scope === "assigned") {
+      const allowed = await userHasAuditAccess(req, auditId);
+
+      if (!allowed) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Bu Audit-in safety məlumatlarına giriş icazəniz yoxdur.",
+        });
+      }
+    }
+
+    const audit = await Audit.findById(auditInfo._id).lean();
+
+    return res.json({
       success: true,
       data: audit.safetyDetails || {
         riskLevel: "low",
@@ -22,9 +42,9 @@ exports.getSafetyDetails = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get safety details error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Safety details error",
     });
@@ -33,21 +53,49 @@ exports.getSafetyDetails = async (req, res) => {
 
 exports.updateSafetyDetails = async (req, res) => {
   try {
+    const auditId = req.params.id;
+
+    const auditInfo = await findAuditByIdentifier(auditId);
+
+    if (!auditInfo) {
+      return res.status(404).json({
+        success: false,
+        message: "Audit not found",
+      });
+    }
+
+    if (req.permission?.scope === "assigned") {
+      const allowed = await userHasAuditAccess(req, auditId);
+
+      if (!allowed) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Bu Audit-in safety məlumatlarını dəyişmək icazəniz yoxdur.",
+        });
+      }
+    }
+
+    const safetyDetails = {
+      riskLevel: req.body.riskLevel || "low",
+      violations: Array.isArray(req.body.violations)
+        ? req.body.violations
+        : [],
+      correctiveAction: req.body.correctiveAction || "",
+      responsiblePerson: req.body.responsiblePerson || "",
+      deadline: req.body.deadline || null,
+    };
+
     const audit = await Audit.findByIdAndUpdate(
-      req.params.id,
+      auditInfo._id,
       {
-        safetyDetails: {
-          riskLevel: req.body.riskLevel || "low",
-          violations: Array.isArray(req.body.violations)
-            ? req.body.violations
-            : [],
-          correctiveAction: req.body.correctiveAction || "",
-          responsiblePerson: req.body.responsiblePerson || "",
-          deadline: req.body.deadline || null,
+        $set: {
+          safetyDetails,
         },
       },
       {
         new: true,
+        runValidators: true,
       }
     );
 
@@ -58,14 +106,14 @@ exports.updateSafetyDetails = async (req, res) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: audit.safetyDetails,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Update safety details error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Safety details error",
     });

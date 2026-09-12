@@ -1,87 +1,73 @@
 const Audit = require("../models/audit.model");
+const {
+  findAuditByIdentifier,
+  userHasAuditAccess,
+} = require("../middleware/auditScope.middleware");
 
+exports.calculateScore = async (req, res) => {
+  try {
+    const auditId = req.params.id;
 
+    const auditInfo = await findAuditByIdentifier(auditId);
 
-exports.calculateScore = async(req,res)=>{
+    if (!auditInfo) {
+      return res.status(404).json({
+        success: false,
+        message: "Audit not found",
+      });
+    }
 
+    if (req.permission?.scope === "assigned") {
+      const allowed = await userHasAuditAccess(req, auditId);
 
- try{
+      if (!allowed) {
+        return res.status(403).json({
+          success: false,
+          message: "Bu Audit-in score-unu dəyişmək icazəniz yoxdur.",
+        });
+      }
+    }
 
+    const audit = await Audit.findById(auditInfo._id);
 
-  const audit =
-    await Audit.findById(
-      req.params.id
-    );
+    if (!audit) {
+      return res.status(404).json({
+        success: false,
+        message: "Audit not found",
+      });
+    }
 
+    const checks = Array.isArray(audit.checks)
+      ? audit.checks
+      : Array.isArray(audit.checklist)
+        ? audit.checklist
+        : [];
 
-  if(!audit){
+    const total = checks.length;
 
-    return res.status(404).json({
-
-      success:false
-
-    });
-
-  }
-
-
-
-  const checks =
-    audit.checklist || [];
-
-
-
-  const total =
-    checks.length;
-
-
-
-  const passed =
-    checks.filter(
-      x=>x.status==="passed"
+    const passed = checks.filter(
+      (item) => item.status === "passed"
     ).length;
 
+    const score = total
+      ? Math.round((passed / total) * 100)
+      : 0;
 
+    audit.overallPercentage = score;
 
-  const score =
-    total
-    ? Math.round(
-        (passed / total) * 100
-      )
-    : 0;
+    await audit.save();
 
+    return res.json({
+      success: true,
+      score,
+      data: audit,
+    });
+  } catch (error) {
+    console.error("Score calculation error:", error);
 
-
-  audit.score = score;
-
-
-  await audit.save();
-
-
-
-  res.json({
-
-    success:true,
-
-    score
-
-  });
-
-
-
- }catch(error){
-
-
-  res.status(500).json({
-
-    success:false,
-
-    message:"Score error"
-
-  });
-
-
- }
-
-
+    return res.status(500).json({
+      success: false,
+      message: "Score error",
+    });
+  }
 };

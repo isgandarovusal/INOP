@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
 const AuditAssignment = require("../models/auditAssignment.model");
 
@@ -17,19 +18,32 @@ async function getAuditIdFromRequest(req) {
   return null;
 }
 
+async function findAuditByIdentifier(auditId) {
+  if (!auditId) {
+    return null;
+  }
+
+  const conditions = [{ id: String(auditId) }];
+
+  if (mongoose.Types.ObjectId.isValid(auditId)) {
+    conditions.unshift({
+      _id: new mongoose.Types.ObjectId(auditId),
+    });
+  }
+
+  return Audit.findOne({
+    $or: conditions,
+  })
+    .select("_id id auditorId")
+    .lean();
+}
+
 async function userHasAuditAccess(req, auditId) {
   if (!req.user?.id || !auditId) {
     return false;
   }
 
-  const audit = await Audit.findOne({
-    $or: [
-      { _id: auditId },
-      { id: auditId },
-    ],
-  })
-    .select("_id auditorId")
-    .lean();
+  const audit = await findAuditByIdentifier(auditId);
 
   if (!audit) {
     return false;
@@ -52,6 +66,12 @@ async function userHasAuditAccess(req, auditId) {
   return Boolean(assignment);
 }
 
+exports.getAuditIdFromRequest = getAuditIdFromRequest;
+
+exports.findAuditByIdentifier = findAuditByIdentifier;
+
+exports.userHasAuditAccess = userHasAuditAccess;
+
 exports.requireAssignedAuditAccess = async (req, res, next) => {
   try {
     const scope = req.permission?.scope;
@@ -68,6 +88,7 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
 
     if (!auditId) {
       return res.status(403).json({
+        success: false,
         message:
           "Bu əməliyyat üçün Audit məlumatı müəyyən edilə bilmədi.",
       });
@@ -77,16 +98,18 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
 
     if (!allowed) {
       return res.status(403).json({
+        success: false,
         message:
           "Bu Audit üzərində əməliyyat aparmaq üçün icazəniz yoxdur.",
       });
     }
 
-    next();
+    return next();
   } catch (error) {
     console.error("Audit scope check error:", error);
 
     return res.status(500).json({
+      success: false,
       message:
         "Audit məlumat səviyyəsi yoxlanılarkən server xətası baş verdi.",
     });
