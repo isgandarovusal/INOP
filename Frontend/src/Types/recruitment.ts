@@ -1,56 +1,116 @@
-export type JobStatus = "open" | "closed" | "draft";
+export type JobStatus =
+  | "open"
+  | "closed"
+  | "draft";
+
+export type JobType =
+  | "Full-time"
+  | "Part-time"
+  | "Contract"
+  | "Internship";
 
 export interface Job {
   id: string;
+  _id?: string;
+
+  title: string;
   position: string;
+
+  department: string;
+  departmentId?: string;
+
+  location: string;
+  type: JobType;
+
   description: string;
+
   requiredSkills: string[];
   preferredSkills: string[];
+
+  experienceYears: number;
   experience: number;
+
   status: JobStatus;
-  createdAt: string;
+
+  createdBy?: string | null;
+  assignedTo?: string | null;
+
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type CandidateStatus =
   | "new"
+  | "applied"
   | "screening"
   | "shortlisted"
-  | "rejected"
-  | "hired";
+  | "interview"
+  | "offer"
+  | "hired"
+  | "rejected";
 
 export interface CandidateFile {
   name: string;
   size: number;
-  blobUrl: string | null;
+  type?: string;
+  url?: string;
 }
 
 export interface Candidate {
   id: string;
+  _id?: string;
+
   name: string;
-  email: string;
-  phone: string;
-  education: string;
-  experience: number;
+  role: string;
+
+  status: CandidateStatus;
+
   skills: string[];
+  experience: number;
+
+  cvUrl?: string;
+  cv?: CandidateFile | null;
+
+  email?: string;
+  phone?: string;
+  education: string;
   languages: string[];
   certificates: string[];
-  status: CandidateStatus;
-  cv: CandidateFile | null;
-  createdAt: string;
+
+  departmentId?: string;
+  createdBy?: string | null;
+  assignedTo?: string | null;
+
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type ApplicationStatus =
   | "applied"
   | "screening"
-  | "shortlisted"
+  | "interview"
+  | "offered"
   | "rejected"
+  | "shortlisted"
   | "hired";
 
 export interface Application {
   id: string;
-  jobId: string;
-  candidateId: string;
-  status: ApplicationStatus;
+  _id?: string;
+
+  jobId: string | Job;
+  candidateId: string | Candidate;
+
+  departmentId?: string;
+  createdBy?: string | null;
+  assignedTo?: string | null;
+
   score: number;
-  appliedAt: string;
+  status: ApplicationStatus;
+  notes?: string;
+
+  appliedAt?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
 }

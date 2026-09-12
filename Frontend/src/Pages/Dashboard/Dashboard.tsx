@@ -24,7 +24,11 @@ import { getApplications } from "../../Services/applicationsService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
 import type { Job, Candidate, Application, CandidateStatus } from "../../Types/recruitment";
 
-const STATUS_COLORS: Record<CandidateStatus, string> = {
+const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
+  applied: "#0ea5e9",
+  interview: "#8b5cf6",
+  offer: "#14b8a6",
+
   new: "#0ea5e9",
   screening: "#d97706",
   shortlisted: "#6366f1",
@@ -70,7 +74,11 @@ const Dashboard: React.FC = () => {
   const recentCandidates = useMemo(
     () =>
       [...candidates]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime()
+        )
         .slice(0, 5),
     [candidates],
   );

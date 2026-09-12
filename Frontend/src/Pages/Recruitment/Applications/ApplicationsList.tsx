@@ -17,10 +17,12 @@ import { useAuth } from "../../../Context/AuthContext";
 import { canManageRecruitment } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
 
-const STATUS_TONE: Record<ApplicationStatus, BadgeTone> = {
+const STATUS_TONE: Partial<Record<ApplicationStatus, BadgeTone>> = {
   applied: "info",
   screening: "warning",
   shortlisted: "accent",
+  interview: "accent",
+  offered: "success",
   rejected: "danger",
   hired: "success",
 };

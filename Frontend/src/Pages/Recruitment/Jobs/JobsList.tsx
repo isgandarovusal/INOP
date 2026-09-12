@@ -51,7 +51,7 @@ const JobsList: React.FC = () => {
           j.requiredSkills.some((s) => s.toLowerCase().includes(q))
         );
       })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }, [jobs, query, statusFilter]);
 
   const handleDelete = async () => {

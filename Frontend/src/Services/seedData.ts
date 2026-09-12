@@ -68,7 +68,12 @@ export const seedUsers: User[] = [
 export const seedJobs: Job[] = [
   {
     id: "job_backend",
+    title: "Backend Developer",
     position: "Backend Developer",
+    department: "IT",
+    location: "Remote",
+    type: "Full-time",
+    experienceYears: 2,
     description:
       "Build and maintain REST APIs for the internal operations platform.",
     requiredSkills: ["Node.js", "Express", "MongoDB"],
@@ -79,7 +84,12 @@ export const seedJobs: Job[] = [
   },
   {
     id: "job_hr",
+    title: "HR Specialist",
     position: "HR Specialist",
+    department: "HR",
+    location: "Baku",
+    type: "Full-time",
+    experienceYears: 1,
     description: "Support recruitment workflows and candidate screening.",
     requiredSkills: ["Recruitment", "Communication"],
     preferredSkills: ["HRIS"],
@@ -89,7 +99,12 @@ export const seedJobs: Job[] = [
   },
   {
     id: "job_auditor",
+    title: "Restaurant Auditor",
     position: "Restaurant Auditor",
+    department: "Operations",
+    location: "Baku",
+    type: "Full-time",
+    experienceYears: 2,
     description: "Conduct on-site quality audits across the restaurant network.",
     requiredSkills: ["Attention to Detail", "Reporting"],
     preferredSkills: ["Food Safety Certification"],
@@ -103,6 +118,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_1",
     name: "Elvin Guliyev",
+    role: "Unspecified",
     email: "elvin.guliyev@example.com",
     phone: "+994 50 123 45 67",
     education: "BSc Computer Science, ADA University",
@@ -117,6 +133,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_2",
     name: "Leyla Ismayilova",
+    role: "Unspecified",
     email: "leyla.ismayilova@example.com",
     phone: "+994 55 234 56 78",
     education: "BA Human Resources, Baku State University",
@@ -131,6 +148,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_3",
     name: "Rashad Mammadli",
+    role: "Unspecified",
     email: "rashad.mammadli@example.com",
     phone: "+994 70 345 67 89",
     education: "BSc Software Engineering, UNEC",
@@ -145,6 +163,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_4",
     name: "Sabina Rzayeva",
+    role: "Unspecified",
     email: "sabina.rzayeva@example.com",
     phone: "+994 51 456 78 90",
     education: "MSc Food Safety Management",
@@ -159,6 +178,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_5",
     name: "Tural Nagiyev",
+    role: "Unspecified",
     email: "tural.nagiyev@example.com",
     phone: "+994 77 567 89 01",
     education: "BSc Computer Engineering, Khazar University",
@@ -173,6 +193,7 @@ export const seedCandidates: Candidate[] = [
   {
     id: "cand_6",
     name: "Gunay Aslanova",
+    role: "Unspecified",
     email: "gunay.aslanova@example.com",
     phone: "+994 50 678 90 12",
     education: "BA Business Administration, ADA University",

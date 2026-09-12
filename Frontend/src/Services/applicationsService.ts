@@ -1,47 +1,140 @@
-import { makeCrud } from "./collection";
-import { generateId, getCollection } from "./storage";
-import type { Application, ApplicationStatus, Job, Candidate } from "../Types/recruitment";
-import { computeCandidateScore } from "./rankingService";
+import API from "../api/axios";
+import type {
+  Application,
+  ApplicationStatus,
+} from "../Types/recruitment";
 
-function describeApplication(app: Application): string {
-  const jobs = getCollection<Job>("jobs");
-  const candidates = getCollection<Candidate>("candidates");
-  const job = jobs.find((j) => j.id === app.jobId);
-  const candidate = candidates.find((c) => c.id === app.candidateId);
-  return `${candidate?.name ?? "Candidate"} → ${job?.position ?? "Job"}`;
+function backendStatus(
+  status: ApplicationStatus
+): "Applied" | "Screening" | "Interview" | "Offered" | "Rejected" {
+  switch (String(status).toLowerCase()) {
+    case "screening":
+      return "Screening";
+
+    case "interview":
+      return "Interview";
+
+    case "offered":
+    case "offer":
+      return "Offered";
+
+    case "rejected":
+      return "Rejected";
+
+    default:
+      return "Applied";
+  }
 }
 
-const crud = makeCrud<Application>("applications", "Application", describeApplication);
+function frontendStatus(
+  status: ApplicationStatus
+): ApplicationStatus {
+  switch (String(status).toLowerCase()) {
+    case "screening":
+      return "screening";
 
-export const getApplications = crud.getAll;
-export const getApplicationById = crud.getById;
-export const deleteApplication = crud.remove;
+    case "interview":
+      return "interview";
+
+    case "offered":
+      return "offered";
+
+    case "rejected":
+      return "rejected";
+
+    case "shortlisted":
+      return "shortlisted";
+
+    case "hired":
+      return "hired";
+
+    default:
+      return "applied";
+  }
+}
+
+function normalizeApplication(
+  data: any
+): Application {
+  return {
+    ...data,
+
+    id: data.id || data._id || "",
+    _id: data._id,
+
+    jobId: data.jobId,
+    candidateId: data.candidateId,
+
+    score: Number(data.score || 0),
+
+    status: frontendStatus(
+      data.status || "Applied"
+    ),
+
+    notes: data.notes || "",
+    appliedAt: data.appliedAt || data.createdAt || "",
+  };
+}
+
+export async function getApplications(): Promise<Application[]> {
+  const response = await API.get("/applications");
+
+  return Array.isArray(response.data)
+    ? response.data.map(normalizeApplication)
+    : [];
+}
+
+export async function getApplicationById(
+  id: string
+): Promise<Application | null> {
+  try {
+    const response = await API.get(
+      `/applications/${id}`
+    );
+
+    return normalizeApplication(response.data);
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
+}
 
 export interface ApplicationInput {
   jobId: string;
   candidateId: string;
+  notes?: string;
 }
 
-export async function createApplication(input: ApplicationInput): Promise<Application> {
-  const jobs = getCollection<Job>("jobs");
-  const candidates = getCollection<Candidate>("candidates");
-  const job = jobs.find((j) => j.id === input.jobId);
-  const candidate = candidates.find((c) => c.id === input.candidateId);
-  const score = job && candidate ? computeCandidateScore(candidate, job) : 0;
+export async function createApplication(
+  input: ApplicationInput
+): Promise<Application> {
+  const response = await API.post(
+    "/applications",
+    input
+  );
 
-  const application: Application = {
-    id: generateId("app"),
-    status: "applied",
-    score,
-    appliedAt: new Date().toISOString(),
-    ...input,
-  };
-  return crud.create(application);
+  return normalizeApplication(response.data);
 }
 
 export async function updateApplicationStatus(
   id: string,
-  status: ApplicationStatus,
-): Promise<Application | undefined> {
-  return crud.update(id, { status });
+  status: ApplicationStatus
+): Promise<Application> {
+  const response = await API.patch(
+    `/applications/${id}/status`,
+    {
+      status: backendStatus(status),
+    }
+  );
+
+  return normalizeApplication(response.data);
+}
+
+export async function deleteApplication(
+  id: string
+): Promise<void> {
+  await API.delete(`/applications/${id}`);
 }
