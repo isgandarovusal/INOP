@@ -6,17 +6,10 @@ import {
   type DropResult,
 } from "@hello-pangea/dnd";
 import { useTranslation } from "react-i18next";
-import MatchScoreBadge from "./MatchScoreBadge";
-import { calculateMatchScore } from "../Services/aiMatchService";
 import type {
   Candidate,
   CandidateStatus,
 } from "../Types/recruitment";
-
-interface TargetRequirements {
-  skills: string[];
-  experience: number;
-}
 
 interface KanbanBoardProps {
   candidates: Candidate[];
@@ -24,7 +17,6 @@ interface KanbanBoardProps {
     candidateId: string,
     newStatus: CandidateStatus,
   ) => Promise<void>;
-  targetRequirements: TargetRequirements;
   canChangeStatus?: boolean;
 }
 
@@ -42,7 +34,6 @@ const COLUMNS: CandidateStatus[] = [
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   candidates,
   onStatusChange,
-  targetRequirements,
   canChangeStatus = true,
 }) => {
   const { t } = useTranslation();
@@ -78,21 +69,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     >
       <DragDropContext onDragEnd={handleOnDragEnd}>
         {COLUMNS.map((status) => {
-          const columnCandidates = candidates
-            .filter((candidate) => candidate.status === status)
-            .sort((a, b) => {
-              const scoreA = calculateMatchScore(
-                a,
-                targetRequirements,
-              ).score;
-
-              const scoreB = calculateMatchScore(
-                b,
-                targetRequirements,
-              ).score;
-
-              return scoreB - scoreA;
-            });
+          const columnCandidates = candidates.filter(
+            (candidate) => candidate.status === status,
+          );
 
           return (
             <div
@@ -123,11 +102,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     style={{ minHeight: "300px" }}
                   >
                     {columnCandidates.map((candidate, index) => {
-                      const matchResult = calculateMatchScore(
-                        candidate,
-                        targetRequirements,
-                      );
-
                       return (
                         <Draggable
                           key={candidate.id}
@@ -172,11 +146,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 {t("components.kanban.yearsExperience")}
                               </span>
 
-                              <div style={{ marginTop: "4px" }}>
-                                <MatchScoreBadge
-                                  score={matchResult.score}
-                                />
-                              </div>
                             </div>
                           )}
                         </Draggable>

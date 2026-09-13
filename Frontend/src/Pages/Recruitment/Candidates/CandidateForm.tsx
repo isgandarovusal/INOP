@@ -10,7 +10,6 @@ import {
   parseCandidateCv,
   updateCandidate,
 } from "../../../Services/candidatesService";
-import { calculateMatchScore } from "../../../Services/aiMatchService";
 import type { CandidateStatus } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 
@@ -194,22 +193,12 @@ const CandidateForm: React.FC = () => {
         await updateCandidate(id, payload);
         toast.success(t("recruitment.candidateForm.updated"));
       } else {
-        // Yeni namizəd üçün AI uyğunlaşdırma ilə ilkin ATS statusu təyin olunur.
-        const matchResult = calculateMatchScore(
-          { skills, experience },
-          {
-            skills: ["React", "TypeScript", "Node.js", "SQL"],
-            experience: 2,
-          },
-        );
-
+        // Namizəd yaradılarkən vakansiya konteksti olmadığı üçün
+        // match score burada hesablanmır. Score Application səviyyəsində,
+        // konkret Job ilə birlikdə backend-də hesablanacaq.
         await createCandidate({
           ...payload,
-          status: (
-            matchResult.suggestedStatus === "applied"
-              ? "new"
-              : matchResult.suggestedStatus
-          ) as CandidateStatus,
+          status: "new" as CandidateStatus,
         });
         toast.success(t("recruitment.candidateForm.created"));
       }

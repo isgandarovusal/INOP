@@ -13,8 +13,6 @@ import {
 import PageHeader from "../../../Components/PageHeader";
 import KanbanBoard from "../../../Components/KanbanBoard";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
-import MatchScoreBadge from "../../../Components/MatchScoreBadge";
-import { calculateMatchScore } from "../../../Services/aiMatchService";
 import {
   deleteCandidate,
   getCandidates,
@@ -24,11 +22,6 @@ import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/AuthContext";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
-const targetRequirements = {
-  skills: ["React", "TypeScript", "Node.js", "Tailwind"],
-  experience: 2,
-};
 
 const CandidatesList: React.FC = () => {
   const { t } = useTranslation();
@@ -322,7 +315,6 @@ const CandidatesList: React.FC = () => {
         <KanbanBoard
           candidates={filteredCandidates}
           onStatusChange={handleStatusChange}
-          targetRequirements={targetRequirements}
           canChangeStatus={canUpdate}
         />
       ) : (
@@ -334,7 +326,6 @@ const CandidatesList: React.FC = () => {
                 <th>{t("recruitment.candidates.position")}</th>
                 <th>{t("recruitment.candidates.experience")}</th>
                 <th>{t("recruitment.candidates.skills")}</th>
-                <th>{t("recruitment.candidates.matchScore")}</th>
                 <th>{t("recruitment.candidates.status")}</th>
                 {canDelete && (
                   <th>{t("recruitment.candidates.actions")}</th>
@@ -344,11 +335,6 @@ const CandidatesList: React.FC = () => {
 
             <tbody>
               {filteredCandidates.map((candidate) => {
-                const score = calculateMatchScore(
-                  candidate,
-                  targetRequirements,
-                ).score;
-
                 return (
                   <tr
                     key={candidate.id}
@@ -393,10 +379,6 @@ const CandidatesList: React.FC = () => {
                           ),
                         )}
                       </div>
-                    </td>
-
-                    <td>
-                      <MatchScoreBadge score={score} />
                     </td>
 
                     <td>
