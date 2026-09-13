@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const AuditActivity = require("../models/auditActivity.model");
 
 const getOptionalModel = (name) => {
@@ -51,6 +52,13 @@ const getAuditHistory = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "auditId is required",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(auditId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid audit id",
       });
     }
 
@@ -159,6 +167,13 @@ const getAuditTimeline = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "auditId is required",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(auditId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid audit id",
       });
     }
 

@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Audit =
   require("../models/audit.model");
 
@@ -23,6 +24,13 @@ exports.closeAudit = async (req, res) => {
       executionId,
       comment,
     } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(auditId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid audit id",
+      });
+    }
 
     const audit =
       await Audit.findById(auditId);

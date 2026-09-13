@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const AuditTemplate = require('../models/auditTemplate.model');
 
 function normalizeTemplate(doc) {
@@ -49,6 +50,12 @@ exports.getTemplates = async (req, res) => {
 
 exports.getTemplateById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        message: 'Invalid audit template id.',
+      });
+    }
+
     const template = await AuditTemplate.findById(req.params.id);
 
     if (!template) {
@@ -114,6 +121,12 @@ exports.createTemplate = async (req, res) => {
 
 exports.updateTemplate = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        message: 'Invalid audit template id.',
+      });
+    }
+
     const template = await AuditTemplate.findById(req.params.id);
 
     if (!template) {
@@ -155,6 +168,12 @@ exports.updateTemplate = async (req, res) => {
 
 exports.deleteTemplate = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        message: 'Invalid audit template id.',
+      });
+    }
+
     const template = await AuditTemplate.findByIdAndDelete(req.params.id);
 
     if (!template) {

@@ -16,6 +16,12 @@ function getOptionalModel(name) {
 }
 
 async function buildAuditData(auditId) {
+  if (!mongoose.Types.ObjectId.isValid(auditId)) {
+    const error = new Error("Invalid audit id");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const audit = await Audit.findById(auditId);
 
   if (!audit) {

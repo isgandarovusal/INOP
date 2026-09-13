@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const AuditNotification = require("../models/auditNotification.model");
 const {
   findAuditByIdentifier,
@@ -99,6 +100,13 @@ exports.createNotification = async (req, res) => {
 
 exports.markRead = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification id",
+      });
+    }
+
     const notification = await AuditNotification.findOneAndUpdate(
       {
         _id: req.params.id,

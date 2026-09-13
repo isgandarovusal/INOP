@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const AuditApproval =
   require("../models/auditApproval.model");
 
@@ -74,6 +75,13 @@ exports.getApprovals = async (req, res) => {
 // UPDATE APPROVAL
 exports.updateApproval = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid approval id",
+      });
+    }
+
     const {
       status,
       comment,
