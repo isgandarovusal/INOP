@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertCircle, FileText, Loader2, Sparkles, UploadCloud, X } from "lucide-react";
+import { AlertCircle, FileText, Loader2, UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
 import {
   createCandidate,
   getCandidateById,
+  parseCandidateCv,
   updateCandidate,
 } from "../../../Services/candidatesService";
-import { parseCVText, calculateMatchScore } from "../../../Services/aiMatchService";
+import { calculateMatchScore } from "../../../Services/aiMatchService";
 import type { CandidateStatus } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 
 const ACCEPTED_CV_TYPES = [
   "application/pdf",
-  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
@@ -38,10 +38,7 @@ const CandidateForm: React.FC = () => {
   const [certificates, setCertificates] = useState<string[]>([]);
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [existingCvName, setExistingCvName] = useState<string | null>(null);
-  // AI Raw Text Extraction State
-  const [rawCvText, setRawCvText] = useState("");
-  const [aiParsing, setAiParsing] = useState(false);
-
+  
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,35 +116,52 @@ const CandidateForm: React.FC = () => {
     return true;
   };
 
-  const handleCvChange = (file: File | null) => {
+  const handleCvChange = async (file: File | null) => {
     if (!file) {
       setCvFile(null);
       return;
     }
 
-    if (validateCvFile(file)) {
-      setCvFile(file);
-      setExistingCvName(null);
-    }
-  };
-
-  const handleAiParse = () => {
-    if (!rawCvText.trim()) {
-      toast.error(t("recruitment.candidateForm.enterCvText"));
+    if (!validateCvFile(file)) {
       return;
     }
-    setAiParsing(true);
-    setTimeout(() => {
-      const parsed = parseCVText(rawCvText);
-      if (parsed.extractedSkills.length > 0) {
-        setSkills((prev) => Array.from(new Set([...prev, ...parsed.extractedSkills])));
-      }
-      if (parsed.extractedExperience) {
-        setExperience(parsed.extractedExperience);
-      }
-      setAiParsing(false);
+
+    setCvFile(file);
+    setExistingCvName(null);
+    setError(null);
+
+    try {
+      const parsed = await parseCandidateCv(file);
+
+      setName(parsed.name || "");
+      setRole(parsed.role || "");
+      setEmail(parsed.email || "");
+      setPhone(parsed.phone || "");
+      setEducation(parsed.education || "");
+      setExperience(Number(parsed.experience || 0));
+      setSkills(Array.isArray(parsed.skills) ? parsed.skills : []);
+      setLanguages(
+        Array.isArray(parsed.languages) ? parsed.languages : [],
+      );
+      setCertificates(
+        Array.isArray(parsed.certificates)
+          ? parsed.certificates
+          : [],
+      );
+
       toast.success(t("recruitment.candidateForm.aiSuccess"));
-    }, 600);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          t("recruitment.candidateForm.genericError"),
+      );
+      toast.error(
+        err?.response?.data?.message ||
+          t("recruitment.candidateForm.genericError"),
+      );
+    } finally {
+      }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,55 +247,6 @@ const CandidateForm: React.FC = () => {
         </div>
       )}
 
-      {/* AI CV Import & Analysis */}
-      <div className="candidate-form-card">
-        <section className="candidate-form-section">
-          <div className="candidate-form-section__header">
-            <div className="candidate-form-section__icon">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h3 className="candidate-form-section__title">
-                {t("recruitment.candidateForm.aiImportTitle")}
-              </h3>
-              <p className="candidate-form-section__description">
-                {t("recruitment.candidateForm.aiImportDescription")}
-              </p>
-            </div>
-          </div>
-
-          <div className="candidate-ai-card">
-            <div className="candidate-ai-card__header">
-              <Sparkles size={18} />
-              <h4 className="candidate-ai-card__title">
-                {t("recruitment.candidateForm.aiAnalyzeTitle")}
-              </h4>
-            </div>
-
-            <textarea
-              className="candidate-ai-textarea"
-              rows={4}
-              placeholder={t("recruitment.candidateForm.aiPlaceholder")}
-              value={rawCvText}
-              onChange={(e) => setRawCvText(e.target.value)}
-            />
-
-            <button
-              type="button"
-              className="btn-primary candidate-ai-button"
-              onClick={handleAiParse}
-              disabled={aiParsing}
-            >
-              {aiParsing ? (
-                <Loader2 size={16} className="spin" />
-              ) : (
-                <Sparkles size={16} />
-              )}
-              {t("recruitment.candidateForm.analyzeCv")}
-            </button>
-          </div>
-        </section>
-
         <form onSubmit={handleSubmit}>
           {/* CV Upload */}
           <section className="candidate-form-section">
@@ -359,7 +324,7 @@ const CandidateForm: React.FC = () => {
                   {cvFile || existingCvName ? t("recruitment.candidateForm.chooseAnotherCv") : t("recruitment.candidateForm.chooseCv")}
                   <input
                     type="file"
-                    accept=".pdf,.doc,.docx"
+                    accept=".pdf,.docx"
                     style={{ display: "none" }}
                     onChange={(e) =>
                       handleCvChange(e.target.files?.[0] || null)
@@ -492,7 +457,6 @@ const CandidateForm: React.FC = () => {
             </button>
           </div>
         </form>
-      </div>
     </div>
   );
 };
