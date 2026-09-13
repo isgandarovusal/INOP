@@ -49,19 +49,81 @@ const Dashboard: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
+  const [auditError, setAuditError] = useState<string | null>(null);
 
   useEffect(() => {
-    const tasks: Promise<unknown>[] = [];
-    if (showRecruitment) {
-      tasks.push(getJobs().then(setJobs));
-      tasks.push(getCandidates().then(setCandidates));
-      tasks.push(getApplications().then(setApplications));
-    }
-    if (showAudit) {
-      tasks.push(getAuditAnalytics().then(setAnalytics));
-    }
-    Promise.all(tasks).finally(() => setLoading(false));
-  }, [showRecruitment, showAudit]);
+    let mounted = true;
+
+    const loadDashboard = async () => {
+      setLoading(true);
+      setRecruitmentError(null);
+      setAuditError(null);
+
+      const tasks: Promise<void>[] = [];
+
+      if (showRecruitment) {
+        tasks.push(
+          Promise.all([
+            getJobs(),
+            getCandidates(),
+            getApplications(),
+          ])
+            .then(([jobsResult, candidatesResult, applicationsResult]) => {
+              if (!mounted) return;
+
+              setJobs(jobsResult);
+              setCandidates(candidatesResult);
+              setApplications(applicationsResult);
+            })
+            .catch((error) => {
+              console.error("Recruitment dashboard load error:", error);
+
+              if (!mounted) return;
+
+              setRecruitmentError(
+                error?.response?.data?.message ||
+                  t("dashboard.recruitmentLoadError")
+              );
+            })
+        );
+      }
+
+      if (showAudit) {
+        tasks.push(
+          getAuditAnalytics()
+            .then((result) => {
+              if (!mounted) return;
+              setAnalytics(result);
+            })
+            .catch((error) => {
+              console.error("Audit dashboard load error:", error);
+
+              if (!mounted) return;
+
+              setAuditError(
+                error?.response?.data?.message ||
+                  t("dashboard.auditLoadError")
+              );
+            })
+        );
+      }
+
+      try {
+        await Promise.all(tasks);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadDashboard();
+
+    return () => {
+      mounted = false;
+    };
+  }, [showRecruitment, showAudit, t]);
 
   const statusBreakdown = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -96,6 +158,16 @@ const Dashboard: React.FC = () => {
           {showRecruitment && (
             <>
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
+
+              {recruitmentError && (
+                <div className="dashboard-error">
+                  <AlertTriangle size={18} />
+                  <div>
+                    <strong>{t("dashboard.recruitmentLoadErrorTitle")}</strong>
+                    <p>{recruitmentError}</p>
+                  </div>
+                </div>
+              )}
               <div className="kpi-grid">
                 <div className="kpi-card anim-in">
                   <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
@@ -134,7 +206,7 @@ const Dashboard: React.FC = () => {
                   <div className="chart-card__header">
                     <h3>{t("dashboard.recentCandidates")}</h3>
                     <button className="recent-card__link" onClick={() => navigate("/app/recruitment/candidates")}>
-                      View all <ArrowUpRight size={13} />
+                      {t("dashboard.viewAll")} <ArrowUpRight size={13} />
                     </button>
                   </div>
                   {recentCandidates.length === 0 ? (
@@ -203,62 +275,154 @@ const Dashboard: React.FC = () => {
             </>
           )}
 
-          {showAudit && analytics && (
+          {showAudit && (
             <>
               <h3 className="dashboard-section-title">{t("dashboard.auditOperations")}</h3>
-              <div className="kpi-grid">
-                <div className="kpi-card anim-in">
-                  <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
-                    <Gauge size={18} color="#6366f1" />
-                  </div>
-                  <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
-                  <p className="kpi-card__value">{analytics.overallScore.toFixed(1)} / 10</p>
-                </div>
-                <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
-                    <ClipboardCheck size={18} color="#0ea5e9" />
-                  </div>
-                  <p className="kpi-card__label">{t("dashboard.totalAudits")}</p>
-                  <p className="kpi-card__value">{analytics.totalAudits}</p>
-                </div>
-                <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
-                    <Store size={18} color="#22c55e" />
-                  </div>
-                  <p className="kpi-card__label">{t("dashboard.restaurantsAudited")}</p>
-                  <p className="kpi-card__value">{analytics.restaurantsAudited}</p>
-                </div>
-                <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
-                    <AlertTriangle size={18} color="#f59e0b" />
-                  </div>
-                  <p className="kpi-card__label">{t("dashboard.criticalLowScores")}</p>
-                  <p className="kpi-card__value">{analytics.criticalCount}</p>
-                </div>
-              </div>
 
-              <div className="recent-card anim-in">
-                <div className="chart-card__header">
-                  <h3>{t("dashboard.restaurantComparison")}</h3>
-                  <button className="recent-card__link" onClick={() => navigate("/app/audit/analytics")}>
-                    <>{t("dashboard.fullAnalytics")} <ArrowUpRight size={13} /></>
-                  </button>
-                </div>
-                {analytics.restaurantComparison.length === 0 ? (
-                  <EmptyState icon={<Store size={26} />} title={t("dashboard.noAudits")} hint={t("dashboard.submitAudit")} />
-                ) : (
-                  <div className="recent-list">
-                    {analytics.restaurantComparison.map((r) => (
-                      <div className="recent-row" key={r.restaurantId}>
-                        <div className="recent-row__info">
-                          <p className="recent-row__title">{r.name}</p>
-                        </div>
-                        <span className="recent-row__time">{r.score.toFixed(1)} / 10</span>
-                      </div>
-                    ))}
+              {auditError && (
+                <div className="dashboard-error">
+                  <AlertTriangle size={18} />
+                  <div>
+                    <strong>{t("dashboard.auditLoadErrorTitle")}</strong>
+                    <p>{auditError}</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {analytics && (
+
+                <>
+
+                  <div className="kpi-grid">
+
+                    <div className="kpi-card anim-in">
+
+                      <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
+
+                        <Gauge size={18} color="#6366f1" />
+
+                      </div>
+
+                      <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
+
+                      <p className="kpi-card__value">{analytics.overallScore.toFixed(1)} / 10</p>
+
+                    </div>
+
+
+                    <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
+
+                      <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
+
+                        <ClipboardCheck size={18} color="#0ea5e9" />
+
+                      </div>
+
+                      <p className="kpi-card__label">{t("dashboard.totalAudits")}</p>
+
+                      <p className="kpi-card__value">{analytics.totalAudits}</p>
+
+                    </div>
+
+
+                    <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
+
+                      <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
+
+                        <Store size={18} color="#22c55e" />
+
+                      </div>
+
+                      <p className="kpi-card__label">{t("dashboard.restaurantsAudited")}</p>
+
+                      <p className="kpi-card__value">{analytics.restaurantsAudited}</p>
+
+                    </div>
+
+
+                    <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
+
+                      <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
+
+                        <AlertTriangle size={18} color="#f59e0b" />
+
+                      </div>
+
+                      <p className="kpi-card__label">{t("dashboard.criticalLowScores")}</p>
+
+                      <p className="kpi-card__value">{analytics.criticalCount}</p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="recent-card anim-in">
+
+                    <div className="chart-card__header">
+
+                      <h3>{t("dashboard.restaurantComparison")}</h3>
+
+                      <button
+
+                        className="recent-card__link"
+
+                        onClick={() => navigate("/app/audit/analytics")}
+
+                      >
+
+                        {t("dashboard.fullAnalytics")} <ArrowUpRight size={13} />
+
+                      </button>
+
+                    </div>
+
+
+                    {analytics.restaurantComparison.length === 0 ? (
+
+                      <EmptyState
+
+                        icon={<Store size={26} />}
+
+                        title={t("dashboard.noAudits")}
+
+                        hint={t("dashboard.submitAudit")}
+
+                      />
+
+                    ) : (
+
+                      <div className="recent-list">
+
+                        {analytics.restaurantComparison.map((r) => (
+
+                          <div className="recent-row" key={r.restaurantId}>
+
+                            <div className="recent-row__info">
+
+                              <p className="recent-row__title">{r.name}</p>
+
+                            </div>
+
+                            <span className="recent-row__time">
+
+                              {r.score.toFixed(1)} / 10
+
+                            </span>
+
+                          </div>
+
+                        ))}
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                </>
+
+              )}
             </>
           )}
         </>

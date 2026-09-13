@@ -149,7 +149,12 @@
     "fullAnalytics": "Tam analitika",
     "noAudits": "Hələ audit yoxdur",
     "submitAudit": "Müqayisəni görmək üçün audit göndərin.",
-    "candidate": "namizəd"
+    "candidate": "namizəd",
+    "viewAll": "Hamısına bax",
+    "recruitmentLoadErrorTitle": "İşə qəbul məlumatları yüklənmədi",
+    "recruitmentLoadError": "İşə qəbul məlumatlarını yükləyərkən xəta baş verdi.",
+    "auditLoadErrorTitle": "Audit məlumatları yüklənmədi",
+    "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
     "signIn": "Daxil ol",
