@@ -6,10 +6,13 @@ import type {
 
 function backendStatus(
   status: ApplicationStatus
-): "Applied" | "Screening" | "Interview" | "Offered" | "Rejected" {
+): "Applied" | "Screening" | "Shortlisted" | "Interview" | "Offered" | "Hired" | "Rejected" {
   switch (String(status).toLowerCase()) {
     case "screening":
       return "Screening";
+
+    case "shortlisted":
+      return "Shortlisted";
 
     case "interview":
       return "Interview";
@@ -17,6 +20,9 @@ function backendStatus(
     case "offered":
     case "offer":
       return "Offered";
+
+    case "hired":
+      return "Hired";
 
     case "rejected":
       return "Rejected";

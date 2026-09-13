@@ -49,8 +49,10 @@ const applicationSchema = new mongoose.Schema(
       enum: [
         "Applied",
         "Screening",
+        "Shortlisted",
         "Interview",
         "Offered",
+        "Hired",
         "Rejected",
       ],
       default: "Applied",

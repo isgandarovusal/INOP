@@ -154,8 +154,10 @@ exports.updateApplicationStatus = async (req, res) => {
     const allowedStatuses = [
       "Applied",
       "Screening",
+      "Shortlisted",
       "Interview",
       "Offered",
+      "Hired",
       "Rejected",
     ];
 

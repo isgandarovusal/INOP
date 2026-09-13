@@ -109,8 +109,10 @@ const ApplicationsList: React.FC = () => {
           <option value="applied">{t("recruitment.applications.applied")}</option>
           <option value="screening">{t("recruitment.applications.screening")}</option>
           <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
-          <option value="rejected">{t("recruitment.applications.rejected")}</option>
+          <option value="interview">{t("recruitment.applications.interview")}</option>
+          <option value="offered">{t("recruitment.applications.offered")}</option>
           <option value="hired">{t("recruitment.applications.hired")}</option>
+          <option value="rejected">{t("recruitment.applications.rejected")}</option>
         </select>
       </div>
 
@@ -173,8 +175,10 @@ const ApplicationsList: React.FC = () => {
                         <option value="applied">{t("recruitment.applications.applied")}</option>
                         <option value="screening">{t("recruitment.applications.screening")}</option>
                         <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
-                        <option value="rejected">{t("recruitment.applications.rejected")}</option>
+                        <option value="interview">{t("recruitment.applications.interview")}</option>
+                        <option value="offered">{t("recruitment.applications.offered")}</option>
                         <option value="hired">{t("recruitment.applications.hired")}</option>
+                        <option value="rejected">{t("recruitment.applications.rejected")}</option>
                       </select>
                     ) : (
                       <Badge tone={STATUS_TONE[app.status]}>{t(`recruitment.applications.${app.status}`)}</Badge>
