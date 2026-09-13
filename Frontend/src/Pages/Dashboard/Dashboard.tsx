@@ -41,8 +41,8 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const showRecruitment = user ? canAccessSection(user.role, "recruitment") : false;
-  const showAudit = user ? canAccessSection(user.role, "audit") : false;
+  const showRecruitment = user ? canAccessSection(user, "recruitment") : false;
+  const showAudit = user ? canAccessSection(user, "audit") : false;
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);

@@ -16,7 +16,7 @@ const RestaurantDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const canManage = user ? canManageAudit(user.role) : false;
+  const canManage = user ? canManageAudit(user) : false;
 
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [audits, setAudits] = useState<Audit[]>([]);

@@ -21,7 +21,7 @@ const AuditsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageAudit(user.role) : false;
+  const canManage = user ? canManageAudit(user) : false;
 
   const [audits, setAudits] = useState<Audit[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);

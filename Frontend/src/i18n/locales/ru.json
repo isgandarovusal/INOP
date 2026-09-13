@@ -159,7 +159,9 @@
     "signingIn": "Выполняется вход…",
     "somethingWentWrong": "Произошла ошибка.",
     "emailPlaceholder": "you@inop.com",
-    "language": "Язык"
+    "language": "Язык",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль"
   },
   "unauthorized": {
     "title": "Доступ ограничен",

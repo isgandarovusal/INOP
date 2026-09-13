@@ -5,7 +5,7 @@ import { canAccessSection, type Section } from "../Utils/permissions";
 const RoleRoute: React.FC<{ section: Section }> = ({ section }) => {
   const { user } = useAuth();
   if (!user) return null;
-  if (!canAccessSection(user.role, section)) {
+  if (!canAccessSection(user, section)) {
     return <Navigate to="/unauthorized" replace />;
   }
   return <Outlet />;

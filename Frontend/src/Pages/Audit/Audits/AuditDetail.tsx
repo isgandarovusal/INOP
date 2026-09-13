@@ -30,7 +30,7 @@ const AuditDetail: React.FC = () => {
   const navigate = useNavigate();
 
   const { user } = useAuth();
-  const canManage = user ? canManageAudit(user.role) : false;
+  const canManage = user ? canManageAudit(user) : false;
 
   const [audit, setAudit] = useState<Audit | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);

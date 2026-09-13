@@ -24,7 +24,7 @@ const JobDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const canManage = user ? canManageRecruitment(user.role) : false;
+  const canManage = user ? canManageRecruitment(user) : false;
 
   const [job, setJob] = useState<Job | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);

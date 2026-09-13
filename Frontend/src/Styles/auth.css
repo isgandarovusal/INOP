@@ -1375,3 +1375,40 @@
     border-radius: 18px !important;
   }
 }
+
+.auth-password-field {
+  position: relative;
+  width: 100%;
+}
+
+.auth-password-field__input {
+  padding-right: 46px !important;
+}
+
+.auth-password-field__toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.auth-password-field__toggle:hover {
+  opacity: 1;
+}
+
+.auth-password-field__toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 6px;
+}

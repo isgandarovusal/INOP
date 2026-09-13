@@ -22,7 +22,7 @@ const JobsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageRecruitment(user.role) : false;
+  const canManage = user ? canManageRecruitment(user) : false;
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);

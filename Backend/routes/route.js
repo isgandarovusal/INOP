@@ -1,5 +1,8 @@
 const auditActivityRoutes = require("./auditActivity.routes");
 const authRoutes = require('./auth.routes');
+const userRoutes = require("./user.routes");
+const departmentRoutes = require("./department.routes");
+const activityLogRoutes = require("./activityLog.routes");
 const { verifyToken } = require('../middleware/auth.middleware');
 const { authorize } = require("../middleware/authorization.middleware");
 const { requireAssignedAuditAccess } = require("../middleware/auditScope.middleware");
@@ -46,6 +49,10 @@ router.use('/auth', authRoutes);
 // All non-auth API routes require a valid JWT.
 // Authentication is therefore secure by default.
 router.use(verifyToken);
+
+router.use('/users', userRoutes);
+router.use('/departments', departmentRoutes);
+router.use("/activity-logs", activityLogRoutes);
 
 // Sub-routes
 

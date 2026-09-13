@@ -126,7 +126,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       return (
                         <Draggable
                           key={candidate.id}
-                          draggableId={candidate.id}
+                          draggableId={candidate.id || candidate._id || `${candidate.name}-${index}`}
                           index={index}
                         >
                           {(provided) => (

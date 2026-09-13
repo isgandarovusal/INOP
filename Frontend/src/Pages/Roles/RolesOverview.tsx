@@ -13,14 +13,32 @@ const ROLE_CAPABILITIES: Record<Role, string[]> = {
     "roles",
     "departments",
     "systemManagement",
+    "allPermissions",
   ],
-  hr: [
+
+  hr_manager: [
+    "jobs",
+    "candidates",
+    "applications",
+    "cvs",
+    "candidateFiltering",
+    "recruitmentAnalytics",
+  ],
+
+  assistant_hr: [
     "jobs",
     "candidates",
     "applications",
     "cvs",
     "candidateFiltering",
   ],
+
+  employee: [
+    "ownProfile",
+    "ownApplications",
+    "ownTasks",
+  ],
+
   auditor: [
     "restaurants",
     "audits",
@@ -28,6 +46,19 @@ const ROLE_CAPABILITIES: Record<Role, string[]> = {
     "comments",
     "attachments",
   ],
+
+  audit_manager: [
+    "restaurants",
+    "audits",
+    "scores",
+    "comments",
+    "attachments",
+    "auditAnalytics",
+    "reportsDataViewing",
+    "findings",
+    "assignments",
+  ],
+
   manager: [
     "dashboard",
     "auditAnalytics",

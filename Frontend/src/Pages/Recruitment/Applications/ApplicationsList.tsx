@@ -31,7 +31,7 @@ const ApplicationsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageRecruitment(user.role) : false;
+  const canManage = user ? canManageRecruitment(user) : false;
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);

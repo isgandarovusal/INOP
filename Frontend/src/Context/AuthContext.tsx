@@ -12,7 +12,6 @@ import {
   logout as logoutRequest,
   getCurrentUser,
 } from "../Services/authService";
-import { ensureSeeded } from "../Services/init";
 
 interface AuthContextValue {
   user: PublicUser | null;
@@ -28,10 +27,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    ensureSeeded();
+    let mounted = true;
+
     getCurrentUser()
-      .then(setUser)
-      .finally(() => setIsLoading(false));
+      .then((currentUser) => {
+        if (mounted) {
+          setUser(currentUser);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -53,6 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
   return ctx;
 }

@@ -191,7 +191,7 @@ const Sidebar: React.FC = () => {
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter((item) =>
-      canAccessSection(user.role, item.section)
+      canAccessSection(user, item.section)
     ),
   })).filter((group) => group.items.length > 0);
 

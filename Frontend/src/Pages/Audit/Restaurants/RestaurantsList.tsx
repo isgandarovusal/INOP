@@ -16,7 +16,7 @@ const RestaurantsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageAudit(user.role) : false;
+  const canManage = user ? canManageAudit(user) : false;
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);

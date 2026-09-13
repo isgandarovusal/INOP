@@ -13,7 +13,15 @@ import type { Role } from "../../Types/auth";
 import type { Department } from "../../Types/core";
 import { ROLE_LABELS } from "../../Utils/permissions";
 
-const ROLES: Role[] = ["admin", "hr", "auditor", "manager"];
+const ROLES: Role[] = [
+  "admin",
+  "hr_manager",
+  "assistant_hr",
+  "employee",
+  "auditor",
+  "audit_manager",
+  "manager",
+];
 
 const UserForm: React.FC = () => {
   const { t } = useTranslation();
@@ -24,7 +32,7 @@ const UserForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<Role>("hr");
+  const [role, setRole] = useState<Role>("employee");
   const [departmentId, setDepartmentId] = useState("");
   const [position, setPosition] = useState("");
   const [departments, setDepartments] = useState<Department[]>([]);
