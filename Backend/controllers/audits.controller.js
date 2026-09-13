@@ -23,7 +23,7 @@ function normalizeAuditPayload(body, req) {
     ...body,
     id: body.id,
     restaurantId: body.restaurantId,
-    auditorId: body.auditorId || req.user?.id || "unknown",
+    auditorId: req.user?.id || "unknown",
     auditType: body.auditType,
     date: body.date,
   };
