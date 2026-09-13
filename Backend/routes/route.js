@@ -275,6 +275,12 @@ router.get(
   applicationsController.getApplications
 );
 
+router.get(
+  '/applications/:id',
+  ...authorize('application', 'read'),
+  applicationsController.getApplicationById
+);
+
 router.post(
   '/applications',
   ...authorize('application', 'create'),
