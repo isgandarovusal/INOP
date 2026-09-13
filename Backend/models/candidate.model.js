@@ -1,5 +1,16 @@
 const mongoose = require("mongoose");
 
+const candidateStatusValues = [
+  "new",
+  "applied",
+  "screening",
+  "shortlisted",
+  "interview",
+  "offer",
+  "hired",
+  "rejected",
+];
+
 const candidateSchema = new mongoose.Schema(
   {
     name: {
@@ -16,8 +27,29 @@ const candidateSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["applied", "interview", "offer", "rejected"],
+      enum: candidateStatusValues,
       default: "applied",
+      lowercase: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+    },
+
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    education: {
+      type: String,
+      default: "",
+      trim: true,
     },
 
     skills: {
@@ -29,6 +61,16 @@ const candidateSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+
+    languages: {
+      type: [String],
+      default: [],
+    },
+
+    certificates: {
+      type: [String],
+      default: [],
     },
 
     cvUrl: {
@@ -78,3 +120,5 @@ const candidateSchema = new mongoose.Schema(
 module.exports =
   mongoose.models.Candidate ||
   mongoose.model("Candidate", candidateSchema);
+
+module.exports.candidateStatusValues = candidateStatusValues;
