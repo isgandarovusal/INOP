@@ -29,6 +29,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    const handleAuthExpired = () => {
+      if (mounted) {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener("inop:auth-expired", handleAuthExpired);
+
     getCurrentUser()
       .then((currentUser) => {
         if (mounted) {
@@ -43,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
+      window.removeEventListener(
+        "inop:auth-expired",
+        handleAuthExpired,
+      );
     };
   }, []);
 

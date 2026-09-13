@@ -51,6 +51,16 @@ api.interceptors.response.use(
       toastId = null;
     }
 
+    if (error.response?.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+
+      window.dispatchEvent(
+        new CustomEvent("inop:auth-expired"),
+      );
+
+      return Promise.reject(error);
+    }
+
     if (error.code === "ECONNABORTED") {
       toast.error("Server cavab vermədi. Yenidən cəhd edin.");
     } else {
