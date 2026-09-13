@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const Application = require("../models/application.model");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
+const {
+  calculateApplicationMatch,
+} = require("../services/applicationMatch.service");
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -110,12 +113,18 @@ exports.createApplication = async (req, res) => {
       });
     }
 
+    const matchResult = calculateApplicationMatch(
+      job,
+      candidate
+    );
+
     const application = new Application({
       jobId,
       candidateId,
       departmentId: req.user?.departmentId || "",
       createdBy: req.user?.id || null,
       assignedTo: req.user?.id || null,
+      score: matchResult.score,
       notes: String(notes).trim(),
     });
 
