@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "../api/axios";
 import type { Restaurant, RestaurantStatus } from "../Types/audit";
 
 export interface RestaurantInput {

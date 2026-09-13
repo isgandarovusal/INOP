@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "../api/axios";
 
 export interface SafetyDetails {
   riskLevel: string;

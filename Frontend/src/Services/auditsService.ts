@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "../api/axios";
 import type { Audit, AuditFile, AuditScores } from "../Types/audit";
 
 function toAuditFiles(files: File[]): AuditFile[] {
@@ -41,7 +41,6 @@ export async function createAudit(
 
   const payload = {
     id: `aud-${Date.now()}`,
-    auditorId: "test-user",
     status: "completed",
     overallPercentage:
       (

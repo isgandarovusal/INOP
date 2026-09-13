@@ -1,4 +1,4 @@
-import request from "./api";
+import request from "../api/axios";
 import type { OccupationalSafetyAudit } from "../Types/Audit";
 
 const BASE = "/audits";
