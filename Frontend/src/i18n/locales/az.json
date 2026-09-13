@@ -325,8 +325,10 @@
       "applied": "Müraciət edib",
       "screening": "İlkin seçim",
       "shortlisted": "Qısa siyahıda",
-      "rejected": "Rədd edilib",
-      "hired": "İşə qəbul edilib"
+      "interview": "Müsahibə",
+      "offer": "Təklif verilib",
+      "hired": "İşə qəbul edilib",
+      "rejected": "Rədd edilib"
     },
     "candidateDetail": {
       "notFound": "Namizəd tapılmadı",

@@ -30,10 +30,13 @@ interface KanbanBoardProps {
 
 const COLUMNS: CandidateStatus[] = [
   "new",
+  "applied",
   "screening",
   "shortlisted",
-  "rejected",
+  "interview",
+  "offer",
   "hired",
+  "rejected",
 ];
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
