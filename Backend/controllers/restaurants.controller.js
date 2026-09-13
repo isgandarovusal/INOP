@@ -87,7 +87,21 @@ async function updateRestaurant(req,res){
 
   }catch(error){
 
-    res.status(500).json({
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Invalid restaurant data",
+        errors: Object.fromEntries(
+          Object.entries(error.errors || {}).map(([field, details]) => [
+            field,
+            details?.message || "Invalid value",
+          ])
+        ),
+      });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
       message:"Failed to update restaurant"
     });
 
