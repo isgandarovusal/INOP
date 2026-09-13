@@ -269,6 +269,12 @@ router.put(
   candidatesController.updateCandidate
 );
 
+router.patch(
+  '/candidates/:id',
+  ...authorize('candidate', 'update'),
+  candidatesController.updateCandidateStatus
+);
+
 router.delete(
   '/candidates/:id',
   ...authorize('candidate', 'delete'),

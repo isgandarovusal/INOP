@@ -332,6 +332,55 @@ exports.updateCandidate = async (req, res) => {
   }
 };
 
+
+exports.updateCandidateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Namizəd ID-si düzgün deyil.",
+      });
+    }
+
+    const status = normalizeStatus(req.body.status);
+
+    if (!status) {
+      return res.status(400).json({
+        message: "Namizəd statusu düzgün deyil.",
+      });
+    }
+
+    const updated = await Candidate.findOneAndUpdate(
+      buildScopedQuery(req, {
+        _id: id,
+      }),
+      { status },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        message:
+          "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
+    return res.status(200).json(updated);
+  } catch (error) {
+    console.error("Update candidate status error:", error);
+
+    return res.status(400).json({
+      message:
+        error.message ||
+        "Namizəd statusu yenilənərkən xəta baş verdi.",
+    });
+  }
+};
+
 exports.deleteCandidate = async (req, res) => {
   try {
     const { id } = req.params;
