@@ -117,6 +117,37 @@ function appendArray(
   });
 }
 
+export interface ParsedCvResult {
+  fileName: string;
+  mimeType: string;
+  size: number;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  education: string;
+  skills: string[];
+  experience: number;
+  languages: string[];
+  certificates: string[];
+  sections: Record<string, string>;
+  rawText: string;
+}
+
+export async function parseCandidateCv(
+  file: File
+): Promise<ParsedCvResult> {
+  const formData = new FormData();
+  formData.append("cv", file);
+
+  const response = await API.post(
+    "/candidates/parse-cv",
+    formData
+  );
+
+  return response.data;
+}
+
 export async function createCandidate(
   input: CandidateInput
 ): Promise<Candidate> {
