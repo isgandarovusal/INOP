@@ -288,7 +288,9 @@
       "noApplicationsHint": "Link candidates to jobs from a job's detail page.",
       "delete": "Delete",
       "removeTitle": "Remove this application?",
-      "removeMessage": "This link between the candidate and job will be removed."
+      "removeMessage": "This link between the candidate and job will be removed.",
+      "loadError": "Applications could not be loaded.",
+      "retry": "Retry"
     },
     "candidates": {
       "title": "Candidates",

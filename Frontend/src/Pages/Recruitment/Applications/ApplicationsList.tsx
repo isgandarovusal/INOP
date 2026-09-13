@@ -37,24 +37,37 @@ const ApplicationsList: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
-    Promise.all([getApplications(), getJobs(), getCandidates()]).then(
-      ([appResult, jobResult, candidateResult]) => {
-        setApplications(appResult);
-        setJobs(jobResult);
-        setCandidates(candidateResult);
-        setLoading(false);
-      },
-    );
+    setError(false);
+
+    try {
+      const [appResult, jobResult, candidateResult] = await Promise.all([
+        getApplications(),
+        getJobs(),
+        getCandidates(),
+      ]);
+
+      setApplications(appResult);
+      setJobs(jobResult);
+      setCandidates(candidateResult);
+    } catch (loadError) {
+      console.error("Applications load error:", loadError);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    void load();
+  }, []);
 
   const rows = useMemo(() => {
     return applications
@@ -71,16 +84,27 @@ const ApplicationsList: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+
     setDeletingId(deleteTarget.id);
-    await deleteApplication(deleteTarget.id);
-    setDeleteTarget(null);
-    setDeletingId(null);
-    load();
+
+    try {
+      await deleteApplication(deleteTarget.id);
+      setDeleteTarget(null);
+      await load();
+    } catch (deleteError) {
+      console.error("Application delete error:", deleteError);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const handleStatusChange = async (appId: string, status: ApplicationStatus) => {
-    await updateApplicationStatus(appId, status);
-    load();
+    try {
+      await updateApplicationStatus(appId, status);
+      await load();
+    } catch (statusError) {
+      console.error("Application status update error:", statusError);
+    }
   };
 
   return (
@@ -133,6 +157,25 @@ const ApplicationsList: React.FC = () => {
                 <td colSpan={5}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
+                  </div>
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    icon={<ClipboardList size={28} />}
+                    title={t("common.somethingWentWrong")}
+                    hint={t("recruitment.applications.loadError")}
+                  />
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+                    <button
+                      type="button"
+                      className="btn btn--secondary"
+                      onClick={load}
+                    >
+                      {t("recruitment.applications.retry")}
+                    </button>
                   </div>
                 </td>
               </tr>

@@ -288,7 +288,9 @@
       "noApplicationsHint": "Namizədləri vakansiyalara vakansiyanın detal səhifəsindən bağlayın.",
       "delete": "Sil",
       "removeTitle": "Bu müraciət silinsin?",
-      "removeMessage": "Namizəd ilə vakansiya arasındakı bu əlaqə silinəcək."
+      "removeMessage": "Namizəd ilə vakansiya arasındakı bu əlaqə silinəcək.",
+      "loadError": "Müraciətlər yüklənə bilmədi.",
+      "retry": "Yenidən cəhd et"
     },
     "candidates": {
       "title": "Namizədlər",
