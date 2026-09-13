@@ -308,7 +308,17 @@
       "years": "il",
       "loadingError": "Namizədlər yüklənərkən xəta baş verdi.",
       "statusUpdated": "Status yeniləndi",
-      "statusUpdateError": "Status yenilənərkən xəta baş verdi."
+      "statusUpdateError": "Status yenilənərkən xəta baş verdi.",
+      "retry": "Yenidən cəhd et",
+      "empty": "Namizəd yoxdur",
+      "emptyDescription": "Hələ heç bir namizəd əlavə edilməyib.",
+      "noSearchResults": "Nəticə tapılmadı",
+      "noSearchResultsDescription": "Axtarışınıza uyğun namizəd tapılmadı.",
+      "notProvided": "Göstərilməyib",
+      "actions": "Əməliyyatlar",
+      "deleteConfirm": "namizədini silmək istədiyinizə əminsiniz?",
+      "deleted": "Namizəd silindi.",
+      "deleteError": "Namizəd silinərkən xəta baş verdi."
     },
     "candidateStatus": {
       "new": "Yeni",

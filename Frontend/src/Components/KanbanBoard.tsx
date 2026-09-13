@@ -25,6 +25,7 @@ interface KanbanBoardProps {
     newStatus: CandidateStatus,
   ) => Promise<void>;
   targetRequirements: TargetRequirements;
+  canChangeStatus?: boolean;
 }
 
 const COLUMNS: CandidateStatus[] = [
@@ -39,6 +40,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   candidates,
   onStatusChange,
   targetRequirements,
+  canChangeStatus = true,
 }) => {
   const { t } = useTranslation();
 
@@ -48,7 +50,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const handleOnDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
-    if (!destination) return;
+    if (!destination || !canChangeStatus) return;
 
     if (
       destination.droppableId === source.droppableId &&
