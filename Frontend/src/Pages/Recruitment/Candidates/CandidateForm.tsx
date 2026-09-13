@@ -28,6 +28,7 @@ const CandidateForm: React.FC = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
+  const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [education, setEducation] = useState("");
@@ -46,23 +47,63 @@ const CandidateForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
-    getCandidateById(id)
-      .then((candidate) => {
-        if (candidate) {
-          setName(candidate.name || "");
-          setEmail(candidate.email || "");
-          setPhone(candidate.phone || "");
-          setEducation(candidate.education || "");
-          setExperience(candidate.experience || 0);
-          setSkills(candidate.skills || []);
-          setLanguages(candidate.languages || []);
-          setCertificates(candidate.certificates || []);
-          setExistingCvName(candidate.cv?.name || null);
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    let mounted = true;
+
+    const loadCandidate = async () => {
+      try {
+        setError(null);
+
+        const candidate = await getCandidateById(id);
+
+        if (!mounted) return;
+
+        if (!candidate) {
+          setError("Namizəd tapılmadı.");
+          return;
         }
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+
+        setName(candidate.name || "");
+        setRole(candidate.role || "");
+        setEmail(candidate.email || "");
+        setPhone(candidate.phone || "");
+        setEducation(candidate.education || "");
+        setExperience(candidate.experience || 0);
+        setSkills(candidate.skills || []);
+        setLanguages(candidate.languages || []);
+        setCertificates(candidate.certificates || []);
+
+        if (candidate.cvUrl) {
+          const fileName = candidate.cvUrl.split("/").pop() || candidate.cvUrl;
+          setExistingCvName(fileName);
+        } else {
+          setExistingCvName(null);
+        }
+      } catch (err: any) {
+        if (!mounted) return;
+
+        setError(
+          err?.response?.data?.message ||
+            err?.message ||
+            t("recruitment.candidateForm.genericError"),
+        );
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadCandidate();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id, t]);
 
   const validateCvFile = (file: File): boolean => {
     if (!ACCEPTED_CV_TYPES.includes(file.type)) {
@@ -121,8 +162,10 @@ const CandidateForm: React.FC = () => {
 
     try {
       const payload = {
-        name,
-        email,
+        name: name.trim(),
+        role: role.trim() || "Unspecified",
+        email: email.trim(),
+
         phone,
         education,
         experience,
@@ -158,7 +201,11 @@ const CandidateForm: React.FC = () => {
       }
       navigate("/app/recruitment/candidates");
     } catch (err: any) {
-      setError(err.message || t("recruitment.candidateForm.genericError"));
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          t("recruitment.candidateForm.genericError"),
+      );
     } finally {
       setSaving(false);
     }
@@ -367,6 +414,18 @@ const CandidateForm: React.FC = () => {
               </div>
 
               <div className="form-group">
+                <label className="candidate-field-label">
+                  {t("recruitment.candidateForm.position")}
+                </label>
+                <input
+                  type="text"
+                  className="input"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
                 <label className="candidate-field-label">{t("recruitment.candidateForm.email")}</label>
                 <input
                   type="email"
@@ -418,7 +477,7 @@ const CandidateForm: React.FC = () => {
               className="btn-secondary"
               onClick={() => navigate(-1)}
             >
-              Ləğv Et
+              {t("recruitment.candidateForm.cancel")}
             </button>
 
             <button

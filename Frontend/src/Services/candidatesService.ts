@@ -253,7 +253,12 @@ export async function updateCandidateStatus(
   id: string,
   status: CandidateStatus
 ): Promise<Candidate> {
-  return updateCandidate(id, { status });
+  const response = await API.patch(
+    `/candidates/${id}`,
+    { status }
+  );
+
+  return normalizeCandidate(response.data);
 }
 
 export async function deleteCandidate(
