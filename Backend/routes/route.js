@@ -5,12 +5,23 @@ const departmentRoutes = require("./department.routes");
 const activityLogRoutes = require("./activityLog.routes");
 const { verifyToken } = require('../middleware/auth.middleware');
 const { authorize } = require("../middleware/authorization.middleware");
+const { cvUpload } = require("../middleware/cvUpload.middleware");
+const { cvParseUpload } = require("../middleware/cvParse.middleware");
+const cvController = require("../controllers/cv.controller");
 const { requireAssignedAuditAccess } = require("../middleware/auditScope.middleware");
 
 const express = require('express');
-const router = express.Router();
 const multer = require('multer');
-const path = require('path');
+const router = express.Router();
+const auditDocumentStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, 'uploads/'),
+  filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+
+const auditDocumentUpload = multer({
+  storage: auditDocumentStorage,
+});
+
 
 const jobsController = require('../controllers/jobs.controller');
 const candidatesController = require('../controllers/candidates.controller');
@@ -36,13 +47,6 @@ const auditNotificationRoutes = require('./auditNotification.routes');
 const auditApprovalRoutes = require('./auditApproval.routes');
 const auditClosureRoutes = require('./auditClosure.routes');
 const auditExportRoutes = require('./auditExport.routes');
-
-// Multer konfiqurasiyası (CV fayllarının saxlanması üçün)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-});
-const upload = multer({ storage });
 
 router.use('/auth', authRoutes);
 
@@ -202,7 +206,7 @@ router.get(
 router.post(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'create'),
-  upload.single('file'),
+  auditDocumentUpload.single('file'),
   auditSourceDocumentsController.uploadDocument
 );
 
@@ -243,6 +247,14 @@ router.delete(
   jobsController.deleteJob
 );
 
+// CV parsing / preview endpoint
+router.post(
+  '/candidates/parse-cv',
+  ...authorize('candidate', 'read'),
+  cvParseUpload,
+  cvController.parseCv
+);
+
 // Candidates Endpoints
 router.get(
   '/candidates',
@@ -259,7 +271,7 @@ router.get(
 router.post(
   '/candidates',
   ...authorize('candidate', 'create'),
-  upload.single('cv'),
+  cvUpload.single('cv'),
   candidatesController.createCandidate
 );
 
