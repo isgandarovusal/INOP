@@ -279,7 +279,15 @@ function extractEducation(sections) {
     .join("\n");
 }
 
-function extractRole(sections) {
+function extractRole(sections, text = "") {
+  const explicitRoleMatch = String(text || "").match(
+    /(?:^|\n)\s*(?:role|position|job\s*title|title)\s*[:\-]\s*(.+?)\s*$/im
+  );
+
+  if (explicitRoleMatch?.[1]) {
+    return explicitRoleMatch[1].trim();
+  }
+
   const source = sections.summary || "";
 
   return source
@@ -296,7 +304,7 @@ function parseStructuredCv(text) {
     name: extractName(normalizedText),
     email: extractEmail(normalizedText),
     phone: extractPhone(normalizedText),
-    role: extractRole(sections),
+    role: extractRole(sections, normalizedText),
     education: extractEducation(sections),
     skills: extractSkills(normalizedText, sections),
     experience: extractExperienceYears(
