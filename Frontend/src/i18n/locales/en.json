@@ -397,7 +397,9 @@
       "tryDifferentKeyword": "Try a different keyword.",
       "jobsWillAppear": "Jobs you create will show up here.",
       "deleteTitle": "Delete this job?",
-      "deleteMessage": "\"{{position}}\" will be permanently removed. This can't be undone."
+      "deleteMessage": "\"{{position}}\" will be permanently removed. This can't be undone.",
+      "loadError": "Jobs could not be loaded.",
+      "retry": "Retry"
     },
     "jobStatus": {
       "open": "Open",
@@ -424,7 +426,10 @@
       "aiSuccess": "AI generated suitable skill requirements for the job!",
       "updated": "Job updated",
       "created": "New job created!",
-      "genericError": "Something went wrong"
+      "genericError": "Something went wrong",
+      "loadError": "Job details could not be loaded.",
+      "notFound": "Job not found.",
+      "backToJobs": "Back to jobs"
     },
     "jobDetail": {
       "notFound": "Job not found",
@@ -443,7 +448,10 @@
       "linkCandidate": "Link a candidate",
       "allCandidatesApplied": "All candidates have already applied to this job.",
       "selectCandidate": "Select a candidate…",
-      "addApplication": "Add application"
+      "addApplication": "Add application",
+      "loadError": "Job details could not be loaded.",
+      "retry": "Retry",
+      "linkError": "The application could not be created."
     },
     "applicationStatus": {
       "applied": "Applied",

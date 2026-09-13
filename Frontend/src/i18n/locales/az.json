@@ -397,7 +397,9 @@
       "tryDifferentKeyword": "Başqa açar söz sınayın.",
       "jobsWillAppear": "Yaratdığınız vakansiyalar burada görünəcək.",
       "deleteTitle": "Bu vakansiya silinsin?",
-      "deleteMessage": "\"{{position}}\" vakansiyası həmişəlik silinəcək. Bu əməliyyat geri qaytarıla bilməz."
+      "deleteMessage": "\"{{position}}\" vakansiyası həmişəlik silinəcək. Bu əməliyyat geri qaytarıla bilməz.",
+      "loadError": "Vakansiyalar yüklənə bilmədi.",
+      "retry": "Yenidən cəhd et"
     },
     "jobStatus": {
       "open": "Açıq",
@@ -424,7 +426,10 @@
       "aiSuccess": "AI vakansiya üçün uyğun bacarıq tələblərini yaratdı!",
       "updated": "Vakansiya yeniləndi",
       "created": "Yeni vakansiya yaradıldı!",
-      "genericError": "Xəta baş verdi"
+      "genericError": "Xəta baş verdi",
+      "loadError": "Vakansiya məlumatları yüklənə bilmədi.",
+      "notFound": "Vakansiya tapılmadı.",
+      "backToJobs": "Vakansiyalara qayıt"
     },
     "jobDetail": {
       "notFound": "Vakansiya tapılmadı",
@@ -443,7 +448,10 @@
       "linkCandidate": "Namizədi əlaqələndir",
       "allCandidatesApplied": "Bütün namizədlər artıq bu vakansiyaya müraciət ediblər.",
       "selectCandidate": "Namizəd seçin…",
-      "addApplication": "Müraciət əlavə et"
+      "addApplication": "Müraciət əlavə et",
+      "loadError": "Vakansiya məlumatları yüklənə bilmədi.",
+      "retry": "Yenidən cəhd et",
+      "linkError": "Müraciət yaratmaq mümkün olmadı."
     },
     "applicationStatus": {
       "applied": "Müraciət edib",

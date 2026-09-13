@@ -32,23 +32,38 @@ const JobDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [linking, setLinking] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const load = () => {
+  const load = async () => {
     if (!id) return;
 
     setLoading(true);
+    setError(null);
 
-    Promise.all([getJobById(id), getApplications(), getCandidates()]).then(
-      ([jobResult, appResult, candidateResult]) => {
-        setJob(jobResult ?? null);
-        setApplications(appResult.filter((a) => a.jobId === id));
-        setCandidates(candidateResult);
-        setLoading(false);
-      },
-    );
+    try {
+      const [jobResult, appResult, candidateResult] = await Promise.all([
+        getJobById(id),
+        getApplications(),
+        getCandidates(),
+      ]);
+
+      setJob(jobResult ?? null);
+      setApplications(appResult.filter((a) => a.jobId === id));
+      setCandidates(candidateResult);
+    } catch (err: any) {
+      console.error("Failed to load job detail:", err);
+      setError(
+        err?.response?.data?.message ||
+          t("recruitment.jobDetail.loadError"),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(load, [id]);
+  useEffect(() => {
+    void load();
+  }, [id]);
 
   const ranked = useMemo(() => {
     return applications
@@ -72,19 +87,51 @@ const JobDetail: React.FC = () => {
     if (!id || !selectedCandidate) return;
 
     setLinking(true);
-    await createApplication({
-      jobId: id,
-      candidateId: selectedCandidate,
-    });
-    setSelectedCandidate("");
-    setLinking(false);
-    load();
+    setError(null);
+
+    try {
+      await createApplication({
+        jobId: id,
+        candidateId: selectedCandidate,
+      });
+
+      setSelectedCandidate("");
+      await load();
+    } catch (err: any) {
+      console.error("Failed to create application:", err);
+      setError(
+        err?.response?.data?.message ||
+          t("recruitment.jobDetail.linkError"),
+      );
+    } finally {
+      setLinking(false);
+    }
   };
 
   if (loading) {
     return (
       <div className="empty-state">
         <Loader2 size={24} className="spin" />
+      </div>
+    );
+  }
+
+  if (error && !job) {
+    return (
+      <div>
+        <EmptyState
+          icon={<UserSquare2 size={28} />}
+          title={t("somethingWentWrong")}
+          hint={error}
+        />
+        <div style={{ textAlign: "center", marginTop: "12px" }}>
+          <button
+            className="btn btn--secondary"
+            onClick={() => void load()}
+          >
+            {t("recruitment.jobDetail.retry")}
+          </button>
+        </div>
       </div>
     );
   }

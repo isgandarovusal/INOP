@@ -26,18 +26,49 @@ const JobForm: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    getJobById(id)
-      .then((job) => {
-        if (job) {
-          setPosition(job.position || "");
-          setDescription(job.description || "");
-          setRequiredSkills(job.requiredSkills || []);
-          setExperience(job.experience || 1);
-          setStatus(job.status || "open");
+
+    let mounted = true;
+
+    const loadJob = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const job = await getJobById(id);
+
+        if (!mounted) return;
+
+        if (!job) {
+          setError(t("recruitment.jobForm.notFound"));
+          return;
         }
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+
+        setPosition(job.position || "");
+        setDescription(job.description || "");
+        setRequiredSkills(job.requiredSkills || []);
+        setExperience(job.experience || 1);
+        setStatus(job.status || "open");
+      } catch (err: any) {
+        if (!mounted) return;
+
+        console.error("Failed to load job:", err);
+        setError(
+          err?.response?.data?.message ||
+            t("recruitment.jobForm.loadError"),
+        );
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadJob();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id, t]);
 
   const handleAiSuggestRequirements = () => {
     if (!position.trim()) {
@@ -98,7 +129,12 @@ const JobForm: React.FC = () => {
 
       navigate("/app/recruitment/jobs");
     } catch (err: any) {
-      setError(err.message || t("recruitment.jobForm.genericError"));
+      console.error("Failed to save job:", err);
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          t("recruitment.jobForm.genericError"),
+      );
     } finally {
       setSaving(false);
     }
@@ -108,6 +144,33 @@ const JobForm: React.FC = () => {
     return (
       <div className="page-loading">
         <Loader2 className="spin" size={32} />
+      </div>
+    );
+  }
+
+  if (isEdit && error && !position && !description && requiredSkills.length === 0) {
+    return (
+      <div>
+        <PageHeader
+          title={t("recruitment.jobForm.editTitle")}
+          subtitle={t("recruitment.jobForm.subtitle")}
+        />
+
+        <div className="empty-state">
+          <AlertCircle size={28} />
+          <p className="empty-state__title">
+            {t("somethingWentWrong")}
+          </p>
+          <p className="empty-state__hint">{error}</p>
+          <div style={{ marginTop: "12px" }}>
+            <button
+              className="btn btn--secondary"
+              onClick={() => navigate("/app/recruitment/jobs")}
+            >
+              {t("recruitment.jobForm.backToJobs")}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

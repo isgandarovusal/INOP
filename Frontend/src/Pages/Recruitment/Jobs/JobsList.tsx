@@ -30,15 +30,29 @@ const JobsList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Job | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
-    getJobs()
-      .then(setJobs)
-      .finally(() => setLoading(false));
+    setError(null);
+
+    try {
+      const result = await getJobs();
+      setJobs(result);
+    } catch (err: any) {
+      console.error("Failed to load jobs:", err);
+      setError(
+        err?.response?.data?.message ||
+          t("recruitment.jobs.loadError"),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    void load();
+  }, []);
 
   const filtered = useMemo(() => {
     return jobs
@@ -56,11 +70,19 @@ const JobsList: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    setDeletingId(deleteTarget.id);
-    await deleteJob(deleteTarget.id);
-    setDeleteTarget(null);
-    setDeletingId(null);
-    load();
+
+    const id = deleteTarget.id;
+    setDeletingId(id);
+
+    try {
+      await deleteJob(id);
+      setDeleteTarget(null);
+      await load();
+    } catch (err) {
+      console.error("Failed to delete job:", err);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -117,6 +139,24 @@ const JobsList: React.FC = () => {
                 <td colSpan={5}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
+                  </div>
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    icon={<Briefcase size={28} />}
+                    title={t("somethingWentWrong")}
+                    hint={error}
+                  />
+                  <div style={{ textAlign: "center", marginTop: "12px" }}>
+                    <button
+                      className="btn btn--secondary"
+                      onClick={() => void load()}
+                    >
+                      {t("recruitment.jobs.retry")}
+                    </button>
                   </div>
                 </td>
               </tr>
