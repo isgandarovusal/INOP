@@ -72,7 +72,8 @@ const auditActionSchema = new mongoose.Schema(
 
 
 module.exports =
-mongoose.model(
- "AuditAction",
- auditActionSchema
-);
+  mongoose.models.AuditAction ||
+  mongoose.model(
+    "AuditAction",
+    auditActionSchema
+  );

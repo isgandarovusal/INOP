@@ -10,7 +10,7 @@ const { authorize } = require("../middleware/authorization.middleware");
 
 router.get(
   "/",
-  ...authorize("dashboard", "read"),
+  ...authorize("audit.analytics", "read"),
   getAuditDashboard
 );
 

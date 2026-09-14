@@ -1,4 +1,58 @@
 const Audit = require("../models/audit.model");
+const {
+  getAssignedAuditFilter,
+} = require("../middleware/auditScope.middleware");
+
+function parseDate(value, endOfDay = false) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  if (endOfDay) date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+async function buildAnalyticsFilter(req, extra = {}) {
+  const scopeFilter = await getAssignedAuditFilter(req);
+
+  if (scopeFilter === null) {
+    return null;
+  }
+
+  const queryFilter = {};
+  const { status, auditType, auditorId, restaurantId, from, to } = req.query || {};
+
+  if (status) queryFilter.status = String(status).trim();
+  if (auditType) queryFilter.auditType = String(auditType).trim();
+  if (auditorId) queryFilter.auditorId = String(auditorId).trim();
+  if (restaurantId) queryFilter.restaurantId = String(restaurantId).trim();
+
+  const fromDate = parseDate(from);
+  const toDate = parseDate(to, true);
+
+  if (fromDate || toDate) {
+    queryFilter.createdAt = {};
+    if (fromDate) queryFilter.createdAt.$gte = fromDate;
+    if (toDate) queryFilter.createdAt.$lte = toDate;
+  }
+
+  const parts = [scopeFilter, queryFilter, extra].filter(
+    (item) => item && Object.keys(item).length
+  );
+
+  if (!parts.length) return {};
+  if (parts.length === 1) return parts[0];
+
+  return { $and: parts };
+}
+
+function denyUnresolvedScope(res) {
+  return res.status(403).json({
+    success: false,
+    message: "Audit analytics məlumat səviyyəsi müəyyən edilə bilmədi.",
+  });
+}
 
 function safeNumber(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -11,7 +65,11 @@ function round(value, decimals = 2) {
 
 exports.getSummary = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req);
+    if (match === null) return denyUnresolvedScope(res);
+
     const result = await Audit.aggregate([
+      { $match: match },
       {
         $group: {
           _id: {
@@ -30,9 +88,8 @@ exports.getSummary = async (req, res) => {
     ]);
 
     const totalResult = await Audit.aggregate([
-      {
-        $count: "total",
-      },
+      { $match: match },
+      { $count: "total" },
     ]);
 
     const total = totalResult[0]?.total || 0;
@@ -59,7 +116,11 @@ exports.getSummary = async (req, res) => {
 
 exports.getByType = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req);
+    if (match === null) return denyUnresolvedScope(res);
+
     const result = await Audit.aggregate([
+      { $match: match },
       {
         $group: {
           _id: {
@@ -98,7 +159,11 @@ exports.getByType = async (req, res) => {
 
 exports.getTrend = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req);
+    if (match === null) return denyUnresolvedScope(res);
+
     const result = await Audit.aggregate([
+      { $match: match },
       {
         $group: {
           _id: {
@@ -143,12 +208,11 @@ exports.getTrend = async (req, res) => {
 
 exports.getServiceAnalytics = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req, { auditType: "service" });
+    if (match === null) return denyUnresolvedScope(res);
+
     const [summary] = await Audit.aggregate([
-      {
-        $match: {
-          auditType: "service",
-        },
-      },
+      { $match: match },
       {
         $facet: {
           overview: [
@@ -287,12 +351,11 @@ exports.getServiceAnalytics = async (req, res) => {
 
 exports.getStandardAnalytics = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req, { auditType: "standard" });
+    if (match === null) return denyUnresolvedScope(res);
+
     const [summary] = await Audit.aggregate([
-      {
-        $match: {
-          auditType: "standard",
-        },
-      },
+      { $match: match },
       {
         $facet: {
           overview: [
@@ -419,12 +482,13 @@ exports.getStandardAnalytics = async (req, res) => {
 
 exports.getSafetyAnalytics = async (req, res) => {
   try {
+    const match = await buildAnalyticsFilter(req, {
+      auditType: "occupational-safety",
+    });
+    if (match === null) return denyUnresolvedScope(res);
+
     const [summary] = await Audit.aggregate([
-      {
-        $match: {
-          auditType: "occupational-safety",
-        },
-      },
+      { $match: match },
       {
         $facet: {
           overview: [
@@ -584,3 +648,5 @@ exports.getSafetyAnalytics = async (req, res) => {
     });
   }
 };
+
+module.exports.buildAnalyticsFilter = buildAnalyticsFilter;

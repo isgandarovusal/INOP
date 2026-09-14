@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+const RevokedToken = require("../models/revokedToken.model");
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -32,6 +34,19 @@ exports.verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, getJwtSecret());
 
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const revoked = await RevokedToken.exists({ tokenHash });
+
+    if (revoked) {
+      return res.status(401).json({
+        message: "Authentication token artıq etibarlı deyil.",
+      });
+    }
+
     const user = await User.findById(decoded.id)
       .select(
         "_id name email role departmentId position managerId isActive"
@@ -49,6 +64,9 @@ exports.verifyToken = async (req, res, next) => {
         message: "Bu istifadəçi hesabı deaktiv edilib.",
       });
     }
+
+    req.authToken = token;
+    req.auth = decoded;
 
     req.user = {
       id: String(user._id),

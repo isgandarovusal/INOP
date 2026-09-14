@@ -119,9 +119,6 @@
     },
     "kanban": {
       "new": "Новые",
-      "applied": "Подал заявку",
-      "interview": "Собеседование",
-      "offer": "Предложение",
       "screening": "На проверке",
       "shortlisted": "Отобраны",
       "rejected": "Отклонены",
@@ -826,10 +823,7 @@
       "title": "Аналитика аудитов",
       "subtitle": "Статистика аудитов на основе реальных данных MongoDB",
       "totalAudits": "Всего аудитов",
-      "statusGroups": "Группы статусов",
-      "auditStatus": "Статус аудита",
-      "auditTypes": "Типы аудита",
-      "auditTrend": "Тренд аудитов"
+      "statusGroups": "Группы статусов"
     },
     "generic": {
       "detail": {
@@ -892,27 +886,11 @@
         "noAudits": "Аудитов пока нет",
         "date": "Дата",
         "type": "Тип",
-        "overallScore": "Общая оценка",
-        "deletedHint": "Ресторан удалён или больше недоступен.",
-        "back": "Назад",
-        "edit": "Редактировать",
-        "newAudit": "Новый аудит"
+        "overallScore": "Общая оценка"
       },
       "form": {
         "restaurantName": "Название ресторана",
-        "locationPlaceholder": "Баку, улица Низами",
-        "titleEdit": "Редактировать ресторан",
-        "titleAdd": "Добавить ресторан",
-        "subtitleEdit": "Обновите информацию о ресторане.",
-        "subtitleAdd": "Создайте новый ресторан для аудитов.",
-        "name": "Название",
-        "location": "Местоположение",
-        "status": "Статус",
-        "active": "Активен",
-        "inactive": "Неактивен",
-        "cancel": "Отмена",
-        "save": "Сохранить",
-        "saving": "Сохранение..."
+        "locationPlaceholder": "Баку, улица Низами"
       },
       "list": {
         "title": "Рестораны",

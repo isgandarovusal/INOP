@@ -107,7 +107,8 @@ const auditExecutionSchema = new mongoose.Schema(
 
 
 module.exports =
-mongoose.model(
- "AuditExecution",
- auditExecutionSchema
-);
+  mongoose.models.AuditExecution ||
+  mongoose.model(
+    "AuditExecution",
+    auditExecutionSchema
+  );

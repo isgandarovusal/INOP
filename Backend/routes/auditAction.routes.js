@@ -10,7 +10,9 @@ const {
 const { authorize } = require("../middleware/authorization.middleware");
 const {
   requireAssignedAuditAccess,
+  requireAssignedResourceAuditAccess,
 } = require("../middleware/auditScope.middleware");
+const AuditAction = require("../models/auditAction.model");
 
 router.post(
   "/",
@@ -29,7 +31,7 @@ router.get(
 router.put(
   "/:id/status",
   ...authorize("audit.action", "update"),
-  requireAssignedAuditAccess,
+  requireAssignedResourceAuditAccess(AuditAction),
   updateActionStatus
 );
 

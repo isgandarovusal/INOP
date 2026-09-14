@@ -80,8 +80,11 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
       return next();
     }
 
-    if (scope !== "assigned") {
-      return next();
+    if (scope !== "assigned" && scope !== "own") {
+      return res.status(403).json({
+        success: false,
+        message: "Bu Audit məlumat səviyyəsi dəstəklənmir.",
+      });
     }
 
     const auditId = await getAuditIdFromRequest(req);
@@ -94,7 +97,17 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
       });
     }
 
-    const allowed = await userHasAuditAccess(req, auditId);
+    let allowed = false;
+
+    if (scope === "assigned") {
+      allowed = await userHasAuditAccess(req, auditId);
+    } else {
+      const audit = await findAuditByIdentifier(auditId);
+      allowed = Boolean(
+        audit &&
+        String(audit.auditorId || "") === String(req.user.id)
+      );
+    }
 
     if (!allowed) {
       return res.status(403).json({
@@ -117,11 +130,23 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
 };
 
 exports.getAssignedAuditFilter = async (req) => {
-  if (req.permission?.scope !== "assigned") {
+  const scope = req.permission?.scope;
+
+  if (scope === "all") {
     return {};
   }
 
   if (!req.user?.id) {
+    return null;
+  }
+
+  if (scope === "own") {
+    return {
+      auditorId: req.user.id,
+    };
+  }
+
+  if (scope !== "assigned") {
     return null;
   }
 
@@ -147,5 +172,80 @@ exports.getAssignedAuditFilter = async (req) => {
         },
       },
     ],
+  };
+};
+
+
+exports.requireAssignedResourceAuditAccess = (Model, options = {}) => {
+  const idParam = options.idParam || "id";
+  const auditField = options.auditField || "auditId";
+
+  return async (req, res, next) => {
+    try {
+      const scope = req.permission?.scope;
+
+      if (scope === "all") {
+        return next();
+      }
+
+      if (scope !== "assigned" && scope !== "own") {
+        return res.status(403).json({
+          success: false,
+          message: "Bu Audit məlumat səviyyəsi dəstəklənmir.",
+        });
+      }
+
+      const resourceId = req.params?.[idParam];
+
+      if (!resourceId || !mongoose.Types.ObjectId.isValid(resourceId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Resurs ID-si düzgün deyil.",
+        });
+      }
+
+      const resource = await Model.findById(resourceId)
+        .select(auditField)
+        .lean();
+
+      if (!resource) {
+        return res.status(404).json({
+          success: false,
+          message: "Resurs tapılmadı.",
+        });
+      }
+
+      const auditId = resource[auditField];
+      let allowed = false;
+
+      if (scope === "assigned") {
+        allowed = await userHasAuditAccess(req, auditId);
+      } else {
+        const audit = await findAuditByIdentifier(auditId);
+        allowed = Boolean(
+          audit &&
+          String(audit.auditorId || "") === String(req.user.id)
+        );
+      }
+
+      if (!allowed) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Bu Audit resursu üzərində əməliyyat aparmaq üçün icazəniz yoxdur.",
+        });
+      }
+
+      req.auditId = String(auditId);
+      return next();
+    } catch (error) {
+      console.error("Audit resource scope check error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Audit resursunun giriş səviyyəsi yoxlanılarkən server xətası baş verdi.",
+      });
+    }
   };
 };

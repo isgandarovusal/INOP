@@ -64,9 +64,6 @@
   },
   "navigation": {
     "dashboard": "İdarə paneli",
-      "ownProfile": "Öz profili",
-      "ownApplications": "Öz müraciətləri",
-      "ownTasks": "Öz tapşırıqları",
     "recruitment": "İşə qəbul",
     "candidates": "Namizədlər",
     "vacancies": "Vakansiyalar",
@@ -122,9 +119,6 @@
     },
     "kanban": {
       "new": "Yeni",
-      "applied": "Müraciət edib",
-      "interview": "Müsahibə",
-      "offer": "Təklif",
       "screening": "Yoxlanılır",
       "shortlisted": "Seçilmiş",
       "rejected": "İmtina edilib",
@@ -253,26 +247,19 @@
       "roles": "Rollar",
       "departments": "Şöbələr",
       "systemManagement": "Sistem səviyyəsində idarəetmə",
-      "allPermissions": "Bütün icazələr",
       "jobs": "Vakansiyalar",
       "candidates": "Namizədlər",
       "applications": "Müraciətlər",
       "cvs": "CV-lər",
       "candidateFiltering": "Namizədlərin filtrasiyası",
-      "recruitmentAnalytics": "İşə qəbul analitikası",
       "restaurants": "Restoranlar",
       "audits": "Auditlər",
       "scores": "Nəticələr",
       "comments": "Şərhlər",
       "attachments": "Əlavələr",
       "dashboard": "İdarə paneli",
-      "ownProfile": "Öz profili",
-      "ownApplications": "Öz müraciətləri",
-      "ownTasks": "Öz tapşırıqları",
       "auditAnalytics": "Audit analitikası",
-      "reportsDataViewing": "Hesabatlar / məlumatlara baxış",
-      "findings": "Aşkar edilmiş uyğunsuzluqlar",
-      "assignments": "Təyinatlar"
+      "reportsDataViewing": "Hesabatlar / məlumatlara baxış"
     }
   },
   "activityLog": {
@@ -853,10 +840,7 @@
       "title": "Audit Analitikası",
       "subtitle": "Real MongoDB məlumatları əsasında audit statistikası",
       "totalAudits": "Ümumi auditlər",
-      "statusGroups": "Status qrupları",
-      "auditStatus": "Audit statusu",
-      "auditTypes": "Audit növləri",
-      "auditTrend": "Audit trendi"
+      "statusGroups": "Status qrupları"
     },
     "generic": {
       "detail": {
@@ -919,27 +903,11 @@
         "noAudits": "Hələ audit yoxdur",
         "date": "Tarix",
         "type": "Növ",
-        "overallScore": "Ümumi bal",
-        "deletedHint": "Restoran silinmiş və ya artıq mövcud deyil.",
-        "back": "Geri",
-        "edit": "Redaktə et",
-        "newAudit": "Yeni audit"
+        "overallScore": "Ümumi bal"
       },
       "form": {
         "restaurantName": "Restoran adı",
-        "locationPlaceholder": "Bakı, Nizami küçəsi",
-        "titleEdit": "Restoranı redaktə et",
-        "titleAdd": "Yeni restoran əlavə et",
-        "subtitleEdit": "Restoran məlumatlarını yeniləyin.",
-        "subtitleAdd": "Auditlər üçün yeni restoran yaradın.",
-        "name": "Ad",
-        "location": "Məkan",
-        "status": "Status",
-        "active": "Aktiv",
-        "inactive": "Passiv",
-        "cancel": "Ləğv et",
-        "save": "Yadda saxla",
-        "saving": "Yadda saxlanılır..."
+        "locationPlaceholder": "Bakı, Nizami küçəsi"
       },
       "list": {
         "title": "Restoranlar",

@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const Candidate = require("../models/candidate.model");
+const {
+  notifyCandidateRecordStatus,
+} = require("../services/candidateNotification.service");
 
 const candidateStatusValues =
   Candidate.schema.path("status").enumValues;
@@ -42,10 +45,14 @@ function normalizeArray(value) {
 }
 
 function normalizeStatus(value) {
-  const status = normalizeString(value).toLowerCase();
+  let status = normalizeString(value).toLowerCase();
 
   if (!status) {
     return "applied";
+  }
+
+  if (status === "offered") {
+    status = "offer";
   }
 
   return candidateStatusValues.includes(status)
@@ -306,6 +313,18 @@ exports.updateCandidate = async (req, res) => {
      * createdBy
      * assignedTo
      */
+    let previousStatus = null;
+
+    if (update.status !== undefined) {
+      const existingCandidate = await Candidate.findOne(
+        buildScopedQuery(req, { _id: id })
+      )
+        .select("status")
+        .lean();
+
+      previousStatus = existingCandidate?.status || null;
+    }
+
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: id,
@@ -321,6 +340,18 @@ exports.updateCandidate = async (req, res) => {
       return res.status(404).json({
         message:
           "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
+    if (
+      update.status !== undefined &&
+      previousStatus !== null &&
+      previousStatus !== updated.status
+    ) {
+      await notifyCandidateRecordStatus({
+        candidate: updated,
+        status: updated.status,
+        actor: req.user,
       });
     }
 
@@ -359,21 +390,26 @@ exports.updateCandidateStatus = async (req, res) => {
       });
     }
 
-    const updated = await Candidate.findOneAndUpdate(
-      buildScopedQuery(req, {
-        _id: id,
-      }),
-      { status },
-      {
-        new: true,
-        runValidators: true,
-      }
+    const candidate = await Candidate.findOne(
+      buildScopedQuery(req, { _id: id })
     );
 
-    if (!updated) {
+    if (!candidate) {
       return res.status(404).json({
         message:
           "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
+    const statusChanged = candidate.status !== status;
+    candidate.status = status;
+    const updated = await candidate.save();
+
+    if (statusChanged) {
+      await notifyCandidateRecordStatus({
+        candidate: updated,
+        status,
+        actor: req.user,
       });
     }
 

@@ -64,7 +64,7 @@ const RestaurantDetail: React.FC = () => {
   }
 
   if (!restaurant) {
-    return <EmptyState icon={<Store size={28} />} title={t("audit.restaurants.detail.notFound")} hint={t("audit.restaurants.detail.deletedHint")} />;
+    return <EmptyState icon={<Store size={28} />} title={t("audit.restaurants.detail.notFound")} hint="It may have been deleted." />;
   }
 
   return (
@@ -75,7 +75,7 @@ const RestaurantDetail: React.FC = () => {
         actions={
           <>
             <button className="btn-secondary" onClick={() => navigate("/app/audit/restaurants")}>
-              <ArrowLeft size={15} /> {t("audit.restaurants.detail.back")}
+              <ArrowLeft size={15} /> Back
             </button>
             {canManage && (
               <>
@@ -83,13 +83,13 @@ const RestaurantDetail: React.FC = () => {
                   className="btn-secondary"
                   onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}/edit`)}
                 >
-                  <Pencil size={15} /> {t("audit.restaurants.detail.edit")}
+                  <Pencil size={15} /> Edit
                 </button>
                 <button
                   className="btn-add"
                   onClick={() => navigate(`/app/audit/audits/new?restaurantId=${restaurant.id}`)}
                 >
-                  <Plus size={15} /> {t("audit.restaurants.detail.newAudit")}
+                  <Plus size={15} /> New audit
                 </button>
               </>
             )}

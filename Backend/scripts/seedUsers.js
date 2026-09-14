@@ -1,4 +1,10 @@
-require("dotenv").config();
+const path = require("path");
+
+require("dotenv").config({
+  path:
+    process.env.BACKEND_ENV_FILE ||
+    path.resolve(__dirname, "../.env"),
+});
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -9,7 +15,7 @@ const users = [
   {
     name: "Admin User",
     email: "admin@inop.com",
-    password: "password123",
+    passwordEnv: "SEED_ADMIN_PASSWORD",
     role: "admin",
     departmentId: "dep_ops",
     position: "System Administrator",
@@ -18,8 +24,8 @@ const users = [
   {
     name: "Aysel Huseynova",
     email: "hr@inop.com",
-    password: "password123",
-    role: "hr",
+    passwordEnv: "SEED_HR_PASSWORD",
+    role: "hr_manager",
     departmentId: "dep_hr",
     position: "HR Manager",
     isActive: true,
@@ -27,7 +33,7 @@ const users = [
   {
     name: "Kamran Aliyev",
     email: "auditor@inop.com",
-    password: "password123",
+    passwordEnv: "SEED_AUDITOR_PASSWORD",
     role: "auditor",
     departmentId: "dep_ops",
     position: "Field Auditor",
@@ -36,7 +42,7 @@ const users = [
   {
     name: "Nigar Mammadova",
     email: "manager@inop.com",
-    password: "password123",
+    passwordEnv: "SEED_MANAGER_PASSWORD",
     role: "manager",
     departmentId: "dep_ops",
     position: "Operations Manager",
@@ -52,32 +58,61 @@ async function seedUsers() {
   }
 
   await mongoose.connect(mongoUri);
-
   console.log("MongoDB connected.");
 
   for (const input of users) {
     const email = input.email.toLowerCase();
-
+    const password = String(process.env[input.passwordEnv] || "");
     const existingUser = await User.findOne({ email }).select("+password");
 
+    if (password && password.length < 10) {
+      throw new Error(
+        `${input.passwordEnv} must contain at least 10 characters.`
+      );
+    }
+
     if (existingUser) {
-      console.log(`SKIP: ${email} already exists.`);
+      existingUser.name = input.name;
+      existingUser.role = input.role;
+      existingUser.departmentId = input.departmentId;
+      existingUser.position = input.position;
+      existingUser.isActive = input.isActive;
+
+      if (password) {
+        existingUser.password = await bcrypt.hash(password, 12);
+      }
+
+      await existingUser.save();
+
+      console.log(
+        `UPDATED: ${email} (${input.role})${password ? " + password" : ""}`
+      );
       continue;
     }
 
-    const hashedPassword = await bcrypt.hash(input.password, 12);
+    if (!password) {
+      console.log(
+        `SKIP CREATE: ${email}. Set ${input.passwordEnv} before creating this seed user.`
+      );
+      continue;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     await User.create({
-      ...input,
+      name: input.name,
       email,
       password: hashedPassword,
+      role: input.role,
+      departmentId: input.departmentId,
+      position: input.position,
+      isActive: input.isActive,
     });
 
     console.log(`CREATED: ${email} (${input.role})`);
   }
 
   const count = await User.countDocuments();
-
   console.log(`Total users in database: ${count}`);
 
   await mongoose.disconnect();

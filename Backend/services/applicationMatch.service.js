@@ -140,6 +140,17 @@ function calculateApplicationMatch(job, candidate) {
   };
 }
 
+function calculateCvMatch(job, cvText) {
+  const { parseStructuredCv } = require("./cvStructuredParser.service");
+  const parsedCandidate = parseStructuredCv(cvText);
+
+  return {
+    parsedCandidate,
+    match: calculateApplicationMatch(job, parsedCandidate),
+  };
+}
+
 module.exports = {
   calculateApplicationMatch,
+  calculateCvMatch,
 };

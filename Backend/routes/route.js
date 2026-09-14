@@ -47,6 +47,11 @@ const auditNotificationRoutes = require('./auditNotification.routes');
 const auditApprovalRoutes = require('./auditApproval.routes');
 const auditClosureRoutes = require('./auditClosure.routes');
 const auditExportRoutes = require('./auditExport.routes');
+const auditActionRoutes = require('./auditAction.routes');
+const auditExecutionRoutes = require('./auditExecution.routes');
+const candidateExportRoutes = require('./candidateExport.routes');
+const candidatePipelineController = require('../controllers/candidatePipeline.controller');
+const notificationLogController = require('../controllers/notificationLog.controller');
 
 router.use('/auth', authRoutes);
 
@@ -76,6 +81,11 @@ router.use('/audit-notification', auditNotificationRoutes);
 router.use('/audit-approval', auditApprovalRoutes);
 router.use('/audit-closure', auditClosureRoutes);
 router.use('/audit-export', auditExportRoutes);
+router.use('/audit-actions', auditActionRoutes);
+router.use('/audit-executions', auditExecutionRoutes);
+// Backward-compatible aliases used by the current frontend client.
+router.use('/audit-action', auditActionRoutes);
+router.use('/audit-execution', auditExecutionRoutes);
 
 router.use(
 '/audit-findings',
@@ -247,12 +257,23 @@ router.delete(
   jobsController.deleteJob
 );
 
+router.use('/candidate-export', candidateExportRoutes);
+
 // CV parsing / preview endpoint
 router.post(
   '/candidates/parse-cv',
   ...authorize('candidate', 'read'),
   cvParseUpload,
   cvController.parseCv
+);
+
+// Complete CV pipeline: upload -> parse -> candidate -> optional application/match
+router.post(
+  '/candidates/from-cv',
+  ...authorize('candidate', 'create'),
+  ...authorize('application', 'create'),
+  cvUpload.single('cv'),
+  candidatePipelineController.createCandidateFromCv
 );
 
 // Candidates Endpoints
@@ -291,6 +312,13 @@ router.delete(
   '/candidates/:id',
   ...authorize('candidate', 'delete'),
   candidatesController.deleteCandidate
+);
+
+// Candidate email notification logs
+router.get(
+  '/notification-logs',
+  ...authorize('application', 'read'),
+  notificationLogController.getNotificationLogs
 );
 
 // Applications Endpoints

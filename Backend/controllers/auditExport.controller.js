@@ -6,6 +6,9 @@ const Audit = require("../models/audit.model");
 const AuditFinding = require("../models/auditFinding.model");
 const AuditApproval = require("../models/auditApproval.model");
 const AuditClosure = require("../models/auditClosure.model");
+const {
+  getAssignedAuditFilter,
+} = require("../middleware/auditScope.middleware");
 
 function getOptionalModel(name) {
   try {
@@ -633,3 +636,131 @@ exports.exportPdf = async (req, res) => {
     res.end();
   }
 };
+
+
+function parseDate(value, endOfDay = false) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  if (endOfDay) {
+    date.setHours(23, 59, 59, 999);
+  }
+
+  return date;
+}
+
+async function buildAuditListFilter(req) {
+  const scopeFilter = await getAssignedAuditFilter(req);
+
+  if (scopeFilter === null) {
+    const error = new Error("Audit scope cannot be resolved.");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const filter = { ...(scopeFilter || {}) };
+  const { status, auditType, restaurantId, auditorId, from, to } = req.query;
+
+  if (status) filter.status = String(status).trim();
+  if (auditType) filter.auditType = String(auditType).trim();
+  if (restaurantId) filter.restaurantId = String(restaurantId).trim();
+  if (auditorId) filter.auditorId = String(auditorId).trim();
+
+  const fromDate = parseDate(from);
+  const toDate = parseDate(to, true);
+
+  if (fromDate || toDate) {
+    filter.createdAt = {};
+    if (fromDate) filter.createdAt.$gte = fromDate;
+    if (toDate) filter.createdAt.$lte = toDate;
+  }
+
+  return filter;
+}
+
+function auditListRow(audit) {
+  return {
+    ID: safeValue(audit._id),
+    AuditCode: safeValue(audit.id),
+    Type: safeValue(audit.auditType),
+    Status: safeValue(audit.status),
+    Restaurant: safeValue(audit.restaurantId),
+    Auditor: safeValue(audit.auditorId),
+    Date: safeValue(audit.date),
+    OverallPercentage: safeValue(audit.overallPercentage),
+    CreatedAt: safeValue(audit.createdAt),
+  };
+}
+
+exports.exportAuditListCsv = async (req, res) => {
+  try {
+    const audits = await Audit.find(await buildAuditListFilter(req))
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const rows = audits.map(auditListRow);
+    const headers = Object.keys(rows[0] || auditListRow({}));
+    const csv = [
+      headers.join(","),
+      ...rows.map((row) =>
+        headers.map((header) => csvEscape(row[header])).join(",")
+      ),
+    ].join("\n");
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="audits-filtered.csv"'
+    );
+
+    return res.send("\ufeff" + csv);
+  } catch (error) {
+    console.error("Filtered audit CSV export error:", error);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: "Filtered audit export zamanı server xətası baş verdi.",
+    });
+  }
+};
+
+exports.exportAuditListExcel = async (req, res) => {
+  try {
+    const audits = await Audit.find(await buildAuditListFilter(req))
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const rows = audits.map(auditListRow);
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(
+      rows.length ? rows : [{ Message: "No audits found" }]
+    );
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Audits");
+
+    const buffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="audits-filtered.xlsx"'
+    );
+
+    return res.send(buffer);
+  } catch (error) {
+    console.error("Filtered audit Excel export error:", error);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: "Filtered audit Excel export zamanı server xətası baş verdi.",
+    });
+  }
+};
+
+module.exports.buildAuditListFilter = buildAuditListFilter;

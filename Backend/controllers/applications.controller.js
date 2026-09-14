@@ -5,6 +5,9 @@ const Job = require("../models/job.model");
 const {
   calculateApplicationMatch,
 } = require("../services/applicationMatch.service");
+const {
+  notifyCandidateStatus,
+} = require("../services/candidateNotification.service");
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -183,23 +186,46 @@ exports.updateApplicationStatus = async (req, res) => {
       });
     }
 
-    const updated = await Application.findOneAndUpdate(
+    const application = await Application.findOne(
       buildScopedQuery(req, {
         _id: req.params.id,
-      }),
-      { status },
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .populate("jobId")
-      .populate("candidateId");
+      })
+    );
 
-    if (!updated) {
+    if (!application) {
       return res.status(404).json({
         message:
           "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
+    const statusChanged = application.status !== status;
+    application.status = status;
+    await application.save();
+
+    const candidateStatusMap = {
+      Applied: "applied",
+      Screening: "screening",
+      Shortlisted: "shortlisted",
+      Interview: "interview",
+      Offered: "offer",
+      Hired: "hired",
+      Rejected: "rejected",
+    };
+
+    await Candidate.updateOne(
+      { _id: application.candidateId },
+      { status: candidateStatusMap[status] }
+    );
+
+    const updated = await Application.findById(application._id)
+      .populate("jobId")
+      .populate("candidateId");
+
+    if (statusChanged) {
+      await notifyCandidateStatus({
+        application: updated,
+        actor: req.user,
       });
     }
 

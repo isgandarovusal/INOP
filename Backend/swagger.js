@@ -5,7 +5,7 @@ const swaggerSpec = {
 
   info: {
     title: "INOP — Internal Operations Platform API",
-    version: "1.0.0",
+    version: "1.1.0",
     description:
       "Internal Operations Platform API for authentication, recruitment, audits, analytics, notifications and operational data management.",
   },
@@ -29,6 +29,8 @@ const swaggerSpec = {
     { name: "Audit Documents" },
     { name: "Audit Notifications" },
     { name: "Audit Exports" },
+    { name: "Recruitment Exports" },
+    { name: "Notifications" },
     { name: "Restaurants" },
   ],
 
@@ -1502,9 +1504,18 @@ const swaggerSpec = {
     "/audit-dashboard": {
       get: {
         tags: ["Audit Analytics"],
-        summary: "Get audit dashboard",
+        summary: "Get filterable audit dashboard",
+        parameters: [
+          { name: "status", in: "query", schema: { type: "string" } },
+          { name: "auditType", in: "query", schema: { type: "string" } },
+          { name: "auditorId", in: "query", schema: { type: "string" } },
+          { name: "restaurantId", in: "query", schema: { type: "string" } },
+          { name: "from", in: "query", schema: { type: "string", format: "date" } },
+          { name: "to", in: "query", schema: { type: "string", format: "date" } },
+        ],
         responses: {
           200: { description: "Dashboard data" },
+          403: { description: "Access denied" },
         },
       },
     },
@@ -1922,6 +1933,187 @@ const swaggerSpec = {
         },
       },
     },
+    "/auth/logout": {
+      post: {
+        tags: ["Authentication"],
+        summary: "Logout and revoke the current JWT",
+        responses: {
+          200: { description: "Token revoked" },
+          401: { description: "Authentication required" },
+        },
+      },
+    },
+
+    "/candidates/from-cv": {
+      post: {
+        tags: ["Recruitment"],
+        summary: "Create candidate from CV and optionally create a matched application",
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["cv"],
+                properties: {
+                  cv: { type: "string", format: "binary" },
+                  jobId: { type: "string" },
+                  name: { type: "string" },
+                  role: { type: "string" },
+                  email: { type: "string", format: "email" },
+                  phone: { type: "string" },
+                  education: { type: "string" },
+                  experience: { type: "number" },
+                  skills: { type: "string", description: "JSON array or comma-separated list" },
+                  languages: { type: "string", description: "JSON array or comma-separated list" },
+                  certificates: { type: "string", description: "JSON array or comma-separated list" },
+                  notes: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Candidate and optional application created" },
+          400: { description: "Invalid input" },
+          422: { description: "CV could not provide required candidate fields" },
+        },
+      },
+    },
+
+    "/candidate-export/csv": {
+      get: {
+        tags: ["Recruitment Exports"],
+        summary: "Export filtered candidates as CSV",
+        parameters: [
+          { name: "status", in: "query", schema: { type: "string" } },
+          { name: "role", in: "query", schema: { type: "string" } },
+          { name: "q", in: "query", schema: { type: "string" } },
+          { name: "from", in: "query", schema: { type: "string", format: "date" } },
+          { name: "to", in: "query", schema: { type: "string", format: "date" } },
+        ],
+        responses: { 200: { description: "Candidate CSV" } },
+      },
+    },
+
+    "/candidate-export/excel": {
+      get: {
+        tags: ["Recruitment Exports"],
+        summary: "Export filtered candidates as Excel",
+        responses: { 200: { description: "Candidate XLSX" } },
+      },
+    },
+
+    "/candidate-export/{candidateId}/pdf": {
+      get: {
+        tags: ["Recruitment Exports"],
+        summary: "Export one candidate report as PDF",
+        parameters: [
+          {
+            name: "candidateId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Candidate PDF" },
+          404: { description: "Candidate not found" },
+        },
+      },
+    },
+
+    "/notification-logs": {
+      get: {
+        tags: ["Notifications"],
+        summary: "List candidate email delivery logs",
+        parameters: [
+          { name: "status", in: "query", schema: { type: "string", enum: ["sent", "skipped", "failed"] } },
+          { name: "type", in: "query", schema: { type: "string" } },
+          { name: "recipient", in: "query", schema: { type: "string" } },
+          { name: "from", in: "query", schema: { type: "string", format: "date" } },
+          { name: "to", in: "query", schema: { type: "string", format: "date" } },
+        ],
+        responses: { 200: { description: "Notification log page" } },
+      },
+    },
+
+    "/audit-actions": {
+      post: {
+        tags: ["Audit Workflow"],
+        summary: "Create corrective audit action",
+        responses: { 201: { description: "Action created" } },
+      },
+    },
+
+    "/audit-actions/audit/{auditId}": {
+      get: {
+        tags: ["Audit Workflow"],
+        summary: "List actions for an audit",
+        parameters: [
+          { name: "auditId", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Audit actions" } },
+      },
+    },
+
+    "/audit-actions/{id}/status": {
+      put: {
+        tags: ["Audit Workflow"],
+        summary: "Update corrective action status",
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Action updated" } },
+      },
+    },
+
+    "/audit-executions": {
+      post: {
+        tags: ["Audit Workflow"],
+        summary: "Create audit execution",
+        responses: { 201: { description: "Execution created" } },
+      },
+    },
+
+    "/audit-executions/{id}": {
+      get: {
+        tags: ["Audit Workflow"],
+        summary: "Get audit execution",
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Execution" } },
+      },
+    },
+
+    "/audit-executions/{id}/submit": {
+      put: {
+        tags: ["Audit Workflow"],
+        summary: "Submit audit execution and calculate risk",
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Execution submitted" } },
+      },
+    },
+
+    "/audit-export/list/csv": {
+      get: {
+        tags: ["Audit Exports"],
+        summary: "Export filtered audit list as CSV",
+        responses: { 200: { description: "Filtered audit CSV" } },
+      },
+    },
+
+    "/audit-export/list/excel": {
+      get: {
+        tags: ["Audit Exports"],
+        summary: "Export filtered audit list as Excel",
+        responses: { 200: { description: "Filtered audit XLSX" } },
+      },
+    },
+
   },
 };
 

@@ -10,7 +10,9 @@ const {
 const { authorize } = require("../middleware/authorization.middleware");
 const {
   requireAssignedAuditAccess,
+  requireAssignedResourceAuditAccess,
 } = require("../middleware/auditScope.middleware");
+const AuditExecution = require("../models/auditExecution.model");
 
 router.post(
   "/",
@@ -22,15 +24,19 @@ router.post(
 router.get(
   "/:id",
   ...authorize("audit.execution", "read"),
-  requireAssignedAuditAccess,
+  requireAssignedResourceAuditAccess(AuditExecution),
   getExecution
 );
 
-router.put(
-  "/:id/submit",
+const submitMiddleware = [
   ...authorize("audit.execution", "update"),
-  requireAssignedAuditAccess,
-  submitExecution
-);
+  requireAssignedResourceAuditAccess(AuditExecution),
+  submitExecution,
+];
+
+// PUT is the canonical API. PATCH is retained for compatibility with the
+// existing frontend client and behaves identically.
+router.put("/:id/submit", ...submitMiddleware);
+router.patch("/:id/submit", ...submitMiddleware);
 
 module.exports = router;

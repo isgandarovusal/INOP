@@ -7,6 +7,19 @@ const {
   requireAssignedAuditAccess,
 } = require("../middleware/auditScope.middleware");
 
+
+router.get(
+  "/list/csv",
+  ...authorize("audit.export", "read"),
+  controller.exportAuditListCsv
+);
+
+router.get(
+  "/list/excel",
+  ...authorize("audit.export", "read"),
+  controller.exportAuditListExcel
+);
+
 router.get(
   "/:auditId/csv",
   ...authorize("audit.export", "read"),
