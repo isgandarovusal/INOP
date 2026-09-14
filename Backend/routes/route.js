@@ -48,6 +48,7 @@ const auditNotificationRoutes = require('./auditNotification.routes');
 const auditApprovalRoutes = require('./auditApproval.routes');
 const auditClosureRoutes = require('./auditClosure.routes');
 const auditExportRoutes = require('./auditExport.routes');
+const candidateExportRoutes = require("./candidateExport.routes");
 
 router.use('/auth', authRoutes);
 
@@ -77,6 +78,7 @@ router.use('/audit-notification', auditNotificationRoutes);
 router.use('/audit-approval', auditApprovalRoutes);
 router.use('/audit-closure', auditClosureRoutes);
 router.use('/audit-export', auditExportRoutes);
+router.use("/candidate-export", candidateExportRoutes);
 
 router.use(
 '/audit-findings',

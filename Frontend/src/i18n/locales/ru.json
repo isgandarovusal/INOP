@@ -311,7 +311,12 @@
       "years": "лет",
       "loadingError": "Произошла ошибка при загрузке кандидатов.",
       "statusUpdated": "Статус обновлён",
-      "statusUpdateError": "Произошла ошибка при обновлении статуса."
+      "statusUpdateError": "Произошла ошибка при обновлении статуса.",
+      "exportExcel": "Экспорт в Excel",
+      "exportPdf": "Экспорт в PDF",
+      "exporting": "Экспорт...",
+      "exportSuccess": "Файл успешно экспортирован.",
+      "exportError": "Произошла ошибка при экспорте файла."
     },
     "candidateStatus": {
       "new": "Новый",

@@ -319,3 +319,27 @@ export async function deleteCandidate(
 ): Promise<void> {
   await API.delete(`/candidates/${id}`);
 }
+
+export async function exportCandidatesExcel(): Promise<Blob> {
+  const response = await API.get(
+    "/candidate-export/excel",
+    {
+      responseType: "blob",
+    }
+  );
+
+  return response.data;
+}
+
+export async function exportCandidatePdf(
+  id: string
+): Promise<Blob> {
+  const response = await API.get(
+    `/candidate-export/${id}/pdf`,
+    {
+      responseType: "blob",
+    }
+  );
+
+  return response.data;
+}

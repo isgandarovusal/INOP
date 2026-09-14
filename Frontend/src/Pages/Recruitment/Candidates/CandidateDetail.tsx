@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   AlertCircle,
   ArrowLeft,
+  FileDown,
   FileText,
   Loader2,
   RefreshCw,
@@ -14,12 +15,14 @@ import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import {
   deleteCandidate,
+  exportCandidatePdf,
   getCandidateById,
 } from "../../../Services/candidatesService";
 import type { Candidate } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
+import { downloadBlob } from "../../../Utils/downloadFile";
 
 const CandidateDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -31,9 +34,11 @@ const CandidateDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const canUpdate = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
+  const canExportPdf = hasPermission(user, "application", "read");
 
   const loadCandidate = useCallback(async () => {
     if (!id) {
@@ -118,6 +123,32 @@ const CandidateDetail: React.FC = () => {
     };
   }, [id, t]);
 
+  const handleExportPdf = async () => {
+    if (!candidate || !canExportPdf || exporting) return;
+
+    try {
+      setExporting(true);
+
+      const blob = await exportCandidatePdf(candidate.id);
+
+      downloadBlob(
+        blob,
+        `candidate-${candidate.id}.pdf`,
+      );
+
+      toast.success(t("recruitment.candidates.exportSuccess"));
+    } catch (err: unknown) {
+      toast.error(
+        getErrorMessage(
+          err,
+          t("recruitment.candidates.exportError"),
+        ),
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!candidate || !canDelete) return;
 
@@ -200,6 +231,24 @@ const CandidateDetail: React.FC = () => {
         }
         actions={
           <>
+            {canExportPdf && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleExportPdf}
+                disabled={exporting}
+              >
+                {exporting ? (
+                  <Loader2 size={16} className="spin" />
+                ) : (
+                  <FileDown size={16} />
+                )}
+                {exporting
+                  ? t("recruitment.candidates.exporting")
+                  : t("recruitment.candidates.exportPdf")}
+              </button>
+            )}
+
             {canUpdate && (
               <button
                 type="button"

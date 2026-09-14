@@ -336,7 +336,12 @@
       "actions": "Əməliyyatlar",
       "deleteConfirm": "namizədini silmək istədiyinizə əminsiniz?",
       "deleted": "Namizəd silindi.",
-      "deleteError": "Namizəd silinərkən xəta baş verdi."
+      "deleteError": "Namizəd silinərkən xəta baş verdi.",
+      "exportExcel": "Excel-ə ixrac et",
+      "exportPdf": "PDF-ə ixrac et",
+      "exporting": "İxrac edilir...",
+      "exportSuccess": "Fayl uğurla ixrac edildi.",
+      "exportError": "Fayl ixrac edilərkən xəta baş verdi."
     },
     "candidateStatus": {
       "new": "Yeni",

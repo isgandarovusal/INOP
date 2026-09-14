@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
+  FileSpreadsheet,
   LayoutGrid,
   List,
   Loader2,
@@ -16,6 +17,7 @@ import KanbanBoard from "../../../Components/KanbanBoard";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
   deleteCandidate,
+  exportCandidatesExcel,
   getCandidates,
   updateCandidateStatus,
 } from "../../../Services/candidatesService";
@@ -23,6 +25,7 @@ import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { downloadBlob } from "../../../Utils/downloadFile";
 
 const CandidatesList: React.FC = () => {
   const { t } = useTranslation();
@@ -35,6 +38,7 @@ const CandidatesList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const canCreate = hasPermission(user, "candidate", "create");
   const canUpdate = hasPermission(user, "candidate", "update");
@@ -120,6 +124,29 @@ const CandidatesList: React.FC = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    if (exporting) return;
+
+    try {
+      setExporting(true);
+
+      const blob = await exportCandidatesExcel();
+
+      downloadBlob(blob, "candidates.xlsx");
+
+      toast.success(t("recruitment.candidates.exportSuccess"));
+    } catch (err: unknown) {
+      toast.error(
+        getErrorMessage(
+          err,
+          t("recruitment.candidates.exportError"),
+        ),
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleDelete = async (
     event: React.MouseEvent<HTMLButtonElement>,
     candidate: Candidate,
@@ -173,17 +200,36 @@ const CandidatesList: React.FC = () => {
         title={t("recruitment.candidates.title")}
         subtitle={t("recruitment.candidates.subtitle")}
         actions={
-          canCreate ? (
+          <>
             <button
-              className="btn-primary"
-              onClick={() =>
-                navigate("/app/recruitment/candidates/new")
-              }
+              type="button"
+              className="btn-secondary"
+              onClick={handleExportExcel}
+              disabled={exporting}
             >
-              <Plus size={16} />
-              {t("recruitment.candidates.newCandidate")}
+              {exporting ? (
+                <Loader2 size={16} className="spin" />
+              ) : (
+                <FileSpreadsheet size={16} />
+              )}
+              {exporting
+                ? t("recruitment.candidates.exporting")
+                : t("recruitment.candidates.exportExcel")}
             </button>
-          ) : null
+
+            {canCreate && (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() =>
+                  navigate("/app/recruitment/candidates/new")
+                }
+              >
+                <Plus size={16} />
+                {t("recruitment.candidates.newCandidate")}
+              </button>
+            )}
+          </>
         }
       />
 

@@ -311,7 +311,12 @@
       "years": "years",
       "loadingError": "An error occurred while loading candidates.",
       "statusUpdated": "Status updated",
-      "statusUpdateError": "An error occurred while updating the status."
+      "statusUpdateError": "An error occurred while updating the status.",
+      "exportExcel": "Export to Excel",
+      "exportPdf": "Export to PDF",
+      "exporting": "Exporting...",
+      "exportSuccess": "File exported successfully.",
+      "exportError": "An error occurred while exporting the file."
     },
     "candidateStatus": {
       "new": "New",
