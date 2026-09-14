@@ -1,3 +1,22 @@
+<<<<<<< HEAD
 .env
 node_modules/
 uploads/
+=======
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+.DS_Store
+
+uploads/*
+!uploads/.gitkeep
+>>>>>>> 3e8e70665c032f00c1faf98c380eefa6b2ad9977

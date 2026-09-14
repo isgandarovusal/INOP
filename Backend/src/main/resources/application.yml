@@ -1,0 +1,16 @@
+server:
+  port: ${PORT:2000}
+
+spring:
+  application:
+    name: backend
+  data:
+    mongodb:
+      uri: ${CS:mongodb://localhost:27017/fbdb}
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 60MB
+
+file:
+  upload-dir: ${UPLOAD_DIR:uploads}
