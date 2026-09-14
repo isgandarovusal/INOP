@@ -35,39 +35,52 @@ export default function ServiceAuditsList() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
-  const loadAudits = async () => {
-    setLoading(true);
-
-    try {
-      const params = new URLSearchParams();
-
-      if (status) params.set("status", status);
-      if (restaurantId) params.set("restaurantId", restaurantId);
-      if (from) params.set("from", from);
-      if (to) params.set("to", to);
-
-      const query = params.toString();
-
-      const response = await fetch(
-        `${API}/audit-module/service${query ? `?${query}` : ""}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to load service audits");
-      }
-
-      const result = await response.json();
-      setAudits(result.data || []);
-    } catch (error) {
-      console.error("Failed to load service audits:", error);
-      setAudits([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadAudits();
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+
+      try {
+        const params = new URLSearchParams();
+
+        if (status) params.set("status", status);
+        if (restaurantId) params.set("restaurantId", restaurantId);
+        if (from) params.set("from", from);
+        if (to) params.set("to", to);
+
+        const query = params.toString();
+
+        const response = await fetch(
+          `${API}/audit-module/service${query ? `?${query}` : ""}`,
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load service audits");
+        }
+
+        const result = await response.json();
+
+        if (!cancelled) {
+          setAudits(result.data || []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load service audits:", error);
+          setAudits([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [status, restaurantId, from, to]);
 
   const restaurants = useMemo(

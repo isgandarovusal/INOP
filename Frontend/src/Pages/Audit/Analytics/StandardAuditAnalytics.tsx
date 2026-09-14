@@ -48,7 +48,7 @@ const StandardAuditAnalytics: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   const findings = data
     ? [

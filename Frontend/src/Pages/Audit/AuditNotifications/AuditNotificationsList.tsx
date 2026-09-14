@@ -5,7 +5,8 @@ import {
 
 import {
  getAuditNotifications,
- markNotificationRead
+ markNotificationRead,
+ type AuditNotification,
 }
 from "../../../Services/auditNotificationService";
 
@@ -15,7 +16,7 @@ export default function AuditNotificationsList(){
  const [
   notifications,
   setNotifications
- ] = useState<any[]>([]);
+ ] = useState<AuditNotification[]>([]);
 
 
  const [

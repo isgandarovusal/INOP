@@ -45,7 +45,7 @@ const ServiceAuditAnalytics: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   return (
     <div>

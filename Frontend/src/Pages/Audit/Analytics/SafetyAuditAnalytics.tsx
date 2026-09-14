@@ -47,7 +47,7 @@ const SafetyAuditAnalytics: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   return (
     <div>

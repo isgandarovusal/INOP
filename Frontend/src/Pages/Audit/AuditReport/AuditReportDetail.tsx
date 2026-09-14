@@ -11,7 +11,8 @@ import {
 
 import {
  getAuditReport,
- calculateAuditScore
+ calculateAuditScore,
+ type AuditReport,
 } from "../../../Services/auditReportService";
 
 
@@ -28,7 +29,7 @@ export default function AuditReportDetail(){
  const [
   report,
   setReport
- ] = useState<any>(null);
+ ] = useState<AuditReport | null>(null);
 
 
 

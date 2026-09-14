@@ -1,149 +1,157 @@
 import {
- useEffect,
- useState
+  useEffect,
+  useState,
 } from "react";
 
 import {
- getApprovals,
- updateApproval
+  getApprovals,
+  updateApproval,
+} from "../../../Services/auditApprovalService";
+
+
+type ApprovalStatus =
+  | "pending"
+  | "approved"
+  | "rejected";
+
+
+interface AuditApproval {
+  _id: string;
+  status: ApprovalStatus;
+  comment?: string;
 }
-from "../../../Services/auditApprovalService";
+
+
+interface AuditApprovalPanelProps {
+  auditId: string;
+}
 
 
 export default function AuditApprovalPanel(
-{
- auditId
-}:{
- auditId:string
-}){
-
-
-const [
- approvals,
- setApprovals
-]=useState<any[]>([]);
-
-
-const load =
-async()=>{
-
- const res =
- await getApprovals(
-  auditId
- );
-
-
- setApprovals(
-  res.data || []
- );
-
-};
-
-
-useEffect(()=>{
-
- load();
-
-},[auditId]);
-
-
-
-
-async function changeStatus(
- id:string,
- status:string
-){
-
- await updateApproval(
-  id,
   {
-   status
+    auditId,
+  }: AuditApprovalPanelProps
+) {
+
+  const [
+    approvals,
+    setApprovals,
+  ] = useState<AuditApproval[]>([]);
+
+
+  useEffect(() => {
+
+    const load = async () => {
+
+      const res = await getApprovals(
+        auditId
+      );
+
+      setApprovals(
+        res.data || []
+      );
+
+    };
+
+    void load();
+
+  }, [auditId]);
+
+
+  async function changeStatus(
+    id: string,
+    status: ApprovalStatus
+  ) {
+
+    await updateApproval(
+      id,
+      {
+        status,
+      }
+    );
+
+    const res = await getApprovals(
+      auditId
+    );
+
+    setApprovals(
+      res.data || []
+    );
+
   }
- );
 
 
- load();
+  return (
+    <div className="detail-card">
 
-}
-
-
-
-return (
-
-<div className="detail-card">
-
-<h3>
- Audit Approval
-</h3>
+      <h3>
+        Audit Approval
+      </h3>
 
 
-{
-approvals.length===0
-?
-<p>
-No approval requests
-</p>
-:
-approvals.map(
- item=>(
+      {
+        approvals.length === 0
+          ?
+          <p>
+            No approval requests
+          </p>
+          :
+          approvals.map(
+            (item) => (
 
-<div
-key={item._id}
-className="detail-row"
->
+              <div
+                key={item._id}
+                className="detail-row"
+              >
 
+                <div>
 
-<div>
+                  <strong>
+                    {item.status}
+                  </strong>
 
-<strong>
-{item.status}
-</strong>
+                  <p>
+                    {item.comment}
+                  </p>
 
-
-<p>
-{item.comment}
-</p>
-
-</div>
+                </div>
 
 
-<div>
+                <div>
 
-<button
-onClick={()=>changeStatus(
- item._id,
- "approved"
-)}
->
-Approve
-</button>
-
-
-<button
-onClick={()=>changeStatus(
- item._id,
- "rejected"
-)}
->
-Reject
-</button>
+                  <button
+                    onClick={() =>
+                      changeStatus(
+                        item._id,
+                        "approved"
+                      )
+                    }
+                  >
+                    Approve
+                  </button>
 
 
-</div>
+                  <button
+                    onClick={() =>
+                      changeStatus(
+                        item._id,
+                        "rejected"
+                      )
+                    }
+                  >
+                    Reject
+                  </button>
+
+                </div>
+
+              </div>
+
+            )
+          )
+      }
 
 
-</div>
-
-)
-
-)
-
-}
-
-
-</div>
-
-);
-
+    </div>
+  );
 
 }

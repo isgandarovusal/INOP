@@ -4,7 +4,8 @@ import {
 } from "react";
 
 import {
- getFindings
+ getFindings,
+ type AuditFinding,
 } from "../../../Services/auditFindingService";
 
 
@@ -16,7 +17,7 @@ export default function AuditFindingsList(
 }){
 
 
-const [items,setItems]=useState<any[]>([]);
+const [items,setItems]=useState<AuditFinding[]>([]);
 
 
 useEffect(()=>{

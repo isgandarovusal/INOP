@@ -27,10 +27,12 @@ const RestaurantForm: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    setLoading(true);
+    let cancelled = false;
 
     getRestaurantById(id)
       .then((restaurant) => {
+        if (cancelled) return;
+
         if (!restaurant) {
           setError("Restaurant not found.");
           return;
@@ -41,12 +43,19 @@ const RestaurantForm: React.FC = () => {
         setStatus(restaurant.status ?? "active");
       })
       .catch(() => {
-        setError("Failed to load restaurant.");
+        if (!cancelled) {
+          setError("Failed to load restaurant.");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
 
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
 

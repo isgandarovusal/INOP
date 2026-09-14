@@ -8,13 +8,18 @@ const API =
  import.meta.env.VITE_API_BASE_URL ||
  "http://localhost:3001/api";
 
-
+interface OccupationalSafetyAudit {
+  _id: string;
+  status: string;
+  auditType: string;
+  createdAt: string;
+}
 
 export default function OccupationalSafetyAuditsList(){
   const { t } = useTranslation();
 
 
- const [audits,setAudits]=useState<any[]>([]);
+ const [audits,setAudits]=useState<OccupationalSafetyAudit[]>([]);
 
  const [loading,setLoading]=useState(true);
 

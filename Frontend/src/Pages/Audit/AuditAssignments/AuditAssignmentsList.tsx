@@ -1,74 +1,46 @@
 import {
- useEffect,
- useState
+  useEffect,
+  useState,
 } from "react";
 
-
 import {
- getAssignments
+  getAssignments,
+  type AuditAssignment,
 } from "../../../Services/auditAssignmentService";
 
-
-
-export default function AuditAssignmentsList(
-{
-auditId
-}:{
-auditId:string
-}){
-
-
-const [data,setData]=useState<any[]>([]);
-
-
-
-useEffect(()=>{
-
-getAssignments(auditId)
-.then(r=>{
-setData(r.data||[]);
-});
-
-
-},[auditId]);
-
-
-
-return (
-
-<div>
-
-<h2>
-Audit Assignments
-</h2>
-
-
-{
-data.map(x=>(
-
-<div
-className="audit-card"
-key={x._id}
->
-
-Auditor:
-{x.auditor?.name || "Unknown"}
-
-<br/>
-
-Status:
-{x.status}
-
-
-</div>
-
-))
-
+interface AuditAssignmentsListProps {
+  auditId: string;
 }
 
+export default function AuditAssignmentsList({
+  auditId,
+}: AuditAssignmentsListProps) {
+  const [data, setData] = useState<AuditAssignment[]>([]);
 
-</div>
+  useEffect(() => {
+    getAssignments(auditId).then((response) => {
+      setData(response.data || []);
+    });
+  }, [auditId]);
 
-);
+  return (
+    <div>
+      <h2>Audit Assignments</h2>
 
+      {data.map((assignment) => (
+        <div
+          className="audit-card"
+          key={assignment._id}
+        >
+          Auditor:
+          {assignment.auditor?.name || "Unknown"}
+
+          <br />
+
+          Status:
+          {assignment.status}
+        </div>
+      ))}
+    </div>
+  );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   getAuditHistory,
   type AuditActivity,
@@ -50,7 +50,7 @@ const AuditHistoryPanel = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     if (!auditId) {
       setActivities([]);
       setLoading(false);
@@ -58,7 +58,6 @@ const AuditHistoryPanel = ({
     }
 
     try {
-      setLoading(true);
       setError("");
 
       const response = await getAuditHistory(auditId);
@@ -70,10 +69,45 @@ const AuditHistoryPanel = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [auditId]);
 
   useEffect(() => {
-    loadHistory();
+    let cancelled = false;
+
+    const load = async () => {
+      if (!auditId) {
+        if (!cancelled) {
+          setActivities([]);
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        setError("");
+
+        const response = await getAuditHistory(auditId);
+
+        if (!cancelled) {
+          setActivities(response.data || []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Failed to load audit history:", err);
+          setError("Audit history could not be loaded.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [auditId]);
 
   return (

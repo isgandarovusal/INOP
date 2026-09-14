@@ -9,7 +9,9 @@ import {
 
 import {
  getAuditExecution,
- submitAuditAnswers
+ submitAuditAnswers,
+ type AuditExecution,
+ type AuditExecutionAnswer,
 } from "../../../Services/auditExecutionService";
 
 
@@ -24,13 +26,13 @@ export default function AuditExecutionPage(){
  const [
   execution,
   setExecution
- ] = useState<any>(null);
+ ] = useState<AuditExecution | null>(null);
 
 
  const [
   answers,
   setAnswers
- ] = useState<any[]>([]);
+ ] = useState<AuditExecutionAnswer[]>([]);
 
 
 
@@ -62,7 +64,7 @@ export default function AuditExecutionPage(){
 
  function updateAnswer(
   index:number,
-  value:any
+  value:string
  ){
 
   const copy=[
@@ -126,7 +128,7 @@ export default function AuditExecutionPage(){
 
   {
    execution.checklist?.map(
-    (item:any,index:number)=>(
+    (item,index:number)=>(
 
     <div
      key={index}
