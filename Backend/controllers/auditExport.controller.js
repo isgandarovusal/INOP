@@ -214,9 +214,14 @@ exports.exportCsv = async (req, res) => {
     return res.send("\ufeff" + csv);
 
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
       success: false,
-      message: error.message
+      message:
+        statusCode === 400
+          ? "Audit ID düzgün deyil."
+          : "Audit export zamanı server xətası baş verdi.",
     });
   }
 };
@@ -359,9 +364,14 @@ exports.exportExcel = async (req, res) => {
     return res.send(buffer);
 
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
       success: false,
-      message: error.message
+      message:
+        statusCode === 400
+          ? "Audit ID düzgün deyil."
+          : "Audit export zamanı server xətası baş verdi.",
     });
   }
 };
@@ -609,11 +619,14 @@ exports.exportPdf = async (req, res) => {
 
   } catch (error) {
     if (!res.headersSent) {
-      return res.status(
-        error.statusCode || 500
-      ).json({
+      const statusCode = error.statusCode || 500;
+
+      return res.status(statusCode).json({
         success: false,
-        message: error.message
+        message:
+          statusCode === 400
+            ? "Audit ID düzgün deyil."
+            : "Audit PDF export zamanı server xətası baş verdi.",
       });
     }
 

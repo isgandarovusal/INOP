@@ -37,9 +37,16 @@ exports.createApproval = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Approval məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Approval əməliyyatı zamanı server xətası baş verdi.",
     });
   }
 };
@@ -64,9 +71,16 @@ exports.getApprovals = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Approval məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Approval əməliyyatı zamanı server xətası baş verdi.",
     });
   }
 };
@@ -130,9 +144,16 @@ exports.updateApproval = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Approval məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Approval əməliyyatı zamanı server xətası baş verdi.",
     });
   }
 };

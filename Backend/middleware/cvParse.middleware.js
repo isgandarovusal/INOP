@@ -76,9 +76,7 @@ const handleCvParseUpload = (req, res, next) => {
     }
 
     return res.status(400).json({
-      message:
-        error.message ||
-        "CV faylı qəbul edilərkən xəta baş verdi.",
+      message: "CV faylı qəbul edilərkən xəta baş verdi.",
     });
   });
 };

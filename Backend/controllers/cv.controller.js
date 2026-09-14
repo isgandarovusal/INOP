@@ -37,9 +37,7 @@ exports.parseCv = async (req, res) => {
     console.error("Parse CV error:", error);
 
     return res.status(422).json({
-      message:
-        error.message ||
-        "CV emal edilərkən xəta baş verdi.",
+      message: "CV emal edilərkən xəta baş verdi.",
     });
   }
 };

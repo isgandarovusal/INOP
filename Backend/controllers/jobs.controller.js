@@ -225,9 +225,14 @@ exports.createJob = async (req, res) => {
   } catch (error) {
     console.error("Create job error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message || "Vakansiya yaradılarkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Vakansiya məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Vakansiya yaradılarkən server xətası baş verdi.",
     });
   }
 };
@@ -387,9 +392,14 @@ exports.updateJob = async (req, res) => {
   } catch (error) {
     console.error("Update job error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message || "Vakansiya yenilənərkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Vakansiya məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Vakansiya yenilənərkən server xətası baş verdi.",
     });
   }
 };

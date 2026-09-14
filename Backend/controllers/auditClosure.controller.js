@@ -109,9 +109,16 @@ exports.closeAudit = async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Audit bağlanma məlumatları düzgün deyil.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Audit bağlanarkən server xətası baş verdi.",
     });
   }
 };
@@ -136,9 +143,16 @@ exports.getClosure = async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Audit bağlanma məlumatları düzgün deyil.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Audit bağlanarkən server xətası baş verdi.",
     });
   }
 };

@@ -192,10 +192,14 @@ exports.createCandidate = async (req, res) => {
   } catch (error) {
     console.error("Create candidate error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message ||
-        "Namizəd yaradılarkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Namizəd məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Namizəd yaradılarkən server xətası baş verdi.",
     });
   }
 };
@@ -324,10 +328,14 @@ exports.updateCandidate = async (req, res) => {
   } catch (error) {
     console.error("Update candidate error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message ||
-        "Namizəd yenilənərkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Namizəd məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Namizəd yenilənərkən server xətası baş verdi.",
     });
   }
 };
@@ -373,10 +381,14 @@ exports.updateCandidateStatus = async (req, res) => {
   } catch (error) {
     console.error("Update candidate status error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message ||
-        "Namizəd statusu yenilənərkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Namizəd statusu düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Namizəd statusu yenilənərkən server xətası baş verdi.",
     });
   }
 };

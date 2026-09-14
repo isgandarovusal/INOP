@@ -105,7 +105,6 @@ const getAuditHistory = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve audit history",
-      error: error.message,
     });
   }
 };
@@ -154,7 +153,6 @@ const createActivity = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to create audit activity",
-      error: error.message,
     });
   }
 };
@@ -205,7 +203,6 @@ const getAuditTimeline = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve audit timeline",
-      error: error.message,
     });
   }
 };

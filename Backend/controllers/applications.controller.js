@@ -145,9 +145,14 @@ exports.createApplication = async (req, res) => {
       });
     }
 
-    return res.status(400).json({
-      message:
-        error.message || "Müraciət yaradılarkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Müraciət məlumatları düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Müraciət yaradılarkən server xətası baş verdi.",
     });
   }
 };
@@ -202,10 +207,14 @@ exports.updateApplicationStatus = async (req, res) => {
   } catch (error) {
     console.error("Update application status error:", error);
 
-    return res.status(400).json({
-      message:
-        error.message ||
-        "Müraciət statusu yenilənərkən xəta baş verdi.",
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Müraciət statusu düzgün deyil.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Müraciət statusu yenilənərkən server xətası baş verdi.",
     });
   }
 };
