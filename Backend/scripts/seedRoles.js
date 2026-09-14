@@ -174,7 +174,7 @@ const roles = [
       permission("audit.template", "update", "all"),
       permission("audit.template", "delete", "all"),
 
-      permission("audit.export", "read", "all"),
+      permission("audit.export", "read", "assigned"),
     ],
   },
 
