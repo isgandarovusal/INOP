@@ -1284,3 +1284,11 @@ tbody tr:hover {
     align-items: flex-start;
   }
 }
+
+/* Roles — keep capability badges inside cards */
+.tag-list .badge {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  text-align: left;
+}

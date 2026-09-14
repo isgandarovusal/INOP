@@ -64,6 +64,9 @@
   },
   "navigation": {
     "dashboard": "İdarə paneli",
+      "ownProfile": "Öz profili",
+      "ownApplications": "Öz müraciətləri",
+      "ownTasks": "Öz tapşırıqları",
     "recruitment": "İşə qəbul",
     "candidates": "Namizədlər",
     "vacancies": "Vakansiyalar",
@@ -250,19 +253,26 @@
       "roles": "Rollar",
       "departments": "Şöbələr",
       "systemManagement": "Sistem səviyyəsində idarəetmə",
+      "allPermissions": "Bütün icazələr",
       "jobs": "Vakansiyalar",
       "candidates": "Namizədlər",
       "applications": "Müraciətlər",
       "cvs": "CV-lər",
       "candidateFiltering": "Namizədlərin filtrasiyası",
+      "recruitmentAnalytics": "İşə qəbul analitikası",
       "restaurants": "Restoranlar",
       "audits": "Auditlər",
       "scores": "Nəticələr",
       "comments": "Şərhlər",
       "attachments": "Əlavələr",
       "dashboard": "İdarə paneli",
+      "ownProfile": "Öz profili",
+      "ownApplications": "Öz müraciətləri",
+      "ownTasks": "Öz tapşırıqları",
       "auditAnalytics": "Audit analitikası",
-      "reportsDataViewing": "Hesabatlar / məlumatlara baxış"
+      "reportsDataViewing": "Hesabatlar / məlumatlara baxış",
+      "findings": "Aşkar edilmiş uyğunsuzluqlar",
+      "assignments": "Təyinatlar"
     }
   },
   "activityLog": {
