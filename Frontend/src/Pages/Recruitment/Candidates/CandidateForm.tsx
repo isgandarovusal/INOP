@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, FileText, Loader2, UploadCloud, X } from "lucide-react";
@@ -40,11 +41,11 @@ const CandidateForm: React.FC = () => {
   
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
-      setLoading(false);
       return;
     }
 
@@ -79,13 +80,11 @@ const CandidateForm: React.FC = () => {
         } else {
           setExistingCvName(null);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!mounted) return;
 
         setError(
-          err?.response?.data?.message ||
-            err?.message ||
-            t("recruitment.candidateForm.genericError"),
+          getErrorMessage(err, t("recruitment.candidateForm.genericError")),
         );
       } finally {
         if (mounted) {
@@ -128,6 +127,7 @@ const CandidateForm: React.FC = () => {
     setCvFile(file);
     setExistingCvName(null);
     setError(null);
+    setAiGenerating(true);
 
     try {
       const parsed = await parseCandidateCv(file);
@@ -149,18 +149,19 @@ const CandidateForm: React.FC = () => {
       );
 
       toast.success(t("recruitment.candidateForm.aiSuccess"));
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          t("recruitment.candidateForm.genericError"),
+        getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
       toast.error(
-        err?.response?.data?.message ||
+        getErrorMessage(
+          err,
           t("recruitment.candidateForm.genericError"),
+        ),
       );
     } finally {
-      }
+      setAiGenerating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,11 +204,9 @@ const CandidateForm: React.FC = () => {
         toast.success(t("recruitment.candidateForm.created"));
       }
       navigate("/app/recruitment/candidates");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          t("recruitment.candidateForm.genericError"),
+        getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
     } finally {
       setSaving(false);
@@ -309,12 +308,21 @@ const CandidateForm: React.FC = () => {
 
               <div style={{ textAlign: "center", marginTop: "14px" }}>
                 <label className="btn-secondary" style={{ cursor: "pointer" }}>
-                  <UploadCloud size={16} />
-                  {cvFile || existingCvName ? t("recruitment.candidateForm.chooseAnotherCv") : t("recruitment.candidateForm.chooseCv")}
+                  {aiGenerating ? (
+                    <Loader2 size={16} className="spin" />
+                  ) : (
+                    <UploadCloud size={16} />
+                  )}
+                  {aiGenerating
+                    ? "Analyzing CV..."
+                    : cvFile || existingCvName
+                      ? t("recruitment.candidateForm.chooseAnotherCv")
+                      : t("recruitment.candidateForm.chooseCv")}
                   <input
                     type="file"
                     accept=".pdf,.docx"
                     style={{ display: "none" }}
+                    disabled={aiGenerating}
                     onChange={(e) =>
                       handleCvChange(e.target.files?.[0] || null)
                     }

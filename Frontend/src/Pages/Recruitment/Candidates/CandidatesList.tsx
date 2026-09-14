@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,7 +20,7 @@ import {
   updateCandidateStatus,
 } from "../../../Services/candidatesService";
 import { hasPermission } from "../../../Utils/permissions";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -46,10 +47,9 @@ const CandidatesList: React.FC = () => {
 
       const data = await getCandidates();
       setCandidates(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message =
-        err?.response?.data?.message ||
-        t("recruitment.candidates.loadingError");
+        getErrorMessage(err, t("recruitment.candidates.loadingError"));
 
       setError(message);
     } finally {
@@ -58,8 +58,42 @@ const CandidatesList: React.FC = () => {
   }, [t]);
 
   useEffect(() => {
-    void fetchCandidates();
-  }, [fetchCandidates]);
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getCandidates();
+
+        if (!cancelled) {
+          setCandidates(data);
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+
+        const error = err as {
+          response?: { data?: { message?: string } };
+        };
+
+        setError(
+          error.response?.data?.message ||
+            t("recruitment.candidates.loadingError"),
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [t]);
 
   const handleStatusChange = async (
     candidateId: string,
@@ -79,10 +113,9 @@ const CandidatesList: React.FC = () => {
       );
 
       toast.success(t("recruitment.candidates.statusUpdated"));
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(
-        err?.response?.data?.message ||
-          t("recruitment.candidates.statusUpdateError"),
+        getErrorMessage(err, t("recruitment.candidates.statusUpdateError")),
       );
     }
   };
@@ -111,10 +144,9 @@ const CandidatesList: React.FC = () => {
       );
 
       toast.success(t("recruitment.candidates.deleted"));
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(
-        err?.response?.data?.message ||
-          t("recruitment.candidates.deleteError"),
+        getErrorMessage(err, t("recruitment.candidates.deleteError")),
       );
     } finally {
       setDeletingId(null);

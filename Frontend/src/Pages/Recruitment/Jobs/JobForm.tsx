@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, Loader2, Sparkles } from "lucide-react";
@@ -48,13 +49,12 @@ const JobForm: React.FC = () => {
         setRequiredSkills(job.requiredSkills || []);
         setExperience(job.experience || 1);
         setStatus(job.status || "open");
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!mounted) return;
 
         console.error("Failed to load job:", err);
         setError(
-          err?.response?.data?.message ||
-            t("recruitment.jobForm.loadError"),
+          getErrorMessage(err, t("recruitment.jobForm.loadError")),
         );
       } finally {
         if (mounted) {
@@ -123,17 +123,15 @@ const JobForm: React.FC = () => {
         await updateJob(id, payload);
         toast.success(t("recruitment.jobForm.updated"));
       } else {
-        await createJob(payload as any);
+        await createJob(payload);
         toast.success(t("recruitment.jobForm.created"));
       }
 
       navigate("/app/recruitment/jobs");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to save job:", err);
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          t("recruitment.jobForm.genericError"),
+        getErrorMessage(err, t("recruitment.jobForm.genericError")),
       );
     } finally {
       setSaving(false);

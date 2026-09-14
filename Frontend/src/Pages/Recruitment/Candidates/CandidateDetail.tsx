@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -18,7 +19,7 @@ import {
 import type { Candidate } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 import { hasPermission } from "../../../Utils/permissions";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 
 const CandidateDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -54,12 +55,10 @@ const CandidateDetail: React.FC = () => {
       }
 
       setCandidate(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setCandidate(null);
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          t("recruitment.candidateDetail.loadError"),
+        getErrorMessage(err, t("recruitment.candidateDetail.loadError")),
       );
     } finally {
       setLoading(false);
@@ -67,8 +66,57 @@ const CandidateDetail: React.FC = () => {
   }, [id, t]);
 
   useEffect(() => {
-    loadCandidate();
-  }, [loadCandidate]);
+    let cancelled = false;
+
+    const load = async () => {
+      if (!id) {
+        setCandidate(null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await getCandidateById(id);
+
+        if (cancelled) return;
+
+        if (!data) {
+          setCandidate(null);
+          setError(t("recruitment.candidateDetail.notFound"));
+          return;
+        }
+
+        setCandidate(data);
+      } catch (err: unknown) {
+        if (cancelled) return;
+
+        const error = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+
+        setCandidate(null);
+        setError(
+          error.response?.data?.message ||
+            error.message ||
+            t("recruitment.candidateDetail.loadError"),
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, t]);
 
   const handleDelete = async () => {
     if (!candidate || !canDelete) return;
@@ -85,11 +133,9 @@ const CandidateDetail: React.FC = () => {
 
       toast.success(t("recruitment.candidateDetail.deleted"));
       navigate("/app/recruitment/candidates");
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          t("recruitment.candidateDetail.deleteError"),
+        getErrorMessage(err, t("recruitment.candidateDetail.deleteError")),
       );
     } finally {
       setDeleting(false);

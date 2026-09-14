@@ -13,7 +13,7 @@ import {
 import { getJobs } from "../../../Services/jobsService";
 import { getCandidates } from "../../../Services/candidatesService";
 import type { Application, ApplicationStatus, Job, Candidate } from "../../../Types/recruitment";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 import { canManageRecruitment } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
 
@@ -66,7 +66,42 @@ const ApplicationsList: React.FC = () => {
   };
 
   useEffect(() => {
-    void load();
+    let cancelled = false;
+
+    const loadApplications = async () => {
+      setLoading(true);
+      setError(false);
+
+      try {
+        const [applicationResult, jobResult, candidateResult] =
+          await Promise.all([
+            getApplications(),
+            getJobs(),
+            getCandidates(),
+          ]);
+
+        if (cancelled) return;
+
+        setApplications(applicationResult);
+        setJobs(jobResult);
+        setCandidates(candidateResult);
+      } catch (loadError) {
+        if (!cancelled) {
+          console.error("Applications load error:", loadError);
+          setError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadApplications();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const rows = useMemo(() => {

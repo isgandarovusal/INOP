@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
@@ -8,7 +9,7 @@ import ConfirmDialog from "../../../Components/ConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
 import { getJobs, deleteJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 import { canManageRecruitment } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
 
@@ -39,11 +40,10 @@ const JobsList: React.FC = () => {
     try {
       const result = await getJobs();
       setJobs(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load jobs:", err);
       setError(
-        err?.response?.data?.message ||
-          t("recruitment.jobs.loadError"),
+        getErrorMessage(err, t("recruitment.jobs.loadError")),
       );
     } finally {
       setLoading(false);
@@ -51,8 +51,45 @@ const JobsList: React.FC = () => {
   };
 
   useEffect(() => {
-    void load();
-  }, []);
+    let cancelled = false;
+
+    const loadJobs = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await getJobs();
+
+        if (!cancelled) {
+          setJobs(result);
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+
+        const error = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+
+        console.error("Failed to load jobs:", err);
+        setError(
+          error.response?.data?.message ||
+            error.message ||
+            t("recruitment.jobs.loadError"),
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadJobs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [t]);
 
   const filtered = useMemo(() => {
     return jobs

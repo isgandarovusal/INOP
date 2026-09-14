@@ -1,4 +1,5 @@
 import API from "../api/axios";
+import { isAxiosError } from "axios";
 import type {
   Application,
   ApplicationStatus,
@@ -59,26 +60,50 @@ function frontendStatus(
   }
 }
 
-function normalizeApplication(
-  data: any
-): Application {
+function normalizeApplication(raw: unknown): Application {
+  const data =
+    typeof raw === "object" && raw !== null
+      ? (raw as Record<string, unknown>)
+      : {};
+
+  const jobId =
+    typeof data.jobId === "string" || typeof data.jobId === "object"
+      ? data.jobId as Application["jobId"]
+      : "";
+
+  const candidateId =
+    typeof data.candidateId === "string" || typeof data.candidateId === "object"
+      ? data.candidateId as Application["candidateId"]
+      : "";
+
+  const status =
+    typeof data.status === "string"
+      ? data.status as ApplicationStatus
+      : "applied";
+
   return {
-    ...data,
+    id:
+      typeof data.id === "string"
+        ? data.id
+        : typeof data._id === "string"
+          ? data._id
+          : "",
+    _id: typeof data._id === "string" ? data._id : undefined,
 
-    id: data.id || data._id || "",
-    _id: data._id,
+    jobId,
+    candidateId,
 
-    jobId: data.jobId,
-    candidateId: data.candidateId,
+    score: Number(data.score ?? 0),
 
-    score: Number(data.score || 0),
+    status: frontendStatus(status),
 
-    status: frontendStatus(
-      data.status || "Applied"
-    ),
-
-    notes: data.notes || "",
-    appliedAt: data.appliedAt || data.createdAt || "",
+    notes: typeof data.notes === "string" ? data.notes : "",
+    appliedAt:
+      typeof data.appliedAt === "string"
+        ? data.appliedAt
+        : typeof data.createdAt === "string"
+          ? data.createdAt
+          : undefined,
   };
 }
 
@@ -99,8 +124,8 @@ export async function getApplicationById(
     );
 
     return normalizeApplication(response.data);
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
 

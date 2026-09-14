@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
@@ -16,7 +17,7 @@ import type {
   Application,
   Candidate,
 } from "../../../Types/recruitment";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 import { canManageRecruitment } from "../../../Utils/permissions";
 
 const JobDetail: React.FC = () => {
@@ -34,7 +35,7 @@ const JobDetail: React.FC = () => {
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const load = async () => {
+  const loadJobDetail = async () => {
     if (!id) return;
 
     setLoading(true);
@@ -50,10 +51,21 @@ const JobDetail: React.FC = () => {
       setJob(jobResult ?? null);
       setApplications(appResult.filter((a) => a.jobId === id));
       setCandidates(candidateResult);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load job detail:", err);
+
+      const error = err as {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+        message?: string;
+      };
+
       setError(
-        err?.response?.data?.message ||
+        error.response?.data?.message ||
+          error.message ||
           t("recruitment.jobDetail.loadError"),
       );
     } finally {
@@ -62,8 +74,58 @@ const JobDetail: React.FC = () => {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      if (!id) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const [jobResult, appResult, candidateResult] = await Promise.all([
+          getJobById(id),
+          getApplications(),
+          getCandidates(),
+        ]);
+
+        if (cancelled) return;
+
+        setJob(jobResult ?? null);
+        setApplications(appResult.filter((a) => a.jobId === id));
+        setCandidates(candidateResult);
+      } catch (err: unknown) {
+        if (cancelled) return;
+
+        console.error("Failed to load job detail:", err);
+
+        const error = err as {
+          response?: {
+            data?: {
+              message?: string;
+            };
+          };
+          message?: string;
+        };
+
+        setError(
+          error.response?.data?.message ||
+            error.message ||
+            t("recruitment.jobDetail.loadError"),
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
     void load();
-  }, [id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, t]);
 
   const ranked = useMemo(() => {
     return applications
@@ -96,12 +158,11 @@ const JobDetail: React.FC = () => {
       });
 
       setSelectedCandidate("");
-      await load();
-    } catch (err: any) {
+      await loadJobDetail();
+    } catch (err: unknown) {
       console.error("Failed to create application:", err);
       setError(
-        err?.response?.data?.message ||
-          t("recruitment.jobDetail.linkError"),
+        getErrorMessage(err, t("recruitment.jobDetail.linkError")),
       );
     } finally {
       setLinking(false);
@@ -127,7 +188,7 @@ const JobDetail: React.FC = () => {
         <div style={{ textAlign: "center", marginTop: "12px" }}>
           <button
             className="btn btn--secondary"
-            onClick={() => void load()}
+            onClick={() => void loadJobDetail()}
           >
             {t("recruitment.jobDetail.retry")}
           </button>
