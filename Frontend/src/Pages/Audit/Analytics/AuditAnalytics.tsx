@@ -78,7 +78,7 @@ const AuditAnalytics: React.FC = () => {
       />
 
       {loading ? (
-        <div className="empty-state">
+        <div className="audit-modern-empty">
           Loading analytics...
         </div>
       ) : (
@@ -106,7 +106,7 @@ const AuditAnalytics: React.FC = () => {
           </div>
 
           <div className="charts-grid">
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.analytics.auditStatus")}</h3>
 
               <ResponsiveContainer
@@ -125,7 +125,7 @@ const AuditAnalytics: React.FC = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.analytics.auditTypes")}</h3>
 
               <ResponsiveContainer
@@ -145,7 +145,7 @@ const AuditAnalytics: React.FC = () => {
             </div>
           </div>
 
-          <div className="chart-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.analytics.auditTrend")}</h3>
 
             <ResponsiveContainer

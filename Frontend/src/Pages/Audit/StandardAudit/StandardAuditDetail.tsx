@@ -96,12 +96,12 @@ export default function StandardAuditDetail() {
   ];
 
   return (
-    <div className="audit-page">
+    <div className="audit-modern-page">
       <PageHeader
         title={t("audit.standard.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
-          <Link to="/app/audit/standard" className="btn btn-secondary">
+          <Link to="/app/audit/standard" className="audit-modern-button audit-modern-button-secondary">
             <ArrowLeft size={15} />
             Geri
           </Link>
@@ -222,12 +222,12 @@ export default function StandardAuditDetail() {
         </div>
 
         {categoryRows.length === 0 ? (
-          <div className="audit-empty-state">
+          <div className="audit-modern-empty">
             {t("audit.standard.detail.noChecklistResults")}
           </div>
         ) : (
           <div className="audit-standard-table-wrapper">
-            <table className="audit-table">
+            <table className="audit-modern-table">
               <thead>
                 <tr>
                   <th>{t("audit.standard.detail.category")}</th>
@@ -265,7 +265,7 @@ export default function StandardAuditDetail() {
         </div>
 
         {audit.results.length === 0 ? (
-          <div className="audit-empty-state">
+          <div className="audit-modern-empty">
             {t("audit.standard.detail.noResults")}
           </div>
         ) : (

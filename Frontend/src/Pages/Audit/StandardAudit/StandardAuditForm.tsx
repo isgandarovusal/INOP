@@ -195,8 +195,8 @@ export default function StandardAuditForm() {
   }
 
   return (
-    <div className="audit-page">
-      <div className="audit-page-header">
+    <div className="audit-modern-page">
+      <div className="audit-modern-header">
         <div>
           <h1>{t("audit.standard.form.newTitle")}</h1>
           <p>{t("audit.standard.form.subtitle")}</p>
@@ -319,7 +319,7 @@ export default function StandardAuditForm() {
                 </div>
 
                 {subsection.items.length === 0 ? (
-                  <div className="audit-empty-state">
+                  <div className="audit-modern-empty">
                     {t("audit.standard.form.sectionCriteriaMissing")}
                   </div>
                 ) : (
@@ -418,7 +418,7 @@ export default function StandardAuditForm() {
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="audit-modern-button audit-modern-button-secondary"
             onClick={() => navigate("/app/audit/standard")}
           >
             Ləğv et
@@ -426,7 +426,7 @@ export default function StandardAuditForm() {
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="audit-modern-button audit-modern-button-primary"
             disabled={submitting}
           >
             Auditi yadda saxla

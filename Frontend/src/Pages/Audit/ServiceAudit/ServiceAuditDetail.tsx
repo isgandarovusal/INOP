@@ -70,12 +70,12 @@ if (!id) return;
   );
 
   return (
-    <div className="audit-page">
+    <div className="audit-modern-page">
       <PageHeader
         title={t("audit.service.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
-          <Link to="/app/audit/service" className="btn btn-secondary">
+          <Link to="/app/audit/service" className="audit-modern-button audit-modern-button-secondary">
             <ArrowLeft size={15} />
             Geri
           </Link>
@@ -147,7 +147,7 @@ if (!id) return;
           </div>
 
           {audit.checks.length === 0 ? (
-            <div className="audit-empty-state">
+            <div className="audit-modern-empty">
               {t("audit.service.detail.noCriteria")}
             </div>
           ) : (
@@ -179,7 +179,7 @@ if (!id) return;
           </div>
 
           {audit.serviceTimeObservations.length === 0 ? (
-            <div className="audit-empty-state">
+            <div className="audit-modern-empty">
               {t("audit.service.detail.noServiceTime")}
             </div>
           ) : (
@@ -227,7 +227,7 @@ if (!id) return;
         </div>
 
         {audit.recommendations.length === 0 ? (
-          <div className="audit-empty-state">
+          <div className="audit-modern-empty">
             {t("audit.service.detail.noRecommendations")}
           </div>
         ) : (

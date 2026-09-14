@@ -82,7 +82,7 @@ export default function AuditApprovalPanel(
 
 
   return (
-    <div className="detail-card">
+    <div className="audit-modern-card">
 
       <h3>
         Audit Approval

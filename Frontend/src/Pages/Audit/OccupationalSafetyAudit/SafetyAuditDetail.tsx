@@ -29,6 +29,7 @@ export default function SafetyAuditDetail() {
       .then(setAudit)
       .catch(() => setAudit(undefined));
   }, [id]);
+
   if (!audit) {
     return (
       <EmptyState
@@ -64,16 +65,21 @@ export default function SafetyAuditDetail() {
 
   const scoreDistribution = scoreScale.map((item) => ({
     ...item,
-    count: audit.checks.filter((check) => check.score === item.value).length,
+    count: audit.checks.filter(
+      (check) => check.score === item.value
+    ).length,
   }));
 
   return (
-    <div className="audit-page">
+    <div className="audit-modern-page">
       <PageHeader
         title={t("audit.safety.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
-          <Link to="/app/audit/safety" className="btn btn-secondary">
+          <Link
+            to="/app/audit/safety"
+            className="audit-modern-button audit-modern-button-secondary"
+          >
             <ArrowLeft size={15} />
             Geri
           </Link>
@@ -89,9 +95,11 @@ export default function SafetyAuditDetail() {
           <h2>{t("audit.safety.detail.result")}</h2>
 
           <p>
-            {t("audit.safety.detail.restaurantId")}: <strong>{audit.restaurantId}</strong>
+            {t("audit.safety.detail.restaurantId")}:{" "}
+            <strong>{audit.restaurantId}</strong>
             {" · "}
-            {t("audit.safety.detail.auditor")}: <strong>{audit.auditorId}</strong>
+            {t("audit.safety.detail.auditor")}:{" "}
+            <strong>{audit.auditorId}</strong>
           </p>
         </div>
 
@@ -142,7 +150,11 @@ export default function SafetyAuditDetail() {
           <div className="audit-card-header">
             <div>
               <h3>{t("audit.safety.detail.scoreDistribution")}</h3>
-              <p>{t("audit.safety.detail.scoreDistributionDescription")}</p>
+              <p>
+                {t(
+                  "audit.safety.detail.scoreDistributionDescription"
+                )}
+              </p>
             </div>
           </div>
 
@@ -155,11 +167,17 @@ export default function SafetyAuditDetail() {
 
               const width =
                 item.count > 0
-                  ? Math.max(5, (item.count / maxCount) * 100)
+                  ? Math.max(
+                      5,
+                      (item.count / maxCount) * 100
+                    )
                   : 0;
 
               return (
-                <div className="audit-safety-score-row" key={item.value}>
+                <div
+                  className="audit-safety-score-row"
+                  key={item.value}
+                >
                   <div className="audit-safety-score-label">
                     <strong>{item.value}</strong>
                     <span>{item.label}</span>
@@ -183,13 +201,20 @@ export default function SafetyAuditDetail() {
           <div className="audit-card-header">
             <div>
               <h3>{t("audit.safety.detail.evaluationScale")}</h3>
-              <p>{t("audit.safety.detail.evaluationScaleDescription")}</p>
+              <p>
+                {t(
+                  "audit.safety.detail.evaluationScaleDescription"
+                )}
+              </p>
             </div>
           </div>
 
           <div className="audit-score-scale">
             {scoreScale.map((item) => (
-              <div className="audit-score-scale-row" key={item.value}>
+              <div
+                className="audit-score-scale-row"
+                key={item.value}
+              >
                 <span className="audit-score-badge">
                   {item.value}
                 </span>
@@ -204,18 +229,25 @@ export default function SafetyAuditDetail() {
         <div className="audit-card-header">
           <div>
             <h3>{t("audit.safety.detail.results")}</h3>
-            <p>{t("audit.safety.detail.checkCount", { count: audit.checks.length })}</p>
+            <p>
+              {t("audit.safety.detail.checkCount", {
+                count: audit.checks.length,
+              })}
+            </p>
           </div>
         </div>
 
         {audit.checks.length === 0 ? (
-          <div className="audit-empty-state">
+          <div className="audit-modern-empty">
             {t("audit.safety.detail.noResults")}
           </div>
         ) : (
           <div className="audit-safety-results">
             {audit.checks.map((item, index) => (
-              <div className="audit-safety-result" key={item.checkId}>
+              <div
+                className="audit-safety-result"
+                key={item.checkId}
+              >
                 <div className="audit-safety-result-number">
                   {index + 1}
                 </div>
@@ -226,7 +258,9 @@ export default function SafetyAuditDetail() {
                   {item.note ? (
                     <p>{item.note}</p>
                   ) : (
-                    <p className="audit-muted">{t("audit.safety.detail.notAdded")}</p>
+                    <p className="audit-muted">
+                      {t("audit.safety.detail.notAdded")}
+                    </p>
                   )}
                 </div>
 
@@ -237,7 +271,9 @@ export default function SafetyAuditDetail() {
                       : ""
                   }`}
                 >
-                  <span>{t("audit.safety.detail.score")}</span>
+                  <span>
+                    {t("audit.safety.detail.score")}
+                  </span>
                   <strong>{item.score ?? "—"}</strong>
                 </div>
               </div>
@@ -249,7 +285,9 @@ export default function SafetyAuditDetail() {
       <section className="audit-card">
         <div className="audit-card-header">
           <div>
-            <h3>{t("audit.safety.detail.auditInformation")}</h3>
+            <h3>
+              {t("audit.safety.detail.auditInformation")}
+            </h3>
             <p>{t("audit.safety.detail.metadata")}</p>
           </div>
         </div>
@@ -261,7 +299,9 @@ export default function SafetyAuditDetail() {
           </div>
 
           <div>
-            <span>{t("audit.safety.detail.auditorLabel")}</span>
+            <span>
+              {t("audit.safety.detail.auditorLabel")}
+            </span>
             <strong>{audit.auditorId}</strong>
           </div>
 
@@ -282,7 +322,9 @@ export default function SafetyAuditDetail() {
         </div>
       </section>
 
-      <AuditLifecyclePanel auditId={id ?? audit?.id ?? ""} />
+      <AuditLifecyclePanel
+        auditId={id ?? audit?.id ?? ""}
+      />
     </div>
   );
 }

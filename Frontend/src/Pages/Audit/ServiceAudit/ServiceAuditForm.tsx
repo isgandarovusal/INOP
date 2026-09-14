@@ -251,8 +251,8 @@ getAuditTemplates({
   }
 
   return (
-    <div className="audit-page">
-      <div className="audit-page-header">
+    <div className="audit-modern-page">
+      <div className="audit-modern-header">
         <div>
           <h1>{t("audit.service.form.title")}</h1>
           <p>{t("audit.service.form.subtitle")}</p>
@@ -322,7 +322,7 @@ getAuditTemplates({
               <h3>{section.title}</h3>
 
               {section.items.length === 0 ? (
-                <div className="audit-empty-state">
+                <div className="audit-modern-empty">
                   {t("audit.service.form.noCriteriaConfigured")}
                 </div>
               ) : (
@@ -389,7 +389,7 @@ getAuditTemplates({
 
             <button
               type="button"
-              className="btn btn-secondary"
+              className="audit-modern-button audit-modern-button-secondary"
               onClick={addObservation}
             >
               {t("audit.service.form.addGuest")}
@@ -436,7 +436,7 @@ getAuditTemplates({
               {observations.length > 1 && (
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="audit-modern-button audit-modern-button-danger"
                   onClick={() => removeObservation(index)}
                 >
                   Sil
@@ -462,7 +462,7 @@ getAuditTemplates({
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="audit-modern-button audit-modern-button-secondary"
             onClick={() => navigate("/app/audit/service")}
           >
             Ləğv et
@@ -470,7 +470,7 @@ getAuditTemplates({
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="audit-modern-button audit-modern-button-primary"
             disabled={submitting}
           >
             Auditi yadda saxla

@@ -41,13 +41,13 @@ export default function AuditTemplatesList() {
   }
 
   return (
-    <div className="audit-page">
+    <div className="audit-modern-page">
       {message && (
         <div className="audit-success-message">
           {message}
         </div>
       )}
-      <div className="audit-page-header">
+      <div className="audit-modern-header">
         <div>
           <h1>{t("audit.checklist.list.title")}</h1>
           <p>
@@ -57,7 +57,7 @@ export default function AuditTemplatesList() {
 
         <Link
           to="/app/audit/checklists/new"
-          className="btn btn-primary"
+          className="audit-modern-button audit-modern-button-primary"
         >
           <Plus size={18} />
           Yeni checklist
@@ -75,7 +75,7 @@ export default function AuditTemplatesList() {
           {t("audit.checklist.list.loading")}
         </div>
       ) : templates.length === 0 ? (
-        <div className="audit-empty-state">
+        <div className="audit-modern-empty">
           <div className="audit-empty-icon">
             <ClipboardList size={30} />
           </div>
@@ -85,7 +85,7 @@ export default function AuditTemplatesList() {
           </p>
           <Link
             to="/app/audit/checklists/new"
-            className="btn btn-primary"
+            className="audit-modern-button audit-modern-button-primary"
           >
             <Plus size={18} />
             Checklist yarat
@@ -144,7 +144,7 @@ export default function AuditTemplatesList() {
               <div className="audit-template-actions">
                 <Link
                   to={`/app/audit/checklists/${template.id}`}
-                  className="btn btn-secondary"
+                  className="audit-modern-button audit-modern-button-secondary"
                 >
                   İdarə et
                   <ChevronRight size={16} />
@@ -152,7 +152,7 @@ export default function AuditTemplatesList() {
 
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="audit-modern-button audit-modern-button-danger"
                   onClick={() => void removeTemplate(template.id)}
                 >
                   Sil

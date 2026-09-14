@@ -11,7 +11,7 @@ export default function AuditExportPanel({
   auditId: string;
 }) {
   return (
-    <div className="detail-card">
+    <div className="audit-modern-card">
       <h3>
         Audit Export
       </h3>

@@ -68,7 +68,7 @@ const RestaurantsList: React.FC = () => {
         }
       />
 
-      <div className="filter-bar">
+      <div className="audit-modern-filter-bar">
         <SearchInput value={query} onChange={setQuery} placeholder={t("audit.restaurants.list.searchPlaceholder")} />
         <select
           className="input-field"
@@ -96,7 +96,7 @@ const RestaurantsList: React.FC = () => {
             {loading ? (
               <tr>
                 <td colSpan={4}>
-                  <div className="empty-state">
+                  <div className="audit-modern-empty">
                     <Loader2 size={24} className="spin" />
                   </div>
                 </td>
@@ -134,14 +134,14 @@ const RestaurantsList: React.FC = () => {
                       {canManage && (
                         <>
                           <button
-                            className="icon-btn icon-btn--edit"
+                            className="audit-modern-button audit-modern-button-secondary"
                             title={t("common.actions.edit")}
                             onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}/edit`)}
                           >
                             <Pencil size={15} />
                           </button>
                           <button
-                            className="icon-btn icon-btn--danger"
+                            className="audit-modern-button audit-modern-button-danger"
                             title={t("common.actions.delete")}
                             disabled={deletingId === restaurant.id}
                             onClick={() => setDeleteTarget(restaurant)}

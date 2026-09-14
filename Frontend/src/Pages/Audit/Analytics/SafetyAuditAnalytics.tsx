@@ -57,13 +57,13 @@ const SafetyAuditAnalytics: React.FC = () => {
       />
 
       {loading && (
-        <div className="empty-state">
+        <div className="audit-modern-empty">
           {t("audit.safety.analytics.loading")}
         </div>
       )}
 
       {!loading && error && (
-        <div className="empty-state">
+        <div className="audit-modern-empty">
           {error}
         </div>
       )}
@@ -95,7 +95,7 @@ const SafetyAuditAnalytics: React.FC = () => {
           </div>
 
           <div className="charts-grid">
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.safety.analytics.scoreDistribution")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
@@ -108,7 +108,7 @@ const SafetyAuditAnalytics: React.FC = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.safety.analytics.trend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>

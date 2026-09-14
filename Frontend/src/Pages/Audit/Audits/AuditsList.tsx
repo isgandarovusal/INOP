@@ -118,7 +118,7 @@ const AuditsList: React.FC = () => {
         }
       />
 
-      <div className="filter-bar">
+      <div className="audit-modern-filter-bar">
         <select
           className="input-field"
           style={{ width: 200 }}
@@ -173,7 +173,7 @@ const AuditsList: React.FC = () => {
             {loading ? (
               <tr>
                 <td colSpan={6}>
-                  <div className="empty-state">
+                  <div className="audit-modern-empty">
                     <Loader2 size={24} className="spin" />
                   </div>
                 </td>
@@ -207,7 +207,7 @@ const AuditsList: React.FC = () => {
                     <td>
                       <div className="row-actions">
                         <button
-                          className="icon-btn icon-btn--danger"
+                          className="audit-modern-button audit-modern-button-danger"
                           title={t("common.actions.delete")}
                           disabled={deletingId === audit.id}
                           onClick={() => setDeleteTarget(audit)}

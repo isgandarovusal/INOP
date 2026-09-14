@@ -95,7 +95,7 @@ const RestaurantForm: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="audit-modern-empty">
         <Loader2 size={24} className="spin" />
       </div>
     );
@@ -115,7 +115,7 @@ const RestaurantForm: React.FC = () => {
       />
 
 
-      <div className="form-card">
+      <div className="audit-modern-card">
 
         <form onSubmit={handleSubmit} noValidate>
 

@@ -60,14 +60,26 @@ export default function OccupationalSafetyAuditsList(){
 
 return (
 
-  <div>
+  <div className="audit-modern-page">
 
-   <h2>
-    Occupational Safety Audit
-   </h2>
+   <div className="audit-modern-header">
+    <div>
+     <h1>Occupational Safety Audit</h1>
+     <p>{t("audit.safety.list.subtitle")}</p>
+    </div>
+   </div>
 
+   <section className="audit-card">
+    <div className="audit-card-header">
+     <div>
+      <h3>{t("audit.safety.list.title")}</h3>
+      <p>{t("audit.safety.list.subtitle")}</p>
+     </div>
+     <strong>{audits.length}</strong>
+    </div>
 
-   <table>
+   <div className="audit-modern-table-wrapper">
+   <table className="audit-modern-table">
 
     <thead>
 
@@ -118,6 +130,8 @@ return (
 
 
    </table>
+   </div>
+   </section>
 
 
   </div>

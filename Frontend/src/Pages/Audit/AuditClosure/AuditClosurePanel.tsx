@@ -47,7 +47,7 @@ export default function AuditClosurePanel({
 
 
   return (
-    <div className="detail-card">
+    <div className="audit-modern-card">
       <h3>
         Audit Closure
       </h3>

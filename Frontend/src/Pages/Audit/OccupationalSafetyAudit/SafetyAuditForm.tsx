@@ -113,8 +113,8 @@ export default function SafetyAuditForm() {
   }
 
   return (
-    <div className="audit-page">
-      <div className="audit-page-header">
+    <div className="audit-modern-page">
+      <div className="audit-modern-header">
         <div>
           <h1>{t("audit.safety.form.newTitle")}</h1>
           <p>{t("audit.safety.form.subtitle")}</p>
@@ -193,12 +193,12 @@ export default function SafetyAuditForm() {
               <h3>{section.title}</h3>
 
               {section.items.length === 0 ? (
-                <div className="audit-empty-state">
+                <div className="audit-modern-empty">
                   {t("audit.safety.form.criteriaMissing")}
                 </div>
               ) : (
                 <div className="audit-safety-table-wrapper">
-                  <table className="audit-table">
+                  <table className="audit-modern-table">
                     <thead>
                       <tr>
                         <th>{t("audit.safety.form.additionalQuestions")}</th>
@@ -228,7 +228,7 @@ export default function SafetyAuditForm() {
                                   )
                                 }
                                 placeholder={t("audit.safety.form.notePlaceholder")}
-                                className="audit-table-input"
+                                className="audit-modern-input"
                               />
                             </td>
 
@@ -273,7 +273,7 @@ export default function SafetyAuditForm() {
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="audit-modern-button audit-modern-button-secondary"
             onClick={() => navigate("/app/audit/safety")}
           >
             Ləğv et
@@ -281,7 +281,7 @@ export default function SafetyAuditForm() {
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="audit-modern-button audit-modern-button-primary"
             disabled={submitting}
           >
             Auditi yadda saxla

@@ -82,7 +82,7 @@ export default function AuditNotificationsList(){
 
  return (
 
- <div className="detail-card">
+ <div className="audit-modern-card">
 
   <h2>
    Audit Notifications

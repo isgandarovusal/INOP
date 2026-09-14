@@ -64,7 +64,7 @@ const AuditEdit: React.FC = () => {
       <PageHeader title={t("audit.generic.edit.title")}/>
 
 
-      <form className="form-card" onSubmit={submit}>
+      <form className="audit-modern-card" onSubmit={submit}>
 
         {Object.entries(scores).map(([key,value])=>(
 

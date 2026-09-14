@@ -117,7 +117,7 @@ export default function AuditDashboard() {
       </div>
 
       <div className="charts-grid">
-        <div className="chart-card">
+        <div className="audit-modern-card">
           <h3>
             Audit Types
           </h3>
@@ -141,7 +141,7 @@ export default function AuditDashboard() {
           </ResponsiveContainer>
         </div>
 
-        <div className="chart-card">
+        <div className="audit-modern-card">
           <h3>
             Risk Distribution
           </h3>
@@ -169,7 +169,7 @@ export default function AuditDashboard() {
         </div>
       </div>
 
-      <div className="chart-card">
+      <div className="audit-modern-card">
         <h3>
           Audit Trend
         </h3>

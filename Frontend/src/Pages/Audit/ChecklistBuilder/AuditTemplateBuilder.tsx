@@ -409,7 +409,7 @@ if (id) {
 
   if (loading) {
     return (
-      <div className="audit-page">
+      <div className="audit-modern-page">
         <div className="audit-card">
           {t("audit.checklist.builder.loading")}
         </div>
@@ -418,9 +418,9 @@ if (id) {
   }
 
   return (
-    <div className="audit-page">
+    <div className="audit-modern-page">
 
-      <div className="audit-page-header">
+      <div className="audit-modern-header">
         <div>
           <Link
             to="/app/audit/checklists"
@@ -442,7 +442,7 @@ if (id) {
         <button
           form="audit-template-form"
           type="submit"
-          className="btn btn-primary"
+          className="audit-modern-button audit-modern-button-primary"
           disabled={saving}
         >
           {saving ? t("audit.checklist.builder.saving") : t("audit.checklist.builder.save")}
@@ -628,7 +628,7 @@ if (id) {
 
             <button
               type="button"
-              className="btn btn-secondary"
+              className="audit-modern-button audit-modern-button-secondary"
               onClick={addSection}
             >
               <Plus size={17} />
@@ -797,7 +797,7 @@ if (id) {
                       <div className="audit-builder-footer-actions">
                         <button
                           type="button"
-                          className="btn btn-secondary"
+                          className="audit-modern-button audit-modern-button-secondary"
                           onClick={() =>
                             addSubsection(section.id)
                           }
@@ -808,7 +808,7 @@ if (id) {
 
                         <button
                           type="button"
-                          className="btn btn-secondary"
+                          className="audit-modern-button audit-modern-button-secondary"
                           onClick={() =>
                             addQuestion(section.id)
                           }

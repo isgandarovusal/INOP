@@ -80,7 +80,7 @@ const AuditForm: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="audit-modern-empty">
         <Loader2 size={24} className="spin" />
       </div>
     );
@@ -90,7 +90,7 @@ const AuditForm: React.FC = () => {
     <div>
       <PageHeader title={t("audit.generic.form.title")} subtitle={t("audit.generic.form.subtitle")} />
 
-      <div className="form-card">
+      <div className="audit-modern-card">
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
             <div className="form-group">

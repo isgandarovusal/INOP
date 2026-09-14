@@ -58,7 +58,7 @@ const AuditDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="audit-modern-empty">
         <Loader2 size={24} className="spin" />
       </div>
     );
@@ -103,7 +103,7 @@ const AuditDetail: React.FC = () => {
 
       <div className="detail-grid">
         <div>
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.scores")}</h3>
             {(Object.entries(audit.scores) as [string, number][]).map(([key, value]) => (
               <div className="score-bar-row" key={key}>
@@ -116,14 +116,14 @@ const AuditDetail: React.FC = () => {
             ))}
           </div>
 
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.status")}</h3>
             <Badge tone={audit.status === "completed" ? "success" : "warning"}>
               {audit.status ?? "unknown"}
             </Badge>
           </div>
 
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.findings")}</h3>
             {audit.findings && audit.findings.length > 0 ? (
               <ul>
@@ -140,7 +140,7 @@ const AuditDetail: React.FC = () => {
             )}
           </div>
 
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.recommendations")}</h3>
             {audit.recommendations && audit.recommendations.length > 0 ? (
               <ul>
@@ -157,14 +157,14 @@ const AuditDetail: React.FC = () => {
             )}
           </div>
 
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.comments")}</h3>
             <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>
               {audit.comments || "No comments provided."}
             </p>
           </div>
 
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.photos")}</h3>
             {audit.photos.length === 0 ? (
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{t("audit.generic.detail.noPhotos")}</p>
@@ -187,7 +187,7 @@ const AuditDetail: React.FC = () => {
           </div>
 
           {audit.attachments.length > 0 && (
-            <div className="detail-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.generic.detail.attachments")}</h3>
               <div className="file-list">
                 {audit.attachments.map((file, idx) =>
@@ -216,11 +216,11 @@ const AuditDetail: React.FC = () => {
         </div>
 
         <div>
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
             <Badge tone={scoreTone(overall)}>{overall.toFixed(1)} / 10</Badge>
           </div>
-          <div className="detail-card">
+          <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
             <div className="detail-row">
               <dt>Restaurant</dt>

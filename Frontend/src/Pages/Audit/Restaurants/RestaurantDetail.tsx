@@ -57,7 +57,7 @@ const RestaurantDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="audit-modern-empty">
         <Loader2 size={24} className="spin" />
       </div>
     );
@@ -97,14 +97,14 @@ const RestaurantDetail: React.FC = () => {
         }
       />
 
-      <div className="detail-card">
+      <div className="audit-modern-card">
         <h3>{t("audit.restaurants.detail.status")}</h3>
         <Badge tone={restaurant.status === "active" ? "success" : "neutral"}>
           {restaurant.status}
         </Badge>
       </div>
 
-      <div className="detail-card">
+      <div className="audit-modern-card">
         <h3>{t("audit.restaurants.detail.auditHistory", { count: history.length })}</h3>
         {history.length === 0 ? (
           <EmptyState

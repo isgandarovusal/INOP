@@ -55,13 +55,13 @@ const ServiceAuditAnalytics: React.FC = () => {
       />
 
       {loading && (
-        <div className="empty-state">
+        <div className="audit-modern-empty">
           {t("audit.service.analytics.loading")}
         </div>
       )}
 
       {!loading && error && (
-        <div className="empty-state">
+        <div className="audit-modern-empty">
           {error}
         </div>
       )}
@@ -93,7 +93,7 @@ const ServiceAuditAnalytics: React.FC = () => {
           </div>
 
           <div className="charts-grid">
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.service.analytics.answers")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
@@ -106,7 +106,7 @@ const ServiceAuditAnalytics: React.FC = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="chart-card">
+            <div className="audit-modern-card">
               <h3>{t("audit.service.analytics.trend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>

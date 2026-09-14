@@ -28,25 +28,25 @@ export default function SafetyAuditsList() {
   }
 
   return (
-    <div className="audit-page">
-      <div className="audit-page-header">
+    <div className="audit-modern-page">
+      <div className="audit-modern-header">
         <div>
           <h1>{t("audit.safety.list.title")}</h1>
           <p>{t("audit.safety.list.subtitle")}</p>
         </div>
 
-        <Link to="/app/audit/safety/new" className="btn btn-primary">
+        <Link to="/app/audit/safety/new" className="audit-modern-button">
           {t("audit.safety.list.newAudit")}
         </Link>
       </div>
 
       {sortedAudits.length === 0 ? (
-        <div className="audit-empty-state">
+        <div className="audit-modern-empty">
           {t("audit.safety.list.noAudits")}
         </div>
       ) : (
-        <div className="audit-table-wrapper">
-          <table className="audit-table">
+        <div className="audit-modern-table-wrapper">
+          <table className="audit-modern-table">
             <thead>
               <tr>
                 <th>{t("audit.safety.list.date")}</th>
@@ -71,7 +71,7 @@ export default function SafetyAuditsList() {
                   </td>
                   <td>{audit.status}</td>
                   <td>
-                    <div className="audit-actions">
+                    <div className="audit-modern-actions">
                       <Link to={`/app/audit/safety/${audit.id}`}>
                         Bax
                       </Link>
