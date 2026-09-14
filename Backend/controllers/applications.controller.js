@@ -5,6 +5,9 @@ const Job = require("../models/job.model");
 const {
   calculateApplicationMatch,
 } = require("../services/applicationMatch.service");
+const {
+  notifyCandidateStatus,
+} = require("../services/candidateNotification.service");
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -183,6 +186,19 @@ exports.updateApplicationStatus = async (req, res) => {
       });
     }
 
+    const existing = await Application.findOne(
+      buildScopedQuery(req, {
+        _id: req.params.id,
+      })
+    );
+
+    if (!existing) {
+      return res.status(404).json({
+        message:
+          "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
     const updated = await Application.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: req.params.id,
@@ -201,6 +217,20 @@ exports.updateApplicationStatus = async (req, res) => {
         message:
           "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
       });
+    }
+
+    if (existing.status !== updated.status) {
+      try {
+        await notifyCandidateStatus({
+          application: updated,
+          actor: req.user,
+        });
+      } catch (notificationError) {
+        console.error(
+          "Candidate status notification error:",
+          notificationError
+        );
+      }
     }
 
     return res.status(200).json(updated);
