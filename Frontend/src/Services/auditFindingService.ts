@@ -1,9 +1,19 @@
+export interface AuditFinding {
+  _id: string;
+  title: string;
+  description: string;
+  severity: string;
+  status: string;
+}
+
 const API =
  import.meta.env.VITE_API_BASE_URL ||
  "http://localhost:3001/api";
 
 
-export async function getFindings(auditId:string){
+export async function getFindings(
+ auditId: string,
+): Promise<{ data: AuditFinding[] }> {
 
  const res =
  await fetch(
@@ -15,7 +25,7 @@ export async function getFindings(auditId:string){
 }
 
 
-export async function createFinding(data:any){
+export async function createFinding(data: Record<string, unknown>){
 
  const res =
  await fetch(

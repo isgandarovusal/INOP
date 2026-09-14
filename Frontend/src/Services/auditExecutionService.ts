@@ -3,10 +3,24 @@ const API =
  "http://localhost:3001/api";
 
 
-async function request(
- path:string,
- options:any={}
-){
+export interface AuditExecutionChecklistItem {
+  question: string;
+}
+
+export interface AuditExecutionAnswer {
+  value?: string;
+  [key: string]: unknown;
+}
+
+export interface AuditExecution {
+  checklist: AuditExecutionChecklistItem[];
+  answers: AuditExecutionAnswer[];
+}
+
+async function request<T>(
+ path: string,
+ options: RequestInit = {},
+): Promise<T> {
 
  const res =
  await fetch(
@@ -33,17 +47,17 @@ async function request(
 
 
 
-export function getAuditExecution(id:string){
-
- return request(
-  `/audit-execution/${id}`
- );
-
+export function getAuditExecution(
+  id: string,
+): Promise<{ data: AuditExecution }> {
+  return request<{ data: AuditExecution }>(
+    `/audit-execution/${id}`,
+  );
 }
 
 
 
-export function startAuditExecution(data:any){
+export function startAuditExecution(data: Record<string, unknown>){
 
  return request(
   "/audit-execution",
@@ -59,7 +73,7 @@ export function startAuditExecution(data:any){
 
 export function submitAuditAnswers(
  id:string,
- answers:any[]
+ answers: unknown[]
 ){
 
  return request(

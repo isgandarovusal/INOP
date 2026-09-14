@@ -3,20 +3,32 @@ const API =
  "http://localhost:3001/api";
 
 
-export async function getAssignments(id:string){
+export interface AuditAssignment {
+  _id: string;
+  auditor?: {
+    name?: string;
+  } | null;
+  status: string;
+}
 
- const res =
- await fetch(
- `${API}/audit-assignments/${id}`
- );
 
- return res.json();
+export async function getAssignments(
+  id: string,
+): Promise<{ data: AuditAssignment[] }> {
+  const res = await fetch(
+    `${API}/audit-assignments/${id}`,
+  );
 
+  if (!res.ok) {
+    throw new Error("Failed to load audit assignments");
+  }
+
+  return res.json();
 }
 
 
 
-export async function assignAudit(data:any){
+export async function assignAudit(data: Record<string, unknown>){
 
  const res =
  await fetch(

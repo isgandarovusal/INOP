@@ -1,9 +1,17 @@
+export interface AuditNotification {
+  _id: string;
+  title: string;
+  message: string;
+  read: boolean;
+}
+
 const API =
  import.meta.env.VITE_API_BASE_URL ||
  "http://localhost:3001/api";
 
 
-export async function getAuditNotifications(){
+export async function getAuditNotifications():
+ Promise<{ data: AuditNotification[] }> {
 
  const res =
  await fetch(

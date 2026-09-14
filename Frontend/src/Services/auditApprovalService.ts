@@ -1,84 +1,105 @@
+import type {
+  AuditApproval,
+  CreateApprovalPayload,
+  UpdateApprovalPayload,
+} from "../Types/Audit/approval";
+
+
 const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
 
 
-async function request(
- path:string,
- options:any={}
-){
-
- const res =
- await fetch(
-  `${API}${path}`,
-  {
-   headers:{
-    "Content-Type":"application/json"
-   },
-   ...options
-  }
- );
-
-
- const data =
- await res.json();
-
-
- if(!res.ok){
-  throw new Error(
-   data.message ||
-   "Audit approval request failed"
-  );
- }
-
-
- return data;
-
+interface ApprovalResponse {
+  success: boolean;
+  data: AuditApproval;
 }
 
+
+interface ApprovalsResponse {
+  success: boolean;
+  data: AuditApproval[];
+}
+
+
+interface ErrorResponse {
+  message?: string;
+}
+
+
+async function request<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+
+  const res = await fetch(
+    `${API}${path}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      ...options,
+    }
+  );
+
+
+  const data = await res.json() as T | ErrorResponse;
+
+
+  if (!res.ok) {
+
+    const errorData = data as ErrorResponse;
+
+    throw new Error(
+      errorData.message ||
+      "Audit approval request failed"
+    );
+
+  }
+
+
+  return data as T;
+
+}
 
 
 export function getApprovals(
- auditId:string
-){
+  auditId: string
+): Promise<ApprovalsResponse> {
 
- return request(
-  `/audit-approval/${auditId}`
- );
+  return request<ApprovalsResponse>(
+    `/audit-approval/${auditId}`
+  );
 
 }
-
 
 
 export function createApproval(
- payload:any
-){
+  payload: CreateApprovalPayload
+): Promise<ApprovalResponse> {
 
- return request(
-  "/audit-approval",
-  {
-   method:"POST",
-   body:
-    JSON.stringify(payload)
-  }
- );
+  return request<ApprovalResponse>(
+    "/audit-approval",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
 
 }
 
 
-
 export function updateApproval(
- id:string,
- payload:any
-){
+  id: string,
+  payload: UpdateApprovalPayload
+): Promise<ApprovalResponse> {
 
- return request(
-  `/audit-approval/${id}`,
-  {
-   method:"PATCH",
-   body:
-    JSON.stringify(payload)
-  }
- );
+  return request<ApprovalResponse>(
+    `/audit-approval/${id}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }
+  );
 
 }

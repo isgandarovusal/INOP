@@ -1,9 +1,26 @@
+export interface AuditReport {
+  type: string;
+  status: string;
+  score: number;
+  summary: {
+    totalChecks: number;
+    passed: number;
+    failed: number;
+  };
+  safety?: {
+    riskLevel: string;
+    violations?: unknown[];
+  };
+}
+
 const API =
  import.meta.env.VITE_API_BASE_URL ||
  "http://localhost:3001/api";
 
 
-async function request(path:string){
+async function request<T>(
+ path: string,
+): Promise<T> {
 
  const res =
  await fetch(`${API}${path}`);
@@ -24,12 +41,12 @@ async function request(path:string){
 
 
 
-export function getAuditReport(id:string){
-
- return request(
-  `/audit-report/${id}`
+export function getAuditReport(
+ id: string,
+): Promise<{ data: AuditReport }> {
+ return request<{ data: AuditReport }>(
+  `/audit-report/${id}`,
  );
-
 }
 
 
