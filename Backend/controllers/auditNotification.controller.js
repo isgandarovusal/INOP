@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const AuditNotification = require("../models/auditNotification.model");
+const User = require("../models/user.model");
+const { sendEmail } = require("../services/email.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -46,6 +48,27 @@ exports.createNotification = async (req, res) => {
       });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
+      return res.status(400).json({
+        success: false,
+        message: "userId düzgün deyil.",
+      });
+    }
+
+    const targetUser = await User.findOne({
+      _id: targetUserId,
+      isActive: true,
+    })
+      .select("_id name email")
+      .lean();
+
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification recipient tapılmadı.",
+      });
+    }
+
     const audit = await findAuditByIdentifier(auditId);
 
     if (!audit) {
@@ -77,16 +100,47 @@ exports.createNotification = async (req, res) => {
 
     const notification = await AuditNotification.create({
       auditId: audit._id,
-      userId: targetUserId,
+      userId: targetUser._id,
       type: req.body.type,
       title: req.body.title,
       message: req.body.message,
       read: false,
     });
 
+    let emailResult = {
+      sent: false,
+      skipped: true,
+      reason: "Recipient email is not configured.",
+    };
+
+    if (targetUser.email) {
+      try {
+        emailResult = await sendEmail({
+          to: targetUser.email,
+          title: req.body.title,
+          message: req.body.message,
+        });
+      } catch (emailError) {
+        console.error(
+          "Notification email delivery failed:",
+          emailError.message
+        );
+
+        emailResult = {
+          sent: false,
+          skipped: false,
+          reason: "Email delivery failed.",
+        };
+      }
+    }
+
     return res.status(201).json({
       success: true,
       data: notification,
+      email: {
+        sent: emailResult.sent,
+        skipped: emailResult.skipped,
+      },
     });
   } catch (error) {
     console.error("Create notification error:", error);
