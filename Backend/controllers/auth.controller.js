@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+const RevokedToken = require("../models/revokedToken.model");
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -44,6 +46,7 @@ function createToken(user) {
       id: String(user._id),
       role: user.role,
       email: user.email,
+      jti: crypto.randomUUID(),
     },
     getJwtSecret(),
     {
@@ -123,6 +126,46 @@ exports.me = async (req, res) => {
 
     return res.status(500).json({
       message: "İstifadəçi məlumatları alınarkən server xətası baş verdi.",
+    });
+  }
+};
+
+
+exports.logout = async (req, res) => {
+  try {
+    if (!req.authToken || !req.auth) {
+      return res.status(401).json({
+        message: "Authentication token tələb olunur.",
+      });
+    }
+
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(req.authToken)
+      .digest("hex");
+
+    const expiresAt = req.auth.exp
+      ? new Date(req.auth.exp * 1000)
+      : new Date(Date.now() + 8 * 60 * 60 * 1000);
+
+    await RevokedToken.findOneAndUpdate(
+      { tokenHash },
+      {
+        tokenHash,
+        userId: req.user?.id || null,
+        expiresAt,
+      },
+      { upsert: true, new: true }
+    );
+
+    return res.status(200).json({
+      message: "Logout uğurla tamamlandı.",
+    });
+  } catch (error) {
+    console.error("Auth logout error:", error);
+
+    return res.status(500).json({
+      message: "Logout zamanı server xətası baş verdi.",
     });
   }
 };

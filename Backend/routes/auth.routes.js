@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   login,
   me,
+  logout,
 } = require("../controllers/auth.controller");
 
 const {
@@ -12,5 +13,6 @@ const {
 
 router.post("/login", login);
 router.get("/me", verifyToken, me);
+router.post("/logout", verifyToken, logout);
 
 module.exports = router;
