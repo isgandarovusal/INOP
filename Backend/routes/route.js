@@ -25,6 +25,7 @@ const auditDocumentUpload = multer({
 
 const jobsController = require('../controllers/jobs.controller');
 const candidatesController = require('../controllers/candidates.controller');
+const candidatePipelineController = require("../controllers/candidatePipeline.controller");
 const applicationsController = require('../controllers/applications.controller');
 const auditsController = require('../controllers/audits.controller');
 const auditTemplatesController = require('../controllers/auditTemplates.controller');
@@ -266,6 +267,14 @@ router.get(
   '/candidates/:id',
   ...authorize('candidate', 'read'),
   candidatesController.getCandidateById
+);
+
+router.post(
+  '/candidates/from-cv',
+  ...authorize('candidate', 'create'),
+  ...authorize('application', 'create'),
+  cvUpload.single('cv'),
+  candidatePipelineController.createCandidateFromCv
 );
 
 router.post(
