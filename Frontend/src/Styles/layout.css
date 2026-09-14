@@ -263,3 +263,28 @@
   text-decoration: none;
   display: inline-flex;
 }
+
+.state-page__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.state-page__message {
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.state-page--error {
+  color: var(--danger);
+}
+
+.state-page--error .state-page__title {
+  color: var(--text-primary);
+}
+
+.state-page__action {
+  margin-top: 0.5rem;
+}
