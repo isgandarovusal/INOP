@@ -119,6 +119,9 @@
     },
     "kanban": {
       "new": "Yeni",
+      "applied": "Müraciət edib",
+      "interview": "Müsahibə",
+      "offer": "Təklif",
       "screening": "Yoxlanılır",
       "shortlisted": "Seçilmiş",
       "rejected": "İmtina edilib",
@@ -840,8 +843,10 @@
       "title": "Audit Analitikası",
       "subtitle": "Real MongoDB məlumatları əsasında audit statistikası",
       "totalAudits": "Ümumi auditlər",
-      "statusGroups": "Status qrupları"
-    },
+      "statusGroups": "Status qrupları",
+      "auditStatus": "Audit statusu",
+      "auditTypes": "Audit növləri",
+      "auditTrend": "Audit trendi"    },
     "generic": {
       "detail": {
         "notFound": "Audit tapılmadı",

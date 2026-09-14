@@ -119,6 +119,9 @@
     },
     "kanban": {
       "new": "Новые",
+      "applied": "Подал заявку",
+      "interview": "Собеседование",
+      "offer": "Предложение",
       "screening": "На проверке",
       "shortlisted": "Отобраны",
       "rejected": "Отклонены",
@@ -823,8 +826,10 @@
       "title": "Аналитика аудитов",
       "subtitle": "Статистика аудитов на основе реальных данных MongoDB",
       "totalAudits": "Всего аудитов",
-      "statusGroups": "Группы статусов"
-    },
+      "statusGroups": "Группы статусов",
+      "auditStatus": "Статус аудита",
+      "auditTypes": "Типы аудита",
+      "auditTrend": "Тренд аудитов"    },
     "generic": {
       "detail": {
         "notFound": "Аудит не найден",

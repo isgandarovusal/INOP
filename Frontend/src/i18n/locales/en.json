@@ -119,6 +119,9 @@
     },
     "kanban": {
       "new": "New",
+      "applied": "Applied",
+      "interview": "Interview",
+      "offer": "Offer",
       "screening": "Screening",
       "shortlisted": "Shortlisted",
       "rejected": "Rejected",
@@ -823,8 +826,10 @@
       "title": "Audit Analytics",
       "subtitle": "Real MongoDB based audit statistics",
       "totalAudits": "Total audits",
-      "statusGroups": "Status groups"
-    },
+      "statusGroups": "Status groups",
+      "auditStatus": "Audit status",
+      "auditTypes": "Audit types",
+      "auditTrend": "Audit trend"    },
     "generic": {
       "detail": {
         "notFound": "Audit not found",

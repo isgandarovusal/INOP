@@ -71,7 +71,7 @@ const AuditAnalytics: React.FC = () => {
   );
 
   return (
-    <div>
+    <div className="audit-analytics">
       <PageHeader
         title={t("audit.analytics.title")}
         subtitle={t("audit.analytics.subtitle")}
@@ -107,7 +107,7 @@ const AuditAnalytics: React.FC = () => {
 
           <div className="charts-grid">
             <div className="chart-card">
-              <h3>Audit Status</h3>
+              <h3>{t("audit.analytics.auditStatus")}</h3>
 
               <ResponsiveContainer
                 width="100%"
@@ -126,7 +126,7 @@ const AuditAnalytics: React.FC = () => {
             </div>
 
             <div className="chart-card">
-              <h3>Audit Types</h3>
+              <h3>{t("audit.analytics.auditTypes")}</h3>
 
               <ResponsiveContainer
                 width="100%"
@@ -146,7 +146,7 @@ const AuditAnalytics: React.FC = () => {
           </div>
 
           <div className="chart-card">
-            <h3>Audit Trend</h3>
+            <h3>{t("audit.analytics.auditTrend")}</h3>
 
             <ResponsiveContainer
               width="100%"
