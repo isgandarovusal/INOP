@@ -71,8 +71,8 @@ const AuditForm: React.FC = () => {
     try {
       await createAudit({ restaurantId, auditType, date, scores, comments, photos, attachments });
       navigate(`/app/audit/restaurants/${restaurantId}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch {
+      setError("Audit yaradılarkən xəta baş verdi.");
     } finally {
       setSaving(false);
     }

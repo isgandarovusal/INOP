@@ -35,10 +35,9 @@ export default function AuditClosurePanel({
         "Audit closed successfully"
       );
 
-    } catch (error: any) {
+    } catch {
       setMessage(
-        error.message ||
-        "Audit close failed"
+        "Audit bağlanarkən xəta baş verdi."
       );
 
     } finally {

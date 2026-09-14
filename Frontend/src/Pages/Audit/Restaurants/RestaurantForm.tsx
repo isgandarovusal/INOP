@@ -76,12 +76,8 @@ const RestaurantForm: React.FC = () => {
 
       navigate("/app/audit/restaurants");
 
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong."
-      );
+    } catch {
+      setError("Restoran yadda saxlanılarkən xəta baş verdi.");
     } finally {
       setSaving(false);
     }

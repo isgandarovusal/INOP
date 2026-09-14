@@ -2,6 +2,7 @@ import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 
+import PageState from "../../../Components/PageState";
 const API =
   import.meta.env.VITE_API_BASE_URL ||
   "http://localhost:3001/api";
@@ -86,7 +87,12 @@ export default function StandardAuditsList() {
   }, [status, restaurantId, from, to]);
 
   if (loading) {
-    return <div>{t("audit.standard.list.loading")}</div>;
+    return (
+      <PageState
+        type="loading"
+        title={t("audit.standard.list.loading")}
+      />
+    );
   }
 
   return (

@@ -2,6 +2,7 @@ import "../auditModern.css";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import PageState from "../../../Components/PageState";
 const API =
   import.meta.env.VITE_API_BASE_URL ||
   "http://localhost:3001/api";
@@ -89,7 +90,12 @@ export default function ServiceAuditsList() {
   };
 
   if (loading) {
-    return <div>{t("audit.service.list.loading")}</div>;
+    return (
+      <PageState
+        type="loading"
+        title={t("audit.service.list.loading")}
+      />
+    );
   }
 
   return (

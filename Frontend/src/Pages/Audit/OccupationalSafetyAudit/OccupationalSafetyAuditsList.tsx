@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 
+import PageState from "../../../Components/PageState";
 const API =
  import.meta.env.VITE_API_BASE_URL ||
  "http://localhost:3001/api";
@@ -43,15 +44,16 @@ export default function OccupationalSafetyAuditsList(){
 
 
 
- if(loading){
+ if (loading) {
+  return (
+    <PageState
+      type="loading"
+      title={t("audit.safety.list.loading")}
+    />
+  );
+}
 
-  return <div>{t("audit.safety.list.loading")}</div>;
-
- }
-
-
-
- return (
+return (
 
   <div>
 
