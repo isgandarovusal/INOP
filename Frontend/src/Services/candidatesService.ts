@@ -1,4 +1,5 @@
 import API from "../api/axios";
+import { isAxiosError } from "axios";
 import type {
   Candidate,
   CandidateStatus,
@@ -39,43 +40,64 @@ function normalizeCandidateStatus(
   return "applied";
 }
 
-function normalizeCandidate(data: any): Candidate {
+function normalizeCandidate(raw: unknown): Candidate {
+  const data =
+    typeof raw === "object" && raw !== null
+      ? (raw as Record<string, unknown>)
+      : {};
+
+  const stringArray = (value: unknown): string[] =>
+    Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
+
   return {
-    ...data,
+    id:
+      typeof data.id === "string"
+        ? data.id
+        : typeof data._id === "string"
+          ? data._id
+          : "",
+    _id: typeof data._id === "string" ? data._id : undefined,
 
-    id: data.id || data._id || "",
-    _id: data._id,
+    name: typeof data.name === "string" ? data.name : "",
+    role: typeof data.role === "string" ? data.role : "Unspecified",
 
-    name: data.name || "",
-    role: data.role || "Unspecified",
+    status:
+      typeof data.status === "string"
+        ? normalizeCandidateStatus(data.status as CandidateStatus)
+        : "applied",
 
-    status: normalizeCandidateStatus(
-      data.status || "applied"
-    ),
+    skills: stringArray(data.skills),
 
-    skills: Array.isArray(data.skills)
-      ? data.skills
-      : [],
+    experience: Number(data.experience ?? 0),
 
-    experience: Number(data.experience || 0),
+    cvUrl: typeof data.cvUrl === "string" ? data.cvUrl : "",
 
-    cvUrl: data.cvUrl || "",
+    email: typeof data.email === "string" ? data.email : undefined,
+    phone: typeof data.phone === "string" ? data.phone : undefined,
+    education:
+      typeof data.education === "string"
+        ? data.education
+        : "",
 
-    email: data.email || "",
-    phone: data.phone || "",
-    education: data.education || "",
+    languages: stringArray(data.languages),
+    certificates: stringArray(data.certificates),
 
-    languages: Array.isArray(data.languages)
-      ? data.languages
-      : [],
+    departmentId:
+      typeof data.departmentId === "string"
+        ? data.departmentId
+        : undefined,
 
-    certificates: Array.isArray(data.certificates)
-      ? data.certificates
-      : [],
+    createdBy:
+      typeof data.createdBy === "string" || data.createdBy === null
+        ? data.createdBy
+        : undefined,
 
-    departmentId: data.departmentId || "",
-    createdBy: data.createdBy || null,
-    assignedTo: data.assignedTo || null,
+    assignedTo:
+      typeof data.assignedTo === "string" || data.assignedTo === null
+        ? data.assignedTo
+        : undefined,
   };
 }
 
@@ -96,8 +118,8 @@ export async function getCandidateById(
     );
 
     return normalizeCandidate(response.data);
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
 

@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import { isAxiosError } from "axios";
 import type { PublicUser } from "../Types/auth";
 
 const TOKEN_KEY = "inop_auth_token";
@@ -53,8 +54,8 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   try {
     const response = await api.get<MeResponse>("/auth/me");
     return response.data.user;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.status === 401) {
       clearAuthToken();
     }
 

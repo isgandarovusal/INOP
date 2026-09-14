@@ -1,7 +1,11 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import toast from "react-hot-toast";
 
 const TOKEN_KEY = "inop_auth_token";
+
+interface RequestConfigWithTimer extends InternalAxiosRequestConfig {
+  timer?: ReturnType<typeof setTimeout>;
+}
 
 const api = axios.create({
   baseURL:
@@ -25,14 +29,14 @@ api.interceptors.request.use((config) => {
     );
   }, 3000);
 
-  (config as any).timer = timer;
+  (config as RequestConfigWithTimer).timer = timer;
 
   return config;
 });
 
 api.interceptors.response.use(
   (response) => {
-    clearTimeout((response.config as any).timer);
+    clearTimeout((response.config as RequestConfigWithTimer).timer);
 
     if (toastId) {
       toast.dismiss(toastId);
@@ -43,7 +47,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.config) {
-      clearTimeout((error.config as any).timer);
+      clearTimeout((error.config as RequestConfigWithTimer).timer);
     }
 
     if (toastId) {

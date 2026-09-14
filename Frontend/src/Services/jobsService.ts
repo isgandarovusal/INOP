@@ -1,4 +1,5 @@
 import API from "../api/axios";
+import { isAxiosError } from "axios";
 import type {
   Job,
   JobStatus,
@@ -42,48 +43,91 @@ function backendStatus(status: JobStatus): "Open" | "Closed" | "Draft" {
   return "Open";
 }
 
-function normalizeJob(data: any): Job {
-  const title = data.title || data.position || "";
+function normalizeJob(raw: unknown): Job {
+  const data =
+    typeof raw === "object" && raw !== null
+      ? (raw as Record<string, unknown>)
+      : {};
+
+  const title =
+    typeof data.title === "string"
+      ? data.title
+      : typeof data.position === "string"
+        ? data.position
+        : "";
+
   const experienceYears = Number(
     data.experienceYears ?? data.experience ?? 0
   );
 
-  const status = normalizeStatus(
-    data.status || "open"
-  );
+  const status =
+    typeof data.status === "string"
+      ? normalizeStatus(data.status as JobStatus)
+      : "open";
+
+  const stringArray = (value: unknown): string[] =>
+    Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
+
+  const type: JobType =
+    data.type === "Full-time" ||
+    data.type === "Part-time" ||
+    data.type === "Contract" ||
+    data.type === "Internship"
+      ? data.type
+      : "Full-time";
 
   return {
-    ...data,
-
-    id: data.id || data._id || "",
-    _id: data._id,
+    id:
+      typeof data.id === "string"
+        ? data.id
+        : typeof data._id === "string"
+          ? data._id
+          : "",
+    _id: typeof data._id === "string" ? data._id : undefined,
 
     title,
     position: title,
 
-    department: data.department || "",
-    departmentId: data.departmentId || "",
+    department:
+      typeof data.department === "string"
+        ? data.department
+        : "",
+    departmentId:
+      typeof data.departmentId === "string"
+        ? data.departmentId
+        : undefined,
 
-    location: data.location || "Remote",
-    type: data.type || "Full-time",
+    location:
+      typeof data.location === "string"
+        ? data.location
+        : "Remote",
 
-    description: data.description || "",
+    type,
 
-    requiredSkills: Array.isArray(data.requiredSkills)
-      ? data.requiredSkills
-      : [],
+    description:
+      typeof data.description === "string"
+        ? data.description
+        : "",
 
-    preferredSkills: Array.isArray(data.preferredSkills)
-      ? data.preferredSkills
-      : [],
+    requiredSkills: stringArray(data.requiredSkills),
+    preferredSkills: stringArray(data.preferredSkills),
 
     experienceYears,
     experience: experienceYears,
 
     status,
 
-    createdBy: data.createdBy || null,
-    assignedTo: data.assignedTo || null,
+    createdBy:
+      typeof data.createdBy === "string" || data.createdBy === null
+        ? data.createdBy
+        : undefined,
+
+    assignedTo:
+      typeof data.assignedTo === "string" || data.assignedTo === null
+        ? data.assignedTo
+        : undefined,
   };
 }
 
@@ -117,8 +161,8 @@ export async function getJobById(
   try {
     const response = await API.get(`/jobs/${id}`);
     return normalizeJob(response.data);
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
 
