@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   AlertCircle,
   Building2,
@@ -57,15 +57,44 @@ const DepartmentsList: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = () => {
-    setLoading(true);
+  const load = useCallback(async () => {
+    try {
+      const result = await getDepartments();
+      setDepartments(result);
+    } catch (error) {
+      console.error("Failed to load departments:", error);
+    }
+  }, []);
 
-    getDepartments()
-      .then(setDepartments)
-      .finally(() => setLoading(false));
-  };
+  useEffect(() => {
+    let cancelled = false;
 
-  useEffect(load, []);
+    const initialLoad = async () => {
+      setLoading(true);
+
+      try {
+        const result = await getDepartments();
+
+        if (!cancelled) {
+          setDepartments(result);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load departments:", error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void initialLoad();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const openCreate = () => {
     setEditing(null);

@@ -14,6 +14,7 @@ const ActivityLogList: React.FC = () => {
   const [logs, setLogs] = useState<ActivityLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
     getActivityLogs()
@@ -34,7 +35,7 @@ const ActivityLogList: React.FC = () => {
   }, [logs, query]);
 
   const relativeTime = (dateStr: string): string => {
-    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const diffMs = now - new Date(dateStr).getTime();
     const mins = Math.floor(diffMs / 60000);
 
     if (mins < 1) return t("activityLog.justNow");

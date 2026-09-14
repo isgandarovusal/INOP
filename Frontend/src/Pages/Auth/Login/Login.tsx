@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff, Loader2, LogIn, Sparkles } from "lucide-react";
-import { useAuth } from "../../../Context/AuthContext";
+import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
 import i18n, { changeLanguage } from "../../../i18n";
 import azFlag from "../../../assets/flags/az.svg";

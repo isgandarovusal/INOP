@@ -16,7 +16,7 @@ import {
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
-import { useAuth } from "../../Context/AuthContext";
+import { useAuth } from "../../Context/useAuth";
 import { canAccessSection } from "../../Utils/permissions";
 import { getJobs } from "../../Services/jobsService";
 import { getCandidates } from "../../Services/candidatesService";

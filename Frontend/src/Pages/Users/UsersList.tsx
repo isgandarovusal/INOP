@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Pencil, Plus, PowerOff, Power, UserCog } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -22,19 +22,51 @@ const UsersList: React.FC = () => {
   const [query, setQuery] = useState("");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const load = () => {
-    setLoading(true);
+  const load = useCallback(async () => {
+    try {
+      const [userResult, deptResult] = await Promise.all([
+        getUsers(),
+        getDepartments(),
+      ]);
 
-    Promise.all([getUsers(), getDepartments()]).then(
-      ([userResult, deptResult]) => {
+      setUsers(userResult);
+      setDepartments(deptResult);
+    } catch (error) {
+      console.error("Failed to load users:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initialLoad = async () => {
+      try {
+        const [userResult, deptResult] = await Promise.all([
+          getUsers(),
+          getDepartments(),
+        ]);
+
+        if (cancelled) return;
+
         setUsers(userResult);
         setDepartments(deptResult);
-        setLoading(false);
-      },
-    );
-  };
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load users:", error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
 
-  useEffect(load, []);
+    void initialLoad();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return users;
