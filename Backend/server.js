@@ -8,6 +8,11 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 const routes = require('./routes/route');
 const setupSwagger = require('./swagger');
+const {
+  standardizeErrorResponses,
+  notFoundHandler,
+  globalErrorHandler,
+} = require('./middleware/error.middleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,6 +21,9 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Standardize API error responses
+app.use(standardizeErrorResponses);
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -33,6 +41,10 @@ setupSwagger(app);
 
 // API Routes
 app.use('/api', routes);
+
+// 404 + global error handling
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || process.env.CS;
