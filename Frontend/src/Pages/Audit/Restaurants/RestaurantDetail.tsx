@@ -24,6 +24,8 @@ const RestaurantDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    // Intentional: show the loading state when navigating between restaurant IDs.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     Promise.all([getRestaurantById(id), getAudits()]).then(([restaurantResult, auditResult]) => {
       setRestaurant(restaurantResult ?? null);

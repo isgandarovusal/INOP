@@ -183,6 +183,8 @@ const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
 
   useEffect(() => {
+    // Intentional: close the mobile menu whenever the route changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
   }, [location.pathname]);
 

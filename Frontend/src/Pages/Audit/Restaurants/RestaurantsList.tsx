@@ -32,6 +32,8 @@ const RestaurantsList: React.FC = () => {
       .finally(() => setLoading(false));
   };
 
+  // Intentional: initial data load on mount.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(load, []);
 
   const filtered = useMemo(() => {

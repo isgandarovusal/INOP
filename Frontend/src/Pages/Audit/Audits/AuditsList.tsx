@@ -67,6 +67,8 @@ const AuditsList: React.FC = () => {
   };
 
   useEffect(() => {
+    // Intentional: load the audit data on initial mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, []);
 

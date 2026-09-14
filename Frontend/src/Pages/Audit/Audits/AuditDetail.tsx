@@ -39,6 +39,8 @@ const AuditDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    // Intentional: show the loading state when navigating between audit IDs.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     getAuditById(id).then(async (auditResult) => {
       if (!auditResult) {
