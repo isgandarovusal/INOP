@@ -829,7 +829,8 @@
       "statusGroups": "Группы статусов",
       "auditStatus": "Статус аудита",
       "auditTypes": "Типы аудита",
-      "auditTrend": "Тренд аудитов"    },
+      "auditTrend": "Тренд аудитов"
+    },
     "generic": {
       "detail": {
         "notFound": "Аудит не найден",
@@ -891,11 +892,27 @@
         "noAudits": "Аудитов пока нет",
         "date": "Дата",
         "type": "Тип",
-        "overallScore": "Общая оценка"
+        "overallScore": "Общая оценка",
+        "deletedHint": "Ресторан удалён или больше недоступен.",
+        "back": "Назад",
+        "edit": "Редактировать",
+        "newAudit": "Новый аудит"
       },
       "form": {
         "restaurantName": "Название ресторана",
-        "locationPlaceholder": "Баку, улица Низами"
+        "locationPlaceholder": "Баку, улица Низами",
+        "titleEdit": "Редактировать ресторан",
+        "titleAdd": "Добавить ресторан",
+        "subtitleEdit": "Обновите информацию о ресторане.",
+        "subtitleAdd": "Создайте новый ресторан для аудитов.",
+        "name": "Название",
+        "location": "Местоположение",
+        "status": "Статус",
+        "active": "Активен",
+        "inactive": "Неактивен",
+        "cancel": "Отмена",
+        "save": "Сохранить",
+        "saving": "Сохранение..."
       },
       "list": {
         "title": "Рестораны",

@@ -829,7 +829,8 @@
       "statusGroups": "Status groups",
       "auditStatus": "Audit status",
       "auditTypes": "Audit types",
-      "auditTrend": "Audit trend"    },
+      "auditTrend": "Audit trend"
+    },
     "generic": {
       "detail": {
         "notFound": "Audit not found",
@@ -891,11 +892,27 @@
         "noAudits": "No audits yet",
         "date": "Date",
         "type": "Type",
-        "overallScore": "Overall score"
+        "overallScore": "Overall score",
+        "deletedHint": "The restaurant was deleted or is no longer available.",
+        "back": "Back",
+        "edit": "Edit",
+        "newAudit": "New audit"
       },
       "form": {
         "restaurantName": "Restaurant name",
-        "locationPlaceholder": "Baku, Nizami Street"
+        "locationPlaceholder": "Baku, Nizami Street",
+        "titleEdit": "Edit restaurant",
+        "titleAdd": "Add restaurant",
+        "subtitleEdit": "Update restaurant information.",
+        "subtitleAdd": "Create a new restaurant for audits.",
+        "name": "Name",
+        "location": "Location",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
       },
       "list": {
         "title": "Restaurants",

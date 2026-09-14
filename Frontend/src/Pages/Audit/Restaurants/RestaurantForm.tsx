@@ -106,11 +106,11 @@ const RestaurantForm: React.FC = () => {
     <div>
 
       <PageHeader
-        title={isEdit ? "Edit restaurant" : "Add restaurant"}
+        title={isEdit ? t("audit.restaurants.form.titleEdit") : t("audit.restaurants.form.titleAdd")}
         subtitle={
           isEdit
-            ? "Update restaurant information."
-            : "Create a new restaurant for audits."
+            ? t("audit.restaurants.form.subtitleEdit")
+            : t("audit.restaurants.form.subtitleAdd")
         }
       />
 
@@ -210,7 +210,7 @@ const RestaurantForm: React.FC = () => {
               {saving ? (
                 <>
                   <Loader2 size={16} className="spin"/>
-                  Saving...
+                  {t("audit.restaurants.form.saving")}
                 </>
               ) : (
                 <>

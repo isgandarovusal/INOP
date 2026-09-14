@@ -846,7 +846,8 @@
       "statusGroups": "Status qrupları",
       "auditStatus": "Audit statusu",
       "auditTypes": "Audit növləri",
-      "auditTrend": "Audit trendi"    },
+      "auditTrend": "Audit trendi"
+    },
     "generic": {
       "detail": {
         "notFound": "Audit tapılmadı",
@@ -908,11 +909,27 @@
         "noAudits": "Hələ audit yoxdur",
         "date": "Tarix",
         "type": "Növ",
-        "overallScore": "Ümumi bal"
+        "overallScore": "Ümumi bal",
+        "deletedHint": "Restoran silinmiş və ya artıq mövcud deyil.",
+        "back": "Geri",
+        "edit": "Redaktə et",
+        "newAudit": "Yeni audit"
       },
       "form": {
         "restaurantName": "Restoran adı",
-        "locationPlaceholder": "Bakı, Nizami küçəsi"
+        "locationPlaceholder": "Bakı, Nizami küçəsi",
+        "titleEdit": "Restoranı redaktə et",
+        "titleAdd": "Yeni restoran əlavə et",
+        "subtitleEdit": "Restoran məlumatlarını yeniləyin.",
+        "subtitleAdd": "Auditlər üçün yeni restoran yaradın.",
+        "name": "Ad",
+        "location": "Məkan",
+        "status": "Status",
+        "active": "Aktiv",
+        "inactive": "Passiv",
+        "cancel": "Ləğv et",
+        "save": "Yadda saxla",
+        "saving": "Yadda saxlanılır..."
       },
       "list": {
         "title": "Restoranlar",
