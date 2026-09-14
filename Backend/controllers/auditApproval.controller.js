@@ -6,6 +6,10 @@ const {
   createAuditActivity,
 } = require("./auditActivity.controller");
 
+const {
+  notifyUser,
+} = require("../services/notification.service");
+
 
 // CREATE APPROVAL
 exports.createApproval = async (req, res) => {
@@ -28,6 +32,17 @@ exports.createApproval = async (req, res) => {
         status: approval.status,
       },
     });
+
+    if (approval.reviewer) {
+      await notifyUser({
+        auditId: approval.auditId,
+        userId: approval.reviewer,
+        type: "approval-required",
+        title: "Audit təsdiqi tələb olunur",
+        message:
+          "Sizə yeni audit approval sorğusu göndərildi. Zəhmət olmasa INOP platformasında nəzərdən keçirin.",
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -135,6 +150,28 @@ exports.updateApproval = async (req, res) => {
         comment: approval.comment,
       },
     });
+
+    if (
+      approval.requestedBy &&
+      ["approved", "rejected"].includes(approval.status)
+    ) {
+      await notifyUser({
+        auditId: approval.auditId,
+        userId: approval.requestedBy,
+        type:
+          approval.status === "approved"
+            ? "completed"
+            : "action-required",
+        title:
+          approval.status === "approved"
+            ? "Audit approval təsdiqləndi"
+            : "Audit approval rədd edildi",
+        message:
+          approval.status === "approved"
+            ? "Audit approval sorğunuz təsdiqləndi."
+            : "Audit approval sorğunuz rədd edildi. Əlavə məlumat üçün INOP platformasındakı şərhə baxın.",
+      });
+    }
 
     res.json({
       success: true,

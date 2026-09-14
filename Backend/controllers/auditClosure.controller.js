@@ -11,9 +11,16 @@ const AuditApproval =
 const AuditClosure =
   require("../models/auditClosure.model");
 
+const AuditAssignment =
+  require("../models/auditAssignment.model");
+
 const {
   createAuditActivity,
 } = require("./auditActivity.controller");
+
+const {
+  notifyUser,
+} = require("../services/notification.service");
 
 
 // CLOSE AUDIT
@@ -100,6 +107,26 @@ exports.closeAudit = async (req, res) => {
         comment: closure.comment,
       },
     });
+
+    const assignment = await AuditAssignment.findOne({
+      auditId: audit._id,
+    })
+      .sort({
+        createdAt: -1,
+      })
+      .select("auditor")
+      .lean();
+
+    if (assignment?.auditor) {
+      await notifyUser({
+        auditId: audit._id,
+        userId: assignment.auditor,
+        type: "completed",
+        title: "Audit tamamlandı",
+        message:
+          "Audit bağlanaraq tamamlandı. Nəticəni INOP platformasında nəzərdən keçirə bilərsiniz.",
+      });
+    }
 
     return res.status(201).json({
       success: true,

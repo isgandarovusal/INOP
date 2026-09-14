@@ -5,6 +5,10 @@ const {
   createAuditActivity,
 } = require("./auditActivity.controller");
 
+const {
+  notifyUser,
+} = require("../services/notification.service");
+
 
 exports.assignAudit = async (req, res) => {
   try {
@@ -22,6 +26,15 @@ exports.assignAudit = async (req, res) => {
         assignedBy: assignment.assignedBy || null,
         status: assignment.status,
       },
+    });
+
+    await notifyUser({
+      auditId: assignment.auditId,
+      userId: assignment.auditor,
+      type: "assigned",
+      title: "Yeni audit sizə təyin edildi",
+      message:
+        "Sizə yeni audit təyin edildi. INOP platformasında audit məlumatlarını nəzərdən keçirə bilərsiniz.",
     });
 
     res.status(201).json({

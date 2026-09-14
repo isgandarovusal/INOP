@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const AuditNotification = require("../models/auditNotification.model");
 const User = require("../models/user.model");
-const { sendEmail } = require("../services/email.service");
+const { notifyUser } = require("../services/notification.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -98,49 +98,25 @@ exports.createNotification = async (req, res) => {
       }
     }
 
-    const notification = await AuditNotification.create({
+    const notificationResult = await notifyUser({
       auditId: audit._id,
       userId: targetUser._id,
       type: req.body.type,
       title: req.body.title,
       message: req.body.message,
-      read: false,
     });
 
-    let emailResult = {
-      sent: false,
-      skipped: true,
-      reason: "Recipient email is not configured.",
-    };
-
-    if (targetUser.email) {
-      try {
-        emailResult = await sendEmail({
-          to: targetUser.email,
-          title: req.body.title,
-          message: req.body.message,
-        });
-      } catch (emailError) {
-        console.error(
-          "Notification email delivery failed:",
-          emailError.message
-        );
-
-        emailResult = {
-          sent: false,
-          skipped: false,
-          reason: "Email delivery failed.",
-        };
-      }
+    if (!notificationResult.created) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification recipient tapılmadı.",
+      });
     }
 
     return res.status(201).json({
       success: true,
-      data: notification,
-      email: {
-        sent: emailResult.sent,
-        skipped: emailResult.skipped,
-      },
+      data: notificationResult.notification,
+      email: notificationResult.email,
     });
   } catch (error) {
     console.error("Create notification error:", error);
