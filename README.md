@@ -1,71 +1,116 @@
 # INOP — Internal Operations Platform
 
-Full-stack internal operations platform for Recruitment and Internal Audit.
+INOP is a full-stack internal operations platform covering **Recruitment / ATS** and **Internal Audit** workflows.
 
 ## Features
-- JWT authentication and RBAC
-- User and role management
-- Recruitment and candidate management
+
+### Authentication & Security
+- JWT authentication
+- Token expiry and revocation
+- Login, current-user and logout flows
+- Role-based access control (RBAC)
+- Protected frontend routes
+- Backend authorization middleware
+- Rate limiting and security headers
+
+### Recruitment / ATS
+- Candidate management
+- Job and application management
+- Candidate search and filtering
 - CV upload and processing
-- Candidate search, filtering and matching
-- Restaurant and audit management
-- Audit scoring, comments and attachments
-- Analytics dashboards
-- Responsive UI
+- PDF and DOCX text extraction
+- Structured candidate data processing
+- Candidate matching and AI match score
+- Candidate status management
+- Candidate status email notifications
+- Candidate PDF export
+- Candidate Excel export
 
-## Stack
-- Frontend: React, TypeScript, Vite, React Router, Axios, Context API, i18next, Recharts
-- Backend: Node.js, Express, Mongoose, MongoDB, JWT, Multer, Nodemailer
-- Documentation: Swagger / OpenAPI
-- Infrastructure: Docker / Docker Compose
+### Internal Audit
+- Audit management
+- Audit assignments and workflows
+- Audit execution
+- Findings, actions and approvals
+- Audit scoring
+- Audit reports
+- Audit analytics and dashboards
+- Attachments and activity tracking
+- Occupational safety audit workflows
 
-## Structure
+### Frontend
+- Responsive desktop, tablet and mobile UI
+- React + TypeScript
+- React Router
+- Context API authentication
+- i18next localization
+- Recharts analytics
+- Loading, empty and error states
+- Toast notifications
+- Route-level lazy loading and code splitting
+
+### API & Documentation
+- REST API
+- Standardized API error responses
+- MongoDB validation and error handling
+- Swagger / OpenAPI documentation
+- Swagger UI
+
+## Tech Stack
+
+### Frontend
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Axios
+- Context API
+- i18next / react-i18next
+- Recharts
+- Formik
+- Lucide React
+- React Hot Toast
+
+### Backend
+- Node.js
+- Express
+- MongoDB
+- Mongoose
+- JWT
+- bcryptjs
+- Multer
+- pdf-parse
+- Mammoth
+- Nodemailer
+- PDFKit
+- XLSX
+
+### Infrastructure
+- Docker
+- Docker Compose
+- MongoDB 7
+- Nginx
+
+### API Documentation
+- Swagger / OpenAPI
+- swagger-jsdoc
+- swagger-ui-express
+
+## Project Structure
+
 ```text
 INOP/
 ├── Backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── scripts/
+│   ├── uploads/
+│   ├── server.js
+│   └── swagger.js
 ├── Frontend/
+│   ├── public/
+│   └── src/
 ├── docker-compose.yml
 └── README.md
-```
-
-## Setup
-### Backend
-```bash
-cd Backend
-npm install
-npm run dev
-```
-
-### Frontend
-```bash
-cd Frontend
-npm install
-npm run dev
-```
-
-Backend: http://localhost:3001
-
-## Production Build
-```bash
-cd Frontend
-npm run build
-```
-
-## Docker
-```bash
-docker compose up --build
-```
-
-## API
-Base: /api
-
-Swagger: /api-docs
-
-## MVP
-**Core + Recruitment + Audit + Dashboard**
-
-## Project Status
-MVP implementation is complete. Final work focuses on deployment QA, end-to-end verification and final presentation.
-
-## Author
-Vüsal İsgəndərov
