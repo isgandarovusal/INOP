@@ -41,7 +41,17 @@ export async function login(
 }
 
 export async function logout(): Promise<void> {
-  clearAuthToken();
+  const token = getAuthToken();
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    await api.post("/auth/logout");
+  } finally {
+    clearAuthToken();
+  }
 }
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
