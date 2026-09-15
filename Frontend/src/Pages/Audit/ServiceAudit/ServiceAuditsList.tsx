@@ -197,7 +197,8 @@ export default function ServiceAuditsList() {
         </button>
       </div>
 
-      <table>
+      <div className="admin-table-container glass">
+        <table>
         <thead>
           <tr>
             <th>
@@ -318,7 +319,8 @@ export default function ServiceAuditsList() {
             </tr>
           )}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

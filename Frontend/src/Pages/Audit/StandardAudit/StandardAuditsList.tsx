@@ -191,7 +191,8 @@ export default function StandardAuditsList() {
         </button>
       </div>
 
-      <table>
+      <div className="admin-table-container glass">
+        <table>
         <thead>
           <tr>
             <th>
@@ -277,7 +278,8 @@ export default function StandardAuditsList() {
             </tr>
           )}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }
