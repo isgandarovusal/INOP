@@ -23,6 +23,7 @@ const swaggerSpec = {
     { name: "Departments" },
     { name: "Activity Logs" },
     { name: "Recruitment" },
+    { name: "Recruitment Exports" },
     { name: "Audits" },
     { name: "Audit Workflow" },
     { name: "Audit Analytics" },
@@ -291,6 +292,17 @@ const swaggerSpec = {
           400: { description: "Invalid request" },
           401: { description: "Invalid credentials" },
           403: { description: "Inactive account" },
+        },
+      },
+    },
+
+    "/auth/logout": {
+      post: {
+        tags: ["Authentication"],
+        summary: "Logout and revoke the current JWT",
+        responses: {
+          200: { description: "Token revoked" },
+          401: { description: "Authentication required" },
         },
       },
     },
@@ -636,6 +648,68 @@ const swaggerSpec = {
        CANDIDATES
        ========================= */
 
+    "/candidates/from-cv": {
+      post: {
+        tags: ["Recruitment"],
+        summary:
+          "Create candidate from CV and optionally create a matched application",
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["cv"],
+                properties: {
+                  cv: {
+                    type: "string",
+                    format: "binary",
+                    description: "Candidate CV file (PDF or DOCX)",
+                  },
+                  jobId: {
+                    type: "string",
+                    description: "Optional job ID for application matching",
+                  },
+                  name: { type: "string" },
+                  role: { type: "string" },
+                  email: { type: "string", format: "email" },
+                  phone: { type: "string" },
+                  education: { type: "string" },
+                  experience: { type: "number" },
+                  skills: {
+                    type: "string",
+                    description: "JSON array or comma-separated list",
+                  },
+                  languages: {
+                    type: "string",
+                    description: "JSON array or comma-separated list",
+                  },
+                  certificates: {
+                    type: "string",
+                    description: "JSON array or comma-separated list",
+                  },
+                  notes: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description:
+              "Candidate and optional application created",
+          },
+          400: { description: "Invalid request or CV file" },
+          401: { description: "Authentication required" },
+          403: { description: "Insufficient permissions" },
+          422: {
+            description:
+              "CV could not provide required candidate fields",
+          },
+        },
+      },
+    },
+
     "/candidates": {
       get: {
         tags: ["Recruitment"],
@@ -799,6 +873,61 @@ const swaggerSpec = {
     /* =========================
        APPLICATIONS
        ========================= */
+
+    "/candidate-export/excel": {
+      get: {
+        tags: ["Recruitment Exports"],
+        summary: "Export filtered candidates as Excel",
+        responses: {
+          200: {
+            description: "Candidate XLSX file",
+            content: {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                schema: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+          401: { description: "Authentication required" },
+          403: { description: "Insufficient permissions" },
+        },
+      },
+    },
+
+    "/candidate-export/{candidateId}/pdf": {
+      get: {
+        tags: ["Recruitment Exports"],
+        summary: "Export one candidate report as PDF",
+        parameters: [
+          {
+            name: "candidateId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "Candidate MongoDB ObjectId",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Candidate PDF report",
+            content: {
+              "application/pdf": {
+                schema: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+          400: { description: "Invalid candidate ID" },
+          401: { description: "Authentication required" },
+          403: { description: "Insufficient permissions" },
+          404: { description: "Candidate not found" },
+        },
+      },
+    },
 
     "/applications": {
       get: {
