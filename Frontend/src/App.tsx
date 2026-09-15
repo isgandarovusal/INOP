@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
@@ -10,7 +11,9 @@ function App() {
   return (
     <AuthProvider>
       <Toaster position="top-right" reverseOrder={false} />
-      <RouterProvider router={router} />
+      <Suspense fallback={<div className="route-loading">Yüklənir...</div>}>
+        <RouterProvider router={router} />
+      </Suspense>
     </AuthProvider>
   );
 }
