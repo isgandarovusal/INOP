@@ -567,7 +567,7 @@
       },
       "analytics": {
         "title": "Servis Auditi Analitikası",
-        "subtitle": "MongoDB aqreqasiyasına əsaslanan servis auditi statistikası",
+        "subtitle": "Servis auditi üzrə əsas statistik göstəricilər",
         "loading": "Analitika yüklənir...",
         "error": "Servis analitikası yüklənə bilmədi.",
         "totalAudits": "Ümumi servis auditi",
@@ -747,7 +747,7 @@
       },
       "analytics": {
         "title": "Standart Audit Analitikası",
-        "subtitle": "MongoDB aggregation əsasında standart audit statistikası",
+        "subtitle": "Standart audit statistikası və göstəricilər",
         "loading": "Analitika yüklənir…",
         "error": "Standart analitika yüklənə bilmədi.",
         "totalAudits": "Ümumi standart auditlər",
@@ -844,7 +844,7 @@
       },
       "analytics": {
         "title": "Əməyin Mühafizəsi Analitikası",
-        "subtitle": "MongoDB aggregation əsasında təhlükəsizlik audit statistikası",
+        "subtitle": "Təhlükəsizlik auditi statistikası və göstəricilər",
         "loading": "Analitika yüklənir…",
         "error": "Təhlükəsizlik analitikası yüklənə bilmədi.",
         "totalAudits": "Ümumi təhlükəsizlik auditləri",
@@ -856,7 +856,7 @@
     },
     "analytics": {
       "title": "Audit Analitikası",
-      "subtitle": "Real MongoDB məlumatları əsasında audit statistikası",
+      "subtitle": "Auditlər üzrə real statistik göstəricilər",
       "totalAudits": "Ümumi auditlər",
       "statusGroups": "Status qrupları",
       "auditStatus": "Audit statusu",

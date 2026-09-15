@@ -540,7 +540,7 @@
       },
       "analytics": {
         "title": "Service Audit Analytics",
-        "subtitle": "Service audit statistics based on MongoDB aggregation",
+        "subtitle": "Key service audit statistics",
         "loading": "Loading analytics...",
         "error": "Service analytics could not be loaded.",
         "totalAudits": "Total service audits",
@@ -720,7 +720,7 @@
       },
       "analytics": {
         "title": "Standard Audit Analytics",
-        "subtitle": "MongoDB aggregation-based standard audit statistics",
+        "subtitle": "Standard audit statistics and indicators",
         "loading": "Loading analytics…",
         "error": "Standard analytics could not be loaded.",
         "totalAudits": "Total standard audits",
@@ -817,7 +817,7 @@
       },
       "analytics": {
         "title": "Occupational Safety Analytics",
-        "subtitle": "MongoDB aggregation-based safety audit statistics",
+        "subtitle": "Safety audit statistics and indicators",
         "loading": "Loading analytics…",
         "error": "Safety analytics could not be loaded.",
         "totalAudits": "Total safety audits",
@@ -829,7 +829,7 @@
     },
     "analytics": {
       "title": "Audit Analytics",
-      "subtitle": "Real MongoDB based audit statistics",
+      "subtitle": "Real audit statistics",
       "totalAudits": "Total audits",
       "statusGroups": "Status groups",
       "auditStatus": "Audit status",
