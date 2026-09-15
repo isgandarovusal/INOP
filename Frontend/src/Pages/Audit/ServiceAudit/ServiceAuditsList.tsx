@@ -1,4 +1,5 @@
 import "../auditModern.css";
+import "./serviceAuditsList.css";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -112,7 +113,7 @@ export default function ServiceAuditsList() {
   }
 
   return (
-    <div>
+    <div className="service-audits-page">
       <h2>{t("audit.service.list.title")}</h2>
 
       <div

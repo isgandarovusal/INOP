@@ -114,13 +114,13 @@ const AuditAnalytics: React.FC = () => {
                 height={280}
               >
                 <BarChart data={statusData}>
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#cbd5e1" }} tickLine={false} />
 
-                  <YAxis />
+                  <YAxis tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#cbd5e1" }} tickLine={false} />
 
-                  <Tooltip />
+                  <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 10px 25px rgba(15,23,42,.08)" }} />
 
-                  <Bar dataKey="value" />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#6366f1" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -133,13 +133,13 @@ const AuditAnalytics: React.FC = () => {
                 height={280}
               >
                 <BarChart data={typeData}>
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#cbd5e1" }} tickLine={false} />
 
-                  <YAxis />
+                  <YAxis tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#cbd5e1" }} tickLine={false} />
 
-                  <Tooltip />
+                  <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 10px 25px rgba(15,23,42,.08)" }} />
 
-                  <Bar dataKey="value" />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#0ea5e9" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -153,13 +153,13 @@ const AuditAnalytics: React.FC = () => {
               height={280}
             >
               <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
 
                 <XAxis dataKey="label" />
 
-                <YAxis />
+                <YAxis tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#cbd5e1" }} tickLine={false} />
 
-                <Tooltip />
+                <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 10px 25px rgba(15,23,42,.08)" }} />
 
                 <Line
                   type="monotone"
