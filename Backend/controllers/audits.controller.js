@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
+const ActivityLog = require("../models/activityLog.model");
 const {
   getAssignedAuditFilter,
 } = require("../middleware/auditScope.middleware");
@@ -123,6 +124,26 @@ async function createAudit(req, res) {
 
     const audit = await Audit.create(payload);
 
+    if (audit.auditType === "service") {
+      try {
+        await ActivityLog.create({
+          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
+            ? req.user.id
+            : null,
+          userName: req.user?.name || "",
+          action: "create",
+          entityType: "service_audit",
+          entityId: String(audit._id),
+          description: `Servis auditi yaradıldı: ${audit.id}`,
+        });
+      } catch (logError) {
+        console.error(
+          "Failed to create activity log for audit:",
+          logError
+        );
+      }
+    }
+
     res.status(201).json(audit);
   } catch (error) {
     console.error("Failed to create audit:", error);
@@ -178,6 +199,26 @@ async function updateAudit(req, res) {
       });
     }
 
+    if (audit.auditType === "service") {
+      try {
+        await ActivityLog.create({
+          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
+            ? req.user.id
+            : null,
+          userName: req.user?.name || "",
+          action: "update",
+          entityType: "service_audit",
+          entityId: String(audit._id),
+          description: `Servis auditi yeniləndi: ${audit.id}`,
+        });
+      } catch (logError) {
+        console.error(
+          "Failed to create activity log for audit:",
+          logError
+        );
+      }
+    }
+
     res.json(audit);
   } catch (error) {
     console.error("Failed to update audit:", error);
@@ -212,6 +253,26 @@ async function deleteAudit(req, res) {
         message:
           "Audit tapılmadı və ya bu Audit-i silmək üçün icazəniz yoxdur.",
       });
+    }
+
+    if (audit.auditType === "service") {
+      try {
+        await ActivityLog.create({
+          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
+            ? req.user.id
+            : null,
+          userName: req.user?.name || "",
+          action: "delete",
+          entityType: "service_audit",
+          entityId: String(audit._id),
+          description: `Servis auditi silindi: ${audit.id}`,
+        });
+      } catch (logError) {
+        console.error(
+          "Failed to create activity log for audit:",
+          logError
+        );
+      }
     }
 
     res.json({
