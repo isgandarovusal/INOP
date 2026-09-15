@@ -1,4 +1,4 @@
-import API_BASE_URL from "./../config/api";
+import API from "../api/axios";
 import { isAxiosError } from "axios";
 import type {
   Job,
@@ -148,7 +148,7 @@ function toBackendPayload(input: JobInput) {
 }
 
 export async function getJobs(): Promise<Job[]> {
-  const response = await API_BASE_URL.get("/jobs");
+  const response = await API.get("/jobs");
 
   return Array.isArray(response.data)
     ? response.data.map(normalizeJob)
@@ -159,7 +159,7 @@ export async function getJobById(
   id: string
 ): Promise<Job | null> {
   try {
-    const response = await API_BASE_URL.get(`/jobs/${id}`);
+    const response = await API.get(`/jobs/${id}`);
     return normalizeJob(response.data);
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 404) {
@@ -173,7 +173,7 @@ export async function getJobById(
 export async function createJob(
   input: JobInput
 ): Promise<Job> {
-  const response = await API_BASE_URL.post(
+  const response = await API.post(
     "/jobs",
     toBackendPayload(input)
   );
@@ -185,7 +185,7 @@ export async function updateJob(
   id: string,
   input: Partial<JobInput>
 ): Promise<Job> {
-  const response = await API_BASE_URL.put(
+  const response = await API.put(
     `/jobs/${id}`,
     toBackendPayload({
       description: input.description || "",
@@ -201,5 +201,5 @@ export async function updateJob(
 export async function deleteJob(
   id: string
 ): Promise<void> {
-  await API_BASE_URL.delete(`/jobs/${id}`);
+  await API.delete(`/jobs/${id}`);
 }

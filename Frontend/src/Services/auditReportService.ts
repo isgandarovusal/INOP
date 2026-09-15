@@ -1,4 +1,3 @@
-import API_BASE_URL from "./../config/api";
 export interface AuditReport {
   type: string;
   status: string;
@@ -14,7 +13,9 @@ export interface AuditReport {
   };
 }
 
-
+const API =
+ import.meta.env.VITE_API_BASE_URL ||
+ "http://localhost:3001/api";
 
 
 async function request<T>(
@@ -22,7 +23,7 @@ async function request<T>(
 ): Promise<T> {
 
  const res =
- await fetch(`${API_BASE_URL}${path}`);
+ await fetch(`${API}${path}`);
 
 
  if(!res.ok){
@@ -53,7 +54,7 @@ export function getAuditReport(
 export function calculateAuditScore(id:string){
 
  return fetch(
-  `${API_BASE_URL}/audit-score/${id}/calculate`,
+  `${API}/audit-score/${id}/calculate`,
   {
    method:"POST"
   }

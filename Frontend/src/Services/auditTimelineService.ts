@@ -1,4 +1,3 @@
-import API_BASE_URL from "./../config/api";
 export interface AuditTimelineItem {
   _id: string;
   action: string;
@@ -6,7 +5,9 @@ export interface AuditTimelineItem {
   createdAt: string;
 }
 
-
+const API =
+ import.meta.env.VITE_API_BASE_URL ||
+ "http://localhost:3001/api";
 
 
 export async function getAuditTimeline(
@@ -15,7 +16,7 @@ export async function getAuditTimeline(
 
  const res =
  await fetch(
- `${API_BASE_URL}/audit-timeline/${id}`
+ `${API}/audit-timeline/${id}`
  );
 
  return res.json();

@@ -1,4 +1,8 @@
-import API_BASE_URL from "./../config/api";
+const API =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
+
+
 export async function closeAudit(
   payload: {
     auditId: string;
@@ -8,7 +12,7 @@ export async function closeAudit(
 ) {
   const res =
     await fetch(
-      `${API_BASE_URL}/audit-closure`,
+      `${API}/audit-closure`,
       {
         method: "POST",
         headers: {
@@ -37,7 +41,7 @@ export async function getClosure(
 ) {
   const res =
     await fetch(
-      `${API_BASE_URL}/audit-closure/${auditId}`
+      `${API}/audit-closure/${auditId}`
     );
 
   return res.json();

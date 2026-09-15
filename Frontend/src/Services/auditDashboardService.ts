@@ -1,4 +1,7 @@
-import API_BASE_URL from "./../config/api";
+const API =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
+
 export interface AuditDashboardStat {
   _id: string;
   count: number;
@@ -20,7 +23,7 @@ export interface AuditDashboardData {
 }
 
 async function request<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`);
+  const res = await fetch(`${API}${path}`);
 
   if (!res.ok) {
     throw new Error("Audit dashboard request failed");

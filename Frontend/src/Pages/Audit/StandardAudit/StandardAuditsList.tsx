@@ -1,10 +1,11 @@
-import API_BASE_URL from "./../../../config/api";
 import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 
 import PageState from "../../../Components/PageState";
-
+const API =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
 
 type StandardAudit = {
   _id: string;
@@ -67,7 +68,7 @@ export default function StandardAuditsList() {
 
         const query = params.toString();
         const response = await fetch(
-          `${API_BASE_URL}/audit-module/standard${query ? `?${query}` : ""}`,
+          `${API}/audit-module/standard${query ? `?${query}` : ""}`,
         );
 
         if (!response.ok) {

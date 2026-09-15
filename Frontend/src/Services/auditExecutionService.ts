@@ -1,4 +1,8 @@
-import API_BASE_URL from "./../config/api";
+const API =
+ import.meta.env.VITE_API_BASE_URL ||
+ "http://localhost:3001/api";
+
+
 export interface AuditExecutionChecklistItem {
   question: string;
 }
@@ -20,7 +24,7 @@ async function request<T>(
 
  const res =
  await fetch(
-  `${API_BASE_URL}${path}`,
+  `${API}${path}`,
   {
    headers:{
     "Content-Type":"application/json"

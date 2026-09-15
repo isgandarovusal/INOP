@@ -110,12 +110,3 @@
     0 0 0 2px rgba(255, 255, 255, 0.20),
     0 0 0 4px rgba(16, 185, 129, 0.20);
 }
-
-.admin-language-label {
-  color: #fff;
-  opacity: 1;
-  visibility: visible;
-  font-weight: 800;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}

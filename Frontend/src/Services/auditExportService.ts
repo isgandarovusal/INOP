@@ -1,10 +1,14 @@
-import API_BASE_URL from "./../config/api";
+const API =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001/api";
+
+
 function downloadAuditFile(
   auditId: string,
   format: "pdf" | "excel" | "csv"
 ) {
   const url =
-    `${API_BASE_URL}/audit-export/${auditId}/${format}`;
+    `${API}/audit-export/${auditId}/${format}`;
 
   window.open(
     url,
