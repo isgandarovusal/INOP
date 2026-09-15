@@ -1,4 +1,4 @@
-import API from "../api/axios";
+import API_BASE_URL from "./../config/api";
 import type { Audit, AuditFile, AuditScores } from "../Types/audit";
 
 function toAuditFiles(files: File[]): AuditFile[] {
@@ -20,12 +20,12 @@ export interface AuditInput {
 }
 
 export async function getAudits(): Promise<Audit[]> {
-  const res = await API.get("/audits");
+  const res = await API_BASE_URL.get("/audits");
   return res.data;
 }
 
 export async function getAuditById(id: string): Promise<Audit> {
-  const res = await API.get(`/audits/${id}`);
+  const res = await API_BASE_URL.get(`/audits/${id}`);
   return res.data;
 }
 
@@ -58,7 +58,7 @@ export async function createAudit(
     ...rest,
   };
 
-  const res = await API.post("/audits", payload);
+  const res = await API_BASE_URL.post("/audits", payload);
 
   return res.data;
 }
@@ -67,12 +67,12 @@ export async function updateAudit(
   id: string,
   input: Partial<AuditInput>
 ) {
-  const res = await API.put(`/audits/${id}`, input);
+  const res = await API_BASE_URL.put(`/audits/${id}`, input);
   return res.data;
 }
 
 export async function deleteAudit(id: string) {
-  await API.delete(`/audits/${id}`);
+  await API_BASE_URL.delete(`/audits/${id}`);
 }
 
 export function overallScore(audit: Audit): number {

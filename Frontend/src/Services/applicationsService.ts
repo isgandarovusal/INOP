@@ -1,4 +1,4 @@
-import API from "../api/axios";
+import API_BASE_URL from "./../config/api";
 import { isAxiosError } from "axios";
 import type {
   Application,
@@ -108,7 +108,7 @@ function normalizeApplication(raw: unknown): Application {
 }
 
 export async function getApplications(): Promise<Application[]> {
-  const response = await API.get("/applications");
+  const response = await API_BASE_URL.get("/applications");
 
   return Array.isArray(response.data)
     ? response.data.map(normalizeApplication)
@@ -119,7 +119,7 @@ export async function getApplicationById(
   id: string
 ): Promise<Application | null> {
   try {
-    const response = await API.get(
+    const response = await API_BASE_URL.get(
       `/applications/${id}`
     );
 
@@ -142,7 +142,7 @@ export interface ApplicationInput {
 export async function createApplication(
   input: ApplicationInput
 ): Promise<Application> {
-  const response = await API.post(
+  const response = await API_BASE_URL.post(
     "/applications",
     input
   );
@@ -154,7 +154,7 @@ export async function updateApplicationStatus(
   id: string,
   status: ApplicationStatus
 ): Promise<Application> {
-  const response = await API.patch(
+  const response = await API_BASE_URL.patch(
     `/applications/${id}/status`,
     {
       status: backendStatus(status),
@@ -167,5 +167,5 @@ export async function updateApplicationStatus(
 export async function deleteApplication(
   id: string
 ): Promise<void> {
-  await API.delete(`/applications/${id}`);
+  await API_BASE_URL.delete(`/applications/${id}`);
 }

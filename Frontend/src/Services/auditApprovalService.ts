@@ -1,3 +1,4 @@
+import API_BASE_URL from "./../config/api";
 import type {
   AuditApproval,
   CreateApprovalPayload,
@@ -5,9 +6,7 @@ import type {
 } from "../Types/Audit/approval";
 
 
-const API =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:3001/api";
+
 
 
 interface ApprovalResponse {
@@ -33,7 +32,7 @@ async function request<T>(
 ): Promise<T> {
 
   const res = await fetch(
-    `${API}${path}`,
+    `${API_BASE_URL}${path}`,
     {
       headers: {
         "Content-Type": "application/json",

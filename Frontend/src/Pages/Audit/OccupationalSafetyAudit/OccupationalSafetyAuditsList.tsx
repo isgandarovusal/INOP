@@ -1,12 +1,11 @@
+import API_BASE_URL from "./../../../config/api";
 import "../auditModern.css";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 
 import PageState from "../../../Components/PageState";
-const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
+
 
 interface OccupationalSafetyAudit {
   _id: string;
@@ -28,7 +27,7 @@ export default function OccupationalSafetyAuditsList(){
  useEffect(()=>{
 
 
-  fetch(`${API}/occupational-safety-audits`)
+  fetch(`${API_BASE_URL}/occupational-safety-audits`)
 
   .then(r=>r.json())
 

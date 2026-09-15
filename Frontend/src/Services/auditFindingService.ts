@@ -1,3 +1,4 @@
+import API_BASE_URL from "./../config/api";
 export interface AuditFinding {
   _id: string;
   title: string;
@@ -6,9 +7,7 @@ export interface AuditFinding {
   status: string;
 }
 
-const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
+
 
 
 export async function getFindings(
@@ -17,7 +16,7 @@ export async function getFindings(
 
  const res =
  await fetch(
- `${API}/audit-findings/${auditId}`
+ `${API_BASE_URL}/audit-findings/${auditId}`
  );
 
  return res.json();
@@ -29,7 +28,7 @@ export async function createFinding(data: Record<string, unknown>){
 
  const res =
  await fetch(
- `${API}/audit-findings`,
+ `${API_BASE_URL}/audit-findings`,
  {
   method:"POST",
   headers:{

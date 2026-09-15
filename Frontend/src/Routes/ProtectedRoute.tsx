@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import RouteLoading from "../Components/RouteLoading";
 import { useAuth } from "../Context/AuthContext";
 
 const ProtectedRoute: React.FC = () => {
@@ -7,11 +7,7 @@ const ProtectedRoute: React.FC = () => {
   const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="route-loading">
-        <Loader2 size={22} className="spin" />
-      </div>
-    );
+    return <RouteLoading />;
   }
 
   if (!user) {

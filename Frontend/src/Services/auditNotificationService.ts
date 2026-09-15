@@ -1,3 +1,4 @@
+import API_BASE_URL from "./../config/api";
 export interface AuditNotification {
   _id: string;
   title: string;
@@ -5,9 +6,7 @@ export interface AuditNotification {
   read: boolean;
 }
 
-const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
+
 
 
 export async function getAuditNotifications():
@@ -15,7 +14,7 @@ export async function getAuditNotifications():
 
  const res =
  await fetch(
-  `${API}/audit-notification`
+  `${API_BASE_URL}/audit-notification`
  );
 
 
@@ -38,7 +37,7 @@ export async function markNotificationRead(
 
  const res =
  await fetch(
-  `${API}/audit-notification/${id}/read`,
+  `${API_BASE_URL}/audit-notification/${id}/read`,
   {
    method:"PATCH",
    headers:{

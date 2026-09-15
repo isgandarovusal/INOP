@@ -1,4 +1,4 @@
-import API from "../api/axios";
+import API_BASE_URL from "./../config/api";
 import type { Restaurant, RestaurantStatus } from "../Types/audit";
 
 export interface RestaurantInput {
@@ -8,14 +8,14 @@ export interface RestaurantInput {
 }
 
 export async function getRestaurants(): Promise<Restaurant[]> {
-  const res = await API.get("/restaurants");
+  const res = await API_BASE_URL.get("/restaurants");
   return res.data;
 }
 
 export async function getRestaurantById(
   id: string
 ): Promise<Restaurant> {
-  const res = await API.get(`/restaurants/${id}`);
+  const res = await API_BASE_URL.get(`/restaurants/${id}`);
   return res.data;
 }
 
@@ -29,7 +29,7 @@ export async function createRestaurant(
     ...input,
   };
 
-  const res = await API.post("/restaurants", payload);
+  const res = await API_BASE_URL.post("/restaurants", payload);
 
   return res.data;
 }
@@ -39,7 +39,7 @@ export async function updateRestaurant(
   input: Partial<RestaurantInput>
 ): Promise<Restaurant> {
 
-  const res = await API.put(
+  const res = await API_BASE_URL.put(
     `/restaurants/${id}`,
     input
   );
@@ -51,5 +51,5 @@ export async function deleteRestaurant(
   id: string
 ): Promise<void> {
 
-  await API.delete(`/restaurants/${id}`);
+  await API_BASE_URL.delete(`/restaurants/${id}`);
 }

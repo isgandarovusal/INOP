@@ -1,3 +1,4 @@
+import API_BASE_URL from "./../config/api";
 export interface AuditSourceDocument {
   id: string;
   templateId?: string;
@@ -8,8 +9,7 @@ export interface AuditSourceDocument {
   createdAt?: string;
 }
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
+
 
 
 async function request<T>(
@@ -17,7 +17,7 @@ async function request<T>(
   options?:RequestInit
 ):Promise<T>{
 
-  const response = await fetch(`${API_BASE}${path}`, options);
+  const response = await fetch(`${API_BASE_URL}${path}`, options);
 
   if(!response.ok){
     const body = await response.json().catch(()=>null);

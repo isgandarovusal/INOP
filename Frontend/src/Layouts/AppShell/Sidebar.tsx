@@ -29,6 +29,7 @@ import {
   type Section,
 } from "../../Utils/permissions";
 import i18n, { changeLanguage } from "../../i18n";
+import { prefetchRoute } from "../../Routes/routePrefetch";
 import "../../Styles/admin.css";
 
 interface NavItem {
@@ -250,16 +251,7 @@ const Sidebar: React.FC = () => {
                 alt=""
                 className="admin-language-flag"
               />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                AZE
-              </span>
+              <span className="admin-language-label">AZE</span>
             </button>
 
             <button
@@ -277,16 +269,7 @@ const Sidebar: React.FC = () => {
                 alt=""
                 className="admin-language-flag"
               />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                ENG
-              </span>
+              <span className="admin-language-label">ENG</span>
             </button>
 
             <button
@@ -304,16 +287,7 @@ const Sidebar: React.FC = () => {
                 alt=""
                 className="admin-language-flag"
               />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                RUS
-              </span>
+              <span className="admin-language-label">RUS</span>
             </button>
           </div>
 
@@ -325,7 +299,14 @@ const Sidebar: React.FC = () => {
 
             <nav className="admin-sidebar__nav">
               {group.items.map(({ to, labelKey, icon: Icon, end }) => (
-                <NavLink key={to} to={to} end={end}>
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  onMouseEnter={() => prefetchRoute(to)}
+                  onFocus={() => prefetchRoute(to)}
+                  onTouchStart={() => prefetchRoute(to)}
+                >
                   <Icon size={17} className="admin-sidebar__icon" />
                   {t(labelKey)}
                 </NavLink>

@@ -1,8 +1,4 @@
-const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
-
-
+import API_BASE_URL from "./../config/api";
 export interface AuditAssignment {
   _id: string;
   auditor?: {
@@ -16,7 +12,7 @@ export async function getAssignments(
   id: string,
 ): Promise<{ data: AuditAssignment[] }> {
   const res = await fetch(
-    `${API}/audit-assignments/${id}`,
+    `${API_BASE_URL}/audit-assignments/${id}`,
   );
 
   if (!res.ok) {
@@ -32,7 +28,7 @@ export async function assignAudit(data: Record<string, unknown>){
 
  const res =
  await fetch(
- `${API}/audit-assignments`,
+ `${API_BASE_URL}/audit-assignments`,
  {
   method:"POST",
   headers:{

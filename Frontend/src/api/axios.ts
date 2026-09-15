@@ -1,3 +1,4 @@
+import API_BASE_URL from "./../config/api";
 import axios, { type InternalAxiosRequestConfig } from "axios";
 import toast from "react-hot-toast";
 
@@ -9,8 +10,7 @@ interface RequestConfigWithTimer extends InternalAxiosRequestConfig {
 
 const api = axios.create({
   baseURL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "http://localhost:3001/api",
+    API_BASE_URL,
   timeout: 40000,
 });
 

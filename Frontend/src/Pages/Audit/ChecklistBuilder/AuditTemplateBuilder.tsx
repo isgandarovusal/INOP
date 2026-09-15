@@ -389,12 +389,9 @@ if (id) {
 
         return;
       } else {
-        console.log("CREATE START");
-        await createAuditTemplate(template);
-        console.log("CREATE DONE");
+            await createAuditTemplate(template);
 
-        console.log("NAVIGATE LIST");
-        navigate("/app/audit/checklists", {
+            navigate("/app/audit/checklists", {
           replace: true
         });
 

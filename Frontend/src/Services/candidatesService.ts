@@ -1,4 +1,4 @@
-import API from "../api/axios";
+import API_BASE_URL from "./../config/api";
 import { isAxiosError } from "axios";
 import type {
   Candidate,
@@ -102,7 +102,7 @@ function normalizeCandidate(raw: unknown): Candidate {
 }
 
 export async function getCandidates(): Promise<Candidate[]> {
-  const response = await API.get("/candidates");
+  const response = await API_BASE_URL.get("/candidates");
 
   return Array.isArray(response.data)
     ? response.data.map(normalizeCandidate)
@@ -113,7 +113,7 @@ export async function getCandidateById(
   id: string
 ): Promise<Candidate | null> {
   try {
-    const response = await API.get(
+    const response = await API_BASE_URL.get(
       `/candidates/${id}`
     );
 
@@ -162,7 +162,7 @@ export async function parseCandidateCv(
   const formData = new FormData();
   formData.append("cv", file);
 
-  const response = await API.post(
+  const response = await API_BASE_URL.post(
     "/candidates/parse-cv",
     formData
   );
@@ -238,7 +238,7 @@ export async function createCandidate(
     formData.append("cv", input.cvFile);
   }
 
-  const response = await API.post(
+  const response = await API_BASE_URL.post(
     "/candidates",
     formData
   );
@@ -294,7 +294,7 @@ export async function updateCandidate(
     payload.certificates = input.certificates;
   }
 
-  const response = await API.put(
+  const response = await API_BASE_URL.put(
     `/candidates/${id}`,
     payload
   );
@@ -306,7 +306,7 @@ export async function updateCandidateStatus(
   id: string,
   status: CandidateStatus
 ): Promise<Candidate> {
-  const response = await API.patch(
+  const response = await API_BASE_URL.patch(
     `/candidates/${id}`,
     { status }
   );
@@ -317,11 +317,11 @@ export async function updateCandidateStatus(
 export async function deleteCandidate(
   id: string
 ): Promise<void> {
-  await API.delete(`/candidates/${id}`);
+  await API_BASE_URL.delete(`/candidates/${id}`);
 }
 
 export async function exportCandidatesExcel(): Promise<Blob> {
-  const response = await API.get(
+  const response = await API_BASE_URL.get(
     "/candidate-export/excel",
     {
       responseType: "blob",
@@ -334,7 +334,7 @@ export async function exportCandidatesExcel(): Promise<Blob> {
 export async function exportCandidatePdf(
   id: string
 ): Promise<Blob> {
-  const response = await API.get(
+  const response = await API_BASE_URL.get(
     `/candidate-export/${id}/pdf`,
     {
       responseType: "blob",

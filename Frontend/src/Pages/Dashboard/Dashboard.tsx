@@ -1,3 +1,4 @@
+import PageSkeleton from "../../Components/PageSkeleton";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +14,8 @@ import {
   ArrowUpRight,
   PackageOpen,
 } from "lucide-react";
-import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { ResponsiveContainer, PieChart,
+  Tooltip, Pie, Cell } from "recharts";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
 import { useAuth } from "../../Context/useAuth";
@@ -152,7 +154,7 @@ const Dashboard: React.FC = () => {
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
       {loading ? (
-        <div className="empty-state">{t("dashboard.loading")}</div>
+        <PageSkeleton />
       ) : (
         <>
           {showRecruitment && (
@@ -262,6 +264,13 @@ const Dashboard: React.FC = () => {
                               />
                             ))}
                           </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              borderRadius: 10,
+                              border: "1px solid #e2e8f0",
+                              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
+                            }}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="donut-center">
