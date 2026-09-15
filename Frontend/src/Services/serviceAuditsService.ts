@@ -48,6 +48,7 @@ export async function createServiceAudit(
 ): Promise<ServiceAudit> {
   const audit = {
     ...input,
+    auditType: input.type,
     id: `service-audit-${Date.now()}`,
     auditorId: "unknown",
   };

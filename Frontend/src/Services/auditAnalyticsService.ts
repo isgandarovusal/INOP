@@ -1,15 +1,9 @@
-const API =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:3001/api";
+import api from "../api/axios";
 
 async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${API}${path}`);
+  const response = await api.get<T>(path);
 
-  if (!response.ok) {
-    throw new Error(`Analytics request failed: ${response.status}`);
-  }
-
-  return response.json();
+  return response.data;
 }
 
 export interface AnalyticsResponse<T> {
