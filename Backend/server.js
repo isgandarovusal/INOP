@@ -36,6 +36,11 @@ app.use('/api/', limiter);
 // Static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Public health check for deployment platforms
+app.get('/health', (_req, res) => {
+  res.status(200).json({ success: true, status: 'ok' });
+});
+
 // Swagger
 setupSwagger(app);
 
