@@ -1370,3 +1370,72 @@ button.btn {
  padding:0 14px;
 
 }
+
+
+/* =====================================================
+   AUDIT BUTTON SYSTEM - FINAL NORMALIZATION
+   ===================================================== */
+
+.audit-page .btn,
+.audit-page button.btn,
+.audit-page .btn-primary,
+.audit-page .btn-secondary,
+.audit-page .btn-danger,
+.audit-page .audit-delete-button,
+.audit-page-header .btn,
+.audit-modern-page .btn,
+.audit-modern-page .btn-primary,
+.audit-modern-page .btn-secondary,
+.audit-modern-page .btn-danger,
+.audit-modern-button {
+  text-decoration: none;
+}
+
+.audit-page .btn-primary,
+.audit-page button.btn-primary,
+.audit-page-header .btn-primary,
+.audit-modern-page .btn-primary,
+.audit-modern-page button:not(.audit-modern-button.secondary) {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #ffffff;
+}
+
+.audit-page .btn-primary:hover:not(:disabled),
+.audit-page button.btn-primary:hover:not(:disabled),
+.audit-page-header .btn-primary:hover:not(:disabled),
+.audit-modern-page .btn-primary:hover:not(:disabled),
+.audit-modern-page button:not(.audit-modern-button.secondary):hover:not(:disabled) {
+  background: #115e59;
+  border-color: #115e59;
+}
+
+.audit-page .btn-secondary,
+.audit-page button.btn-secondary,
+.audit-modern-page .btn-secondary,
+.audit-modern-button.secondary {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+.audit-page .btn-secondary:hover:not(:disabled),
+.audit-page button.btn-secondary:hover:not(:disabled),
+.audit-modern-page .btn-secondary:hover:not(:disabled),
+.audit-modern-button.secondary:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.audit-page .btn-danger,
+.audit-page .audit-delete-button,
+.audit-modern-page .btn-danger {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.audit-page .btn-danger:hover:not(:disabled),
+.audit-page .audit-delete-button:hover:not(:disabled),
+.audit-modern-page .btn-danger:hover:not(:disabled) {
+  background: #fecaca;
+}

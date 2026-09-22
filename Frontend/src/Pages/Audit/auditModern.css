@@ -51,7 +51,7 @@
   border-radius: 10px;
   padding: 10px 16px;
   min-height: 40px;
-  background: #2563eb;
+  background: #0f766e;
   color: white;
   font-size: 13px;
   font-weight: 650;
@@ -65,15 +65,15 @@
 .audit-modern-button:hover,
 .audit-modern-page button:hover,
 .audit-analytics button:hover {
-  background: #1d4ed8;
+  background: #115e59;
   transform: translateY(-1px);
   box-shadow: 0 7px 18px rgba(37, 99, 235, .18);
 }
 
 .audit-modern-button.secondary {
-  background: white;
+  background: #ffffff;
   color: #334155;
-  border: 1px solid #dbe3ee;
+  border: 1px solid #cbd5e1;
 }
 
 .audit-modern-button.secondary:hover {
