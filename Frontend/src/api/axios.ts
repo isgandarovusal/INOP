@@ -1,11 +1,8 @@
-import axios, { type InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 import toast from "react-hot-toast";
 
 const TOKEN_KEY = "inop_auth_token";
 
-interface RequestConfigWithTimer extends InternalAxiosRequestConfig {
-  timer?: ReturnType<typeof setTimeout>;
-}
 
 const api = axios.create({
   baseURL:
@@ -14,8 +11,6 @@ const api = axios.create({
   timeout: 40000,
 });
 
-let toastId: string | null = null;
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
 
@@ -23,38 +18,12 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  const timer = setTimeout(() => {
-    toastId = toast.loading(
-      "Server oyandırılır, lütfən gözləyin (~20-30 san)...",
-    );
-  }, 3000);
-
-  (config as RequestConfigWithTimer).timer = timer;
-
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => {
-    clearTimeout((response.config as RequestConfigWithTimer).timer);
-
-    if (toastId) {
-      toast.dismiss(toastId);
-      toastId = null;
-    }
-
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.config) {
-      clearTimeout((error.config as RequestConfigWithTimer).timer);
-    }
-
-    if (toastId) {
-      toast.dismiss(toastId);
-      toastId = null;
-    }
-
     if (error.response?.status === 401) {
       localStorage.removeItem(TOKEN_KEY);
 
