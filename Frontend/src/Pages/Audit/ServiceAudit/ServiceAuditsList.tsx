@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageState from "../../../Components/PageState";
-const API =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:3001/api";
+import api from "../../../api/axios";
 
 type ServiceAudit = {
   _id: string;
@@ -52,18 +50,12 @@ export default function ServiceAuditsList() {
 
         const query = params.toString();
 
-        const response = await fetch(
-          `${API}/audit-module/service${query ? `?${query}` : ""}`,
+        const response = await api.get<{ data?: ServiceAudit[] }>(
+          `/audit-module/service${query ? `?${query}` : ""}`,
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to load service audits");
-        }
-
-        const result = await response.json();
-
         if (!cancelled) {
-          setAudits(result.data || []);
+          setAudits(response.data?.data || []);
         }
       } catch (error) {
         if (!cancelled) {
