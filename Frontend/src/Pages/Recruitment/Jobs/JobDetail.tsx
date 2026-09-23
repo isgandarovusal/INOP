@@ -45,7 +45,7 @@ const JobDetail: React.FC = () => {
       const [jobResult, appResult, candidateResult] = await Promise.all([
         getJobById(id),
         getApplications(),
-        getCandidates(),
+        canManage ? getCandidates() : Promise.resolve([]),
       ]);
 
       setJob(jobResult ?? null);
@@ -86,7 +86,7 @@ const JobDetail: React.FC = () => {
         const [jobResult, appResult, candidateResult] = await Promise.all([
           getJobById(id),
           getApplications(),
-          getCandidates(),
+          canManage ? getCandidates() : Promise.resolve([]),
         ]);
 
         if (cancelled) return;
@@ -131,7 +131,10 @@ const JobDetail: React.FC = () => {
     return applications
       .map((app) => ({
         app,
-        candidate: candidates.find((c) => c.id === app.candidateId),
+        candidate:
+          typeof app.candidateId === "string"
+            ? candidates.find((c) => c.id === app.candidateId)
+            : app.candidateId,
       }))
       .filter((r) => r.candidate)
       .sort((a, b) => b.app.score - a.app.score);
