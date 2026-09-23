@@ -39,23 +39,55 @@ const AuditDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+
+    let cancelled = false;
+
     // Intentional: show the loading state when navigating between audit IDs.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    getAuditById(id).then(async (auditResult) => {
-      if (!auditResult) {
+
+    const loadAudit = async () => {
+      try {
+        const auditResult = await getAuditById(id);
+
+        if (cancelled) return;
+
+        if (!auditResult) {
+          setAudit(null);
+          setLoading(false);
+          return;
+        }
+
+        setAudit(auditResult);
         setLoading(false);
-        return;
+
+        // These are secondary display details. Do not block the main
+        // Audit Detail UI while they are loading.
+        const [restaurantResult, users] = await Promise.all([
+          getRestaurantById(auditResult.restaurantId),
+          getUsers(),
+        ]);
+
+        if (cancelled) return;
+
+        setRestaurant(restaurantResult ?? null);
+        setAuditor(
+          users.find((u) => u.id === auditResult.auditorId) ?? null,
+        );
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("Failed to load audit detail:", error);
+        setAudit(null);
+        setLoading(false);
       }
-      setAudit(auditResult);
-      const [restaurantResult, users] = await Promise.all([
-        getRestaurantById(auditResult.restaurantId),
-        getUsers(),
-      ]);
-      setRestaurant(restaurantResult ?? null);
-      setAuditor(users.find((u) => u.id === auditResult.auditorId) ?? null);
-      setLoading(false);
-    });
+    };
+
+    void loadAudit();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   if (loading) {
