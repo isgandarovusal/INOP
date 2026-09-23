@@ -48,73 +48,77 @@ const Dashboard: React.FC = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [recruitmentLoading, setRecruitmentLoading] = useState(true);
+  const [auditLoading, setAuditLoading] = useState(true);
   const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
 
-    const loadDashboard = async () => {
-      setLoading(true);
+    const loadDashboard = () => {
       setRecruitmentError(null);
       setAuditError(null);
 
-      const tasks: Promise<void>[] = [];
-
       if (showRecruitment) {
-        tasks.push(
-          Promise.all([
-            getJobs(),
-            getCandidates(),
-            getApplications(),
-          ])
-            .then(([jobsResult, candidatesResult, applicationsResult]) => {
-              if (!mounted) return;
+        setRecruitmentLoading(true);
 
-              setJobs(jobsResult);
-              setCandidates(candidatesResult);
-              setApplications(applicationsResult);
-            })
-            .catch((error) => {
-              console.error("Recruitment dashboard load error:", error);
+        void Promise.all([
+          getJobs(),
+          getCandidates(),
+          getApplications(),
+        ])
+          .then(([jobsResult, candidatesResult, applicationsResult]) => {
+            if (!mounted) return;
 
-              if (!mounted) return;
+            setJobs(jobsResult);
+            setCandidates(candidatesResult);
+            setApplications(applicationsResult);
+          })
+          .catch((error) => {
+            console.error("Recruitment dashboard load error:", error);
 
-              setRecruitmentError(
-                error?.response?.data?.message ||
-                  t("dashboard.recruitmentLoadError")
-              );
-            })
-        );
+            if (!mounted) return;
+
+            setRecruitmentError(
+              error?.response?.data?.message ||
+                t("dashboard.recruitmentLoadError")
+            );
+          })
+          .finally(() => {
+            if (mounted) {
+              setRecruitmentLoading(false);
+            }
+          });
+      } else {
+        setRecruitmentLoading(false);
       }
 
       if (showAudit) {
-        tasks.push(
-          getAuditAnalytics()
-            .then((result) => {
-              if (!mounted) return;
-              setAnalytics(result);
-            })
-            .catch((error) => {
-              console.error("Audit dashboard load error:", error);
+        setAuditLoading(true);
 
-              if (!mounted) return;
+        void getAuditAnalytics()
+          .then((result) => {
+            if (!mounted) return;
+            setAnalytics(result);
+          })
+          .catch((error) => {
+            console.error("Audit dashboard load error:", error);
 
-              setAuditError(
-                error?.response?.data?.message ||
-                  t("dashboard.auditLoadError")
-              );
-            })
-        );
-      }
+            if (!mounted) return;
 
-      try {
-        await Promise.all(tasks);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+            setAuditError(
+              error?.response?.data?.message ||
+                t("dashboard.auditLoadError")
+            );
+          })
+          .finally(() => {
+            if (mounted) {
+              setAuditLoading(false);
+            }
+          });
+      } else {
+        setAuditLoading(false);
       }
     };
 
@@ -151,14 +155,15 @@ const Dashboard: React.FC = () => {
     <div>
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
-      {loading ? (
-        <div className="empty-state">{t("dashboard.loading")}</div>
-      ) : (
-        <>
+      <>
           {showRecruitment && (
             <>
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
 
+              {recruitmentLoading ? (
+                <div className="empty-state">{t("dashboard.loading")}</div>
+              ) : (
+                <>
               {recruitmentError && (
                 <div className="dashboard-error">
                   <AlertTriangle size={18} />
@@ -272,6 +277,8 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               </div>
+                </>
+              )}
             </>
           )}
 
@@ -279,6 +286,10 @@ const Dashboard: React.FC = () => {
             <>
               <h3 className="dashboard-section-title">{t("dashboard.auditOperations")}</h3>
 
+              {auditLoading ? (
+                <div className="empty-state">{t("dashboard.loading")}</div>
+              ) : (
+                <>
               {auditError && (
                 <div className="dashboard-error">
                   <AlertTriangle size={18} />
@@ -423,10 +434,11 @@ const Dashboard: React.FC = () => {
                 </>
 
               )}
+                </>
+              )}
             </>
           )}
         </>
-      )}
     </div>
   );
 };
