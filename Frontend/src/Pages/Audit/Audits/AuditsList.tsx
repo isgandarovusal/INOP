@@ -74,13 +74,23 @@ const AuditsList: React.FC = () => {
 
   const auditors = useMemo(() => users.filter((u) => u.role === "auditor"), [users]);
 
+  const restaurantMap = useMemo(
+    () => new Map(restaurants.map((restaurant) => [restaurant.id, restaurant])),
+    [restaurants],
+  );
+
+  const userMap = useMemo(
+    () => new Map(users.map((auditUser) => [auditUser.id, auditUser])),
+    [users],
+  );
+
   const rows = useMemo(() => {
     const min = minScore ? Number(minScore) : 0;
     return audits
       .map((audit) => ({
         audit,
-        restaurant: restaurants.find((r) => r.id === audit.restaurantId),
-        auditor: users.find((u) => u.id === audit.auditorId),
+        restaurant: restaurantMap.get(audit.restaurantId),
+        auditor: userMap.get(audit.auditorId),
         overall:
           audit.overallPercentage && audit.overallPercentage > 0
             ? audit.overallPercentage / 10
@@ -94,7 +104,7 @@ const AuditsList: React.FC = () => {
       .filter((r) => restaurantFilter === "all" || r.audit.restaurantId === restaurantFilter)
       .filter((r) => auditorFilter === "all" || r.audit.auditorId === auditorFilter)
       .filter((r) => r.overall >= min);
-  }, [audits, restaurants, users, restaurantFilter, auditorFilter, minScore]);
+  }, [audits, restaurantMap, userMap, restaurantFilter, auditorFilter, minScore]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
