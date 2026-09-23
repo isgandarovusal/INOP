@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -180,19 +180,21 @@ const CandidatesList: React.FC = () => {
     }
   };
 
-  const filteredCandidates = candidates.filter((candidate) => {
+  const filteredCandidates = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    if (!query) return true;
+    if (!query) return candidates;
 
-    const nameMatch = candidate.name.toLowerCase().includes(query);
-    const roleMatch = candidate.role?.toLowerCase().includes(query);
-    const skillMatch = candidate.skills?.some((skill) =>
-      skill.toLowerCase().includes(query),
-    );
+    return candidates.filter((candidate) => {
+      const nameMatch = candidate.name.toLowerCase().includes(query);
+      const roleMatch = candidate.role?.toLowerCase().includes(query);
+      const skillMatch = candidate.skills?.some((skill) =>
+        skill.toLowerCase().includes(query),
+      );
 
-    return nameMatch || roleMatch || skillMatch;
-  });
+      return nameMatch || roleMatch || skillMatch;
+    });
+  }, [candidates, searchQuery]);
 
   return (
     <div className="page-container">
