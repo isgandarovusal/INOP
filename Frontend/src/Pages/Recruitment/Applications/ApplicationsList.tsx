@@ -105,11 +105,26 @@ const ApplicationsList: React.FC = () => {
   }, []);
 
   const rows = useMemo(() => {
+    const jobMap = new Map(jobs.map((job) => [job.id, job]));
+    const candidateMap = new Map(
+      candidates.map((candidate) => [candidate.id, candidate]),
+    );
+
+    const getRelatedId = (
+      value: string | Job | Candidate,
+    ): string => {
+      if (typeof value === "string") {
+        return value;
+      }
+
+      return value.id || value._id || "";
+    };
+
     return applications
       .map((app) => ({
         app,
-        job: jobs.find((j) => j.id === app.jobId),
-        candidate: candidates.find((c) => c.id === app.candidateId),
+        job: jobMap.get(getRelatedId(app.jobId)),
+        candidate: candidateMap.get(getRelatedId(app.candidateId)),
       }))
       .filter((r) => r.job && r.candidate)
       .filter((r) => jobFilter === "all" || r.job!.id === jobFilter)
