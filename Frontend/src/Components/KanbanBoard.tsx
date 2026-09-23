@@ -41,6 +41,30 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const columnTitle = (status: CandidateStatus) =>
     t(`components.kanban.${status}`);
 
+  const candidatesByStatus = candidates.reduce<
+    Record<CandidateStatus, Candidate[]>
+  >(
+    (columns, candidate) => {
+      const status = candidate.status;
+
+      if (columns[status]) {
+        columns[status].push(candidate);
+      }
+
+      return columns;
+    },
+    {
+      new: [],
+      applied: [],
+      screening: [],
+      shortlisted: [],
+      interview: [],
+      offer: [],
+      hired: [],
+      rejected: [],
+    },
+  );
+
   const handleOnDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
@@ -69,9 +93,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     >
       <DragDropContext onDragEnd={handleOnDragEnd}>
         {COLUMNS.map((status) => {
-          const columnCandidates = candidates.filter(
-            (candidate) => candidate.status === status,
-          );
+          const columnCandidates = candidatesByStatus[status];
 
           return (
             <div
