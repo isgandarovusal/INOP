@@ -48,7 +48,9 @@ const Dashboard: React.FC = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
-  const [recruitmentLoading, setRecruitmentLoading] = useState(true);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [auditLoading, setAuditLoading] = useState(true);
   const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
@@ -61,22 +63,17 @@ const Dashboard: React.FC = () => {
       setAuditError(null);
 
       if (showRecruitment) {
-        setRecruitmentLoading(true);
+        setJobsLoading(true);
+        setCandidatesLoading(true);
+        setApplicationsLoading(true);
 
-        void Promise.all([
-          getJobs(),
-          getCandidates(),
-          getApplications(),
-        ])
-          .then(([jobsResult, candidatesResult, applicationsResult]) => {
+        void getJobs()
+          .then((result) => {
             if (!mounted) return;
-
-            setJobs(jobsResult);
-            setCandidates(candidatesResult);
-            setApplications(applicationsResult);
+            setJobs(result);
           })
           .catch((error) => {
-            console.error("Recruitment dashboard load error:", error);
+            console.error("Jobs dashboard load error:", error);
 
             if (!mounted) return;
 
@@ -87,11 +84,55 @@ const Dashboard: React.FC = () => {
           })
           .finally(() => {
             if (mounted) {
-              setRecruitmentLoading(false);
+              setJobsLoading(false);
+            }
+          });
+
+        void getCandidates()
+          .then((result) => {
+            if (!mounted) return;
+            setCandidates(result);
+          })
+          .catch((error) => {
+            console.error("Candidates dashboard load error:", error);
+
+            if (!mounted) return;
+
+            setRecruitmentError(
+              error?.response?.data?.message ||
+                t("dashboard.recruitmentLoadError")
+            );
+          })
+          .finally(() => {
+            if (mounted) {
+              setCandidatesLoading(false);
+            }
+          });
+
+        void getApplications()
+          .then((result) => {
+            if (!mounted) return;
+            setApplications(result);
+          })
+          .catch((error) => {
+            console.error("Applications dashboard load error:", error);
+
+            if (!mounted) return;
+
+            setRecruitmentError(
+              error?.response?.data?.message ||
+                t("dashboard.recruitmentLoadError")
+            );
+          })
+          .finally(() => {
+            if (mounted) {
+              setApplicationsLoading(false);
             }
           });
       } else {
-        setRecruitmentLoading(false);
+        setJobsLoading(false);
+        setCandidatesLoading(false);
+        setApplicationsLoading(false);
       }
 
       if (showAudit) {
@@ -155,15 +196,10 @@ const Dashboard: React.FC = () => {
     <div>
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
-      <>
           {showRecruitment && (
             <>
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
 
-              {recruitmentLoading ? (
-                <div className="empty-state">{t("dashboard.loading")}</div>
-              ) : (
-                <>
               {recruitmentError && (
                 <div className="dashboard-error">
                   <AlertTriangle size={18} />
@@ -179,21 +215,27 @@ const Dashboard: React.FC = () => {
                     <Briefcase size={18} color="#6366f1" />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
-                  <p className="kpi-card__value">{jobs.length}</p>
+                  <p className="kpi-card__value">
+                    {jobsLoading ? "—" : jobs.length}
+                  </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
                     <UserSquare2 size={18} color="#0ea5e9" />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
-                  <p className="kpi-card__value">{candidates.length}</p>
+                  <p className="kpi-card__value">
+                    {candidatesLoading ? "—" : candidates.length}
+                  </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
                     <ClipboardList size={18} color="#22c55e" />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.applications")}</p>
-                  <p className="kpi-card__value">{applications.length}</p>
+                  <p className="kpi-card__value">
+                    {applicationsLoading ? "—" : applications.length}
+                  </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
                   <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
@@ -201,7 +243,9 @@ const Dashboard: React.FC = () => {
                   </div>
                   <p className="kpi-card__label">{t("dashboard.shortlisted")}</p>
                   <p className="kpi-card__value">
-                    {candidates.filter((c) => c.status === "shortlisted").length}
+                    {candidatesLoading
+                      ? "—"
+                      : candidates.filter((c) => c.status === "shortlisted").length}
                   </p>
                 </div>
               </div>
@@ -214,7 +258,9 @@ const Dashboard: React.FC = () => {
                       {t("dashboard.viewAll")} <ArrowUpRight size={13} />
                     </button>
                   </div>
-                  {recentCandidates.length === 0 ? (
+                  {candidatesLoading ? (
+                    <div className="empty-state">{t("dashboard.loading")}</div>
+                  ) : recentCandidates.length === 0 ? (
                     <div className="chart-empty">
                       <PackageOpen size={22} />
                       <p>{t("dashboard.noCandidates")}</p>
@@ -242,7 +288,9 @@ const Dashboard: React.FC = () => {
                   <div className="chart-card__header">
                     <h3>{t("dashboard.candidatesByStatus")}</h3>
                   </div>
-                  {statusBreakdown.length === 0 ? (
+                  {candidatesLoading ? (
+                    <div className="empty-state">{t("dashboard.loading")}</div>
+                  ) : statusBreakdown.length === 0 ? (
                     <div className="chart-empty">
                       <UserSquare2 size={22} />
                       <p>{t("dashboard.addCandidates")}</p>
@@ -277,8 +325,6 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               </div>
-                </>
-              )}
             </>
           )}
 
@@ -438,7 +484,6 @@ const Dashboard: React.FC = () => {
               )}
             </>
           )}
-        </>
     </div>
   );
 };
