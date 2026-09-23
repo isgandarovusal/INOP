@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -41,28 +41,30 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const columnTitle = (status: CandidateStatus) =>
     t(`components.kanban.${status}`);
 
-  const candidatesByStatus = candidates.reduce<
-    Record<CandidateStatus, Candidate[]>
-  >(
-    (columns, candidate) => {
-      const status = candidate.status;
+  const candidatesByStatus = useMemo(
+    () =>
+      candidates.reduce<Record<CandidateStatus, Candidate[]>>(
+        (columns, candidate) => {
+          const status = candidate.status;
 
-      if (columns[status]) {
-        columns[status].push(candidate);
-      }
+          if (columns[status]) {
+            columns[status].push(candidate);
+          }
 
-      return columns;
-    },
-    {
-      new: [],
-      applied: [],
-      screening: [],
-      shortlisted: [],
-      interview: [],
-      offer: [],
-      hired: [],
-      rejected: [],
-    },
+          return columns;
+        },
+        {
+          new: [],
+          applied: [],
+          screening: [],
+          shortlisted: [],
+          interview: [],
+          offer: [],
+          hired: [],
+          rejected: [],
+        },
+      ),
+    [candidates],
   );
 
   const handleOnDragEnd = async (result: DropResult) => {
