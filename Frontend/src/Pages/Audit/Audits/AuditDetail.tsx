@@ -6,7 +6,7 @@ import AuditClosurePanel from "../AuditClosure/AuditClosurePanel";
 import AuditExportPanel from "../AuditExport/AuditExportPanel";
 import AuditHistoryPanel from "../AuditHistory/AuditHistoryPanel";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
@@ -36,6 +36,8 @@ const AuditDetail: React.FC = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [auditor, setAuditor] = useState<PublicUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [businessModulesReady, setBusinessModulesReady] = useState(false);
+  const businessModulesRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -89,6 +91,41 @@ const AuditDetail: React.FC = () => {
       cancelled = true;
     };
   }, [id]);
+
+  useEffect(() => {
+    setBusinessModulesReady(false);
+  }, [id]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const element = businessModulesRef.current;
+
+    if (!element) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setBusinessModulesReady(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+
+        setBusinessModulesReady(true);
+        observer.disconnect();
+      },
+      {
+        rootMargin: "500px 0px",
+      },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [id, loading]);
 
   if (loading) {
     return (
@@ -279,36 +316,21 @@ const AuditDetail: React.FC = () => {
 
       {/* AUDIT BUSINESS MODULES */}
 
-      <div className="audit-business-modules">
-
-        <AuditFindingsList
-          auditId={id ?? ""}
-        />
-
-        <AuditAssignmentsList
-          auditId={id ?? ""}
-        />
-
-        <AuditTimeline
-          auditId={id ?? ""}
-        />
-
-        <AuditApprovalPanel
-          auditId={id ?? ""}
-        />
-
-        <AuditClosurePanel
-          auditId={id ?? ""}
-        />
-
-        <AuditExportPanel
-          auditId={id ?? ""}
-        />
-
-        <AuditHistoryPanel
-          auditId={id ?? ""}
-        />
-
+      <div
+        ref={businessModulesRef}
+        className="audit-business-modules"
+      >
+        {businessModulesReady ? (
+          <>
+            <AuditFindingsList auditId={id ?? ""} />
+            <AuditAssignmentsList auditId={id ?? ""} />
+            <AuditTimeline auditId={id ?? ""} />
+            <AuditApprovalPanel auditId={id ?? ""} />
+            <AuditClosurePanel auditId={id ?? ""} />
+            <AuditExportPanel auditId={id ?? ""} />
+            <AuditHistoryPanel auditId={id ?? ""} />
+          </>
+        ) : null}
       </div>
 
 
