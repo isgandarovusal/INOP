@@ -1,26 +1,17 @@
+import api from "../api/axios";
 import type { ServiceAudit } from "../Types/Audit";
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
 
 async function request<T>(
   path: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-    ...options,
+  const response = await api.request<T>({
+    url: path,
+    method: options?.method,
+    data: options?.body,
   });
 
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
-    throw new Error(body?.message || "Sorğu uğursuz oldu");
-  }
-
-  return response.json();
+  return response.data;
 }
 
 export async function getServiceAudits(): Promise<ServiceAudit[]> {
