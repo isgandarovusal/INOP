@@ -1,6 +1,4 @@
-const API =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:3001/api";
+import api from "../api/axios";
 
 export interface AuditDashboardStat {
   _id: string;
@@ -23,13 +21,9 @@ export interface AuditDashboardData {
 }
 
 async function request<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`);
+  const response = await api.get<T>(path);
 
-  if (!res.ok) {
-    throw new Error("Audit dashboard request failed");
-  }
-
-  return res.json() as Promise<T>;
+  return response.data;
 }
 
 export function getAuditDashboard(): Promise<AuditDashboardData> {
