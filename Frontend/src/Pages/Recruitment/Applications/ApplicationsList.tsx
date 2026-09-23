@@ -11,8 +11,7 @@ import {
   updateApplicationStatus,
 } from "../../../Services/applicationsService";
 import { getJobs } from "../../../Services/jobsService";
-import { getCandidates } from "../../../Services/candidatesService";
-import type { Application, ApplicationStatus, Job, Candidate } from "../../../Types/recruitment";
+import type { Application, ApplicationStatus, Job } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
 import { canManageRecruitment } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
@@ -35,7 +34,6 @@ const ApplicationsList: React.FC = () => {
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [jobFilter, setJobFilter] = useState("all");
@@ -48,15 +46,13 @@ const ApplicationsList: React.FC = () => {
     setError(false);
 
     try {
-      const [appResult, jobResult, candidateResult] = await Promise.all([
+      const [appResult, jobResult] = await Promise.all([
         getApplications(),
         getJobs(),
-        getCandidates(),
       ]);
 
       setApplications(appResult);
       setJobs(jobResult);
-      setCandidates(candidateResult);
     } catch (loadError) {
       console.error("Applications load error:", loadError);
       setError(true);
@@ -73,18 +69,16 @@ const ApplicationsList: React.FC = () => {
       setError(false);
 
       try {
-        const [applicationResult, jobResult, candidateResult] =
+        const [applicationResult, jobResult] =
           await Promise.all([
             getApplications(),
             getJobs(),
-            getCandidates(),
           ]);
 
         if (cancelled) return;
 
         setApplications(applicationResult);
         setJobs(jobResult);
-        setCandidates(candidateResult);
       } catch (loadError) {
         if (!cancelled) {
           console.error("Applications load error:", loadError);
@@ -106,31 +100,24 @@ const ApplicationsList: React.FC = () => {
 
   const rows = useMemo(() => {
     const jobMap = new Map(jobs.map((job) => [job.id, job]));
-    const candidateMap = new Map(
-      candidates.map((candidate) => [candidate.id, candidate]),
-    );
-
-    const getRelatedId = (
-      value: string | Job | Candidate,
-    ): string => {
-      if (typeof value === "string") {
-        return value;
-      }
-
-      return value.id || value._id || "";
-    };
 
     return applications
       .map((app) => ({
         app,
-        job: jobMap.get(getRelatedId(app.jobId)),
-        candidate: candidateMap.get(getRelatedId(app.candidateId)),
+        job:
+          typeof app.jobId === "string"
+            ? jobMap.get(app.jobId)
+            : app.jobId,
+        candidate:
+          typeof app.candidateId === "string"
+            ? undefined
+            : app.candidateId,
       }))
       .filter((r) => r.job && r.candidate)
       .filter((r) => jobFilter === "all" || r.job!.id === jobFilter)
       .filter((r) => statusFilter === "all" || r.app.status === statusFilter)
       .sort((a, b) => b.app.score - a.app.score);
-  }, [applications, jobs, candidates, jobFilter, statusFilter]);
+  }, [applications, jobs, jobFilter, statusFilter]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
