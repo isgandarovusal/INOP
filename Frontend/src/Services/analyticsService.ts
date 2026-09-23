@@ -58,54 +58,101 @@ export async function getAuditAnalytics(): Promise<AuditAnalytics> {
     };
   }
 
-  const overall = round1(
-    audits.reduce((sum, a) => sum + overallScore(a), 0) / audits.length,
-  );
-
-  const criticalCount = audits.filter((a) => overallScore(a) < CRITICAL_THRESHOLD).length;
-  const restaurantIds = new Set(audits.map((a) => a.restaurantId));
-
-  const restaurantComparison: RestaurantScore[] = [...restaurantIds]
-    .map((id) => {
-      const restaurant = restaurants.find((r) => r.id === id);
-      const restaurantAudits = audits.filter((a) => a.restaurantId === id);
-      const score = round1(
-        restaurantAudits.reduce((sum, a) => sum + overallScore(a), 0) / restaurantAudits.length,
-      );
-      return { restaurantId: id, name: restaurant?.name ?? "Unknown", score };
-    })
-    .sort((a, b) => b.score - a.score);
-
-  const categories: (keyof Audit["scores"])[] = ["food", "cleanliness", "staff", "service"];
-  const categoryAnalysis: CategoryScore[] = categories
-    .map((category) => ({
-      category: category.charAt(0).toUpperCase() + category.slice(1),
-      score: round1(audits.reduce((sum, a) => sum + a.scores[category], 0) / audits.length),
-    }))
-    .sort((a, b) => b.score - a.score);
-
+  const restaurantMap = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
+  const restaurantGroups = new Map<string, { sum: number; count: number }>();
   const monthGroups = new Map<string, { sum: number; count: number; order: number }>();
+
+  let totalScore = 0;
+  let criticalCount = 0;
+
+  const categoryTotals: Record<keyof Audit["scores"], number> = {
+    food: 0,
+    cleanliness: 0,
+    staff: 0,
+    service: 0,
+  };
+
   audits.forEach((audit) => {
-    const d = new Date(audit.date);
-    const key = d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
-    const order = d.getFullYear() * 12 + d.getMonth();
-    const existing = monthGroups.get(key);
-    if (existing) {
-      existing.sum += overallScore(audit);
-      existing.count += 1;
+    const score = overallScore(audit);
+
+    totalScore += score;
+
+    if (score < CRITICAL_THRESHOLD) {
+      criticalCount += 1;
+    }
+
+    categoryTotals.food += audit.scores.food;
+    categoryTotals.cleanliness += audit.scores.cleanliness;
+    categoryTotals.staff += audit.scores.staff;
+    categoryTotals.service += audit.scores.service;
+
+    const restaurantGroup = restaurantGroups.get(audit.restaurantId);
+
+    if (restaurantGroup) {
+      restaurantGroup.sum += score;
+      restaurantGroup.count += 1;
     } else {
-      monthGroups.set(key, { sum: overallScore(audit), count: 1, order });
+      restaurantGroups.set(audit.restaurantId, {
+        sum: score,
+        count: 1,
+      });
+    }
+
+    const d = new Date(audit.date);
+    const key = d.toLocaleDateString(undefined, {
+      month: "short",
+      year: "2-digit",
+    });
+    const order = d.getFullYear() * 12 + d.getMonth();
+    const monthGroup = monthGroups.get(key);
+
+    if (monthGroup) {
+      monthGroup.sum += score;
+      monthGroup.count += 1;
+    } else {
+      monthGroups.set(key, {
+        sum: score,
+        count: 1,
+        order,
+      });
     }
   });
 
+  const overall = round1(totalScore / audits.length);
+
+  const restaurantComparison: RestaurantScore[] = [...restaurantGroups.entries()]
+    .map(([id, group]) => ({
+      restaurantId: id,
+      name: restaurantMap.get(id)?.name ?? "Unknown",
+      score: round1(group.sum / group.count),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  const categories: (keyof Audit["scores"])[] = [
+    "food",
+    "cleanliness",
+    "staff",
+    "service",
+  ];
+
+  const categoryAnalysis: CategoryScore[] = categories
+    .map((category) => ({
+      category: category.charAt(0).toUpperCase() + category.slice(1),
+      score: round1(categoryTotals[category] / audits.length),
+    }))
+    .sort((a, b) => b.score - a.score);
+
   const historicalTrend: TrendPoint[] = [...monthGroups.entries()]
     .sort((a, b) => a[1].order - b[1].order)
-    .map(([label, { sum, count }]) => ({ label, score: round1(sum / count) }));
+    .map(([label, { sum, count }]) => ({
+      label,
+      score: round1(sum / count),
+    }));
 
   return {
     overallScore: overall,
     totalAudits: audits.length,
-    restaurantsAudited: restaurantIds.size,
+    restaurantsAudited: restaurantGroups.size,
     criticalCount,
     restaurantComparison,
     categoryAnalysis,
