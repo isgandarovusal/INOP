@@ -15,7 +15,7 @@ import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
 import { getAuditById } from "../../../Services/auditsService";
 import { getRestaurantById } from "../../../Services/restaurantsService";
-import { getUsers } from "../../../Services/usersService";
+import { getUserById } from "../../../Services/usersService";
 import type { Audit } from "../../../Types/audit";
 import type { Restaurant } from "../../../Types/audit";
 import type { PublicUser } from "../../../Types/auth";
@@ -65,17 +65,15 @@ const AuditDetail: React.FC = () => {
 
         // These are secondary display details. Do not block the main
         // Audit Detail UI while they are loading.
-        const [restaurantResult, users] = await Promise.all([
+        const [restaurantResult, auditorResult] = await Promise.all([
           getRestaurantById(auditResult.restaurantId),
-          getUsers(),
+          getUserById(auditResult.auditorId),
         ]);
 
         if (cancelled) return;
 
         setRestaurant(restaurantResult ?? null);
-        setAuditor(
-          users.find((u) => u.id === auditResult.auditorId) ?? null,
-        );
+        setAuditor(auditorResult ?? null);
       } catch (error) {
         if (cancelled) return;
 
