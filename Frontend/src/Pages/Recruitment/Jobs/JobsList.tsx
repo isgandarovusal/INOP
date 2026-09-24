@@ -113,8 +113,8 @@ const JobsList: React.FC = () => {
 
     try {
       await deleteJob(id);
+      setJobs((prev) => prev.filter((job) => job.id !== id));
       setDeleteTarget(null);
-      await load();
     } catch (err) {
       console.error("Failed to delete job:", err);
     } finally {
