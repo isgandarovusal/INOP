@@ -1395,7 +1395,7 @@ button.btn {
 .audit-page button.btn-primary,
 .audit-page-header .btn-primary,
 .audit-modern-page .btn-primary,
-.audit-modern-page button:not(.audit-modern-button.secondary) {
+.audit-modern-page button:not(.audit-modern-button) {
   background: #0f766e;
   border-color: #0f766e;
   color: #ffffff;
@@ -1405,7 +1405,7 @@ button.btn {
 .audit-page button.btn-primary:hover:not(:disabled),
 .audit-page-header .btn-primary:hover:not(:disabled),
 .audit-modern-page .btn-primary:hover:not(:disabled),
-.audit-modern-page button:not(.audit-modern-button.secondary):hover:not(:disabled) {
+.audit-modern-page button:not(.audit-modern-button):hover:not(:disabled) {
   background: #115e59;
   border-color: #115e59;
 }

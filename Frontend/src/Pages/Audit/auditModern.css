@@ -45,12 +45,12 @@
 }
 
 .audit-modern-button {
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 10px;
   padding: 10px 16px;
   min-height: 40px;
   background: #0f766e;
-  color: white;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 650;
   cursor: pointer;
@@ -66,14 +66,40 @@
   box-shadow: 0 7px 18px rgba(37, 99, 235, .18);
 }
 
+.audit-modern-button-primary {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #ffffff;
+}
+
+.audit-modern-button-primary:hover {
+  background: #115e59;
+  border-color: #115e59;
+}
+
+.audit-modern-button-secondary,
 .audit-modern-button.secondary {
   background: #ffffff;
   color: #334155;
-  border: 1px solid #cbd5e1;
+  border-color: #cbd5e1;
 }
 
+.audit-modern-button-secondary:hover,
 .audit-modern-button.secondary:hover {
   background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: none;
+}
+
+.audit-modern-button-danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.audit-modern-button-danger:hover {
+  background: #fecaca;
+  border-color: #fca5a5;
 }
 
 .audit-modern-grid {
@@ -341,9 +367,9 @@
   font-family: inherit;
 }
 
-.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel),
-.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel),
-.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel) {
+.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button),
+.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button),
+.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button) {
   border: 1px solid #dbe3ee;
   border-radius: 10px;
   padding: 9px 14px;
@@ -357,9 +383,9 @@
   transition: all .18s ease;
 }
 
-.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover,
-.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover,
-.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover {
+.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button):hover,
+.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button):hover,
+.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.audit-modern-button):hover {
   background: #f8fafc;
   border-color: #c7d2e2;
   transform: translateY(-1px);
