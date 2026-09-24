@@ -98,6 +98,16 @@ function normalizeCandidate(raw: unknown): Candidate {
       typeof data.assignedTo === "string" || data.assignedTo === null
         ? data.assignedTo
         : undefined,
+
+    createdAt:
+      typeof data.createdAt === "string"
+        ? data.createdAt
+        : undefined,
+
+    updatedAt:
+      typeof data.updatedAt === "string"
+        ? data.updatedAt
+        : undefined,
   };
 }
 
