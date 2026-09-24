@@ -996,8 +996,8 @@
   padding: 7px 10px;
   border: 0;
   border-radius: 8px;
-  background: rgba(59, 130, 246, 0.08);
-  color: #2563eb;
+  background: rgba(15, 118, 110, 0.10);
+  color: #0f766e;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -1141,12 +1141,6 @@
 
 
 /* Buttons */
-
-.audit-builder-add {
-  background:rgba(15,118,110,0.10);
-  color:#0f766e;
-}
-
 
 .audit-icon-danger {
   color:#dc2626;

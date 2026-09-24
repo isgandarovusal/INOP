@@ -72,12 +72,16 @@ export default function SafetyAuditsList() {
                   <td>{audit.status}</td>
                   <td>
                     <div className="audit-modern-actions">
-                      <Link to={`/app/audit/safety/${audit.id}`}>
+                      <Link
+                        to={`/app/audit/safety/${audit.id}`}
+                        className="audit-modern-button audit-modern-button-secondary"
+                      >
                         Bax
                       </Link>
 
                       <button
                         type="button"
+                        className="audit-modern-button audit-modern-button-danger"
                         onClick={() => handleDelete(audit.id)}
                       >
                         Sil
