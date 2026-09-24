@@ -522,15 +522,6 @@
   flex-wrap: wrap;
 }
 
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-}
-
 .audit-table-input {
   width: 100%;
   min-height: 38px;
