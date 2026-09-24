@@ -105,6 +105,7 @@ exports.exportCandidatePdf = async (req, res) => {
       candidateId: candidate._id,
       ...getScopeFilter(req),
     })
+      .select("jobId status score")
       .populate(
         "jobId",
         "title department location type"
