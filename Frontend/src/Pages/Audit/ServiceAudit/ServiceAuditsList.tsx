@@ -183,7 +183,7 @@ export default function ServiceAuditsList() {
           })}
         />
 
-        <button type="button" onClick={resetFilters}>
+        <button type="button" className="btn-secondary" onClick={resetFilters}>
           {t("audit.service.list.resetFilters", {
             defaultValue: "Reset filters",
           })}
