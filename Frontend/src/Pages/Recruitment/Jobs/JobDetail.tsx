@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -35,7 +35,7 @@ const JobDetail: React.FC = () => {
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const loadJobDetail = async () => {
+  const loadJobDetail = useCallback(async () => {
     if (!id) return;
 
     setLoading(true);
@@ -71,61 +71,11 @@ const JobDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [canManage, id, t]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      if (!id) return;
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const [jobResult, appResult, candidateResult] = await Promise.all([
-          getJobById(id),
-          getApplications(),
-          canManage ? getCandidates() : Promise.resolve([]),
-        ]);
-
-        if (cancelled) return;
-
-        setJob(jobResult ?? null);
-        setApplications(appResult.filter((a) => a.jobId === id));
-        setCandidates(candidateResult);
-      } catch (err: unknown) {
-        if (cancelled) return;
-
-        console.error("Failed to load job detail:", err);
-
-        const error = err as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-          message?: string;
-        };
-
-        setError(
-          error.response?.data?.message ||
-            error.message ||
-            t("recruitment.jobDetail.loadError"),
-        );
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, t]);
+    void loadJobDetail();
+  }, [loadJobDetail]);
 
   const ranked = useMemo(() => {
     return applications
