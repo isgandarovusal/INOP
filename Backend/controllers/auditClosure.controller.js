@@ -49,13 +49,20 @@ exports.closeAudit = async (req, res) => {
       });
     }
 
-    const openFindings =
-      await AuditFinding.countDocuments({
-        auditId,
-        status: {
-          $ne: "closed",
-        },
-      });
+    const [openFindings, approval] =
+      await Promise.all([
+        AuditFinding.countDocuments({
+          auditId,
+          status: {
+            $ne: "closed",
+          },
+        }),
+        AuditApproval.findOne({
+          auditId,
+        }).sort({
+          createdAt: -1,
+        }),
+      ]);
 
     if (openFindings > 0) {
       return res.status(400).json({
@@ -63,13 +70,6 @@ exports.closeAudit = async (req, res) => {
         message: "Open findings exist",
       });
     }
-
-    const approval =
-      await AuditApproval.findOne({
-        auditId,
-      }).sort({
-        createdAt: -1,
-      });
 
     if (
       approval &&
@@ -95,27 +95,29 @@ exports.closeAudit = async (req, res) => {
 
     await audit.save();
 
-    await createAuditActivity({
-      auditId: audit._id,
-      action: "closed",
-      resource: "closure",
-      description: "Audit bağlandı",
-      metadata: {
-        closureId: closure._id,
-        approvalStatus: closure.approvalStatus,
-        finalStatus: closure.finalStatus,
-        comment: closure.comment,
-      },
-    });
-
-    const assignment = await AuditAssignment.findOne({
-      auditId: audit._id,
-    })
-      .sort({
-        createdAt: -1,
-      })
-      .select("auditor")
-      .lean();
+    const [, assignment] =
+      await Promise.all([
+        createAuditActivity({
+          auditId: audit._id,
+          action: "closed",
+          resource: "closure",
+          description: "Audit bağlandı",
+          metadata: {
+            closureId: closure._id,
+            approvalStatus: closure.approvalStatus,
+            finalStatus: closure.finalStatus,
+            comment: closure.comment,
+          },
+        }),
+        AuditAssignment.findOne({
+          auditId: audit._id,
+        })
+          .sort({
+            createdAt: -1,
+          })
+          .select("auditor")
+          .lean(),
+      ]);
 
     if (assignment?.auditor) {
       await notifyUser({
