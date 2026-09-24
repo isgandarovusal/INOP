@@ -1,12 +1,10 @@
-import AuditFindingsList from "../AuditFindings/AuditFindingsList";
-import AuditAssignmentsList from "../AuditAssignments/AuditAssignmentsList";
-import AuditTimeline from "../AuditTimeline/AuditTimeline";
-import AuditApprovalPanel from "../AuditApproval/AuditApprovalPanel";
-import AuditClosurePanel from "../AuditClosure/AuditClosurePanel";
-import AuditExportPanel from "../AuditExport/AuditExportPanel";
-import AuditHistoryPanel from "../AuditHistory/AuditHistoryPanel";
-
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
@@ -22,6 +20,48 @@ import type { PublicUser } from "../../../Types/auth";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
+const AuditFindingsList = lazy(
+  () => import("../AuditFindings/AuditFindingsList")
+);
+const AuditAssignmentsList = lazy(
+  () => import("../AuditAssignments/AuditAssignmentsList")
+);
+const AuditTimeline = lazy(
+  () => import("../AuditTimeline/AuditTimeline")
+);
+const AuditApprovalPanel = lazy(
+  () => import("../AuditApproval/AuditApprovalPanel")
+);
+const AuditClosurePanel = lazy(
+  () => import("../AuditClosure/AuditClosurePanel")
+);
+const AuditExportPanel = lazy(
+  () => import("../AuditExport/AuditExportPanel")
+);
+const AuditHistoryPanel = lazy(
+  () => import("../AuditHistory/AuditHistoryPanel")
+);
+
+type LazyAuditModuleProps = {
+  children: React.ReactNode;
+};
+
+const LazyAuditModule: React.FC<LazyAuditModuleProps> = ({ children }) => {
+  return (
+    <div className="audit-business-module">
+      <Suspense
+        fallback={
+          <div className="audit-business-module__loading">
+            Loading...
+          </div>
+        }
+      >
+        {children}
+      </Suspense>
+    </div>
+  );
+};
+
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
 const AuditDetail: React.FC = () => {
@@ -36,8 +76,8 @@ const AuditDetail: React.FC = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [auditor, setAuditor] = useState<PublicUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [businessModulesReady, setBusinessModulesReady] = useState(false);
-  const businessModulesRef = useRef<HTMLDivElement | null>(null);
+  const [renderedBusinessModules, setRenderedBusinessModules] = useState(1);
+  const businessModulesSentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -91,18 +131,20 @@ const AuditDetail: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    setBusinessModulesReady(false);
+    setRenderedBusinessModules(1);
   }, [id]);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || renderedBusinessModules >= 7) return;
 
-    const element = businessModulesRef.current;
+    const sentinel = businessModulesSentinelRef.current;
 
-    if (!element) return;
+    if (!sentinel) return;
 
     if (!("IntersectionObserver" in window)) {
-      setBusinessModulesReady(true);
+      setRenderedBusinessModules((current) =>
+        Math.min(current + 1, 7),
+      );
       return;
     }
 
@@ -110,20 +152,19 @@ const AuditDetail: React.FC = () => {
       ([entry]) => {
         if (!entry.isIntersecting) return;
 
-        setBusinessModulesReady(true);
-        observer.disconnect();
+        setRenderedBusinessModules((current) =>
+          Math.min(current + 1, 7),
+        );
       },
       {
-        rootMargin: "500px 0px",
+        rootMargin: "300px 0px",
       },
     );
 
-    observer.observe(element);
+    observer.observe(sentinel);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [id, loading]);
+    return () => observer.disconnect();
+  }, [loading, renderedBusinessModules]);
 
   if (loading) {
     return (
@@ -314,21 +355,56 @@ const AuditDetail: React.FC = () => {
 
       {/* AUDIT BUSINESS MODULES */}
 
-      <div
-        ref={businessModulesRef}
-        className="audit-business-modules"
-      >
-        {businessModulesReady ? (
-          <>
+      <div className="audit-business-modules">
+        {renderedBusinessModules >= 1 && (
+          <LazyAuditModule>
             <AuditFindingsList auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 2 && (
+          <LazyAuditModule>
             <AuditAssignmentsList auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 3 && (
+          <LazyAuditModule>
             <AuditTimeline auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 4 && (
+          <LazyAuditModule>
             <AuditApprovalPanel auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 5 && (
+          <LazyAuditModule>
             <AuditClosurePanel auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 6 && (
+          <LazyAuditModule>
             <AuditExportPanel auditId={id ?? ""} />
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules >= 7 && (
+          <LazyAuditModule>
             <AuditHistoryPanel auditId={id ?? ""} />
-          </>
-        ) : null}
+          </LazyAuditModule>
+        )}
+
+        {renderedBusinessModules < 7 && (
+          <div
+            ref={businessModulesSentinelRef}
+            className="audit-business-modules__sentinel"
+            aria-hidden="true"
+          />
+        )}
       </div>
 
 
