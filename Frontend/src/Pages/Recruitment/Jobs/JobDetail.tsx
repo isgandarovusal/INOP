@@ -77,25 +77,37 @@ const JobDetail: React.FC = () => {
     void loadJobDetail();
   }, [loadJobDetail]);
 
+  const candidateById = useMemo(
+    () => new Map(candidates.map((candidate) => [candidate.id, candidate])),
+    [candidates],
+  );
+
+  const appliedCandidateIds = useMemo(
+    () =>
+      new Set(
+        applications
+          .filter((application) => typeof application.candidateId === "string")
+          .map((application) => application.candidateId),
+      ),
+    [applications],
+  );
+
   const ranked = useMemo(() => {
     return applications
       .map((app) => ({
         app,
         candidate:
           typeof app.candidateId === "string"
-            ? candidates.find((c) => c.id === app.candidateId)
+            ? candidateById.get(app.candidateId)
             : app.candidateId,
       }))
       .filter((r) => r.candidate)
       .sort((a, b) => b.app.score - a.app.score);
-  }, [applications, candidates]);
+  }, [applications, candidateById]);
 
   const applicableCandidates = useMemo(
-    () =>
-      candidates.filter(
-        (c) => !applications.some((a) => a.candidateId === c.id),
-      ),
-    [candidates, applications],
+    () => candidates.filter((candidate) => !appliedCandidateIds.has(candidate.id)),
+    [candidates, appliedCandidateIds],
   );
 
   const handleLink = async () => {
