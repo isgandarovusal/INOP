@@ -50,12 +50,13 @@ const CandidatesList: React.FC = () => {
       setError(null);
 
       const data = await getCandidates();
-      setCandidates(data);
+      return data;
     } catch (err: unknown) {
       const message =
         getErrorMessage(err, t("recruitment.candidates.loadingError"));
 
       setError(message);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -65,30 +66,10 @@ const CandidatesList: React.FC = () => {
     let cancelled = false;
 
     const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      const data = await fetchCandidates();
 
-        const data = await getCandidates();
-
-        if (!cancelled) {
-          setCandidates(data);
-        }
-      } catch (err: unknown) {
-        if (cancelled) return;
-
-        const error = err as {
-          response?: { data?: { message?: string } };
-        };
-
-        setError(
-          error.response?.data?.message ||
-            t("recruitment.candidates.loadingError"),
-        );
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+      if (!cancelled && data) {
+        setCandidates(data);
       }
     };
 
@@ -97,7 +78,7 @@ const CandidatesList: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, [fetchCandidates]);
 
   const handleStatusChange = async (
     candidateId: string,
