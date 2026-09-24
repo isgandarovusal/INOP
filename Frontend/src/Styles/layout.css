@@ -255,6 +255,22 @@
   min-width: 0;
 }
 
+.route-loading--content {
+  min-height: 70vh;
+  background: transparent;
+  align-items: flex-start;
+}
+
+.route-loading__content-state {
+  width: 100%;
+  padding: 12px 0;
+  min-width: 0;
+}
+
+.route-loading--content .route-loading__card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .route-loading__line,
 .route-loading__card-grid > div {
   background: linear-gradient(
