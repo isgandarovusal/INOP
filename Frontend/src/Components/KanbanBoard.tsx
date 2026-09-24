@@ -20,6 +20,73 @@ interface KanbanBoardProps {
   canChangeStatus?: boolean;
 }
 
+interface KanbanCandidateCardProps {
+  candidate: Candidate;
+  index: number;
+  canChangeStatus: boolean;
+  yearsExperienceLabel: string;
+}
+
+const KanbanCandidateCard = React.memo(
+  ({
+    candidate,
+    index,
+    canChangeStatus,
+    yearsExperienceLabel,
+  }: KanbanCandidateCardProps) => (
+    <Draggable
+      key={candidate.id}
+      draggableId={
+        candidate.id ||
+        candidate._id ||
+        `${candidate.name}-${index}`
+      }
+      index={index}
+      isDragDisabled={!canChangeStatus}
+    >
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            userSelect: "none",
+            padding: "12px",
+            margin: "0 0 8px 0",
+            backgroundColor: "#fff",
+            borderRadius: "6px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            ...provided.draggableProps.style,
+          }}
+        >
+          <strong
+            style={{
+              display: "block",
+              color: "#111827",
+            }}
+          >
+            {candidate.name}
+          </strong>
+
+          <span
+            style={{
+              fontSize: "13px",
+              color: "#6b7280",
+            }}
+          >
+            {candidate.experience} {yearsExperienceLabel}
+          </span>
+        </div>
+      )}
+    </Draggable>
+  ),
+);
+
+KanbanCandidateCard.displayName = "KanbanCandidateCard";
+
 const COLUMNS: CandidateStatus[] = [
   "new",
   "applied",
@@ -125,56 +192,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     {...provided.droppableProps}
                     style={{ minHeight: "300px" }}
                   >
-                    {columnCandidates.map((candidate, index) => {
-                      return (
-                        <Draggable
-                          key={candidate.id}
-                          draggableId={candidate.id || candidate._id || `${candidate.name}-${index}`}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={{
-                                userSelect: "none",
-                                padding: "12px",
-                                margin: "0 0 8px 0",
-                                backgroundColor: "#fff",
-                                borderRadius: "6px",
-                                boxShadow:
-                                  "0 1px 3px rgba(0,0,0,0.1)",
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "6px",
-                                ...provided.draggableProps.style,
-                              }}
-                            >
-                              <strong
-                                style={{
-                                  display: "block",
-                                  color: "#111827",
-                                }}
-                              >
-                                {candidate.name}
-                              </strong>
-
-                              <span
-                                style={{
-                                  fontSize: "13px",
-                                  color: "#6b7280",
-                                }}
-                              >
-                                {candidate.experience}{" "}
-                                {t("components.kanban.yearsExperience")}
-                              </span>
-
-                            </div>
-                          )}
-                        </Draggable>
-                      );
-                    })}
+                    {columnCandidates.map((candidate, index) => (
+                      <KanbanCandidateCard
+                        key={candidate.id || candidate._id || `${candidate.name}-${index}`}
+                        candidate={candidate}
+                        index={index}
+                        canChangeStatus={canChangeStatus}
+                        yearsExperienceLabel={t(
+                          "components.kanban.yearsExperience",
+                        )}
+                      />
+                    ))}
 
                     {provided.placeholder}
                   </div>
