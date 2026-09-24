@@ -274,7 +274,7 @@ const CandidatesList: React.FC = () => {
         >
           <button
             className={
-              "btn-icon " +
+              "view-switcher__button " +
               (viewMode === "grid" ? "active" : "")
             }
             onClick={() => setViewMode("grid")}
@@ -285,7 +285,7 @@ const CandidatesList: React.FC = () => {
 
           <button
             className={
-              "btn-icon " +
+              "view-switcher__button " +
               (viewMode === "list" ? "active" : "")
             }
             onClick={() => setViewMode("list")}
@@ -462,7 +462,7 @@ const CandidatesList: React.FC = () => {
                       <td>
                         <button
                           type="button"
-                          className="btn-icon"
+                          className="icon-btn icon-btn--danger"
                           title={t(
                             "recruitment.candidates.delete",
                           )}
