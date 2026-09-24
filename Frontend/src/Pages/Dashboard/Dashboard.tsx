@@ -170,13 +170,28 @@ const Dashboard: React.FC = () => {
     };
   }, [showRecruitment, showAudit, t]);
 
-  const statusBreakdown = useMemo(() => {
+  const candidateStatusStats = useMemo(() => {
     const counts: Record<string, number> = {};
-    candidates.forEach((c) => {
-      counts[c.status] = (counts[c.status] ?? 0) + 1;
+    let shortlistedCount = 0;
+
+    candidates.forEach((candidate) => {
+      counts[candidate.status] = (counts[candidate.status] ?? 0) + 1;
+
+      if (candidate.status === "shortlisted") {
+        shortlistedCount += 1;
+      }
     });
-    return Object.entries(counts).map(([status, value]) => ({ status, value }));
+
+    return {
+      breakdown: Object.entries(counts).map(([status, value]) => ({
+        status,
+        value,
+      })),
+      shortlistedCount,
+    };
   }, [candidates]);
+
+  const statusBreakdown = candidateStatusStats.breakdown;
 
   const recentCandidates = useMemo(
     () =>
@@ -245,7 +260,7 @@ const Dashboard: React.FC = () => {
                   <p className="kpi-card__value">
                     {candidatesLoading
                       ? "—"
-                      : candidates.filter((c) => c.status === "shortlisted").length}
+                      : candidateStatusStats.shortlistedCount}
                   </p>
                 </div>
               </div>
