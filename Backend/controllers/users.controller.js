@@ -148,7 +148,9 @@ exports.createUser = async (req, res) => {
     const roleExists = await Role.findOne({
       key: role,
       isActive: true,
-    }).lean();
+    })
+      .select("permissions")
+      .lean();
 
     if (!roleExists) {
       return res.status(400).json({
@@ -168,7 +170,7 @@ exports.createUser = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    const permissions = await getPermissions(user.role);
+    const permissions = roleExists.permissions || [];
 
     return res.status(201).json({
       message: "İstifadəçi uğurla yaradıldı.",
@@ -234,17 +236,23 @@ exports.updateUser = async (req, res) => {
       }
     }
 
+    let rolePermissions;
+
     if (req.body.role !== undefined) {
       const roleExists = await Role.findOne({
         key: user.role,
         isActive: true,
-      }).lean();
+      })
+        .select("permissions")
+        .lean();
 
       if (!roleExists) {
         return res.status(400).json({
           message: "Seçilmiş rol mövcud deyil.",
         });
       }
+
+      rolePermissions = roleExists.permissions || [];
     }
 
     if (req.body.password !== undefined) {
@@ -262,7 +270,10 @@ exports.updateUser = async (req, res) => {
 
     await user.save();
 
-    const permissions = await getPermissions(user.role);
+    const permissions =
+      req.body.role !== undefined
+        ? rolePermissions
+        : await getPermissions(user.role);
 
     return res.status(200).json({
       message: "İstifadəçi uğurla yeniləndi.",
