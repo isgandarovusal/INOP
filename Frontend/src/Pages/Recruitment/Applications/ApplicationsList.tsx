@@ -220,7 +220,7 @@ const ApplicationsList: React.FC = () => {
                   <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
                     <button
                       type="button"
-                      className="btn btn--secondary"
+                      className="btn-secondary"
                       onClick={load}
                     >
                       {t("recruitment.applications.retry")}

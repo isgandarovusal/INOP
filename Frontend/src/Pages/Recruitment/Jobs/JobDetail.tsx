@@ -152,7 +152,7 @@ const JobDetail: React.FC = () => {
         />
         <div style={{ textAlign: "center", marginTop: "12px" }}>
           <button
-            className="btn btn--secondary"
+            className="btn-secondary"
             onClick={() => void loadJobDetail()}
           >
             {t("recruitment.jobDetail.retry")}

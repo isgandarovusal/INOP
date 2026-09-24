@@ -162,7 +162,7 @@ const JobForm: React.FC = () => {
           <p className="empty-state__hint">{error}</p>
           <div style={{ marginTop: "12px" }}>
             <button
-              className="btn btn--secondary"
+              className="btn-secondary"
               onClick={() => navigate("/app/recruitment/jobs")}
             >
               {t("recruitment.jobForm.backToJobs")}
@@ -274,7 +274,7 @@ const JobForm: React.FC = () => {
         <div className="form-actions" style={{ marginTop: "20px" }}>
           <button
             type="button"
-            className="btn btn--secondary"
+            className="btn-secondary"
             onClick={() => navigate(-1)}
           >
             {t("recruitment.jobForm.cancel")}
@@ -282,7 +282,7 @@ const JobForm: React.FC = () => {
 
           <button
             type="submit"
-            className="btn btn--primary"
+            className="btn-primary"
             disabled={saving}
           >
             {saving ? <Loader2 size={16} className="spin" /> : null}
