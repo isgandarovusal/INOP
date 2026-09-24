@@ -39,19 +39,20 @@ exports.verifyToken = async (req, res, next) => {
       .update(token)
       .digest("hex");
 
-    const revoked = await RevokedToken.exists({ tokenHash });
+    const [revoked, user] = await Promise.all([
+      RevokedToken.exists({ tokenHash }),
+      User.findById(decoded.id)
+        .select(
+          "_id name email role departmentId position managerId isActive"
+        )
+        .lean(),
+    ]);
 
     if (revoked) {
       return res.status(401).json({
         message: "Authentication token artıq etibarlı deyil.",
       });
     }
-
-    const user = await User.findById(decoded.id)
-      .select(
-        "_id name email role departmentId position managerId isActive"
-      )
-      .lean();
 
     if (!user) {
       return res.status(401).json({
