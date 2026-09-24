@@ -193,17 +193,40 @@ const Dashboard: React.FC = () => {
 
   const statusBreakdown = candidateStatusStats.breakdown;
 
-  const recentCandidates = useMemo(
-    () =>
-      [...candidates]
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt || 0).getTime() -
-            new Date(a.createdAt || 0).getTime()
-        )
-        .slice(0, 5),
-    [candidates],
-  );
+  const recentCandidates = useMemo(() => {
+    const recent = candidates.slice(0, 5);
+
+    for (let index = 5; index < candidates.length; index += 1) {
+      const candidate = candidates[index];
+      const candidateTime = new Date(candidate.createdAt || 0).getTime();
+
+      let oldestIndex = 0;
+      let oldestTime = new Date(
+        recent[0]?.createdAt || 0,
+      ).getTime();
+
+      for (let recentIndex = 1; recentIndex < recent.length; recentIndex += 1) {
+        const recentTime = new Date(
+          recent[recentIndex]?.createdAt || 0,
+        ).getTime();
+
+        if (recentTime < oldestTime) {
+          oldestTime = recentTime;
+          oldestIndex = recentIndex;
+        }
+      }
+
+      if (candidateTime > oldestTime) {
+        recent[oldestIndex] = candidate;
+      }
+    }
+
+    return recent.sort(
+      (a, b) =>
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime(),
+    );
+  }, [candidates]);
 
   if (!user) return null;
 
