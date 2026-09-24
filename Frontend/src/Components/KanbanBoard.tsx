@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -134,22 +134,27 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     [candidates],
   );
 
-  const handleOnDragEnd = async (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+  const handleOnDragEnd = useCallback(
+    async (result: DropResult) => {
+      const { destination, source, draggableId } = result;
 
-    if (!destination || !canChangeStatus) return;
+      if (!destination || !canChangeStatus) return;
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
+      if (
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
+      ) {
+        return;
+      }
 
-    const newStatus = destination.droppableId as CandidateStatus;
+      const newStatus = destination.droppableId as CandidateStatus;
 
-    await onStatusChange(draggableId, newStatus);
-  };
+      await onStatusChange(draggableId, newStatus);
+    },
+    [canChangeStatus, onStatusChange],
+  );
+
+  const yearsExperienceLabel = t("components.kanban.yearsExperience");
 
   return (
     <div
@@ -198,9 +203,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         candidate={candidate}
                         index={index}
                         canChangeStatus={canChangeStatus}
-                        yearsExperienceLabel={t(
-                          "components.kanban.yearsExperience",
-                        )}
+                        yearsExperienceLabel={yearsExperienceLabel}
                       />
                     ))}
 
