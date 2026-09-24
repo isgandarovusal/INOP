@@ -88,7 +88,7 @@ const RestaurantDetail: React.FC = () => {
                   <Pencil size={15} /> {t("audit.restaurants.detail.edit")}
                 </button>
                 <button
-                  className="btn-add"
+                  className="btn-add audit-primary-action"
                   onClick={() => navigate(`/app/audit/audits/new?restaurantId=${restaurant.id}`)}
                 >
                   <Plus size={15} /> {t("audit.restaurants.detail.newAudit")}

@@ -1439,3 +1439,24 @@ button.btn {
 .audit-modern-page .btn-danger:hover:not(:disabled) {
   background: #fecaca;
 }
+
+
+/* Audit primary action normalization */
+
+.audit-primary-action {
+  min-height: 42px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid #0f766e;
+  border-radius: 10px;
+  background: #0f766e;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.audit-primary-action:hover:not(:disabled) {
+  background: #115e59;
+  border-color: #115e59;
+  transform: translateY(-1px);
+  box-shadow: none;
+}
