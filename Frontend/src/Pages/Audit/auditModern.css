@@ -77,15 +77,13 @@
   border-color: #115e59;
 }
 
-.audit-modern-button-secondary,
-.audit-modern-button.secondary {
+.audit-modern-button-secondary {
   background: #ffffff;
   color: #334155;
   border-color: #cbd5e1;
 }
 
-.audit-modern-button-secondary:hover,
-.audit-modern-button.secondary:hover {
+.audit-modern-button-secondary:hover {
   background: #f8fafc;
   border-color: #cbd5e1;
   box-shadow: none;
