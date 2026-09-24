@@ -30,27 +30,27 @@ async function buildAuditData(auditId) {
     throw error;
   }
 
-  const findings = await AuditFinding.find({ auditId })
-    .sort({ createdAt: 1 })
-    .lean();
-
-  const approvals = await AuditApproval.find({ auditId })
-    .sort({ createdAt: 1 })
-    .lean();
-
-  const closures = await AuditClosure.find({ auditId })
-    .sort({ createdAt: 1 })
-    .lean();
-
   const AuditAction = getOptionalModel("AuditAction");
 
-  let actions = [];
-
-  if (AuditAction) {
-    actions = await AuditAction.find({ auditId })
+  const [findings, approvals, closures, actions] = await Promise.all([
+    AuditFinding.find({ auditId })
       .sort({ createdAt: 1 })
-      .lean();
-  }
+      .lean(),
+
+    AuditApproval.find({ auditId })
+      .sort({ createdAt: 1 })
+      .lean(),
+
+    AuditClosure.find({ auditId })
+      .sort({ createdAt: 1 })
+      .lean(),
+
+    AuditAction
+      ? AuditAction.find({ auditId })
+          .sort({ createdAt: 1 })
+          .lean()
+      : Promise.resolve([])
+  ]);
 
   return {
     audit: audit.toObject(),
