@@ -139,7 +139,15 @@ exports.requirePermission = (resource, action) => {
     }
 
     try {
-      const role = await getRole(req.user.role);
+      let role = req.authRole;
+
+      if (!role) {
+        role = await getRole(req.user.role);
+
+        if (role) {
+          req.authRole = role;
+        }
+      }
 
       if (!role) {
         return res.status(403).json({
@@ -193,7 +201,15 @@ exports.requireAnyPermission = (permissions) => {
     }
 
     try {
-      const role = await getRole(req.user.role);
+      let role = req.authRole;
+
+      if (!role) {
+        role = await getRole(req.user.role);
+
+        if (role) {
+          req.authRole = role;
+        }
+      }
 
       if (!role) {
         return res.status(403).json({
