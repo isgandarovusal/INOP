@@ -126,8 +126,10 @@ const ApplicationsList: React.FC = () => {
 
     try {
       await deleteApplication(deleteTarget.id);
+      setApplications((prev) =>
+        prev.filter((application) => application.id !== deleteTarget.id),
+      );
       setDeleteTarget(null);
-      await load();
     } catch (deleteError) {
       console.error("Application delete error:", deleteError);
     } finally {
@@ -135,10 +137,20 @@ const ApplicationsList: React.FC = () => {
     }
   };
 
-  const handleStatusChange = async (appId: string, status: ApplicationStatus) => {
+  const handleStatusChange = async (
+    appId: string,
+    status: ApplicationStatus,
+  ) => {
     try {
       await updateApplicationStatus(appId, status);
-      await load();
+
+      setApplications((prev) =>
+        prev.map((application) =>
+          application.id === appId
+            ? { ...application, status }
+            : application,
+        ),
+      );
     } catch (statusError) {
       console.error("Application status update error:", statusError);
     }
