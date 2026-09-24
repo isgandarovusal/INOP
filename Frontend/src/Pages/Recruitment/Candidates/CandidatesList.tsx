@@ -80,30 +80,33 @@ const CandidatesList: React.FC = () => {
     };
   }, [fetchCandidates]);
 
-  const handleStatusChange = async (
-    candidateId: string,
-    newStatus: CandidateStatus,
-  ) => {
-    if (!canUpdate) return;
+  const handleStatusChange = useCallback(
+    async (
+      candidateId: string,
+      newStatus: CandidateStatus,
+    ) => {
+      if (!canUpdate) return;
 
-    try {
-      await updateCandidateStatus(candidateId, newStatus);
+      try {
+        await updateCandidateStatus(candidateId, newStatus);
 
-      setCandidates((prev) =>
-        prev.map((candidate) =>
-          candidate.id === candidateId
-            ? { ...candidate, status: newStatus }
-            : candidate,
-        ),
-      );
+        setCandidates((prev) =>
+          prev.map((candidate) =>
+            candidate.id === candidateId
+              ? { ...candidate, status: newStatus }
+              : candidate,
+          ),
+        );
 
-      toast.success(t("recruitment.candidates.statusUpdated"));
-    } catch (err: unknown) {
-      toast.error(
-        getErrorMessage(err, t("recruitment.candidates.statusUpdateError")),
-      );
-    }
-  };
+        toast.success(t("recruitment.candidates.statusUpdated"));
+      } catch (err: unknown) {
+        toast.error(
+          getErrorMessage(err, t("recruitment.candidates.statusUpdateError")),
+        );
+      }
+    },
+    [canUpdate, t],
+  );
 
   const handleExportExcel = async () => {
     if (exporting) return;
