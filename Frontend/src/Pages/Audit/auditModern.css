@@ -310,9 +310,9 @@
   font-family: inherit;
 }
 
-.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel),
-.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel),
-.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel) {
+.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger),
+.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger),
+.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger) {
   border: 1px solid #dbe3ee;
   border-radius: 10px;
   padding: 9px 14px;
@@ -326,9 +326,9 @@
   transition: all .18s ease;
 }
 
-.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover,
-.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover,
-.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):hover {
+.audit-modern-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger):hover,
+.audit-analytics button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger):hover,
+.audit-analytics-page button:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger-solid):not(.btn-cancel):not(.btn-add):not(.btn-danger):hover {
   background: #f8fafc;
   border-color: #c7d2e2;
   transform: translateY(-1px);
