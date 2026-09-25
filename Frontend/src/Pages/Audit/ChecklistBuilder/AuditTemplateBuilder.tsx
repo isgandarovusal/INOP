@@ -600,7 +600,7 @@ if (id) {
                     event.preventDefault();
                     removeSourceDocument(document.id);
                   }}
-                  className="audit-delete-button"
+                  className="btn-danger"
                 >
                   Sil
                 </button>

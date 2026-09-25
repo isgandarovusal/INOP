@@ -1191,27 +1191,6 @@
 
 
 /* =====================================================
-   AUDIT ACTION STANDARD
-   ===================================================== */
-
-
-.audit-delete-button {
-  background:#fee2e2;
-  color:#b91c1c;
-  border:1px solid #fecaca;
-  padding:8px 14px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:600;
-}
-
-
-.audit-delete-button:hover {
-  background:#fecaca;
-}
-
-
-/* =====================================================
    AUDIT BUTTON SYSTEM
    ===================================================== */
 
