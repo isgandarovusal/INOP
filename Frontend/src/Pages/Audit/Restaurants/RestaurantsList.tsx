@@ -136,14 +136,14 @@ const RestaurantsList: React.FC = () => {
                       {canManage && (
                         <>
                           <button
-                            className="audit-modern-button audit-modern-button-secondary"
+                            className="btn-secondary"
                             title={t("common.actions.edit")}
                             onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}/edit`)}
                           >
                             <Pencil size={15} />
                           </button>
                           <button
-                            className="audit-modern-button audit-modern-button-danger"
+                            className="btn-danger"
                             title={t("common.actions.delete")}
                             disabled={deletingId === restaurant.id}
                             onClick={() => setDeleteTarget(restaurant)}

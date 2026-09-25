@@ -219,7 +219,7 @@ const AuditsList: React.FC = () => {
                     <td>
                       <div className="row-actions">
                         <button
-                          className="audit-modern-button audit-modern-button-danger"
+                          className="btn-danger"
                           title={t("common.actions.delete")}
                           disabled={deletingId === audit.id}
                           onClick={() => setDeleteTarget(audit)}

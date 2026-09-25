@@ -78,7 +78,7 @@ export default function SafetyAuditDetail() {
         actions={
           <Link
             to="/app/audit/safety"
-            className="audit-modern-button audit-modern-button-secondary"
+            className="btn-secondary"
           >
             <ArrowLeft size={15} />
             Geri

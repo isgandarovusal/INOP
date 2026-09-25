@@ -389,7 +389,7 @@ getAuditTemplates({
 
             <button
               type="button"
-              className="audit-modern-button audit-modern-button-secondary"
+              className="btn-secondary"
               onClick={addObservation}
             >
               {t("audit.service.form.addGuest")}
@@ -436,7 +436,7 @@ getAuditTemplates({
               {observations.length > 1 && (
                 <button
                   type="button"
-                  className="audit-modern-button audit-modern-button-danger"
+                  className="btn-danger"
                   onClick={() => removeObservation(index)}
                 >
                   Sil
@@ -462,7 +462,7 @@ getAuditTemplates({
         <div className="audit-form-actions">
           <button
             type="button"
-            className="audit-modern-button audit-modern-button-secondary"
+            className="btn-secondary"
             onClick={() => navigate("/app/audit/service")}
           >
             Ləğv et
@@ -470,7 +470,7 @@ getAuditTemplates({
 
           <button
             type="submit"
-            className="audit-modern-button audit-modern-button-primary"
+            className="btn-primary"
             disabled={submitting}
           >
             Auditi yadda saxla

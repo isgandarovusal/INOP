@@ -35,7 +35,7 @@ export default function SafetyAuditsList() {
           <p>{t("audit.safety.list.subtitle")}</p>
         </div>
 
-        <Link to="/app/audit/safety/new" className="audit-modern-button">
+        <Link to="/app/audit/safety/new" className="btn-primary">
           {t("audit.safety.list.newAudit")}
         </Link>
       </div>
@@ -74,14 +74,14 @@ export default function SafetyAuditsList() {
                     <div className="audit-modern-actions">
                       <Link
                         to={`/app/audit/safety/${audit.id}`}
-                        className="audit-modern-button audit-modern-button-secondary"
+                        className="btn-secondary"
                       >
                         Bax
                       </Link>
 
                       <button
                         type="button"
-                        className="audit-modern-button audit-modern-button-danger"
+                        className="btn-danger"
                         onClick={() => handleDelete(audit.id)}
                       >
                         Sil

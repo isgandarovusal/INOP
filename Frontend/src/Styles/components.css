@@ -62,6 +62,33 @@
   background: #f0f1f7;
 }
 
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fecaca;
+  border-color: #fca5a5;
+  transform: translateY(-1px);
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-danger-solid {
   display: flex;
   align-items: center;

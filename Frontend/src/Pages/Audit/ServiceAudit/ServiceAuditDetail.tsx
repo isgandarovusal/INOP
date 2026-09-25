@@ -75,7 +75,7 @@ if (!id) return;
         title={t("audit.service.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
-          <Link to="/app/audit/service" className="audit-modern-button audit-modern-button-secondary">
+          <Link to="/app/audit/service" className="btn-secondary">
             <ArrowLeft size={15} />
             Geri
           </Link>

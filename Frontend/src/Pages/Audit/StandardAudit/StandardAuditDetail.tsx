@@ -101,7 +101,7 @@ export default function StandardAuditDetail() {
         title={t("audit.standard.detail.title")}
         subtitle={`${audit.date} · ${audit.shift}`}
         actions={
-          <Link to="/app/audit/standard" className="audit-modern-button audit-modern-button-secondary">
+          <Link to="/app/audit/standard" className="btn-secondary">
             <ArrowLeft size={15} />
             Geri
           </Link>

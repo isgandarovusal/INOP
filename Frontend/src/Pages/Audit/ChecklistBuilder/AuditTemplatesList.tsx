@@ -57,7 +57,7 @@ export default function AuditTemplatesList() {
 
         <Link
           to="/app/audit/checklists/new"
-          className="audit-modern-button audit-modern-button-primary"
+          className="btn-primary"
         >
           <Plus size={18} />
           Yeni checklist
@@ -85,7 +85,7 @@ export default function AuditTemplatesList() {
           </p>
           <Link
             to="/app/audit/checklists/new"
-            className="audit-modern-button audit-modern-button-primary"
+            className="btn-primary"
           >
             <Plus size={18} />
             Checklist yarat
@@ -144,7 +144,7 @@ export default function AuditTemplatesList() {
               <div className="audit-template-actions">
                 <Link
                   to={`/app/audit/checklists/${template.id}`}
-                  className="audit-modern-button audit-modern-button-secondary"
+                  className="btn-secondary"
                 >
                   İdarə et
                   <ChevronRight size={16} />
@@ -152,7 +152,7 @@ export default function AuditTemplatesList() {
 
                 <button
                   type="button"
-                  className="audit-modern-button audit-modern-button-danger"
+                  className="btn-danger"
                   onClick={() => void removeTemplate(template.id)}
                 >
                   Sil

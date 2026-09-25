@@ -442,7 +442,7 @@ if (id) {
         <button
           form="audit-template-form"
           type="submit"
-          className="audit-modern-button audit-modern-button-primary"
+          className="btn-primary"
           disabled={saving}
         >
           {saving ? t("audit.checklist.builder.saving") : t("audit.checklist.builder.save")}
@@ -628,7 +628,7 @@ if (id) {
 
             <button
               type="button"
-              className="audit-modern-button audit-modern-button-secondary"
+              className="btn-secondary"
               onClick={addSection}
             >
               <Plus size={17} />
@@ -797,7 +797,7 @@ if (id) {
                       <div className="audit-builder-footer-actions">
                         <button
                           type="button"
-                          className="audit-modern-button audit-modern-button-secondary"
+                          className="btn-secondary"
                           onClick={() =>
                             addSubsection(section.id)
                           }
@@ -808,7 +808,7 @@ if (id) {
 
                         <button
                           type="button"
-                          className="audit-modern-button audit-modern-button-secondary"
+                          className="btn-secondary"
                           onClick={() =>
                             addQuestion(section.id)
                           }

@@ -273,7 +273,7 @@ export default function SafetyAuditForm() {
         <div className="audit-form-actions">
           <button
             type="button"
-            className="audit-modern-button audit-modern-button-secondary"
+            className="btn-secondary"
             onClick={() => navigate("/app/audit/safety")}
           >
             Ləğv et
@@ -281,7 +281,7 @@ export default function SafetyAuditForm() {
 
           <button
             type="submit"
-            className="audit-modern-button audit-modern-button-primary"
+            className="btn-primary"
             disabled={submitting}
           >
             Auditi yadda saxla
