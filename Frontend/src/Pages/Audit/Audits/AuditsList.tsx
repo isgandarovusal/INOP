@@ -122,7 +122,7 @@ const AuditsList: React.FC = () => {
         subtitle={`${audits.length} total · ${rows.length} shown`}
         actions={
           canManage && (
-            <button className="btn-add audit-primary-action" onClick={() => navigate("/app/audit/audits/new")}>
+            <button className="btn-add" onClick={() => navigate("/app/audit/audits/new")}>
               <Plus size={16} />
               New audit
             </button>

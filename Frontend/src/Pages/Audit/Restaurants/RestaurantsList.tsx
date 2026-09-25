@@ -62,7 +62,7 @@ const RestaurantsList: React.FC = () => {
         subtitle={`${restaurants.length} total · ${filtered.length} shown`}
         actions={
           canManage && (
-            <button className="btn-add audit-primary-action" onClick={() => navigate("/app/audit/restaurants/new")}>
+            <button className="btn-add" onClick={() => navigate("/app/audit/restaurants/new")}>
               <Plus size={16} />
               Add restaurant
             </button>
