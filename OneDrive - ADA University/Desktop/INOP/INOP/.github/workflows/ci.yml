@@ -1,0 +1,26 @@
+name: INOP checks
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            Backend/package-lock.json
+            Frontend/package-lock.json
+      - run: npm ci
+        working-directory: Backend
+      - run: npm test
+        working-directory: Backend
+      - run: npm run test:integration
+        working-directory: Backend
+      - run: npm ci
+        working-directory: Frontend
+      - run: npm run build
+        working-directory: Frontend
+      - run: npm run lint
+        working-directory: Frontend

@@ -1,0 +1,10 @@
+{
+  "name": "inop",
+  "private": true,
+  "scripts": {
+    "install:all": "npm ci --prefix Backend && npm ci --prefix Frontend",
+    "test": "npm test --prefix Backend && npm run build --prefix Frontend",
+    "dev:backend": "npm run dev --prefix Backend",
+    "dev:frontend": "npm run dev --prefix Frontend"
+  }
+}

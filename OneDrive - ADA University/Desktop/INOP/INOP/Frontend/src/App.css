@@ -1,0 +1,8 @@
+@import "./Styles/variables.css";
+@import "./Styles/layout.css";
+@import "./Styles/components.css";
+@import "./Styles/auth.css";
+@import "./Styles/dashboard.css";
+@import "./Styles/recruitment.css";
+@import "./Styles/audit.css";
+@import "./Styles/core.css";

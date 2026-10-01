@@ -1,0 +1,134 @@
+.audit-home {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.audit-home-header {
+  margin-bottom: 30px;
+}
+
+.audit-home-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #6b7280;
+}
+
+.audit-home-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #111827;
+}
+
+.audit-home-header p {
+  max-width: 680px;
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.audit-home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.audit-home-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.audit-home-card:hover {
+  transform: translateY(-3px);
+  border-color: #d1d5db;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.09);
+}
+
+.audit-home-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 22px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.audit-home-card-content {
+  flex: 1;
+}
+
+.audit-home-card-content h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 650;
+  color: #111827;
+}
+
+.audit-home-card-content p {
+  max-width: 470px;
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.audit-home-card-action {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 22px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.audit-home-card:hover .audit-home-card-action {
+  color: #111827;
+}
+
+.audit-home-card:nth-child(5) {
+  grid-column: 1 / -1;
+  min-height: 170px;
+}
+
+@media (max-width: 760px) {
+  .audit-home {
+    padding: 20px;
+  }
+
+  .audit-home-header h1 {
+    font-size: 26px;
+  }
+
+  .audit-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-home-card:nth-child(5) {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,193 @@
+import "../auditModern.css";
+import "../auditAnalytics.css";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+} from "recharts";
+
+import { BarChart3, TrendingUp } from "lucide-react";
+
+import PageHeader from "../../../Components/PageHeader";
+
+import {
+  getAuditSummary,
+  getAuditTypeAnalytics,
+  getAuditTrend,
+  type SummaryData,
+  type TypeAnalyticsData,
+  type TrendData,
+} from "../../../Services/auditAnalyticsService";
+
+const AuditAnalytics: React.FC = () => {
+  const { t } = useTranslation();
+
+  const [statusData, setStatusData] = useState<SummaryData["statusSummary"]>(
+    [],
+  );
+
+  const [typeData, setTypeData] = useState<TypeAnalyticsData["typeSummary"]>(
+    [],
+  );
+
+  const [trendData, setTrendData] = useState<TrendData["trend"]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([getAuditSummary(), getAuditTypeAnalytics(), getAuditTrend()])
+      .then(([summary, type, trend]) => {
+        setStatusData(summary?.data?.statusSummary || []);
+
+        setTypeData(type?.data?.typeSummary || []);
+
+        setTrendData(trend?.data?.trend || []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const total = statusData.reduce(
+    (sum: number, item: SummaryData["statusSummary"][number]) =>
+      sum + item.value,
+    0,
+  );
+
+  return (
+    <div className="audit-analytics">
+      <PageHeader
+        title={t("audit.analytics.title")}
+        subtitle={t("audit.analytics.subtitle")}
+      />
+
+      {loading ? (
+        <div className="audit-modern-empty">Loading analytics...</div>
+      ) : (
+        <>
+          <div className="kpi-grid">
+            <div className="kpi-card">
+              <BarChart3 size={22} />
+
+              <p>{t("audit.analytics.totalAudits")}</p>
+
+              <h2>{total}</h2>
+            </div>
+
+            <div className="kpi-card">
+              <TrendingUp size={22} />
+
+              <p>{t("audit.analytics.statusGroups")}</p>
+
+              <h2>{statusData.length}</h2>
+            </div>
+          </div>
+
+          <div className="charts-grid">
+            <div className="audit-modern-card">
+              <h3>{t("audit.analytics.auditStatus")}</h3>
+
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={statusData}>
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    axisLine={{ stroke: "#cbd5e1" }}
+                    tickLine={false}
+                  />
+
+                  <YAxis
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    axisLine={{ stroke: "#cbd5e1" }}
+                    tickLine={false}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 12,
+                      boxShadow: "0 10px 25px rgba(15,23,42,.08)",
+                    }}
+                  />
+
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#6366f1" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="audit-modern-card">
+              <h3>{t("audit.analytics.auditTypes")}</h3>
+
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={typeData}>
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    axisLine={{ stroke: "#cbd5e1" }}
+                    tickLine={false}
+                  />
+
+                  <YAxis
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    axisLine={{ stroke: "#cbd5e1" }}
+                    tickLine={false}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 12,
+                      boxShadow: "0 10px 25px rgba(15,23,42,.08)",
+                    }}
+                  />
+
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#0ea5e9" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="audit-modern-card">
+            <h3>{t("audit.analytics.auditTrend")}</h3>
+
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={trendData}>
+                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+
+                <XAxis dataKey="label" />
+
+                <YAxis
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                  axisLine={{ stroke: "#cbd5e1" }}
+                  tickLine={false}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    background: "#fff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 12,
+                    boxShadow: "0 10px 25px rgba(15,23,42,.08)",
+                  }}
+                />
+
+                <Line type="monotone" dataKey="value" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default AuditAnalytics;
