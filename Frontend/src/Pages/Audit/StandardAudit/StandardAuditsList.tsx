@@ -27,6 +27,8 @@ export default function StandardAuditsList() {
 
   const [audits, setAudits] = useState<StandardAudit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   const [status, setStatus] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
@@ -57,6 +59,7 @@ export default function StandardAuditsList() {
 
     const load = async () => {
       setLoading(true);
+      setLoadError(false);
 
       try {
         const params = new URLSearchParams();
@@ -84,6 +87,7 @@ export default function StandardAuditsList() {
         if (!cancelled) {
           console.error("Failed to load standard audits:", error);
           setAudits([]);
+          setLoadError(true);
         }
       } finally {
         if (!cancelled) {
@@ -97,13 +101,31 @@ export default function StandardAuditsList() {
     return () => {
       cancelled = true;
     };
-  }, [status, restaurantId, from, to]);
+  }, [status, restaurantId, from, to, retryCount]);
 
   if (loading) {
     return (
       <PageState
         type="loading"
         title={t("audit.standard.list.loading")}
+      />
+    );
+  }
+
+  if (loadError) {
+    return (
+      <PageState
+        type="error"
+        title={t("auth.somethingWentWrong")}
+        action={
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setRetryCount((value) => value + 1)}
+          >
+            {t("common.retry")}
+          </button>
+        }
       />
     );
   }

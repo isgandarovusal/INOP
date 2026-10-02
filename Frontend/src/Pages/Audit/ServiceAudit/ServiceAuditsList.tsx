@@ -28,6 +28,8 @@ export default function ServiceAuditsList() {
 
   const [audits, setAudits] = useState<ServiceAudit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   const [status, setStatus] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
@@ -39,6 +41,7 @@ export default function ServiceAuditsList() {
 
     const load = async () => {
       setLoading(true);
+      setLoadError(false);
 
       try {
         const params = new URLSearchParams();
@@ -61,6 +64,7 @@ export default function ServiceAuditsList() {
         if (!cancelled) {
           console.error("Failed to load service audits:", error);
           setAudits([]);
+          setLoadError(true);
         }
       } finally {
         if (!cancelled) {
@@ -74,7 +78,7 @@ export default function ServiceAuditsList() {
     return () => {
       cancelled = true;
     };
-  }, [status, restaurantId, from, to]);
+  }, [status, restaurantId, from, to, retryCount]);
 
   const restaurants = useMemo(
     () =>
@@ -100,6 +104,24 @@ export default function ServiceAuditsList() {
       <PageState
         type="loading"
         title={t("audit.service.list.loading")}
+      />
+    );
+  }
+
+  if (loadError) {
+    return (
+      <PageState
+        type="error"
+        title={t("auth.somethingWentWrong")}
+        action={
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setRetryCount((value) => value + 1)}
+          >
+            {t("common.retry")}
+          </button>
+        }
       />
     );
   }
