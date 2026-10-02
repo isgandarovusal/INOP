@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Department = require("../models/department.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 function validId(id) {
   return mongoose.Types.ObjectId.isValid(id);
@@ -94,6 +95,18 @@ exports.createDepartment = async (req, res) => {
       createdBy: req.user.id,
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "department",
+        entityId: String(department._id),
+        description: `Şöbə yaradıldı: ${department.name}`,
+      });
+    } catch (activityError) {
+      console.error("Create department activity log error:", activityError);
+    }
+
     return res.status(201).json({
       message: "Şöbə uğurla yaradıldı.",
       department,
@@ -165,6 +178,18 @@ exports.updateDepartment = async (req, res) => {
 
     await department.save();
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "department",
+        entityId: String(department._id),
+        description: `Şöbə yeniləndi: ${department.name}`,
+      });
+    } catch (activityError) {
+      console.error("Update department activity log error:", activityError);
+    }
+
     return res.status(200).json({
       message: "Şöbə uğurla yeniləndi.",
       department,
@@ -206,6 +231,18 @@ exports.deleteDepartment = async (req, res) => {
       return res.status(404).json({
         message: "Şöbə tapılmadı.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "department",
+        entityId: String(department._id),
+        description: `Şöbə silindi: ${department.name}`,
+      });
+    } catch (activityError) {
+      console.error("Delete department activity log error:", activityError);
     }
 
     return res.status(200).json({
