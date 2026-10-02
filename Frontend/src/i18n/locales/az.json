@@ -952,7 +952,11 @@
         "location": "Məkan",
         "status": "Status",
         "actions": "Əməliyyatlar",
-        "deleteTitle": "Bu restoran silinsin?"
+        "deleteTitle": "Bu restoran silinsin?",
+        "noSearchResults": "Filtrlərinizə uyğun restoran tapılmadı",
+        "tryDifferentKeyword": "Fərqli axtarış və ya filtr sınayın.",
+        "noRestaurants": "Hələ restoran yoxdur",
+        "restaurantsWillAppear": "Əlavə etdiyiniz restoranlar burada görünəcək."
       }
     }
   }

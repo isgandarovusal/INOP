@@ -928,7 +928,11 @@
         "location": "Location",
         "status": "Status",
         "actions": "Actions",
-        "deleteTitle": "Delete this restaurant?"
+        "deleteTitle": "Delete this restaurant?",
+        "noSearchResults": "No restaurants match your filters",
+        "tryDifferentKeyword": "Try a different search or filter.",
+        "noRestaurants": "No restaurants yet",
+        "restaurantsWillAppear": "Restaurants you add will show up here."
       }
     }
   }

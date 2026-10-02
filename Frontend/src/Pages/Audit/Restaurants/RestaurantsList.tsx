@@ -26,6 +26,14 @@ const RestaurantsList: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const filtersActive =
+    query.trim() !== "" || statusFilter !== "all";
+
+  const clearFilters = () => {
+    setQuery("");
+    setStatusFilter("all");
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
@@ -97,6 +105,16 @@ const RestaurantsList: React.FC = () => {
           <option value="active">{t("common.status.active")}</option>
           <option value="inactive">{t("common.status.inactive")}</option>
         </select>
+
+        {filtersActive && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={clearFilters}
+          >
+            {t("common.actions.clear")}
+          </button>
+        )}
       </div>
 
       <div className="admin-table-container glass">
@@ -142,8 +160,16 @@ const RestaurantsList: React.FC = () => {
                 <td colSpan={4}>
                   <EmptyState
                     icon={<Store size={28} />}
-                    title={query ? "No restaurants match your search" : "No restaurants yet"}
-                    hint={query ? "Try a different keyword." : "Restaurants you add will show up here."}
+                    title={
+                      filtersActive
+                        ? t("audit.restaurants.list.noSearchResults")
+                        : t("audit.restaurants.list.noRestaurants")
+                    }
+                    hint={
+                      filtersActive
+                        ? t("audit.restaurants.list.tryDifferentKeyword")
+                        : t("audit.restaurants.list.restaurantsWillAppear")
+                    }
                   />
                 </td>
               </tr>
