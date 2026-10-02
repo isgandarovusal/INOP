@@ -64,9 +64,6 @@
   },
   "navigation": {
     "dashboard": "İdarə paneli",
-      "ownProfile": "Öz profili",
-      "ownApplications": "Öz müraciətləri",
-      "ownTasks": "Öz tapşırıqları",
     "recruitment": "İşə qəbul",
     "candidates": "Namizədlər",
     "vacancies": "Vakansiyalar",
