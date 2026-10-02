@@ -3,6 +3,7 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require("./user.routes");
 const departmentRoutes = require("./department.routes");
 const activityLogRoutes = require("./activityLog.routes");
+const rolesRoutes = require("./roles.routes");
 const { verifyToken } = require('../middleware/auth.middleware');
 const { authorize } = require("../middleware/authorization.middleware");
 const { cvUpload } = require("../middleware/cvUpload.middleware");
@@ -59,6 +60,7 @@ router.use(verifyToken);
 router.use('/users', userRoutes);
 router.use('/departments', departmentRoutes);
 router.use("/activity-logs", activityLogRoutes);
+router.use("/roles", rolesRoutes);
 
 // Sub-routes
 
