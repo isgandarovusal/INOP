@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Role = require("../models/role.model");
 const User = require("../models/user.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 const VALID_SCOPES = new Set([
   "all",
@@ -204,6 +205,18 @@ exports.createRole = async (req, res) => {
       isActive: true,
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "role",
+        entityId: String(role._id),
+        description: `Rol yaradıldı: ${role.name} (${role.key})`,
+      });
+    } catch (activityError) {
+      console.error("Create role activity log error:", activityError);
+    }
+
     return res.status(201).json({
       message: "Rol uğurla yaradıldı.",
       role: serializeRole(role, 0),
@@ -308,6 +321,18 @@ exports.updateRole = async (req, res) => {
       role: role.key,
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "role",
+        entityId: String(role._id),
+        description: `Rol yeniləndi: ${role.name} (${role.key})`,
+      });
+    } catch (activityError) {
+      console.error("Update role activity log error:", activityError);
+    }
+
     return res.status(200).json({
       message: "Rol uğurla yeniləndi.",
       role: serializeRole(role, userCount),
@@ -377,6 +402,20 @@ exports.updateRoleStatus = async (req, res) => {
       role: role.key,
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: role.isActive ? "activate" : "deactivate",
+        entityType: "role",
+        entityId: String(role._id),
+        description: role.isActive
+          ? `Rol aktivləşdirildi: ${role.name} (${role.key})`
+          : `Rol deaktiv edildi: ${role.name} (${role.key})`,
+      });
+    } catch (activityError) {
+      console.error("Update role status activity log error:", activityError);
+    }
+
     return res.status(200).json({
       message: role.isActive
         ? "Rol aktivləşdirildi."
@@ -428,6 +467,18 @@ exports.deleteRole = async (req, res) => {
     }
 
     await role.deleteOne();
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "role",
+        entityId: String(role._id),
+        description: `Rol silindi: ${role.name} (${role.key})`,
+      });
+    } catch (activityError) {
+      console.error("Delete role activity log error:", activityError);
+    }
 
     return res.status(200).json({
       message: "Rol uğurla silindi.",
