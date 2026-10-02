@@ -40,35 +40,61 @@ const UserForm: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
+    setLoading(true);
+    setLoadError(null);
+
     Promise.all([
       getDepartments(),
       isEdit ? getUsers() : Promise.resolve([]),
-    ]).then(([deptResult, userResult]) => {
-      setDepartments(deptResult);
+    ])
+      .then(([deptResult, userResult]) => {
+        if (cancelled) return;
 
-      if (deptResult.length && !departmentId) {
-        setDepartmentId(deptResult[0].id);
-      }
+        setDepartments(deptResult);
 
-      if (isEdit && id) {
-        const existing = userResult.find((u) => u.id === id);
-
-        if (existing) {
-          setName(existing.name);
-          setEmail(existing.email);
-          setRole(existing.role);
-          setDepartmentId(existing.departmentId);
-          setPosition(existing.position);
+        if (deptResult.length && !departmentId) {
+          setDepartmentId(deptResult[0].id);
         }
-      }
 
-      setLoading(false);
-    });
+        if (isEdit && id) {
+          const existing = userResult.find((u) => u.id === id);
+
+          if (existing) {
+            setName(existing.name);
+            setEmail(existing.email);
+            setRole(existing.role);
+            setDepartmentId(existing.departmentId);
+            setPosition(existing.position);
+          } else {
+            setLoadError(t("auth.somethingWentWrong"));
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load user form data:", err);
+
+        if (!cancelled) {
+          setLoadError(t("auth.somethingWentWrong"));
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, retryCount]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +143,22 @@ const UserForm: React.FC = () => {
     return (
       <div className="empty-state">
         <Loader2 size={24} className="spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="empty-state">
+        <AlertCircle size={28} />
+        <p>{loadError}</p>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() => setRetryCount((value) => value + 1)}
+        >
+          {t("common.retry")}
+        </button>
       </div>
     );
   }
