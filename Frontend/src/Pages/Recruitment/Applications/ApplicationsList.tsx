@@ -218,8 +218,16 @@ const ApplicationsList: React.FC = () => {
                 <td colSpan={canManage ? 5 : 4}>
                   <EmptyState
                     icon={<ClipboardList size={28} />}
-                    title={t("recruitment.applications.noApplications")}
-                    hint={t("recruitment.applications.noApplicationsHint")}
+                    title={
+                      filtersActive
+                        ? t("recruitment.applications.noFilteredApplications")
+                        : t("recruitment.applications.noApplications")
+                    }
+                    hint={
+                      filtersActive
+                        ? t("recruitment.applications.noFilteredApplicationsHint")
+                        : t("recruitment.applications.noApplicationsHint")
+                    }
                   />
                 </td>
               </tr>

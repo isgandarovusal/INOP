@@ -288,6 +288,8 @@
       "rejected": "Отклонён",
       "hired": "Принят на работу",
       "noApplications": "Заявок пока нет",
+      "noFilteredApplications": "Заявок по заданным фильтрам не найдено",
+      "noFilteredApplicationsHint": "Попробуйте другой фильтр вакансии или статуса.",
       "noApplicationsHint": "Свяжите кандидатов с вакансиями на странице деталей вакансии.",
       "delete": "Удалить",
       "removeTitle": "Удалить эту заявку?",

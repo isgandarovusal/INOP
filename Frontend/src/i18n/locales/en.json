@@ -288,6 +288,8 @@
       "rejected": "Rejected",
       "hired": "Hired",
       "noApplications": "No applications yet",
+      "noFilteredApplications": "No applications match your filters",
+      "noFilteredApplicationsHint": "Try a different job or status filter.",
       "noApplicationsHint": "Link candidates to jobs from a job's detail page.",
       "delete": "Delete",
       "removeTitle": "Remove this application?",

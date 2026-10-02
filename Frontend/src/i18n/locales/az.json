@@ -300,6 +300,8 @@
       "rejected": "Rədd edilib",
       "hired": "İşə qəbul edilib",
       "noApplications": "Hələ müraciət yoxdur",
+      "noFilteredApplications": "Filtrlərinizə uyğun müraciət tapılmadı",
+      "noFilteredApplicationsHint": "Fərqli vakansiya və ya status filtri sınayın.",
       "noApplicationsHint": "Namizədləri vakansiyalara vakansiyanın detal səhifəsindən bağlayın.",
       "delete": "Sil",
       "removeTitle": "Bu müraciət silinsin?",
