@@ -1,10 +1,12 @@
 import "../auditModern.css";
 import "./serviceAuditsList.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageState from "../../../Components/PageState";
 import api from "../../../api/axios";
+import { getRestaurants } from "../../../Services/restaurantsService";
+import type { Restaurant } from "../../../Types/audit";
 
 type ServiceAudit = {
   _id: string;
@@ -27,6 +29,7 @@ export default function ServiceAuditsList() {
   const { t } = useTranslation();
 
   const [audits, setAudits] = useState<ServiceAudit[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -37,6 +40,30 @@ export default function ServiceAuditsList() {
   const [restaurantId, setRestaurantId] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadRestaurants = async () => {
+      try {
+        const result = await getRestaurants();
+
+        if (!cancelled) {
+          setRestaurants(result);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load restaurants:", error);
+        }
+      }
+    };
+
+    void loadRestaurants();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,18 +112,6 @@ export default function ServiceAuditsList() {
       cancelled = true;
     };
   }, [status, restaurantId, from, to, retryCount]);
-
-  const restaurants = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          audits
-            .map((audit) => audit.restaurantId)
-            .filter(Boolean)
-        )
-      ),
-    [audits]
-  );
 
   const resetFilters = () => {
     setStatus("");
@@ -187,8 +202,8 @@ export default function ServiceAuditsList() {
           </option>
 
           {restaurants.map((restaurant) => (
-            <option key={restaurant} value={restaurant}>
-              {restaurant}
+            <option key={restaurant.id} value={restaurant.id}>
+              {restaurant.name}
             </option>
           ))}
         </select>

@@ -1,8 +1,10 @@
 import "../auditModern.css";
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import PageState from "../../../Components/PageState";
+import { getRestaurants } from "../../../Services/restaurantsService";
+import type { Restaurant } from "../../../Types/audit";
 const API =
   import.meta.env.VITE_API_BASE_URL ||
   "http://localhost:3001/api";
@@ -26,6 +28,7 @@ export default function StandardAuditsList() {
   const { t } = useTranslation();
 
   const [audits, setAudits] = useState<StandardAudit[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -37,24 +40,36 @@ export default function StandardAuditsList() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
-  const restaurants = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          audits
-            .map((audit) => audit.restaurantId)
-            .filter(Boolean)
-        )
-      ),
-    [audits]
-  );
-
   const resetFilters = () => {
     setStatus("");
     setRestaurantId("");
     setFrom("");
     setTo("");
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadRestaurants = async () => {
+      try {
+        const result = await getRestaurants();
+
+        if (!cancelled) {
+          setRestaurants(result);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load restaurants:", error);
+        }
+      }
+    };
+
+    void loadRestaurants();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,8 +203,8 @@ export default function StandardAuditsList() {
           </option>
 
           {restaurants.map((restaurant) => (
-            <option key={restaurant} value={restaurant}>
-              {restaurant}
+            <option key={restaurant.id} value={restaurant.id}>
+              {restaurant.name}
             </option>
           ))}
         </select>
