@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
+const { recordActivity } = require("../services/activityLog.service");
 const Role = require("../models/role.model");
 
 function publicUser(user, permissions = []) {
@@ -172,6 +173,18 @@ exports.createUser = async (req, res) => {
 
     const permissions = roleExists.permissions || [];
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "user",
+        entityId: String(user._id),
+        description: `İstifadəçi yaradıldı: ${user.name} (${user.email})`,
+      });
+    } catch (activityError) {
+      console.error("Create user activity log error:", activityError);
+    }
+
     return res.status(201).json({
       message: "İstifadəçi uğurla yaradıldı.",
       user: publicUser(user, permissions),
@@ -275,6 +288,18 @@ exports.updateUser = async (req, res) => {
         ? rolePermissions
         : await getPermissions(user.role);
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "user",
+        entityId: String(user._id),
+        description: `İstifadəçi yeniləndi: ${user.name} (${user.email})`,
+      });
+    } catch (activityError) {
+      console.error("Update user activity log error:", activityError);
+    }
+
     return res.status(200).json({
       message: "İstifadəçi uğurla yeniləndi.",
       user: publicUser(user, permissions),
@@ -332,6 +357,20 @@ exports.updateUserStatus = async (req, res) => {
 
     const permissions = await getPermissions(user.role);
 
+    try {
+      await recordActivity({
+        req,
+        action: user.isActive ? "activate" : "deactivate",
+        entityType: "user",
+        entityId: String(user._id),
+        description: user.isActive
+          ? `İstifadəçi aktivləşdirildi: ${user.name} (${user.email})`
+          : `İstifadəçi deaktiv edildi: ${user.name} (${user.email})`,
+      });
+    } catch (activityError) {
+      console.error("Update user status activity log error:", activityError);
+    }
+
     return res.status(200).json({
       message: req.body.isActive
         ? "İstifadəçi aktivləşdirildi."
@@ -374,6 +413,18 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({
         message: "İstifadəçi tapılmadı.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "user",
+        entityId: String(user._id),
+        description: `İstifadəçi silindi: ${user.name} (${user.email})`,
+      });
+    } catch (activityError) {
+      console.error("Delete user activity log error:", activityError);
     }
 
     return res.status(200).json({
