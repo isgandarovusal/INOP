@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { recordActivity } = require("../services/activityLog.service");
 const AuditTemplate = require('../models/auditTemplate.model');
 
 function normalizeTemplate(doc) {
@@ -110,6 +111,21 @@ exports.createTemplate = async (req, res) => {
       updatedBy: createdBy,
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_template",
+        entityId: template._id,
+        description: `Audit template yaradıldı: ${template.name} (${template.auditType})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit template create activity log error:",
+        activityError
+      );
+    }
+
     res.status(201).json(normalizeTemplate(template));
   } catch (error) {
     console.error('createTemplate error:', error);
@@ -157,6 +173,21 @@ exports.updateTemplate = async (req, res) => {
 
     await template.save();
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "audit_template",
+        entityId: template._id,
+        description: `Audit template yeniləndi: ${template.name} (${template.auditType})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit template update activity log error:",
+        activityError
+      );
+    }
+
     res.json(normalizeTemplate(template));
   } catch (error) {
     console.error('updateTemplate error:', error);
@@ -180,6 +211,21 @@ exports.deleteTemplate = async (req, res) => {
       return res.status(404).json({
         message: 'Audit template tapılmadı.',
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "audit_template",
+        entityId: template._id,
+        description: `Audit template silindi: ${template.name} (${template.auditType})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit template delete activity log error:",
+        activityError
+      );
     }
 
     res.json({
