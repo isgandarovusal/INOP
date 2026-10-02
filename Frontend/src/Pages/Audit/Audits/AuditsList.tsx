@@ -27,6 +27,7 @@ const AuditsList: React.FC = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [restaurantFilter, setRestaurantFilter] = useState("all");
   const [auditorFilter, setAuditorFilter] = useState("all");
   const [minScore, setMinScore] = useState("");
@@ -36,6 +37,7 @@ const AuditsList: React.FC = () => {
   const load = async () => {
     try {
       setLoading(true);
+      setLoadError(false);
 
       const [
         auditResult,
@@ -60,6 +62,7 @@ const AuditsList: React.FC = () => {
 
     } catch (error) {
       console.error("Failed loading audits:", error);
+      setLoadError(true);
 
     } finally {
       setLoading(false);
@@ -108,11 +111,20 @@ const AuditsList: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+
     setDeletingId(deleteTarget.id);
-    await deleteAudit(deleteTarget.id);
-    setDeleteTarget(null);
-    setDeletingId(null);
-    load();
+    setLoadError(false);
+
+    try {
+      await deleteAudit(deleteTarget.id);
+      setDeleteTarget(null);
+      await load();
+    } catch (error) {
+      console.error("Failed deleting audit:", error);
+      setLoadError(true);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -184,15 +196,34 @@ const AuditsList: React.FC = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={canManage ? 6 : 5}>
                   <div className="audit-modern-empty">
                     <Loader2 size={24} className="spin" />
                   </div>
                 </td>
               </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={canManage ? 6 : 5}>
+                  <EmptyState
+                    icon={<ClipboardCheck size={28} />}
+                    title={t("auth.somethingWentWrong")}
+                    hint={t("common.retry")}
+                  />
+                  <div className="state-page__action">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => void load()}
+                    >
+                      {t("common.retry")}
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={canManage ? 6 : 5}>
                   <EmptyState
                     icon={<ClipboardCheck size={28} />}
                     title={t("audit.generic.list.noAudits")}
