@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../Context/AuthContext";
 import PageHeader from "../../Components/PageHeader";
 import Badge from "../../Components/Badge";
 import PageState from "../../Components/PageState";
@@ -25,6 +26,7 @@ import type {
   Permission,
   PermissionScope,
 } from "../../Types/auth";
+import { hasPermission } from "../../Utils/permissions";
 
 const SCOPES: PermissionScope[] = [
   "all",
@@ -50,6 +52,11 @@ const EMPTY_FORM: RoleFormState = {
 
 const RolesOverview: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const canCreateRole = hasPermission(user, "role", "create");
+  const canUpdateRole = hasPermission(user, "role", "update");
+  const canDeleteRole = hasPermission(user, "role", "delete");
 
   const [roles, setRoles] = useState<RoleRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -316,14 +323,16 @@ const RolesOverview: React.FC = () => {
           marginBottom: 16,
         }}
       >
-        <button
-          type="button"
-          className="btn-primary"
-          onClick={openCreate}
-        >
-          <Plus size={16} />
-          {t("roles.create")}
-        </button>
+        {canCreateRole && (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={openCreate}
+          >
+            <Plus size={16} />
+            {t("roles.create")}
+          </button>
+        )}
       </div>
 
       {roles.length === 0 ? (
@@ -331,14 +340,16 @@ const RolesOverview: React.FC = () => {
           type="empty"
           title={t("roles.empty")}
           action={
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={openCreate}
-            >
-              <Plus size={16} />
-              {t("roles.create")}
-            </button>
+            canCreateRole ? (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={openCreate}
+              >
+                <Plus size={16} />
+                {t("roles.create")}
+              </button>
+            ) : undefined
           }
         />
       ) : (
@@ -435,22 +446,26 @@ const RolesOverview: React.FC = () => {
                   marginTop: 16,
                 }}
               >
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => openEdit(role)}
-                >
-                  <Edit3 size={14} />
-                  {t("roles.edit")}
-                </button>
-
-                {!role.isSystemRole && (
+                {canUpdateRole && (
                   <button
                     type="button"
                     className="btn-secondary"
-                    disabled={statusLoadingId === role.id}
-                    onClick={() => void handleToggleStatus(role)}
+                    onClick={() => openEdit(role)}
                   >
+                    <Edit3 size={14} />
+                    {t("roles.edit")}
+                  </button>
+                )}
+
+                {canUpdateRole &&
+                  !role.isSystemRole &&
+                  (role.isActive || role.userCount === 0) && (
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      disabled={statusLoadingId === role.id}
+                      onClick={() => void handleToggleStatus(role)}
+                    >
                     {statusLoadingId === role.id ? (
                       <Loader2 size={14} className="spin" />
                     ) : role.isActive ? (
@@ -464,7 +479,7 @@ const RolesOverview: React.FC = () => {
                   </button>
                 )}
 
-                {canDelete(role) && (
+                {canDeleteRole && canDelete(role) && (
                   <button
                     type="button"
                     className="btn-danger"
