@@ -33,6 +33,14 @@ const JobsList: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const filtersActive =
+    query.trim() !== "" || statusFilter !== "all";
+
+  const clearFilters = () => {
+    setQuery("");
+    setStatusFilter("all");
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -121,6 +129,16 @@ const JobsList: React.FC = () => {
           <option value="closed">{t("recruitment.jobs.closed")}</option>
           <option value="draft">{t("recruitment.jobs.draft")}</option>
         </select>
+
+        {filtersActive && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={clearFilters}
+          >
+            {t("common.actions.clear")}
+          </button>
+        )}
       </div>
 
       <div className="admin-table-container glass">
@@ -171,12 +189,12 @@ const JobsList: React.FC = () => {
                   <EmptyState
                     icon={<Briefcase size={28} />}
                     title={
-                      query
+                      filtersActive
                         ? t("recruitment.jobs.noSearchResults")
                         : t("recruitment.jobs.noJobs")
                     }
                     hint={
-                      query
+                      filtersActive
                         ? t("recruitment.jobs.tryDifferentKeyword")
                         : t("recruitment.jobs.jobsWillAppear")
                     }
