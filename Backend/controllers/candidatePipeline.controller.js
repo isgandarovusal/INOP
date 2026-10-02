@@ -1,5 +1,6 @@
 const fs = require("fs/promises");
 const mongoose = require("mongoose");
+const { recordActivity } = require("../services/activityLog.service");
 
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
@@ -284,6 +285,38 @@ exports.createCandidateFromCv = async (req, res) => {
           notes:
             stringValue(req.body.notes),
         });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "candidate",
+        entityId: savedCandidate._id,
+        description: `Namizəd CV-dən yaradıldı: ${savedCandidate.name} (${savedCandidate.role})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Candidate pipeline activity log error:",
+        activityError
+      );
+    }
+
+    if (savedApplication?._id) {
+      try {
+        await recordActivity({
+          req,
+          action: "create",
+          entityType: "application",
+          entityId: savedApplication._id,
+          description: `Müraciət CV pipeline-dan yaradıldı: ${savedCandidate.name} → ${job.title}`,
+        });
+      } catch (activityError) {
+        console.error(
+          "Candidate pipeline application activity log error:",
+          activityError
+        );
+      }
     }
 
     return res.status(201).json({
