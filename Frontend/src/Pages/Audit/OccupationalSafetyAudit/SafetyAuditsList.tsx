@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
@@ -6,10 +6,31 @@ import {
   deleteOccupationalSafetyAudit,
 } from "../../../Services/occupationalSafetyAuditsService";
 import type { OccupationalSafetyAudit } from "../../../Types/Audit";
+import PageState from "../../../Components/PageState";
 
 export default function SafetyAuditsList() {
   const { t } = useTranslation();
   const [audits, setAudits] = useState<OccupationalSafetyAudit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+
+    try {
+      setAudits(await getOccupationalSafetyAudits());
+    } catch {
+      setLoadError(t("auth.somethingWentWrong"));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const sortedAudits = useMemo(
     () =>
@@ -23,8 +44,16 @@ export default function SafetyAuditsList() {
   async function handleDelete(id: string) {
     if (!window.confirm(t("audit.safety.list.deleteConfirm"))) return;
 
-    deleteOccupationalSafetyAudit(id);
-    setAudits(await getOccupationalSafetyAudits());
+    setDeletingId(id);
+
+    try {
+      await deleteOccupationalSafetyAudit(id);
+      await load();
+    } catch {
+      setLoadError(t("auth.somethingWentWrong"));
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   return (
@@ -40,7 +69,23 @@ export default function SafetyAuditsList() {
         </Link>
       </div>
 
-      {sortedAudits.length === 0 ? (
+      {loading ? (
+        <PageState type="loading" />
+      ) : loadError ? (
+        <PageState
+          type="error"
+          message={loadError}
+          action={
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => void load()}
+            >
+              {t("common.retry")}
+            </button>
+          }
+        />
+      ) : sortedAudits.length === 0 ? (
         <div className="audit-modern-empty">
           {t("audit.safety.list.noAudits")}
         </div>
@@ -82,9 +127,10 @@ export default function SafetyAuditsList() {
                       <button
                         type="button"
                         className="btn-danger"
-                        onClick={() => handleDelete(audit.id)}
+                        disabled={deletingId === audit.id}
+                        onClick={() => void handleDelete(audit.id)}
                       >
-                        Sil
+                        {deletingId === audit.id ? "..." : "Sil"}
                       </button>
                     </div>
                   </td>
