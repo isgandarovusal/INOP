@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { AlertCircle, Loader2, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../Components/PageHeader";
 import Badge from "../../Components/Badge";
+import PageState from "../../Components/PageState";
 import { getUsers } from "../../Services/usersService";
 import type { PublicUser, Role } from "../../Types/auth";
 import { ROLE_LABELS } from "../../Utils/permissions";
@@ -103,8 +104,13 @@ const RolesOverview: React.FC = () => {
     };
   }, [retryCount]);
 
-  const countFor = (role: Role) =>
-    users.filter((u) => u.role === role).length;
+  const roleCounts = users.reduce<Record<Role, number>>(
+    (counts, user) => {
+      counts[user.role] = (counts[user.role] || 0) + 1;
+      return counts;
+    },
+    {} as Record<Role, number>,
+  );
 
   return (
     <div>
@@ -114,21 +120,24 @@ const RolesOverview: React.FC = () => {
       />
 
       {loading ? (
-        <div className="empty-state">
-          <Loader2 size={24} className="spin" />
-        </div>
+        <PageState
+          type="loading"
+          title={t("dashboard.loading")}
+        />
       ) : error ? (
-        <div className="empty-state">
-          <AlertCircle size={28} />
-          <p>{t("auth.somethingWentWrong")}</p>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => setRetryCount((value) => value + 1)}
-          >
-            {t("common.retry")}
-          </button>
-        </div>
+        <PageState
+          type="error"
+          title={t("auth.somethingWentWrong")}
+          action={
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setRetryCount((value) => value + 1)}
+            >
+              {t("common.retry")}
+            </button>
+          }
+        />
       ) : (
         <div className="kpi-grid">
           {(Object.keys(ROLE_CAPABILITIES) as Role[]).map(
@@ -160,8 +169,8 @@ const RolesOverview: React.FC = () => {
                   marginBottom: 12,
                 }}
               >
-                {countFor(role)}{" "}
-                {countFor(role) === 1
+                {roleCounts[role] || 0}{" "}
+                {(roleCounts[role] || 0) === 1
                   ? t("roles.user")
                   : t("roles.users")}
               </p>
