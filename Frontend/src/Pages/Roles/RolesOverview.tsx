@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { AlertCircle, Loader2, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../Components/PageHeader";
 import Badge from "../../Components/Badge";
@@ -69,10 +69,39 @@ const ROLE_CAPABILITIES: Record<Role, string[]> = {
 const RolesOverview: React.FC = () => {
   const { t } = useTranslation();
   const [users, setUsers] = useState<PublicUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    getUsers().then(setUsers);
-  }, []);
+    let cancelled = false;
+
+    setLoading(true);
+    setError(false);
+
+    getUsers()
+      .then((result) => {
+        if (!cancelled) {
+          setUsers(result);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load users for roles:", err);
+
+        if (!cancelled) {
+          setError(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [retryCount]);
 
   const countFor = (role: Role) =>
     users.filter((u) => u.role === role).length;
@@ -84,8 +113,25 @@ const RolesOverview: React.FC = () => {
         subtitle={t("roles.subtitle")}
       />
 
-      <div className="kpi-grid">
-        {(Object.keys(ROLE_CAPABILITIES) as Role[]).map(
+      {loading ? (
+        <div className="empty-state">
+          <Loader2 size={24} className="spin" />
+        </div>
+      ) : error ? (
+        <div className="empty-state">
+          <AlertCircle size={28} />
+          <p>{t("auth.somethingWentWrong")}</p>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setRetryCount((value) => value + 1)}
+          >
+            {t("common.retry")}
+          </button>
+        </div>
+      ) : (
+        <div className="kpi-grid">
+          {(Object.keys(ROLE_CAPABILITIES) as Role[]).map(
           (role, idx) => (
             <div
               className="detail-card anim-in"
@@ -128,9 +174,10 @@ const RolesOverview: React.FC = () => {
                 ))}
               </div>
             </div>
-          ),
-        )}
-      </div>
+            ),
+          )}
+        </div>
+      )}
     </div>
   );
 };
