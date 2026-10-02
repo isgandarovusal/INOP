@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Pencil, Plus, Store, Trash2 } from "lucide-react";
@@ -24,17 +24,24 @@ const RestaurantsList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | RestaurantStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Restaurant | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = () => {
+  const load = useCallback(async () => {
     setLoading(true);
-    getRestaurants()
-      .then(setRestaurants)
-      .finally(() => setLoading(false));
-  };
+    setLoadError(null);
 
-  // Intentional: initial data load on mount.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(load, []);
+    try {
+      setRestaurants(await getRestaurants());
+    } catch {
+      setLoadError(t("auth.somethingWentWrong"));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     return restaurants
@@ -48,11 +55,19 @@ const RestaurantsList: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
+
     setDeletingId(deleteTarget.id);
-    await deleteRestaurant(deleteTarget.id);
-    setDeleteTarget(null);
-    setDeletingId(null);
-    load();
+    setLoadError(null);
+
+    try {
+      await deleteRestaurant(deleteTarget.id);
+      setDeleteTarget(null);
+      await load();
+    } catch {
+      setLoadError(t("auth.somethingWentWrong"));
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -100,6 +115,25 @@ const RestaurantsList: React.FC = () => {
                 <td colSpan={4}>
                   <div className="audit-modern-empty">
                     <Loader2 size={24} className="spin" />
+                  </div>
+                </td>
+              </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={4}>
+                  <EmptyState
+                    icon={<Store size={28} />}
+                    title={t("auth.somethingWentWrong")}
+                    hint={t("common.retry")}
+                  />
+                  <div className="state-page__action">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => void load()}
+                    >
+                      {t("common.retry")}
+                    </button>
                   </div>
                 </td>
               </tr>
