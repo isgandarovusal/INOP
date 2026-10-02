@@ -9,19 +9,10 @@ import {
   updateUser,
 } from "../../Services/usersService";
 import { getDepartments } from "../../Services/departmentsService";
+import { getRoles, type RoleRecord } from "../../Services/rolesService";
 import type { Role } from "../../Types/auth";
 import type { Department } from "../../Types/core";
-import { ROLE_LABELS } from "../../Utils/permissions";
-
-const ROLES: Role[] = [
-  "admin",
-  "hr_manager",
-  "assistant_hr",
-  "employee",
-  "auditor",
-  "audit_manager",
-  "manager",
-];
+import { getRoleLabel } from "../../Utils/permissions";
 
 const UserForm: React.FC = () => {
   const { t } = useTranslation();
@@ -36,6 +27,7 @@ const UserForm: React.FC = () => {
   const [departmentId, setDepartmentId] = useState("");
   const [position, setPosition] = useState("");
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [roles, setRoles] = useState<RoleRecord[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -51,12 +43,28 @@ const UserForm: React.FC = () => {
 
     Promise.all([
       getDepartments(),
+      getRoles(),
       isEdit ? getUsers() : Promise.resolve([]),
     ])
-      .then(([deptResult, userResult]) => {
+      .then(([deptResult, roleResult, userResult]) => {
         if (cancelled) return;
 
         setDepartments(deptResult);
+        setRoles(roleResult);
+
+        if (!isEdit && roleResult.length) {
+          const activeRoles = roleResult.filter(
+            (item) => item.isActive,
+          );
+
+          const defaultRole =
+            activeRoles.find((item) => item.key === "employee") ||
+            activeRoles[0];
+
+          if (defaultRole) {
+            setRole(defaultRole.key);
+          }
+        }
 
         if (deptResult.length && !departmentId) {
           setDepartmentId(deptResult[0].id);
@@ -223,11 +231,17 @@ const UserForm: React.FC = () => {
                 value={role}
                 onChange={(e) => setRole(e.target.value as Role)}
               >
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {ROLE_LABELS[r]}
-                  </option>
-                ))}
+                {roles
+                  .filter(
+                    (item) =>
+                      item.isActive ||
+                      (isEdit && item.key === role),
+                  )
+                  .map((item) => (
+                    <option key={item.id} value={item.key}>
+                      {getRoleLabel(item.key)}
+                    </option>
+                  ))}
               </select>
             </div>
 

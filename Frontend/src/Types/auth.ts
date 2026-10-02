@@ -1,4 +1,4 @@
-export type Role =
+export type BuiltInRole =
   | "admin"
   | "hr_manager"
   | "assistant_hr"
@@ -6,6 +6,8 @@ export type Role =
   | "auditor"
   | "audit_manager"
   | "manager";
+
+export type Role = BuiltInRole | (string & {});
 
 export type PermissionScope =
   | "all"

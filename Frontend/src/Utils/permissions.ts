@@ -113,7 +113,7 @@ export function canManageCore(
   );
 }
 
-export const ROLE_LABELS: Record<Role, string> = {
+export const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",
   hr_manager: "HR Manager",
   assistant_hr: "Assistant HR",
@@ -122,3 +122,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   audit_manager: "Audit Manager",
   manager: "Manager",
 };
+
+export function getRoleLabel(role: Role): string {
+  return ROLE_LABELS[role] || role;
+}

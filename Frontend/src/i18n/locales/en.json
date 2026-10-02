@@ -238,7 +238,7 @@
   },
   "roles": {
     "title": "Roles",
-    "subtitle": "Fixed roles with pre-defined permissions. Custom role management is on the future roadmap.",
+    "subtitle": "Manage system and custom roles, their permissions, and user assignments.",
     "user": "user",
     "users": "users",
     "capabilities": {
@@ -259,6 +259,45 @@
       "dashboard": "Dashboard",
       "auditAnalytics": "Audit analytics",
       "reportsDataViewing": "Reports / data viewing"
+    },
+    "empty": "No roles found.",
+    "create": "New role",
+    "edit": "Edit",
+    "delete": "Delete",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deleteTitle": "Delete role",
+    "deleteMessage": "Are you sure you want to delete the \"{{role}}\" role?",
+    "form": {
+      "createTitle": "Create role",
+      "editTitle": "Edit role",
+      "subtitle": "Define the role details and permissions.",
+      "close": "Close",
+      "name": "Role name",
+      "key": "Role key",
+      "description": "Description",
+      "permissions": "Permissions",
+      "addPermission": "Add permission",
+      "removePermission": "Remove permission",
+      "resource": "Resource",
+      "action": "Action",
+      "scope": "Scope",
+      "noPermissions": "No permissions have been added to this role yet.",
+      "required": "Role name and key are required.",
+      "permissionRequired": "Resource and action are required for every permission.",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "create": "Create role"
+    },
+    "scopes": {
+      "all": "All",
+      "department": "Department",
+      "assigned": "Assigned",
+      "own": "Own",
+      "none": "None"
     }
   },
   "activityLog": {

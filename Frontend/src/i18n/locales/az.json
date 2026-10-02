@@ -243,7 +243,7 @@
   },
   "roles": {
     "title": "Rollar",
-    "subtitle": "Əvvəlcədən müəyyən edilmiş icazələrə malik sabit rollar. Fərdi rol idarəetməsi gələcək inkişaf planındadır.",
+    "subtitle": "Sistem və fərdi rolları, onların icazələrini və istifadəçi təyinatlarını idarə edin.",
     "user": "istifadəçi",
     "users": "istifadəçi",
     "capabilities": {
@@ -271,6 +271,45 @@
       "reportsDataViewing": "Hesabatlar / məlumatlara baxış",
       "findings": "Aşkar edilmiş uyğunsuzluqlar",
       "assignments": "Təyinatlar"
+    },
+    "empty": "Heç bir rol tapılmadı.",
+    "create": "Yeni rol",
+    "edit": "Redaktə et",
+    "delete": "Sil",
+    "activate": "Aktivləşdir",
+    "deactivate": "Deaktiv et",
+    "active": "Aktiv",
+    "inactive": "Deaktiv",
+    "deleteTitle": "Rolu sil",
+    "deleteMessage": "\"{{role}}\" rolunu silmək istədiyinizə əminsiniz?",
+    "form": {
+      "createTitle": "Yeni rol yarat",
+      "editTitle": "Rolu redaktə et",
+      "subtitle": "Rol məlumatlarını və icazələrini müəyyən edin.",
+      "close": "Bağla",
+      "name": "Rol adı",
+      "key": "Role key",
+      "description": "Təsvir",
+      "permissions": "İcazələr",
+      "addPermission": "İcazə əlavə et",
+      "removePermission": "İcazəni sil",
+      "resource": "Resource",
+      "action": "Action",
+      "scope": "Əhatə dairəsi",
+      "noPermissions": "Bu rol üçün hələ icazə əlavə edilməyib.",
+      "required": "Rol adı və key tələb olunur.",
+      "permissionRequired": "Hər icazə üçün resource və action doldurulmalıdır.",
+      "cancel": "Ləğv et",
+      "saving": "Saxlanılır...",
+      "save": "Dəyişiklikləri saxla",
+      "create": "Rol yarat"
+    },
+    "scopes": {
+      "all": "Hamısı",
+      "department": "Şöbə",
+      "assigned": "Təyin edilmiş",
+      "own": "Öz məlumatları",
+      "none": "Yoxdur"
     }
   },
   "activityLog": {
