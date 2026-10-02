@@ -1,4 +1,5 @@
 const AuditFinding = require("../models/auditFinding.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -96,6 +97,21 @@ exports.createFinding = async (req, res) => {
         createdBy: req.user?.id || null,
       },
     });
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_finding",
+        entityId: finding._id,
+        description: `Audit finding yaradıldı: ${finding.title}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit finding activity log error:",
+        activityError
+      );
+    }
 
     return res.status(201).json({
       success: true,
