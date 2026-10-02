@@ -3,6 +3,8 @@ import {
  useState
 } from "react";
 
+import PageState from "../../../Components/PageState";
+
 import {
  useParams
 } from "react-router-dom";
@@ -106,11 +108,7 @@ export default function AuditExecutionPage(){
 
  if(!execution){
 
-  return (
-   <div>
-    Loading audit...
-   </div>
-  );
+  return <PageState type="loading" />;
 
  }
 

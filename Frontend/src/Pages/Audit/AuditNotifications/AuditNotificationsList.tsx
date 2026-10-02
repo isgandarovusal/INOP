@@ -3,6 +3,8 @@ import {
  useState
 } from "react";
 
+import PageState from "../../../Components/PageState";
+
 import {
  getAuditNotifications,
  markNotificationRead,
@@ -70,11 +72,7 @@ export default function AuditNotificationsList(){
 
  if(loading){
 
-  return (
-   <div>
-    Loading notifications...
-   </div>
-  );
+  return <PageState type="loading" />;
 
  }
 

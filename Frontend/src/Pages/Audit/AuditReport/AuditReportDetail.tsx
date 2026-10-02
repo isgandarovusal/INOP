@@ -3,6 +3,8 @@ import {
  useState
 } from "react";
 
+import PageState from "../../../Components/PageState";
+
 
 import {
  useParams
@@ -69,11 +71,7 @@ export default function AuditReportDetail(){
 
  if(loading){
 
-  return (
-   <div>
-    Loading audit report...
-   </div>
-  );
+  return <PageState type="loading" />;
 
  }
 

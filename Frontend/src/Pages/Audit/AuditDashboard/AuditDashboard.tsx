@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import PageState from "../../../Components/PageState";
+
 import {
   ResponsiveContainer,
   BarChart,
@@ -52,11 +54,7 @@ export default function AuditDashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div>
-        Loading audit dashboard...
-      </div>
-    );
+    return <PageState type="loading" />;
   }
 
   return (
