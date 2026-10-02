@@ -77,6 +77,17 @@ const AuditsList: React.FC = () => {
 
   const auditors = useMemo(() => users.filter((u) => u.role === "auditor"), [users]);
 
+  const filtersActive =
+    restaurantFilter !== "all" ||
+    auditorFilter !== "all" ||
+    minScore !== "";
+
+  const clearFilters = () => {
+    setRestaurantFilter("all");
+    setAuditorFilter("all");
+    setMinScore("");
+  };
+
   const restaurantMap = useMemo(
     () => new Map(restaurants.map((restaurant) => [restaurant.id, restaurant])),
     [restaurants],
@@ -179,6 +190,15 @@ const AuditsList: React.FC = () => {
           value={minScore}
           onChange={(e) => setMinScore(e.target.value)}
         />
+        {filtersActive && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={clearFilters}
+          >
+            {t("common.actions.clear")}
+          </button>
+        )}
       </div>
 
       <div className="admin-table-container glass">
