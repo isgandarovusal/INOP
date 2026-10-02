@@ -28,6 +28,8 @@ export default function ServiceAuditsList() {
 
   const [audits, setAudits] = useState<ServiceAudit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -40,7 +42,9 @@ export default function ServiceAuditsList() {
     let cancelled = false;
 
     const load = async () => {
-      setLoading(true);
+      const isInitialLoad = !hasLoadedOnce;
+      setLoading(isInitialLoad);
+      setIsRefreshing(!isInitialLoad);
       setLoadError(false);
 
       try {
@@ -69,6 +73,8 @@ export default function ServiceAuditsList() {
       } finally {
         if (!cancelled) {
           setLoading(false);
+          setIsRefreshing(false);
+          setHasLoadedOnce(true);
         }
       }
     };
@@ -212,7 +218,33 @@ export default function ServiceAuditsList() {
         </button>
       </div>
 
-      <div className="admin-table-container glass">
+      <div
+        className="admin-table-container glass"
+        style={{ position: "relative" }}
+      >
+        {isRefreshing && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 1,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "6px 10px",
+              borderRadius: 999,
+              background: "rgba(255, 255, 255, 0.92)",
+              boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
+              fontSize: 12,
+              color: "#64748b",
+            }}
+          >
+            {t("common.loading", { defaultValue: "Loading…" })}
+          </div>
+        )}
         <table>
         <thead>
           <tr>
