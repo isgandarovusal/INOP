@@ -1,4 +1,5 @@
 const Restaurant = require('../models/restaurant.model');
+const { recordActivity } = require("../services/activityLog.service");
 
 
 async function getRestaurants(req, res) {
@@ -49,6 +50,21 @@ async function createRestaurant(req,res){
       status:req.body.status || "active"
     });
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "restaurant",
+        entityId: restaurant._id,
+        description: `Restoran yaradıldı: ${restaurant.name}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Restaurant activity log error:",
+        activityError
+      );
+    }
+
 
     res.status(201).json(restaurant);
 
@@ -79,6 +95,21 @@ async function updateRestaurant(req,res){
       return res.status(404).json({
         message:"Restaurant not found"
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "restaurant",
+        entityId: restaurant._id,
+        description: `Restoran yeniləndi: ${restaurant.name}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Restaurant activity log error:",
+        activityError
+      );
     }
 
 
@@ -124,6 +155,21 @@ async function deleteRestaurant(req,res){
       return res.status(404).json({
         message:"Restaurant not found"
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "restaurant",
+        entityId: restaurant._id,
+        description: `Restoran silindi: ${restaurant.name}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Restaurant activity log error:",
+        activityError
+      );
     }
 
 
