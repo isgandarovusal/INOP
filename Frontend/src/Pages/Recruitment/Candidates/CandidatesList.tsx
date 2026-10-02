@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import KanbanBoard from "../../../Components/KanbanBoard";
+import SearchInput from "../../../Components/SearchInput";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
   deleteCandidate,
@@ -213,38 +214,13 @@ const CandidatesList: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <div
-          className="search-box"
-          style={{
-            position: "relative",
-            flex: 1,
-            maxWidth: "320px",
-          }}
-        >
-          <Search
-            size={16}
-            style={{
-              position: "absolute",
-              left: "12px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#6b7280",
-            }}
-          />
-
-          <input
-            type="text"
-            placeholder={t(
-              "recruitment.candidates.searchPlaceholder",
-            )}
-            className="input-field"
-            style={{ paddingLeft: "36px" }}
-            value={searchQuery}
-            onChange={(event) =>
-              setSearchQuery(event.target.value)
-            }
-          />
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={t(
+            "recruitment.candidates.searchPlaceholder",
+          )}
+        />
 
         <div
           className="view-switcher"
