@@ -10,6 +10,7 @@ const AuditApproval =
 
 const AuditClosure =
   require("../models/auditClosure.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 const AuditAssignment =
   require("../models/auditAssignment.model");
@@ -118,6 +119,21 @@ exports.closeAudit = async (req, res) => {
           .select("auditor")
           .lean(),
       ]);
+
+    try {
+      await recordActivity({
+        req,
+        action: "close",
+        entityType: "audit_closure",
+        entityId: closure._id,
+        description: "Audit bağlandı",
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit closure activity log error:",
+        activityError
+      );
+    }
 
     if (assignment?.auditor) {
       await notifyUser({
