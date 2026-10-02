@@ -1,3 +1,4 @@
+const { recordActivity } = require("../services/activityLog.service");
 const mongoose = require("mongoose");
 const Job = require("../models/job.model");
 
@@ -221,6 +222,18 @@ exports.createJob = async (req, res) => {
 
     const saved = await job.save();
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "job",
+        entityId: saved._id,
+        description: `Vakansiya yaradıldı: ${saved.title}`,
+      });
+    } catch (activityError) {
+      console.error("Job create activity log error:", activityError);
+    }
+
     return res.status(201).json(saved);
   } catch (error) {
     console.error("Create job error:", error);
@@ -388,6 +401,18 @@ exports.updateJob = async (req, res) => {
       });
     }
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "job",
+        entityId: updated._id,
+        description: `Vakansiya yeniləndi: ${updated.title}`,
+      });
+    } catch (activityError) {
+      console.error("Job update activity log error:", activityError);
+    }
+
     return res.status(200).json(updated);
   } catch (error) {
     console.error("Update job error:", error);
@@ -423,6 +448,18 @@ exports.deleteJob = async (req, res) => {
         message:
           "Vakansiya tapılmadı və ya bu vakansiyanı silmək üçün icazəniz yoxdur.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "job",
+        entityId: deleted._id,
+        description: `Vakansiya silindi: ${deleted.title}`,
+      });
+    } catch (activityError) {
+      console.error("Job delete activity log error:", activityError);
     }
 
     return res.status(200).json({
