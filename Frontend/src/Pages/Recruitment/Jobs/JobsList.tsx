@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -33,7 +33,7 @@ const JobsList: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -48,48 +48,11 @@ const JobsList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadJobs = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const result = await getJobs();
-
-        if (!cancelled) {
-          setJobs(result);
-        }
-      } catch (err: unknown) {
-        if (cancelled) return;
-
-        const error = err as {
-          response?: { data?: { message?: string } };
-          message?: string;
-        };
-
-        console.error("Failed to load jobs:", err);
-        setError(
-          error.response?.data?.message ||
-            error.message ||
-            t("recruitment.jobs.loadError"),
-        );
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadJobs();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [t]);
+    void load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     return jobs
@@ -115,8 +78,9 @@ const JobsList: React.FC = () => {
       await deleteJob(id);
       setJobs((prev) => prev.filter((job) => job.id !== id));
       setDeleteTarget(null);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to delete job:", err);
+      setError(getErrorMessage(err, t("somethingWentWrong")));
     } finally {
       setDeletingId(null);
     }
@@ -167,13 +131,17 @@ const JobsList: React.FC = () => {
               <th>{t("recruitment.jobs.requiredSkills")}</th>
               <th>{t("recruitment.jobs.experience")}</th>
               <th>{t("recruitment.jobs.status")}</th>
-              <th className="col-actions">{t("recruitment.jobs.actions")}</th>
+              {canManage && (
+                <th className="col-actions">
+                  {t("recruitment.jobs.actions")}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
                   </div>
@@ -181,7 +149,7 @@ const JobsList: React.FC = () => {
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <EmptyState
                     icon={<Briefcase size={28} />}
                     title={t("somethingWentWrong")}
@@ -199,7 +167,7 @@ const JobsList: React.FC = () => {
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <EmptyState
                     icon={<Briefcase size={28} />}
                     title={
@@ -247,35 +215,33 @@ const JobsList: React.FC = () => {
                       {t(`recruitment.jobStatus.${job.status}`)}
                     </Badge>
                   </td>
-                  <td>
-                    <div className="row-actions">
-                      {canManage && (
-                        <>
-                          <button
-                            className="icon-btn icon-btn--edit"
-                            title={t("recruitment.jobs.edit")}
-                            onClick={() =>
-                              navigate(`/app/recruitment/jobs/${job.id}/edit`)
-                            }
-                          >
-                            <Pencil size={15} />
-                          </button>
-                          <button
-                            className="icon-btn icon-btn--danger"
-                            title={t("recruitment.jobs.delete")}
-                            disabled={deletingId === job.id}
-                            onClick={() => setDeleteTarget(job)}
-                          >
-                            {deletingId === job.id ? (
-                              <Loader2 size={15} className="spin" />
-                            ) : (
-                              <Trash2 size={15} />
-                            )}
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+                  {canManage && (
+                    <td>
+                      <div className="row-actions">
+                        <button
+                          className="icon-btn icon-btn--edit"
+                          title={t("recruitment.jobs.edit")}
+                          onClick={() =>
+                            navigate(`/app/recruitment/jobs/${job.id}/edit`)
+                          }
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          className="icon-btn icon-btn--danger"
+                          title={t("recruitment.jobs.delete")}
+                          disabled={deletingId === job.id}
+                          onClick={() => setDeleteTarget(job)}
+                        >
+                          {deletingId === job.id ? (
+                            <Loader2 size={15} className="spin" />
+                          ) : (
+                            <Trash2 size={15} />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             )}
