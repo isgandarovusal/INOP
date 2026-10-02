@@ -41,6 +41,14 @@ const ApplicationsList: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const filtersActive =
+    jobFilter !== "all" || statusFilter !== "all";
+
+  const clearFilters = () => {
+    setJobFilter("all");
+    setStatusFilter("all");
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(false);
@@ -154,6 +162,16 @@ const ApplicationsList: React.FC = () => {
           <option value="hired">{t("recruitment.applications.hired")}</option>
           <option value="rejected">{t("recruitment.applications.rejected")}</option>
         </select>
+
+        {filtersActive && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={clearFilters}
+          >
+            {t("common.actions.clear")}
+          </button>
+        )}
       </div>
 
       <div className="admin-table-container glass">
