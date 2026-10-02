@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const AuditApproval =
   require("../models/auditApproval.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 const {
   createAuditActivity,
@@ -32,6 +33,21 @@ exports.createApproval = async (req, res) => {
         status: approval.status,
       },
     });
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_approval",
+        entityId: approval._id,
+        description: "Audit approval sorğusu yaradıldı",
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit approval activity log error:",
+        activityError
+      );
+    }
 
     if (approval.reviewer) {
       await notifyUser({
@@ -150,6 +166,21 @@ exports.updateApproval = async (req, res) => {
         comment: approval.comment,
       },
     });
+
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "audit_approval",
+        entityId: approval._id,
+        description: `Audit approval status dəyişdirildi: ${approval.status}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit approval activity log error:",
+        activityError
+      );
+    }
 
     if (
       approval.requestedBy &&
