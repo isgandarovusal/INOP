@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const AuditNotification = require("../models/auditNotification.model");
 const User = require("../models/user.model");
 const { notifyUser } = require("../services/notification.service");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -111,6 +112,21 @@ exports.createNotification = async (req, res) => {
         success: false,
         message: "Notification recipient tapılmadı.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_notification",
+        entityId: notificationResult.notification?._id,
+        description: `Audit notification yaradıldı: ${notificationResult.notification?.title || req.body.title || "Bildiriş"}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit notification activity log error:",
+        activityError
+      );
     }
 
     return res.status(201).json({
