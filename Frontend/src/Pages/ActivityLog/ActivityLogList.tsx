@@ -79,8 +79,16 @@ const ActivityLogList: React.FC = () => {
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={<History size={28} />}
-            title={t("activityLog.noActivity")}
-            hint={t("activityLog.hint")}
+            title={
+              query.trim()
+                ? t("activityLog.noSearchResults")
+                : t("activityLog.noActivity")
+            }
+            hint={
+              query.trim()
+                ? t("activityLog.noSearchResultsHint")
+                : t("activityLog.hint")
+            }
           />
         ) : (
           <div className="recent-list">
