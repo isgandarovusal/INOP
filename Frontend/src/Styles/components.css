@@ -377,15 +377,15 @@ select.input-field {
   padding-bottom: 4px;
 }
 .page-header__title {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   line-height: 1.2;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
 }
 .page-header__subtitle {
-  margin-top: 6px;
-  font-size: 0.9rem;
+  margin-top: 4px;
+  font-size: 0.85rem;
   line-height: 1.5;
   color: var(--text-secondary);
 }
