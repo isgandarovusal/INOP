@@ -221,6 +221,7 @@
     "name": "Ad",
     "description": "Təsvir",
     "actions": "Əməliyyatlar",
+    "saving": "Yadda saxlanılır…",
     "noDepartments": "Heç bir şöbə yoxdur",
     "addFirst": "İlk şöbənizi əlavə edin.",
     "edit": "Redaktə et",

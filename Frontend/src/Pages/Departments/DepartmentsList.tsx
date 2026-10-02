@@ -77,6 +77,23 @@ const DepartmentsList: React.FC = () => {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (!showForm || saving) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setShowForm(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showForm, saving]);
+
   const openCreate = () => {
     setEditing(null);
     setName("");
@@ -265,17 +282,24 @@ const DepartmentsList: React.FC = () => {
       {showForm && (
         <div
           className="modal-backdrop"
-          onClick={() => setShowForm(false)}
+          onClick={() => {
+            if (!saving) {
+              setShowForm(false);
+            }
+          }}
         >
           <div
             className="modal-card anim-pop"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="department-form-title"
             style={{
               textAlign: "left",
               maxWidth: 420,
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="modal-card__title">
+            <h3 id="department-form-title" className="modal-card__title">
               {editing
                 ? t("departments.editDepartment")
                 : t("departments.createDepartment")}
@@ -324,7 +348,10 @@ const DepartmentsList: React.FC = () => {
                   disabled={saving}
                 >
                   {saving ? (
-                    <Loader2 size={16} className="spin" />
+                    <>
+                      <Loader2 size={16} className="spin" />
+                      {t("departments.saving")}
+                    </>
                   ) : editing ? (
                     t("departments.saveChanges")
                   ) : (
@@ -335,6 +362,7 @@ const DepartmentsList: React.FC = () => {
                 <button
                   type="button"
                   className="btn-cancel"
+                  disabled={saving}
                   onClick={() => setShowForm(false)}
                 >
                   {t("departments.cancel")}

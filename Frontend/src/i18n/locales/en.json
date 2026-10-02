@@ -216,6 +216,7 @@
     "name": "Name",
     "description": "Description",
     "actions": "Actions",
+    "saving": "Saving…",
     "noDepartments": "No departments",
     "addFirst": "Add your first department.",
     "edit": "Edit",
