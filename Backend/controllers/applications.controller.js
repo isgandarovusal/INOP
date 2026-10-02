@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { recordActivity } = require("../services/activityLog.service");
 const Application = require("../models/application.model");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
@@ -138,6 +139,21 @@ exports.createApplication = async (req, res) => {
       .populate("candidateId")
       .lean();
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "application",
+        entityId: saved._id,
+        description: `Müraciət yaradıldı: ${populated?.candidateId?.name || "Namizəd"} → ${populated?.jobId?.title || "Vakansiya"}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Application create activity log error:",
+        activityError
+      );
+    }
+
     return res.status(201).json(populated);
   } catch (error) {
     console.error("Create application error:", error);
@@ -231,6 +247,21 @@ exports.updateApplicationStatus = async (req, res) => {
           notificationError
         );
       }
+
+      try {
+        await recordActivity({
+          req,
+          action: "status_change",
+          entityType: "application",
+          entityId: updated._id,
+          description: `Müraciət statusu dəyişdirildi: ${updated?.candidateId?.name || "Namizəd"} → ${updated?.jobId?.title || "Vakansiya"} (${existing.status} → ${updated.status})`,
+        });
+      } catch (activityError) {
+        console.error(
+          "Application status activity log error:",
+          activityError
+        );
+      }
     }
 
     return res.status(200).json(updated);
@@ -261,13 +292,30 @@ exports.deleteApplication = async (req, res) => {
       buildScopedQuery(req, {
         _id: req.params.id,
       })
-    );
+    )
+      .populate("jobId")
+      .populate("candidateId");
 
     if (!deleted) {
       return res.status(404).json({
         message:
           "Müraciət tapılmadı və ya bu müraciəti silmək üçün icazəniz yoxdur.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "application",
+        entityId: deleted._id,
+        description: `Müraciət silindi: ${deleted?.candidateId?.name || "Namizəd"} → ${deleted?.jobId?.title || "Vakansiya"}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Application delete activity log error:",
+        activityError
+      );
     }
 
     return res.status(200).json({
