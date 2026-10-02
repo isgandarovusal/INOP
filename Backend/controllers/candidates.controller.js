@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
 
 const candidateStatusValues =
@@ -188,6 +189,21 @@ exports.createCandidate = async (req, res) => {
 
     const saved = await candidate.save();
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "candidate",
+        entityId: saved._id,
+        description: `Namizəd yaradıldı: ${saved.name} (${saved.role})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Candidate create activity log error:",
+        activityError
+      );
+    }
+
     return res.status(201).json(saved);
   } catch (error) {
     console.error("Create candidate error:", error);
@@ -324,6 +340,21 @@ exports.updateCandidate = async (req, res) => {
       });
     }
 
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "candidate",
+        entityId: updated._id,
+        description: `Namizəd yeniləndi: ${updated.name} (${updated.role})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Candidate update activity log error:",
+        activityError
+      );
+    }
+
     return res.status(200).json(updated);
   } catch (error) {
     console.error("Update candidate error:", error);
@@ -359,6 +390,19 @@ exports.updateCandidateStatus = async (req, res) => {
       });
     }
 
+    const existing = await Candidate.findOne(
+      buildScopedQuery(req, {
+        _id: id,
+      })
+    );
+
+    if (!existing) {
+      return res.status(404).json({
+        message:
+          "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",
+      });
+    }
+
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: id,
@@ -375,6 +419,23 @@ exports.updateCandidateStatus = async (req, res) => {
         message:
           "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",
       });
+    }
+
+    if (existing.status !== updated.status) {
+      try {
+        await recordActivity({
+          req,
+          action: "status_change",
+          entityType: "candidate",
+          entityId: updated._id,
+          description: `Namizəd statusu dəyişdirildi: ${updated.name} (${existing.status} → ${updated.status})`,
+        });
+      } catch (activityError) {
+        console.error(
+          "Candidate status activity log error:",
+          activityError
+        );
+      }
     }
 
     return res.status(200).json(updated);
@@ -414,6 +475,21 @@ exports.deleteCandidate = async (req, res) => {
         message:
           "Namizəd tapılmadı və ya bu namizədi silmək üçün icazəniz yoxdur.",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "candidate",
+        entityId: deleted._id,
+        description: `Namizəd silindi: ${deleted.name} (${deleted.role})`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Candidate delete activity log error:",
+        activityError
+      );
     }
 
     return res.status(200).json({
