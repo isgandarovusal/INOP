@@ -1,6 +1,7 @@
 const path = require("path");
 const AuditSourceDocument =
   require("../models/auditSourceDocument.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 
 function normalizeDocument(doc) {
@@ -139,6 +140,21 @@ exports.uploadDocument = async (req, res) => {
 
       });
 
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_source_document",
+        entityId: document._id,
+        description: `Audit source document yükləndi: ${document.originalName || document.name || document.id}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit source document activity log error:",
+        activityError
+      );
+    }
+
 
     res.status(201).json(
       normalizeDocument(document)
@@ -181,6 +197,21 @@ exports.deleteDocument = async(req,res)=>{
           "Audit faylı tapılmadı.",
       });
 
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "delete",
+        entityType: "audit_source_document",
+        entityId: document._id,
+        description: `Audit source document silindi: ${document.originalName || document.name || document.id}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit source document activity log error:",
+        activityError
+      );
     }
 
 
