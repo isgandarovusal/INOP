@@ -48,6 +48,7 @@ const DepartmentsList: React.FC = () => {
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Department | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -58,43 +59,23 @@ const DepartmentsList: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+
     try {
       const result = await getDepartments();
       setDepartments(result);
     } catch (error) {
       console.error("Failed to load departments:", error);
+      setLoadError(t("auth.somethingWentWrong"));
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const initialLoad = async () => {
-      setLoading(true);
-
-      try {
-        const result = await getDepartments();
-
-        if (!cancelled) {
-          setDepartments(result);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Failed to load departments:", error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void initialLoad();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void load();
+  }, [load]);
 
   const openCreate = () => {
     setEditing(null);
@@ -152,11 +133,23 @@ const DepartmentsList: React.FC = () => {
   const handleDelete = async () => {
     if (!deleteTarget) return;
 
-    setDeletingId(deleteTarget.id);
-    await deleteDepartment(deleteTarget.id);
-    setDeleteTarget(null);
-    setDeletingId(null);
-    load();
+    const id = deleteTarget.id;
+    setDeletingId(id);
+
+    try {
+      await deleteDepartment(id);
+      setDeleteTarget(null);
+      await load();
+    } catch (error) {
+      console.error("Failed to delete department:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : t("auth.somethingWentWrong"),
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -192,6 +185,24 @@ const DepartmentsList: React.FC = () => {
                 <td colSpan={3}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
+                  </div>
+                </td>
+              </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={3}>
+                  <EmptyState
+                    icon={<Building2 size={28} />}
+                    title={t("auth.somethingWentWrong")}
+                    hint={loadError}
+                  />
+                  <div style={{ textAlign: "center", marginTop: "12px" }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => void load()}
+                    >
+                      {t("common.retry")}
+                    </button>
                   </div>
                 </td>
               </tr>

@@ -19,10 +19,14 @@ const UsersList: React.FC = () => {
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     try {
       const [userResult, deptResult] = await Promise.all([
         getUsers(),
@@ -33,40 +37,15 @@ const UsersList: React.FC = () => {
       setDepartments(deptResult);
     } catch (error) {
       console.error("Failed to load users:", error);
+      setError(t("auth.somethingWentWrong"));
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const initialLoad = async () => {
-      try {
-        const [userResult, deptResult] = await Promise.all([
-          getUsers(),
-          getDepartments(),
-        ]);
-
-        if (cancelled) return;
-
-        setUsers(userResult);
-        setDepartments(deptResult);
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Failed to load users:", error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void initialLoad();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return users;
@@ -135,6 +114,24 @@ const UsersList: React.FC = () => {
                 <td colSpan={5}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
+                  </div>
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    icon={<UserCog size={28} />}
+                    title={t("auth.somethingWentWrong")}
+                    hint={error}
+                  />
+                  <div style={{ textAlign: "center", marginTop: "12px" }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => void load()}
+                    >
+                      {t("common.retry")}
+                    </button>
                   </div>
                 </td>
               </tr>
