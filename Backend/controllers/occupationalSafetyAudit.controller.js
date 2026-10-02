@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   getAssignedAuditFilter,
 } = require("../middleware/auditScope.middleware");
@@ -91,6 +92,21 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
           ? req.body.metadata
           : {},
     });
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "occupational_safety_audit",
+        entityId: audit._id,
+        description: `Əməyin mühafizəsi auditi yaradıldı: ${audit.id || audit._id}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Occupational safety audit activity log error:",
+        activityError
+      );
+    }
 
     return res.status(201).json({
       success: true,
