@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -104,6 +105,21 @@ exports.updateSafetyDetails = async (req, res) => {
         success: false,
         message: "Audit not found",
       });
+    }
+
+    try {
+      await recordActivity({
+        req,
+        action: "update",
+        entityType: "occupational_safety_details",
+        entityId: audit._id,
+        description: `Əməyin mühafizəsi auditinin safety məlumatları yeniləndi: ${audit.id || audit._id}`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Occupational safety details activity log error:",
+        activityError
+      );
     }
 
     return res.json({
