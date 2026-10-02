@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
-const ActivityLog = require("../models/activityLog.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   getAssignedAuditFilter,
 } = require("../middleware/auditScope.middleware");
@@ -126,11 +126,8 @@ async function createAudit(req, res) {
 
     if (audit.auditType === "service") {
       try {
-        await ActivityLog.create({
-          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
-            ? req.user.id
-            : null,
-          userName: req.user?.name || "",
+        await recordActivity({
+          req,
           action: "create",
           entityType: "service_audit",
           entityId: String(audit._id),
@@ -201,11 +198,8 @@ async function updateAudit(req, res) {
 
     if (audit.auditType === "service") {
       try {
-        await ActivityLog.create({
-          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
-            ? req.user.id
-            : null,
-          userName: req.user?.name || "",
+        await recordActivity({
+          req,
           action: "update",
           entityType: "service_audit",
           entityId: String(audit._id),
@@ -257,11 +251,8 @@ async function deleteAudit(req, res) {
 
     if (audit.auditType === "service") {
       try {
-        await ActivityLog.create({
-          userId: mongoose.Types.ObjectId.isValid(req.user?.id)
-            ? req.user.id
-            : null,
-          userName: req.user?.name || "",
+        await recordActivity({
+          req,
           action: "delete",
           entityType: "service_audit",
           entityId: String(audit._id),
