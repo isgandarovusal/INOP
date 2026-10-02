@@ -1,5 +1,6 @@
 const AuditAssignment =
   require("../models/auditAssignment.model");
+const { recordActivity } = require("../services/activityLog.service");
 
 const {
   createAuditActivity,
@@ -27,6 +28,21 @@ exports.assignAudit = async (req, res) => {
         status: assignment.status,
       },
     });
+
+    try {
+      await recordActivity({
+        req,
+        action: "create",
+        entityType: "audit_assignment",
+        entityId: assignment._id,
+        description: "Audit auditor-a təyin edildi",
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit assignment activity log error:",
+        activityError
+      );
+    }
 
     await notifyUser({
       auditId: assignment.auditId,
