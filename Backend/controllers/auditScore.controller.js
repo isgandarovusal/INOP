@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -56,6 +57,21 @@ exports.calculateScore = async (req, res) => {
     audit.overallPercentage = score;
 
     await audit.save();
+
+    try {
+      await recordActivity({
+        req,
+        action: "calculate",
+        entityType: "audit_score",
+        entityId: audit._id,
+        description: `Audit score hesablandı: ${score}%`,
+      });
+    } catch (activityError) {
+      console.error(
+        "Audit score activity log error:",
+        activityError
+      );
+    }
 
     return res.json({
       success: true,
