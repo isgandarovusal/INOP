@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ClipboardCheck, Loader2, Pencil, Plus, Store } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, Pencil, Plus, Store } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
+import PageState from "../../../Components/PageState";
 import { getRestaurantById } from "../../../Services/restaurantsService";
 import { getAudits } from "../../../Services/auditsService";
 import type { Restaurant, Audit } from "../../../Types/audit";
@@ -21,21 +22,48 @@ const RestaurantDetail: React.FC = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [audits, setAudits] = useState<Audit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-    // Intentional: show the loading state when navigating between restaurant IDs.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-    Promise.all([getRestaurantById(id), getAudits()]).then(([restaurantResult, auditResult]) => {
-      setRestaurant(restaurantResult ?? null);
-      setAudits(
-        auditResult
-          .filter((a) => a.restaurantId === id)
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-      );
-      setLoading(false);
-    });
+
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setLoadError(false);
+
+      try {
+        const [restaurantResult, auditResult] = await Promise.all([
+          getRestaurantById(id),
+          getAudits(),
+        ]);
+
+        if (cancelled) return;
+
+        setRestaurant(restaurantResult ?? null);
+        setAudits(
+          auditResult
+            .filter((a) => a.restaurantId === id)
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        );
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed loading restaurant detail:", error);
+          setLoadError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const history = useMemo(
@@ -58,10 +86,24 @@ const RestaurantDetail: React.FC = () => {
   const maxScore = 10;
 
   if (loading) {
+    return <PageState type="loading" />;
+  }
+
+  if (loadError) {
     return (
-      <div className="audit-modern-empty">
-        <Loader2 size={24} className="spin" />
-      </div>
+      <PageState
+        type="error"
+        title={t("auth.somethingWentWrong")}
+        action={
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => window.location.reload()}
+          >
+            {t("common.retry")}
+          </button>
+        }
+      />
     );
   }
 
