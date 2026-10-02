@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
@@ -49,6 +50,17 @@ exports.updateAuditStatus = async (req, res) => {
       }
     }
 
+    const existingAudit = await Audit.findById(auditInfo._id);
+
+    if (!existingAudit) {
+      return res.status(404).json({
+        success: false,
+        message: "Audit not found",
+      });
+    }
+
+    const previousStatus = existingAudit.status;
+
     const audit = await Audit.findByIdAndUpdate(
       auditInfo._id,
       {
@@ -61,6 +73,23 @@ exports.updateAuditStatus = async (req, res) => {
         runValidators: true,
       }
     );
+
+    if (previousStatus !== status) {
+      try {
+        await recordActivity({
+          req,
+          action: "status_change",
+          entityType: "audit",
+          entityId: audit._id,
+          description: `Audit statusu dəyişdirildi: ${previousStatus} → ${status}`,
+        });
+      } catch (activityError) {
+        console.error(
+          "Audit workflow activity log error:",
+          activityError
+        );
+      }
+    }
 
     return res.json({
       success: true,
