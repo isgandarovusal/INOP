@@ -50,34 +50,19 @@ const CandidatesList: React.FC = () => {
       setError(null);
 
       const data = await getCandidates();
-      return data;
+      setCandidates(data);
     } catch (err: unknown) {
       const message =
         getErrorMessage(err, t("recruitment.candidates.loadingError"));
 
       setError(message);
-      return null;
     } finally {
       setLoading(false);
     }
   }, [t]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      const data = await fetchCandidates();
-
-      if (!cancelled && data) {
-        setCandidates(data);
-      }
-    };
-
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
+    void fetchCandidates();
   }, [fetchCandidates]);
 
   const handleStatusChange = useCallback(
