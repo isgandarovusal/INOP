@@ -1,10 +1,12 @@
 import "../auditModern.css";
 import { useTranslation } from "react-i18next";
+import { Loader2 } from "lucide-react";
 import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createStandardAudit } from "../../../Services/standardAuditsService";
 import { standardAuditChecklist } from "../../../Config/Audit/standardAuditChecklist";
+import toast from "react-hot-toast";
 import type {
   StandardAudit,
   StandardChecklistResult,
@@ -127,7 +129,7 @@ export default function StandardAuditForm() {
     event.preventDefault();
 
     if (!restaurantId.trim()) {
-      window.alert(t("audit.standard.form.restaurantRequired"));
+      toast.error(t("audit.standard.form.restaurantRequired"));
       return;
     }
 
@@ -186,7 +188,7 @@ export default function StandardAuditForm() {
       await createStandardAudit(audit);
     } catch (error) {
       console.error("Standard audit creation failed:", error);
-      window.alert(t("audit.standard.form.saveError"));
+      toast.error(t("audit.standard.form.saveError"));
       setSubmitting(false);
       return;
     }
@@ -421,7 +423,7 @@ export default function StandardAuditForm() {
             className="btn-secondary"
             onClick={() => navigate("/app/audit/standard")}
           >
-            Ləğv et
+            {t("audit.standard.form.cancel")}
           </button>
 
           <button
@@ -429,7 +431,14 @@ export default function StandardAuditForm() {
             className="btn-primary"
             disabled={submitting}
           >
-            Auditi yadda saxla
+            {submitting ? (
+              <>
+                <Loader2 size={16} className="spin" />
+                {t("audit.standard.form.saving")}
+              </>
+            ) : (
+              t("audit.standard.form.save")
+            )}
           </button>
         </div>
       </form>

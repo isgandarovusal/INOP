@@ -666,6 +666,7 @@
         "compliantDescription": "meets the standard",
         "cancel": "Cancel",
         "save": "Save audit",
+        "saving": "Saving…",
         "restaurantRequired": "Restaurant must be selected.",
         "saveError": "An error occurred while saving the audit."
       },
