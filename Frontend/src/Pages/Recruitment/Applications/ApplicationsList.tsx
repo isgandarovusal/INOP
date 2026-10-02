@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardList, Loader2, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -41,7 +41,7 @@ const ApplicationsList: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(false);
 
@@ -59,44 +59,11 @@ const ApplicationsList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadApplications = async () => {
-      setLoading(true);
-      setError(false);
-
-      try {
-        const [applicationResult, jobResult] =
-          await Promise.all([
-            getApplications(),
-            getJobs(),
-          ]);
-
-        if (cancelled) return;
-
-        setApplications(applicationResult);
-        setJobs(jobResult);
-      } catch (loadError) {
-        if (!cancelled) {
-          console.error("Applications load error:", loadError);
-          setError(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadApplications();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void load();
+  }, [load]);
 
   const rows = useMemo(() => {
     const jobMap = new Map(jobs.map((job) => [job.id, job]));
@@ -203,7 +170,7 @@ const ApplicationsList: React.FC = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
                   </div>
@@ -211,7 +178,7 @@ const ApplicationsList: React.FC = () => {
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <EmptyState
                     icon={<ClipboardList size={28} />}
                     title={t("common.somethingWentWrong")}
@@ -230,7 +197,7 @@ const ApplicationsList: React.FC = () => {
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={canManage ? 5 : 4}>
                   <EmptyState
                     icon={<ClipboardList size={28} />}
                     title={t("recruitment.applications.noApplications")}
