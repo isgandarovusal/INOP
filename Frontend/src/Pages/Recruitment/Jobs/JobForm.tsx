@@ -1,6 +1,7 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import PageState from "../../../Components/PageState";
 import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -139,11 +140,7 @@ const JobForm: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="page-loading">
-        <Loader2 className="spin" size={32} />
-      </div>
-    );
+    return <PageState type="loading" />;
   }
 
   if (isEdit && error && !position && !description && requiredSkills.length === 0) {

@@ -1,3 +1,4 @@
+import PageState from "../../../Components/PageState";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -174,11 +175,7 @@ const CandidateDetail: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="page-loading">
-        <Loader2 className="spin" size={32} />
-      </div>
-    );
+    return <PageState type="loading" />;
   }
 
   if (error || !candidate) {

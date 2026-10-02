@@ -1,6 +1,7 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import PageState from "../../../Components/PageState";
 import { AlertCircle, FileText, Loader2, UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
@@ -214,11 +215,7 @@ const CandidateForm: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="page-loading">
-        <Loader2 className="spin" size={32} />
-      </div>
-    );
+    return <PageState type="loading" />;
   }
 
   return (
