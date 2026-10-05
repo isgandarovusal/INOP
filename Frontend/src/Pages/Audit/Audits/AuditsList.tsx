@@ -153,7 +153,7 @@ const AuditsList: React.FC = () => {
         }
       />
 
-      <div className="audit-modern-filter-bar">
+      <div className="filter-bar">
         <select
           className="input-field"
           style={{ width: 200 }}

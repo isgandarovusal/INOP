@@ -93,7 +93,7 @@ const RestaurantsList: React.FC = () => {
         }
       />
 
-      <div className="audit-modern-filter-bar">
+      <div className="filter-bar">
         <SearchInput value={query} onChange={setQuery} placeholder={t("audit.restaurants.list.searchPlaceholder")} />
         <select
           className="input-field"
