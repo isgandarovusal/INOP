@@ -114,63 +114,198 @@ export default function AuditExecutionPage(){
 
 
 
+ const checklist = execution.checklist || [];
+ const totalQuestions = checklist.length;
+
+ const answeredQuestions = checklist.reduce(
+  (count, _item, index) =>
+   answers[index]?.value?.trim()
+    ? count + 1
+    : count,
+  0
+ );
+
+ const progress =
+  totalQuestions > 0
+   ? Math.round(
+      (answeredQuestions / totalQuestions) * 100
+     )
+   : 0;
+
+
  return (
 
  <div className="audit-execution">
 
+  <header className="audit-execution__header">
 
-  <h1>
-   Audit Execution
-  </h1>
+   <span className="audit-execution__eyebrow">
+    AUDIT EXECUTION
+   </span>
 
+   <h1>
+    Audit Execution
+   </h1>
 
-  {
-   execution.checklist?.map(
-    (item,index:number)=>(
+   <p>
+    Complete each checklist item before submitting the audit.
+   </p>
 
-    <div
-     key={index}
-     className="audit-question"
-    >
-
-     <h3>
-      {item.question}
-     </h3>
+  </header>
 
 
-     <input
+  <section className="audit-execution__progress">
 
-      value={
-       answers[index]?.value || ""
-      }
+   <div className="audit-execution__progress-top">
 
-      onChange={
-       e=>
-       updateAnswer(
-        index,
-        e.target.value
-       )
-      }
+    <div>
 
-     />
+     <span className="audit-execution__progress-label">
+      CHECKLIST PROGRESS
+     </span>
 
+     <strong>
+      {answeredQuestions} / {totalQuestions}
+     </strong>
 
     </div>
 
+    <span className="audit-execution__progress-percent">
+     {progress}%
+    </span>
+
+   </div>
+
+   <div
+    className="audit-execution__progress-track"
+    aria-hidden="true"
+   >
+
+    <div
+     className="audit-execution__progress-fill"
+     style={{
+      width: `${progress}%`
+     }}
+    />
+
+   </div>
+
+  </section>
+
+
+  <section className="audit-execution__questions">
+
+   {
+    checklist.map(
+     (item,index:number)=>{
+
+      const isAnswered =
+       Boolean(
+        answers[index]?.value?.trim()
+       );
+
+
+      return (
+
+       <article
+        key={index}
+        className={
+         `audit-question ${
+          isAnswered
+           ? "audit-question--answered"
+           : ""
+         }`
+        }
+       >
+
+        <div className="audit-question__number">
+         {String(index + 1).padStart(2, "0")}
+        </div>
+
+
+        <div className="audit-question__body">
+
+         <div className="audit-question__topline">
+
+          <span className="audit-question__label">
+           CHECKLIST ITEM
+          </span>
+
+          {
+           isAnswered && (
+
+            <span className="audit-question__state">
+             Answered
+            </span>
+
+           )
+          }
+
+         </div>
+
+
+         <h3>
+          {item.question}
+         </h3>
+
+
+         <input
+          value={
+           answers[index]?.value || ""
+          }
+          onChange={
+           e =>
+            updateAnswer(
+             index,
+             e.target.value
+            )
+          }
+          placeholder="Enter your answer"
+         />
+
+        </div>
+
+       </article>
+
+      );
+
+     }
     )
+   }
 
-   )
-  }
+  </section>
 
 
+  <div className="audit-execution__actions">
 
-  <button
-   onClick={submit}
-  >
+   <div className="audit-execution__action-copy">
 
-   Submit Audit
+    <span>
+     {answeredQuestions} of {totalQuestions} completed
+    </span>
 
-  </button>
+    <small>
+     Review your responses before completing the audit.
+    </small>
+
+   </div>
+
+
+   <button
+    type="button"
+    className="btn-primary audit-execution__submit"
+    onClick={submit}
+   >
+
+    Submit Audit
+
+    <span aria-hidden="true">
+     →
+    </span>
+
+   </button>
+
+  </div>
 
 
  </div>
