@@ -351,18 +351,6 @@
   color: var(--text-muted, #6b7280);
 }
 
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 16px;
-  background: var(--surface, #fff);
-}
-
-
 .audit-modern-page .btn,
 .audit-modern-page .btn-primary,
 .audit-modern-page .btn-secondary,
@@ -389,7 +377,4 @@
     white-space: nowrap;
   }
 
-  .filter-bar {
-    flex-direction: column;
-  }
 }
