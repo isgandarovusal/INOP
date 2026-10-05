@@ -53,17 +53,15 @@
 }
 
 .audit-modern-card {
-  background: rgba(255,255,255,.94);
-  border: 1px solid #e5eaf1;
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, .03),
-    0 10px 30px rgba(15, 23, 42, .045);
+  box-shadow: var(--shadow-card);
 }
 
 .audit-modern-card:hover {
-  border-color: #d6dfeb;
+  border-color: var(--border-default);
 }
 
 .audit-modern-card-label {
@@ -91,11 +89,11 @@
 
 .audit-modern-section {
   margin-top: 20px;
-  background: rgba(255,255,255,.95);
-  border: 1px solid #e5eaf1;
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 22px;
-  box-shadow: 0 8px 28px rgba(15,23,42,.035);
+  box-shadow: var(--shadow-card);
 }
 
 .audit-modern-section-header {
