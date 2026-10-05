@@ -218,16 +218,6 @@
   background: #2563eb;
 }
 
-.audit-analytics .card,
-.audit-analytics .stat-card,
-.audit-analytics .metric-card,
-.audit-analytics .analytics-card {
-  background: rgba(255,255,255,.96);
-  border: 1px solid #e5eaf1;
-  border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(15,23,42,.045);
-}
-
 .audit-analytics h1,
 .audit-analytics h2,
 .audit-analytics h3 {
@@ -236,41 +226,6 @@
 
 .audit-analytics p {
   color: var(--text-muted);
-}
-
-.audit-analytics table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.audit-analytics th {
-  background: var(--surface-subtle);
-  color: var(--text-muted);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.audit-analytics td,
-.audit-analytics th {
-  border-bottom: 1px solid #eef2f7;
-  padding: 12px 14px;
-}
-
-.audit-analytics input,
-.audit-analytics select {
-  border: 1px solid #dbe3ee;
-  border-radius: 9px;
-  padding: 9px 11px;
-  background: white;
-  color: var(--text-secondary-strong);
-  outline: none;
-}
-
-.audit-analytics input:focus,
-.audit-analytics select:focus {
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
 }
 
 @media (max-width: 1100px) {
