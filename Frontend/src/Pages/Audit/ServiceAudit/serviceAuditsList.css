@@ -1,6 +1,5 @@
 .service-audits-page { padding: 28px; }
 .service-audits-page > h2 { margin: 0 0 22px; font-size: 28px; font-weight: 750; }
-.service-audits-page select, .service-audits-page input { width: 100%; min-height: 44px; box-sizing: border-box; border: 1px solid #dbe2ea; border-radius: 11px; background: #fff; color: #172033; padding: 0 13px; font-size: 14px; outline: none; }
 .service-audits-page .admin-table-container { margin-top: 22px; overflow-x: auto; }
 .service-audits-page table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 760px; }
 .service-audits-page thead { background: var(--surface-subtle); }
