@@ -343,7 +343,7 @@ const CandidatesList: React.FC = () => {
           canChangeStatus={canUpdate}
         />
       ) : (
-        <div className="admin-table-container glass">
+        <div className="admin-table-container">
           <table className="data-table">
             <thead>
               <tr>

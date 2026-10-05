@@ -174,7 +174,7 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      <div className="admin-table-container glass">
+      <div className="admin-table-container">
         <table>
           <thead>
             <tr>
