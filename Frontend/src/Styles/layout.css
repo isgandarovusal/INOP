@@ -428,3 +428,239 @@
 .state-page__action {
   margin-top: var(--space-2);
 }
+/* ============================================================
+   INOP APP SHELL — LOGIN VISUAL LANGUAGE
+   Visual layer only. Existing AppShell structure is preserved.
+   ============================================================ */
+
+.admin-layout {
+  background:
+    radial-gradient(
+      circle at 88% 4%,
+      rgba(79, 70, 229, 0.025),
+      transparent 28%
+    ),
+    #f7f8fb;
+}
+
+.admin-sidebar {
+  width: var(--admin-sidebar-width);
+  padding: 24px 14px 16px;
+  gap: 2px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfcfe 100%
+    );
+  border-right: 1px solid rgba(23, 54, 93, 0.085);
+  box-shadow:
+    4px 0 18px rgba(15, 23, 42, 0.018);
+}
+
+.admin-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px 24px;
+  color: #343b46;
+  font-size: 21px;
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.admin-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #000 0%,
+      #000 34%,
+      #080910 45%,
+      #171728 58%,
+      rgba(79, 70, 229, 0.28) 72%,
+      transparent 100%
+    );
+  color: transparent;
+  box-shadow:
+    0 0 5px rgba(70, 78, 112, 0.14),
+    0 0 11px rgba(79, 67, 145, 0.09);
+  flex: 0 0 auto;
+}
+
+.admin-sidebar__group {
+  margin-bottom: 18px;
+}
+
+.admin-sidebar__group-title {
+  padding: 7px 10px 6px;
+  color: #8a929e;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.admin-sidebar__nav {
+  gap: 2px;
+}
+
+.admin-sidebar a {
+  min-height: 38px;
+  padding: 0 10px;
+  gap: 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #68717e;
+  font-size: 12.5px;
+  font-weight: 590;
+  letter-spacing: -0.005em;
+}
+
+.admin-sidebar a:hover {
+  color: #343b46;
+  background: rgba(23, 54, 93, 0.035);
+  border-color: rgba(23, 54, 93, 0.055);
+}
+
+.admin-sidebar a.active {
+  color: #4540a5;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(79, 70, 229, 0.085),
+      rgba(79, 70, 229, 0.045)
+    );
+  border-color: rgba(79, 70, 229, 0.105);
+  font-weight: 680;
+}
+
+.admin-sidebar a.active::before {
+  left: -14px;
+  width: 3px;
+  height: 20px;
+  background: #4f46e5;
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.18);
+}
+
+.admin-sidebar__icon {
+  width: 16px;
+  color: currentColor;
+  opacity: 0.88;
+}
+
+.admin-sidebar__user {
+  margin-top: auto;
+  padding: 14px 8px 0;
+  border-top: 1px solid rgba(23, 54, 93, 0.075);
+  gap: 10px;
+}
+
+.admin-sidebar__user-name {
+  color: #343b46;
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.admin-sidebar__user-role {
+  margin-top: 3px;
+  color: #8a929e;
+  font-size: 10.5px;
+}
+
+.admin-sidebar__logout {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(23, 54, 93, 0.09);
+  border-radius: 9px;
+  background: #ffffff;
+  color: #7b8491;
+}
+
+.admin-sidebar__logout:hover {
+  color: #c24141;
+  border-color: rgba(194, 65, 65, 0.18);
+  background: rgba(194, 65, 65, 0.045);
+}
+
+.admin-main {
+  padding: 30px 34px 40px;
+  background: transparent;
+}
+
+.admin-topbar {
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(23, 54, 93, 0.075);
+}
+
+.admin-topbar__brand {
+  color: #343b46;
+  font-size: 15px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
+}
+
+.admin-language-panel {
+  width: auto;
+  margin: 0 8px 18px;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid rgba(23, 54, 93, 0.08);
+  border-radius: 10px;
+  background: #f7f8fb;
+  box-shadow: none;
+}
+
+.admin-language-option {
+  height: 29px;
+  gap: 6px;
+  padding: 0 7px;
+  border-radius: 7px;
+  color: #737c89 !important;
+  font-size: 8.5px;
+  font-weight: 760;
+  letter-spacing: 0.045em;
+}
+
+.admin-language-option span {
+  color: inherit !important;
+}
+
+.admin-language-option:hover {
+  background: rgba(23, 54, 93, 0.045);
+  color: #343b46 !important;
+}
+
+.admin-language-option--active {
+  background: #ffffff;
+  color: #4540a5 !important;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(79, 70, 229, 0.07);
+}
+
+.admin-language-option--active span {
+  color: #4540a5 !important;
+}
+
+.admin-language-option:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(79, 70, 229, 0.12);
+}
+
+@media (max-width: 900px) {
+  .admin-main {
+    padding: 82px 18px 28px;
+  }
+
+  .admin-sidebar__brand {
+    margin-bottom: 20px;
+  }
+}

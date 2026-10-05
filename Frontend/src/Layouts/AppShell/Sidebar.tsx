@@ -19,7 +19,6 @@ import {
   LogOut,
   Menu,
   X,
-  Sparkles,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Context/AuthContext";
@@ -83,6 +82,13 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "navigation.groups.audit",
     items: [
+      {
+        to: "/app/audit/",
+        labelKey: "navigation.auditCenter",
+        icon: LayoutDashboard,
+        section: "audit",
+        end: true,
+      },
       {
         to: "/app/audit/restaurants",
         labelKey: "navigation.restaurants",
@@ -203,8 +209,10 @@ const Sidebar: React.FC = () => {
     <>
       <div className="admin-topbar">
         <div className="admin-topbar__brand">
-          <Sparkles size={16} />
-          INOP
+          <span className="admin-brand-mark" aria-hidden="true">
+            I
+          </span>
+          <span>INOP</span>
         </div>
 
         <button
@@ -230,8 +238,10 @@ const Sidebar: React.FC = () => {
         }`}
       >
         <h2 className="admin-sidebar__brand">
-          <Sparkles size={18} />
-          INOP
+          <span className="admin-brand-mark" aria-hidden="true">
+            I
+          </span>
+          <span>INOP</span>
         </h2>
 
           <div className="admin-language-panel">
