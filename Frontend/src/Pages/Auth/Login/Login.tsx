@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { AlertCircle, Eye, EyeOff, Loader2, LogIn, Sparkles } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
 import i18n, { changeLanguage } from "../../../i18n";
@@ -44,151 +44,202 @@ const Login: React.FC = () => {
     }
   };
 
+  const languages = [
+    { code: "az" as const, label: "AZE", flag: azFlag, name: "Azərbaycan" },
+    { code: "en" as const, label: "ENG", flag: gbFlag, name: "English" },
+    { code: "ru" as const, label: "RUS", flag: ruFlag, name: "Русский" },
+  ];
+
   return (
     <div className="auth-page">
+      <div className="auth-page__ambient auth-page__ambient--one" />
+      <div className="auth-page__ambient auth-page__ambient--two" />
       <div className="auth-page__grid-overlay" />
 
-      <div className="auth-page__wrap">
-        <div className="auth-page__brand anim-in">
-          <Sparkles size={18} />
-          INOP
-        </div>
-
-        <p
-          className="auth-page__tagline anim-in"
-          style={{ animationDelay: "0.06s" }}
-        >
-          Internal Operations Platform
-        </p>
-
-        <div
-          className="auth-language-switcher anim-in"
-          style={{ animationDelay: "0.1s" }}
-          aria-label={t("auth.language")}
-        >
-          {[
-            { code: "az" as const, label: "AZE", flag: azFlag, name: "Azərbaycan" },
-            { code: "en" as const, label: "ENG", flag: gbFlag, name: "English" },
-            { code: "ru" as const, label: "RUS", flag: ruFlag, name: "Русский" },
-          ].map((language) => (
-            <button
-              key={language.code}
-              type="button"
-              className={`auth-language-switcher__option ${
-                i18n.language === language.code
-                  ? "auth-language-switcher__option--active"
-                  : ""
-              }`}
-              onClick={() => changeLanguage(language.code)}
-              aria-pressed={i18n.language === language.code}
-              aria-label={language.name}
-            >
-              <img
-                src={language.flag}
-                alt=""
-                className="auth-language-switcher__flag"
-                aria-hidden="true"
-              />
-              <span>{language.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="auth-card anim-in"
-          style={{ animationDelay: "0.08s" }}
-        >
-          <h1 className="auth-card__title">{t("auth.signIn")}</h1>
-
-          <p className="auth-card__subtitle">
-            {t("auth.subtitle")}
-          </p>
-
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                {t("auth.email")}
-              </label>
-
-              <input
-                id="email"
-                type="email"
-                autoComplete="username"
-                placeholder={t("auth.emailPlaceholder")}
-                className="input-field"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+      <main className="auth-shell">
+        <section className="auth-brand-panel" aria-label="INOP">
+          <div className="auth-brand-panel__top">
+            <div className="auth-wordmark" aria-label="INOP">
+              <span className="auth-wordmark__letter">I</span>
+              <span className="auth-wordmark__letter">N</span>
+              <span className="auth-wordmark__letter">O</span>
+              <span className="auth-wordmark__letter">P</span>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
-                {t("auth.password")}
-              </label>
+            <div className="auth-wordmark__rule" />
+            <p className="auth-wordmark__descriptor">
+              INTERNAL OPERATIONS PLATFORM
+            </p>
+          </div>
 
-              <div className="auth-password-field">
+          <div className="auth-brand-panel__statement">
+            <span className="auth-brand-panel__eyebrow">INOP / OPERATIONS</span>
+            <h1>
+              One platform.
+              <br />
+              <span>Every operation.</span>
+            </h1>
+            <p>{t("auth.subtitle")}</p>
+          </div>
+
+          <div className="auth-brand-panel__geometry" aria-hidden="true">
+            <div className="auth-orbit auth-orbit--outer" />
+            <div className="auth-orbit auth-orbit--middle" />
+            <div className="auth-orbit auth-orbit--inner" />
+            <div className="auth-orbit__core" />
+            <span className="auth-orbit__point auth-orbit__point--one" />
+            <span className="auth-orbit__point auth-orbit__point--two" />
+          </div>
+
+          <div className="auth-brand-panel__footer">
+            <span>RECRUITMENT</span>
+            <i />
+            <span>AUDIT</span>
+            <i />
+            <span>OPERATIONS</span>
+          </div>
+        </section>
+
+        <section className="auth-entry-panel">
+          <div className="auth-entry-panel__topbar">
+            <div className="auth-entry-panel__mobile-brand">
+              <span>INOP</span>
+              <small>INTERNAL OPERATIONS PLATFORM</small>
+            </div>
+
+            <div
+              className="auth-language-switcher"
+              aria-label={t("auth.language")}
+            >
+              {languages.map((language) => (
+                <button
+                  key={language.code}
+                  type="button"
+                  className={`auth-language-switcher__option ${
+                    i18n.language === language.code
+                      ? "auth-language-switcher__option--active"
+                      : ""
+                  }`}
+                  onClick={() => changeLanguage(language.code)}
+                  aria-pressed={i18n.language === language.code}
+                  aria-label={language.name}
+                >
+                  <img
+                    src={language.flag}
+                    alt=""
+                    className="auth-language-switcher__flag"
+                    aria-hidden="true"
+                  />
+                  <span>{language.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="auth-card">
+            <div className="auth-card__eyebrow">WELCOME BACK</div>
+
+            <h2 className="auth-card__title">{t("auth.signIn")}</h2>
+
+            <p className="auth-card__subtitle">
+              {t("auth.subtitle")}
+            </p>
+
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  {t("auth.email")}
+                </label>
+
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  className="input-field auth-password-field__input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder={t("auth.emailPlaceholder")}
+                  className="input-field"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-
-                <button
-                  type="button"
-                  className="auth-password-field__toggle"
-                  onClick={() => setShowPassword((current) => !current)}
-                  aria-label={
-                    showPassword
-                      ? t("auth.hidePassword")
-                      : t("auth.showPassword")
-                  }
-                  title={
-                    showPassword
-                      ? t("auth.hidePassword")
-                      : t("auth.showPassword")
-                  }
-                >
-                  {showPassword ? (
-                    <EyeOff size={17} />
-                  ) : (
-                    <Eye size={17} />
-                  )}
-                </button>
               </div>
-            </div>
 
-            {error && (
-              <p className="form-error form-error--submit">
-                <AlertCircle size={12} /> {error}
-              </p>
-            )}
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  {t("auth.password")}
+                </label>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-primary"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 size={16} className="spin" />
-                  {t("auth.signingIn")}
-                </>
-              ) : (
-                <>
-                  <LogIn size={16} />
-                  {t("auth.signIn")}
-                </>
+                <div className="auth-password-field">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    className="input-field auth-password-field__input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="auth-password-field__toggle"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={
+                      showPassword
+                        ? t("auth.hidePassword")
+                        : t("auth.showPassword")
+                    }
+                    title={
+                      showPassword
+                        ? t("auth.hidePassword")
+                        : t("auth.showPassword")
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff size={17} />
+                    ) : (
+                      <Eye size={17} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <p className="form-error form-error--submit">
+                  <AlertCircle size={12} /> {error}
+                </p>
               )}
-            </button>
-          </form>
-        </div>
-      </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary auth-submit"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 size={16} className="spin" />
+                    {t("auth.signingIn")}
+                  </>
+                ) : (
+                  <>
+                    {t("auth.signIn")}
+                    <LogIn size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="auth-card__security">
+              <span className="auth-card__security-dot" />
+              Secure internal workspace
+            </div>
+          </div>
+
+          <p className="auth-entry-panel__footer">
+            INOP · INTERNAL OPERATIONS PLATFORM
+          </p>
+        </section>
+      </main>
     </div>
   );
 };
