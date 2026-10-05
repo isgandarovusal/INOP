@@ -564,50 +564,50 @@ select.input-field {
 
 /* ── Table ───────────────────────────────────────────── */
 .admin-table-container {
-  border-radius: 1rem;
+  margin-top: var(--space-2);
   overflow-x: auto;
-  margin-top: 0.5rem;
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
+
 table {
   width: 100%;
-  border-collapse: collapse;
   min-width: 520px;
+  border-collapse: collapse;
 }
+
 th,
 td {
-  padding: 1rem;
+  padding: var(--space-4);
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-subtle);
   white-space: nowrap;
 }
+
 th {
-  background: rgba(26, 29, 46, 0.03);
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.8rem;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
 tbody tr {
-  transition: background 0.15s ease;
-  animation: rowFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: background-color var(--transition-fast);
 }
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
 tbody tr:hover {
-  background: rgba(99, 102, 241, 0.04);
+  background: var(--surface-subtle);
 }
-@keyframes rowFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
 .row--removing {
   opacity: 0.45;
   pointer-events: none;
