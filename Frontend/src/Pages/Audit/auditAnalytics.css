@@ -100,3 +100,224 @@
     padding: 16px;
   }
 }
+
+/* ── INOP executive analytics composition ───────────────────────────── */
+
+.audit-analytics {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* KPI summary */
+
+.audit-analytics .kpi-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 26px 0 18px;
+}
+
+.audit-analytics .kpi-card {
+  position: relative;
+  min-height: 142px;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 21px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 15px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(99, 102, 241, 0.075),
+      transparent 34%
+    ),
+    linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025),
+    0 10px 28px rgba(15, 23, 42, 0.045);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.audit-analytics .kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.22);
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.035),
+    0 16px 34px rgba(15, 23, 42, 0.07);
+}
+
+.audit-analytics .kpi-card svg {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.075);
+  color: #5963d8;
+}
+
+.audit-analytics .kpi-card p {
+  margin: auto 0 0;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.audit-analytics .kpi-card h2 {
+  margin: 0;
+  color: #202632;
+  font-size: clamp(1.8rem, 2.4vw, 2.15rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+/* Chart composition */
+
+.audit-analytics .charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.audit-analytics .charts-grid > .audit-modern-card,
+.audit-analytics > .audit-modern-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 15px;
+  background:
+    linear-gradient(145deg, #ffffff 0%, #fbfcfe 100%);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025),
+    0 10px 28px rgba(15, 23, 42, 0.045);
+}
+
+.audit-analytics .charts-grid > .audit-modern-card {
+  padding: 0 18px 16px;
+}
+
+.audit-analytics > .audit-modern-card {
+  padding: 0 20px 18px;
+}
+
+.audit-analytics .charts-grid > .audit-modern-card h3,
+.audit-analytics > .audit-modern-card h3 {
+  position: relative;
+  margin: 0;
+  padding: 17px 2px 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  color: #29313d;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.audit-analytics .charts-grid > .audit-modern-card h3::after,
+.audit-analytics > .audit-modern-card h3::after {
+  position: absolute;
+  left: 2px;
+  bottom: -1px;
+  width: 28px;
+  height: 2px;
+  border-radius: 999px;
+  background: #6366f1;
+  content: "";
+}
+
+.audit-analytics .charts-grid > .audit-modern-card .recharts-responsive-container {
+  margin-top: 8px;
+}
+
+.audit-analytics > .audit-modern-card {
+  margin-top: 0;
+}
+
+.audit-analytics > .audit-modern-card .recharts-responsive-container {
+  margin-top: 8px;
+}
+
+/* Recharts surface language */
+
+.audit-analytics .recharts-cartesian-axis-tick-value {
+  fill: #64748b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.audit-analytics .recharts-cartesian-axis-line {
+  stroke: rgba(148, 163, 184, 0.24);
+}
+
+.audit-analytics .recharts-cartesian-grid line {
+  stroke: rgba(148, 163, 184, 0.13);
+}
+
+.audit-analytics .recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.audit-analytics .recharts-default-tooltip {
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Empty / loading surface */
+
+.audit-analytics .empty-state {
+  margin-top: 24px;
+  padding: 48px 24px;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  border-radius: 15px;
+  background: #fbfcfe;
+  color: #64748b;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .audit-analytics {
+    max-width: none;
+  }
+
+  .audit-analytics .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .audit-analytics .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .audit-analytics .kpi-card {
+    min-height: 126px;
+    padding: 18px;
+  }
+
+  .audit-analytics .charts-grid > .audit-modern-card,
+  .audit-analytics > .audit-modern-card {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .audit-analytics .charts-grid > .audit-modern-card h3,
+  .audit-analytics > .audit-modern-card h3 {
+    padding-top: 15px;
+    padding-bottom: 12px;
+  }
+}
