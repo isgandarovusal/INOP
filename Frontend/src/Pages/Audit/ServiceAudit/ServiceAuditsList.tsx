@@ -230,7 +230,7 @@ export default function ServiceAuditsList() {
       </div>
 
       <div
-        className="admin-table-container glass"
+        className="admin-table-container"
         style={{ position: "relative" }}
       >
         {isRefreshing && (
