@@ -1067,14 +1067,14 @@
 .audit-detail-hero h2,
 .audit-builder-title-input,
 .audit-result-main strong {
-  color: #0f172a;
+  color: var(--text-primary-strong);
 }
 
 
 .audit-card-header p,
 .audit-detail-hero p,
 .audit-detail-eyebrow {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 
@@ -1101,13 +1101,13 @@
 
 
 .audit-builder-section-header {
-  background:#f8fafc;
+  background:var(--surface-subtle);
 }
 
 
 .audit-builder-subsection {
   border-left-color:rgba(15,118,110,0.25);
-  background:#f8fafc;
+  background:var(--surface-subtle);
 }
 
 
@@ -1117,7 +1117,7 @@
 .audit-builder-subsection-header input,
 .audit-builder-question > input,
 .audit-builder-question > select {
-  background:#ffffff;
+  background:var(--surface);
   border-color:#dbe4ea;
 }
 
@@ -1142,8 +1142,8 @@
 
 
 .audit-builder-empty {
-  background:#f8fafc;
-  border-color:#cbd5e1;
+  background:var(--surface-subtle);
+  border-color:var(--border-strong);
 }
 
 
