@@ -104,11 +104,11 @@
 
 .admin-sidebar__user {
   margin-top: auto;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--border-color);
+  padding: var(--space-4) var(--space-2) 0;
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-3);
 }
 
 .admin-sidebar__user-info {
@@ -117,32 +117,39 @@
 }
 
 .admin-sidebar__user-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin: 0;
+  color: var(--text-primary-strong);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .admin-sidebar__user-role {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .admin-sidebar__logout {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-color);
-  border-radius: 0.55rem;
-  background: #fff;
-  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .admin-sidebar__logout:hover {
