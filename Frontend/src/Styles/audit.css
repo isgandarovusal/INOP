@@ -8,7 +8,7 @@
 .audit-trend-mini__bar {
   flex: 1;
   border-radius: 6px 6px 0 0;
-  background: linear-gradient(180deg, #8b5cf6, #6366f1);
+  background: linear-gradient(180deg, var(--accent), var(--accent));
   min-height: 4px;
   transition: height 0.3s ease;
 }
@@ -61,7 +61,7 @@
   align-items: center;
   justify-content: center;
   border: 8px solid rgba(99, 102, 241, 0.14);
-  border-top-color: #6366f1;
+  border-top-color: var(--accent);
   border-radius: 50%;
   background: var(--surface-color, #fff);
 }
@@ -113,7 +113,7 @@
   justify-content: center;
   border-radius: 10px;
   background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  color: var(--accent);
 }
 
 .audit-detail-grid {
@@ -246,7 +246,7 @@
 .audit-service-time-bar {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  background: linear-gradient(90deg, var(--accent), var(--accent));
   transition: width 0.3s ease;
 }
 
@@ -571,8 +571,8 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: rgba(99, 102, 241, 0.08);
-  color: #6366f1;
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent);
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -679,7 +679,7 @@
   width: 100%;
   min-height: 4px;
   border-radius: 7px 7px 3px 3px;
-  background: linear-gradient(180deg, #8b5cf6, #6366f1);
+  background: linear-gradient(180deg, var(--accent), var(--accent));
   transition: height 0.3s ease;
 }
 

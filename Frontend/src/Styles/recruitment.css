@@ -17,7 +17,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   color: var(--accent-hover);
   font-size: 0.72rem;
   font-weight: 700;

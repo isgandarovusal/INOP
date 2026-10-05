@@ -30,6 +30,7 @@ import {
   type TypeAnalyticsData,
   type TrendData,
 } from "../../../Services/auditAnalyticsService";
+import { ACCENT } from "../../../Utils/theme";
 
 const AuditAnalytics: React.FC = () => {
   const { t } = useTranslation();
@@ -120,7 +121,7 @@ const AuditAnalytics: React.FC = () => {
 
                   <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 10px 25px rgba(15,23,42,.08)" }} />
 
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#6366f1" />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} fill={ACCENT} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

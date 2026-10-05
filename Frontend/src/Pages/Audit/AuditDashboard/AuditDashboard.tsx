@@ -28,6 +28,7 @@ import {
   getAuditDashboard,
   type AuditDashboardData,
 } from "../../../Services/auditDashboardService";
+import { ACCENT } from "../../../Utils/theme";
 
 const EMPTY: AuditDashboardData = {
   totalAudits: 0,
@@ -133,7 +134,7 @@ export default function AuditDashboard() {
 
               <Bar
                 dataKey="count"
-                fill="#6366f1"
+                fill={ACCENT}
               />
             </BarChart>
           </ResponsiveContainer>

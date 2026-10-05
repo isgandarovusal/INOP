@@ -23,6 +23,7 @@ import { getCandidates } from "../../Services/candidatesService";
 import { getApplications } from "../../Services/applicationsService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
 import type { Job, Candidate, Application, CandidateStatus } from "../../Types/recruitment";
+import { ACCENT } from "../../Utils/theme";
 
 const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
   applied: "#0ea5e9",
@@ -250,7 +251,7 @@ const Dashboard: React.FC = () => {
               <div className="kpi-grid">
                 <div className="kpi-card anim-in">
                   <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
-                    <Briefcase size={18} color="#6366f1" />
+                    <Briefcase size={18} color={ACCENT} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
                   <p className="kpi-card__value">
@@ -394,7 +395,7 @@ const Dashboard: React.FC = () => {
 
                       <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
 
-                        <Gauge size={18} color="#6366f1" />
+                        <Gauge size={18} color={ACCENT} />
 
                       </div>
 
