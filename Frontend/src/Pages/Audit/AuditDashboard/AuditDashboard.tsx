@@ -60,7 +60,17 @@ export default function AuditDashboard() {
 
   return (
     <div className="audit-dashboard">
-      <h1>Audit Dashboard</h1>
+      <div className="audit-dashboard__header">
+        <div>
+          <span className="audit-dashboard__eyebrow">
+            AUDIT MANAGEMENT
+          </span>
+          <h1>Audit Dashboard</h1>
+          <p>
+            Operational overview of audit activity, risk and performance.
+          </p>
+        </div>
+      </div>
 
       <div className="kpi-grid">
         <div className="kpi-card">
@@ -125,16 +135,39 @@ export default function AuditDashboard() {
             width="100%"
             height={260}
           >
-            <BarChart data={data.typeStats}>
-              <XAxis dataKey="_id" />
+            <BarChart
+              data={data.typeStats}
+              margin={{ top: 8, right: 8, left: -12, bottom: 4 }}
+            >
+              <CartesianGrid
+                stroke="rgba(148, 163, 184, 0.13)"
+                strokeDasharray="3 3"
+                vertical={false}
+              />
 
-              <YAxis />
+              <XAxis
+                dataKey="_id"
+                tick={{ fill: "#64748b", fontSize: 11 }}
+                axisLine={{ stroke: "rgba(148, 163, 184, 0.24)" }}
+                tickLine={false}
+              />
 
-              <Tooltip />
+              <YAxis
+                allowDecimals={false}
+                tick={{ fill: "#64748b", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <Tooltip
+                cursor={{ fill: "rgba(99, 102, 241, 0.045)" }}
+              />
 
               <Bar
                 dataKey="count"
                 fill={ACCENT}
+                radius={[5, 5, 0, 0]}
+                maxBarSize={42}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -154,10 +187,27 @@ export default function AuditDashboard() {
                 data={data.riskStats}
                 dataKey="count"
                 nameKey="_id"
+                cx="50%"
+                cy="50%"
+                innerRadius={62}
+                outerRadius={92}
+                paddingAngle={3}
+                stroke="none"
               >
                 {data.riskStats?.map(
                   (_, index) => (
-                    <Cell key={index} />
+                    <Cell
+                      key={index}
+                      fill={
+                        [
+                          "#6366f1",
+                          "#f59e0b",
+                          "#ef4444",
+                          "#64748b",
+                          "#22c55e",
+                        ][index % 5]
+                      }
+                    />
                   ),
                 )}
               </Pie>
@@ -177,21 +227,42 @@ export default function AuditDashboard() {
           width="100%"
           height={280}
         >
-          <LineChart data={data.trend}>
+          <LineChart
+            data={data.trend}
+            margin={{ top: 8, right: 8, left: -12, bottom: 4 }}
+          >
             <CartesianGrid
+              stroke="rgba(148, 163, 184, 0.13)"
               strokeDasharray="3 3"
+              vertical={false}
             />
 
-            <XAxis dataKey="_id" />
+            <XAxis
+              dataKey="_id"
+              tick={{ fill: "#64748b", fontSize: 11 }}
+              axisLine={{ stroke: "rgba(148, 163, 184, 0.24)" }}
+              tickLine={false}
+            />
 
-            <YAxis />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fill: "#64748b", fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+            />
 
-            <Tooltip />
+            <Tooltip
+              cursor={{ stroke: "rgba(99, 102, 241, 0.18)" }}
+            />
 
             <Line
               type="monotone"
               dataKey="count"
-              strokeWidth={3}
+              stroke={ACCENT}
+              strokeWidth={2.5}
+              dot={{ r: 3, strokeWidth: 2, fill: "#ffffff" }}
+              activeDot={{ r: 5, strokeWidth: 2 }}
+              connectNulls
             />
           </LineChart>
         </ResponsiveContainer>
