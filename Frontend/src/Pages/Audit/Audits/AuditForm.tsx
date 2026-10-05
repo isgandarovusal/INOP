@@ -6,7 +6,7 @@ import PageHeader from "../../../Components/PageHeader";
 import { createAudit } from "../../../Services/auditsService";
 import { getRestaurants } from "../../../Services/restaurantsService";
 import type { Restaurant, AuditScores } from "../../../Types/audit";
-import { validateCVFile } from "../../../utils/fileValidation";
+import { validateCVFile } from "../../../Utils/fileValidation";
 
 const AUDIT_TYPES = ["Routine", "Follow-up", "Surprise", "Complaint-driven"];
 

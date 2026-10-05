@@ -1,6 +1,6 @@
 import "../auditModern.css";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import PageState from "../../../Components/PageState";
 import { getRestaurants } from "../../../Services/restaurantsService";
@@ -31,7 +31,7 @@ export default function StandardAuditsList() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const hasLoadedOnceRef = useRef(false);
   const [loadError, setLoadError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -75,7 +75,7 @@ export default function StandardAuditsList() {
     let cancelled = false;
 
     const load = async () => {
-      const isInitialLoad = !hasLoadedOnce;
+      const isInitialLoad = !hasLoadedOnceRef.current;
       setLoading(isInitialLoad);
       setIsRefreshing(!isInitialLoad);
       setLoadError(false);
@@ -112,7 +112,7 @@ export default function StandardAuditsList() {
         if (!cancelled) {
           setLoading(false);
           setIsRefreshing(false);
-          setHasLoadedOnce(true);
+          hasLoadedOnceRef.current = true;
         }
       }
     };

@@ -29,6 +29,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     if (!loading) {
       confirmButtonRef.current?.focus();
     }
+    // Intentionally runs once on mount: focus the confirm button when the dialog opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
