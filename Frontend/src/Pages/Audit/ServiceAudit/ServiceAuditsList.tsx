@@ -151,16 +151,9 @@ export default function ServiceAuditsList() {
     <div className="service-audits-page">
       <h2>{t("audit.service.list.title")}</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="filter-bar">
         <select
+          className="input-field"
           value={status}
           onChange={(event) => setStatus(event.target.value)}
         >
@@ -190,6 +183,7 @@ export default function ServiceAuditsList() {
         </select>
 
         <select
+          className="input-field"
           value={restaurantId}
           onChange={(event) =>
             setRestaurantId(event.target.value)
@@ -209,6 +203,7 @@ export default function ServiceAuditsList() {
         </select>
 
         <input
+          className="input-field"
           type="date"
           value={from}
           onChange={(event) => setFrom(event.target.value)}
@@ -218,6 +213,7 @@ export default function ServiceAuditsList() {
         />
 
         <input
+          className="input-field"
           type="date"
           value={to}
           onChange={(event) => setTo(event.target.value)}

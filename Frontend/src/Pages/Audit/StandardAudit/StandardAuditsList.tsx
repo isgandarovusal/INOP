@@ -155,16 +155,9 @@ export default function StandardAuditsList() {
     <div>
       <h2>{t("audit.standard.list.title")}</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="filter-bar">
         <select
+          className="input-field"
           value={status}
           onChange={(event) => setStatus(event.target.value)}
         >
@@ -191,6 +184,7 @@ export default function StandardAuditsList() {
         </select>
 
         <select
+          className="input-field"
           value={restaurantId}
           onChange={(event) =>
             setRestaurantId(event.target.value)
@@ -210,6 +204,7 @@ export default function StandardAuditsList() {
         </select>
 
         <input
+          className="input-field"
           type="date"
           value={from}
           onChange={(event) => setFrom(event.target.value)}
@@ -219,6 +214,7 @@ export default function StandardAuditsList() {
         />
 
         <input
+          className="input-field"
           type="date"
           value={to}
           onChange={(event) => setTo(event.target.value)}
