@@ -126,17 +126,23 @@
   display: flex;
   align-items: baseline;
   gap: 0;
-  color: #151a24;
+  color: #343b46;
   font-family: var(--font-sans);
   font-size: clamp(4.4rem, 8vw, 6.5rem);
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: -0.105em;
   user-select: none;
+  text-rendering: geometricPrecision;
 }
 
 .auth-wordmark__letter {
   display: inline-block;
+  position: relative;
+  color: #343b46;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18),
+    0 4px 16px rgba(15, 23, 42, 0.08);
 }
 
 .auth-wordmark__letter:nth-child(1) {
@@ -148,15 +154,102 @@
   transform: scaleX(0.94);
 }
 
+/* ============================================================
+   INOP — O / BLACK HOLE
+   Front-facing, compact, no horizontal disk / horizon line.
+   ============================================================ */
+
 .auth-wordmark__letter:nth-child(3) {
-  transform: scaleX(0.98);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  color: transparent;
+  transform: scale(0.98);
+  border-radius: 50%;
+
+  /*
+   * Deep gravitational well.
+   * The eye should feel like it is looking into something
+   * rather than at a flat black circle.
+   */
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #000000 0%,
+      #000000 22%,
+      #010104 28%,
+      #02030a 34%,
+      #050711 40%,
+      rgba(17, 20, 38, 0.72) 46%,
+      rgba(61, 54, 101, 0.26) 53%,
+      rgba(87, 78, 146, 0.10) 61%,
+      transparent 72%
+    );
+
+  filter:
+    drop-shadow(0 0 5px rgba(70, 78, 112, 0.18))
+    drop-shadow(0 0 15px rgba(79, 67, 145, 0.12));
+}
+
+/*
+ * Extremely restrained photon ring.
+ * It stays behind the black core so the center remains dominant.
+ */
+.auth-wordmark__letter:nth-child(3)::before {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border-radius: 50%;
+
+  border: 2px solid rgba(214, 198, 255, 0.58);
+
+  box-shadow:
+    0 0 4px rgba(221, 207, 255, 0.28),
+    0 0 10px rgba(117, 103, 195, 0.16);
+
+  opacity: 0.86;
+}
+
+/*
+ * Deep event horizon.
+ *
+ * Multiple nested radial layers create a visual gravity well:
+ * the center remains absolute black while the surrounding
+ * darkness gradually collapses toward it.
+ */
+.auth-wordmark__letter:nth-child(3)::after {
+  content: "";
+  position: absolute;
+  inset: 27%;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 46% 44%,
+      #000000 0%,
+      #000000 46%,
+      #000000 58%,
+      #010105 68%,
+      #03040a 82%,
+      #050711 100%
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.98),
+    0 0 10px rgba(0, 0, 0, 0.98),
+    0 0 18px rgba(0, 0, 0, 0.72),
+    inset 0 0 12px rgba(0, 0, 0, 1),
+    inset 0 0 22px rgba(1, 2, 7, 0.96);
 }
 
 .auth-wordmark__letter:nth-child(4) {
   transform: scaleX(0.84);
   transform-origin: left center;
 }
-
 
 .auth-wordmark__descriptor {
   margin: 13px 0 0;
