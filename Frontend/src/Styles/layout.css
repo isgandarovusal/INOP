@@ -161,7 +161,7 @@
 .admin-main {
   flex: 1;
   margin-left: var(--admin-sidebar-width);
-  padding: 2rem 3rem;
+  padding: var(--space-8) var(--space-10);
   min-width: 0;
 }
 
