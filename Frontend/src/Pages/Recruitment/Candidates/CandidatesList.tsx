@@ -28,6 +28,28 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { downloadBlob } from "../../../Utils/downloadFile";
 
+const getCandidateStatusBadgeVariant = (
+  status: CandidateStatus,
+): "neutral" | "info" | "success" | "warning" | "danger" | "accent" => {
+  switch (status) {
+    case "applied":
+    case "screening":
+      return "info";
+    case "shortlisted":
+    case "offer":
+      return "accent";
+    case "interview":
+      return "warning";
+    case "hired":
+      return "success";
+    case "rejected":
+      return "danger";
+    case "new":
+    default:
+      return "neutral";
+  }
+};
+
 const CandidatesList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -408,10 +430,9 @@ const CandidatesList: React.FC = () => {
 
                     <td>
                       <span
-                        className={
-                          "status-badge status-" +
-                          candidate.status
-                        }
+                        className={`badge badge--${getCandidateStatusBadgeVariant(
+                          candidate.status,
+                        )}`}
                       >
                         {t(
                           `recruitment.candidateStatus.${candidate.status}`,
