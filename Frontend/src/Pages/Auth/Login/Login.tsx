@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { AlertCircle, Eye, EyeOff, Loader2, LogIn } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
 import i18n, { changeLanguage } from "../../../i18n";
@@ -66,7 +66,6 @@ const Login: React.FC = () => {
               <span className="auth-wordmark__letter">P</span>
             </div>
 
-            <div className="auth-wordmark__rule" />
             <p className="auth-wordmark__descriptor">
               INTERNAL OPERATIONS PLATFORM
             </p>
@@ -222,8 +221,14 @@ const Login: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    {t("auth.signIn")}
-                    <LogIn size={16} />
+                    <span className="auth-submit__content">
+                      <span>{t("auth.signIn")}</span>
+                      <ArrowRight
+                        size={17}
+                        strokeWidth={2.2}
+                        aria-hidden="true"
+                      />
+                    </span>
                   </>
                 )}
               </button>
