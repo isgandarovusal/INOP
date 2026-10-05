@@ -322,41 +322,59 @@ select.input-field {
 .tag-input {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-2);
   align-items: center;
   width: 100%;
-  min-height: 46px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: #f8f9fc;
-  border: 1px solid var(--border-color);
+  min-height: var(--control-height-lg);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface);
   cursor: text;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
+
+.tag-input:hover {
+  border-color: var(--border-strong);
+}
+
 .tag-input:focus-within {
-  border-color: rgba(99, 102, 241, 0.55);
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
+
 .tag-input input {
   flex: 1;
   min-width: 90px;
   border: none;
   background: transparent;
   outline: none;
+  font: inherit;
   font-size: 13px;
-  padding: 4px 2px;
-  color: var(--text-primary);
+  line-height: 1.4;
+  padding: var(--space-1) 2px;
+  color: var(--text-primary-strong);
 }
+
+.tag-input input::placeholder {
+  color: var(--text-disabled);
+}
+
 .tag-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
+  gap: var(--space-1);
+  padding: 4px var(--space-2);
   border-radius: 999px;
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--accent-soft);
   color: var(--accent-hover);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.3;
 }
 .tag-chip button {
   display: flex;
