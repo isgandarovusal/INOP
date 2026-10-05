@@ -314,22 +314,3 @@
   border-radius: 10px;
   font-weight: 650;
 }
-
-.audit-table-input {
-  width: 100%;
-  min-height: 38px;
-  border: 1px solid var(--border, #d1d5db);
-  border-radius: 9px;
-  padding: 8px 10px;
-  background: var(--surface, #fff);
-}
-
-@media (max-width: 768px) {
-
-  .audit-table th,
-  .audit-table td {
-    padding: 11px 12px;
-    white-space: nowrap;
-  }
-
-}
