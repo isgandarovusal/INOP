@@ -424,7 +424,7 @@ select.input-field {
 /* ── Page header / filter bar ───────────────────────────── */
 .page-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-4);
@@ -439,18 +439,18 @@ select.input-field {
 .page-header__title {
   margin: 0;
   color: var(--text-primary-strong);
-  font-size: 24px;
-  font-weight: 650;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
 }
 
 .page-header__subtitle {
   max-width: 720px;
   margin: var(--space-2) 0 0;
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
 
 .page-header__actions {
@@ -465,6 +465,7 @@ select.input-field {
 @media (max-width: 640px) {
   .page-header {
     align-items: stretch;
+    margin-bottom: var(--space-5);
   }
 
   .page-header > div:first-child {
