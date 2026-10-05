@@ -1063,19 +1063,6 @@
    INOP AUDIT ENTERPRISE THEME
    ===================================================== */
 
-.audit-card,
-.audit-detail-hero {
-  background: var(--surface);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-card);
-}
-
-
-.audit-card {
-  border-radius: var(--radius-lg);
-}
-
-
 .audit-card-header h3,
 .audit-detail-hero h2,
 .audit-builder-title-input,
@@ -1180,14 +1167,6 @@
    ===================================================== */
 
 
-
-
-.audit-card {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
 
 
 /* =====================================================
