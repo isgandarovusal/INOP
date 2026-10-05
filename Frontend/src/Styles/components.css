@@ -281,23 +281,25 @@ select.input-field {
 
 .form-card {
   max-width: 720px;
-  border-radius: 20px;
-  padding: 2rem;
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-8);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
+
 @media (min-width: 640px) {
   .form-card {
-    padding: 2.25rem;
+    padding: var(--space-10);
   }
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 1.25rem;
+  gap: 0 var(--space-5);
 }
+
 @media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -306,8 +308,8 @@ select.input-field {
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 0.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 .form-actions .btn-secondary {
   flex: 1;
