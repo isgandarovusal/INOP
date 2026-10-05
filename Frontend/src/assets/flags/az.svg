@@ -1,8 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" role="img" aria-label="Azərbaycan bayrağı">
   <rect width="60" height="13.333" fill="#00B5E2"/>
   <rect y="13.333" width="60" height="13.334" fill="#EF3340"/>
   <rect y="26.667" width="60" height="13.333" fill="#509E2F"/>
-  <circle cx="29" cy="20" r="6.1" fill="white"/>
-  <circle cx="31.5" cy="20" r="5.1" fill="#EF3340"/>
-  <path d="M36.3 20l1.35 2.05 2.4.55-1.65 1.8.25 2.45-2.35-1.05-2.35 1.05.25-2.45-1.65-1.8 2.4-.55z" fill="white"/>
+
+  <circle cx="28.4" cy="20" r="6.1" fill="#fff"/>
+  <circle cx="30.8" cy="20" r="5.1" fill="#EF3340"/>
+
+  <path
+    d="M38.6 14.9
+       L39.9 17.5
+       L42.8 17.2
+       L41.0 19.5
+       L42.7 22.0
+       L39.8 21.6
+       L38.5 24.2
+       L37.3 21.6
+       L34.4 22.0
+       L36.1 19.5
+       L34.3 17.2
+       L37.2 17.5 Z"
+    fill="#fff"
+  />
 </svg>
