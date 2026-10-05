@@ -967,16 +967,20 @@ tbody tr:hover {
   margin-bottom: 24px;
 }
 .kpi-card {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 .kpi-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--border-default);
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 8px 18px rgba(15, 23, 42, 0.06);
 }
 .kpi-card__icon {
   width: 38px;
@@ -1022,11 +1026,11 @@ tbody tr:hover {
 }
 .chart-card,
 .recent-card {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 20px 20px 8px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
 }
 .recent-card {
   padding-bottom: 20px;
@@ -1132,11 +1136,11 @@ tbody tr:hover {
   }
 }
 .detail-card {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   margin-bottom: 1.25rem;
 }
 .detail-card h3 {
@@ -1150,7 +1154,7 @@ tbody tr:hover {
   justify-content: space-between;
   gap: 12px;
   padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-subtle);
   font-size: 0.87rem;
 }
 .detail-row:last-child {
