@@ -613,30 +613,38 @@ tbody tr:hover {
   pointer-events: none;
 }
 .cell-title {
-  font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-primary-strong);
+  font-weight: 600;
+  line-height: 1.4;
 }
+
 .cell-title--clickable {
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color var(--transition-fast);
 }
+
 .cell-title--clickable:hover {
   color: var(--accent);
 }
+
 .cell-muted {
-  color: var(--text-secondary);
   max-width: 280px;
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--text-muted);
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
+
 .col-actions {
+  width: 1%;
   text-align: right;
 }
+
 .row-actions {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
   justify-content: flex-end;
+  gap: var(--space-2);
 }
 
 /* ── Badges ──────────────────────────────────────────── */
