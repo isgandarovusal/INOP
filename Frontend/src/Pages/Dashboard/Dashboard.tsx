@@ -37,6 +37,25 @@ const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
   hired: "#16a34a",
 };
 
+const KPI_ICON_STYLES = {
+  accent: {
+    background: "rgba(99,102,241,0.12)",
+    color: ACCENT,
+  },
+  info: {
+    background: "rgba(14,165,233,0.12)",
+    color: "#0ea5e9",
+  },
+  success: {
+    background: "rgba(34,197,94,0.12)",
+    color: "#22c55e",
+  },
+  warning: {
+    background: "rgba(245,158,11,0.12)",
+    color: "#f59e0b",
+  },
+} as const;
+
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -250,7 +269,7 @@ const Dashboard: React.FC = () => {
               )}
               <div className="kpi-grid">
                 <div className="kpi-card anim-in">
-                  <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
+                  <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.accent.background }}>
                     <Briefcase size={18} color={ACCENT} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
@@ -259,8 +278,8 @@ const Dashboard: React.FC = () => {
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
-                    <UserSquare2 size={18} color="#0ea5e9" />
+                  <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.info.background }}>
+                    <UserSquare2 size={18} color={KPI_ICON_STYLES.info.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
                   <p className="kpi-card__value">
@@ -268,8 +287,8 @@ const Dashboard: React.FC = () => {
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
-                    <ClipboardList size={18} color="#22c55e" />
+                  <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.success.background }}>
+                    <ClipboardList size={18} color={KPI_ICON_STYLES.success.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.applications")}</p>
                   <p className="kpi-card__value">
@@ -277,8 +296,8 @@ const Dashboard: React.FC = () => {
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
-                  <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
-                    <Star size={18} color="#f59e0b" />
+                  <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.warning.background }}>
+                    <Star size={18} color={KPI_ICON_STYLES.warning.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.shortlisted")}</p>
                   <p className="kpi-card__value">
@@ -393,7 +412,7 @@ const Dashboard: React.FC = () => {
 
                     <div className="kpi-card anim-in">
 
-                      <div className="kpi-card__icon" style={{ background: "rgba(99,102,241,0.12)" }}>
+                      <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.accent.background }}>
 
                         <Gauge size={18} color={ACCENT} />
 
@@ -408,9 +427,9 @@ const Dashboard: React.FC = () => {
 
                     <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
 
-                      <div className="kpi-card__icon" style={{ background: "rgba(14,165,233,0.12)" }}>
+                      <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.info.background }}>
 
-                        <ClipboardCheck size={18} color="#0ea5e9" />
+                        <ClipboardCheck size={18} color={KPI_ICON_STYLES.info.color} />
 
                       </div>
 
@@ -423,9 +442,9 @@ const Dashboard: React.FC = () => {
 
                     <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
 
-                      <div className="kpi-card__icon" style={{ background: "rgba(34,197,94,0.12)" }}>
+                      <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.success.background }}>
 
-                        <Store size={18} color="#22c55e" />
+                        <Store size={18} color={KPI_ICON_STYLES.success.color} />
 
                       </div>
 
@@ -438,9 +457,9 @@ const Dashboard: React.FC = () => {
 
                     <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
 
-                      <div className="kpi-card__icon" style={{ background: "rgba(245,158,11,0.12)" }}>
+                      <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.warning.background }}>
 
-                        <AlertTriangle size={18} color="#f59e0b" />
+                        <AlertTriangle size={18} color={KPI_ICON_STYLES.warning.color} />
 
                       </div>
 
