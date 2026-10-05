@@ -23,6 +23,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import { ACCENT } from "../../../Utils/theme";
+
 import PageHeader from "../../../Components/PageHeader";
 
 import { getStandardAnalytics } from "../../../Services/auditAnalyticsService";
@@ -68,7 +70,7 @@ const StandardAuditAnalytics: React.FC = () => {
     : [];
 
   return (
-    <div>
+    <div className="audit-analytics">
       <PageHeader
         title={t("audit.standard.analytics.title")}
         subtitle={t("audit.standard.analytics.subtitle")}
@@ -122,10 +124,49 @@ const StandardAuditAnalytics: React.FC = () => {
 
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={findings}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={{ stroke: "rgba(148,163,184,.24)" }}
+                    tickLine={false}
+                    tickMargin={10}
+                  />
+
+                  <YAxis
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={34}
+                    allowDecimals={false}
+                  />
+
+                  <Tooltip
+                    cursor={{ fill: "rgba(99,102,241,.035)" }}
+                    contentStyle={{
+                      background: "#ffffff",
+                      border: "1px solid rgba(148,163,184,.2)",
+                      borderRadius: 10,
+                      boxShadow: "0 12px 30px rgba(15,23,42,.10)",
+                      padding: "9px 12px",
+                    }}
+                    labelStyle={{
+                      color: "#29313d",
+                      fontWeight: 700,
+                      marginBottom: 4,
+                    }}
+                    itemStyle={{
+                      color: "#5963d8",
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  />
+
+                  <Bar
+                    dataKey="value"
+                    radius={[7, 7, 2, 2]}
+                    fill={ACCENT}
+                    maxBarSize={42}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -135,13 +176,70 @@ const StandardAuditAnalytics: React.FC = () => {
 
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={data.trend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid
+                    stroke="rgba(148,163,184,.13)"
+                    strokeDasharray="3 5"
+                    vertical={false}
+                  />
+
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={{ stroke: "rgba(148,163,184,.24)" }}
+                    tickLine={false}
+                    tickMargin={10}
+                  />
+
+                  <YAxis
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={42}
+                    allowDecimals={false}
+                  />
+
+                  <Tooltip
+                    cursor={{
+                      stroke: "rgba(99,102,241,.18)",
+                      strokeWidth: 1,
+                    }}
+                    contentStyle={{
+                      background: "#ffffff",
+                      border: "1px solid rgba(148,163,184,.2)",
+                      borderRadius: 10,
+                      boxShadow: "0 12px 30px rgba(15,23,42,.10)",
+                      padding: "9px 12px",
+                    }}
+                    labelStyle={{
+                      color: "#29313d",
+                      fontWeight: 700,
+                      marginBottom: 4,
+                    }}
+                    itemStyle={{
+                      color: "#5963d8",
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  />
+
                   <Line
                     type="monotone"
                     dataKey="value"
+                    stroke={ACCENT}
+                    strokeWidth={2.5}
+                    dot={{
+                      r: 3,
+                      fill: "#ffffff",
+                      stroke: ACCENT,
+                      strokeWidth: 2,
+                    }}
+                    activeDot={{
+                      r: 5,
+                      fill: ACCENT,
+                      stroke: "#ffffff",
+                      strokeWidth: 2,
+                    }}
+                    connectNulls
                   />
                 </LineChart>
               </ResponsiveContainer>
