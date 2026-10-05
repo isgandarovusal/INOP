@@ -305,12 +305,3 @@
   background: var(--surface-muted, #f8fafc);
   color: var(--text-muted, #6b7280);
 }
-
-.audit-modern-page .btn,
-.audit-modern-page .btn-primary,
-.audit-modern-page .btn-secondary,
-.audit-modern-page .btn-danger {
-  min-height: 40px;
-  border-radius: 10px;
-  font-weight: 650;
-}
