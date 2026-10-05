@@ -362,23 +362,6 @@
   background: var(--surface, #fff);
 }
 
-.form-card,
-.detail-card,
-.chart-card {
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 18px;
-  background: var(--surface, #fff);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
-}
-
-.form-card,
-.detail-card {
-  padding: 24px;
-}
-
-.chart-card {
-  padding: 20px;
-}
 
 .audit-modern-page .btn,
 .audit-modern-page .btn-primary,
