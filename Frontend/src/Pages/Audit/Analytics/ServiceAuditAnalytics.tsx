@@ -26,6 +26,7 @@ import PageHeader from "../../../Components/PageHeader";
 
 import { getServiceAnalytics } from "../../../Services/auditAnalyticsService";
 import type { ServiceAnalyticsData } from "../../../Services/auditAnalyticsService";
+import { ACCENT } from "../../../Utils/theme";
 
 const ServiceAuditAnalytics: React.FC = () => {
   const { t } = useTranslation();
@@ -48,7 +49,7 @@ const ServiceAuditAnalytics: React.FC = () => {
   }, [t]);
 
   return (
-    <div>
+    <div className="audit-analytics">
       <PageHeader
         title={t("audit.service.analytics.title")}
         subtitle={t("audit.service.analytics.subtitle")}
@@ -97,11 +98,36 @@ const ServiceAuditAnalytics: React.FC = () => {
               <h3>{t("audit.service.analytics.answers")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={data.answerDistribution}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" />
+                <BarChart
+                  data={data.answerDistribution}
+                  margin={{ top: 8, right: 8, left: -12, bottom: 4 }}
+                >
+                  <CartesianGrid
+                    stroke="rgba(148, 163, 184, 0.13)"
+                    strokeDasharray="3 3"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={{ stroke: "rgba(148, 163, 184, 0.24)" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(99, 102, 241, 0.045)" }}
+                  />
+                  <Bar
+                    dataKey="value"
+                    fill={ACCENT}
+                    radius={[5, 5, 0, 0]}
+                    maxBarSize={42}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -110,14 +136,38 @@ const ServiceAuditAnalytics: React.FC = () => {
               <h3>{t("audit.service.analytics.trend")}</h3>
 
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={data.trend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" />
-                  <YAxis />
-                  <Tooltip />
+                <LineChart
+                  data={data.trend}
+                  margin={{ top: 8, right: 8, left: -12, bottom: 4 }}
+                >
+                  <CartesianGrid
+                    stroke="rgba(148, 163, 184, 0.13)"
+                    strokeDasharray="3 3"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={{ stroke: "rgba(148, 163, 184, 0.24)" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ stroke: "rgba(99, 102, 241, 0.18)" }}
+                  />
                   <Line
                     type="monotone"
                     dataKey="value"
+                    stroke={ACCENT}
+                    strokeWidth={2.5}
+                    dot={{ r: 3, strokeWidth: 2, fill: "#ffffff" }}
+                    activeDot={{ r: 5, strokeWidth: 2 }}
+                    connectNulls
                   />
                 </LineChart>
               </ResponsiveContainer>
