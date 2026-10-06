@@ -625,7 +625,7 @@ if (id) {
 
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary checklist-add-section"
               onClick={addSection}
             >
               <Plus size={17} />
