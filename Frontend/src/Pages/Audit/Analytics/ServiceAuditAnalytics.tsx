@@ -49,7 +49,7 @@ const ServiceAuditAnalytics: React.FC = () => {
   }, [t]);
 
   return (
-    <div className="audit-analytics">
+    <div className="audit-analytics service-audit-analytics">
       <PageHeader
         title={t("audit.service.analytics.title")}
         subtitle={t("audit.service.analytics.subtitle")}
@@ -80,7 +80,7 @@ const ServiceAuditAnalytics: React.FC = () => {
               <TrendingUp size={22} />
               <p>{t("audit.service.analytics.averageScore")}</p>
               <h2>
-                {data.averageOverallPercentage.toFixed(1)}%
+                {data.averageOverallPercentage.toFixed(1)} %
               </h2>
             </div>
 
@@ -88,7 +88,7 @@ const ServiceAuditAnalytics: React.FC = () => {
               <Clock3 size={22} />
               <p>{t("audit.service.analytics.averageServiceTime")}</p>
               <h2>
-                {data.averageServiceTimeSeconds.toFixed(0)}{t("audit.service.analytics.secondsShort")}
+                {data.averageServiceTimeSeconds.toFixed(0)} {t("audit.service.analytics.secondsShort")}
               </h2>
             </div>
           </div>
