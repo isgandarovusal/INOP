@@ -6864,3 +6864,184 @@
   line-height:1;
 }
 
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Professional score legend
+   ============================================================ */
+
+.safety-audit-form > .audit-card:nth-child(3){
+  padding:15px 17px 17px;
+  border-color:#e1e5ec;
+  background:linear-gradient(180deg,#ffffff 0%,#fafbfc 100%);
+}
+
+.safety-audit-form > .audit-card:nth-child(3) h2{
+  margin:0;
+  color:#2d3442;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.025em;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) h2::after{
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:5px;
+  margin:0 0 2px 7px;
+  border-radius:50%;
+  background:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.08);
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  min-height:34px;
+  margin:9px 5px 0 0;
+  padding:0 11px 0 9px;
+  border:1px solid #e4e8ef;
+  border-radius:9px;
+  background:#fff;
+  color:#667080;
+  font-size:10px;
+  font-weight:650;
+  line-height:1;
+  box-shadow:0 2px 6px rgba(20,28,45,.025);
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p::first-letter{
+  font-weight:850;
+}
+
+/* 0 — critical */
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(1){
+  border-color:#fecaca;
+  background:linear-gradient(180deg,#fff7f7 0%,#fff1f1 100%);
+  color:#991b1b;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(1)::before{
+  content:"0";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  margin-right:7px;
+  border-radius:6px;
+  background:#dc2626;
+  color:#fff;
+  font-size:10px;
+  font-weight:850;
+}
+
+/* 1–2 — weak */
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(2){
+  border-color:#fed7aa;
+  background:linear-gradient(180deg,#fffaf4 0%,#fff6eb 100%);
+  color:#9a3412;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(2)::before{
+  content:"1–2";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:23px;
+  margin-right:7px;
+  border-radius:6px;
+  background:#ea580c;
+  color:#fff;
+  font-size:9px;
+  font-weight:850;
+}
+
+/* 3 — partial */
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(3){
+  border-color:#fde68a;
+  background:linear-gradient(180deg,#fffef5 0%,#fffbe8 100%);
+  color:#854d0e;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(3)::before{
+  content:"3";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  margin-right:7px;
+  border-radius:6px;
+  background:#ca8a04;
+  color:#fff;
+  font-size:10px;
+  font-weight:850;
+}
+
+/* 4 — good */
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(4){
+  border-color:#bbf7d0;
+  background:linear-gradient(180deg,#f7fff9 0%,#effdf3 100%);
+  color:#166534;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(4)::before{
+  content:"4";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  margin-right:7px;
+  border-radius:6px;
+  background:#16a34a;
+  color:#fff;
+  font-size:10px;
+  font-weight:850;
+}
+
+/* 5 — fully compliant */
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(5){
+  border-color:#86efac;
+  background:linear-gradient(180deg,#f2fff6 0%,#e8fbea 100%);
+  color:#14532d;
+}
+
+.safety-audit-form > .audit-card:nth-child(3) p:nth-of-type(5)::before{
+  content:"5";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  margin-right:7px;
+  border-radius:6px;
+  background:#15803d;
+  color:#fff;
+  font-size:10px;
+  font-weight:850;
+}
+
+@media (max-width:900px){
+  .safety-audit-form > .audit-card:nth-child(3) p{
+    margin-right:4px;
+  }
+}
+
+@media (max-width:640px){
+  .safety-audit-form > .audit-card:nth-child(3) p{
+    display:flex;
+    width:100%;
+    margin:5px 0 0;
+  }
+}
+
