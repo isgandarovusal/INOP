@@ -8,6 +8,7 @@ import { getRestaurants } from "../../../Services/restaurantsService";
 import type { Restaurant, AuditScores } from "../../../Types/audit";
 import { validateCVFile } from "../../../Utils/fileValidation";
 
+import "../auditModern.css";
 const AUDIT_TYPES = ["Routine", "Follow-up", "Surprise", "Complaint-driven"];
 
 const SCORE_FIELDS: { key: keyof AuditScores; label: string }[] = [
