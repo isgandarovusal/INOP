@@ -88,7 +88,7 @@ const AuditForm: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="audit-form-page">
       <PageHeader title={t("audit.generic.form.title")} subtitle={t("audit.generic.form.subtitle")} />
 
       <div className="audit-modern-card">

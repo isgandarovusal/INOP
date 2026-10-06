@@ -3170,7 +3170,7 @@
    Parent-independent selectors
    ============================================================ */
 
-.audit-modern-card{
+.audit-form-page .audit-modern-card{
   border:1px solid #dfe4ec !important;
   border-radius:16px !important;
   background:linear-gradient(180deg,#ffffff 0%,#fafbfe 100%) !important;
@@ -3180,16 +3180,16 @@
 }
 
 /* Metadata inputs */
-.audit-modern-card .form-label{
+.audit-form-page .audit-modern-card .form-label{
   color:#303847 !important;
   font-size:11px !important;
   font-weight:750 !important;
   margin-bottom:7px !important;
 }
 
-.audit-modern-card input,
-.audit-modern-card select,
-.audit-modern-card textarea{
+.audit-form-page .audit-modern-card input,
+.audit-form-page .audit-modern-card select,
+.audit-form-page .audit-modern-card textarea{
   border:1px solid #d9dfe9 !important;
   border-radius:9px !important;
   background:#fff !important;
@@ -3200,16 +3200,16 @@
     box-shadow .16s ease !important;
 }
 
-.audit-modern-card input:focus,
-.audit-modern-card select:focus,
-.audit-modern-card textarea:focus{
+.audit-form-page .audit-modern-card input:focus,
+.audit-form-page .audit-modern-card select:focus,
+.audit-form-page .audit-modern-card textarea:focus{
   border-color:#818cf8 !important;
   box-shadow:0 0 0 3px rgba(99,102,241,.10) !important;
   outline:none !important;
 }
 
 /* Score rows */
-.audit-modern-card .score-field{
+.audit-form-page .audit-modern-card .score-field{
   display:grid !important;
   grid-template-columns:72px minmax(0,1fr) 34px !important;
   align-items:center !important;
@@ -3217,13 +3217,13 @@
   min-height:36px !important;
 }
 
-.audit-modern-card .score-field > span:first-child{
+.audit-form-page .audit-modern-card .score-field > span:first-child{
   color:#596273 !important;
   font-size:10px !important;
   font-weight:700 !important;
 }
 
-.audit-modern-card .score-field input[type="range"]{
+.audit-form-page .audit-modern-card .score-field input[type="range"]{
   height:6px !important;
   min-height:6px !important;
   padding:0 !important;
@@ -3235,7 +3235,7 @@
   cursor:pointer !important;
 }
 
-.audit-modern-card .score-field input[type="range"]::-webkit-slider-thumb{
+.audit-form-page .audit-modern-card .score-field input[type="range"]::-webkit-slider-thumb{
   appearance:none !important;
   -webkit-appearance:none !important;
   width:15px !important;
@@ -3246,7 +3246,7 @@
   box-shadow:0 2px 8px rgba(30,58,138,.28) !important;
 }
 
-.audit-modern-card .score-field__value{
+.audit-form-page .audit-modern-card .score-field__value{
   display:grid !important;
   place-items:center !important;
   width:30px !important;
@@ -3260,7 +3260,7 @@
 }
 
 /* Comments */
-.audit-modern-card textarea{
+.audit-form-page .audit-modern-card textarea{
   min-height:100px !important;
   padding:11px 12px !important;
   line-height:1.55 !important;
@@ -3268,15 +3268,15 @@
 }
 
 /* File upload areas — target common audit upload containers */
-.audit-modern-card input[type="file"]{
+.audit-form-page .audit-modern-card input[type="file"]{
   border:0 !important;
   background:transparent !important;
   box-shadow:none !important;
 }
 
 /* Action row */
-.audit-modern-card .form-actions,
-.audit-modern-card .audit-form-actions{
+.audit-form-page .audit-modern-card .form-actions,
+.audit-form-page .audit-modern-card .audit-form-actions{
   display:flex !important;
   align-items:center !important;
   gap:10px !important;
@@ -3286,8 +3286,8 @@
 }
 
 /* Cancel */
-.audit-modern-card .form-actions .btn-secondary,
-.audit-modern-card .audit-form-actions .btn-secondary{
+.audit-form-page .audit-modern-card .form-actions .btn-secondary,
+.audit-form-page .audit-modern-card .audit-form-actions .btn-secondary{
   min-height:40px !important;
   padding:0 20px !important;
   border:1px solid #fecaca !important;
@@ -3300,8 +3300,8 @@
 }
 
 /* Submit */
-.audit-modern-card .form-actions .btn-primary,
-.audit-modern-card .audit-form-actions .btn-primary{
+.audit-form-page .audit-modern-card .form-actions .btn-primary,
+.audit-form-page .audit-modern-card .audit-form-actions .btn-primary{
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -3319,15 +3319,15 @@
     inset 0 1px 0 rgba(255,255,255,.12) !important;
 }
 
-.audit-modern-card .form-actions .btn-primary:hover:not(:disabled),
-.audit-modern-card .audit-form-actions .btn-primary:hover:not(:disabled){
+.audit-form-page .audit-modern-card .form-actions .btn-primary:hover:not(:disabled),
+.audit-form-page .audit-modern-card .audit-form-actions .btn-primary:hover:not(:disabled){
   transform:translateY(-1px) !important;
   background:linear-gradient(135deg,#2563eb,#1e3a8a) !important;
   box-shadow:0 10px 22px rgba(23,37,84,.27) !important;
 }
 
-.audit-modern-card .form-actions svg,
-.audit-modern-card .audit-form-actions svg{
+.audit-form-page .audit-modern-card .form-actions svg,
+.audit-form-page .audit-modern-card .audit-form-actions svg{
   width:14px !important;
   height:14px !important;
   flex:0 0 14px !important;
