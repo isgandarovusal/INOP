@@ -297,7 +297,9 @@
       "removeTitle": "Удалить эту заявку?",
       "removeMessage": "Связь между кандидатом и вакансией будет удалена.",
       "loadError": "Не удалось загрузить заявки.",
-      "retry": "Повторить"
+      "retry": "Повторить",
+      "interview": "Собеседование",
+      "offered": "Предложение"
     },
     "candidates": {
       "title": "Кандидаты",
@@ -348,7 +350,22 @@
       "education": "Образование",
       "currentAtsStatus": "Текущий статус ATS",
       "notProvided": "Не указано",
-      "years": "лет"
+      "years": "лет",
+      "email": "Email",
+      "skills": "Навыки",
+      "additionalInformation": "Дополнительная информация",
+      "languages": "Языки",
+      "certificates": "Сертификаты",
+      "openCv": "Открыть CV",
+      "delete": "Удалить",
+      "deleteConfirm": "кандидата?",
+      "deleted": "Кандидат удалён",
+      "deleteError": "Не удалось удалить кандидата",
+      "cv": "CV",
+      "title": "Кандидат",
+      "subtitle": "Профиль кандидата",
+      "retry": "Повторить",
+      "loadError": "Не удалось загрузить данные кандидата"
     },
     "candidateForm": {
       "editTitle": "Редактирование кандидата",
@@ -385,7 +402,8 @@
       "nameRequired": "Имя и фамилия обязательны",
       "updated": "Данные кандидата обновлены",
       "created": "Новый кандидат добавлен на Kanban-доску с помощью AI-анализа!",
-      "genericError": "Произошла ошибка"
+      "genericError": "Произошла ошибка",
+      "position": "Должность"
     },
     "jobs": {
       "title": "Вакансии",

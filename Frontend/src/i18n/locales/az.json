@@ -348,7 +348,9 @@
       "removeTitle": "Bu müraciət silinsin?",
       "removeMessage": "Namizəd ilə vakansiya arasındakı bu əlaqə silinəcək.",
       "loadError": "Müraciətlər yüklənə bilmədi.",
-      "retry": "Yenidən cəhd et"
+      "retry": "Yenidən cəhd et",
+      "interview": "Müsahibə",
+      "offered": "Təklif"
     },
     "candidates": {
       "title": "Namizədlər",
@@ -411,7 +413,22 @@
       "education": "Təhsil",
       "currentAtsStatus": "Cari ATS Statusu",
       "notProvided": "Qeyd edilməyib",
-      "years": "il"
+      "years": "il",
+      "email": "Email",
+      "skills": "Bacarıqlar",
+      "additionalInformation": "Əlavə məlumat",
+      "languages": "Dillər",
+      "certificates": "Sertifikatlar",
+      "openCv": "CV-ni aç",
+      "delete": "Sil",
+      "deleteConfirm": "namizədi silmək istəyirsiniz?",
+      "deleted": "Namizəd silindi",
+      "deleteError": "Namizədi silmək mümkün olmadı",
+      "cv": "CV",
+      "title": "Namizəd",
+      "subtitle": "Namizəd profili",
+      "retry": "Yenidən cəhd et",
+      "loadError": "Namizəd məlumatlarını yükləmək mümkün olmadı"
     },
     "candidateForm": {
       "editTitle": "Namizədi Redaktə Et",
@@ -448,7 +465,8 @@
       "nameRequired": "Ad və soyad mütləqdir",
       "updated": "Namizəd məlumatları yeniləndi",
       "created": "Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!",
-      "genericError": "Xəta baş verdi"
+      "genericError": "Xəta baş verdi",
+      "position": "Vəzifə"
     },
     "jobs": {
       "title": "Vakansiyalar",

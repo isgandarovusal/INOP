@@ -336,7 +336,9 @@
       "removeTitle": "Remove this application?",
       "removeMessage": "This link between the candidate and job will be removed.",
       "loadError": "Applications could not be loaded.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "interview": "Interview",
+      "offered": "Offered"
     },
     "candidates": {
       "title": "Candidates",
@@ -387,7 +389,22 @@
       "education": "Education",
       "currentAtsStatus": "Current ATS Status",
       "notProvided": "Not provided",
-      "years": "years"
+      "years": "years",
+      "email": "Email",
+      "skills": "Skills",
+      "additionalInformation": "Additional Information",
+      "languages": "Languages",
+      "certificates": "Certificates",
+      "openCv": "Open CV",
+      "delete": "Delete",
+      "deleteConfirm": "candidate?",
+      "deleted": "Candidate deleted",
+      "deleteError": "Unable to delete candidate",
+      "cv": "CV",
+      "title": "Candidate",
+      "subtitle": "Candidate profile",
+      "retry": "Retry",
+      "loadError": "Unable to load candidate information"
     },
     "candidateForm": {
       "editTitle": "Edit Candidate",
@@ -424,7 +441,8 @@
       "nameRequired": "Name and surname are required",
       "updated": "Candidate information updated",
       "created": "New candidate added to the Kanban board with AI analysis!",
-      "genericError": "An error occurred"
+      "genericError": "An error occurred",
+      "position": "Position"
     },
     "jobs": {
       "title": "Jobs",
