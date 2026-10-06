@@ -6378,3 +6378,489 @@
   transform:translateY(0);
 }
 
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Section hierarchy refinement
+   ============================================================ */
+
+.safety-audit-form .audit-checklist-section{
+  position:relative;
+  background:#fff;
+  border-top:1px solid #e7ebf1;
+}
+
+.safety-audit-form .audit-checklist-section > h3{
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-height:46px;
+  margin:0;
+  padding:0 18px;
+  border-bottom:1px solid #e7ebf1;
+  background:
+    linear-gradient(
+      90deg,
+      #f1f2ff 0%,
+      #f7f8fc 38%,
+      #fafbfc 100%
+    );
+  color:#252b38;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.035em;
+  text-transform:none;
+}
+
+.safety-audit-form .audit-checklist-section > h3::before{
+  content:"";
+  width:4px;
+  height:19px;
+  flex:0 0 4px;
+  margin-right:10px;
+  border-radius:4px;
+  background:linear-gradient(
+    180deg,
+    #6366f1 0%,
+    #4f46e5 100%
+  );
+  box-shadow:0 0 0 3px rgba(99,102,241,.08);
+}
+
+/* Question area */
+
+.safety-audit-form .audit-checklist-section
+.audit-safety-table-wrapper{
+  background:#fff;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr{
+  position:relative;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr td:first-child{
+  position:relative;
+  padding-left:18px;
+  color:#343b49;
+  font-size:12px;
+  font-weight:600;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr td:first-child::before{
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:5px;
+  margin:0 9px 2px 0;
+  border-radius:50%;
+  background:#c7ccd7;
+  transition:
+    background .16s ease,
+    transform .16s ease;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr:hover td:first-child::before{
+  background:#6366f1;
+  transform:scale(1.25);
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr:hover{
+  background:#fafaff;
+}
+
+/* Stronger separation between category and questions */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table thead{
+  border-bottom:1px solid #edf0f4;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table thead th{
+  background:#fbfcfe;
+  color:#8a93a2;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.07em;
+}
+
+/* Note field remains secondary */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2)
+.audit-modern-input{
+  background:#fbfcfe;
+}
+
+/* Score column gets its own visual lane */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table th:last-child,
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:last-child{
+  background:#fafbfe;
+  border-left:1px solid #edf0f4;
+}
+
+@media (max-width:640px){
+  .safety-audit-form .audit-checklist-section > h3{
+    min-height:43px;
+    padding:0 13px;
+    font-size:10px;
+  }
+
+  .safety-audit-form .audit-checklist-section
+  .audit-modern-table tbody tr td:first-child{
+    padding-left:13px;
+  }
+}
+
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Professional note / observation field
+   ============================================================ */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2){
+  padding-top:8px;
+  padding-bottom:8px;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2)
+.audit-modern-input{
+  display:block;
+  width:100%;
+  height:36px;
+  min-height:36px;
+  padding:0 11px;
+  border:1px solid #dfe4ec;
+  border-radius:8px;
+  background:linear-gradient(180deg,#ffffff 0%,#fafbfc 100%);
+  color:#303746;
+  font-family:inherit;
+  font-size:11px;
+  font-weight:550;
+  line-height:36px;
+  box-shadow:
+    inset 0 1px 2px rgba(20,28,45,.025),
+    0 1px 1px rgba(20,28,45,.015);
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2)
+.audit-modern-input::placeholder{
+  color:#a1a8b5;
+  font-weight:500;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2)
+.audit-modern-input:hover{
+  border-color:#cbd2de;
+  background:#fff;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table td:nth-child(2)
+.audit-modern-input:focus{
+  border-color:#818cf8;
+  background:#fff;
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.09),
+    0 2px 5px rgba(20,28,45,.04);
+  outline:none;
+}
+
+/* Make the note column feel like an observation field */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table th:nth-child(2){
+  color:#697386;
+}
+
+@media (max-width:640px){
+  .safety-audit-form .audit-checklist-section
+  .audit-modern-table td:nth-child(2)
+  .audit-modern-input{
+    height:34px;
+    min-height:34px;
+    line-height:34px;
+  }
+}
+
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Compact audit metadata panel
+   ============================================================ */
+
+.safety-audit-form > .audit-card:first-child{
+  border-color:#dfe4ec;
+  box-shadow:
+    0 7px 22px rgba(20,28,45,.045),
+    inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.safety-audit-form > .audit-card:first-child h2{
+  display:flex;
+  align-items:center;
+  min-height:42px;
+  padding:0 18px;
+  border-bottom:1px solid #e8ecf2;
+  background:
+    linear-gradient(
+      90deg,
+      #f7f8ff 0%,
+      #fbfcfe 100%
+    );
+  color:#303746;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+}
+
+.safety-audit-form > .audit-card:first-child h2::before{
+  content:"";
+  width:7px;
+  height:7px;
+  margin-right:8px;
+  border-radius:50%;
+  background:#6366f1;
+  box-shadow:0 0 0 4px rgba(99,102,241,.09);
+}
+
+.safety-audit-form .audit-form-grid{
+  min-height:82px;
+  background:#fff;
+}
+
+.safety-audit-form .audit-form-grid label{
+  position:relative;
+  justify-content:center;
+  padding:13px 17px 14px;
+  color:#7a8392;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.065em;
+}
+
+.safety-audit-form .audit-form-grid label + label{
+  border-left:1px solid #edf0f4;
+}
+
+.safety-audit-form .audit-form-grid label::after{
+  content:"";
+  position:absolute;
+  left:17px;
+  right:17px;
+  bottom:0;
+  height:2px;
+  border-radius:2px 2px 0 0;
+  background:transparent;
+  transition:background .16s ease;
+}
+
+.safety-audit-form .audit-form-grid label:focus-within::after{
+  background:#6366f1;
+}
+
+.safety-audit-form .audit-form-grid input,
+.safety-audit-form .audit-form-grid select{
+  min-height:36px;
+  height:36px;
+  margin-top:1px;
+  padding:0 10px;
+  border:1px solid #dfe4ec;
+  border-radius:8px;
+  background:#fff;
+  color:#303746;
+  font-size:11px;
+  font-weight:600;
+  box-shadow:none;
+}
+
+.safety-audit-form .audit-form-grid input:hover,
+.safety-audit-form .audit-form-grid select:hover{
+  border-color:#cbd2de;
+}
+
+.safety-audit-form .audit-form-grid input:focus,
+.safety-audit-form .audit-form-grid select:focus{
+  border-color:#818cf8;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(99,102,241,.09);
+  outline:none;
+}
+
+@media (max-width:900px){
+  .safety-audit-form .audit-form-grid{
+    min-height:auto;
+  }
+
+  .safety-audit-form .audit-form-grid label{
+    padding:12px 14px;
+  }
+}
+
+@media (max-width:640px){
+  .safety-audit-form .audit-form-grid label{
+    padding:11px 13px;
+  }
+
+  .safety-audit-form .audit-form-grid label::after{
+    left:13px;
+    right:13px;
+  }
+}
+
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Checklist summary header
+   ============================================================ */
+
+.safety-audit-form > .audit-card:nth-child(2) > .audit-section-header{
+  position:relative;
+  min-height:76px;
+  padding:15px 18px;
+  border-bottom:1px solid #e5e9f0;
+  background:
+    radial-gradient(
+      circle at 88% 50%,
+      rgba(99,102,241,.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8f9fc 100%
+    );
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header h2{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  color:#252b38;
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:-.015em;
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header h2::before{
+  content:"";
+  width:8px;
+  height:8px;
+  flex:0 0 8px;
+  border-radius:50%;
+  background:#6366f1;
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,.09),
+    0 2px 6px rgba(79,70,229,.16);
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header p{
+  margin:4px 0 0 16px;
+  color:#7b8493;
+  font-size:10px;
+  line-height:1.45;
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header strong{
+  position:relative;
+  min-width:86px;
+  min-height:42px;
+  padding:0 12px;
+  border:1px solid #d9dcfb;
+  border-radius:10px;
+  background:
+    linear-gradient(
+      180deg,
+      #f5f5ff 0%,
+      #eef0ff 100%
+    );
+  color:#4f46e5;
+  font-size:15px;
+  font-weight:850;
+  letter-spacing:-.02em;
+  box-shadow:
+    0 5px 14px rgba(79,70,229,.09),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header strong::before{
+  content:"TOTAL";
+  display:block;
+  margin-bottom:2px;
+  color:#8b91c9;
+  font-size:7px;
+  font-weight:850;
+  letter-spacing:.09em;
+  line-height:1;
+}
+
+/* Give the checklist body a clean visual start */
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-checklist-section:first-of-type{
+  border-top:0;
+}
+
+@media (max-width:640px){
+  .safety-audit-form > .audit-card:nth-child(2)
+  > .audit-section-header{
+    min-height:70px;
+    padding:13px;
+  }
+
+  .safety-audit-form > .audit-card:nth-child(2)
+  > .audit-section-header strong{
+    min-width:72px;
+    min-height:38px;
+    font-size:13px;
+  }
+
+  .safety-audit-form > .audit-card:nth-child(2)
+  > .audit-section-header strong::before{
+    font-size:6px;
+  }
+}
+
+
+/* INOP — Separate total label from score value */
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header strong{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  line-height:1;
+}
+
+.safety-audit-form > .audit-card:nth-child(2)
+> .audit-section-header strong::before{
+  display:block;
+  margin:0;
+  line-height:1;
+}
+
