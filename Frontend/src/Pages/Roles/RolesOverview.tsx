@@ -66,6 +66,7 @@ const RolesOverview: React.FC = () => {
   const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState<RoleFormState>(EMPTY_FORM);
+  const [roleTemplateKey, setRoleTemplateKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -100,11 +101,13 @@ const RolesOverview: React.FC = () => {
   const openCreate = () => {
     setEditingRole(null);
     setForm(EMPTY_FORM);
+    setRoleTemplateKey("");
     setFormError(null);
     setShowCreate(true);
   };
 
   const openEdit = (role: RoleRecord) => {
+    setRoleTemplateKey("");
     setEditingRole(role);
     setForm({
       name: role.name,
@@ -124,8 +127,51 @@ const RolesOverview: React.FC = () => {
     setEditingRole(null);
     setShowCreate(false);
     setForm(EMPTY_FORM);
+    setRoleTemplateKey("");
     setFormError(null);
   };
+
+  const handleRoleTemplateChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const templateKey = event.target.value;
+    setRoleTemplateKey(templateKey);
+
+    if (!templateKey) {
+      setForm((current) => ({
+        ...current,
+        description: "",
+        permissions: [],
+      }));
+      return;
+    }
+
+    const template = roles.find((role) => role.key === templateKey);
+
+    if (!template) return;
+
+    setForm((current) => ({
+      ...current,
+      description: template.description,
+      permissions: template.permissions.map((permission) => ({
+        ...permission,
+      })),
+    }));
+  };
+
+  const slugifyRoleKey = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/ə/g, "e")
+      .replace(/ı/g, "i")
+      .replace(/ö/g, "o")
+      .replace(/ü/g, "u")
+      .replace(/ş/g, "s")
+      .replace(/ç/g, "c")
+      .replace(/ğ/g, "g")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
 
   const addPermission = () => {
     setForm((current) => ({
@@ -506,26 +552,13 @@ const RolesOverview: React.FC = () => {
           }}
         >
           <div
-            className="modal-card anim-pop"
+            className="modal-card role-modal anim-pop"
             role="dialog"
             aria-modal="true"
             aria-labelledby="role-form-title"
             onClick={(event) => event.stopPropagation()}
-            style={{
-              width: "min(760px, calc(100vw - 32px))",
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: 16,
-                marginBottom: 20,
-              }}
-            >
+            <div className="role-modal__header">
               <div>
                 <h3
                   id="role-form-title"
@@ -544,7 +577,7 @@ const RolesOverview: React.FC = () => {
 
               <button
                 type="button"
-                className="btn-icon"
+                className="btn-icon role-modal__close"
                 onClick={closeForm}
                 disabled={saving}
                 aria-label={t("roles.form.close")}
@@ -554,6 +587,32 @@ const RolesOverview: React.FC = () => {
             </div>
 
             <form onSubmit={handleSave} noValidate>
+              {!editingRole && (
+                <div className="form-group role-template-field">
+                  <label className="form-label">
+                    Rol şablonu
+                  </label>
+                  <select
+                    className="input-field"
+                    value={roleTemplateKey}
+                    onChange={handleRoleTemplateChange}
+                    disabled={saving}
+                  >
+                    <option value="">Şablon seçin</option>
+                    {roles
+                      .filter((role) => role.isSystemRole && role.isActive)
+                      .map((role) => (
+                        <option key={role.key} value={role.key}>
+                          {role.name}
+                        </option>
+                      ))}
+                  </select>
+                  <p className="role-modal__field-hint">
+                    Mövcud sistem rolunu başlanğıc şablon kimi seçin.
+                  </p>
+                </div>
+              )}
+
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">
@@ -562,12 +621,18 @@ const RolesOverview: React.FC = () => {
                   <input
                     className="input-field"
                     value={form.name}
-                    onChange={(event) =>
+                    placeholder="Məsələn: Senior Auditor"
+                    onChange={(event) => {
+                      const name = event.target.value;
+
                       setForm((current) => ({
                         ...current,
-                        name: event.target.value,
-                      }))
-                    }
+                        name,
+                        ...(editingRole
+                          ? {}
+                          : { key: slugifyRoleKey(name) }),
+                      }));
+                    }}
                   />
                 </div>
 
@@ -576,8 +641,9 @@ const RolesOverview: React.FC = () => {
                     {t("roles.form.key")}
                   </label>
                   <input
-                    className="input-field"
+                    className="input-field role-key-field"
                     value={form.key}
+                    readOnly={!editingRole}
                     disabled={Boolean(editingRole?.isSystemRole)}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -586,6 +652,11 @@ const RolesOverview: React.FC = () => {
                       }))
                     }
                   />
+                  {!editingRole && (
+                    <p className="role-modal__field-hint">
+                      Rol adından avtomatik yaradılır.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -606,15 +677,8 @@ const RolesOverview: React.FC = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 8,
-                  }}
-                >
+              <div className="form-group role-modal__permissions">
+                <div className="role-modal__section-header">
                   <label className="form-label" style={{ margin: 0 }}>
                     {t("roles.form.permissions")}
                   </label>
@@ -646,13 +710,7 @@ const RolesOverview: React.FC = () => {
                     {form.permissions.map((permission, index) => (
                       <div
                         key={`${index}-${permission.resource}-${permission.action}`}
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns:
-                            "1fr 1fr 160px auto",
-                          gap: 8,
-                          alignItems: "end",
-                        }}
+                        className="role-modal__permission-row"
                       >
                         <div className="form-group" style={{ margin: 0 }}>
                           <label className="form-label">
@@ -735,7 +793,7 @@ const RolesOverview: React.FC = () => {
                 </p>
               )}
 
-              <div className="modal-card__actions">
+              <div className="modal-card__actions role-modal__actions">
                 <button
                   type="button"
                   className="btn-cancel"
