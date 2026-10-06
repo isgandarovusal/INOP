@@ -289,7 +289,7 @@ const DepartmentsList: React.FC = () => {
           }}
         >
           <div
-            className="modal-card anim-pop"
+            className="modal-card department-modal-card anim-pop"
             role="dialog"
             aria-modal="true"
             aria-labelledby="department-form-title"
