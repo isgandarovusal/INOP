@@ -746,3 +746,368 @@
     border-radius: 13px;
   }
 }
+
+/* INOP — dashboard navigation actions */
+.dashboard-panel .recent-card__link,
+.dashboard-panel .chart-card .recent-card__link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:34px;
+  padding:0 12px;
+  border:1px solid #d9def0;
+  border-radius:9px;
+  background:linear-gradient(180deg,#fff,#f7f8ff);
+  color:#4f46e5;
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.01em;
+  box-shadow:0 4px 12px rgba(79,70,229,.06);
+  transition:all .16s ease;
+}
+
+.dashboard-panel .recent-card__link:hover,
+.dashboard-panel .chart-card .recent-card__link:hover{
+  transform:translateY(-1px);
+  border-color:#6366f1;
+  background:#eef0ff;
+  color:#4338ca;
+  box-shadow:0 7px 16px rgba(79,70,229,.12);
+}
+
+.dashboard-panel .recent-card__link:active,
+.dashboard-panel .chart-card .recent-card__link:active{
+  transform:translateY(0);
+}
+
+
+/* INOP — Dashboard premium composition */
+.dashboard-section-title{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:28px 0 12px;
+  color:#202532;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+
+.dashboard-section-title::before{
+  content:"";
+  width:3px;
+  height:15px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#6366f1,#818cf8);
+  box-shadow:0 3px 9px rgba(99,102,241,.25);
+}
+
+.dashboard-section-title:first-of-type{
+  margin-top:2px;
+}
+
+.dashboard-panel{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #e1e6ef;
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(99,102,241,.045),transparent 30%),
+    linear-gradient(180deg,#ffffff 0%,#fafbfe 100%);
+  box-shadow:0 12px 30px rgba(20,28,45,.055);
+}
+
+.dashboard-panel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,#6366f1,rgba(99,102,241,0));
+}
+
+.dashboard-panel .chart-card__header{
+  min-height:58px;
+  padding:0 18px;
+  border-bottom:1px solid #e9edf3;
+  background:rgba(255,255,255,.72);
+}
+
+.dashboard-panel .chart-card__header h3{
+  color:#252b38;
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:-.005em;
+}
+
+.dashboard-panel .recent-card__link,
+.dashboard-panel .chart-card__header .recent-card__link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-height:32px;
+  padding:0 11px;
+  border:1px solid #d8dded;
+  border-radius:8px;
+  background:#f8f9ff;
+  color:#4f46e5;
+  font-size:10px;
+  font-weight:750;
+  text-decoration:none;
+  box-shadow:0 4px 12px rgba(79,70,229,.07);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+
+.dashboard-panel .recent-card__link:hover,
+.dashboard-panel .chart-card__header .recent-card__link:hover{
+  transform:translateY(-1px);
+  border-color:#6366f1;
+  background:#eef0ff;
+  color:#4338ca;
+  box-shadow:0 7px 16px rgba(79,70,229,.13);
+}
+
+.dashboard-panel .recent-card__link:active{
+  transform:translateY(0);
+}
+
+.dashboard-kpi-grid{
+  gap:10px;
+}
+
+.dashboard-kpi-grid .kpi-card{
+  min-height:116px;
+  border:1px solid #e1e6ef;
+  border-radius:14px;
+  background:linear-gradient(145deg,#fff 0%,#fafbfe 100%);
+  box-shadow:0 8px 22px rgba(20,28,45,.045);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+
+.dashboard-kpi-grid .kpi-card:hover{
+  transform:translateY(-2px);
+  border-color:#d5daf0;
+  box-shadow:0 13px 28px rgba(20,28,45,.08);
+}
+
+.dashboard-kpi-grid .kpi-card__label{
+  color:#737d8f;
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+.dashboard-kpi-grid .kpi-card__value{
+  margin-top:7px;
+  color:#202532;
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-.035em;
+}
+
+.dashboard-panel .recent-row{
+  min-height:58px;
+  padding:10px 16px;
+  border-bottom:1px solid #edf0f4;
+  transition:background .16s ease,padding-left .16s ease;
+}
+
+.dashboard-panel .recent-row:hover{
+  padding-left:19px;
+  background:#fafbff;
+}
+
+.dashboard-panel .recent-row:last-child{
+  border-bottom:0;
+}
+
+.dashboard-panel .recent-row__title{
+  color:#303746;
+  font-size:11px;
+  font-weight:700;
+}
+
+.dashboard-panel .recent-row__desc,
+.dashboard-panel .recent-row__time{
+  color:#8992a1;
+  font-size:10px;
+}
+
+@media(max-width:768px){
+  .dashboard-section-title{
+    margin-top:22px;
+  }
+
+  .dashboard-panel{
+    border-radius:13px;
+  }
+
+  .dashboard-panel .chart-card__header{
+    padding:0 14px;
+  }
+}
+
+
+/* INOP — Dashboard final executive rhythm */
+.dashboard-section-title + .kpi-grid{
+  margin-top:0;
+}
+
+.dashboard-section-title + .dashboard-error{
+  margin-top:0;
+  margin-bottom:12px;
+}
+
+.dashboard-error{
+  border:1px solid #e5d7d7;
+  border-radius:12px;
+  background:linear-gradient(180deg,#fffafa,#fff);
+  box-shadow:0 6px 18px rgba(127,29,29,.045);
+}
+
+.charts-grid{
+  align-items:stretch;
+}
+
+.charts-grid .recent-card,
+.charts-grid .chart-card{
+  min-height:250px;
+}
+
+.charts-grid .chart-empty,
+.charts-grid .empty-state{
+  min-height:190px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#8a93a2;
+  background:linear-gradient(180deg,rgba(248,249,252,.4),rgba(255,255,255,.7));
+}
+
+.charts-grid .chart-empty svg{
+  width:30px;
+  height:30px;
+  padding:9px;
+  box-sizing:content-box;
+  border-radius:12px;
+  background:#f1f3ff;
+  color:#6366f1;
+}
+
+.charts-grid .chart-empty p{
+  margin:0;
+  color:#7b8494;
+  font-size:12px;
+  font-weight:600;
+}
+
+.dashboard-panel,
+.charts-grid .recent-card,
+.charts-grid .chart-card,
+.kpi-grid .kpi-card{
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+
+@media(max-width:768px){
+  .charts-grid .recent-card,
+  .charts-grid .chart-card{
+    min-height:220px;
+  }
+}
+
+
+
+/* INOP — Dashboard action buttons FINAL */
+.charts-grid .recent-card__link{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 13px !important;
+  border:1px solid #cfd5e8 !important;
+  border-radius:9px !important;
+  background:linear-gradient(180deg,#ffffff 0%,#f4f6ff 100%) !important;
+  color:#4f46e5 !important;
+  font-size:11px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  text-decoration:none !important;
+  box-shadow:0 5px 14px rgba(79,70,229,.10) !important;
+  cursor:pointer !important;
+  transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease !important;
+}
+
+.charts-grid .recent-card__link svg{
+  width:14px !important;
+  height:14px !important;
+  color:currentColor !important;
+}
+
+.charts-grid .recent-card__link:hover{
+  transform:translateY(-2px) !important;
+  border-color:#6366f1 !important;
+  background:linear-gradient(180deg,#eef0ff 0%,#e6e9ff 100%) !important;
+  color:#3730a3 !important;
+  box-shadow:0 9px 20px rgba(79,70,229,.18) !important;
+}
+
+.charts-grid .recent-card__link:active{
+  transform:translateY(0) !important;
+}
+
+/* INOP — Dashboard FULL ANALYTICS action */
+.recent-card .chart-card__header .recent-card__link{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 13px !important;
+  border:1px solid #cfd5e8 !important;
+  border-radius:9px !important;
+  background:linear-gradient(180deg,#ffffff 0%,#f4f6ff 100%) !important;
+  color:#4f46e5 !important;
+  font-size:11px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  box-shadow:0 5px 14px rgba(79,70,229,.10) !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  transition:
+    transform .16s ease,
+    background .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease !important;
+}
+
+.recent-card .chart-card__header .recent-card__link svg{
+  width:14px !important;
+  height:14px !important;
+  color:currentColor !important;
+}
+
+.recent-card .chart-card__header .recent-card__link:hover{
+  transform:translateY(-2px) !important;
+  border-color:#6366f1 !important;
+  background:linear-gradient(180deg,#eef0ff 0%,#e6e9ff 100%) !important;
+  color:#3730a3 !important;
+  box-shadow:0 9px 20px rgba(79,70,229,.18) !important;
+}
+
+.recent-card .chart-card__header .recent-card__link:active{
+  transform:translateY(0) !important;
+}
