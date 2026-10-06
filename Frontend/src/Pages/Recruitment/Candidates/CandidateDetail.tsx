@@ -231,7 +231,7 @@ const CandidateDetail: React.FC = () => {
             {canExportPdf && (
               <button
                 type="button"
-                className="btn-secondary"
+                className="btn-secondary candidate-detail-action candidate-detail-action--export"
                 onClick={handleExportPdf}
                 disabled={exporting}
               >
@@ -249,7 +249,7 @@ const CandidateDetail: React.FC = () => {
             {canUpdate && (
               <button
                 type="button"
-                className="btn-primary"
+                className="btn-primary candidate-detail-action candidate-detail-action--edit"
                 onClick={() =>
                   navigate(
                     `/app/recruitment/candidates/${candidate.id}/edit`,
@@ -263,7 +263,7 @@ const CandidateDetail: React.FC = () => {
             {canDelete && (
               <button
                 type="button"
-                className="btn-secondary"
+                className="btn-secondary candidate-detail-action candidate-detail-action--delete"
                 onClick={handleDelete}
                 disabled={deleting}
               >
@@ -278,7 +278,7 @@ const CandidateDetail: React.FC = () => {
 
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary candidate-detail-action candidate-detail-action--back"
               onClick={() => navigate(-1)}
             >
               <ArrowLeft size={16} />
