@@ -2189,3 +2189,29 @@
     width: 100%;
   }
 }
+/* INOP — Audit Operations unified visual layer */
+.audit-modern-page{max-width:1220px;margin:0 auto;padding:4px 0 48px}
+.audit-modern-header{margin-bottom:24px}
+.audit-modern-header h1{font-size:28px;line-height:1.15;font-weight:750;letter-spacing:-.025em;color:#202532;margin:0}
+.audit-modern-header p{margin:7px 0 0;color:#737d8f;font-size:14px}
+.audit-card,.audit-modern-card{background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);border:1px solid #e5e9f0;border-radius:16px;box-shadow:0 10px 28px rgba(20,28,45,.055);overflow:hidden}
+.audit-card-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #edf0f4}
+.audit-card-header h2,.audit-card-header h3{margin:0;color:#252b38;font-size:15px;font-weight:700}
+.audit-modern-card{padding:20px}
+.audit-modern-empty{border:1px dashed #d7dce5;border-radius:14px;background:#fafbfc;padding:40px 24px;text-align:center;color:#7b8494}
+.audit-status-badge{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border:1px solid #e1e5eb;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.01em}
+.audit-business-module{margin-top:18px}
+.audit-business-module__loading{min-height:120px;display:grid;place-items:center;border:1px solid #e7eaf0;border-radius:14px;background:#fff;color:#7a8392;font-size:13px}
+.audit-modern-page table{width:100%;border-collapse:separate;border-spacing:0}
+.audit-modern-page th{height:46px;padding:0 16px;background:#f7f8fa;border-bottom:1px solid #e5e8ee;color:#6d7685;font-size:11px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;text-align:left}
+.audit-modern-page td{padding:14px 16px;border-bottom:1px solid #edf0f4;color:#343b49;font-size:13px;vertical-align:middle}
+.audit-modern-page tbody tr{transition:background .16s ease}
+.audit-modern-page tbody tr:hover{background:#f8faff}
+.audit-modern-page .btn-primary,.audit-modern-page .btn-secondary,.audit-modern-page .btn-danger{border-radius:9px;font-weight:650}
+@media(max-width:768px){
+  .audit-modern-page{padding-bottom:32px}
+  .audit-modern-header h1{font-size:24px}
+  .audit-card,.audit-modern-card{border-radius:13px}
+  .audit-card-header{padding:15px 16px;align-items:flex-start}
+  .audit-modern-page th,.audit-modern-page td{padding:12px}
+}
