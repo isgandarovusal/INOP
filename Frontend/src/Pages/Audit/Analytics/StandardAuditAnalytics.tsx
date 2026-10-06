@@ -70,7 +70,7 @@ const StandardAuditAnalytics: React.FC = () => {
     : [];
 
   return (
-    <div className="audit-analytics">
+    <div className="audit-analytics standard-audit-analytics">
       <PageHeader
         title={t("audit.standard.analytics.title")}
         subtitle={t("audit.standard.analytics.subtitle")}
@@ -101,7 +101,7 @@ const StandardAuditAnalytics: React.FC = () => {
               <TrendingUp size={22} />
               <p>{t("audit.standard.analytics.averageCompliance")}</p>
               <h2>
-                {data.averageCompliancePercentage.toFixed(1)}%
+                {data.averageCompliancePercentage.toFixed(1)} %
               </h2>
             </div>
 
