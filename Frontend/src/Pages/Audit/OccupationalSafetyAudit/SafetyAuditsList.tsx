@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import {
   getOccupationalSafetyAudits,
   deleteOccupationalSafetyAudit,
@@ -57,15 +58,17 @@ export default function SafetyAuditsList() {
   }
 
   return (
-    <div className="audit-modern-page">
+    <div className="audit-modern-page safety-audits-page">
       <div className="audit-modern-header">
         <div>
           <h1>{t("audit.safety.list.title")}</h1>
           <p>{t("audit.safety.list.subtitle")}</p>
         </div>
 
-        <Link to="/app/audit/safety/new" className="btn-primary">
-          {t("audit.safety.list.newAudit")}
+        <Link to="/app/audit/safety/new" className="btn-primary safety-audits-create">
+          <ShieldCheck size={16} aria-hidden="true" />
+          <span>{t("audit.safety.list.newAudit")}</span>
+          <ArrowRight size={15} aria-hidden="true" />
         </Link>
       </div>
 
@@ -86,9 +89,27 @@ export default function SafetyAuditsList() {
           }
         />
       ) : sortedAudits.length === 0 ? (
-        <div className="audit-modern-empty">
-          {t("audit.safety.list.noAudits")}
-        </div>
+        <section className="safety-audits-empty" aria-label="Occupational safety audit empty state">
+          <div className="safety-audits-empty__watermark" aria-hidden="true">
+            HSE
+          </div>
+
+          <div className="safety-audits-empty__visual" aria-hidden="true">
+            <ShieldCheck size={34} strokeWidth={1.8} />
+          </div>
+
+          <div className="safety-audits-empty__content">
+            <span className="safety-audits-empty__eyebrow">
+              Occupational Safety
+            </span>
+            <h2>{t("audit.safety.list.noAudits")}</h2>
+            <p>
+              Təhlükəsizlik yoxlamalarını başladın və əməyin mühafizəsi
+              nəticələrini burada izləyin.
+            </p>
+          </div>
+
+        </section>
       ) : (
         <div className="audit-modern-table-wrapper">
           <table className="audit-modern-table">
