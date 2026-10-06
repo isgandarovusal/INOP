@@ -2943,3 +2943,556 @@ table.audit-modern-table {
   }
 }
 
+
+/* ============================================================
+   INOP — Roles overview visual polish
+   ============================================================ */
+
+.roles-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:22px;
+}
+
+.roles-grid .role-card{
+  position:relative;
+  min-width:0;
+  min-height:390px;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  border:1px solid #e1e5ec;
+  border-radius:15px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(99,102,241,.065),transparent 42%),
+    linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%);
+  box-shadow:
+    0 10px 26px rgba(20,28,45,.045),
+    0 2px 5px rgba(20,28,45,.018);
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease;
+}
+
+.roles-grid .role-card:hover{
+  transform:translateY(-2px);
+  border-color:#d5daf0;
+  box-shadow:
+    0 15px 32px rgba(20,28,45,.065),
+    0 3px 7px rgba(20,28,45,.022);
+}
+
+.roles-grid .role-card .tag-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:14px;
+}
+
+.roles-grid .role-card .tag-list > *{
+  margin:0;
+  padding:6px 9px;
+  border:1px solid rgba(99,102,241,.09);
+  border-radius:999px;
+  background:#f4f3ff;
+  color:#4f46e5;
+  font-size:10px;
+  font-weight:650;
+  line-height:1.2;
+}
+
+.roles-grid .role-card .btn-secondary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:max-content;
+  min-width:104px;
+  height:34px;
+  min-height:34px;
+  margin-top:auto;
+  padding:0 12px;
+  border:1px solid #d6dbe5;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fff 0%,#f6f7f9 100%);
+  color:#4b5565;
+  font-size:10.5px;
+  font-weight:700;
+  line-height:1;
+  box-shadow:0 2px 7px rgba(20,28,45,.035);
+}
+
+.roles-grid .role-card .btn-secondary:hover:not(:disabled){
+  border-color:#c5cad8;
+  background:#f3f4f7;
+  color:#303746;
+  transform:translateY(-1px);
+}
+
+.roles-grid .role-card .btn-danger{
+  height:34px;
+  min-height:34px;
+  border-radius:8px;
+  font-size:10.5px;
+}
+
+.roles-grid .role-card .badge{
+  font-size:9px;
+  font-weight:750;
+}
+
+@media (max-width:1100px){
+  .roles-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:640px){
+  .roles-grid{
+    grid-template-columns:1fr;
+  }
+
+  .roles-grid .role-card{
+    min-height:0;
+  }
+}
+
+
+/* ============================================================
+   INOP — Roles final typography & action polish
+   ============================================================ */
+
+/* Page header create action */
+.roles-grid{
+  margin-top:24px;
+}
+
+.roles-grid .role-card h3{
+  color:#202633;
+  font-size:17px;
+  font-weight:750;
+  letter-spacing:-.015em;
+  line-height:1.25;
+}
+
+.roles-grid .role-card h3 svg{
+  width:17px;
+  height:17px;
+  margin-right:7px !important;
+  color:#6366f1 !important;
+  vertical-align:-2px !important;
+}
+
+.roles-grid .role-card > p{
+  color:#6b7587 !important;
+  font-size:11px !important;
+  line-height:1.45;
+}
+
+.roles-grid .role-card > p:first-of-type{
+  margin:9px 0 4px !important;
+  color:#7b8494 !important;
+  font-size:10.5px !important;
+  font-weight:600;
+  letter-spacing:.015em;
+}
+
+.roles-grid .role-card > p:nth-of-type(2){
+  margin:0 0 13px !important;
+  color:#667085 !important;
+  font-size:11px !important;
+  font-weight:550;
+}
+
+.roles-grid .role-card > p:nth-of-type(3){
+  margin:0 0 14px !important;
+  color:#68748a !important;
+  font-size:11px !important;
+  line-height:1.5;
+}
+
+/* Permission labels */
+.roles-grid .role-card .tag-list{
+  gap:7px;
+  margin-top:2px;
+}
+
+.roles-grid .role-card .tag-list > *{
+  min-height:28px;
+  padding:6px 9px;
+  border:1px solid rgba(99,102,241,.10);
+  border-radius:999px;
+  background:linear-gradient(180deg,#f7f6ff 0%,#f0efff 100%);
+  color:#5148df;
+  font-size:9.5px;
+  font-weight:650;
+  line-height:1.1;
+}
+
+/* Edit / secondary actions */
+.roles-grid .role-card .btn-secondary{
+  min-width:112px;
+  height:36px;
+  min-height:36px;
+  margin-top:18px;
+  padding:0 13px;
+  gap:7px;
+  border:1px solid #d8dde7;
+  border-radius:9px;
+  background:linear-gradient(180deg,#ffffff 0%,#f7f8fa 100%);
+  color:#4d5768;
+  font-size:10.5px;
+  font-weight:700;
+  line-height:1;
+  box-shadow:0 3px 9px rgba(20,28,45,.045);
+}
+
+.roles-grid .role-card .btn-secondary svg{
+  width:14px;
+  height:14px;
+  margin:0;
+  flex:0 0 14px;
+}
+
+.roles-grid .role-card .btn-secondary:hover:not(:disabled){
+  border-color:#bfc6d5;
+  background:#f3f4f7;
+  color:#303746;
+  box-shadow:0 5px 12px rgba(20,28,45,.07);
+  transform:translateY(-1px);
+}
+
+/* New Role page-header action */
+.page-header .btn-primary{
+  min-height:40px;
+  height:40px;
+  padding:0 16px;
+  gap:7px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:750;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.page-header .btn-primary svg{
+  width:15px;
+  height:15px;
+  margin:0;
+  flex:0 0 15px;
+}
+
+@media (max-width:640px){
+  .page-header .btn-primary{
+    min-height:38px;
+    height:38px;
+    padding:0 13px;
+  }
+}
+
+
+/* ============================================================
+   INOP — Roles actions / naming polish
+   ============================================================ */
+
+.roles-page .page-header .btn-primary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:104px;
+  height:38px;
+  min-height:38px;
+  padding:0 15px;
+  border:1px solid #4f46e5;
+  border-radius:9px;
+  background:linear-gradient(180deg,#6366f1 0%,#4f46e5 100%);
+  color:#fff;
+  font-size:11px;
+  font-weight:750;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:
+    0 5px 14px rgba(79,70,229,.18),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+.roles-page .page-header .btn-primary:hover:not(:disabled){
+  background:linear-gradient(180deg,#6d70f5 0%,#4338ca 100%);
+  border-color:#4338ca;
+  box-shadow:
+    0 8px 18px rgba(79,70,229,.24),
+    inset 0 1px 0 rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+
+.roles-page .page-header .btn-primary svg{
+  width:15px;
+  height:15px;
+  flex:0 0 15px;
+  margin:0;
+}
+
+/* Redaktə et — purple secondary action */
+.roles-page .roles-grid .role-card .btn-secondary{
+  border-color:#c9c6f6;
+  background:linear-gradient(180deg,#f8f7ff 0%,#efefff 100%);
+  color:#5b50d6;
+  box-shadow:0 3px 10px rgba(79,70,229,.08);
+}
+
+.roles-page .roles-grid .role-card .btn-secondary:hover:not(:disabled){
+  border-color:#a9a4ee;
+  background:linear-gradient(180deg,#f0efff 0%,#e7e5ff 100%);
+  color:#4338ca;
+  box-shadow:0 6px 14px rgba(79,70,229,.14);
+  transform:translateY(-1px);
+}
+
+.roles-page .roles-grid .role-card .btn-secondary svg{
+  color:currentColor;
+}
+
+/* Role names */
+.roles-page .roles-grid .role-card h3{
+  color:#202633;
+  font-size:17px;
+  font-weight:750;
+  letter-spacing:-.015em;
+}
+
+
+/* ============================================================
+   INOP — Roles action polish
+   ============================================================ */
+
+.roles-page .roles-create-action{
+  margin-top:-2px;
+  margin-bottom:20px !important;
+}
+
+.roles-page .roles-create-action .btn-primary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:104px;
+  height:38px;
+  min-height:38px;
+  padding:0 15px;
+  border:1px solid #4f46e5;
+  border-radius:9px;
+  background:linear-gradient(180deg,#6366f1 0%,#4f46e5 100%);
+  color:#fff;
+  font-size:11px;
+  font-weight:750;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:
+    0 5px 14px rgba(79,70,229,.18),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+.roles-page .roles-create-action .btn-primary:hover:not(:disabled){
+  background:linear-gradient(180deg,#6d70f5 0%,#4338ca 100%);
+  border-color:#4338ca;
+  box-shadow:0 8px 18px rgba(79,70,229,.24);
+  transform:translateY(-1px);
+}
+
+.roles-page .roles-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:0;
+}
+
+.roles-page .role-card{
+  min-height:390px;
+}
+
+.roles-page .role-card .role-edit-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:112px;
+  height:36px;
+  min-height:36px;
+  padding:0 13px;
+  border:1px solid #c9c6f6;
+  border-radius:9px;
+  background:linear-gradient(180deg,#f8f7ff 0%,#efefff 100%);
+  color:#5b50d6;
+  font-size:10.5px;
+  font-weight:700;
+  line-height:1;
+  box-shadow:0 3px 10px rgba(79,70,229,.08);
+}
+
+.roles-page .role-card .role-edit-action svg{
+  width:14px;
+  height:14px;
+  flex:0 0 14px;
+  margin:0;
+  color:currentColor;
+}
+
+.roles-page .role-card .role-edit-action:hover:not(:disabled){
+  border-color:#a9a4ee;
+  background:linear-gradient(180deg,#f0efff 0%,#e7e5ff 100%);
+  color:#4338ca;
+  box-shadow:0 6px 14px rgba(79,70,229,.14);
+  transform:translateY(-1px);
+}
+
+@media (max-width:1100px){
+  .roles-page .roles-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:640px){
+  .roles-page .roles-grid{
+    grid-template-columns:1fr;
+  }
+
+  .roles-page .roles-create-action .btn-primary{
+    width:100%;
+  }
+}
+
+
+/* ============================================================
+   ROLES — FINAL ACTION VISUAL
+   ============================================================ */
+
+.roles-page .roles-create-action .btn-primary{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:auto !important;
+  min-width:112px !important;
+  height:40px !important;
+  min-height:40px !important;
+  padding:0 16px !important;
+  border:1px solid #4f46e5 !important;
+  border-radius:9px !important;
+  background:#5b55e8 !important;
+  color:#fff !important;
+  font-size:12px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  box-shadow:0 6px 16px rgba(79,70,229,.20) !important;
+}
+
+.roles-page .roles-create-action .btn-primary:hover:not(:disabled){
+  background:#4f46e5 !important;
+  border-color:#4338ca !important;
+  color:#fff !important;
+  box-shadow:0 9px 20px rgba(79,70,229,.26) !important;
+  transform:translateY(-1px) !important;
+}
+
+.roles-page .role-card .role-edit-action{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:auto !important;
+  min-width:116px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 14px !important;
+  border:1px solid #8b85f2 !important;
+  border-radius:9px !important;
+  background:#6366f1 !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  box-shadow:0 5px 13px rgba(99,102,241,.20) !important;
+}
+
+.roles-page .role-card .role-edit-action svg{
+  width:14px !important;
+  height:14px !important;
+  flex:0 0 14px !important;
+  margin:0 !important;
+  color:#fff !important;
+}
+
+.roles-page .role-card .role-edit-action:hover:not(:disabled){
+  background:#4f46e5 !important;
+  border-color:#4338ca !important;
+  color:#fff !important;
+  box-shadow:0 8px 17px rgba(79,70,229,.27) !important;
+  transform:translateY(-1px) !important;
+}
+
+
+/* ROLES — FINAL ACTION VISUAL */
+.roles-page .roles-create-action .btn-primary{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:auto !important;
+  min-width:112px !important;
+  height:40px !important;
+  min-height:40px !important;
+  padding:0 16px !important;
+  border:1px solid #4f46e5 !important;
+  border-radius:9px !important;
+  background:#5b55e8 !important;
+  color:#fff !important;
+  font-size:12px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  box-shadow:0 6px 16px rgba(79,70,229,.20) !important;
+}
+
+.roles-page .roles-create-action .btn-primary:hover:not(:disabled){
+  background:#4f46e5 !important;
+  border-color:#4338ca !important;
+  color:#fff !important;
+  box-shadow:0 9px 20px rgba(79,70,229,.26) !important;
+  transform:translateY(-1px) !important;
+}
+
+.roles-page .role-card .role-edit-action{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:auto !important;
+  min-width:116px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:0 14px !important;
+  border:1px solid #8b85f2 !important;
+  border-radius:9px !important;
+  background:#6366f1 !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  box-shadow:0 5px 13px rgba(99,102,241,.20) !important;
+}
+
+.roles-page .role-card .role-edit-action svg{
+  width:14px !important;
+  height:14px !important;
+  flex:0 0 14px !important;
+  margin:0 !important;
+  color:#fff !important;
+}
+
+.roles-page .role-card .role-edit-action:hover:not(:disabled){
+  background:#4f46e5 !important;
+  border-color:#4338ca !important;
+  color:#fff !important;
+  box-shadow:0 8px 17px rgba(79,70,229,.27) !important;
+  transform:translateY(-1px) !important;
+}
+

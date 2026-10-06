@@ -310,13 +310,14 @@ const RolesOverview: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="roles-page">
       <PageHeader
         title={t("roles.title")}
         subtitle={t("roles.subtitle")}
       />
 
       <div
+        className="roles-create-action"
         style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -326,7 +327,7 @@ const RolesOverview: React.FC = () => {
         {canCreateRole && (
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary roles-create-button"
             onClick={openCreate}
           >
             <Plus size={16} />
@@ -353,10 +354,10 @@ const RolesOverview: React.FC = () => {
           }
         />
       ) : (
-        <div className="kpi-grid">
+        <div className="kpi-grid roles-grid">
           {roles.map((role, idx) => (
             <div
-              className="detail-card anim-in"
+              className="detail-card role-card anim-in"
               key={role.id}
               style={{
                 animationDelay: `${idx * 0.05}s`,
@@ -449,7 +450,7 @@ const RolesOverview: React.FC = () => {
                 {canUpdateRole && (
                   <button
                     type="button"
-                    className="btn-secondary"
+                    className="btn-secondary role-edit-action"
                     onClick={() => openEdit(role)}
                   >
                     <Edit3 size={14} />
