@@ -113,7 +113,7 @@ export default function SafetyAuditForm() {
   }
 
   return (
-    <div className="audit-modern-page">
+    <div className="audit-modern-page safety-audit-form-page">
       <div className="audit-modern-header">
         <div>
           <h1>{t("audit.safety.form.newTitle")}</h1>
@@ -125,7 +125,7 @@ export default function SafetyAuditForm() {
         </strong>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form className="safety-audit-form" onSubmit={handleSubmit}>
         <section className="audit-card">
           <h2>{t("audit.safety.form.auditInformation")}</h2>
 
@@ -273,7 +273,7 @@ export default function SafetyAuditForm() {
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-danger"
             onClick={() => navigate("/app/audit/safety")}
           >
             Ləğv et
