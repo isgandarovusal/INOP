@@ -7,3 +7,520 @@
 .service-audits-page td { padding: 17px 18px; color: var(--text-primary-strong); font-size: 14px; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
 .service-audits-page tbody tr:hover { background: #f8faff; }
 .service-audits-page tbody td:nth-child(4) { font-weight: 750; color: var(--accent-hover); }
+
+/* ============================================================
+   Service Audit — premium list composition
+   ============================================================ */
+
+.service-audits-page {
+  width: 100%;
+}
+
+/* Compact horizontal filter toolbar */
+.service-audits-page .filter-bar {
+  display: grid !important;
+  grid-template-columns: minmax(150px, 1fr) minmax(180px, 1.25fr) minmax(145px, 1fr) minmax(145px, 1fr) auto !important;
+  align-items: center !important;
+  gap: 9px !important;
+  margin-top: 14px !important;
+  padding: 13px !important;
+  border: 1px solid #e3e7ef !important;
+  border-radius: 14px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfe 100%) !important;
+  box-shadow:
+    0 8px 22px rgba(20, 28, 45, .045),
+    0 1px 2px rgba(20, 28, 45, .025) !important;
+}
+
+.service-audits-page .filter-bar .input-field {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border: 1px solid #dfe4ec !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: #303746 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+}
+
+.service-audits-page .filter-bar .input-field:hover {
+  border-color: #cbd2df !important;
+}
+
+.service-audits-page .filter-bar .input-field:focus {
+  border-color: #8b8ff0 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .09) !important;
+  outline: none !important;
+}
+
+.service-audits-page .filter-bar .btn-secondary {
+  height: 38px !important;
+  min-height: 38px !important;
+  min-width: 88px !important;
+  margin: 0 !important;
+  padding: 0 13px !important;
+  border: 1px solid #f0c7a0 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(180deg, #fffaf5 0%, #fff3e7 100%) !important;
+  color: #b45309 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 3px 10px rgba(180, 83, 9, .06) !important;
+}
+
+.service-audits-page .filter-bar .btn-secondary:hover {
+  border-color: #f0b77e !important;
+  background: linear-gradient(180deg, #fff5eb 0%, #ffead8 100%) !important;
+  color: #92400e !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 14px rgba(180, 83, 9, .11) !important;
+}
+
+/* Table surface */
+.service-audits-page .admin-table-container {
+  margin-top: 14px !important;
+  overflow-x: auto !important;
+  border: 1px solid #e1e5ed !important;
+  border-radius: 15px !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 10px 28px rgba(20, 28, 45, .05),
+    0 1px 2px rgba(20, 28, 45, .025) !important;
+}
+
+.service-audits-page .admin-table-container table {
+  width: 100% !important;
+  min-width: 760px !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.service-audits-page .admin-table-container thead th {
+  height: 39px !important;
+  padding: 0 14px !important;
+  border-bottom: 1px solid #e4e8ef !important;
+  background: #fafbfc !important;
+  color: #687285 !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+.service-audits-page .admin-table-container tbody td {
+  height: 48px !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid #edf0f4 !important;
+  color: #3f4654 !important;
+  font-size: 11px !important;
+}
+
+.service-audits-page .admin-table-container tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.service-audits-page .admin-table-container tbody tr:hover:not(:has(td[colspan="6"])) td {
+  background: #fafaff !important;
+}
+
+/* Empty state inside the six-column service audit table */
+.service-audits-page .admin-table-container tbody tr:has(td[colspan="6"]) td[colspan="6"] {
+  height: 178px !important;
+  padding: 26px 20px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  color: #5f6878 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(99, 102, 241, .045), transparent 125px),
+    #ffffff !important;
+}
+
+.service-audits-page .admin-table-container tbody tr:has(td[colspan="6"]) td[colspan="6"]::before {
+  content: "" !important;
+  display: block !important;
+  width: 42px !important;
+  height: 42px !important;
+  margin: 0 auto 11px !important;
+  border: 1px solid rgba(99, 102, 241, .13) !important;
+  border-radius: 13px !important;
+  background:
+    linear-gradient(145deg, #f1f2ff 0%, #e9ebff 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 6px 15px rgba(79,70,229,.08) !important;
+}
+
+/* Responsive fallback */
+@media (max-width: 900px) {
+  .service-audits-page .filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .service-audits-page .filter-bar .btn-secondary {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .service-audits-page .filter-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Service Audit — enterprise SaaS visual refinement
+   ============================================================ */
+
+.service-audits-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.service-audits-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -26px;
+  left: -34px;
+  right: -34px;
+  height: 170px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(99,102,241,.10), transparent 34%),
+    radial-gradient(circle at 82% 8%, rgba(59,130,246,.07), transparent 30%);
+  pointer-events: none;
+}
+
+.service-audits-page .filter-bar {
+  position: relative !important;
+  border-color: #dfe3f0 !important;
+  background:
+    linear-gradient(135deg, rgba(248,249,255,.96) 0%, rgba(255,255,255,.98) 58%, rgba(249,250,255,.96) 100%) !important;
+  box-shadow:
+    0 12px 30px rgba(39,48,78,.055),
+    0 2px 5px rgba(39,48,78,.025),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+.service-audits-page .filter-bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #6366f1 0%, #818cf8 48%, rgba(129,140,248,0) 100%);
+  opacity: .72;
+}
+
+.service-audits-page .filter-bar .input-field {
+  transition:
+    border-color .16s ease,
+    box-shadow .16s ease,
+    transform .16s ease,
+    background .16s ease !important;
+}
+
+.service-audits-page .filter-bar .input-field:hover {
+  background: #fcfcff !important;
+  transform: translateY(-1px);
+}
+
+.service-audits-page .admin-table-container {
+  position: relative !important;
+  border-color: #dfe3eb !important;
+  box-shadow:
+    0 16px 36px rgba(20,28,45,.055),
+    0 2px 5px rgba(20,28,45,.025) !important;
+}
+
+.service-audits-page .admin-table-container::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #818cf8 36%,
+    #dfe3ff 72%,
+    transparent 100%
+  );
+  opacity: .8;
+}
+
+.service-audits-page .admin-table-container thead th {
+  height: 43px !important;
+  background: linear-gradient(180deg, #f8f9fc 0%, #f3f5f9 100%) !important;
+  color: #606a7b !important;
+  border-bottom-color: #dfe4ec !important;
+  font-size: 8px !important;
+  letter-spacing: .105em !important;
+}
+
+.service-audits-page .admin-table-container tbody td {
+  height: 54px !important;
+  color: #4b5361 !important;
+  font-size: 11px !important;
+}
+
+.service-audits-page .admin-table-container tbody tr {
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+.service-audits-page .admin-table-container tbody tr:hover:not(:has(td[colspan="6"])) {
+  box-shadow: inset 3px 0 0 #6366f1;
+}
+
+.service-audits-page .admin-table-container tbody tr:hover:not(:has(td[colspan="6"])) td {
+  background: linear-gradient(90deg, #fafaff 0%, #ffffff 72%) !important;
+}
+
+.service-audits-page .admin-table-container tbody td:first-child {
+  color: #252b38 !important;
+  font-weight: 700 !important;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(2) {
+  color: #687285 !important;
+  font-weight: 600 !important;
+}
+
+.service-audits-page .audit-answer,
+.service-audits-page .audit-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .025em !important;
+  line-height: 1 !important;
+}
+
+.service-audits-page .audit-answer--yes,
+.service-audits-page .audit-answer--compliant {
+  background: #ecfdf3 !important;
+  border: 1px solid #b7ebcb !important;
+  color: #15803d !important;
+}
+
+.service-audits-page .audit-answer--no,
+.service-audits-page .audit-answer--critical {
+  background: #fff1f2 !important;
+  border: 1px solid #fecdd3 !important;
+  color: #be123c !important;
+}
+
+.service-audits-page .audit-answer--na,
+.service-audits-page .audit-answer--notApplicable {
+  background: #f4f5f7 !important;
+  border: 1px solid #e0e3e8 !important;
+  color: #717887 !important;
+}
+
+.service-audits-page .row-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+}
+
+.service-audits-page .row-actions .btn-secondary,
+.service-audits-page .row-actions .btn-danger {
+  min-width: 32px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 9px !important;
+  border-radius: 8px !important;
+  font-size: 9px !important;
+}
+
+@media (max-width: 900px) {
+  .service-audits-page::before {
+    left: -16px;
+    right: -16px;
+  }
+}
+
+
+
+/* ============================================================
+   Service Audit — premium empty state
+   ============================================================ */
+
+.service-audits-page .service-audit-empty-cell {
+  position: relative !important;
+  height: 196px !important;
+  padding: 28px 24px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  color: #667085 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  line-height: 1.55 !important;
+  background:
+    radial-gradient(
+      circle at 50% 38%,
+      rgba(99,102,241,.065) 0,
+      rgba(99,102,241,.028) 95px,
+      transparent 175px
+    ),
+    linear-gradient(180deg,#ffffff 0%,#fcfcff 100%) !important;
+}
+
+.service-audits-page .service-audit-empty-cell::before {
+  content: "∅";
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 12px;
+  border: 1px solid rgba(99,102,241,.16);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg,#f1f2ff 0%,#e8eaff 100%);
+  color: #6366f1;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 8px 18px rgba(79,70,229,.10);
+}
+
+.service-audits-page .service-audit-empty-cell::after {
+  content: "Adjust your filters or create a new service audit to see records here.";
+  display: block;
+  max-width: 390px;
+  margin: 7px auto 0;
+  color: #9299a7;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+@media (max-width: 560px) {
+  .service-audits-page .service-audit-empty-cell {
+    height: 180px !important;
+    padding: 24px 16px !important;
+  }
+
+  .service-audits-page .service-audit-empty-cell::after {
+    max-width: 290px;
+  }
+}
+
+
+
+/* ============================================================
+   Service Audit — final business table
+   ============================================================ */
+
+.service-audits-page .admin-table-container table {
+  table-layout: fixed !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(1),
+.service-audits-page .admin-table-container tbody td:nth-child(1) {
+  width: 16% !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(2),
+.service-audits-page .admin-table-container tbody td:nth-child(2) {
+  width: 13% !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(3),
+.service-audits-page .admin-table-container tbody td:nth-child(3) {
+  width: 13% !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(4),
+.service-audits-page .admin-table-container tbody td:nth-child(4) {
+  width: 16% !important;
+  text-align: center !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(5),
+.service-audits-page .admin-table-container tbody td:nth-child(5) {
+  width: 19% !important;
+  text-align: center !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(6),
+.service-audits-page .admin-table-container tbody td:nth-child(6) {
+  width: 23% !important;
+  text-align: right !important;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(4) {
+  color: #3730a3 !important;
+  font-weight: 750 !important;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(4)::first-letter {
+  color: #6366f1;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(5) {
+  color: #4f46e5 !important;
+  font-weight: 700 !important;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(6) {
+  color: #596273 !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650 !important;
+}
+
+.service-audits-page .admin-table-container tbody td:nth-child(3) {
+  color: #737c8c !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.service-audits-page .admin-table-container tbody tr {
+  position: relative;
+}
+
+.service-audits-page .admin-table-container tbody tr:not(:has(td[colspan="6"])) td {
+  transition:
+    background .15s ease,
+    color .15s ease;
+}
+
+.service-audits-page .admin-table-container tbody tr:hover:not(:has(td[colspan="6"])) td:nth-child(4),
+.service-audits-page .admin-table-container tbody tr:hover:not(:has(td[colspan="6"])) td:nth-child(5) {
+  color: #4338ca !important;
+}
+
+.service-audits-page .admin-table-container thead th:nth-child(4)::after {
+  content: " / SCORE";
+  color: #a0a7b4;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+@media (max-width: 900px) {
+  .service-audits-page .admin-table-container table {
+    table-layout: auto !important;
+  }
+
+  .service-audits-page .admin-table-container thead th,
+  .service-audits-page .admin-table-container tbody td {
+    width: auto !important;
+  }
+}

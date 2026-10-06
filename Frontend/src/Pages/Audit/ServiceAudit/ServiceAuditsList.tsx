@@ -369,7 +369,7 @@ export default function ServiceAuditsList() {
 
           {audits.length === 0 && (
             <tr>
-              <td colSpan={6}>
+              <td colSpan={6} className="service-audit-empty-cell">
                 {t("audit.service.list.empty", {
                   defaultValue: "No service audits found",
                 })}
