@@ -7045,3 +7045,65 @@
   }
 }
 
+
+/* ============================================================
+   INOP — Occupational Safety Audit
+   Prevent checklist question overflow into Note column
+   ============================================================ */
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table{
+  table-layout:fixed;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td:first-child{
+  width:52%;
+  max-width:52%;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  overflow:hidden;
+  text-overflow:clip;
+  line-height:1.5;
+  vertical-align:middle;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td:nth-child(2){
+  width:40%;
+  max-width:40%;
+  overflow:hidden;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td:nth-child(3){
+  width:8%;
+  max-width:8%;
+  overflow:hidden;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody tr{
+  height:auto;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td{
+  height:auto;
+  min-height:54px;
+}
+
+
+/* Slight readability increase — Occupational Safety checklist */
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td:first-child{
+  font-size:11.5px;
+}
+
+.safety-audit-form .audit-checklist-section
+.audit-modern-table tbody td:nth-child(2)
+.audit-modern-input{
+  font-size:11.5px;
+}
+
