@@ -132,7 +132,7 @@ const ApplicationsList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="recruitment-list-page">
       <PageHeader
         title={t("recruitment.applications.title")}
         subtitle={t("recruitment.applications.totalShown", { total: applications.length, shown: rows.length })}

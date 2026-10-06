@@ -49,34 +49,14 @@ const KanbanCandidateCard = React.memo(
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          style={{
-            userSelect: "none",
-            padding: "12px",
-            margin: "0 0 8px 0",
-            backgroundColor: "#fff",
-            borderRadius: "6px",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "6px",
-            ...provided.draggableProps.style,
-          }}
+          className="recruitment-kanban__card"
+          style={provided.draggableProps.style}
         >
-          <strong
-            style={{
-              display: "block",
-              color: "#111827",
-            }}
-          >
+          <strong className="recruitment-kanban__name">
             {candidate.name}
           </strong>
 
-          <span
-            style={{
-              fontSize: "13px",
-              color: "#6b7280",
-            }}
-          >
+          <span className="recruitment-kanban__meta">
             {candidate.experience} {yearsExperienceLabel}
           </span>
         </div>
@@ -157,45 +137,31 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const yearsExperienceLabel = t("components.kanban.yearsExperience");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "16px",
-        padding: "10px 0",
-        overflowX: "auto",
-      }}
-    >
+    <div className="recruitment-kanban">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         {COLUMNS.map((status) => {
           const columnCandidates = candidatesByStatus[status];
 
           return (
-            <div
+            <section
               key={status}
-              style={{
-                flex: "1",
-                minWidth: "260px",
-                backgroundColor: "#f4f5f7",
-                borderRadius: "8px",
-                padding: "12px",
-              }}
+              className={`recruitment-kanban__column recruitment-kanban__column--${status}`}
             >
-              <h3
-                style={{
-                  fontSize: "16px",
-                  marginBottom: "12px",
-                  color: "#374151",
-                }}
-              >
-                {columnTitle(status)} ({columnCandidates.length})
-              </h3>
+              <header className="recruitment-kanban__header">
+                <h3 className="recruitment-kanban__title">
+                  {columnTitle(status)}
+                </h3>
+                <span className="recruitment-kanban__count">
+                  {columnCandidates.length}
+                </span>
+              </header>
 
               <Droppable droppableId={status}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    style={{ minHeight: "300px" }}
+                    className="recruitment-kanban__dropzone"
                   >
                     {columnCandidates.map((candidate, index) => (
                       <KanbanCandidateCard
@@ -211,7 +177,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   </div>
                 )}
               </Droppable>
-            </div>
+            </section>
           );
         })}
       </DragDropContext>

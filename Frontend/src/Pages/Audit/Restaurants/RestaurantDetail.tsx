@@ -112,7 +112,7 @@ const RestaurantDetail: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="restaurant-detail-page">
       <PageHeader
         title={restaurant.name}
         subtitle={restaurant.location}

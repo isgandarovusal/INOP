@@ -197,7 +197,7 @@ const CandidatesList: React.FC = () => {
           <>
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary recruitment-action--export"
               onClick={handleExportExcel}
               disabled={exporting}
             >
@@ -214,7 +214,7 @@ const CandidatesList: React.FC = () => {
             {canCreate && (
               <button
                 type="button"
-                className="btn-primary"
+                className="btn-primary recruitment-action--create"
                 onClick={() =>
                   navigate("/app/recruitment/candidates/new")
                 }

@@ -2215,3 +2215,487 @@
   .audit-card-header{padding:15px 16px;align-items:flex-start}
   .audit-modern-page th,.audit-modern-page td{padding:12px}
 }
+/* INOP — Audits List business surface */
+.audit-list-page{max-width:1220px;margin:0 auto;padding-bottom:48px}
+.audit-list-page .filter-bar{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding:12px;background:linear-gradient(180deg,#fff,#f8f9fb);border:1px solid #e4e8ef;border-radius:14px;box-shadow:0 8px 24px rgba(20,28,45,.045)}
+.audit-list-page .filter-bar .input-field{height:40px;border-radius:9px;background:#fff;border-color:#dfe4eb}
+.audit-list-page .filter-bar .input-field:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.audit-list-page .admin-table-container{border:1px solid #e3e7ee;border-radius:16px;background:#fff;box-shadow:0 12px 32px rgba(20,28,45,.06);overflow:hidden}
+.audit-list-page .admin-table-container table{min-width:760px}
+.audit-list-page .admin-table-container th{height:48px;padding:0 18px;background:#f7f8fa;color:#697386;border-bottom:1px solid #e5e8ee;font-size:10px;font-weight:750;letter-spacing:.075em;text-transform:uppercase}
+.audit-list-page .admin-table-container td{padding:15px 18px;border-bottom:1px solid #eef1f5;font-size:13px;color:#343b49}
+.audit-list-page .admin-table-container tbody tr{transition:background .16s ease,box-shadow .16s ease}
+.audit-list-page .admin-table-container tbody tr:hover{background:#fafbff;box-shadow:inset 3px 0 0 #6366f1}
+.audit-list-page .cell-title--clickable{font-weight:700;color:#252b38;cursor:pointer}
+.audit-list-page .cell-title--clickable:hover{color:#4f46e5}
+.audit-list-page .cell-muted{color:#747e8e}
+.audit-list-page td:nth-child(3){color:#667085;font-variant-numeric:tabular-nums}
+.audit-list-page td:nth-child(4){color:#596273;font-weight:600}
+.audit-list-page td .badge{min-width:70px;justify-content:center;font-weight:750}
+.audit-list-page .row-actions{display:flex;justify-content:flex-end}
+.audit-list-page .btn-danger{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px}
+.audit-list-page .state-page__action{display:flex;justify-content:center;margin-top:14px}
+.audit-list-page .audit-modern-empty{min-height:150px;display:grid;place-items:center}
+.audit-list-page .page-header__actions .btn-add{height:40px;border-radius:9px}
+@media(max-width:800px){
+  .audit-list-page .filter-bar{align-items:stretch;flex-wrap:wrap}
+  .audit-list-page .filter-bar .input-field{flex:1 1 180px!important;width:auto!important}
+  .audit-list-page .admin-table-container{overflow-x:auto}
+}
+@media(max-width:800px){.audit-list-page .filter-bar{align-items:stretch;flex-wrap:wrap}.audit-list-page .filter-bar .input-field{flex:1 1 180px!important;width:auto!important}.audit-list-page .admin-table-container{overflow-x:auto}}
+
+/* INOP — Standard Audits List business composition */
+.audit-standard-list-page{
+  max-width:1220px;
+  margin:0 auto;
+  padding:4px 0 48px;
+}
+
+.audit-standard-list-page>h2{
+  margin:0 0 18px;
+  color:#202532;
+  font-size:28px;
+  line-height:1.15;
+  font-weight:750;
+  letter-spacing:-.025em;
+}
+
+.audit-standard-list-page .filter-bar{
+  display:grid;
+  grid-template-columns:1fr 1.25fr 150px 150px auto;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+  padding:12px;
+  background:linear-gradient(180deg,#fff,#f8f9fb);
+  border:1px solid #e4e8ef;
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(20,28,45,.045);
+}
+
+.audit-standard-list-page .filter-bar .input-field{
+  width:100%;
+  min-width:0;
+  height:40px;
+  padding:0 12px;
+  border-radius:9px;
+  background:#fff;
+  border:1px solid #dfe4eb;
+  color:#303746;
+  font-size:13px;
+}
+
+.audit-standard-list-page .filter-bar .input-field:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.1);
+}
+
+.audit-standard-list-page .filter-bar .btn-secondary{
+  height:40px;
+  white-space:nowrap;
+  border-radius:9px;
+  font-weight:650;
+}
+
+.audit-standard-list-page .admin-table-container{
+  position:relative;
+  border:1px solid #e3e7ee;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 32px rgba(20,28,45,.06);
+  overflow:hidden;
+}
+
+.audit-standard-list-page .admin-table-container table{
+  min-width:860px;
+  width:100%;
+}
+
+.audit-standard-list-page .admin-table-container th{
+  height:48px;
+  padding:0 18px;
+  background:#f7f8fa;
+  color:#697386;
+  border-bottom:1px solid #e5e8ee;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+
+.audit-standard-list-page .admin-table-container td{
+  padding:15px 18px;
+  border-bottom:1px solid #eef1f5;
+  color:#343b49;
+  font-size:13px;
+  vertical-align:middle;
+}
+
+.audit-standard-list-page .admin-table-container tbody tr{
+  transition:background .16s ease,box-shadow .16s ease;
+}
+
+.audit-standard-list-page .admin-table-container tbody tr:hover{
+  background:#fafbff;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+
+.audit-standard-list-page .admin-table-container tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.audit-standard-list-page .admin-table-container td:nth-child(1){
+  color:#252b38;
+  font-weight:700;
+}
+
+.audit-standard-list-page .admin-table-container td:nth-child(2){
+  color:#596273;
+  font-weight:600;
+}
+
+.audit-standard-list-page .admin-table-container td:nth-child(3){
+  color:#667085;
+  font-variant-numeric:tabular-nums;
+}
+
+.audit-standard-list-page .admin-table-container td:nth-child(4),
+.audit-standard-list-page .admin-table-container td:nth-child(5),
+.audit-standard-list-page .admin-table-container td:nth-child(6){
+  font-variant-numeric:tabular-nums;
+}
+
+.audit-standard-list-page .admin-table-container .badge{
+  min-width:76px;
+  justify-content:center;
+  border-radius:999px;
+  font-weight:750;
+}
+
+.audit-standard-list-page .admin-table-container [role="status"]{
+  border:1px solid #e3e7ee;
+  color:#667085;
+  box-shadow:0 6px 18px rgba(20,28,45,.08);
+  backdrop-filter:blur(10px);
+}
+
+@media(max-width:980px){
+  .audit-standard-list-page .filter-bar{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .audit-standard-list-page .filter-bar .btn-secondary{
+    justify-self:start;
+  }
+
+  .audit-standard-list-page .admin-table-container{
+    overflow-x:auto;
+  }
+}
+
+@media(max-width:640px){
+  .audit-standard-list-page{
+    padding-bottom:32px;
+  }
+
+  .audit-standard-list-page>h2{
+    font-size:24px;
+  }
+
+  .audit-standard-list-page .filter-bar{
+    grid-template-columns:1fr;
+  }
+
+  .audit-standard-list-page .filter-bar .btn-secondary{
+    width:100%;
+  }
+
+  .audit-standard-list-page .admin-table-container{
+    border-radius:13px;
+  }
+}
+
+
+/* INOP — Service Audits List business composition */
+.service-audits-page{
+  max-width:1220px;
+  margin:0 auto;
+  padding:4px 0 48px;
+}
+
+.service-audits-page>h2{
+  margin:0 0 18px;
+  color:#202532;
+  font-size:28px;
+  line-height:1.15;
+  font-weight:750;
+  letter-spacing:-.025em;
+}
+
+.service-audits-page .filter-bar{
+  display:grid;
+  grid-template-columns:1fr 1.25fr 150px 150px auto;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+  padding:12px;
+  background:linear-gradient(180deg,#fff,#f8f9fb);
+  border:1px solid #e4e8ef;
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(20,28,45,.045);
+}
+
+.service-audits-page .filter-bar .input-field{
+  width:100%;
+  min-width:0;
+  height:40px;
+  padding:0 12px;
+  border-radius:9px;
+  background:#fff;
+  border:1px solid #dfe4eb;
+  color:#303746;
+  font-size:13px;
+}
+
+.service-audits-page .filter-bar .input-field:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.1);
+}
+
+.service-audits-page .filter-bar .btn-secondary{
+  height:40px;
+  white-space:nowrap;
+  border-radius:9px;
+  font-weight:650;
+}
+
+.service-audits-page .admin-table-container{
+  position:relative;
+  border:1px solid #e3e7ee;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 32px rgba(20,28,45,.06);
+  overflow:hidden;
+}
+
+.service-audits-page .admin-table-container table{
+  width:100%;
+  min-width:760px;
+}
+
+.service-audits-page .admin-table-container th{
+  height:48px;
+  padding:0 18px;
+  background:#f7f8fa;
+  color:#697386;
+  border-bottom:1px solid #e5e8ee;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  text-align:left;
+}
+
+.service-audits-page .admin-table-container td{
+  padding:15px 18px;
+  border-bottom:1px solid #eef1f5;
+  color:#343b49;
+  font-size:13px;
+  vertical-align:middle;
+}
+
+.service-audits-page .admin-table-container tbody tr{
+  transition:background .16s ease,box-shadow .16s ease;
+}
+
+.service-audits-page .admin-table-container tbody tr:hover{
+  background:#fafbff;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+
+.service-audits-page .admin-table-container tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.service-audits-page .admin-table-container td:first-child{
+  color:#252b38;
+  font-weight:700;
+}
+
+.service-audits-page .admin-table-container td:nth-child(2){
+  color:#596273;
+  font-weight:600;
+}
+
+.service-audits-page .admin-table-container td:nth-child(3){
+  color:#667085;
+  font-variant-numeric:tabular-nums;
+}
+
+.service-audits-page .admin-table-container td:nth-child(4){
+  color:#252b38;
+  font-weight:750;
+  font-variant-numeric:tabular-nums;
+}
+
+.service-audits-page .admin-table-container .badge{
+  min-width:76px;
+  justify-content:center;
+  border-radius:999px;
+  font-weight:750;
+}
+
+.service-audits-page .admin-table-container [role="status"]{
+  border:1px solid #e3e7ee;
+  color:#667085;
+  box-shadow:0 6px 18px rgba(20,28,45,.08);
+  backdrop-filter:blur(10px);
+}
+
+@media(max-width:980px){
+  .service-audits-page .filter-bar{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .service-audits-page .filter-bar .btn-secondary{
+    justify-self:start;
+  }
+
+  .service-audits-page .admin-table-container{
+    overflow-x:auto;
+  }
+}
+
+@media(max-width:640px){
+  .service-audits-page{
+    padding-bottom:32px;
+  }
+
+  .service-audits-page>h2{
+    font-size:24px;
+  }
+
+  .service-audits-page .filter-bar{
+    grid-template-columns:1fr;
+  }
+
+  .service-audits-page .filter-bar .btn-secondary{
+    width:100%;
+  }
+
+  .service-audits-page .admin-table-container{
+    border-radius:13px;
+  }
+}
+
+
+/* INOP — Occupational Safety Audits List */
+.audit-modern-page .audit-card{
+  margin-top:0;
+}
+
+.audit-modern-page .audit-card-header strong{
+  min-width:42px;
+  height:42px;
+  display:inline-grid;
+  place-items:center;
+  padding:0 12px;
+  border-radius:12px;
+  background:#202532;
+  color:#fff;
+  font-size:14px;
+  font-weight:750;
+  font-variant-numeric:tabular-nums;
+  box-shadow:0 6px 16px rgba(20,28,45,.16);
+}
+
+.audit-modern-page .audit-card-header p{
+  margin:5px 0 0;
+  color:#7b8494;
+  font-size:12px;
+}
+
+.audit-modern-page .audit-modern-table-wrapper{
+  overflow-x:auto;
+}
+
+.audit-modern-page .audit-modern-table{
+  width:100%;
+  min-width:680px;
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+.audit-modern-page .audit-modern-table th{
+  height:46px;
+  padding:0 18px;
+  background:#f7f8fa;
+  border-bottom:1px solid #e5e8ee;
+  color:#697386;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  text-align:left;
+}
+
+.audit-modern-page .audit-modern-table td{
+  padding:15px 18px;
+  border-bottom:1px solid #eef1f5;
+  color:#343b49;
+  font-size:13px;
+  vertical-align:middle;
+}
+
+.audit-modern-page .audit-modern-table tbody tr{
+  transition:background .16s ease,box-shadow .16s ease;
+}
+
+.audit-modern-page .audit-modern-table tbody tr:hover{
+  background:#fafbff;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+
+.audit-modern-page .audit-modern-table tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.audit-modern-page .audit-modern-table td:first-child{
+  color:#252b38;
+  font-weight:700;
+}
+
+.audit-modern-page .audit-modern-table td:nth-child(2){
+  color:#596273;
+  font-weight:600;
+}
+
+.audit-modern-page .audit-modern-table td:nth-child(3){
+  color:#667085;
+  font-variant-numeric:tabular-nums;
+}
+
+@media(max-width:640px){
+  .audit-modern-page{
+    padding-bottom:32px;
+  }
+
+  .audit-modern-header h1{
+    font-size:24px;
+  }
+
+  .audit-modern-page .audit-card{
+    border-radius:13px;
+  }
+
+  .audit-modern-page .audit-card-header{
+    padding:15px 16px;
+  }
+
+  .audit-modern-page .audit-modern-table th,
+  .audit-modern-page .audit-modern-table td{
+    padding-left:14px;
+    padding-right:14px;
+  }
+}
+

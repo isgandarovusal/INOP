@@ -95,7 +95,7 @@ const JobsList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="recruitment-list-page">
       <PageHeader
         title={t("recruitment.jobs.title")}
         subtitle={t("recruitment.jobs.totalShown", {
@@ -104,7 +104,7 @@ const JobsList: React.FC = () => {
         })}
         actions={
           canManage && (
-            <button className="btn-add" onClick={() => navigate("/app/recruitment/jobs/new")}>
+            <button className="btn-add recruitment-action--create" onClick={() => navigate("/app/recruitment/jobs/new")}>
               <Plus size={16} />
               {t("recruitment.jobs.newJob")}
             </button>

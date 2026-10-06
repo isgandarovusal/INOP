@@ -79,7 +79,7 @@ const RestaurantsList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="audit-restaurants-page">
       <PageHeader
         title={t("audit.restaurants.list.title")}
         subtitle={`${restaurants.length} total · ${filtered.length} shown`}

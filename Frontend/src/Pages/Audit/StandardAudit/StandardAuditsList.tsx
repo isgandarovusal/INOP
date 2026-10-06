@@ -152,7 +152,7 @@ export default function StandardAuditsList() {
   }
 
   return (
-    <div>
+    <div className="audit-list-page audit-standard-list-page">
       <h2>{t("audit.standard.list.title")}</h2>
 
       <div className="filter-bar">

@@ -103,7 +103,7 @@ const RestaurantForm: React.FC = () => {
 
 
   return (
-    <div>
+    <div className="restaurant-form-page">
 
       <PageHeader
         title={isEdit ? t("audit.restaurants.form.titleEdit") : t("audit.restaurants.form.titleAdd")}

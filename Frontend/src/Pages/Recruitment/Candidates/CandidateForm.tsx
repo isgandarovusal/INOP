@@ -304,7 +304,7 @@ const CandidateForm: React.FC = () => {
               )}
 
               <div style={{ textAlign: "center", marginTop: "14px" }}>
-                <label className="btn-secondary" style={{ cursor: "pointer" }}>
+                <label className="btn-secondary recruitment-upload-button">
                   {aiGenerating ? (
                     <Loader2 size={16} className="spin" />
                   ) : (

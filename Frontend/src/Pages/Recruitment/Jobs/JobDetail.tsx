@@ -173,7 +173,7 @@ const JobDetail: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="job-detail-page">
       <PageHeader
         title={job.position}
         subtitle={`${t("recruitment.jobDetail.yearsExperience", {

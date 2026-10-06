@@ -227,19 +227,9 @@ const JobForm: React.FC = () => {
 
             <button
               type="button"
+              className="recruitment-ai-action"
               onClick={handleAiSuggestRequirements}
               disabled={aiGenerating}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--primary-color)",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "4px",
-                fontSize: "13px",
-                fontWeight: 500,
-              }}
             >
               {aiGenerating ? (
                 <Loader2 size={14} className="spin" />
@@ -268,7 +258,7 @@ const JobForm: React.FC = () => {
           />
         </div>
 
-        <div className="form-actions" style={{ marginTop: "20px" }}>
+        <div className="form-actions recruitment-form-actions">
           <button
             type="button"
             className="btn-secondary"

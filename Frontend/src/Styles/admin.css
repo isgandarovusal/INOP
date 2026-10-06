@@ -110,3 +110,580 @@
     0 0 0 2px rgba(255, 255, 255, 0.20),
     0 0 0 4px rgba(16, 185, 129, 0.20);
 }
+
+/* INOP — Restaurant List business surface */
+.audit-restaurants-page{
+  max-width:1220px;
+  margin:0 auto;
+  padding-bottom:48px;
+}
+
+.audit-restaurants-page .filter-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 18px;
+  padding:12px;
+  background:linear-gradient(180deg,#fff,#f8f9fb);
+  border:1px solid #e4e8ef;
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(20,28,45,.045);
+}
+
+.audit-restaurants-page .filter-bar .input-field{
+  height:40px;
+  border-radius:9px;
+  background:#fff;
+  border-color:#dfe4eb;
+}
+
+.audit-restaurants-page .filter-bar .input-field:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.1);
+}
+
+.audit-restaurants-page .admin-table-container{
+  border:1px solid #e3e7ee;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 32px rgba(20,28,45,.06);
+  overflow:hidden;
+}
+
+.audit-restaurants-page .admin-table-container table{
+  width:100%;
+  min-width:760px;
+}
+
+.audit-restaurants-page .admin-table-container th{
+  height:48px;
+  padding:0 18px;
+  background:#f7f8fa;
+  color:#697386;
+  border-bottom:1px solid #e5e8ee;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+
+.audit-restaurants-page .admin-table-container td{
+  padding:15px 18px;
+  border-bottom:1px solid #eef1f5;
+  font-size:13px;
+  color:#343b49;
+  vertical-align:middle;
+}
+
+.audit-restaurants-page .admin-table-container tbody tr{
+  transition:background .16s ease,box-shadow .16s ease;
+}
+
+.audit-restaurants-page .admin-table-container tbody tr:hover{
+  background:#fafbff;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+
+.audit-restaurants-page .admin-table-container tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.audit-restaurants-page .cell-title--clickable{
+  color:#252b38;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.audit-restaurants-page .cell-title--clickable:hover{
+  color:#4f46e5;
+}
+
+.audit-restaurants-page .cell-muted{
+  color:#747e8e;
+}
+
+.audit-restaurants-page .admin-table-container .badge{
+  min-width:72px;
+  justify-content:center;
+  border-radius:999px;
+  font-weight:750;
+  text-transform:capitalize;
+}
+
+.audit-restaurants-page .row-actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:7px;
+}
+
+.audit-restaurants-page .row-actions .btn-secondary,
+.audit-restaurants-page .row-actions .btn-danger{
+  width:34px;
+  height:34px;
+  padding:0;
+  display:inline-grid;
+  place-items:center;
+  border-radius:8px;
+}
+
+.audit-restaurants-page .row--removing{
+  opacity:.5;
+  pointer-events:none;
+}
+
+.audit-restaurants-page .audit-modern-empty{
+  min-height:150px;
+  display:grid;
+  place-items:center;
+}
+
+@media(max-width:800px){
+  .audit-restaurants-page .filter-bar{
+    align-items:stretch;
+    flex-wrap:wrap;
+  }
+
+  .audit-restaurants-page .filter-bar .input-field{
+    flex:1 1 180px!important;
+    width:auto!important;
+  }
+
+  .audit-restaurants-page .admin-table-container{
+    overflow-x:auto;
+  }
+}
+
+@media(max-width:640px){
+  .audit-restaurants-page{
+    padding-bottom:32px;
+  }
+
+  .audit-restaurants-page .filter-bar{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .audit-restaurants-page .filter-bar .btn-secondary{
+    width:100%;
+  }
+
+  .audit-restaurants-page .admin-table-container{
+    border-radius:13px;
+  }
+}
+
+
+/* INOP — Restaurant Detail business surface */
+.restaurant-detail-page{
+  max-width:1220px;
+  margin:0 auto;
+  padding-bottom:48px;
+}
+
+.restaurant-detail-page .page-header{
+  margin-bottom:22px;
+}
+
+.restaurant-detail-page .page-header__actions{
+  gap:8px;
+}
+
+.restaurant-detail-page .page-header__actions .btn-secondary,
+.restaurant-detail-page .page-header__actions .btn-add{
+  min-height:40px;
+  border-radius:9px;
+  font-weight:650;
+}
+
+.restaurant-detail-page .page-header__actions .btn-secondary:first-child{
+  border-color:#dfe3ea;
+  color:#596273;
+}
+
+.restaurant-detail-page .audit-modern-card{
+  position:relative;
+  margin-bottom:18px;
+  padding:22px;
+  background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);
+  border:1px solid #e3e7ee;
+  border-radius:16px;
+  box-shadow:0 10px 28px rgba(20,28,45,.055);
+  overflow:hidden;
+}
+
+.restaurant-detail-page .audit-modern-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  background:linear-gradient(180deg,#6366f1,#818cf8);
+}
+
+.restaurant-detail-page .audit-modern-card h3{
+  margin:0 0 14px;
+  color:#252b38;
+  font-size:15px;
+  font-weight:750;
+  letter-spacing:-.01em;
+}
+
+.restaurant-detail-page .audit-modern-card>.badge{
+  min-height:30px;
+  padding:0 12px;
+  border-radius:999px;
+  font-weight:750;
+}
+
+.restaurant-detail-page .audit-trend-mini{
+  height:150px;
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  padding:20px 16px 0;
+  border:1px solid #e7eaf0;
+  border-radius:13px;
+  background:
+    linear-gradient(to top,rgba(99,102,241,.045) 1px,transparent 1px);
+  background-size:100% 25%;
+  overflow:hidden;
+}
+
+.restaurant-detail-page .audit-trend-mini__bar{
+  flex:1;
+  min-width:12px;
+  max-width:54px;
+  background:linear-gradient(180deg,#6366f1,#818cf8);
+  border-radius:7px 7px 2px 2px;
+  box-shadow:0 5px 14px rgba(99,102,241,.18);
+  transition:height .2s ease,transform .16s ease;
+}
+
+.restaurant-detail-page .audit-trend-mini__bar:hover{
+  transform:translateY(-3px);
+}
+
+.restaurant-detail-page .audit-trend-mini__label{
+  color:#7a8392;
+  font-size:11px;
+  font-weight:650;
+  text-align:center;
+}
+
+.restaurant-detail-page .admin-table-container{
+  margin-top:4px;
+  border:1px solid #e3e7ee;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(20,28,45,.045);
+  overflow:hidden;
+}
+
+.restaurant-detail-page .admin-table-container table{
+  width:100%;
+  min-width:620px;
+}
+
+.restaurant-detail-page .admin-table-container th{
+  height:46px;
+  padding:0 16px;
+  background:#f7f8fa;
+  border-bottom:1px solid #e5e8ee;
+  color:#697386;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+  text-align:left;
+}
+
+.restaurant-detail-page .admin-table-container td{
+  padding:14px 16px;
+  border-bottom:1px solid #eef1f5;
+  color:#343b49;
+  font-size:13px;
+}
+
+.restaurant-detail-page .admin-table-container tbody tr{
+  transition:background .16s ease,box-shadow .16s ease;
+}
+
+.restaurant-detail-page .admin-table-container tbody tr:hover{
+  background:#fafbff;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+
+.restaurant-detail-page .admin-table-container tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.restaurant-detail-page .admin-table-container tbody tr.cell-title--clickable{
+  cursor:pointer;
+}
+
+.restaurant-detail-page .admin-table-container tbody td:first-child{
+  color:#596273;
+  font-variant-numeric:tabular-nums;
+}
+
+.restaurant-detail-page .admin-table-container tbody td:nth-child(2){
+  color:#252b38;
+  font-weight:650;
+}
+
+.restaurant-detail-page .admin-table-container tbody td:nth-child(3){
+  color:#252b38;
+  font-variant-numeric:tabular-nums;
+}
+
+.restaurant-detail-page .admin-table-container tbody td:nth-child(3) strong{
+  font-size:15px;
+  font-weight:800;
+  color:#4f46e5;
+}
+
+@media(max-width:800px){
+  .restaurant-detail-page{
+    padding-bottom:32px;
+  }
+
+  .restaurant-detail-page .page-header__actions{
+    flex-wrap:wrap;
+  }
+
+  .restaurant-detail-page .audit-modern-card{
+    border-radius:13px;
+    padding:18px;
+  }
+
+  .restaurant-detail-page .audit-trend-mini{
+    height:125px;
+    gap:7px;
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .restaurant-detail-page .admin-table-container{
+    overflow-x:auto;
+  }
+}
+
+@media(max-width:560px){
+  .restaurant-detail-page .page-header__actions{
+    width:100%;
+  }
+
+  .restaurant-detail-page .page-header__actions .btn-secondary,
+  .restaurant-detail-page .page-header__actions .btn-add{
+    flex:1 1 100%;
+    justify-content:center;
+  }
+
+  .restaurant-detail-page .audit-modern-card{
+    padding:16px;
+  }
+}
+
+
+/* INOP — Restaurant Form business surface */
+.restaurant-form-page{
+  max-width:900px;
+  margin:0 auto;
+  padding-bottom:48px;
+}
+
+.restaurant-form-page .audit-modern-card{
+  position:relative;
+  padding:28px;
+  background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);
+  border:1px solid #e3e7ee;
+  border-radius:16px;
+  box-shadow:0 12px 32px rgba(20,28,45,.06);
+  overflow:hidden;
+}
+
+.restaurant-form-page .audit-modern-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  background:linear-gradient(180deg,#6366f1,#818cf8);
+}
+
+.restaurant-form-page form{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.restaurant-form-page .form-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.restaurant-form-page .form-label{
+  color:#343b49;
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.01em;
+}
+
+.restaurant-form-page .input-field{
+  min-height:44px;
+  border-radius:10px;
+  border:1px solid #dfe4eb;
+  background:#fff;
+  color:#252b38;
+  font-size:13px;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+
+.restaurant-form-page .input-field:hover{
+  border-color:#cbd2dd;
+}
+
+.restaurant-form-page .input-field:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.1);
+  outline:none;
+  background:#fff;
+}
+
+.restaurant-form-page .form-error--submit{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0;
+  padding:11px 13px;
+  border:1px solid #fecaca;
+  border-radius:10px;
+  background:#fff7f7;
+  color:#b42318;
+  font-size:12px;
+}
+
+.restaurant-form-page .form-actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:9px;
+  margin-top:6px;
+  padding-top:20px;
+  border-top:1px solid #edf0f4;
+}
+
+.restaurant-form-page .form-actions .btn-secondary,
+.restaurant-form-page .form-actions .btn-primary{
+  min-height:40px;
+  border-radius:9px;
+  font-weight:650;
+}
+
+.restaurant-form-page .form-actions .btn-secondary{
+  border-color:#dfe3ea;
+  color:#596273;
+}
+
+.restaurant-form-page .form-actions .btn-primary{
+  min-width:145px;
+}
+
+@media(max-width:640px){
+  .restaurant-form-page{
+    padding-bottom:32px;
+  }
+
+  .restaurant-form-page .audit-modern-card{
+    padding:20px 18px;
+    border-radius:13px;
+  }
+
+  .restaurant-form-page .form-actions{
+    flex-direction:column-reverse;
+    align-items:stretch;
+  }
+
+  .restaurant-form-page .form-actions .btn-secondary,
+  .restaurant-form-page .form-actions .btn-primary{
+    width:100%;
+    justify-content:center;
+  }
+}
+
+
+
+/* INOP — final language switcher surface */
+.admin-language-panel{
+  background:linear-gradient(
+    135deg,
+    rgba(99,102,241,.16),
+    rgba(59,130,246,.10)
+  );
+  border:1px solid rgba(129,140,248,.30);
+  border-radius:13px;
+  box-shadow:
+    0 8px 20px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+.admin-language-option{
+  color:#d9def0 !important;
+}
+
+.admin-language-option span{
+  color:inherit !important;
+}
+
+.admin-language-option:hover{
+  background:rgba(129,140,248,.16);
+  color:#ffffff !important;
+}
+
+.admin-language-option--active{
+  background:linear-gradient(
+    135deg,
+    #6366f1,
+    #4f46e5
+  );
+  color:#ffffff !important;
+  box-shadow:
+    0 5px 14px rgba(79,70,229,.28),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+
+/* INOP — inactive language contrast */
+.admin-language-option:not(.admin-language-option--active){
+  color:#202532 !important;
+}
+
+.admin-language-option:not(.admin-language-option--active) span{
+  color:#202532 !important;
+}
+
+
+/* INOP — language label typography polish */
+.admin-language-option{
+  gap:6px;
+  font-size:8.5px;
+  font-weight:700;
+  letter-spacing:.035em;
+  line-height:1;
+}
+
+.admin-language-option span{
+  font-weight:700;
+  letter-spacing:.035em;
+}
+
+.admin-language-flag{
+  flex:0 0 16px;
+}
+
