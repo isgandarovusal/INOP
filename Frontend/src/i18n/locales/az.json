@@ -26,7 +26,8 @@
       "download": "Yüklə",
       "upload": "Yüklə",
       "refresh": "Yenilə",
-      "loading": "Yüklənir..."
+      "loading": "Yüklənir...",
+      "retry": "Yenidən cəhd et"
     },
     "status": {
       "active": "Aktiv",

@@ -2,13 +2,10 @@ import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useRef } from "react";
 
+import api from "../../../api/axios";
 import PageState from "../../../Components/PageState";
 import { getRestaurants } from "../../../Services/restaurantsService";
 import type { Restaurant } from "../../../Types/audit";
-const API =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:3001/api";
-
 type StandardAudit = {
   _id: string;
   id: string;
@@ -89,15 +86,11 @@ export default function StandardAuditsList() {
         if (to) params.set("to", to);
 
         const query = params.toString();
-        const response = await fetch(
-          `${API}/audit-module/standard${query ? `?${query}` : ""}`,
+        const response = await api.get(
+          `/audit-module/standard${query ? `?${query}` : ""}`,
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to load standard audits");
-        }
-
-        const result = await response.json();
+        const result = response.data;
 
         if (!cancelled) {
           setAudits(result.data || []);
@@ -126,28 +119,32 @@ export default function StandardAuditsList() {
 
   if (loading) {
     return (
-      <PageState
-        type="loading"
-        title={t("audit.standard.list.loading")}
-      />
+      <div className="audit-standard-state">
+        <PageState
+          type="loading"
+          title={t("audit.standard.list.loading")}
+        />
+      </div>
     );
   }
 
   if (loadError) {
     return (
-      <PageState
-        type="error"
-        title={t("auth.somethingWentWrong")}
-        action={
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => setRetryCount((value) => value + 1)}
-          >
-            {t("common.retry")}
-          </button>
-        }
-      />
+      <div className="audit-standard-state">
+        <PageState
+          type="error"
+          title={t("auth.somethingWentWrong")}
+          action={
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setRetryCount((value) => value + 1)}
+            >
+              {t("common.retry")}
+            </button>
+          }
+        />
+      </div>
     );
   }
 

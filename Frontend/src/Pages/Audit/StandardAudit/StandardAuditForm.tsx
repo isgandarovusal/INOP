@@ -197,7 +197,7 @@ export default function StandardAuditForm() {
   }
 
   return (
-    <div className="audit-modern-page">
+    <div className="audit-modern-page standard-audit-form">
       <div className="audit-modern-header">
         <div>
           <h1>{t("audit.standard.form.newTitle")}</h1>
@@ -213,7 +213,7 @@ export default function StandardAuditForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="standard-audit-form">
         <section className="audit-card">
           <h2>{t("audit.standard.form.restaurantInformation")}</h2>
 
@@ -300,7 +300,7 @@ export default function StandardAuditForm() {
         {standardAuditChecklist.map((category) => (
           <section
             key={category.id}
-            className="audit-card"
+            className="audit-card standard-audit-category"
           >
             <h2>{category.title}</h2>
 
@@ -367,6 +367,7 @@ export default function StandardAuditForm() {
                           result.result !== "compliant" && (
                             <>
                               <input
+                                className="standard-audit-note-input"
                                 value={result.finding}
                                 onChange={(event) =>
                                   updateText(
@@ -379,6 +380,7 @@ export default function StandardAuditForm() {
                               />
 
                               <input
+                                className="standard-audit-action-input"
                                 value={result.correctiveAction}
                                 onChange={(event) =>
                                   updateText(

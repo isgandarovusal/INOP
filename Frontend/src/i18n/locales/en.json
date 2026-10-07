@@ -26,7 +26,8 @@
       "download": "Download",
       "upload": "Upload",
       "refresh": "Refresh",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "retry": "Retry"
     },
     "status": {
       "active": "Active",

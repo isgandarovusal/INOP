@@ -1,3 +1,4 @@
+import "../auditModern.css";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -57,7 +58,7 @@ export default function AuditTemplatesList() {
 
         <Link
           to="/app/audit/checklists/new"
-          className="btn-primary"
+          className="btn-primary checklist-create-action"
         >
           <Plus size={18} />
           Yeni checklist
@@ -75,22 +76,14 @@ export default function AuditTemplatesList() {
           {t("audit.checklist.list.loading")}
         </div>
       ) : templates.length === 0 ? (
-        <div className="audit-modern-empty">
+        <div className="audit-modern-empty checklist-empty-state">
           <div className="audit-empty-icon">
             <ClipboardList size={30} />
           </div>
           <h2>{t("audit.checklist.list.emptyTitle")}</h2>
           <p>
             {t("audit.checklist.list.emptyHint")}
-          </p>
-          <Link
-            to="/app/audit/checklists/new"
-            className="btn-primary"
-          >
-            <Plus size={18} />
-            Checklist yarat
-          </Link>
-        </div>
+          </p>        </div>
       ) : (
         <div className="audit-template-grid">
           {templates.map((template) => (
