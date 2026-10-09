@@ -1,14 +1,14 @@
+import type { AxiosRequestConfig } from "axios";
 import api from "../api/axios";
 import type { ServiceAudit } from "../Types/Audit";
 
 async function request<T>(
   path: string,
-  options?: RequestInit
+  options?: AxiosRequestConfig
 ): Promise<T> {
   const response = await api.request<T>({
+    ...options,
     url: path,
-    method: options?.method,
-    data: options?.body,
   });
 
   return response.data;
@@ -46,7 +46,7 @@ export async function createServiceAudit(
 
   return request<ServiceAudit>("/audits", {
     method: "POST",
-    body: JSON.stringify(audit),
+    data: audit,
   });
 }
 
@@ -55,7 +55,7 @@ export async function updateServiceAudit(
 ): Promise<ServiceAudit> {
   return request<ServiceAudit>(`/audits/${audit.id}`, {
     method: "PUT",
-    body: JSON.stringify(audit),
+    data: audit,
   });
 }
 
