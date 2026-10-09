@@ -7,14 +7,15 @@ import React, {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ClipboardCheck, ImageOff, Loader2, Paperclip, Pencil } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ImageOff, Paperclip, Pencil } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
 import { getAuditById } from "../../../Services/auditsService";
 import { getRestaurantById } from "../../../Services/restaurantsService";
 import { getUserById } from "../../../Services/usersService";
-import type { Audit } from "../../../Types/audit";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import AuditResourceState from "../../../Components/AuditResourceState";
 import type { Restaurant } from "../../../Types/audit";
 import type { PublicUser } from "../../../Types/auth";
 import { useAuth } from "../../../Context/AuthContext";
@@ -72,63 +73,26 @@ const AuditDetail: React.FC = () => {
   const { user } = useAuth();
   const canManage = user ? canManageAudit(user) : false;
 
-  const [audit, setAudit] = useState<Audit | null>(null);
+  const { data: audit, status, reload } = useAuditResource(id, "audit", getAuditById);
+  const loading = status === "loading";
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [auditor, setAuditor] = useState<PublicUser | null>(null);
-  const [loading, setLoading] = useState(true);
+
   const [renderedBusinessModules, setRenderedBusinessModules] = useState(1);
   const businessModulesSentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!id) return;
-
     let cancelled = false;
-
-    // Intentional: show the loading state when navigating between audit IDs.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-
-    const loadAudit = async () => {
-      try {
-        const auditResult = await getAuditById(id);
-
+    if (!audit) return;
+    setRestaurant(null); setAuditor(null);
+    void Promise.allSettled([getRestaurantById(audit.restaurantId), getUserById(audit.auditorId)])
+      .then(([restaurantResult, auditorResult]) => {
         if (cancelled) return;
-
-        if (!auditResult) {
-          setAudit(null);
-          setLoading(false);
-          return;
-        }
-
-        setAudit(auditResult);
-        setLoading(false);
-
-        // These are secondary display details. Do not block the main
-        // Audit Detail UI while they are loading.
-        const [restaurantResult, auditorResult] = await Promise.all([
-          getRestaurantById(auditResult.restaurantId),
-          getUserById(auditResult.auditorId),
-        ]);
-
-        if (cancelled) return;
-
-        setRestaurant(restaurantResult ?? null);
-        setAuditor(auditorResult ?? null);
-      } catch (error) {
-        if (cancelled) return;
-
-        console.error("Failed to load audit detail:", error);
-        setAudit(null);
-        setLoading(false);
-      }
-    };
-
-    void loadAudit();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+        setRestaurant(restaurantResult.status === "fulfilled" ? restaurantResult.value ?? null : null);
+        setAuditor(auditorResult.status === "fulfilled" ? auditorResult.value ?? null : null);
+      });
+    return () => { cancelled = true; };
+  }, [audit]);
 
   useEffect(() => {
     setRenderedBusinessModules(1);
@@ -166,13 +130,7 @@ const AuditDetail: React.FC = () => {
     return () => observer.disconnect();
   }, [loading, renderedBusinessModules]);
 
-  if (loading) {
-    return (
-      <div className="audit-modern-empty">
-        <Loader2 size={24} className="spin" />
-      </div>
-    );
-  }
+  if (status !== "ready") return <AuditResourceState status={status} retry={reload} />;
 
   if (!audit) {
     return <EmptyState icon={<ClipboardCheck size={28} />} title={t("audit.generic.detail.notFound")} hint="It may have been deleted." />;
@@ -355,46 +313,46 @@ const AuditDetail: React.FC = () => {
 
       {/* AUDIT BUSINESS MODULES */}
 
-      <div className="audit-business-modules">
+      <div className="audit-business-modules" key={String(audit.id)}>
         {renderedBusinessModules >= 1 && (
           <LazyAuditModule>
-            <AuditFindingsList auditId={id ?? ""} />
+            <AuditFindingsList auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 2 && (
           <LazyAuditModule>
-            <AuditAssignmentsList auditId={id ?? ""} />
+            <AuditAssignmentsList auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 3 && (
           <LazyAuditModule>
-            <AuditTimeline auditId={id ?? ""} />
+            <AuditTimeline auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 4 && (
           <LazyAuditModule>
-            <AuditApprovalPanel auditId={id ?? ""} />
+            <AuditApprovalPanel auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 5 && (
           <LazyAuditModule>
-            <AuditClosurePanel auditId={id ?? ""} />
+            <AuditClosurePanel auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 6 && (
           <LazyAuditModule>
-            <AuditExportPanel auditId={id ?? ""} />
+            <AuditExportPanel auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 
         {renderedBusinessModules >= 7 && (
           <LazyAuditModule>
-            <AuditHistoryPanel auditId={id ?? ""} />
+            <AuditHistoryPanel auditId={String(audit.id)} />
           </LazyAuditModule>
         )}
 

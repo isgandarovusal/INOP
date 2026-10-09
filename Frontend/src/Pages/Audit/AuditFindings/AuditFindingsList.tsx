@@ -1,91 +1,9 @@
-import {
- useEffect,
- useState
-} from "react";
-
-import {
- getFindings,
- type AuditFinding,
-} from "../../../Services/auditFindingService";
-
-
-export default function AuditFindingsList(
-{
- auditId
-}:{
- auditId:string
-}){
-
-
-const [items,setItems]=useState<AuditFinding[]>([]);
-
-
-useEffect(()=>{
-
-getFindings(auditId)
-.then(r=>{
- setItems(r.data||[]);
-});
-
-},[auditId]);
-
-
-
-return (
-
-<div className="audit-section">
-
-<h2>
-Audit Findings
-</h2>
-
-
-{
-items.length===0?
-
-<p>
-No findings
-</p>
-
-:
-
-items.map(item=>(
-
-<div
-key={item._id}
-className="audit-card"
->
-
-<h4>
-{item.title}
-</h4>
-
-<p>
-{item.description}
-</p>
-
-
-<span>
-Severity: {item.severity}
-</span>
-
-
-<br/>
-
-<span>
-Status: {item.status}
-</span>
-
-
-</div>
-
-))
-
-}
-
-
-</div>
-
-);
-
+import { getFindings } from "../../../Services/auditFindingService";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import AuditResourceState from "../../../Components/AuditResourceState";
+export default function AuditFindingsList({ auditId }: { auditId: string }) {
+ const {data,status,reload}=useAuditResource(auditId,"audit.finding",getFindings);
+ return <section><h2>Audit Findings</h2><button type="button" onClick={reload}>Refresh</button>
+ {status !== "ready" ? <AuditResourceState status={status} retry={reload} /> : data?.data.length ? data.data.map(item => <div className="audit-card" key={item._id}><h4>{item.title}</h4><p>{item.description}</p><span>Severity: {item.severity}</span><p>Status: {item.status}</p></div>) : <p>No records</p>}
+ </section>;
 }

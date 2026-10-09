@@ -15,9 +15,9 @@ export async function getOccupationalSafetyAudits(): Promise<OccupationalSafetyA
 }
 
 export async function getOccupationalSafetyAuditById(
-  id: string
+  id: string, signal?: AbortSignal
 ): Promise<OccupationalSafetyAudit | undefined> {
-  const { data } = await request.get(`${BASE}/${id}`);
+  const { data } = await request.get(`${BASE}/${id}`, { signal });
   return data;
 }
 

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import AuditResourceState from "../../../Components/AuditResourceState";
 import {
   getAuditHistory,
   type AuditActivity,
@@ -46,70 +47,10 @@ const getActionLabel = (action: string) => {
 const AuditHistoryPanel = ({
   auditId,
 }: AuditHistoryPanelProps) => {
-  const [activities, setActivities] = useState<AuditActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const loadHistory = useCallback(async () => {
-    if (!auditId) {
-      setActivities([]);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setError("");
-
-      const response = await getAuditHistory(auditId);
-
-      setActivities(response.data || []);
-    } catch (err) {
-      console.error("Failed to load audit history:", err);
-      setError("Audit history could not be loaded.");
-    } finally {
-      setLoading(false);
-    }
-  }, [auditId]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      if (!auditId) {
-        if (!cancelled) {
-          setActivities([]);
-          setLoading(false);
-        }
-        return;
-      }
-
-      try {
-        setError("");
-
-        const response = await getAuditHistory(auditId);
-
-        if (!cancelled) {
-          setActivities(response.data || []);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error("Failed to load audit history:", err);
-          setError("Audit history could not be loaded.");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [auditId]);
-
+  const { data, status, reload: loadHistory } = useAuditResource(auditId, "audit.activity", getAuditHistory);
+  const activities = data?.data || [];
+  const loading = status === "loading";
+  const error = status !== "ready" && !loading;
   return (
     <section
       style={{
@@ -186,7 +127,7 @@ const AuditHistoryPanel = ({
             color: "#b91c1c",
           }}
         >
-          {error}
+          <AuditResourceState status={status} retry={loadHistory} />
         </div>
       )}
 

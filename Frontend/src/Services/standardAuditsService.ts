@@ -11,9 +11,9 @@ export async function getStandardAudits(): Promise<StandardAudit[]> {
 }
 
 export async function getStandardAuditById(
-  id: string
+  id: string, signal?: AbortSignal
 ): Promise<StandardAudit | undefined> {
-  const { data } = await request.get(`${BASE}/${id}`);
+  const { data } = await request.get(`${BASE}/${id}`, { signal });
   return data;
 }
 

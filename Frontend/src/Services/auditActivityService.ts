@@ -1,11 +1,4 @@
-import axios from "axios";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
-
-const auditActivityApi = axios.create({
-  baseURL: `${API_BASE_URL}/audit-activity`,
-});
+import api from "../api/axios";
 
 export interface AuditActivityUser {
   _id?: string;
@@ -34,10 +27,10 @@ export interface AuditActivityResponse {
 }
 
 export const getAuditHistory = async (
-  auditId: string
+  auditId: string, signal?: AbortSignal
 ): Promise<AuditActivityResponse> => {
-  const response = await auditActivityApi.get<AuditActivityResponse>(
-    `/${auditId}`
+  const response = await api.get<AuditActivityResponse>(
+    `/audit-activity/${auditId}`, { signal }
   );
 
   return response.data;

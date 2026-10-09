@@ -1,7 +1,7 @@
 import "../auditModern.css";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import type { StandardAudit } from "../../../Types/Audit/standardAudit";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import AuditResourceState from "../../../Components/AuditResourceState";
 import { Link, useParams } from "react-router-dom";
 import {
   AlertCircle,
@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
-import PageState from "../../../Components/PageState";
 import { getStandardAuditById } from "../../../Services/standardAuditsService";
 import AuditLifecyclePanel from "../AuditLifecycle/AuditLifecyclePanel";
 
@@ -27,72 +26,8 @@ export default function StandardAuditDetail() {
   const { id } = useParams();
   const { t } = useTranslation();
 
-  const [audit, setAudit] =
-    useState<StandardAudit | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      setAudit(undefined);
-      return;
-    }
-
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
-      setLoadError(false);
-
-      try {
-        const result = await getStandardAuditById(id);
-
-        if (cancelled) return;
-
-        setAudit(result);
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Failed to load standard audit:", error);
-          setAudit(undefined);
-          setLoadError(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, retryCount]);
-
-  if (loading) {
-    return <PageState type="loading" />;
-  }
-
-  if (loadError) {
-    return (
-      <PageState
-        type="error"
-        title={t("auth.somethingWentWrong")}
-        action={
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => setRetryCount((value) => value + 1)}
-          >
-            {t("common.retry")}
-          </button>
-        }
-      />
-    );
-  }
+  const { data: audit, status, reload } = useAuditResource(id, "audit", getStandardAuditById);
+  if (status !== "ready") return <AuditResourceState status={status} retry={reload} />;
 
   if (!audit) {
     return (

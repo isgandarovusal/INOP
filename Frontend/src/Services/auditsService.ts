@@ -24,8 +24,8 @@ export async function getAudits(): Promise<Audit[]> {
   return res.data;
 }
 
-export async function getAuditById(id: string): Promise<Audit> {
-  const res = await API.get(`/audits/${id}`);
+export async function getAuditById(id: string, signal?: AbortSignal): Promise<Audit> {
+  const res = await API.get(`/audits/${id}`, { signal });
   return res.data;
 }
 
