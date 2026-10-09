@@ -41,6 +41,7 @@ const auditReportRoutes = require('./auditReport.routes');
 const auditScoreRoutes = require('./auditScore.routes');
 const auditPermissionRoutes = require('./auditPermission.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
+const { requireGlobalRestaurantAccess } = require('../middleware/restaurantScope.middleware');
 
 const auditFindingRoutes = require('./auditFinding.routes');
 const auditAssignmentRoutes = require('./auditAssignment.routes');
@@ -148,30 +149,35 @@ router.delete(
 router.get(
   '/restaurants',
   ...authorize('restaurant', 'read'),
+  requireGlobalRestaurantAccess,
   restaurantsController.getRestaurants
 );
 
 router.get(
   '/restaurants/:id',
   ...authorize('restaurant', 'read'),
+  requireGlobalRestaurantAccess,
   restaurantsController.getRestaurantById
 );
 
 router.post(
   '/restaurants',
   ...authorize('restaurant', 'create'),
+  requireGlobalRestaurantAccess,
   restaurantsController.createRestaurant
 );
 
 router.put(
   '/restaurants/:id',
   ...authorize('restaurant', 'update'),
+  requireGlobalRestaurantAccess,
   restaurantsController.updateRestaurant
 );
 
 router.delete(
   '/restaurants/:id',
   ...authorize('restaurant', 'delete'),
+  requireGlobalRestaurantAccess,
   restaurantsController.deleteRestaurant
 );
 
