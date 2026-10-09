@@ -7,9 +7,10 @@ export async function getOccupationalSafetyAudits(): Promise<OccupationalSafetyA
   const { data } = await request.get(BASE);
 
   return (data as OccupationalSafetyAudit[]).filter(
-    (audit) =>
-      (audit as OccupationalSafetyAudit & { auditType?: string }).auditType ===
-      "safety"
+    (audit) => {
+      const auditType = (audit as OccupationalSafetyAudit & { auditType?: string }).auditType;
+      return auditType === "occupational-safety" || auditType === "safety";
+    }
   );
 }
 
@@ -26,7 +27,12 @@ export async function createOccupationalSafetyAudit(
     "id" | "auditorId" | "createdAt"
   >
 ): Promise<OccupationalSafetyAudit> {
-  const { data } = await request.post(BASE, input);
+  const payload = {
+    ...input,
+    id: `safety-audit-${crypto.randomUUID()}`,
+    auditType: "occupational-safety",
+  };
+  const { data } = await request.post(BASE, payload);
   return data;
 }
 

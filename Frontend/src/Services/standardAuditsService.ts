@@ -20,7 +20,12 @@ export async function getStandardAuditById(
 export async function createStandardAudit(
   input: Omit<StandardAudit, "id" | "auditorId" | "createdAt">
 ): Promise<StandardAudit> {
-  const { data } = await request.post(BASE, input);
+  const payload = {
+    ...input,
+    id: `standard-audit-${crypto.randomUUID()}`,
+    auditType: "standard",
+  };
+  const { data } = await request.post(BASE, payload);
   return data;
 }
 
