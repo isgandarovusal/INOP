@@ -63,6 +63,16 @@ const Dashboard: React.FC = () => {
 
   const showRecruitment = user ? canAccessSection(user, "recruitment") : false;
   const showAudit = user ? canAccessSection(user, "audit") : false;
+  // Translation changes do not change the user's data scope.
+  const dataScopeKey = user
+    ? JSON.stringify([
+        user.id,
+        user.role,
+        user.departmentId,
+        user.isActive,
+        (user.permissions || []).map(({ resource, action, scope }) => [resource, action, scope]),
+      ])
+    : null;
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -81,6 +91,10 @@ const Dashboard: React.FC = () => {
     const loadDashboard = () => {
       setRecruitmentError(null);
       setAuditError(null);
+      setJobs([]);
+      setCandidates([]);
+      setApplications([]);
+      setAnalytics(null);
 
       if (showRecruitment) {
         setJobsLoading(true);
@@ -98,8 +112,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message ||
-                t("dashboard.recruitmentLoadError")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -119,8 +132,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message ||
-                t("dashboard.recruitmentLoadError")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -140,8 +152,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message ||
-                t("dashboard.recruitmentLoadError")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -169,8 +180,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setAuditError(
-              error?.response?.data?.message ||
-                t("dashboard.auditLoadError")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -188,7 +198,7 @@ const Dashboard: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [showRecruitment, showAudit, t]);
+  }, [dataScopeKey, showRecruitment, showAudit]);
 
   const candidateStatusStats = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -258,12 +268,12 @@ const Dashboard: React.FC = () => {
             <>
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
 
-              {recruitmentError && (
+              {recruitmentError !== null && (
                 <div className="dashboard-error">
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.recruitmentLoadErrorTitle")}</strong>
-                    <p>{recruitmentError}</p>
+                    <p>{recruitmentError || t("dashboard.recruitmentLoadError")}</p>
                   </div>
                 </div>
               )}
@@ -394,12 +404,12 @@ const Dashboard: React.FC = () => {
                 <div className="empty-state">{t("dashboard.loading")}</div>
               ) : (
                 <>
-              {auditError && (
+              {auditError !== null && (
                 <div className="dashboard-error">
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.auditLoadErrorTitle")}</strong>
-                    <p>{auditError}</p>
+                    <p>{auditError || t("dashboard.auditLoadError")}</p>
                   </div>
                 </div>
               )}
