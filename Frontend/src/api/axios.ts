@@ -26,11 +26,11 @@ api.interceptors.response.use(
   (error) => {
     if (axios.isCancel(error)) return Promise.reject(error);
     if (error.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY);
-
-      window.dispatchEvent(
-        new CustomEvent("inop:auth-expired"),
-      );
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token && error.config?.headers?.Authorization === `Bearer ${token}`) {
+        localStorage.removeItem(TOKEN_KEY);
+        window.dispatchEvent(new CustomEvent("inop:auth-expired"));
+      }
 
       return Promise.reject(error);
     }
