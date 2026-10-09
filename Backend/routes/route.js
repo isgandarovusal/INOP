@@ -12,17 +12,10 @@ const cvController = require("../controllers/cv.controller");
 const { requireAssignedAuditAccess } = require("../middleware/auditScope.middleware");
 
 const express = require('express');
-const multer = require('multer');
 const router = express.Router();
-const auditDocumentStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, 'uploads/'),
-  filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-});
-
-const auditDocumentUpload = multer({
-  storage: auditDocumentStorage,
-});
-
+const { privateUpload, types } = require('../middleware/privateUpload.middleware');
+const auditDocumentUpload = privateUpload('file', Object.keys(types));
+const privateFiles = require('../controllers/privateFiles.controller');
 
 const jobsController = require('../controllers/jobs.controller');
 const candidatesController = require('../controllers/candidates.controller');
@@ -219,6 +212,9 @@ router.delete(
   auditTemplatesController.deleteTemplate
 );
 
+router.get('/candidates/:id/cv', ...authorize('candidate', 'read'), privateFiles.candidate);
+router.get('/audit-source-documents/:id/file', ...authorize('audit.source_document', 'read'), requireGlobalSourceDocumentAccess, privateFiles.source);
+
 // Audit Source Documents
 router.get(
   '/audit-source-documents',
@@ -231,7 +227,7 @@ router.post(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'create'),
   requireGlobalSourceDocumentAccess,
-  auditDocumentUpload.single('file'),
+  auditDocumentUpload,
   auditSourceDocumentsController.uploadDocument
 );
 

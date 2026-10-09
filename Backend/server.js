@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
@@ -33,8 +32,8 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Static uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Uploads are private: resolve their owning record and current server permission.
+app.use('/uploads', require('./routes/privateUpload.routes'));
 
 // Public health check for deployment platforms
 app.get('/health', (_req, res) => {

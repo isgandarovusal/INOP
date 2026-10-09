@@ -353,3 +353,7 @@ export async function exportCandidatePdf(
 
   return response.data;
 }
+
+export async function getCandidateCv(id: string, signal?: AbortSignal): Promise<Blob> {
+  return (await API.get<Blob>(`/candidates/${encodeURIComponent(id)}/cv`, { responseType: "blob", signal })).data;
+}

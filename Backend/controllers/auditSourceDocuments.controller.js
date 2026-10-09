@@ -1,4 +1,5 @@
 const path = require("path");
+const { randomUUID } = require("node:crypto");
 const AuditSourceDocument =
   require("../models/auditSourceDocument.model");
 const { recordActivity } = require("../services/activityLog.service");
@@ -91,7 +92,6 @@ exports.uploadDocument = async (req, res) => {
       organizationId = "",
       brandId = "",
       auditType = "service",
-      uploadedBy = "",
     } = req.body;
 
 
@@ -99,7 +99,7 @@ exports.uploadDocument = async (req, res) => {
       await AuditSourceDocument.create({
 
         id:
-          `source-${Date.now()}`,
+          `source-${randomUUID()}`,
 
         templateId,
 
@@ -136,7 +136,7 @@ exports.uploadDocument = async (req, res) => {
         status:
           "uploaded",
 
-        uploadedBy,
+        uploadedBy: req.user.id,
 
       });
 
@@ -186,7 +186,7 @@ exports.deleteDocument = async(req,res)=>{
 
     const document =
       await AuditSourceDocument.findOneAndDelete({
-        id:req.params.id,
+        ...require("./privateFiles.controller").sourceQuery(req.params.id),
       });
 
 

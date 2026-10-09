@@ -18,6 +18,7 @@ import {
   deleteCandidate,
   exportCandidatePdf,
   getCandidateById,
+  getCandidateCv,
 } from "../../../Services/candidatesService";
 import type { Candidate } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
@@ -25,12 +26,17 @@ import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
 import { downloadBlob } from "../../../Utils/downloadFile";
 
+import PrivateFilePreview from "../../../Components/PrivateFilePreview";
+import { usePrivateFile, privateFileErrorMessage } from "../../../Hooks/usePrivateFile";
+
 const CandidateDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const fileContext = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  const cv = usePrivateFile(fileContext);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -349,22 +355,16 @@ const CandidateDetail: React.FC = () => {
             <strong>
               {t("recruitment.candidateDetail.cv")}:
             </strong>{" "}
-            <a
-              href={cvUrl}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
+            <button type="button" disabled={cv.loading || !hasPermission(user, "candidate", "read")} onClick={() => void cv.open(signal => getCandidateCv(candidate.id, signal))}>
               <FileText size={16} />
-              {t("recruitment.candidateDetail.openCv")}
-            </a>
+              {cv.loading ? t("audit.checklist.builder.loading") : t("recruitment.candidateDetail.openCv")}
+            </button>
+            {cv.error && <span role="alert" data-file-error={cv.error}>{privateFileErrorMessage(cv.error)}</span>}
           </p>
         )}
       </div>
+
+      {cv.url && <PrivateFilePreview url={cv.url} type={cv.type} name={cvUrl.split("/").pop() || "cv"} onClose={cv.close} />}
 
       <div
         style={{

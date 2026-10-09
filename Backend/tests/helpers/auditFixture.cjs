@@ -55,6 +55,7 @@ exports.withAuditFixture = async (callback) => {
       next();
     });
     const errors = require('../../middleware/error.middleware'); app.use(errors.standardizeErrorResponses);
+    app.use('/uploads', require('../../routes/privateUpload.routes'));
     app.use('/api', require('../../routes/route')); app.use(errors.notFoundHandler); app.use(errors.globalErrorHandler);
     server = http.createServer(app); await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     const base = `http://127.0.0.1:${server.address().port}/api`;
