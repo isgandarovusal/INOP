@@ -14,7 +14,7 @@ export function auditErrorStatus(error: unknown): AuditLoadStatus {
   return "error";
 }
 
-export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal) => Promise<T>) {
+export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>) {
   const { user, isLoading } = useAuth();
   const [revision, setRevision] = useState(0);
   const reload = useCallback(() => setRevision(value => value + 1), []);
@@ -27,13 +27,13 @@ export function useAuditResource<T>(id: string | undefined, resource: string, lo
   useEffect(() => {
     if (blocked || !id) return;
     const controller = new AbortController(); let current = true;
-    void load(id, controller.signal).then(data => {
+    void load(id, controller.signal, key).then(data => {
       if (current) setResult({ key, status: data == null ? "not-found" : "ready", data });
     }).catch(error => {
       if (current && !controller.signal.aborted) setResult({ key, status: auditErrorStatus(error) });
     });
     return () => { current = false; controller.abort(); };
-  }, [id, key, blocked, load]);
+  }, [id, key, authKey, blocked, load]);
 
   useEffect(() => {
     const visible = () => { if (document.visibilityState === "visible") reload(); };

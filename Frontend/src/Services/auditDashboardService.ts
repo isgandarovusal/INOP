@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 
 export interface AuditDashboardStat {
   _id: string;
@@ -22,8 +22,8 @@ export interface AuditDashboardData {
   trend: AuditDashboardTrend[];
 }
 
-export async function getAuditDashboard(_id = "dashboard", signal?: AbortSignal): Promise<AuditDashboardData> {
+export async function getAuditDashboard(_id = "dashboard", signal?: AbortSignal, scopeKey?: string): Promise<AuditDashboardData> {
   void _id; // The resource hook's identity key is not an endpoint parameter.
-  const { data: response } = await api.get<{ success: boolean; data: AuditDashboardData }>("/audit-dashboard", { signal });
+  const response = await readJson<{ success: boolean; data: AuditDashboardData }>("/audit-dashboard", { signal, scopeKey });
   return { ...response.data, trend: response.data.trend.map(item => ({ ...item, label: `${item._id.year}-${String(item._id.month).padStart(2, "0")}` })) };
 }

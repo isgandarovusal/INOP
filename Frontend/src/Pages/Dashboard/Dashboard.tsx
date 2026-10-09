@@ -14,10 +14,11 @@ import {
   PackageOpen,
 } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import PageState from "../../Components/PageState";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
 import { useAuth } from "../../Context/useAuth";
-import { canAccessSection } from "../../Utils/permissions";
+import { getPermissionScope } from "../../Utils/permissions";
 import { getJobsSummary, getCandidatesSummary, getApplicationsSummary, type CountSummary, type CandidateSummary } from "../../Services/dashboardSummaryService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
 import { ACCENT } from "../../Utils/theme";
@@ -34,6 +35,31 @@ const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
   rejected: "#ef4444",
   hired: "#16a34a",
 };
+
+const CandidateStatusDonut = React.memo(function CandidateStatusDonut({ data }: { data: CandidateSummary["statusBreakdown"] }) {
+  return (
+    <ResponsiveContainer width="100%" height={180}>
+      <PieChart>
+        <Pie
+          data={data}
+          dataKey="value"
+          innerRadius={55}
+          outerRadius={75}
+          paddingAngle={2}
+          animationDuration={900}
+        >
+          {data.map((entry) => (
+            <Cell
+              key={entry.status}
+              fill={STATUS_COLORS[entry.status as CandidateStatus]}
+              stroke="none"
+            />
+          ))}
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+  );
+});
 
 const KPI_ICON_STYLES = {
   accent: {
@@ -59,8 +85,10 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const showRecruitment = user ? canAccessSection(user, "recruitment") : false;
-  const showAudit = user ? canAccessSection(user, "audit") : false;
+  const recruitmentScope = getPermissionScope(user, "recruitment", "read");
+  const showRecruitment = !!recruitmentScope && recruitmentScope !== "none";
+  const auditScope = getPermissionScope(user, "audit", "read");
+  const showAudit = !!auditScope && auditScope !== "none";
   // Translation changes do not change the user's data scope.
   const dataScopeKey = user
     ? JSON.stringify([
@@ -72,6 +100,8 @@ const Dashboard: React.FC = () => {
       ])
     : null;
 
+  const [loadedScopeKey, setLoadedScopeKey] = useState<string | null>(null);
+  const [refreshRevision, setRefreshRevision] = useState(0);
   const [jobs, setJobs] = useState<CountSummary>({total:0});
   const [candidates, setCandidates] = useState<CandidateSummary>({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
   const [applications, setApplications] = useState<CountSummary>({total:0});
@@ -84,9 +114,20 @@ const Dashboard: React.FC = () => {
   const [auditError, setAuditError] = useState<string | null>(null);
 
   useEffect(() => {
+    const refresh = () => setRefreshRevision(value => value + 1);
+    const visible = () => { if (document.visibilityState === "visible") refresh(); };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visible);
+    return () => { window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", visible); };
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
+    const controller = new AbortController();
+    const requestScopeKey = JSON.stringify([dataScopeKey, refreshRevision]);
 
     const loadDashboard = () => {
+      setLoadedScopeKey(dataScopeKey);
       setRecruitmentError(null);
       setAuditError(null);
       setJobs({total:0});
@@ -99,7 +140,7 @@ const Dashboard: React.FC = () => {
         setCandidatesLoading(true);
         setApplicationsLoading(true);
 
-        void getJobsSummary()
+        void getJobsSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
             setJobs(result);
@@ -119,7 +160,7 @@ const Dashboard: React.FC = () => {
             }
           });
 
-        void getCandidatesSummary()
+        void getCandidatesSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
             setCandidates(result);
@@ -139,7 +180,7 @@ const Dashboard: React.FC = () => {
             }
           });
 
-        void getApplicationsSummary()
+        void getApplicationsSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
             setApplications(result);
@@ -167,7 +208,7 @@ const Dashboard: React.FC = () => {
       if (showAudit) {
         setAuditLoading(true);
 
-        void getAuditAnalytics()
+        void getAuditAnalytics(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
             setAnalytics(result);
@@ -195,14 +236,16 @@ const Dashboard: React.FC = () => {
 
     return () => {
       mounted = false;
+      controller.abort();
     };
-  }, [dataScopeKey, showRecruitment, showAudit]);
+  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit]);
 
   const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
   const statusBreakdown=candidates.statusBreakdown;
   const recentCandidates=candidates.recentCandidates;
 
   if (!user) return null;
+  if (loadedScopeKey !== dataScopeKey) return <PageState type="loading" message={t("dashboard.loading")} />;
 
   return (
     <div>
@@ -309,26 +352,7 @@ const Dashboard: React.FC = () => {
                     </div>
                   ) : (
                     <div className="donut-wrap">
-                      <ResponsiveContainer width="100%" height={180}>
-                        <PieChart>
-                          <Pie
-                            data={statusBreakdown}
-                            dataKey="value"
-                            innerRadius={55}
-                            outerRadius={75}
-                            paddingAngle={2}
-                            animationDuration={900}
-                          >
-                            {statusBreakdown.map((entry) => (
-                              <Cell
-                                key={entry.status}
-                                fill={STATUS_COLORS[entry.status as CandidateStatus]}
-                                stroke="none"
-                              />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
+                      <CandidateStatusDonut data={statusBreakdown} />
                       <div className="donut-center">
                         <span className="donut-center__value">{candidates.total}</span>
                         <span className="donut-center__label">{candidates.total === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>

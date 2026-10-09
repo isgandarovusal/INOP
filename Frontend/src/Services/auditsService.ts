@@ -1,3 +1,4 @@
+import { readJson } from "../api/readRequest";
 import API from "../api/axios";
 import type { Audit, AuditFile, AuditScores } from "../Types/audit";
 import { auditScore } from "../Utils/auditScore";
@@ -25,9 +26,8 @@ export async function getAudits(): Promise<Audit[]> {
   return res.data;
 }
 
-export async function getAuditById(id: string, signal?: AbortSignal): Promise<Audit> {
-  const res = await API.get(`/audits/${id}`, { signal });
-  return res.data;
+export async function getAuditById(id: string, signal?: AbortSignal, scopeKey?: string): Promise<Audit> {
+  return readJson<Audit>(`/audits/${id}`, { signal, scopeKey });
 }
 
 export async function createAudit(

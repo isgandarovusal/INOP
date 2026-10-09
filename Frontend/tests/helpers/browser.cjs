@@ -27,7 +27,7 @@ exports.withBrowserFixture = async (source, callback) => withAuditFixture(async 
     await vite.listen();
     const origin = `http://127.0.0.1:${vite.httpServer.address().port}`;
     browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
-    const page = await browser.newPage(); const pageErrors = [], failures = [];
+    const page = await browser.newPage(); const pageErrors = [], failures = [], wire = [];
     page.setDefaultTimeout(process.env.INOP_BROWSER_BASELINE ? 3000 : 10000);
     page.on('requestfailed', request => failures.push(request.url() + ': ' + request.failure()?.errorText));
     page.on('console', msg => { if (msg.type() === 'error') failures.push(msg.text()); });
@@ -38,6 +38,7 @@ exports.withBrowserFixture = async (source, callback) => withAuditFixture(async 
       if (!['127.0.0.1', 'localhost'].includes(url.hostname)) return route.abort();
       if (url.pathname.startsWith('/api/')) {
         const actor = Object.keys(h.tokens).find(name => route.request().headers().authorization === `Bearer ${h.tokens[name]}`) || 'anonymous';
+        wire.push({ actor, method: route.request().method(), path: url.pathname });
         const body = route.request().postDataJSON();
         const result = await h.request(actor, route.request().method(), url.pathname.slice(4) + url.search, body === null ? undefined : body);
         return route.fulfill({ status: result.status, contentType: result.headers['content-type'], body: result.buffer });
@@ -56,7 +57,7 @@ exports.withBrowserFixture = async (source, callback) => withAuditFixture(async 
       try { await page.waitForFunction(() => typeof window.navigateTest === 'function', null, { timeout: 10000 }); }
       catch (error) { throw Error(error.message + '\n' + JSON.stringify({ pageErrors, failures })); }
     }
-    await callback({ ...h, page, pageErrors, origin, profile, open });
+    await callback({ ...h, page, pageErrors, wire, origin, profile, open });
   } finally {
     if (browser) await browser.close();
     if (vite) await vite.close();

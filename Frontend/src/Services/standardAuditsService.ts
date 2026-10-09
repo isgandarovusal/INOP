@@ -1,3 +1,4 @@
+import { readJson } from "../api/readRequest";
 import request from "../api/axios";
 import type { StandardAudit } from "../Types/Audit";
 
@@ -11,10 +12,9 @@ export async function getStandardAudits(): Promise<StandardAudit[]> {
 }
 
 export async function getStandardAuditById(
-  id: string, signal?: AbortSignal
+  id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<StandardAudit | undefined> {
-  const { data } = await request.get(`${BASE}/${id}`, { signal });
-  return data;
+  return readJson<StandardAudit | undefined>(`${BASE}/${id}`, { signal, scopeKey });
 }
 
 export async function createStandardAudit(

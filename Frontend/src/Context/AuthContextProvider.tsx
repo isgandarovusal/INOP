@@ -3,6 +3,7 @@ import {
   useEffect,
   useState,
   useRef,
+  useMemo,
   type ReactNode,
 } from "react";
 import type { PublicUser } from "../Types/auth";
@@ -36,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const revision = ++requestRevision.current;
       const token = getAuthToken();
       const currentUser = await getCurrentUser();
-      if (!mounted || revision !== requestRevision.current || (currentUser && token !== getAuthToken())) return;
+      if (!mounted || revision !== requestRevision.current || token !== getAuthToken()) return;
       // A transient /me failure must not sign out a still-authenticated user.
       if (currentUser || !getAuthToken()) {
         setUser(previous => JSON.stringify(previous) === JSON.stringify(currentUser) ? previous : currentUser);
@@ -72,8 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const value = useMemo(() => ({ user, isLoading, login, logout }), [user, isLoading, login, logout]);
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

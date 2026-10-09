@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 import type { Audit } from "../Types/audit";
 import { overallScore } from "./auditsService";
 import { categoryScores, scoreCategories } from "../Utils/auditScore";
@@ -35,8 +35,8 @@ function round1(n: number): number {
   return Math.round(n * 10) / 10;
 }
 
-export async function getAuditAnalytics(signal?: AbortSignal): Promise<AuditAnalytics> {
-  const {data}=await api.get<AuditAnalytics>("/audits/dashboard-summary",{signal});
+export async function getAuditAnalytics(signal?: AbortSignal, scopeKey?: string): Promise<AuditAnalytics> {
+  const data=await readJson<AuditAnalytics>("/audits/dashboard-summary",{signal,scopeKey});
   return {...data,historicalTrend:data.historicalTrend.map(item=>({...item,label:new Date(`${item.label}-01T00:00:00Z`).toLocaleDateString(undefined,{month:"short",year:"2-digit",timeZone:"UTC"})}))};
 }
 

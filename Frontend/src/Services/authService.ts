@@ -62,10 +62,10 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   }
 
   try {
-    const response = await api.get<MeResponse>("/auth/me");
+    const response = await api.get<MeResponse>("/auth/me", { headers: { Authorization: `Bearer ${token}` } });
     return response.data.user;
   } catch (error: unknown) {
-    if (isAxiosError(error) && error.response?.status === 401) {
+    if (isAxiosError(error) && error.response?.status === 401 && getAuthToken() === token) {
       clearAuthToken();
     }
 
