@@ -3,6 +3,21 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
 const { recordActivity } = require("../services/activityLog.service");
 const Role = require("../models/role.model");
+const { getPermissionScope } = require("../middleware/auth.middleware");
+
+async function canManagePrivileges(req) {
+  return (
+    (await getPermissionScope(req.user.role, "role", "update")) === "all"
+  );
+}
+
+function denyPrivilegeChange(res) {
+  return res.status(403).json({
+    message: "Bu səlahiyyət dəyişikliyi üçün kifayət qədər icazəniz yoxdur.",
+    requiredPermission: "role.update",
+    requiredScope: "all",
+  });
+}
 
 function publicUser(user, permissions = []) {
   return {
@@ -138,6 +153,12 @@ exports.createUser = async (req, res) => {
       });
     }
 
+    // Creating an account also assigns its role; user.create alone must not
+    // allow creating an administrator or another privileged identity.
+    if (!(await canManagePrivileges(req))) {
+      return denyPrivilegeChange(res);
+    }
+
     const existing = await User.findOne({ email }).lean();
 
     if (existing) {
@@ -226,6 +247,34 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({
         message: "İstifadəçi tapılmadı.",
       });
+    }
+
+    const isSelf = String(req.user.id) === String(user._id);
+    const roleChanged =
+      req.body.role !== undefined &&
+      normalizeString(req.body.role).toLowerCase() !== user.role;
+    const departmentChanged =
+      req.body.departmentId !== undefined &&
+      (typeof req.body.departmentId !== "string" ||
+        normalizeString(req.body.departmentId) !== (user.departmentId || ""));
+    const managerChanged =
+      req.body.managerId !== undefined &&
+      ((req.body.managerId !== null && typeof req.body.managerId !== "string") ||
+        String(req.body.managerId || "") !== String(user.managerId || ""));
+    const otherIdentityChanged =
+      !isSelf &&
+      (req.body.password !== undefined ||
+        (req.body.email !== undefined &&
+          normalizeString(req.body.email).toLowerCase() !== user.email));
+
+    // Keep ordinary profile updates (including unchanged form fields) scoped
+    // by user.update. Protect scope changes and other accounts' credentials
+    // as well as role changes so a password/email reset cannot bypass RBAC.
+    if (
+      (roleChanged || departmentChanged || managerChanged || otherIdentityChanged) &&
+      !(await canManagePrivileges(req))
+    ) {
+      return denyPrivilegeChange(res);
     }
 
     const allowedFields = [
