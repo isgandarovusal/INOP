@@ -46,16 +46,24 @@ exports.withAuditFixture = async (callback) => {
     }
     await models.Audit.createIndexes();
     const app = express(); app.use(express.json());
+    app.use((req, res, next) => {
+      const started = performance.now(), send = res.send;
+      res.send = function (body) {
+        if (!res.headersSent) res.setHeader('Server-Timing', `app;dur=${(performance.now() - started).toFixed(2)}`);
+        return send.call(this, body);
+      };
+      next();
+    });
     const errors = require('../../middleware/error.middleware'); app.use(errors.standardizeErrorResponses);
     app.use('/api', require('../../routes/route')); app.use(errors.notFoundHandler); app.use(errors.globalErrorHandler);
     server = http.createServer(app); await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     const base = `http://127.0.0.1:${server.address().port}/api`;
     await callback({
-      models, actors, tokens, mongoose,
-      async request(actor, method, endpoint, body) {
+      models, actors, tokens, mongoose, apiBase: base,
+      async request(actor, method, endpoint, body, options = {}) {
         const headers = { 'Content-Type': 'application/json' };
         if (tokens[actor]) headers.Authorization = `Bearer ${tokens[actor]}`;
-        const response = await fetch(base + endpoint, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(10000) });
+        const response = await fetch(base + endpoint, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(options.timeoutMs || 10000) });
         const buffer = Buffer.from(await response.arrayBuffer());
         const text = buffer.toString('utf8'); let data; try { data = JSON.parse(text); } catch { data = text; }
         return { status: response.status, data, buffer, headers: Object.fromEntries(response.headers) };

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,12 +18,10 @@ import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
 import { useAuth } from "../../Context/useAuth";
 import { canAccessSection } from "../../Utils/permissions";
-import { getJobs } from "../../Services/jobsService";
-import { getCandidates } from "../../Services/candidatesService";
-import { getApplications } from "../../Services/applicationsService";
+import { getJobsSummary, getCandidatesSummary, getApplicationsSummary, type CountSummary, type CandidateSummary } from "../../Services/dashboardSummaryService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
-import type { Job, Candidate, Application, CandidateStatus } from "../../Types/recruitment";
 import { ACCENT } from "../../Utils/theme";
+import type { CandidateStatus } from "../../Types/recruitment";
 
 const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
   applied: "#0ea5e9",
@@ -74,9 +72,9 @@ const Dashboard: React.FC = () => {
       ])
     : null;
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [jobs, setJobs] = useState<CountSummary>({total:0});
+  const [candidates, setCandidates] = useState<CandidateSummary>({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
+  const [applications, setApplications] = useState<CountSummary>({total:0});
   const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
@@ -91,9 +89,9 @@ const Dashboard: React.FC = () => {
     const loadDashboard = () => {
       setRecruitmentError(null);
       setAuditError(null);
-      setJobs([]);
-      setCandidates([]);
-      setApplications([]);
+      setJobs({total:0});
+      setCandidates({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
+      setApplications({total:0});
       setAnalytics(null);
 
       if (showRecruitment) {
@@ -101,7 +99,7 @@ const Dashboard: React.FC = () => {
         setCandidatesLoading(true);
         setApplicationsLoading(true);
 
-        void getJobs()
+        void getJobsSummary()
           .then((result) => {
             if (!mounted) return;
             setJobs(result);
@@ -121,7 +119,7 @@ const Dashboard: React.FC = () => {
             }
           });
 
-        void getCandidates()
+        void getCandidatesSummary()
           .then((result) => {
             if (!mounted) return;
             setCandidates(result);
@@ -141,7 +139,7 @@ const Dashboard: React.FC = () => {
             }
           });
 
-        void getApplications()
+        void getApplicationsSummary()
           .then((result) => {
             if (!mounted) return;
             setApplications(result);
@@ -200,63 +198,9 @@ const Dashboard: React.FC = () => {
     };
   }, [dataScopeKey, showRecruitment, showAudit]);
 
-  const candidateStatusStats = useMemo(() => {
-    const counts: Record<string, number> = {};
-    let shortlistedCount = 0;
-
-    candidates.forEach((candidate) => {
-      counts[candidate.status] = (counts[candidate.status] ?? 0) + 1;
-
-      if (candidate.status === "shortlisted") {
-        shortlistedCount += 1;
-      }
-    });
-
-    return {
-      breakdown: Object.entries(counts).map(([status, value]) => ({
-        status,
-        value,
-      })),
-      shortlistedCount,
-    };
-  }, [candidates]);
-
-  const statusBreakdown = candidateStatusStats.breakdown;
-
-  const recentCandidates = useMemo(() => {
-    const recent = candidates.slice(0, 5);
-
-    for (let index = 5; index < candidates.length; index += 1) {
-      const candidate = candidates[index];
-      const candidateTime = new Date(candidate.createdAt || 0).getTime();
-
-      let oldestIndex = 0;
-      let oldestTime = new Date(
-        recent[0]?.createdAt || 0,
-      ).getTime();
-
-      for (let recentIndex = 1; recentIndex < recent.length; recentIndex += 1) {
-        const recentTime = new Date(
-          recent[recentIndex]?.createdAt || 0,
-        ).getTime();
-
-        if (recentTime < oldestTime) {
-          oldestTime = recentTime;
-          oldestIndex = recentIndex;
-        }
-      }
-
-      if (candidateTime > oldestTime) {
-        recent[oldestIndex] = candidate;
-      }
-    }
-
-    return recent.sort(
-      (a, b) =>
-        new Date(b.createdAt || 0).getTime() -
-        new Date(a.createdAt || 0).getTime(),
-    );
-  }, [candidates]);
+  const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
+  const statusBreakdown=candidates.statusBreakdown;
+  const recentCandidates=candidates.recentCandidates;
 
   if (!user) return null;
 
@@ -284,7 +228,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
                   <p className="kpi-card__value">
-                    {jobsLoading ? "—" : jobs.length}
+                    {jobsLoading ? "—" : jobs.total}
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
@@ -293,7 +237,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
                   <p className="kpi-card__value">
-                    {candidatesLoading ? "—" : candidates.length}
+                    {candidatesLoading ? "—" : candidates.total}
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
@@ -302,7 +246,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <p className="kpi-card__label">{t("dashboard.applications")}</p>
                   <p className="kpi-card__value">
-                    {applicationsLoading ? "—" : applications.length}
+                    {applicationsLoading ? "—" : applications.total}
                   </p>
                 </div>
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
@@ -386,8 +330,8 @@ const Dashboard: React.FC = () => {
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="donut-center">
-                        <span className="donut-center__value">{candidates.length}</span>
-                        <span className="donut-center__label">{candidates.length === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>
+                        <span className="donut-center__value">{candidates.total}</span>
+                        <span className="donut-center__label">{candidates.total === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>
                       </div>
                     </div>
                   )}

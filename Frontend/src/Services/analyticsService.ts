@@ -1,5 +1,4 @@
-import { getAudits } from "./auditsService";
-import { getRestaurants } from "./restaurantsService";
+import api from "../api/axios";
 import type { Audit } from "../Types/audit";
 import { overallScore } from "./auditsService";
 import { categoryScores, scoreCategories } from "../Utils/auditScore";
@@ -36,9 +35,9 @@ function round1(n: number): number {
   return Math.round(n * 10) / 10;
 }
 
-export async function getAuditAnalytics(): Promise<AuditAnalytics> {
-  const [audits, restaurants] = await Promise.all([getAudits(), getRestaurants().catch(() => [])]);
-  return calculateAuditAnalytics(audits, restaurants);
+export async function getAuditAnalytics(signal?: AbortSignal): Promise<AuditAnalytics> {
+  const {data}=await api.get<AuditAnalytics>("/audits/dashboard-summary",{signal});
+  return {...data,historicalTrend:data.historicalTrend.map(item=>({...item,label:new Date(`${item.label}-01T00:00:00Z`).toLocaleDateString(undefined,{month:"short",year:"2-digit",timeZone:"UTC"})}))};
 }
 
 export function calculateAuditAnalytics(audits: Audit[], restaurants: { id: string; name: string }[]): AuditAnalytics {

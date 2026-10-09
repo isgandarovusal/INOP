@@ -29,6 +29,7 @@ const candidatesController = require('../controllers/candidates.controller');
 const candidatePipelineController = require("../controllers/candidatePipeline.controller");
 const applicationsController = require('../controllers/applications.controller');
 const auditsController = require('../controllers/audits.controller');
+const dashboardSummary = require('../controllers/dashboardSummary.controller');
 const auditTemplatesController = require('../controllers/auditTemplates.controller');
 const auditSourceDocumentsController = require('../controllers/auditSourceDocuments.controller');
 const auditAnalyticsRoutes = require('./auditAnalytics.routes');
@@ -101,6 +102,10 @@ auditTimelineRoutes
 router.use('/audit-permission', auditPermissionRoutes);
 
 // Audit API
+router.get('/audits/dashboard-summary', ...authorize('audit', 'read'), dashboardSummary.audits);
+router.get('/jobs/dashboard-summary', ...authorize('recruitment', 'read'), dashboardSummary.jobs);
+router.get('/candidates/dashboard-summary', ...authorize('candidate', 'read'), dashboardSummary.candidates);
+router.get('/applications/dashboard-summary', ...authorize('application', 'read'), dashboardSummary.applications);
 router.get(
   '/audits/analytics',
   ...authorize('audit.analytics', 'read'),
