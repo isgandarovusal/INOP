@@ -19,7 +19,7 @@ const users = [
     name: "Aysel Huseynova",
     email: "hr@inop.com",
     password: "password123",
-    role: "hr",
+    role: "hr_manager",
     departmentId: "dep_hr",
     position: "HR Manager",
     isActive: true,
