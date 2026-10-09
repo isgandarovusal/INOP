@@ -22,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    const controllers = new Set<AbortController>();
 
     const handleAuthExpired = () => {
       requestRevision.current += 1;
@@ -33,10 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener("inop:auth-expired", handleAuthExpired);
 
-    const refresh = async () => {
+    const refresh = async (initial = false) => {
+      for (const controller of controllers) controller.abort();
       const revision = ++requestRevision.current;
       const token = getAuthToken();
-      const currentUser = await getCurrentUser();
+      const controller = new AbortController();
+      controllers.add(controller);
+      const currentUser = await getCurrentUser(controller.signal, JSON.stringify(["session", initial ? "initial" : revision]));
+      controllers.delete(controller);
       if (!mounted || revision !== requestRevision.current || token !== getAuthToken()) return;
       // A transient /me failure must not sign out a still-authenticated user.
       if (currentUser || !getAuthToken()) {
@@ -44,15 +49,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
     };
-    const visible = () => { if (document.visibilityState === "visible") void refresh(); };
-    void refresh();
-    window.addEventListener("focus", refresh);
+    const onFocus = () => { void refresh(); };
+    const visible = () => { if (document.visibilityState === "visible") onFocus(); };
+    void refresh(true);
+    window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", visible);
 
     return () => {
       mounted = false;
+      for (const controller of controllers) controller.abort();
       requestRevision.current += 1;
-      window.removeEventListener("focus", refresh);
+      window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", visible);
       window.removeEventListener(
         "inop:auth-expired",

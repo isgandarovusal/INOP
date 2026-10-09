@@ -10,6 +10,9 @@ test('Real AuthProvider revalidates revoked and restored permissions on focus',a
  const audit=await h.audit('own','standard',{compliancePercentage:100,foundTotal:0,foundCritical:0,foundMajor:0,foundMinor:0,passed:true});
  const role=await h.models.Role.findOne({key:'test_own'}).lean();
  await h.open('own',`/${audit.id}`);await h.page.getByText(audit.restaurantId,{exact:true}).first().waitFor();
+ await h.page.waitForLoadState('networkidle');
+ assert.equal(h.wire.filter(item=>item.path==='/api/auth/me').length,1,'StrictMode shares its initial session read');
+ assert.equal(h.wire.filter(item=>item.path===`/api/audit-activity/${audit.id}`).length,1,'StrictMode shares audit history');
  await h.models.Role.updateOne({_id:role._id},{permissions:[]});
  await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.locator('[data-audit-state="forbidden"]').first().waitFor();
  assert.equal(await h.page.getByText(audit.restaurantId,{exact:true}).count(),0);

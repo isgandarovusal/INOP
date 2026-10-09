@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 
 export interface AuditActivityUser {
   _id?: string;
@@ -27,11 +27,9 @@ export interface AuditActivityResponse {
 }
 
 export const getAuditHistory = async (
-  auditId: string, signal?: AbortSignal
+  auditId: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<AuditActivityResponse> => {
-  const response = await api.get<AuditActivityResponse>(
-    `/audit-activity/${auditId}`, { signal }
+  return readJson<AuditActivityResponse>(
+    `/audit-activity/${auditId}`, { signal, scopeKey }
   );
-
-  return response.data;
 };

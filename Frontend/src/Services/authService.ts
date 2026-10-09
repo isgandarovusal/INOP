@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 import { isAxiosError } from "axios";
 import type { PublicUser } from "../Types/auth";
 
@@ -54,7 +55,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-export async function getCurrentUser(): Promise<PublicUser | null> {
+export async function getCurrentUser(signal?: AbortSignal, scopeKey?: string): Promise<PublicUser | null> {
   const token = getAuthToken();
 
   if (!token) {
@@ -62,8 +63,8 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   }
 
   try {
-    const response = await api.get<MeResponse>("/auth/me", { headers: { Authorization: `Bearer ${token}` } });
-    return response.data.user;
+    const response = await readJson<MeResponse>("/auth/me", { signal, scopeKey });
+    return response.user;
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 401 && getAuthToken() === token) {
       clearAuthToken();
