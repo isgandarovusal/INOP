@@ -1,5 +1,6 @@
 import API from "../api/axios";
 import type { Audit, AuditFile, AuditScores } from "../Types/audit";
+import { auditScore } from "../Utils/auditScore";
 
 function toAuditFiles(files: File[]): AuditFile[] {
   return files.map((file) => ({
@@ -75,16 +76,4 @@ export async function deleteAudit(id: string) {
   await API.delete(`/audits/${id}`);
 }
 
-export function overallScore(audit: Audit): number {
-
-  if (audit.overallPercentage && audit.overallPercentage > 0) {
-    return audit.overallPercentage / 10;
-  }
-
-  return (
-    audit.scores.cleanliness +
-    audit.scores.service +
-    audit.scores.food +
-    audit.scores.staff
-  ) / 4;
-}
+export const overallScore = auditScore;

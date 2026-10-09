@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import AuditResourceState from "../../../Components/AuditResourceState";
 
-import PageState from "../../../Components/PageState";
 
 import {
   ResponsiveContainer,
@@ -26,38 +26,12 @@ import {
 
 import {
   getAuditDashboard,
-  type AuditDashboardData,
 } from "../../../Services/auditDashboardService";
 import { ACCENT } from "../../../Utils/theme";
 
-const EMPTY: AuditDashboardData = {
-  totalAudits: 0,
-  completedAudits: 0,
-  pendingAudits: 0,
-  averageScore: 0,
-  riskStats: [],
-  typeStats: [],
-  trend: [],
-};
-
 export default function AuditDashboard() {
-  const [data, setData] =
-    useState<AuditDashboardData>(EMPTY);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getAuditDashboard()
-      .then((res) => {
-        setData(res);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return <PageState type="loading" />;
-  }
-
+ const {data,status,reload}=useAuditResource("dashboard","dashboard",getAuditDashboard);
+ if(status !== "ready" || !data) return <AuditResourceState status={status} retry={reload}/>;
   return (
     <div className="audit-dashboard">
       <div className="audit-dashboard__header">
@@ -105,7 +79,7 @@ export default function AuditDashboard() {
           </span>
 
           <strong>
-            {data.averageScore?.toFixed?.(1) || 0}
+            {data.scoredExecutions ? data.averageScore.toFixed(1) : "—"}
           </strong>
         </div>
 
@@ -238,7 +212,7 @@ export default function AuditDashboard() {
             />
 
             <XAxis
-              dataKey="_id"
+              dataKey="label"
               tick={{ fill: "#64748b", fontSize: 11 }}
               axisLine={{ stroke: "rgba(148, 163, 184, 0.24)" }}
               tickLine={false}

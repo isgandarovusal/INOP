@@ -6,26 +6,24 @@ export interface AuditDashboardStat {
 }
 
 export interface AuditDashboardTrend {
-  _id: string;
+  _id: { year: number; month: number };
+  label: string;
   count: number;
+  averageScore: number | null;
 }
 
 export interface AuditDashboardData {
   totalAudits: number;
   completedAudits: number;
-  pendingAudits: number;
   averageScore: number;
+  scoredExecutions: number;
   riskStats: AuditDashboardStat[];
   typeStats: AuditDashboardStat[];
   trend: AuditDashboardTrend[];
 }
 
-async function request<T>(path: string): Promise<T> {
-  const response = await api.get<T>(path);
-
-  return response.data;
-}
-
-export function getAuditDashboard(): Promise<AuditDashboardData> {
-  return request<AuditDashboardData>("/audit-dashboard");
+export async function getAuditDashboard(_id = "dashboard", signal?: AbortSignal): Promise<AuditDashboardData> {
+  void _id; // The resource hook's identity key is not an endpoint parameter.
+  const { data: response } = await api.get<{ success: boolean; data: AuditDashboardData }>("/audit-dashboard", { signal });
+  return { ...response.data, trend: response.data.trend.map(item => ({ ...item, label: `${item._id.year}-${String(item._id.month).padStart(2, "0")}` })) };
 }

@@ -2,27 +2,28 @@ import { getAudits } from "./auditsService";
 import { getRestaurants } from "./restaurantsService";
 import type { Audit } from "../Types/audit";
 import { overallScore } from "./auditsService";
+import { categoryScores, scoreCategories } from "../Utils/auditScore";
 
 const CRITICAL_THRESHOLD = 7;
 
 export interface RestaurantScore {
   restaurantId: string;
   name: string;
-  score: number;
+  score: number | null;
 }
 
 export interface CategoryScore {
   category: string;
-  score: number;
+  score: number | null;
 }
 
 export interface TrendPoint {
   label: string;
-  score: number;
+  score: number | null;
 }
 
 export interface AuditAnalytics {
-  overallScore: number;
+  overallScore: number | null;
   totalAudits: number;
   restaurantsAudited: number;
   criticalCount: number;
@@ -36,126 +37,45 @@ function round1(n: number): number {
 }
 
 export async function getAuditAnalytics(): Promise<AuditAnalytics> {
-  const [auditResult, restaurantResult] = await Promise.all([
-    getAudits(),
-    getRestaurants(),
-  ]);
+  const [audits, restaurants] = await Promise.all([getAudits(), getRestaurants().catch(() => [])]);
+  return calculateAuditAnalytics(audits, restaurants);
+}
 
-  const audits = Array.isArray(auditResult) ? auditResult : [];
-  const restaurants = Array.isArray(restaurantResult)
-    ? restaurantResult
-    : [];
-
-  if (audits.length === 0) {
-    return {
-      overallScore: 0,
-      totalAudits: 0,
-      restaurantsAudited: 0,
-      criticalCount: 0,
-      restaurantComparison: [],
-      categoryAnalysis: [],
-      historicalTrend: [],
-    };
-  }
-
-  const restaurantMap = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
-  const restaurantGroups = new Map<string, { sum: number; count: number }>();
-  const monthGroups = new Map<string, { sum: number; count: number; order: number }>();
-
-  let totalScore = 0;
-  let criticalCount = 0;
-
-  const categoryTotals: Record<keyof Audit["scores"], number> = {
-    food: 0,
-    cleanliness: 0,
-    staff: 0,
-    service: 0,
-  };
-
-  audits.forEach((audit) => {
+export function calculateAuditAnalytics(audits: Audit[], restaurants: { id: string; name: string }[]): AuditAnalytics {
+  const names = new Map(restaurants.map(item => [item.id, item.name]));
+  const restaurantGroups = new Map<string, {sum:number; count:number}>();
+  const months = new Map<string, {sum:number; count:number; order:number}>();
+  const categories = new Map<string, {sum:number; count:number}>();
+  let sum = 0, scored = 0, criticalCount = 0;
+  for (const audit of audits) {
     const score = overallScore(audit);
-
-    totalScore += score;
-
-    if (score < CRITICAL_THRESHOLD) {
-      criticalCount += 1;
+    const restaurant = restaurantGroups.get(audit.restaurantId) || {sum:0,count:0};
+    restaurantGroups.set(audit.restaurantId, restaurant);
+    const date = new Date(audit.date);
+    const key = date.toLocaleDateString(undefined, {month:"short",year:"2-digit"});
+    const month = months.get(key) || {sum:0,count:0,order:date.getFullYear()*12+date.getMonth()};
+    if (!Number.isNaN(date.getTime())) months.set(key, month);
+    if (score !== null) {
+      sum += score; scored += 1;
+      if (score < CRITICAL_THRESHOLD) criticalCount += 1;
+      restaurant.sum += score; restaurant.count += 1;
+      month.sum += score; month.count += 1;
     }
-
-    categoryTotals.food += audit.scores.food;
-    categoryTotals.cleanliness += audit.scores.cleanliness;
-    categoryTotals.staff += audit.scores.staff;
-    categoryTotals.service += audit.scores.service;
-
-    const restaurantGroup = restaurantGroups.get(audit.restaurantId);
-
-    if (restaurantGroup) {
-      restaurantGroup.sum += score;
-      restaurantGroup.count += 1;
-    } else {
-      restaurantGroups.set(audit.restaurantId, {
-        sum: score,
-        count: 1,
-      });
+    const values = categoryScores(audit);
+    for (const key of scoreCategories) {
+      const value = values[key]; if (value === undefined) continue;
+      const category = categories.get(key) || {sum:0,count:0};
+      category.sum += value; category.count += 1; categories.set(key,category);
     }
-
-    const d = new Date(audit.date);
-    const key = d.toLocaleDateString(undefined, {
-      month: "short",
-      year: "2-digit",
-    });
-    const order = d.getFullYear() * 12 + d.getMonth();
-    const monthGroup = monthGroups.get(key);
-
-    if (monthGroup) {
-      monthGroup.sum += score;
-      monthGroup.count += 1;
-    } else {
-      monthGroups.set(key, {
-        sum: score,
-        count: 1,
-        order,
-      });
-    }
-  });
-
-  const overall = round1(totalScore / audits.length);
-
-  const restaurantComparison: RestaurantScore[] = [...restaurantGroups.entries()]
-    .map(([id, group]) => ({
-      restaurantId: id,
-      name: restaurantMap.get(id)?.name ?? "Unknown",
-      score: round1(group.sum / group.count),
-    }))
-    .sort((a, b) => b.score - a.score);
-
-  const categories: (keyof Audit["scores"])[] = [
-    "food",
-    "cleanliness",
-    "staff",
-    "service",
-  ];
-
-  const categoryAnalysis: CategoryScore[] = categories
-    .map((category) => ({
-      category: category.charAt(0).toUpperCase() + category.slice(1),
-      score: round1(categoryTotals[category] / audits.length),
-    }))
-    .sort((a, b) => b.score - a.score);
-
-  const historicalTrend: TrendPoint[] = [...monthGroups.entries()]
-    .sort((a, b) => a[1].order - b[1].order)
-    .map(([label, { sum, count }]) => ({
-      label,
-      score: round1(sum / count),
-    }));
-
+  }
+  const average = (group:{sum:number;count:number}) => group.count ? round1(group.sum/group.count) : null;
   return {
-    overallScore: overall,
-    totalAudits: audits.length,
-    restaurantsAudited: restaurantGroups.size,
-    criticalCount,
-    restaurantComparison,
-    categoryAnalysis,
-    historicalTrend,
+    overallScore: scored ? round1(sum/scored) : null,
+    totalAudits: audits.length, restaurantsAudited: restaurantGroups.size, criticalCount,
+    restaurantComparison: [...restaurantGroups].map(([id,group]) => ({restaurantId:id,name:names.get(id)||"Unknown",score:average(group)}))
+      .sort((a,b)=>(b.score ?? -1)-(a.score ?? -1)),
+    categoryAnalysis: scoreCategories.flatMap(key => {const group=categories.get(key);return group ? [{category:key.charAt(0).toUpperCase()+key.slice(1),score:average(group)}] : [];})
+      .sort((a,b)=>(b.score ?? -1)-(a.score ?? -1)),
+    historicalTrend: [...months].sort((a,b)=>a[1].order-b[1].order).map(([label,group])=>({label,score:average(group)})),
   };
 }

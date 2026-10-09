@@ -430,7 +430,7 @@ const Dashboard: React.FC = () => {
 
                       <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
 
-                      <p className="kpi-card__value">{analytics.overallScore.toFixed(1)} / 10</p>
+                      <p className="kpi-card__value">{analytics.overallScore?.toFixed(1) ?? "—"} / 10</p>
 
                     </div>
 
@@ -531,7 +531,7 @@ const Dashboard: React.FC = () => {
 
                             <span className="recent-row__time">
 
-                              {r.score.toFixed(1)} / 10
+                              {r.score?.toFixed(1) ?? "—"} / 10
 
                             </span>
 

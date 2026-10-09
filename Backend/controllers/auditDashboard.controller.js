@@ -1,5 +1,7 @@
 const Audit = require("../models/audit.model");
 const AuditExecution = require("../models/auditExecution.model");
+// Execution totals are raw points; legacy score is read only when totalScore is absent.
+const executionScore = { $ifNull: ["$totalScore", "$score"] };
 const { getAuditScopeFilter, getAuditChildScopeFilter } = require("../middleware/auditScope.middleware");
 
 
@@ -74,8 +76,9 @@ AuditExecution.aggregate([
  $group:{
   _id:null,
   averageScore:{
-   $avg:"$score"
-  }
+   $avg:executionScore
+  },
+  scoredExecutions: { $sum: { $cond: [{ $isNumber: executionScore }, 1, 0] } }
  }
 }
 
@@ -102,7 +105,7 @@ AuditExecution.aggregate([
   },
 
   averageScore:{
-   $avg:"$score"
+   $avg:executionScore
   }
 
  }
@@ -132,7 +135,9 @@ totalAudits,
 completedAudits,
 
 averageScore:
-scoreStats[0]?.averageScore || 0,
+scoreStats[0]?.averageScore ?? 0,
+
+scoredExecutions: scoreStats[0]?.scoredExecutions || 0,
 
 riskStats,
 

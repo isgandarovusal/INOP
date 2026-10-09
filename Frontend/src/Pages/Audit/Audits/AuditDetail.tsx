@@ -11,7 +11,7 @@ import { ArrowLeft, ClipboardCheck, ImageOff, Paperclip, Pencil } from "lucide-r
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
-import { getAuditById } from "../../../Services/auditsService";
+import { getAuditById, overallScore } from "../../../Services/auditsService";
 import { getRestaurantById } from "../../../Services/restaurantsService";
 import { getUserById } from "../../../Services/usersService";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
@@ -136,15 +136,7 @@ const AuditDetail: React.FC = () => {
     return <EmptyState icon={<ClipboardCheck size={28} />} title={t("audit.generic.detail.notFound")} hint="It may have been deleted." />;
   }
 
-  const overall =
-    audit.overallPercentage && audit.overallPercentage > 0
-      ? audit.overallPercentage / 10
-      : (
-          audit.scores.cleanliness +
-          audit.scores.service +
-          audit.scores.food +
-          audit.scores.staff
-        ) / 4;
+  const overall = overallScore(audit);
 
   return (
     <div>
@@ -173,7 +165,7 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.scores")}</h3>
-            {(Object.entries(audit.scores) as [string, number][]).map(([key, value]) => (
+            {(Object.entries(audit.scores || {}) as [string, number][]).map(([key, value]) => (
               <div className="score-bar-row" key={key}>
                 <span style={{ textTransform: "capitalize" }}>{key}</span>
                 <div className="score-bar-track">
@@ -286,7 +278,7 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
-            <Badge tone={scoreTone(overall)}>{overall.toFixed(1)} / 10</Badge>
+            <Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>
           </div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
