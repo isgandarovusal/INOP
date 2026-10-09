@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { createAuditWithDepartmentSnapshot } = require("../services/auditCreation.service");
 const { recordActivity } = require("../services/activityLog.service");
 const {
   getAssignedAuditFilter,
@@ -49,7 +50,7 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
       });
     }
 
-    const audit = await Audit.create({
+    const audit = await createAuditWithDepartmentSnapshot({
       id: req.body.id,
       restaurantId: req.body.restaurantId,
       auditorId: req.user.id,
@@ -91,7 +92,7 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
         typeof req.body.metadata === "object"
           ? req.body.metadata
           : {},
-    });
+    }, req.user);
 
     try {
       await recordActivity({

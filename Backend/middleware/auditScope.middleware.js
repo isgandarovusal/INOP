@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
 const AuditAssignment = require("../models/auditAssignment.model");
+const AuditDepartmentSnapshot = require("../models/auditDepartmentSnapshot.model");
 
 async function getAuditIdFromRequest(req) {
   // Set only by a server-side child-record resolver, never by request JSON.
@@ -161,9 +162,12 @@ exports.getAuditScopeFilter = async (req) => {
     case "all": return {};
     case "own": return { auditorId: req.user.id };
     case "assigned": return exports.getAssignedAuditFilter(req);
-    // Legacy audit JSON has no trusted department provenance. Fail closed
-    // until server-owned department snapshots are available.
-    case "department": return { _id: { $in: [] } };
+    case "department": {
+      if (!req.user.departmentId) return null;
+      const snapshots = await AuditDepartmentSnapshot.find({ departmentId: req.user.departmentId })
+        .select("auditId").lean();
+      return { _id: { $in: snapshots.map(item => item.auditId) } };
+    }
     default: return null;
   }
 };

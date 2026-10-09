@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
+const { createAuditWithDepartmentSnapshot } = require("../services/auditCreation.service");
 const { recordActivity } = require("../services/activityLog.service");
 const {
-  getAssignedAuditFilter,
+  getAuditScopeFilter,
 } = require("../middleware/auditScope.middleware");
 
 function buildAuditIdentifierFilter(identifier) {
@@ -31,7 +32,7 @@ function normalizeAuditPayload(body, req) {
 }
 
 async function getAuditFilter(req, extra = {}) {
-  const scopeFilter = await getAssignedAuditFilter(req);
+  const scopeFilter = await getAuditScopeFilter(req);
 
   if (scopeFilter === null) {
     return null;
@@ -122,7 +123,7 @@ async function createAudit(req, res) {
       });
     }
 
-    const audit = await Audit.create(payload);
+    const audit = await createAuditWithDepartmentSnapshot(payload, req.user);
 
     if (audit.auditType === "service") {
       try {
@@ -169,6 +170,7 @@ async function updateAudit(req, res) {
     const payload = normalizeAuditPayload(req.body, req);
 
     delete payload.id;
+    delete payload._id;
 
     const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
 
