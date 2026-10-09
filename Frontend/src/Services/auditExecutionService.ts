@@ -1,89 +1,39 @@
-const API =
- import.meta.env.VITE_API_BASE_URL ||
- "http://localhost:3001/api";
-
-
-export interface AuditExecutionChecklistItem {
-  question: string;
-}
+import api from '../api/axios';
+import { readJson } from '../api/readRequest';
 
 export interface AuditExecutionAnswer {
-  value?: string;
-  [key: string]: unknown;
+  questionId?: string | null;
+  answer?: string | null;
+  score?: number | null;
+  comment?: string | null;
 }
 
 export interface AuditExecution {
-  checklist: AuditExecutionChecklistItem[];
+  _id: string;
+  auditId: string;
+  checklistId?: string;
   answers: AuditExecutionAnswer[];
+  totalScore: number;
+  riskLevel: string;
+  status: string;
+  updatedAt: string;
 }
 
-async function request<T>(
- path: string,
- options: RequestInit = {},
-): Promise<T> {
+interface ExecutionResponse<T> { success: boolean; data: T }
 
- const res =
- await fetch(
-  `${API}${path}`,
-  {
-   headers:{
-    "Content-Type":"application/json"
-   },
-   ...options
-  }
- );
-
-
- if(!res.ok){
-  throw new Error(
-   "Audit execution request failed"
-  );
- }
-
-
- return res.json();
-
+export function getAuditExecution(id: string, signal?: AbortSignal, scopeKey?: string): Promise<ExecutionResponse<AuditExecution>> {
+  return readJson(`/audit-execution/${encodeURIComponent(id)}`, { signal, scopeKey });
 }
 
-
-
-export function getAuditExecution(
-  id: string,
-): Promise<{ data: AuditExecution }> {
-  return request<{ data: AuditExecution }>(
-    `/audit-execution/${id}`,
-  );
+export function listAuditExecutions(auditId?: string, signal?: AbortSignal, scopeKey?: string): Promise<ExecutionResponse<AuditExecution[]>> {
+  const query = auditId ? `?auditId=${encodeURIComponent(auditId)}` : '';
+  return readJson(`/audit-execution${query}`, { signal, scopeKey });
 }
 
-
-
-export function startAuditExecution(data: Record<string, unknown>){
-
- return request(
-  "/audit-execution",
-  {
-   method:"POST",
-   body:JSON.stringify(data)
-  }
- );
-
+export async function startAuditExecution(data: Record<string, unknown>, signal?: AbortSignal): Promise<ExecutionResponse<AuditExecution>> {
+  return (await api.post('/audit-execution', data, { signal })).data;
 }
 
-
-
-export function submitAuditAnswers(
- id:string,
- answers: unknown[]
-){
-
- return request(
-  `/audit-execution/${id}/submit`,
-  {
-   method:"PATCH",
-   body:JSON.stringify({
-    answers
-   })
-  }
- );
-
+export async function submitAuditAnswers(id: string, answers: AuditExecutionAnswer[], signal?: AbortSignal): Promise<ExecutionResponse<AuditExecution>> {
+  return (await api.put(`/audit-execution/${encodeURIComponent(id)}/submit`, { answers }, { signal })).data;
 }

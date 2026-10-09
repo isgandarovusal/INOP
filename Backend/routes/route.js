@@ -76,6 +76,7 @@ router.use('/audit-workflow', auditWorkflowRoutes);
 router.use('/occupational-safety-details', occupationalSafetyDetailsRoutes);
 router.use('/audit-report', auditReportRoutes);
 router.use('/audit-score', auditScoreRoutes);
+router.use('/audit-execution', require('./auditExecution.routes'));
 
 router.use('/audit-dashboard', auditDashboardRoutes);
 router.use('/audit-notification', auditNotificationRoutes);
