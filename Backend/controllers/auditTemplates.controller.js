@@ -87,7 +87,6 @@ exports.createTemplate = async (req, res) => {
       status = 'draft',
       sections = [],
       sourceDocumentIds = [],
-      createdBy = '',
     } = req.body;
 
     if (!brandName || !auditType || !name) {
@@ -107,8 +106,8 @@ exports.createTemplate = async (req, res) => {
       status,
       sections,
       sourceDocumentIds,
-      createdBy,
-      updatedBy: createdBy,
+      createdBy: req.user.id,
+      updatedBy: req.user.id,
     });
 
     try {
@@ -162,7 +161,6 @@ exports.updateTemplate = async (req, res) => {
       'status',
       'sections',
       'sourceDocumentIds',
-      'updatedBy',
     ];
 
     for (const field of allowedFields) {
@@ -171,6 +169,7 @@ exports.updateTemplate = async (req, res) => {
       }
     }
 
+    template.updatedBy = req.user.id;
     await template.save();
 
     try {

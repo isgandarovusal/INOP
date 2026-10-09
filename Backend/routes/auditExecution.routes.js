@@ -13,6 +13,7 @@ const {
   requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 const { requireExecutionAccess } = require('../middleware/auditExecutionScope.middleware');
+const { requireExecutionTemplateAccess } = require('../middleware/templateScope.middleware');
 
 router.get('/', ...authorize('audit.execution', 'read'), listExecutions);
 
@@ -20,6 +21,7 @@ router.post(
   "/",
   ...authorize("audit.execution", "create"),
   requireAuditParentAccess,
+  requireExecutionTemplateAccess,
   createExecution
 );
 

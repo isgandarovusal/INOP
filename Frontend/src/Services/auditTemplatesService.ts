@@ -1,29 +1,6 @@
 import type { AuditTemplate } from "../Types/Audit";
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
-
-async function request<T>(
-  path: string,
-  options?: RequestInit
-): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-    ...options,
-  });
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
-    throw new Error(
-      body?.message || "Sorğu zamanı xəta baş verdi."
-    );
-  }
-
-  return response.json();
-}
+import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 
 export async function getAuditTemplates(params?: {
   brandId?: string;
@@ -38,7 +15,7 @@ export async function getAuditTemplates(params?: {
 
   const suffix = query.toString() ? `?${query}` : "";
 
-  return request<AuditTemplate[]>(
+  return readJson<AuditTemplate[]>(
     `/audit-templates${suffix}`
   );
 }
@@ -46,32 +23,24 @@ export async function getAuditTemplates(params?: {
 export function getAuditTemplate(
   id: string
 ): Promise<AuditTemplate> {
-  return request<AuditTemplate>(`/audit-templates/${id}`);
+  return readJson<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`);
 }
 
-export function createAuditTemplate(
+export async function createAuditTemplate(
   input: Partial<AuditTemplate>
 ): Promise<AuditTemplate> {
-  return request<AuditTemplate>("/audit-templates", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  return (await api.post<AuditTemplate>("/audit-templates", input)).data;
 }
 
-export function updateAuditTemplate(
+export async function updateAuditTemplate(
   id: string,
   input: Partial<AuditTemplate>
 ): Promise<AuditTemplate> {
-  return request<AuditTemplate>(`/audit-templates/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(input),
-  });
+  return (await api.put<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`, input)).data;
 }
 
 export async function deleteAuditTemplate(
   id: string
 ): Promise<void> {
-  await request(`/audit-templates/${id}`, {
-    method: "DELETE",
-  });
+  await api.delete(`/audit-templates/${encodeURIComponent(id)}`);
 }

@@ -42,6 +42,7 @@ const auditScoreRoutes = require('./auditScore.routes');
 const auditPermissionRoutes = require('./auditPermission.routes');
 const restaurantsController = require('../controllers/restaurants.controller');
 const { requireGlobalRestaurantAccess } = require('../middleware/restaurantScope.middleware');
+const { requireGlobalTemplateAccess, requireGlobalSourceDocumentAccess } = require('../middleware/templateScope.middleware');
 
 const auditFindingRoutes = require('./auditFinding.routes');
 const auditAssignmentRoutes = require('./auditAssignment.routes');
@@ -186,30 +187,35 @@ router.delete(
 router.get(
   '/audit-templates',
   ...authorize('audit.template', 'read'),
+  requireGlobalTemplateAccess,
   auditTemplatesController.getTemplates
 );
 
 router.get(
   '/audit-templates/:id',
   ...authorize('audit.template', 'read'),
+  requireGlobalTemplateAccess,
   auditTemplatesController.getTemplateById
 );
 
 router.post(
   '/audit-templates',
   ...authorize('audit.template', 'create'),
+  requireGlobalTemplateAccess,
   auditTemplatesController.createTemplate
 );
 
 router.put(
   '/audit-templates/:id',
   ...authorize('audit.template', 'update'),
+  requireGlobalTemplateAccess,
   auditTemplatesController.updateTemplate
 );
 
 router.delete(
   '/audit-templates/:id',
   ...authorize('audit.template', 'delete'),
+  requireGlobalTemplateAccess,
   auditTemplatesController.deleteTemplate
 );
 
@@ -217,12 +223,14 @@ router.delete(
 router.get(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'read'),
+  requireGlobalSourceDocumentAccess,
   auditSourceDocumentsController.getDocuments
 );
 
 router.post(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'create'),
+  requireGlobalSourceDocumentAccess,
   auditDocumentUpload.single('file'),
   auditSourceDocumentsController.uploadDocument
 );
@@ -230,6 +238,7 @@ router.post(
 router.delete(
   '/audit-source-documents/:id',
   ...authorize('audit.source_document', 'delete'),
+  requireGlobalSourceDocumentAccess,
   auditSourceDocumentsController.deleteDocument
 );
 
