@@ -7,13 +7,13 @@ const {
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.get(
   "/:id",
   ...authorize("audit.report", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   getAuditReport
 );
 

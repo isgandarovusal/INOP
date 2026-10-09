@@ -1,6 +1,9 @@
 const Audit = require("../models/audit.model");
+const { getAuditScopeFilter } = require("../middleware/auditScope.middleware");
 
-function buildAuditFilter(req, auditType) {
+async function buildAuditFilter(req, auditType) {
+  const scopeFilter = await getAuditScopeFilter(req);
+  if (scopeFilter === null) return null;
   const filter = {
     auditType,
   };
@@ -27,12 +30,13 @@ function buildAuditFilter(req, auditType) {
     }
   }
 
-  return filter;
+  return { $and: [filter, scopeFilter] };
 }
 
 exports.getStandardAudits = async (req, res) => {
   try {
-    const filter = buildAuditFilter(req, "standard");
+    const filter = await buildAuditFilter(req, "standard");
+    if (filter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
 
     const audits = await Audit.find(filter).sort({
       date: -1,
@@ -57,7 +61,8 @@ exports.getStandardAudits = async (req, res) => {
 
 exports.getServiceAudits = async (req, res) => {
   try {
-    const filter = buildAuditFilter(req, "service");
+    const filter = await buildAuditFilter(req, "service");
+    if (filter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
 
     const audits = await Audit.find(filter).sort({
       date: -1,

@@ -29,17 +29,12 @@ async function findAuditByIdentifier(auditId) {
     return null;
   }
 
-  const conditions = [{ id: String(auditId) }];
-
   if (mongoose.Types.ObjectId.isValid(auditId)) {
-    conditions.unshift({
-      _id: new mongoose.Types.ObjectId(auditId),
-    });
+    const audit = await Audit.findById(auditId).select("_id id auditorId").lean();
+    if (audit) return audit;
   }
 
-  return Audit.findOne({
-    $or: conditions,
-  })
+  return Audit.findOne({ id: String(auditId) })
     .select("_id id auditorId")
     .lean();
 }
@@ -193,4 +188,34 @@ exports.requireAuditAccess = async (req, res, next) => {
     console.error("Audit access error:", error);
     return res.status(500).json({ message: "Audit scope yoxlanıla bilmədi." });
   }
+};
+
+// Only for routes whose URL/body identifies a parent Audit, never a child id.
+// Controllers must query the exact parent that was authorized, including when
+// callers use a public UUID or an id that aliases another record's Mongo id.
+exports.requireAuditParentAccess = (req, res, next) => exports.requireAuditAccess(req, res, async () => {
+  try {
+    if (req.body?.executionId) {
+      const Execution = require("../models/auditExecution.model");
+      if (!mongoose.Types.ObjectId.isValid(req.body.executionId) ||
+          !(await Execution.exists({ _id: req.body.executionId, auditId: req.auditScopeId }))) {
+        return res.status(400).json({ message: "Execution bu Audit-ə aid deyil." });
+      }
+    }
+    if (req.params.auditId) req.params.auditId = req.auditScopeId;
+    if (req.params.id) req.params.id = req.auditScopeId;
+    if (req.body?.auditId) req.body.auditId = req.auditScopeId;
+    next();
+  } catch (error) {
+    console.error("Audit parent check error:", error);
+    return res.status(500).json({ message: "Audit əlaqəsi yoxlanıla bilmədi." });
+  }
+});
+
+exports.getAuditChildScopeFilter = async (req) => {
+  const filter = await exports.getAuditScopeFilter(req);
+  if (filter === null) return null;
+  if (req.permission.scope === "all") return {};
+  const audits = await Audit.find(filter).select("_id").lean();
+  return { auditId: { $in: audits.map(audit => audit._id) } };
 };

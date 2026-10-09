@@ -6,12 +6,16 @@ const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
+  getAuditChildScopeFilter,
 } = require("../middleware/auditScope.middleware");
 
 exports.getNotifications = async (req, res) => {
   try {
+    const scopeFilter = await getAuditChildScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const notifications = await AuditNotification.find({
       userId: req.user.id,
+      ...scopeFilter,
     }).sort({
       createdAt: -1,
     });
@@ -153,10 +157,13 @@ exports.markRead = async (req, res) => {
       });
     }
 
+    const scopeFilter = await getAuditChildScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const notification = await AuditNotification.findOneAndUpdate(
       {
         _id: req.params.id,
         userId: req.user.id,
+        ...scopeFilter,
       },
       {
         read: true,

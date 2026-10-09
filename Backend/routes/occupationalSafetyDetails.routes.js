@@ -8,20 +8,20 @@ const {
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.get(
   "/:id/details",
   ...authorize("occupational_safety_details", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   getSafetyDetails
 );
 
 router.patch(
   "/:id/details",
   ...authorize("occupational_safety_details", "update"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   updateSafetyDetails
 );
 

@@ -4,13 +4,13 @@ const controller = require("../controllers/auditTimeline.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.get(
   "/:auditId",
   ...authorize("audit.timeline", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   controller.getTimeline
 );
 

@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { getAuditScopeFilter } = require("../middleware/auditScope.middleware");
 
 function safeNumber(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -11,7 +12,10 @@ function round(value, decimals = 2) {
 
 exports.getSummary = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $group: {
           _id: {
@@ -30,6 +34,7 @@ exports.getSummary = async (req, res) => {
     ]);
 
     const totalResult = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $count: "total",
       },
@@ -59,7 +64,10 @@ exports.getSummary = async (req, res) => {
 
 exports.getByType = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $group: {
           _id: {
@@ -98,7 +106,10 @@ exports.getByType = async (req, res) => {
 
 exports.getTrend = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $group: {
           _id: {
@@ -143,7 +154,10 @@ exports.getTrend = async (req, res) => {
 
 exports.getServiceAnalytics = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $match: {
           auditType: "service",
@@ -287,7 +301,10 @@ exports.getServiceAnalytics = async (req, res) => {
 
 exports.getStandardAnalytics = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $match: {
           auditType: "standard",
@@ -419,7 +436,10 @@ exports.getStandardAnalytics = async (req, res) => {
 
 exports.getSafetyAnalytics = async (req, res) => {
   try {
+    const scopeFilter = await getAuditScopeFilter(req);
+    if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
+      { $match: scopeFilter },
       {
         $match: {
           auditType: "occupational-safety",

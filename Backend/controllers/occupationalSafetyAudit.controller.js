@@ -2,12 +2,12 @@ const Audit = require("../models/audit.model");
 const { createAuditWithDepartmentSnapshot } = require("../services/auditCreation.service");
 const { recordActivity } = require("../services/activityLog.service");
 const {
-  getAssignedAuditFilter,
+  getAuditScopeFilter,
 } = require("../middleware/auditScope.middleware");
 
 exports.getOccupationalSafetyAudits = async (req, res) => {
   try {
-    const scopeFilter = await getAssignedAuditFilter(req);
+    const scopeFilter = await getAuditScopeFilter(req);
 
     if (scopeFilter === null) {
       return res.status(403).json({

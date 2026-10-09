@@ -7,13 +7,13 @@ const {
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.patch(
   "/:id/status",
   ...authorize("audit.workflow", "update"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   updateAuditStatus
 );
 

@@ -527,7 +527,7 @@ async function getAuditAnalytics(req, res) {
             _id: 0,
             label: {
               $dateToString: {
-                format: "%b %y",
+                format: "%b %Y",
                 date: {
                   $dateFromParts: {
                     year: "$_id.year",

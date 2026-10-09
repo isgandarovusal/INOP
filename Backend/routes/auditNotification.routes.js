@@ -4,6 +4,7 @@ const router = express.Router();
 const controller = require("../controllers/auditNotification.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
+const { requireAuditParentAccess } = require("../middleware/auditScope.middleware");
 
 router.get(
   "/",
@@ -14,6 +15,7 @@ router.get(
 router.post(
   "/",
   ...authorize("audit.notification", "create"),
+  requireAuditParentAccess,
   controller.createNotification
 );
 

@@ -4,20 +4,20 @@ const controller = require("../controllers/auditFinding.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.get(
   "/:auditId",
   ...authorize("audit.finding", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   controller.getFindings
 );
 
 router.post(
   "/",
   ...authorize("audit.finding", "create"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   controller.createFinding
 );
 

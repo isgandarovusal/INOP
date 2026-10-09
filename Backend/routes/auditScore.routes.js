@@ -7,13 +7,13 @@ const {
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.post(
   "/:id/calculate",
   ...authorize("audit.score", "update"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   calculateScore
 );
 

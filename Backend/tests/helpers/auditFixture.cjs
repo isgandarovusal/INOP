@@ -56,8 +56,9 @@ exports.withAuditFixture = async (callback) => {
         const headers = { 'Content-Type': 'application/json' };
         if (tokens[actor]) headers.Authorization = `Bearer ${tokens[actor]}`;
         const response = await fetch(base + endpoint, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(10000) });
-        const text = await response.text(); let data; try { data = JSON.parse(text); } catch { data = text; }
-        return { status: response.status, data };
+        const buffer = Buffer.from(await response.arrayBuffer());
+        const text = buffer.toString('utf8'); let data; try { data = JSON.parse(text); } catch { data = text; }
+        return { status: response.status, data, buffer, headers: Object.fromEntries(response.headers) };
       },
       async audit(owner, auditType = 'standard', extra = {}) {
         return models.Audit.create({ id: crypto.randomUUID(), auditType, type: auditType, restaurantId: `restaurant-${owner}`, auditorId: String(actors[owner]._id), date: '2026-10-09', status: 'completed', scores: { food: 8, service: 8, cleanliness: 8, staff: 8 }, checks: [], results: [], categories: [], findings: [], recommendations: [], ...extra });

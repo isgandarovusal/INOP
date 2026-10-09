@@ -1,11 +1,16 @@
 const Audit = require("../models/audit.model");
 const AuditExecution = require("../models/auditExecution.model");
+const { getAuditScopeFilter, getAuditChildScopeFilter } = require("../middleware/auditScope.middleware");
 
 
 
 exports.getAuditDashboard = async(req,res)=>{
 
 try{
+
+const auditFilter = await getAuditScopeFilter(req);
+if (auditFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
+const executionFilter = await getAuditChildScopeFilter(req);
 
 
 const [
@@ -19,17 +24,19 @@ const [
 
 
 
-Audit.countDocuments(),
+Audit.countDocuments(auditFilter),
 
 
 
 AuditExecution.countDocuments({
+ ...executionFilter,
  status:"completed"
 }),
 
 
 
 AuditExecution.aggregate([
+{ $match: executionFilter },
 
 {
  $group:{
@@ -45,6 +52,7 @@ AuditExecution.aggregate([
 
 
 Audit.aggregate([
+{ $match: auditFilter },
 
 {
  $group:{
@@ -60,6 +68,7 @@ Audit.aggregate([
 
 
 AuditExecution.aggregate([
+{ $match: executionFilter },
 
 {
  $group:{
@@ -75,6 +84,7 @@ AuditExecution.aggregate([
 
 
 AuditExecution.aggregate([
+{ $match: executionFilter },
 
 {
  $group:{

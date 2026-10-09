@@ -4,20 +4,20 @@ const controller = require("../controllers/auditClosure.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.post(
   "/",
   ...authorize("audit.closure", "update"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   controller.closeAudit
 );
 
 router.get(
   "/:auditId",
   ...authorize("audit.closure", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   controller.getClosure
 );
 

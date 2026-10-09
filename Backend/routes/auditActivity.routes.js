@@ -8,7 +8,7 @@ const {
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
 } = require("../middleware/auditScope.middleware");
 
 const router = express.Router();
@@ -16,21 +16,21 @@ const router = express.Router();
 router.post(
   "/",
   ...authorize("audit.activity", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   createActivity
 );
 
 router.get(
   "/:auditId/timeline",
   ...authorize("audit.activity", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   getAuditTimeline
 );
 
 router.get(
   "/:auditId",
   ...authorize("audit.activity", "read"),
-  requireAssignedAuditAccess,
+  requireAuditParentAccess,
   getAuditHistory
 );
 
