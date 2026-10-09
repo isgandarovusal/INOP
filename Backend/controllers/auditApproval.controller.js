@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const AuditApproval =
   require("../models/auditApproval.model");
+const AuditFinding = require("../models/auditFinding.model");
+const AuditAction = require("../models/auditAction.model");
 const { recordActivity } = require("../services/activityLog.service");
 
 const {
@@ -15,9 +17,23 @@ const {
 // CREATE APPROVAL
 exports.createApproval = async (req, res) => {
   try {
+    // Child references must belong to the same authorized, canonical parent.
+    for (const [field, Model] of [["findingId", AuditFinding], ["actionId", AuditAction]]) {
+      const value = req.body[field];
+      if (value != null && (!mongoose.Types.ObjectId.isValid(value) ||
+        !(await Model.exists({ _id: value, auditId: req.auditScopeId })))) {
+        return res.status(400).json({ message: `${field} bu Audit-ə aid deyil.` });
+      }
+    }
     const approval =
       await AuditApproval.create({
-        ...req.body,
+        auditId: req.auditScopeId,
+        findingId: req.body.findingId,
+        actionId: req.body.actionId,
+        reviewer: req.body.reviewer,
+        status: req.body.status,
+        comment: req.body.comment,
+        approvedAt: req.body.status === "approved" ? new Date() : null,
         requestedBy: req.user?.id || null,
       });
 
@@ -88,7 +104,7 @@ exports.getApprovals = async (req, res) => {
   try {
     const approvals =
       await AuditApproval.find({
-        auditId: req.params.auditId,
+        auditId: req.auditScopeId,
       })
       .sort({
         createdAt: -1,
@@ -117,6 +133,26 @@ exports.getApprovals = async (req, res) => {
 };
 
 
+// Resolve a child ID through its stored FK, not through client auditId or an
+// unrelated Audit whose ID happens to match the Approval ID.
+exports.resolveApprovalParent = async (req, res, next) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(req.permission.scope === "all" ? 400 : 403).json({ message: "Invalid approval id" });
+    }
+    const approval = await AuditApproval.findById(req.params.id).select("_id auditId").lean();
+    if (!approval) {
+      return res.status(req.permission.scope === "all" ? 404 : 403).json({ message: "Approval not found" });
+    }
+    req.approvalParent = approval;
+    req.auditScopeId = String(approval.auditId);
+    next();
+  } catch (error) {
+    console.error("Approval parent error:", error);
+    return res.status(500).json({ message: "Approval parent yoxlanıla bilmədi." });
+  }
+};
+
 // UPDATE APPROVAL
 exports.updateApproval = async (req, res) => {
   try {
@@ -132,19 +168,19 @@ exports.updateApproval = async (req, res) => {
       comment,
     } = req.body;
 
+    const changes = {};
+    if (comment !== undefined) changes.comment = comment;
+    if (status !== undefined) {
+      changes.status = status;
+      changes.approvedAt = status === "approved" ? new Date() : null;
+    }
     const approval =
-      await AuditApproval.findByIdAndUpdate(
-        req.params.id,
-        {
-          status,
-          comment,
-          approvedAt:
-            status === "approved"
-              ? new Date()
-              : null,
-        },
+      await AuditApproval.findOneAndUpdate(
+        { _id: req.approvalParent._id, auditId: req.approvalParent.auditId },
+        { $set: changes },
         {
           new: true,
+          runValidators: true,
         }
       );
 

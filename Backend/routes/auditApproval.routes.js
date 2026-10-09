@@ -4,27 +4,28 @@ const controller = require("../controllers/auditApproval.controller");
 
 const { authorize } = require("../middleware/authorization.middleware");
 const {
-  requireAssignedAuditAccess,
+  requireAuditAccess,
 } = require("../middleware/auditScope.middleware");
 
 router.post(
   "/",
   ...authorize("audit.approval", "create"),
-  requireAssignedAuditAccess,
+  requireAuditAccess,
   controller.createApproval
 );
 
 router.get(
   "/:auditId",
   ...authorize("audit.approval", "read"),
-  requireAssignedAuditAccess,
+  requireAuditAccess,
   controller.getApprovals
 );
 
 router.patch(
   "/:id",
   ...authorize("audit.approval", "update"),
-  requireAssignedAuditAccess,
+  controller.resolveApprovalParent,
+  requireAuditAccess,
   controller.updateApproval
 );
 
