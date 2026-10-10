@@ -21,7 +21,7 @@ import {
   exportCandidatePdf,
   getCandidateById,
   getCandidateCv,
-  parseCandidateCv,
+  getCandidateCvPreview,
 } from "../../../Services/candidatesService";
 import { useTranslation } from "react-i18next";
 import { hasPermission } from "../../../Utils/permissions";
@@ -264,11 +264,15 @@ const CandidateDetail: React.FC = () => {
               const blob = await getCandidateCv(candidate.id, signal);
               if (candidate.cvUrl?.endsWith('.docx')) {
                 try {
-                  const parsed = await parseCandidateCv(new File([blob], 'preview.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), signal);
-                  return { blob, text: parsed.rawText };
+                  const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())), byte => byte.toString(16).padStart(2, '0')).join('');
+                  if (signal.aborted) throw new Error('Canceled preview.');
+                  if (candidate.cvOriginal?.sha256 && candidate.cvOriginal.sha256 !== hash) throw Object.assign(new Error('CV changed.'), { response: { status: 409 } });
+                  const parsed = await getCandidateCvPreview(candidate.id, hash, candidate.revision ?? 0, signal);
+                  return { blob, text: [...parsed.warnings.map(code => t(`cvReview.${code}`)), parsed.rawText].join('\n\n') };
                 } catch (error) {
                   const status = auditErrorStatus(error);
-                  if (signal.aborted || status === 'unauthenticated' || status === 'forbidden') throw error;
+                  if (signal.aborted || status === 'unauthenticated' || status === 'forbidden' || status === 'not-found') throw error;
+                  if ((error as { response?: { status?: number } })?.response?.status === 409) { result.reload(); throw error; }
                   return { blob, text: t('cvReview.previewUnavailable') };
                 }
               }

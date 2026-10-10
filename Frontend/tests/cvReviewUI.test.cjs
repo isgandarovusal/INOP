@@ -46,18 +46,18 @@ test('HR review UI preserves unknowns, edits extracted facts and previews privat
       await h.page.getByRole('button', { name: 'Bağla', exact: true }).click(); assert.equal(await h.page.getByRole('dialog').count(), 0);
     });
     await t.test('secondary DOCX extraction failure preserves authorized original download', async () => {
-      await h.page.route('**/api/candidates/parse-cv', r => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Synthetic extraction outage"}' }));
+      await h.page.route('**/api/candidates/*/cv-preview?*', r => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Synthetic extraction outage"}' }));
       await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click(); await h.page.getByRole('dialog').waitFor();
       assert.match(await h.page.locator('[role=dialog] pre').textContent(), /Orijinal CV-ni/);
       assert.equal(await h.page.locator('[role=dialog] a').getAttribute('download'), 'original.docx');
       await h.page.getByRole('button', { name: 'Bağla', exact: true }).click();
-      await h.page.unroute('**/api/candidates/parse-cv');
+      await h.page.unroute('**/api/candidates/*/cv-preview?*');
     });
     await t.test('authorization failure never exposes a retained DOCX blob', async () => {
-      await h.page.route('**/api/candidates/parse-cv', r => r.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"Synthetic revoked permission"}' }));
+      await h.page.route('**/api/candidates/*/cv-preview?*', r => r.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"Synthetic revoked permission"}' }));
       await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click(); await h.page.locator('[data-file-error=forbidden]').waitFor();
       assert.equal(await h.page.getByRole('dialog').count(), 0);
-      await h.page.unroute('**/api/candidates/parse-cv');
+      await h.page.unroute('**/api/candidates/*/cv-preview?*');
     });
     await t.test('partial extraction warning remains visible and translated in AZ/EN/RU without refetch', async () => {
       await Candidate.updateOne({ _id: candidate._id }, { $set: { 'cvReview.warnings': ['text_limit', 'page_limit'] } });
@@ -76,6 +76,48 @@ test('HR review UI preserves unknowns, edits extracted facts and previews privat
         }
       }
       assert.equal(h.wire.length, requests);
+    });
+    await t.test('own read-only original DOCX preview avoids a second upload', async () => {
+      await h.models.Role.updateOne({ key: 'test_own' }, { $set: { permissions: [{ resource: 'candidate', action: 'read', scope: 'own' }] } });
+      await Candidate.updateOne({ _id: candidate._id }, { $set: { createdBy: h.actors.own._id } });
+      await h.open('own', `/app/recruitment/candidates/${candidate._id}`);
+      await h.page.getByText('HR reviewed name', { exact: true }).waitFor();
+      const count = h.wire.length;
+      await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click(); await h.page.getByRole('dialog').waitFor();
+      assert.match(await h.page.locator('[role=dialog] pre').textContent(), /Original Person/);
+      const requests = h.wire.slice(count); assert.equal(requests.filter(r => r.method === 'POST').length, 0);
+      assert.equal(requests.filter(r => r.path.endsWith('/cv-preview') && r.actor === 'own').length, 1);
+      assert.equal(requests.filter(r => r.path.endsWith('/cv') && r.actor === 'own').length, 1);
+      await h.page.getByRole('button', { name: 'Bağla', exact: true }).click();
+    });
+    for (const status of [401, 404]) await t.test(`preview HTTP ${status} fails closed instead of retaining old blob`, async () => {
+      await h.open('admin', `/app/recruitment/candidates/${candidate._id}`);
+      await h.page.getByText('HR reviewed name', { exact: true }).waitFor();
+      await h.page.route('**/api/candidates/*/cv-preview?*', r => r.fulfill({ status, contentType: 'application/json', body: '{"message":"Synthetic access failure"}' }));
+      await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click();
+      await h.page.locator('[data-file-error=' + (status === 401 ? 'unauthenticated' : 'not-found') + ']').waitFor();
+      assert.equal(await h.page.getByRole('dialog').count(), 0); await h.page.unroute('**/api/candidates/*/cv-preview?*');
+    });
+    await t.test('CV changed response reloads the profile and never displays old preview', async () => {
+      await h.open('admin', `/app/recruitment/candidates/${candidate._id}`); await h.page.getByText('HR reviewed name', { exact: true }).waitFor();
+      await h.page.route('**/api/candidates/*/cv-preview?*', r => r.fulfill({ status: 409, contentType: 'application/json', body: '{"code":"CV_CHANGED"}' }));
+      const count = h.wire.filter(r => r.path === `/api/candidates/${candidate._id}`).length;
+      await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click();
+      for (let i = 0; i < 40 && h.wire.filter(r => r.path === `/api/candidates/${candidate._id}`).length === count; i++) await h.page.waitForTimeout(25);
+      assert.ok(h.wire.filter(r => r.path === `/api/candidates/${candidate._id}`).length > count); assert.equal(await h.page.getByRole('dialog').count(), 0);
+      await h.page.unroute('**/api/candidates/*/cv-preview?*');
+    });
+    await t.test('late original preview after permission revocation cannot allocate an object URL', async () => {
+      await h.open('admin', `/app/recruitment/candidates/${candidate._id}`); await h.page.getByText('HR reviewed name', { exact: true }).waitFor();
+      await h.page.evaluate(() => { window.previewURLs = 0; const original = URL.createObjectURL; URL.createObjectURL = (...args) => { window.previewURLs++; return original(...args); }; });
+      let entered, release; const ready = new Promise(r => entered = r), gate = new Promise(r => release = r);
+      await h.page.route('**/api/candidates/*/cv-preview?*', async r => { entered(); await gate; await r.fulfill({ contentType: 'application/json', body: JSON.stringify({ rawText: 'Obsolete preview', warnings: [], sha256: candidate.cvOriginal.sha256 }) }); });
+      try {
+        await h.page.getByRole('button', { name: 'CV-ni aç', exact: true }).click(); await ready;
+        await h.page.evaluate(() => window.setTestUser({ ...window.testUser, permissions: [] })); release();
+        await h.page.waitForFunction(() => !document.querySelector('[role=dialog]') && !document.querySelector('button.candidate-detail-action--edit'));
+        assert.equal(await h.page.evaluate(() => window.previewURLs), 0);
+      } finally { release(); await h.page.unroute('**/api/candidates/*/cv-preview?*'); }
     });
     assert.deepEqual(h.pageErrors, []);
   } finally { await fs.unlink(path.join(uploadsDir, path.basename(candidate.cvUrl))); }

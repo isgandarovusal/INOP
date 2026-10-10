@@ -1,0 +1,15 @@
+# Original CV preview
+
+`GET /api/candidates/:id/cv-preview` is an additive read endpoint. It accepts no multipart upload or client-selected file path. Authorization uses the existing independent `candidate.read` all/own/department/assigned scope, including fail-closed none/missing department behavior. It does not change access policy or write Candidate data.
+
+The existing arbitrary-file `/candidates/parse-cv` route remains `candidate.read` as it was before this increment. The initial tracker hypothesis that it required create was incorrect; a real read-only browser reproduction passed. That finding is retained with its explicit correction, not claimed as a fixed vulnerability.
+
+Preview resolves the Candidate's existing `/uploads/` original through the same private filename/root/symlink checks as download. File reading stops at 5 MiB + 1; oversized, malformed and scanned inputs return safe 422 errors. Worker extraction keeps the existing page/text/deadline/queue bounds. The response is `{ rawText, warnings, sha256 }`, with `Cache-Control: private, no-store`, and no filesystem path or unrelated profile fields.
+
+Optional `expectedHash` is a lower-case SHA-256 of the already downloaded original; optional `expectedRevision` is the Candidate revision. Invalid values return 400, changed values 409 `CV_CHANGED`. After extraction, the server checks the current JWT/revocation, live actor/role/read grant and owning record again. It suppresses results if assignment, department, role or record visibility changed and returns 409 if the CV/revision changed. Legacy originals without a stored SHA work using actual bytes; no hash backfill is run.
+
+Frontend downloads the authorized original once, hashes its actual bytes, then requests text preview without re-uploading the file. The text stays React-escaped; limit warnings accompany partial text. HTTP 401/403/404 clears the prospective preview. A conflict triggers profile reload; an extraction 500/503 preserves the authorized original download with explicit unavailable-preview text. Existing keyed cancellation and objectURL revocation remain in place, so an obsolete route/permission response cannot allocate a new URL.
+
+Network disconnection cancels this read-only worker operation. Concurrent accepted Candidate writes are not undone by cancellation. There is no new file storage provider, public URL, schema, migration or production action; existing Native Node ephemeral storage and durable create/pipeline processing remain package 10.
+
+Evidence: `Backend/tests/candidatePreview.test.cjs` exercises positive/negative mixed read scopes, current JWT/role/department/assignment, replacement during extraction, legacy identity, traversal/symlink, input bounds, OCR/partial output and 503 overload. `Frontend/tests/cvReviewUI.test.cjs` checks real read-only preview with zero redundant POSTs, original download, escaped content, conflict reload, HTTP failure separation and stale permission response. Existing private-file and HR lifecycle suites remain regression gates.

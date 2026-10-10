@@ -396,3 +396,10 @@ export async function exportCandidatePdf(
 export async function getCandidateCv(id: string, signal?: AbortSignal): Promise<Blob> {
   return (await API.get<Blob>(`/candidates/${encodeURIComponent(id)}/cv`, { responseType: "blob", signal })).data;
 }
+
+export async function getCandidateCvPreview(id: string, expectedHash: string, expectedRevision: number, signal?: AbortSignal): Promise<{ rawText: string; warnings: string[]; sha256: string }> {
+  const params = new URLSearchParams({ expectedHash, expectedRevision: String(expectedRevision) });
+  const data = await readJson<{ rawText: string; warnings: string[]; sha256: string }>(`/candidates/${encodeURIComponent(id)}/cv-preview?${params}`, { signal });
+  if (typeof data?.rawText !== 'string' || data.rawText.length > 100000 || data.sha256 !== expectedHash || !Array.isArray(data.warnings) || data.warnings.some(code => !['text_limit', 'page_limit'].includes(code))) throw new Error('Invalid CV preview response.');
+  return data;
+}
