@@ -46,6 +46,17 @@ const candidateSchema = new mongoose.Schema(
       trim: true,
     },
     phoneRaw: { type: String, default: "", maxlength: 80 },
+    // Server-only opaque reference. Never accepted from Candidate request bodies.
+    // No default migration; records without it retain authorized legacy reads.
+    privateCvBlob: {
+      type: new mongoose.Schema({
+        provider: { type: String, enum: ['s3'], required: true },
+        key: { type: String, required: true }, sha256: { type: String, required: true },
+        size: { type: Number, required: true }, mimeType: { type: String, required: true },
+      }, { _id: false }),
+      select: false,
+      validate: value => { try { require('../services/hrPrivateObjectStorage.service').reference(value.toObject ? value.toObject() : value); return true; } catch { return false; } },
+    },
     cvOriginal: {
       originalName: String, mimeType: String, size: Number, sha256: String,
     },
@@ -129,6 +140,7 @@ const candidateSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { transform: (_doc, value) => { delete value.privateCvBlob; return value; } },
   }
 );
 

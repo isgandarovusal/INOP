@@ -343,13 +343,13 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P10-001 | Private object storage adapter | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
-| P10-002 | Authorized file access | OPEN | — |
+| P10-001 | Private object storage adapter | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
+| P10-002 | Authorized file access | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-003 | Original CV retention | OPEN | — |
 | P10-004 | Parsing metadata | OPEN | — |
-| P10-005 | Source identity | OPEN | — |
+| P10-005 | Source identity | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-006 | Existing file migration plan | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
-| P10-007 | Existing file fallback | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
+| P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | OPEN | — |
 | P10-009 | OCR jobs | OPEN | — |
 | P10-010 | AI jobs | OPEN | — |
@@ -737,3 +737,15 @@ Negative baseline `/tmp/inop-hr10a-privacy-baseline.log` **0/9 passed**; targete
 In progress. New adapter/test/contract are intentionally not wired into runtime upload/download or a new schema. Target `/tmp/inop-hr10b-target.log` **31/31** is entirely synthetic mock/DNS/HTTPS-injected proof, not real provider access. Fixed endpoint private SigV4, conditional encryption, immutable SHA/size, bounded slots/deadlines and no public URLs/deletion/retry are covered. No new resource, credential, migration or live request. Native filesystem still ephemeral; AUD-050 remains OPEN. Contract, external setup and proposed migration/fallback/backup approval: `docs/HR_PRIVATE_STORAGE_CONTRACT.md`.
 
 Existing application code is unchanged after 10A's 1628 full regression; the new unwired module has its own 31 tests. No unexecuted 1659-test full-suite total is claimed. Final `/tmp/inop-hr10b-validation.log` and `/tmp/inop-packagehr10b-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Local commit pending creation. Real object ownership/bucket policy/conditional write compatibility/durability/recovery and malware/retention are not verified. P10-001/006/007/016/017 in progress; P10-018/019 BLOCKED_EXTERNAL. Next: current-owning-resource read integration, then durable manifests/jobs/quarantine/source drafts.
+
+10B1 commit: `c87c7dc41a80e830a48e1f7fc73fd46dd8cc7fa4` (4 files), 31 synthetic adapter tests; 10A's unchanged application 1628 full test proof retained separately; 632 authorization / 13 smoke, TypeScript/build PASS, lint 0 errors / 9 warnings. No activated writer/provider/resource/migration/push.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-110 | 10B2 | Legacy Candidate download uses initial ownership even after assignment is revoked during asynchronous filesystem read | TESTED | Read-only c87c7dc controller baseline returns 200 after revocation; current actual file regression returns 404; 23 new current-storage authorization tests and 1682 full regression/final gates pass |
+
+## 10B2 — current-resource private object/legacy reads
+
+Focused `/tmp/inop-hr10b2-target.log` **177/177**, including 23 new actual HTTP/object/local authorization checks and existing private upload, original preview, Candidate action, CV review/AI UI protection. Full `/tmp/inop-hr10b2-regression.log` **1682/1682**, final `/tmp/inop-hr10b2-validation.log` and `/tmp/inop-packagehr10b2-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Local commit pending creation; docs/tracker only changed after final source freeze. The new optional select:false/JSON-hidden Candidate blob is server-only with no default/backfill/index. No object upload route is enabled. Existing Candidate/Audit/Source/frontend contracts stay compatible; new storage is read-only until approved manifest/quarantine writer work. Whole-source DOCX/PDF extraction remains local, minimized AI only receives approved professional facts. Contract and precise limitations: `docs/HR_PRIVATE_STORAGE_CONTRACT.md`.
+
+All object transport is synthetic; real durability/recovery/provider policy/access/cost remain BLOCKED_EXTERNAL. Existing filesystem originals remain authorized but ephemeral; native replacement safely clears old blob reference and retains the old object. Retention/orphans/AUD-050 and P10-003/006/008–015 remain OPEN/IN_PROGRESS. No production DB/env/secret/resource/migration/push. Next: bounded durable job/manifests and HR-visible processing/retry diagnostics; real CV ingestion stays gated.

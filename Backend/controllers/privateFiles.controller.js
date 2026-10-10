@@ -32,6 +32,69 @@ async function readBoundedPrivateFile(filename) {
     throw Object.assign(new Error('Document input limit exceeded.'), { code: 'DOCUMENT_LIMIT' });
   } finally { await handle.close(); }
 }
+async function readCandidateOriginal(candidate, options = {}) {
+  if (candidate.privateCvBlob) {
+    const store = require('../services/hrPrivateObjectStorage.service');
+    const blob = store.reference(candidate.privateCvBlob.toObject?.() || candidate.privateCvBlob);
+    if ((candidate.cvOriginal?.sha256 && candidate.cvOriginal.sha256 !== blob.sha256) || (candidate.cvOriginal?.size !== undefined && candidate.cvOriginal.size !== blob.size)) throw Object.assign(new Error('Source identity changed.'), { code: 'STORAGE_IDENTITY_MISMATCH', status: 409 });
+    // Presence of a blob forbids filesystem fallback, even when unavailable.
+    return store.fromEnvironment().get(blob, options);
+  }
+  if (!candidate.cvUrl?.startsWith('/uploads/')) return null;
+  return readBoundedPrivateFile(candidate.cvUrl.slice('/uploads/'.length));
+}
+const candidateIdentity = row => JSON.stringify([String(row._id),row.cvUrl,row.privateCvBlob,row.__v || 0,row.updatedAt]);
+const readAuthority = (req,scope) => JSON.stringify([req.user.id,req.user.role,req.user.departmentId,scope]);
+async function currentCandidate(req, res, candidate, initialAuthority) {
+  const fresh = async () => {
+    await verifyToken(req,res,()=>{}); if (res.headersSent || res.destroyed) return null;
+    const scope = await getPermissionScope(req.user.role,'candidate','read');
+    const filter = getDataScope({user:req.user,permission:{scope}});
+    if (filter === null) { res.status(403).json({message:'Fayla giriş icazəsi yoxdur.'});return null; }
+    return {filter,authority:readAuthority(req,scope)};
+  };
+  const context = await fresh();if (!context) return false;
+  const current = await Candidate.findOne({_id:candidate._id,...context.filter}).select('+privateCvBlob').lean();
+  if (!current) { missing(res);return false; }
+  if (candidateIdentity(current) !== candidateIdentity(candidate)) { res.status(409).json({message:'CV changed. Reload the Candidate.',code:'CV_CHANGED'});return false; }
+  const final = await fresh();if (!final) return false;
+  if (final.authority !== context.authority || (initialAuthority && initialAuthority !== final.authority)) { res.status(403).json({message:'File authorization changed. Reload the current profile.',code:'FILE_AUTHORIZATION_CHANGED'});return false; }
+  return true;
+}
+function sendCandidateBytes(req,res,bytes,candidate) {
+  res.set({'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'",'Accept-Ranges':'bytes'});
+  res.attachment(path.basename(candidate.cvUrl || 'CV').replace(/[\x00-\x1f\x7f]/g,''));
+  res.type(bytes.subarray(0,5).toString() === '%PDF-' ? 'application/pdf' : 'application/octet-stream');
+  const range = req.headers.range;
+  // A conditional/multi-range can safely be ignored; single byte ranges preserve previews.
+  if (range && !req.headers['if-range']) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+    if (match && (match[1] || match[2])) {
+      const start = match[1] ? Number(match[1]) : Math.max(0,bytes.length-Number(match[2]));
+      const end = match[1] ? (match[2] ? Math.min(Number(match[2]),bytes.length-1) : bytes.length-1) : bytes.length-1;
+      if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start> end || start>=bytes.length || (!match[1] && Number(match[2])===0)) return res.status(416).set('Content-Range',`bytes */${bytes.length}`).end();
+      return res.status(206).set('Content-Range',`bytes ${start}-${end}/${bytes.length}`).send(bytes.subarray(start,end+1));
+    }
+  }
+  return res.send(bytes);
+}
+async function sendCandidateFile(req,res,candidate,scope) {
+  const initialAuthority=readAuthority(req,scope),controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.once('close',close);
+  try {
+    const bytes=await readCandidateOriginal(candidate,{signal:controller.signal});
+    if(controller.signal.aborted || res.destroyed)return;
+    if(!bytes)return missing(res);
+    if(!await currentCandidate(req,res,candidate,initialAuthority))return;
+    return sendCandidateBytes(req,res,bytes,candidate);
+  } catch(error) {
+    if(controller.signal.aborted || res.destroyed || res.headersSent)return;
+    if(['ENOENT','ENOTDIR','EACCES','ELOOP','STORAGE_NOT_FOUND'].includes(error.code))return missing(res);
+    if(error.code==='STORAGE_IDENTITY_MISMATCH')return res.status(409).json({message:'CV changed. Reload the Candidate.',code:'CV_CHANGED'});
+    if(error.code==='DOCUMENT_LIMIT')return res.status(413).json({message:'Private source exceeds the supported size.',code:'FILE_TOO_LARGE'});
+    if(error.code?.startsWith('STORAGE_'))return res.status(503).json({message:'Private source is temporarily unavailable.',code:'PRIVATE_STORAGE_UNAVAILABLE'});
+    return res.status(500).json({message:'Faylı açmaq mümkün olmadı.'});
+  } finally {res.off('close',close);}
+}
 async function sendPrivateFile(req, res, filename, displayName) {
   if (!safeFilename(filename)) return missing(res);
   try {
@@ -54,11 +117,12 @@ function sourceQuery(id) { return mongoose.isValidObjectId(id) ? { $or: [{ _id: 
 exports.sourceQuery = sourceQuery;
 // Internal server helper only; callers must first authorize the owning record.
 exports.readBoundedPrivateFile = readBoundedPrivateFile;
+exports.readCandidateOriginal = readCandidateOriginal;
 exports.candidate = async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Namizəd ID-si düzgün deyil.' });
-  const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).lean();
+  const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob').lean();
   if (!candidate || !candidate.cvUrl?.startsWith('/uploads/')) return missing(res);
-  return sendPrivateFile(req, res, candidate.cvUrl.slice('/uploads/'.length), path.basename(candidate.cvUrl));
+  return sendCandidateFile(req,res,candidate,req.permission.scope);
 };
 exports.source = async (req, res) => {
   const source = await Source.findOne(sourceQuery(req.params.id)).lean();
@@ -76,8 +140,8 @@ exports.legacy = async (req, res) => {
   if (source) return sendPrivateFile(req, res, filename, source.originalName);
   const filter = getDataScope({ user: req.user, permission: { scope } });
   if (filter === null) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
-  const candidate = await Candidate.findOne({ cvUrl: '/uploads/' + filename, ...filter }).lean();
-  return candidate ? sendPrivateFile(req, res, filename, filename) : missing(res);
+  const candidate = await Candidate.findOne({ cvUrl: '/uploads/' + filename, ...filter }).select('+privateCvBlob').lean();
+  return candidate ? sendCandidateFile(req,res,candidate,scope) : missing(res);
 };
 
 exports.candidatePreview = async (req, res) => {
@@ -87,7 +151,7 @@ exports.candidatePreview = async (req, res) => {
   const disconnected = () => { if (!res.writableEnded) controller.abort(); };
   res.once('close', disconnected);
   try {
-    const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).lean();
+    const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob').lean();
     if (!candidate || !candidate.cvUrl?.startsWith('/uploads/')) return missing(res);
     const { expectedHash, expectedRevision } = req.query;
     if ((expectedHash !== undefined && (typeof expectedHash !== 'string' || !/^[a-f0-9]{64}$/.test(expectedHash))) ||
@@ -95,26 +159,22 @@ exports.candidatePreview = async (req, res) => {
     const changed = () => res.status(409).json({ message: 'CV changed. Reload the Candidate.', code: 'CV_CHANGED' });
     if (expectedRevision !== undefined && Number(expectedRevision) !== (candidate.__v || 0)) return changed();
     const filename = candidate.cvUrl.slice('/uploads/'.length);
-    const bytes = await readBoundedPrivateFile(filename);
+    const initialAuthority = readAuthority(req,req.permission.scope);
+    const bytes = await readCandidateOriginal(candidate,{signal:controller.signal});
     if (!bytes) return missing(res);
     const sha256 = require('node:crypto').createHash('sha256').update(bytes).digest('hex');
     if (expectedHash && sha256 !== expectedHash) return changed();
     const { text, warnings } = await require('../services/cvParser.service').extractCvResultFromBuffer(bytes, filename, { signal: controller.signal });
     if (controller.signal.aborted || res.destroyed) return;
-    // Extraction can take seconds: recheck the current JWT, actor and independent read scope.
-    await verifyToken(req, res, () => {});
-    if (res.headersSent) return;
-    const scope = await getPermissionScope(req.user.role, 'candidate', 'read');
-    const filter = getDataScope({ user: req.user, permission: { scope } });
-    if (filter === null) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
-    const current = await Candidate.findOne({ _id: req.params.id, ...filter }).lean();
-    if (!current) return missing(res);
-    if (current.cvUrl !== candidate.cvUrl || (current.__v || 0) !== (candidate.__v || 0)) return changed();
+    // Storage and extraction may take seconds: recheck current ownership/authority.
+    if (!await currentCandidate(req,res,candidate,initialAuthority)) return;
     if (!text) return res.status(422).json({ message: 'OCR is required for this document.', code: 'OCR_REQUIRED', processingStatus: 'unsupported_ocr' });
     return res.json({ rawText: text, warnings, sha256 });
   } catch (error) {
     if (controller.signal.aborted || res.destroyed) return;
-    if (['ENOENT', 'ENOTDIR', 'EACCES', 'ELOOP'].includes(error?.code)) return missing(res);
+    if (['ENOENT', 'ENOTDIR', 'EACCES', 'ELOOP', 'STORAGE_NOT_FOUND'].includes(error?.code)) return missing(res);
+    if (error?.code === 'STORAGE_IDENTITY_MISMATCH') return res.status(409).json({message:'CV changed. Reload the Candidate.',code:'CV_CHANGED'});
+    if (error?.code?.startsWith('STORAGE_')) return res.status(503).json({message:'Private source is temporarily unavailable.',code:'PRIVATE_STORAGE_UNAVAILABLE'});
     if (['DOCUMENT_BUSY', 'DOCUMENT_TIMEOUT'].includes(error?.code)) return res.status(503).json({ message: 'Preview processing is busy. Retry later.', code: error.code });
     if (error?.code?.startsWith('DOCUMENT_')) return res.status(422).json({ message: 'CV preview could not be extracted.', code: 'EXTRACTION_FAILED' });
     return res.status(500).json({ message: 'Faylı açmaq mümkün olmadı.', code: 'FILE_READ_FAILED' });

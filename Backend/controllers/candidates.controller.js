@@ -366,7 +366,7 @@ exports.updateCandidate = async (req, res) => {
         _id: id,
         __v: current.__v === undefined ? { $exists: false } : current.__v,
       }),
-      { $set: update, $inc: { __v: 1 } },
+      { $set: update, $inc: { __v: 1 }, ...(req.file ? { $unset: { privateCvBlob: 1 } } : {}) },
       {
         new: true,
         runValidators: true,
