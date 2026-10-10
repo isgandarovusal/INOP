@@ -231,6 +231,7 @@ exports.updateCandidate = async (req, res) => {
     }
 
     const update = {};
+    if (req.file) update.cvUrl = `/uploads/${req.file.filename}`;
 
     if (req.body.name !== undefined) {
       const name = normalizeString(req.body.name);

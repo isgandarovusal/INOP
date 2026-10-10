@@ -1,5 +1,8 @@
 import API from "../api/axios";
 import { isAxiosError } from "axios";
+import { readJson } from "../api/readRequest";
+import { normalizeJob } from "./jobsService";
+import { normalizeCandidate } from "./candidatesService";
 import type {
   Application,
   ApplicationStatus,
@@ -67,14 +70,12 @@ function normalizeApplication(raw: unknown): Application {
       : {};
 
   const jobId =
-    typeof data.jobId === "string" || typeof data.jobId === "object"
-      ? data.jobId as Application["jobId"]
-      : "";
+    typeof data.jobId === "string" ? data.jobId
+      : data.jobId && typeof data.jobId === "object" ? normalizeJob(data.jobId) : null;
 
   const candidateId =
-    typeof data.candidateId === "string" || typeof data.candidateId === "object"
-      ? data.candidateId as Application["candidateId"]
-      : "";
+    typeof data.candidateId === "string" ? data.candidateId
+      : data.candidateId && typeof data.candidateId === "object" ? normalizeCandidate(data.candidateId) : null;
 
   const status =
     typeof data.status === "string"
@@ -107,23 +108,19 @@ function normalizeApplication(raw: unknown): Application {
   };
 }
 
-export async function getApplications(): Promise<Application[]> {
-  const response = await API.get("/applications");
+export async function getApplications(signal?: AbortSignal, scopeKey?: string): Promise<Application[]> {
+  const data = await readJson<unknown>("/applications", { signal, scopeKey });
 
-  return Array.isArray(response.data)
-    ? response.data.map(normalizeApplication)
+  return Array.isArray(data)
+    ? data.map(normalizeApplication)
     : [];
 }
 
 export async function getApplicationById(
-  id: string
+  id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<Application | null> {
   try {
-    const response = await API.get(
-      `/applications/${id}`
-    );
-
-    return normalizeApplication(response.data);
+    return normalizeApplication(await readJson(`/applications/${id}`, { signal, scopeKey }));
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 404) {
       return null;

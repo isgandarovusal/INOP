@@ -17,7 +17,7 @@ test('Dashboard summary scope equals existing list contracts without private pay
   const expected=actor==='admin'||actor==='hr'?40:actor==='department'?30:actor==='assigned'&&resource==='audits'?20:10;
   assert.equal(list.data.length,expected);assert.equal(summary.data.total??summary.data.totalAudits,expected);
   const text=JSON.stringify(summary.data);for(const secret of ['PRIVATE_JOB_DESCRIPTION','PRIVATE_CV','PRIVATE_APPLICATION_NOTES','PRIVATE_CHECKLIST','PRIVATE_SKILL'])assert.equal(text.includes(secret),false);
-  if(resource==='candidates'){assert.equal(summary.data.recentCandidates.length,5);assert.equal(summary.data.shortlistedCount,expected/2);assert.equal(summary.data.statusBreakdown.find(x=>x.status==='applied').value,expected/2);}
+  if(resource==='candidates'){assert.equal(summary.data.recentCandidates.length,5);assert.equal(summary.data.shortlistedCount,expected/2);assert.equal(summary.data.statusBreakdown.find(x=>x.status==='new').value,expected/2);}
   if(resource==='audits'){assert.equal(summary.data.overallScore,0);assert.equal(summary.data.criticalCount,expected);}
  });
  for(const actor of ['none','department_missing','anonymous'])for(const resource of ['jobs','candidates','applications','audits'])await t.test(`${actor}: ${resource} denied`,async()=>{

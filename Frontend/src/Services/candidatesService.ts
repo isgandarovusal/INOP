@@ -1,5 +1,6 @@
 import API from "../api/axios";
 import { isAxiosError } from "axios";
+import { readJson } from "../api/readRequest";
 import type {
   Candidate,
   CandidateStatus,
@@ -29,6 +30,7 @@ function normalizeCandidateStatus(
   status: CandidateStatus
 ): CandidateStatus {
   const value = String(status || "").toLowerCase();
+  if (value === "new") return "new";
 
   if (value === "screening") return "screening";
   if (value === "shortlisted") return "shortlisted";
@@ -40,7 +42,7 @@ function normalizeCandidateStatus(
   return "applied";
 }
 
-function normalizeCandidate(raw: unknown): Candidate {
+export function normalizeCandidate(raw: unknown): Candidate {
   const data =
     typeof raw === "object" && raw !== null
       ? (raw as Record<string, unknown>)
@@ -111,23 +113,19 @@ function normalizeCandidate(raw: unknown): Candidate {
   };
 }
 
-export async function getCandidates(): Promise<Candidate[]> {
-  const response = await API.get("/candidates");
+export async function getCandidates(signal?: AbortSignal, scopeKey?: string): Promise<Candidate[]> {
+  const data = await readJson<unknown>("/candidates", { signal, scopeKey });
 
-  return Array.isArray(response.data)
-    ? response.data.map(normalizeCandidate)
+  return Array.isArray(data)
+    ? data.map(normalizeCandidate)
     : [];
 }
 
 export async function getCandidateById(
-  id: string
+  id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<Candidate | null> {
   try {
-    const response = await API.get(
-      `/candidates/${id}`
-    );
-
-    return normalizeCandidate(response.data);
+    return normalizeCandidate(await readJson(`/candidates/${id}`, { signal, scopeKey }));
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 404) {
       return null;
@@ -167,14 +165,14 @@ export interface ParsedCvResult {
 }
 
 export async function parseCandidateCv(
-  file: File
+  file: File, signal?: AbortSignal
 ): Promise<ParsedCvResult> {
   const formData = new FormData();
   formData.append("cv", file);
 
   const response = await API.post(
     "/candidates/parse-cv",
-    formData
+    formData, { signal }
   );
 
   return response.data;
@@ -304,10 +302,20 @@ export async function updateCandidate(
     payload.certificates = input.certificates;
   }
 
-  const response = await API.put(
-    `/candidates/${id}`,
-    payload
-  );
+  let body: Record<string, unknown> | FormData = payload;
+  if (input.cvFile) {
+    const form = new FormData();
+    for (const [key, value] of Object.entries(payload)) {
+      if (Array.isArray(value)) {
+        if (!value.length) form.append(key, "");
+        else value.forEach(item => form.append(key, String(item)));
+      }
+      else form.append(key, String(value));
+    }
+    form.append("cv", input.cvFile);
+    body = form;
+  }
+  const response = await API.put(`/candidates/${id}`, body);
 
   return normalizeCandidate(response.data);
 }

@@ -28,7 +28,7 @@ exports.candidates = wrap(async req => {
       total: [{ $count: 'value' }],
       statuses: [
         { $addFields: { normalizedStatus: { $toLower: { $convert: { input: '$status', to: 'string', onError: '', onNull: '' } } } } },
-        { $project: { status: { $cond: [{ $in: ['$normalizedStatus', ['screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected']] }, '$normalizedStatus', 'applied'] } } },
+        { $project: { status: { $cond: [{ $in: ['$normalizedStatus', ['new', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected']] }, '$normalizedStatus', 'applied'] } } },
         { $group: { _id: '$status', value: { $sum: 1 } } }, { $sort: { _id: 1 } },
       ],
       recent: [

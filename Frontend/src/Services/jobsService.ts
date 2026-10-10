@@ -1,5 +1,6 @@
 import API from "../api/axios";
 import { isAxiosError } from "axios";
+import { readJson } from "../api/readRequest";
 import type {
   Job,
   JobStatus,
@@ -43,7 +44,7 @@ function backendStatus(status: JobStatus): "Open" | "Closed" | "Draft" {
   return "Open";
 }
 
-function normalizeJob(raw: unknown): Job {
+export function normalizeJob(raw: unknown): Job {
   const data =
     typeof raw === "object" && raw !== null
       ? (raw as Record<string, unknown>)
@@ -128,6 +129,8 @@ function normalizeJob(raw: unknown): Job {
       typeof data.assignedTo === "string" || data.assignedTo === null
         ? data.assignedTo
         : undefined,
+    createdAt: typeof data.createdAt === "string" ? data.createdAt : undefined,
+    updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : undefined,
   };
 }
 
@@ -147,20 +150,19 @@ function toBackendPayload(input: JobInput) {
   };
 }
 
-export async function getJobs(): Promise<Job[]> {
-  const response = await API.get("/jobs");
+export async function getJobs(signal?: AbortSignal, scopeKey?: string): Promise<Job[]> {
+  const data = await readJson<unknown>("/jobs", { signal, scopeKey });
 
-  return Array.isArray(response.data)
-    ? response.data.map(normalizeJob)
+  return Array.isArray(data)
+    ? data.map(normalizeJob)
     : [];
 }
 
 export async function getJobById(
-  id: string
+  id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<Job | null> {
   try {
-    const response = await API.get(`/jobs/${id}`);
-    return normalizeJob(response.data);
+    return normalizeJob(await readJson(`/jobs/${id}`, { signal, scopeKey }));
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 404) {
       return null;
@@ -185,15 +187,14 @@ export async function updateJob(
   id: string,
   input: Partial<JobInput>
 ): Promise<Job> {
-  const response = await API.put(
-    `/jobs/${id}`,
-    toBackendPayload({
-      description: input.description || "",
-      requiredSkills: input.requiredSkills || [],
-      ...input,
-      status: input.status || "open",
-    })
-  );
+  const payload: Record<string, unknown> = {};
+  for (const field of ["department", "location", "type", "description", "requiredSkills", "preferredSkills"] as const) {
+    if (input[field] !== undefined) payload[field] = input[field];
+  }
+  if (input.title !== undefined || input.position !== undefined) payload.title = input.title ?? input.position;
+  if (input.experienceYears !== undefined || input.experience !== undefined) payload.experienceYears = input.experienceYears ?? input.experience;
+  if (input.status !== undefined) payload.status = backendStatus(input.status);
+  const response = await API.put(`/jobs/${id}`, payload);
 
   return normalizeJob(response.data);
 }

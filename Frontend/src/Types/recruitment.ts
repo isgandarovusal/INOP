@@ -98,8 +98,8 @@ export interface Application {
   id: string;
   _id?: string;
 
-  jobId: string | Job;
-  candidateId: string | Candidate;
+  jobId: string | Job | null;
+  candidateId: string | Candidate | null;
 
   departmentId?: string;
   createdBy?: string | null;

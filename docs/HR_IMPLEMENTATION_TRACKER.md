@@ -23,16 +23,16 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-009 | 13 | Live JWT and role.update escalation protection must remain intact | OPEN | — |
 | AUD-010 | 13 | Legacy hr role migration is not automatic and hosted state unknown | OPEN | — |
 | AUD-011 | 06 | Assigned creator field lacks explicit reassignment workflow | OPEN | — |
-| AUD-012 | 02 | Nested populated _id objects are not normalized to id | OPEN | — |
+| AUD-012 | 02 | Nested populated _id objects are not normalized to id | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-013 | 02 | JobDetail compares populated jobId object with string and loses applications | OPEN | — |
 | AUD-014 | 02 | Applied candidate IDs ignore objects and allow duplicate selection | OPEN | — |
 | AUD-015 | 02 | Populated links/filter/position mapping uses undefined identifiers | OPEN | — |
-| AUD-016 | 02 | Candidate new is silently mapped to applied | OPEN | — |
+| AUD-016 | 02 | Candidate new is silently mapped to applied | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-017 | 02 | Job preferredSkills lost on edit | OPEN | — |
-| AUD-018 | 02 | Partial Job update defaults overwrite department/location/type | OPEN | — |
+| AUD-018 | 02 | Partial Job update defaults overwrite department/location/type | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-019 | 02 | Zero experience becomes one on edit | OPEN | — |
-| AUD-020 | 02 | Job normalization drops timestamps and breaks newest sorting | OPEN | — |
-| AUD-021 | 02 | Candidate update ignores accepted cvFile | OPEN | — |
+| AUD-020 | 02 | Job normalization drops timestamps and breaks newest sorting | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
+| AUD-021 | 02 | Candidate update ignores accepted cvFile | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-022 | 02 | Parsing stale response overwrites newer selected CV/manual fields | OPEN | — |
 | AUD-023 | 03 | Education/languages/certificates have no full HR review editors | OPEN | — |
 | AUD-024 | 02 | HR lists and details lack auth-context cancellation/reset | OPEN | — |
@@ -117,16 +117,16 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P02-001 | Normalize populated _id/id | OPEN | — |
+| P02-001 | Normalize populated _id/id | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | P02-002 | JobDetail displays job-specific applications | OPEN | — |
 | P02-003 | JobDetail displays ranking | OPEN | — |
-| P02-004 | Preserve Candidate new status | OPEN | — |
+| P02-004 | Preserve Candidate new status | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | P02-005 | Preserve preferredSkills on Job edit | OPEN | — |
 | P02-006 | Preserve department on Job edit | OPEN | — |
 | P02-007 | Preserve location on Job edit | OPEN | — |
 | P02-008 | Preserve type on Job edit | OPEN | — |
 | P02-009 | Preserve zero experience on Job edit | OPEN | — |
-| P02-010 | Candidate CV replacement persists file | OPEN | — |
+| P02-010 | Candidate CV replacement persists file | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | P02-011 | Stale responses cannot replace current state | OPEN | — |
 | P02-012 | Secondary failure does not hide primary data | OPEN | — |
 | P02-013 | 401/403/404/500 distinct UI states | OPEN | — |
@@ -451,7 +451,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | Package | Commit | Validation | Remaining risk |
 |---|---|---|---|
-| 01 | `fix(hr): enforce independent recruitment resource scopes` (SHA recorded next package) | Target 85/85; full regression 1020/1020; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | Scope-denied parents return null; UI normalization/lifecycle remains package 02 |
+| 01 | `a832bd76f918d6a142e3086c1a5be108935a0000` | Target 85/85; full regression 1020/1020; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | Scope-denied parents return null; UI normalization/lifecycle remains package 02 |
 
 ## External prerequisites
 
@@ -466,3 +466,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 Append here; never delete earlier findings.
 
 Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-final-target.log`, `/tmp/inop-hr01-regression.log`, `/tmp/inop-packagehr01-validation.json`. Full suite ran 84 new checks plus 936 existing checks; final target rerun includes one additional missing-department check. Test DBs are uniquely owned loopback databases, never Atlas.
+
+| 02A | `fix(hr): preserve recruitment service contracts and CV replacement` (SHA recorded next update) | Full regression 1029/1029; HR + summary target 44/44; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | UI lifecycle and edit form criteria still OPEN; replaced old files retained for migration |
+
+02A evidence: `/tmp/inop-hr02a-final-regression.log`, `/tmp/inop-hr02a-summary-contracts.log`, `/tmp/inop-hr02a-final-smoke.log`, `/tmp/inop-packagehr02-validation.json`. Baseline frontend reproduces partial Job update 400. Existing summary tests now assert actual new status, preserving identical scope/count/privacy assertions.

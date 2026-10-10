@@ -308,6 +308,7 @@ router.post(
 router.put(
   '/candidates/:id',
   ...authorize('candidate', 'update'),
+  cvUpload.single('cv'),
   candidatesController.updateCandidate
 );
 
