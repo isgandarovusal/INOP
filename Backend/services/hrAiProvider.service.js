@@ -74,3 +74,6 @@ exports.createProvider = ({ env = process.env, testTransport, budget = defaultBu
     },
   };
 };
+// One shared capacity limit for all HTTP consumers; no runtime mock switch.
+const provider = exports.createProvider();
+exports.suggestJob = (input, options) => provider.suggestJob(input, options);

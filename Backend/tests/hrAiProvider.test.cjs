@@ -12,6 +12,10 @@ test('AI adapter remains disabled without approved configuration and never inven
  });
 });
 test('AI contract rejects unsafe context, fabricated structure and protected criteria',async t=>{
+ await t.test('optional missing business context stays null and normalization is idempotent',async()=>{
+  const normalized=jobContext({title:'Unbranded legacy vacancy',description:'Food safety'});assert.equal(normalized.brandName,null);assert.equal(normalized.workplace,null);assert.deepEqual(jobContext(normalized),normalized);
+  await assert.rejects(createProvider({env:{}}).suggestJob(normalized,{actorId}),e=>e.code==='AI_UNAVAILABLE');
+ });
  for(const value of [{...context,rawCv:'Private CV'},{...context,apiKey:'not-forwarded'},{...context,title:''},{...context,description:'x'.repeat(8001)},{...context,experienceYears:-1},{...context,requiredSkills:['Gender']},{...context,preferredSkills:['ｇｅｎｄｅｒ']}])await t.test('invalid/unapproved context rejected',()=>assert.throws(()=>jobContext(value),e=>e.code==='AI_INVALID_CONTEXT'));
  for(const name of ['Female','Under 30','Gender','yaş','milliyyət','женщина','возраст','пол','ｇｅｎｄｅｒ','g\u200bender'])await t.test('protected/hidden criterion rejected: '+name,()=>assert.throws(()=>validateSuggestion({...suggestion,requiredSkills:[{name,reason:'Synthetic',confidence:0.5}]}),e=>e.code==='AI_INVALID_OUTPUT'));
  for(const result of [{...suggestion,hire:true},{...suggestion,uncertainty:'none'},{...suggestion,requiredSkills:[{name:'Food safety',reason:'Synthetic',confidence:2}]},{...suggestion,preferredSkills:suggestion.requiredSkills},{...suggestion,status:'insufficient_context'},{...suggestion,requiredSkills:undefined}])await t.test('schema/non-deterministic decisions/duplicates rejected',()=>assert.throws(()=>validateSuggestion(result),e=>e.code==='AI_INVALID_OUTPUT'));

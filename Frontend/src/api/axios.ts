@@ -1,6 +1,10 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
+declare module "axios" {
+  interface AxiosRequestConfig { suppressErrorToast?: boolean }
+}
+
 const TOKEN_KEY = "inop_auth_token";
 
 
@@ -34,6 +38,8 @@ api.interceptors.response.use(
 
       return Promise.reject(error);
     }
+
+    if (error.config?.suppressErrorToast) return Promise.reject(error);
 
     if (error.code === "ECONNABORTED") {
       toast.error("Server cavab vermədi. Yenidən cəhd edin.");

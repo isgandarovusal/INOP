@@ -1,3 +1,4 @@
+import JobSkillsAssistant from "../../../Components/JobSkillsAssistant";
 import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFields";
 import { useMounted } from "../../../Hooks/useMounted";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
@@ -8,7 +9,7 @@ import { useAuditResource } from "../../../Hooks/useAuditResource";
 import { useAuth } from "../../../Context/useAuth";
 import { hasPermission } from "../../../Utils/permissions";
 import type { Job, JobType } from "../../../Types/recruitment";
-import { AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../../Components/PageHeader";
@@ -37,36 +38,8 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const [location, setLocation] = useState(initial?.location ?? "Remote");
   const [type, setType] = useState<JobType>(initial?.type ?? "Full-time");
   const [saving, setSaving] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
+  const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const handleAiSuggestRequirements = () => {
-    if (!position.trim()) {
-      toast.error(t("recruitment.jobForm.aiPositionRequired"));
-      return;
-    }
-
-    setAiGenerating(true);
-
-    setTimeout(() => {
-      let suggestedSkills = ["Git", "Problem Solving", "Teamwork"];
-      const titleLower = position.toLowerCase();
-
-      if (titleLower.includes("react") || titleLower.includes("frontend")) {
-        suggestedSkills = ["React", "TypeScript", "JavaScript", "Tailwind CSS", "REST API"];
-      } else if (titleLower.includes("backend") || titleLower.includes("node")) {
-        suggestedSkills = ["Node.js", "Express", "PostgreSQL", "Docker", "REST API"];
-      } else if (titleLower.includes("designer") || titleLower.includes("figma")) {
-        suggestedSkills = ["Figma", "UI/UX", "Prototyping", "Design Systems"];
-      }
-
-      setRequiredSkills((prev) =>
-        Array.from(new Set([...prev, ...suggestedSkills])),
-      );
-      setAiGenerating(false);
-      toast.success(t("recruitment.jobForm.aiSuccess"));
-    }, 600);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +86,8 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
     }
   };
 
+  if (accessDenied) return <HRResourceState status={accessDenied} />;
+  const aiContext = { title: position, description, brandId, branchId, workplace: location, experienceYears: experience, requiredSkills, preferredSkills };
   return (
     <div className="job-form-page">
       <PageHeader
@@ -179,19 +154,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
               {t("recruitment.jobForm.requiredSkills")}
             </label>
 
-            <button
-              type="button"
-              className="recruitment-ai-action"
-              onClick={handleAiSuggestRequirements}
-              disabled={aiGenerating}
-            >
-              {aiGenerating ? (
-                <Loader2 size={14} className="spin" />
-              ) : (
-                <Sparkles size={14} />
-              )}
-              {t("recruitment.jobForm.generateRequirements")}
-            </button>
+
           </div>
 
           <TagInput
@@ -213,6 +176,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
           />
         </div>
 
+        <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
         <div className="form-actions recruitment-form-actions">
           <button
             type="button"

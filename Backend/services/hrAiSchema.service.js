@@ -6,7 +6,7 @@ exports.jobContext = value => {
   const fields = ['title', 'description', 'brandName', 'workplace', 'experienceYears', 'requiredSkills', 'preferredSkills'];
   if (!keys(value, fields) || !text(value.title, 200) || !value.title.trim() || !text(value.description, 8000)) throw error('AI_INVALID_CONTEXT', 'A bounded vacancy title and description are required.');
   const result = { title: value.title.trim(), description: value.description };
-  for (const key of ['brandName', 'workplace']) { if (value[key] !== undefined && !text(value[key], 200)) throw error('AI_INVALID_CONTEXT', 'Invalid business context.'); result[key] = value[key] || null; }
+  for (const key of ['brandName', 'workplace']) { if (value[key] !== undefined && value[key] !== null && !text(value[key], 200)) throw error('AI_INVALID_CONTEXT', 'Invalid business context.'); result[key] = value[key] || null; }
   if (value.experienceYears !== undefined && value.experienceYears !== null && (!Number.isFinite(value.experienceYears) || value.experienceYears < 0 || value.experienceYears > 80)) throw error('AI_INVALID_CONTEXT', 'Invalid experience requirement.');
   result.experienceYears = value.experienceYears ?? null;
   for (const key of ['requiredSkills', 'preferredSkills']) {

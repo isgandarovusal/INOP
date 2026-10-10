@@ -1283,5 +1283,26 @@
     "changed": "The card page failed or changed. Reload from the first page.",
     "manualOrder": "Card order is saved for this vacancy.",
     "selectVacancy": "Choose one vacancy and clear other filters to save card order."
+  },
+  "hrAi": {
+    "label": "AI skills assistant",
+    "notice": "AI only proposes. HR must review and approve; it makes no hiring decision.",
+    "generate": "Request AI skills proposal",
+    "processing": "Preparing proposal…",
+    "mock": "MOCK TEST — not a real AI result",
+    "proposal": "AI proposal — HR approval required",
+    "required": "Proposed required skills",
+    "preferred": "Proposed preferred skills",
+    "approve": "Add reviewed skills to form",
+    "dismiss": "Dismiss proposal",
+    "confidence": "Provider confidence (not a match score)",
+    "unknown": "Unknown",
+    "insufficient": "Insufficient context. Clarify responsibilities; no facts were invented.",
+    "unavailable": "AI is not configured or unavailable. You can enter skills manually.",
+    "timeout": "AI request timed out. Retry or enter skills manually.",
+    "invalid": "AI response failed validation; skills were not changed.",
+    "context": "Check vacancy context and the selected branch.",
+    "limited": "AI request limit or budget reached. You can continue manually.",
+    "changed": "Permission, vacancy or branch changed. Reload and review."
   }
 }

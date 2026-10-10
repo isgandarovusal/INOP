@@ -1307,5 +1307,26 @@
     "changed": "Kart səhifəsi yüklənmədi və ya dəyişib. İlk səhifəni yenidən yükləyin.",
     "manualOrder": "Bu vakansiyada kart sırası saxlanılır.",
     "selectVacancy": "Kart sırasını saxlamaq üçün bir vakansiya seçin və digər filtrləri təmizləyin."
+  },
+  "hrAi": {
+    "label": "AI bacarıq köməkçisi",
+    "notice": "AI yalnız təklif verir. HR yoxlamalı və təsdiq etməlidir; işə qəbul qərarı vermir.",
+    "generate": "AI bacarıq təklifini soruş",
+    "processing": "Təklif hazırlanır…",
+    "mock": "MOCK TEST — real AI nəticəsi deyil",
+    "proposal": "AI təklifi — HR təsdiqi tələb olunur",
+    "required": "Təklif edilən məcburi bacarıqlar",
+    "preferred": "Təklif edilən arzuolunan bacarıqlar",
+    "approve": "Yoxladığım bacarıqları formaya əlavə et",
+    "dismiss": "Təklifi bağla",
+    "confidence": "Provider confidence (uyğunluq balı deyil)",
+    "unknown": "Naməlum",
+    "insufficient": "Kontekst kifayət deyil. Öhdəlikləri dəqiqləşdirin; məlumat uydurulmadı.",
+    "unavailable": "AI konfiqurasiya edilməyib və ya əlçatan deyil. Bacarıqları əl ilə əlavə edə bilərsiniz.",
+    "timeout": "AI sorğusu vaxt limitini keçdi. Yenidən cəhd edin və ya əl ilə əlavə edin.",
+    "invalid": "AI cavabı yoxlamadan keçmədi; bacarıqlar dəyişdirilmədi.",
+    "context": "Vakansiya kontekstini və seçilmiş filialı yoxlayın.",
+    "limited": "AI sorğu limiti və ya büdcəsi bitib. Əl ilə davam edə bilərsiniz.",
+    "changed": "İcazə, vakansiya və ya filial dəyişib. Məlumatı yenidən açıb yoxlayın."
   }
 }

@@ -56,14 +56,14 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-042 | 03 | AZ/RU language labels and section variants are missing | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-043 | 03 | Certificate issuer/expiry/evidence not represented | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
-| AUD-045 | 09 | Rule parser and static suggestions are presented as AI | OPEN | — |
+| AUD-045 | 09 | Rule parser and static suggestions are presented as AI | TESTED | `hrAiUI` / existing `cvReviewUI`: unavailable/manual/rule-based labels and no manufactured skills; provider test-only mode explicit; real AI E2E remains blocked |
 | AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-047 | 02 | Upload/processing/error strings have incomplete localization | OPEN | — |
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
 | AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | — |
-| AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | OPEN | — |
+| AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | TESTED | `hrAiUI` / existing `cvReviewUI`: unavailable/manual/rule-based labels and no manufactured skills; provider test-only mode explicit; real AI E2E remains blocked |
 | AUD-053 | 05 | Standalone aiMatchService and MatchScoreBadge unused | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-054 | 05 | Historical global match UI removed; restore only Application context | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-055 | 05 | Exact-string score ignores skill aliases and deduplication | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
@@ -315,7 +315,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P09-001 | Remove hardcoded AI suggestions | OPEN | — |
+| P09-001 | Remove hardcoded AI suggestions | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
 | P09-002 | Configurable backend adapter | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-003 | Title and responsibilities context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-004 | Restaurant/brand context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
@@ -324,7 +324,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P09-007 | Explanation | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-008 | Confidence/uncertainty | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-009 | Source context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
-| P09-010 | HR approval/edit | OPEN | — |
+| P09-010 | HR approval/edit | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
 | P09-011 | Schema validation | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-012 | Timeout | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-013 | Bounded retry | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
@@ -332,8 +332,8 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P09-015 | Cost budget | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-016 | Usage logging without sensitive input | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-017 | AI-assisted CV review | OPEN | — |
-| P09-018 | Explicit unavailable state | OPEN | — |
-| P09-019 | Mock never presented as real AI | OPEN | — |
+| P09-018 | Explicit unavailable state | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
+| P09-019 | Mock never presented as real AI | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
 | P09-020 | Untrusted CV prompt injection defense | OPEN | — |
 | P09-021 | Data disclosure controls | OPEN | — |
 | P09-022 | Adapter mock tests | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
@@ -670,3 +670,23 @@ Target `/tmp/inop-hr09a-target-final.log`: **47/47**. Full serial regression **1
 Two process-local active requests, bounded stream/timeout/retry, atomic cross-instance daily budget and hashed actor quotas, sanitized errors and aggregate-only usage counters are tested. Reservations remain conservative after failure; billing/provider-side limits and model compatibility require approved external configuration. TTL is declared for a new counters collection but no production DDL is executed. Protected lexical criteria are checked in skill names, reasons and uncertainty; human approval is still required for semantic bias/accuracy.
 
 P09-001 and AUD-052 remain OPEN until 09B removes the existing Job form hardcoded suggestions. P09-010 approval/edit and 018/019 UI states remain OPEN until the UI and server authorization increment; P09-017/020/021 CV-assisted review/prompt minimization remain OPEN for 09C. P09-023 remains BLOCKED_EXTERNAL. No provider call, production operation, secret, new infrastructure or push.
+
+09A commit: `bb7ff48edf76f3a2fb2b12caacc18ec3d13e9e4c` (7 files), 47 target / 1494 full tests and recorded gates. No push.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-104 | 09B | Nullable unset brand/workplace normalization is not idempotent and prevents the explicit unavailable state | TESTED | `hrAiProvider`: nullable normalization regression; actual `hrAiUI` first run reproduces invalid context for an unbranded draft, corrected UI reports unavailable without fabricated skills |
+
+## 09B — independently authorized, human-reviewed Job proposals
+
+Target `/tmp/inop-hr09b-target-expanded.log` **87/87**. TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632** via `/tmp/inop-packagehr09b-validation.json`. Full serial regression **1534/1534** via `/tmp/inop-hr09b-regression.log`; local commit pending. Additional final UI run `/tmp/inop-hr09b-ui-final.log` **19/19** includes direct intercepted-AI POST counting for the zero language-refetch assertion. Application code is unchanged since the passing full run/gates. The live provider is not configured and P09-023 remains BLOCKED_EXTERNAL. Contract: `docs/HR_AI_PROVIDER_CONTRACT.md`.
+
+Additive draft/create and existing-Job/edit proposal routes independently require current server recruitment permissions. Read/all does not overwrite update/own or the converse. Parent, assignment, role, account, JWT revocation, millisecond Job changes and scoped catalog changes are rechecked after latency; no proposal or data is returned on failure. Neither route persists criteria. Scope-denied parent is unavailable; missing business context stays null without guessing a legacy brand.
+
+Actual Job form removes its fixed 600ms Git/Teamwork suggestions. Structured proposals are not auto-applied; HR can edit the proposed skill names and explicitly approve before normal authorized submit. Confidence including null/real zero is shown separately from matching. Mock identity stays visible. Draft/route/auth identity invalidates and cancels stale proposals; translation produces no request. 401/403/404 hide the form; outage/timeout/limit/invalid output preserve primary input with AZ/EN/RU messages. Four viewport widths and bounded long text are tested. Shared Axios Bearer and 401 expiry remain; only opted-in AI requests suppress duplicate generic toasts. Existing manual Job CRUD and preferred/location/type/zero experience edit behavior are tested.
+
+First UI fixture used a guessed position-label selector and produced failures; it was corrected to the actual current localized label, without changing product/assertions. The next run found actual AUD-104, fixed with a separate nullable normalization assertion. Expanded current run passes. Baseline initially targeted the new-only assistant container and therefore established missing UI rather than static behavior; the baseline selector was then adjusted to the shared old/new action and an explicit zero-fabricated-skills assertion. All failed/intermediate logs remain, never presented as PASS.
+
+Remaining: P09-017/020/021 minimized AI-assisted CV review, real provider P09-023, durable AI evidence/job history in P10, broader AUD-047 upload error localization, AUD-073 draft/double upload and AUD-090 Source concurrency finding. No external call, production write, new infrastructure, secret change or push.
+
+09B corrected read-only archived UI baseline `/tmp/inop-hr09b-static-baseline-corrected.log` reproduces **3 manufactured skills vs expected 0** without any provider configuration; final current UI **19/19**. Previous missing-container and label-fixture failures remain distinct from this actual static-behavior proof. Every owned fixture cleanup completed; no production test records or files were used.
