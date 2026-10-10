@@ -1,5 +1,5 @@
-import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import type { FormEvent, SetStateAction } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -17,9 +17,7 @@ import {
   getAuditSourceDocuments,
   uploadAuditSourceDocument,
   deleteAuditSourceDocument,
-} from "../../../Services/auditSourceDocumentsService";
-import type {
-  AuditSourceDocument,
+  getAuditSourceDocumentFile,
 } from "../../../Services/auditSourceDocumentsService";
 import type {
   AuditTemplate,
@@ -29,6 +27,16 @@ import type {
   AuditTemplateType,
 } from "../../../Types/Audit";
 import { useTranslation } from "react-i18next";
+
+import { useAuth } from "../../../Context/useAuth";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import { useAuditAction } from "../../../Hooks/useAuditAction";
+import { usePrivateFile, privateFileErrorMessage } from "../../../Hooks/usePrivateFile";
+import { getPermissionScope } from "../../../Utils/permissions";
+import AuditResourceState from "../../../Components/AuditResourceState";
+import PrivateFilePreview from "../../../Components/PrivateFilePreview";
+
+const loadDocuments = (id: string, signal?: AbortSignal, scopeKey?: string) => getAuditSourceDocuments(id === "__new__" ? undefined : id, signal, scopeKey);
 
 const emptyTemplate = (): Partial<AuditTemplate> => ({
   organizationId: "",
@@ -81,94 +89,56 @@ function newSection(order: number, labels?: { newQuestion: string; newSubsection
 }
 
 export default function AuditTemplateBuilder() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const key = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  return <AuditTemplateEditor key={key} />;
+}
+
+function AuditTemplateEditor() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [template, setTemplate] =
-    useState<Partial<AuditTemplate>>(emptyTemplate());
-  const [loading, setLoading] = useState(Boolean(id));
-  const [saving, setSaving] = useState(false);
-  const [openSections, setOpenSections] = useState<
-    Record<string, boolean>
-  >({});
+  const { user, isLoading } = useAuth();
+  const primary = useAuditResource(id, "audit.template", getAuditTemplate);
+  const source = useAuditResource(id || "__new__", "audit.source_document", loadDocuments);
+  const [draft, setDraft] = useState<Partial<AuditTemplate> | null>(null);
+  const template = draft || primary.data || emptyTemplate();
+  const setTemplate = (next: SetStateAction<Partial<AuditTemplate>>) => setDraft(current => typeof next === "function" ? next(current || template) : next);
+  const save = useAuditAction(id || "__new__", "audit.template", id ? "update" : "create");
+  const upload = useAuditAction(id || "__new__", "audit.source_document", "create");
+  const removal = useAuditAction(id || "__new__", "audit.source_document", "delete");
+  const preview = usePrivateFile(JSON.stringify([id, user?.id, user?.role, user?.permissions, source.status]));
+  const [previewName, setPreviewName] = useState("");
+  const documents = source.data || [];
+  const saving = save.busy;
+  const uploading = upload.busy;
+  const canUpload = getPermissionScope(user, "audit.source_document", "create") === "all";
+  const canDeleteDocument = getPermissionScope(user, "audit.source_document", "delete") === "all";
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
-  const [documents, setDocuments] = useState<
-    AuditSourceDocument[]
-  >([]);
-
-  const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    const load = async () => {
-if (id) {
-      getAuditTemplate(id)
-        .then((data) => setTemplate(data))
-        .finally(() => setLoading(false));
-    }
-
-    getAuditSourceDocuments(id)
-      .then((data) => setDocuments(data))
-      .catch(() => setDocuments([]));
-    };
-
-    load();
-  }, [id]);
-
-  async function handleDocumentUpload(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const file = event.target.files?.[0];
-
+  async function handleDocumentUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
-
     try {
-      setUploading(true);
-
-      const uploaded = await uploadAuditSourceDocument(
-        file,
-        {
-          templateId: id,
-          organizationId: template.organizationId || "",
-          brandId: template.brandId || "",
-          auditType:
-            template.auditType || "service",
-        }
-      );
-
-      setDocuments((current) => [
-        uploaded,
-        ...current,
-      ]);
-
-      setTemplate((current) => ({
-        ...current,
-        sourceDocumentIds: [
-          ...(current.sourceDocumentIds || []),
-          uploaded.id,
-        ],
-      }));
-    } finally {
-      setUploading(false);
-      event.target.value = "";
-    }
+      await upload.run(async signal => {
+        const uploaded = await uploadAuditSourceDocument(file, {
+          templateId: id, organizationId: template.organizationId || "",
+          brandId: template.brandId || "", auditType: template.auditType || "service",
+        }, signal);
+        if (!signal.aborted) setTemplate(current => ({ ...current, sourceDocumentIds: [...(current.sourceDocumentIds || []), uploaded.id] }));
+      }, source.reload);
+    } finally { input.value = ""; }
   }
 
-
-  async function removeSourceDocument(id: string) {
-    await deleteAuditSourceDocument(id);
-
-    setDocuments((current) =>
-      current.filter((item) => item.id !== id)
-    );
-
-    setTemplate((current) => ({
-      ...current,
-      sourceDocumentIds:
-        (current.sourceDocumentIds || []).filter(
-          (item) => item !== id
-        ),
-    }));
+  async function removeSourceDocument(documentId: string) {
+    await removal.run(signal => deleteAuditSourceDocument(documentId, signal), () => {
+      preview.close();
+      setTemplate(current => ({ ...current, sourceDocumentIds: (current.sourceDocumentIds || []).filter(item => item !== documentId) }));
+      source.reload();
+    });
   }
 
   function toggleSourceDocument(id: string) {
@@ -377,42 +347,11 @@ if (id) {
       return;
     }
 
-    try {
-      setSaving(true);
-
-      if (id) {
-        await updateAuditTemplate(id, template);
-
-        navigate("/app/audit/checklists", {
-          replace: true
-        });
-
-        return;
-      } else {
-        await createAuditTemplate(template);
-
-        navigate("/app/audit/checklists", {
-          replace: true
-        });
-
-        return;
-      }
-
-      window.alert(t("audit.checklist.builder.saved"));
-    } finally {
-      setSaving(false);
-    }
+    await save.run(signal => id ? updateAuditTemplate(id, template, signal) : createAuditTemplate(template, signal), () => navigate("/app/audit/checklists", { replace: true }));
   }
 
-  if (loading) {
-    return (
-      <div className="audit-modern-page">
-        <div className="audit-card">
-          {t("audit.checklist.builder.loading")}
-        </div>
-      </div>
-    );
-  }
+  const primaryStatus = id ? primary.status : isLoading ? "loading" : !user ? "unauthenticated" : getPermissionScope(user, "audit.template", "create") !== "all" ? "forbidden" : "ready";
+  if (primaryStatus !== "ready") return <AuditResourceState status={primaryStatus} retry={primary.reload} />;
 
   return (
     <div className="audit-modern-page">
@@ -447,6 +386,7 @@ if (id) {
       </div>
 
       <form id="audit-template-form" onSubmit={handleSubmit}>
+        {save.status !== "ready" && save.status !== "loading" && <AuditResourceState status={save.status} />}
         <section className="audit-card">
           <div className="audit-section-header">
             <div>
@@ -567,11 +507,19 @@ if (id) {
               <input
                 type="file"
                 onChange={handleDocumentUpload}
-                disabled={uploading}
+                disabled={uploading || !canUpload} accept=".pdf,.docx,.doc,.xlsx,.xls,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
               />
             </label>
           </div>
 
+          <div data-source-state={source.status}>
+            <AuditResourceState status={source.status} retry={source.reload} />
+          </div>
+          {upload.status !== "ready" && upload.status !== "loading" && <div data-source-mutation={upload.status}><AuditResourceState status={upload.status} /></div>}
+          {removal.status !== "ready" && removal.status !== "loading" && <div data-source-mutation={removal.status}><AuditResourceState status={removal.status} /></div>}
+          {preview.loading && <p role="status">{t("audit.checklist.builder.loading")}</p>}
+          {preview.error && <p role="alert" data-file-error={preview.error}>{privateFileErrorMessage(preview.error)}</p>}
+          {preview.url && <PrivateFilePreview url={preview.url} type={preview.type} name={previewName} onClose={preview.close} />}
           <div className="audit-builder-list">
             {documents.map((document) => (
               <label
@@ -590,14 +538,18 @@ if (id) {
                   }
                 />
                 <span>{document.originalName || document.name}</span>
+                <button type="button" disabled={preview.loading} onClick={event => {
+                  event.preventDefault(); setPreviewName(document.originalName || document.name);
+                  void preview.open(signal => getAuditSourceDocumentFile(document.id, signal));
+                }}>Aç / Endir</button>
 
                 <button
                   type="button"
                   onClick={(event) => {
                     event.preventDefault();
-                    removeSourceDocument(document.id);
+                    void removeSourceDocument(document.id);
                   }}
-                  className="btn-danger"
+                  className="btn-danger" disabled={removal.busy || !canDeleteDocument}
                 >
                   Sil
                 </button>
@@ -606,7 +558,7 @@ if (id) {
               </label>
             ))}
 
-            {documents.length === 0 && (
+            {source.status === "ready" && documents.length === 0 && (
               <div className="audit-builder-empty">
                 {t("audit.checklist.builder.noSourceDocuments")}
               </div>

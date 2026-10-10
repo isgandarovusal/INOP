@@ -21,22 +21,22 @@ export async function getAuditTemplates(params?: {
 }
 
 export function getAuditTemplate(
-  id: string
+  id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<AuditTemplate> {
-  return readJson<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`);
+  return readJson<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`, { signal, scopeKey });
 }
 
 export async function createAuditTemplate(
-  input: Partial<AuditTemplate>
+  input: Partial<AuditTemplate>, signal?: AbortSignal
 ): Promise<AuditTemplate> {
-  return (await api.post<AuditTemplate>("/audit-templates", input)).data;
+  return (await api.post<AuditTemplate>("/audit-templates", input, { signal })).data;
 }
 
 export async function updateAuditTemplate(
   id: string,
-  input: Partial<AuditTemplate>
+  input: Partial<AuditTemplate>, signal?: AbortSignal
 ): Promise<AuditTemplate> {
-  return (await api.put<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`, input)).data;
+  return (await api.put<AuditTemplate>(`/audit-templates/${encodeURIComponent(id)}`, input, { signal })).data;
 }
 
 export async function deleteAuditTemplate(

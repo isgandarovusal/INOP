@@ -1,3 +1,5 @@
+import api from "../api/axios";
+import { readJson } from "../api/readRequest";
 export interface AuditSourceDocument {
   id: string;
   templateId?: string;
@@ -7,93 +9,25 @@ export interface AuditSourceDocument {
   uploadedBy?: string;
   createdAt?: string;
 }
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
-
-
-async function request<T>(
-  path:string,
-  options?:RequestInit
-):Promise<T>{
-
-  const response = await fetch(`${API_BASE}${path}`, options);
-
-  if(!response.ok){
-    const body = await response.json().catch(()=>null);
-    throw new Error(
-      body?.message || "Sorğu xətası"
-    );
-  }
-
-  return response.json();
+type Metadata = {
+  templateId?: string; organizationId?: string; brandId?: string;
+  auditType?: "service" | "standard" | "occupational-safety"; uploadedBy?: string;
+};
+export function getAuditSourceDocuments(templateId?: string, signal?: AbortSignal, scopeKey?: string): Promise<AuditSourceDocument[]> {
+  const query = templateId ? `?${new URLSearchParams({ templateId })}` : "";
+  return readJson(`/audit-source-documents${query}`, { signal, scopeKey });
 }
-
-
-export async function getAuditSourceDocuments(
-  templateId?:string
-):Promise<AuditSourceDocument[]>{
-
-  const query = templateId
-    ? `?templateId=${templateId}`
-    : "";
-
-  return request(
-    `/audit-source-documents${query}`
-  );
-}
-
-
-
-export async function uploadAuditSourceDocument(
- file:File,
- metadata:{
-  templateId?:string;
-  organizationId?:string;
-  brandId?:string;
-  auditType?:
-    | "service"
-    | "standard"
-    | "occupational-safety";
-  uploadedBy?:string;
- }
-):Promise<AuditSourceDocument>{
-
- const formData = new FormData();
-
- formData.append("file",file);
- formData.append(
-  "templateId",
-  metadata.templateId || ""
- );
-
- formData.append(
-  "uploadedBy",
-  metadata.uploadedBy || ""
- );
-
-
- return request(
-  "/audit-source-documents",
-  {
-    method:"POST",
-    body:formData
+export async function uploadAuditSourceDocument(file: File, metadata: Metadata, signal?: AbortSignal): Promise<AuditSourceDocument> {
+  const form = new FormData(); form.append("file", file);
+  for (const key of ["templateId", "organizationId", "brandId", "auditType", "uploadedBy"] as const) {
+    if (metadata[key] !== undefined) form.append(key, metadata[key]);
   }
- );
-
+  // Axios/browser supplies the multipart boundary; never force a JSON Content-Type.
+  return (await api.post<AuditSourceDocument>("/audit-source-documents", form, { signal })).data;
 }
-
-
-
-export async function deleteAuditSourceDocument(
- id:string
-):Promise<void>{
-
- await request(
-  `/audit-source-documents/${id}`,
-  {
-   method:"DELETE"
-  }
- );
-
+export async function deleteAuditSourceDocument(id: string, signal?: AbortSignal): Promise<void> {
+  await api.delete(`/audit-source-documents/${encodeURIComponent(id)}`, { signal });
+}
+export async function getAuditSourceDocumentFile(id: string, signal?: AbortSignal): Promise<Blob> {
+  return (await api.get<Blob>(`/audit-source-documents/${encodeURIComponent(id)}/file`, { responseType: "blob", signal })).data;
 }

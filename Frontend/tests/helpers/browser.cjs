@@ -39,6 +39,14 @@ exports.withBrowserFixture = async (source, callback) => withAuditFixture(async 
       if (url.pathname.startsWith('/api/')) {
         const actor = Object.keys(h.tokens).find(name => route.request().headers().authorization === `Bearer ${h.tokens[name]}`) || 'anonymous';
         wire.push({ actor, method: route.request().method(), path: url.pathname });
+        const contentType = route.request().headers()['content-type'] || '';
+        if (contentType.startsWith('multipart/form-data')) {
+          const response = await fetch(h.apiBase + url.pathname.slice(4) + url.search, {
+            method: route.request().method(), headers: { 'Content-Type': contentType, ...(h.tokens[actor] ? { Authorization: 'Bearer ' + h.tokens[actor] } : {}) },
+            body: route.request().postDataBuffer(), signal: AbortSignal.timeout(10000),
+          });
+          return route.fulfill({ status: response.status, contentType: response.headers.get('content-type'), body: Buffer.from(await response.arrayBuffer()) });
+        }
         const body = route.request().postDataJSON();
         const result = await h.request(actor, route.request().method(), url.pathname.slice(4) + url.search, body === null ? undefined : body);
         return route.fulfill({ status: result.status, contentType: result.headers['content-type'], body: result.buffer });
