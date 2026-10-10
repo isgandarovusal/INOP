@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
-const XLSX = require("xlsx");
+const { buildExcelBuffer } = require("../utils/spreadsheet");
 
 const Candidate = require("../models/candidate.model");
 const Application = require("../models/application.model");
@@ -30,7 +30,7 @@ function candidateRow(candidate) {
 }
 
 function getScopeFilter(req) {
-  return req.dataScope || {};
+  return { deletedAt: null, ...(req.dataScope || {}) };
 }
 
 exports.exportCandidatesExcel = async (req, res) => {
@@ -41,22 +41,8 @@ exports.exportCandidatesExcel = async (req, res) => {
 
     const rows = candidates.map(candidateRow);
 
-    const workbook = XLSX.utils.book_new();
-
-    const worksheet = XLSX.utils.json_to_sheet(
-      rows.length ? rows : [{ Message: "No candidates found" }]
-    );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Candidates"
-    );
-
-    const buffer = XLSX.write(workbook, {
-      type: "buffer",
-      bookType: "xlsx",
-    });
+    const buffer = await buildExcelBuffer([{ name: "Candidates",
+      rows: rows.length ? rows : [{ Message: "No candidates found" }] }]);
 
     res.setHeader(
       "Content-Type",
@@ -70,7 +56,7 @@ exports.exportCandidatesExcel = async (req, res) => {
 
     return res.send(buffer);
   } catch (error) {
-    console.error("Candidate Excel export error:", error);
+    console.error("Candidate Excel export error:", error?.name || "Error");
 
     return res.status(500).json({
       message:
@@ -103,7 +89,7 @@ exports.exportCandidatePdf = async (req, res) => {
 
     const applications = await Application.find({
       candidateId: candidate._id,
-      ...getScopeFilter(req),
+      ...(req.dataScope || {}),
     })
       .select("jobId status score")
       .populate(
@@ -208,8 +194,7 @@ exports.exportCandidatePdf = async (req, res) => {
   } catch (error) {
     console.error(
       "Candidate PDF export error:",
-      error
-    );
+      error?.name || "Error");
 
     if (!res.headersSent) {
       return res.status(500).json({

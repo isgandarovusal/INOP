@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
-const XLSX = require("xlsx");
+const { buildExcelBuffer } = require("../utils/spreadsheet");
 
 const Audit = require("../models/audit.model");
 const AuditFinding = require("../models/auditFinding.model");
@@ -78,7 +78,8 @@ function safeValue(value) {
 }
 
 function csvEscape(value) {
-  const text = safeValue(value);
+  const raw = safeValue(value);
+  const text = /^[\s]*[=+@\-]/.test(raw) ? "'" + raw : raw;
 
   if (
     text.includes(",") ||
@@ -93,7 +94,7 @@ function csvEscape(value) {
 
 exports.exportCsv = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.audit._id);
 
     const rows = [
       ["AUDIT REPORT"],
@@ -229,7 +230,7 @@ exports.exportCsv = async (req, res) => {
 
 exports.exportExcel = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.audit._id);
 
     const auditRows = [
       {
@@ -295,61 +296,13 @@ exports.exportExcel = async (req, res) => {
       ClosedAt: safeValue(closure.closedAt)
     }));
 
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(auditRows),
-      "Audit"
-    );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(
-        findingRows.length
-          ? findingRows
-          : [{ Message: "No findings" }]
-      ),
-      "Findings"
-    );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(
-        approvalRows.length
-          ? approvalRows
-          : [{ Message: "No approvals" }]
-      ),
-      "Approvals"
-    );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(
-        actionRows.length
-          ? actionRows
-          : [{ Message: "No actions" }]
-      ),
-      "Actions"
-    );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(
-        closureRows.length
-          ? closureRows
-          : [{ Message: "No closures" }]
-      ),
-      "Closures"
-    );
-
-    const buffer = XLSX.write(
-      workbook,
-      {
-        type: "buffer",
-        bookType: "xlsx"
-      }
-    );
+    const buffer = await buildExcelBuffer([
+      { name: 'Audit', rows: auditRows },
+      { name: 'Findings', rows: findingRows.length ? findingRows : [{ Message: 'No findings' }] },
+      { name: 'Approvals', rows: approvalRows.length ? approvalRows : [{ Message: 'No approvals' }] },
+      { name: 'Actions', rows: actionRows.length ? actionRows : [{ Message: 'No actions' }] },
+      { name: 'Closures', rows: closureRows.length ? closureRows : [{ Message: 'No closures' }] },
+    ]);
 
     res.setHeader(
       "Content-Type",
@@ -379,7 +332,7 @@ exports.exportExcel = async (req, res) => {
 
 exports.exportPdf = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.audit._id);
 
     const doc = new PDFDocument({
       margin: 50
