@@ -65,7 +65,13 @@ async function prepareWorkflow(req, current) {
     else {
       const action = body.nextAction;
       if (!action || !['review', 'call', 'interview', 'offer', 'follow_up', 'none'].includes(action.kind) || (action.notes !== undefined && (typeof action.notes !== 'string' || action.notes.length > 500))) throw failure('Invalid next action.');
-      update.nextAction = { kind: action.kind, dueAt: action.dueAt ? isoDate(action.dueAt) : null, notes: action.notes || '' };
+      let dueAt = null;
+      if (action.timezone !== undefined && action.timezone !== null) {
+        if (typeof action.timezone !== 'string' || !action.timezone || action.timezone.length > 80) throw failure('Invalid next-action timezone.');
+        try { wallAt(Date.now(), action.timezone); } catch { throw failure('Unknown next-action timezone.'); }
+      }
+      try { dueAt = action.localDueAt ? localTime(action.localDueAt, action.timezone) : action.dueAt ? isoDate(action.dueAt) : null; } catch { throw failure('Invalid next-action time or timezone.'); }
+      update.nextAction = { kind: action.kind, dueAt, timezone: action.timezone || null, notes: action.notes || '' };
     }
   }
   if (body.interview !== undefined) {

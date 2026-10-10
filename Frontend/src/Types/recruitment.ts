@@ -136,6 +136,11 @@ export interface Application {
   assignedTo?: string | null;
 
   revision?: number;
+  processingState?: 'idle' | 'queued' | 'running' | 'completed' | 'failed' | 'unsupported';
+  substatus?: string;
+  stageEnteredAt?: string;
+  interview?: ApplicationInterview | null;
+  nextAction?: ApplicationNextAction | null;
   score: number | null;
   scoreStatus: "pending" | "incomplete" | "calculated" | "stale" | "legacy" | "restricted";
   matching?: ApplicationMatch | null;
@@ -156,3 +161,8 @@ export interface ApplicationMatch {
   version: string; calculatedAt: string; dataCoverage: number; reason: string | null;
   jobHash: string; candidateHash: string; criteria: MatchCriterion[];
 }
+
+export interface ApplicationInterview { startsAt: string; timezone: string; durationMinutes: number; interviewerId: string; result: 'pending' | 'passed' | 'failed' | 'no_show' | 'cancelled' }
+export interface ApplicationNextAction { kind: 'review' | 'call' | 'interview' | 'offer' | 'follow_up' | 'none'; dueAt: string | null; timezone?: string | null; notes: string }
+export interface ApplicationEvent { id: string; type: string; actor: string; at: string; revision: number; reason: string;
+  before: Record<string, unknown> | null; after: Record<string, unknown>; delivery?: { state: string; attempts: number; lastErrorCode?: string } }

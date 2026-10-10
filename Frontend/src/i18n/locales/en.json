@@ -324,7 +324,7 @@
       "score": "Score",
       "status": "Status",
       "actions": "Actions",
-      "applied": "Applied",
+      "applied": "New application",
       "screening": "Screening",
       "shortlisted": "Shortlisted",
       "rejected": "Rejected",
@@ -1103,6 +1103,91 @@
       "requirements_missing": "Vacancy criteria are missing",
       "application_context_required": "Application context is required",
       "protected_criteria_forbidden": "Protected personal traits are never evaluated"
+    }
+  },
+  "hrWorkflow": {
+    "application": "Manage application",
+    "history": "Application history",
+    "actor": "Actor",
+    "delivery": "Notification",
+    "reopen": "Reopen decision with a reason",
+    "conflict": "Application changed in another operation. Reload and review the latest data.",
+    "substatus": "Substatus",
+    "timezone": "Timezone (IANA)",
+    "interviewStart": "Interview time",
+    "duration": "Duration (minutes)",
+    "interviewer": "Interviewer",
+    "existingInterviewer": "Existing assigned user",
+    "result": "Interview result",
+    "nextAction": "Next action",
+    "due": "Due time (in selected timezone)",
+    "actionNotes": "Next-action notes",
+    "notes": "HR notes",
+    "reason": "Reason for change",
+    "processing": "Processing",
+    "move": "Move application",
+    "details": "Open application",
+    "candidateCards": "Candidate cards",
+    "profileStatus": "Profile status (legacy)",
+    "assignee": "Responsible HR user",
+    "search": "Search candidate / vacancy",
+    "sort": "Sort",
+    "sortScore": "Matching",
+    "sortNewest": "Newest",
+    "sortName": "Candidate name",
+    "sub": {
+      "new": "New",
+      "review-required": "Review required",
+      "in-review": "In review",
+      "selected": "Selected",
+      "contacted": "Contacted",
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "no-show": "No-show",
+      "rescheduled": "Rescheduled",
+      "cancelled": "Cancelled",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "onboarding": "Onboarding",
+      "closed": "Closed"
+    },
+    "resultState": {
+      "pending": "Pending",
+      "passed": "Passed",
+      "failed": "Failed",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "action": {
+      "none": "None",
+      "review": "Review",
+      "call": "Call",
+      "interview": "Interview",
+      "offer": "Offer",
+      "follow_up": "Follow-up"
+    },
+    "event": {
+      "create": "Created",
+      "status": "Stage change",
+      "workflow": "Workflow change",
+      "score": "Matching"
+    },
+    "processingState": {
+      "idle": "Processing not active",
+      "queued": "Queued",
+      "running": "Processing",
+      "completed": "Processing completed",
+      "failed": "Processing failed",
+      "unsupported": "Processing unsupported"
+    },
+    "deliveryState": {
+      "pending": "Queued",
+      "running": "Sending",
+      "sent": "Sent",
+      "failed": "Delivery failed",
+      "blocked": "Configuration required",
+      "skipped": "Not sent"
     }
   }
 }

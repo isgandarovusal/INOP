@@ -285,7 +285,7 @@
       "score": "Баллы",
       "status": "Статус",
       "actions": "Действия",
-      "applied": "Подал заявку",
+      "applied": "Новая заявка",
       "screening": "Первичный отбор",
       "shortlisted": "В коротком списке",
       "rejected": "Отклонён",
@@ -1064,6 +1064,91 @@
       "requirements_missing": "Нет критериев вакансии",
       "application_context_required": "Требуется контекст заявки",
       "protected_criteria_forbidden": "Защищённые личные признаки не оцениваются"
+    }
+  },
+  "hrWorkflow": {
+    "application": "Управление заявкой",
+    "history": "История заявки",
+    "actor": "Автор",
+    "delivery": "Уведомление",
+    "reopen": "Повторно открыть решение с обоснованием",
+    "conflict": "Заявка изменена другой операцией. Загрузите и проверьте актуальные данные.",
+    "substatus": "Подстатус",
+    "timezone": "Часовой пояс (IANA)",
+    "interviewStart": "Время интервью",
+    "duration": "Продолжительность (минуты)",
+    "interviewer": "Интервьюер",
+    "existingInterviewer": "Ранее назначенный пользователь",
+    "result": "Результат интервью",
+    "nextAction": "Следующее действие",
+    "due": "Срок (в выбранном часовом поясе)",
+    "actionNotes": "Заметки следующего действия",
+    "notes": "Заметки HR",
+    "reason": "Причина изменения",
+    "processing": "Обработка",
+    "move": "Переместить заявку",
+    "details": "Открыть заявку",
+    "candidateCards": "Карточки кандидатов",
+    "profileStatus": "Статус профиля (legacy)",
+    "assignee": "Ответственный HR",
+    "search": "Поиск кандидата / вакансии",
+    "sort": "Сортировка",
+    "sortScore": "Соответствие",
+    "sortNewest": "Новые",
+    "sortName": "Имя кандидата",
+    "sub": {
+      "new": "Новая",
+      "review-required": "Требуется проверка",
+      "in-review": "На проверке",
+      "selected": "Отобран",
+      "contacted": "Связались",
+      "scheduled": "Назначено",
+      "completed": "Завершено",
+      "no-show": "Не явился",
+      "rescheduled": "Перенесено",
+      "cancelled": "Отменено",
+      "sent": "Отправлено",
+      "accepted": "Принято",
+      "declined": "Отклонено",
+      "onboarding": "Адаптация",
+      "closed": "Закрыто"
+    },
+    "resultState": {
+      "pending": "Ожидается",
+      "passed": "Успешно",
+      "failed": "Не пройдено",
+      "no_show": "Не явился",
+      "cancelled": "Отменено"
+    },
+    "action": {
+      "none": "Нет",
+      "review": "Проверка",
+      "call": "Звонок",
+      "interview": "Интервью",
+      "offer": "Предложение",
+      "follow_up": "Повторная связь"
+    },
+    "event": {
+      "create": "Создано",
+      "status": "Изменение этапа",
+      "workflow": "Изменение процесса",
+      "score": "Оценка"
+    },
+    "processingState": {
+      "idle": "Обработка не активна",
+      "queued": "В очереди",
+      "running": "Обработка",
+      "completed": "Обработка завершена",
+      "failed": "Ошибка обработки",
+      "unsupported": "Обработка недоступна"
+    },
+    "deliveryState": {
+      "pending": "В очереди",
+      "running": "Отправляется",
+      "sent": "Отправлено",
+      "failed": "Ошибка отправки",
+      "blocked": "Требуется настройка",
+      "skipped": "Не отправлено"
     }
   }
 }

@@ -336,7 +336,7 @@
       "score": "Bal",
       "status": "Status",
       "actions": "Əməliyyatlar",
-      "applied": "Müraciət edib",
+      "applied": "Yeni müraciət",
       "screening": "İlkin seçim",
       "shortlisted": "Qısa siyahıda",
       "rejected": "Rədd edilib",
@@ -1127,6 +1127,91 @@
       "requirements_missing": "Vakansiya meyarları verilməyib",
       "application_context_required": "Müraciət konteksti tələb olunur",
       "protected_criteria_forbidden": "Qorunan şəxsi xüsusiyyətlər qiymətləndirilmir"
+    }
+  },
+  "hrWorkflow": {
+    "application": "Müraciətin idarə edilməsi",
+    "history": "Müraciət tarixçəsi",
+    "actor": "Əməliyyat edən",
+    "delivery": "Bildiriş",
+    "reopen": "Qərarı əsas göstərərək yenidən aç",
+    "conflict": "Müraciət başqa əməliyyatda dəyişib. Son məlumatı yükləyib yenidən yoxlayın.",
+    "substatus": "Alt-status",
+    "timezone": "Saat qurşağı (IANA)",
+    "interviewStart": "Müsahibə vaxtı",
+    "duration": "Müddət (dəqiqə)",
+    "interviewer": "Müsahibəni aparan",
+    "existingInterviewer": "Mövcud təyin olunmuş istifadəçi",
+    "result": "Müsahibə nəticəsi",
+    "nextAction": "Növbəti addım",
+    "due": "Son tarix (seçilmiş saat qurşağında)",
+    "actionNotes": "Növbəti addımın qeydi",
+    "notes": "HR qeydləri",
+    "reason": "Dəyişiklik səbəbi",
+    "processing": "Emal olunur",
+    "move": "Müraciəti köçür",
+    "details": "Müraciəti aç",
+    "candidateCards": "Namizəd kartları",
+    "profileStatus": "Profil statusu (legacy)",
+    "assignee": "Məsul HR istifadəçisi",
+    "search": "Namizəd / vakansiya üzrə axtarış",
+    "sort": "Sıralama",
+    "sortScore": "Uyğunluq",
+    "sortNewest": "Ən yeni",
+    "sortName": "Namizəd adı",
+    "sub": {
+      "new": "Yeni",
+      "review-required": "Review tələb olunur",
+      "in-review": "İlkin yoxlama",
+      "selected": "Seçilib",
+      "contacted": "Əlaqə saxlanılıb",
+      "scheduled": "Planlaşdırılıb",
+      "completed": "Tamamlanıb",
+      "no-show": "Gəlməyib",
+      "rescheduled": "Yenidən planlaşdırılıb",
+      "cancelled": "Ləğv edilib",
+      "sent": "Göndərilib",
+      "accepted": "Qəbul edilib",
+      "declined": "İmtina edilib",
+      "onboarding": "Onboarding",
+      "closed": "Bağlanıb"
+    },
+    "resultState": {
+      "pending": "Gözlənilir",
+      "passed": "Müsbət",
+      "failed": "Mənfi",
+      "no_show": "Gəlməyib",
+      "cancelled": "Ləğv edilib"
+    },
+    "action": {
+      "none": "Təyin edilməyib",
+      "review": "Review",
+      "call": "Zəng",
+      "interview": "Müsahibə",
+      "offer": "Təklif",
+      "follow_up": "Təkrar əlaqə"
+    },
+    "event": {
+      "create": "Yaradılma",
+      "status": "Mərhələ dəyişikliyi",
+      "workflow": "Axın dəyişikliyi",
+      "score": "Qiymətləndirmə"
+    },
+    "processingState": {
+      "idle": "Emal aktiv deyil",
+      "queued": "Emal növbəsində",
+      "running": "Emal olunur",
+      "completed": "Emal tamamlanıb",
+      "failed": "Emal xətası",
+      "unsupported": "Emal dəstəklənmir"
+    },
+    "deliveryState": {
+      "pending": "Növbədə",
+      "running": "Göndərilir",
+      "sent": "Göndərilib",
+      "failed": "Göndərmə xətası",
+      "blocked": "Konfiqurasiya tələb olunur",
+      "skipped": "Göndərilməyib"
     }
   }
 }

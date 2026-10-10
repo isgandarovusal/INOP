@@ -1,11 +1,16 @@
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import ApplicationKanban from "../../../Components/ApplicationKanban";
+import { applicationTransitions } from "../../../Utils/applicationWorkflow";
+import { useHRActionContext } from "../../../Hooks/useHRActionContext";
+import { isAxiosError } from "axios";
+import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ClipboardList, Loader2, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
+import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/ConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
@@ -46,20 +51,27 @@ const ApplicationsList: React.FC = () => {
   const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
   const loading = result.status === "loading";
   const [error, setError] = useState(false);
-  const [view, setView] = useState<"table" | "board">("table");
+  const [params] = useSearchParams();
+  const [view, setView] = useState<"table" | "board">(params.get('view') === 'board' ? 'board' : 'table');
+  const context = useHRActionContext();
+  const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus> }>({ key: '', statuses: {} });
+  const [mutation, setMutation] = useState<{ key: string; error: string }>({ key: '', error: '' });
+  const visibleApplications = useMemo(() => applications.map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'score' | 'newest' | 'name'>('score');
   const [brandFilter, setBrandFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "processing" | ApplicationStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtersActive =
-    jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
+    search.trim() !== "" || jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
 
   const clearFilters = () => {
     setJobFilter("all"); setBrandFilter("all"); setBranchFilter("all");
-    setStatusFilter("all");
+    setStatusFilter("all"); setSearch("");
   };
 
   const load = result.reload;
@@ -67,7 +79,7 @@ const ApplicationsList: React.FC = () => {
   const rows = useMemo(() => {
     const jobMap = new Map(jobs.map((job) => [job.id, job]));
 
-    return applications
+    return visibleApplications
       .map((app) => ({
         app,
         job:
@@ -82,9 +94,10 @@ const ApplicationsList: React.FC = () => {
       .filter(r => brandFilter === "all" || (r.job?.brandId || "unset") === brandFilter)
       .filter(r => branchFilter === "all" || (r.job?.branchId || "unset") === branchFilter)
       .filter((r) => jobFilter === "all" || r.job?.id === jobFilter)
-      .filter((r) => statusFilter === "all" || r.app.status === statusFilter)
-      .sort((a, b) => applicationScoreOrder(a.app, b.app));
-  }, [applications, jobs, jobFilter, statusFilter, brandFilter, branchFilter]);
+      .filter((r) => statusFilter === "all" || (statusFilter === "processing" ? r.app.status === "applied" && ["queued", "running"].includes(r.app.processingState || "") : r.app.status === statusFilter))
+      .filter(r => !search.trim() || [r.candidate?.name, r.job?.position, r.job?.brandName, r.job?.branchName].some(value => value?.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())))
+      .sort((a, b) => sort === 'newest' ? new Date(b.app.createdAt || 0).getTime() - new Date(a.app.createdAt || 0).getTime() : sort === 'name' ? (a.candidate?.name || '').localeCompare(b.candidate?.name || '') : applicationScoreOrder(a.app, b.app));
+  }, [visibleApplications, jobs, jobFilter, statusFilter, brandFilter, branchFilter, search, sort]);
 
   const handleDelete = async () => {
     if (!deleteTarget || !canDelete) return;
@@ -106,13 +119,21 @@ const ApplicationsList: React.FC = () => {
     appId: string,
     status: ApplicationStatus,
   ) => {
-    if (!canUpdate) return;
+    if (!canUpdate || optimistic.key === context.key && optimistic.statuses[appId]) return;
+    const app = applications.find(a => a.id === appId); if (!app) return;
+    const key = context.key;
+    setOptimistic(previous => ({ key, statuses: { ...(previous.key === key ? previous.statuses : {}), [appId]: status } }));
+    setMutation({ key, error: '' });
     try {
-      await updateApplicationStatus(appId, status);
-
-      load();
-    } catch (statusError) {
-      console.error("Application status update error:", statusError); setError(true);
+      await updateApplicationStatus(appId, status, app.revision);
+      if (context.current.current === key) load();
+    } catch (err) {
+      if (context.current.current === key) {
+        setMutation({ key, error: isAxiosError(err) && err.response?.status === 409 ? t('hrWorkflow.conflict') : getErrorMessage(err, t('somethingWentWrong')) });
+        if (isAxiosError(err) && [401, 403, 404, 409].includes(err.response?.status || 0)) load();
+      }
+    } finally {
+      if (context.current.current === key) setOptimistic(previous => { const statuses = { ...(previous.key === key ? previous.statuses : {}) }; delete statuses[appId]; return { key, statuses }; });
     }
   };
 
@@ -125,7 +146,10 @@ const ApplicationsList: React.FC = () => {
         subtitle={t("recruitment.applications.totalShown", { total: applications.length, shown: rows.length })}
       />
 
+      {mutation.key === context.key && mutation.error && <p role="alert">{mutation.error} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
+        <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
+        <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(`hrWorkflow.sort${s.charAt(0).toUpperCase() + s.slice(1)}`)}</option>)}</select>
         <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
         <select aria-label={t('hrCatalog.brand')} value={brandFilter} onChange={e => { setBrandFilter(e.target.value); setBranchFilter('all'); }}><option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.map(j => j.brandId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}</select>
         <select aria-label={t('hrCatalog.branch')} value={branchFilter} onChange={e => setBranchFilter(e.target.value)}><option value="all">{t('hrCatalog.allBranches')}</option>{[...new Set(jobs.filter(j => brandFilter === 'all' || j.brandId === brandFilter).map(j => j.branchId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.branchId === id)?.branchName || t("hrCatalog.unavailable")}</option>)}</select>
@@ -141,10 +165,11 @@ const ApplicationsList: React.FC = () => {
           className="input-field"
           style={{ width: 170 }}
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as "all" | ApplicationStatus)}
+          onChange={(e) => setStatusFilter(e.target.value as "all" | "processing" | ApplicationStatus)}
         >
           <option value="all">{t("recruitment.applications.allStatuses")}</option>
           <option value="applied">{t("recruitment.applications.applied")}</option>
+          <option value="processing">{t("hrWorkflow.processing")}</option>
           <option value="screening">{t("recruitment.applications.screening")}</option>
           <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
           <option value="interview">{t("recruitment.applications.interview")}</option>
@@ -164,7 +189,7 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      {view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} /> : <div className="admin-table-container">
+      {view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
         <table>
           <thead>
             <tr>
@@ -237,24 +262,20 @@ const ApplicationsList: React.FC = () => {
                     {job?.position ?? t("hrStates.restricted")}
                     {job?.brandId && <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId)}{job.branchName ? ` · ${job.branchName}` : ""}</small>}
                   </td>
-                  <td><MatchScoreBadge application={app} onUpdated={load} /></td>
+                  <td><MatchScoreBadge application={app} onUpdated={load} /><button type="button" onClick={() => navigate(`/app/recruitment/applications/${app.id}`)}>{t("hrWorkflow.details")}</button></td>
                   <td>
                     {canUpdate ? (
                       <select
                         className="input-field"
                         style={{ width: 150, padding: "6px 10px" }}
+                        aria-label={`${t("recruitment.applications.status")} ${candidate?.name || app.id}`}
+                        disabled={optimistic.key === context.key && !!optimistic.statuses[app.id]}
                         value={app.status}
                         onChange={(e) =>
                           handleStatusChange(app.id, e.target.value as ApplicationStatus)
                         }
                       >
-                        <option value="applied">{t("recruitment.applications.applied")}</option>
-                        <option value="screening">{t("recruitment.applications.screening")}</option>
-                        <option value="shortlisted">{t("recruitment.applications.shortlisted")}</option>
-                        <option value="interview">{t("recruitment.applications.interview")}</option>
-                        <option value="offered">{t("recruitment.applications.offered")}</option>
-                        <option value="hired">{t("recruitment.applications.hired")}</option>
-                        <option value="rejected">{t("recruitment.applications.rejected")}</option>
+                        {[app.status, ...applicationTransitions[app.status]].map(s => <option key={s} value={s}>{t(`recruitment.applications.${s}`)}</option>)}
                       </select>
                     ) : (
                       <Badge tone={STATUS_TONE[app.status]}>{t(`recruitment.applications.${app.status}`)}</Badge>

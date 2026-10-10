@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -13,14 +13,12 @@ import {
   Trash2,
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
-import KanbanBoard from "../../../Components/KanbanBoard";
 import SearchInput from "../../../Components/SearchInput";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
   deleteCandidate,
   exportCandidatesExcel,
   getCandidates,
-  updateCandidateStatus,
 } from "../../../Services/candidatesService";
 import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
@@ -69,33 +67,9 @@ const CandidatesList: React.FC = () => {
   const [exporting, setExporting] = useState(false);
 
   const canCreate = hasPermission(user, "candidate", "create");
-  const canUpdate = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
 
   const fetchCandidates = result.reload;
-
-  const handleStatusChange = useCallback(
-    async (
-      candidateId: string,
-      newStatus: CandidateStatus,
-    ) => {
-      if (!canUpdate) return;
-
-      try {
-        await updateCandidateStatus(candidateId, newStatus);
-
-        fetchCandidates();
-
-        toast.success(t("recruitment.candidates.statusUpdated"));
-      } catch (err: unknown) {
-        setError(getErrorMessage(err, t("somethingWentWrong")));
-        toast.error(
-          getErrorMessage(err, t("recruitment.candidates.statusUpdateError")),
-        );
-      }
-    },
-    [canUpdate, t, fetchCandidates],
-  );
 
   const handleExportExcel = async () => {
     if (exporting) return;
@@ -219,6 +193,7 @@ const CandidatesList: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
+        <>{hasPermission(user, "application", "read") && <button type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}</>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
@@ -244,7 +219,7 @@ const CandidatesList: React.FC = () => {
               (viewMode === "grid" ? "active" : "")
             }
             onClick={() => setViewMode("grid")}
-            title={t("recruitment.candidates.kanbanMode")}
+            title={t("hrWorkflow.candidateCards")}
           >
             <LayoutGrid size={18} />
           </button>
@@ -342,11 +317,10 @@ const CandidatesList: React.FC = () => {
           )}
         </div>
       ) : viewMode === "grid" ? (
-        <KanbanBoard
-          candidates={filteredCandidates}
-          onStatusChange={handleStatusChange}
-          canChangeStatus={canUpdate}
-        />
+        <div className="hr-candidate-grid">{filteredCandidates.map(c => <article key={c.id} className="recruitment-kanban__card">
+          <button type="button" onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role}</p>
+          <p>{t('hrWorkflow.profileStatus')}: {t(`recruitment.candidateStatus.${c.status}`)}</p>
+        </article>)}</div>
       ) : (
         <div className="admin-table-container">
           <table className="data-table">

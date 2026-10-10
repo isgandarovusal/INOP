@@ -73,10 +73,10 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-059 | 05 | Default zero conflates uncalculated and real zero | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
-| AUD-062 | 06 | Candidate-global statuses conflict with Application stages | OPEN | — |
+| AUD-062 | 06 | Candidate-global statuses conflict with Application stages | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-063 | 06 | No processing state, revision CAS or transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
-| AUD-064 | 06 | DnD order not persisted and status requests can race | OPEN | — |
-| AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | OPEN | — |
+| AUD-064 | 06/08 | DnD order not persisted and status requests can race | OPEN | Stage persistence/race/rollback TESTED in 06B; manual within-column ordering remains package 08, not silently closed |
+| AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | OPEN | — |
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
@@ -223,29 +223,29 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P06-001 | Replace Candidate-global board | OPEN | — |
-| P06-002 | New application stage | OPEN | — |
-| P06-003 | AI processing separate from HR stage | OPEN | — |
-| P06-004 | Initial selection stage | OPEN | — |
-| P06-005 | Interview stage | OPEN | — |
-| P06-006 | Offered/Hired/Rejected decisions | OPEN | — |
-| P06-007 | Persist drag and drop | OPEN | — |
+| P06-001 | Replace Candidate-global board | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-002 | New application stage | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-003 | AI processing separate from HR stage | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-004 | Initial selection stage | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-005 | Interview stage | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-006 | Offered/Hired/Rejected decisions | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-007 | Persist drag and drop | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | P06-008 | Independent status across vacancies | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
-| P06-009 | Interview schedule | OPEN | — |
-| P06-010 | Timezone | OPEN | — |
-| P06-011 | Interviewer | OPEN | — |
-| P06-012 | Interview result | OPEN | — |
-| P06-013 | Substatus and next action | OPEN | — |
+| P06-009 | Interview schedule | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-010 | Timezone | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-011 | Interviewer | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-012 | Interview result | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-013 | Substatus and next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | P06-014 | Event before/after | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | P06-015 | Event actor/timestamp/reason | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | P06-016 | Transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | P06-017 | Revision and 409 conflicts | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
-| P06-018 | Optimistic UI rollback/refetch | OPEN | — |
-| P06-019 | Status filter | OPEN | — |
-| P06-020 | Search | OPEN | — |
-| P06-021 | Sorting | OPEN | — |
-| P06-022 | Profile quick edit | OPEN | — |
-| P06-023 | Permission change fail closed | OPEN | — |
+| P06-018 | Optimistic UI rollback/refetch | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-019 | Status filter | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-020 | Search | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-021 | Sorting | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-022 | Profile quick edit | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
+| P06-023 | Permission change fail closed | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | P06-024 | Interview notification tests | OPEN | — |
 | P06-025 | SMTP failure does not hide successful status change | OPEN | — |
 
@@ -461,7 +461,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 05 | `2d2cb13af787542756437af20213edfc6ed4c9c9` | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
 
-| 06A | `feat(hr): persist scoped Application lifecycle and history` (SHA recorded next update) | Full regression 1172/1172; targets 38/38; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | DnD/interview UI and notification worker remain 06B/06C; real SMTP not claimed |
+| 06A | `659084198ed19a8f23ae8a186eb35b47dc85165d` | Full regression 1172/1172; targets 38/38; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | DnD/interview UI and notification worker remain 06B/06C; real SMTP not claimed |
 
 ## External prerequisites
 
@@ -501,3 +501,7 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 05 evidence: `/tmp/inop-hr05-baseline.log` (11/11 failing before patch), `/tmp/inop-hr05-target.log`, `/tmp/inop-hr05-final-browser.log`, `/tmp/inop-hr05-final-regression.log`, `/tmp/inop-packagehr05-validation.json`. Contract and limitations: `docs/HR_MATCHING_CONTRACT.md`. Existing lifecycle test's numeric legacy score assertion now verifies restricted derived data while preserving the row visibility/count, missing parent names and prohibited edit assertions. Recalculation never changes stage. No bulk legacy rewrite or external provider call. The Application board is a score-consistent display; lifecycle/DnD work remains package 06.
 
 06A evidence: `/tmp/inop-hr06a-baseline.log` (11 failed / 14 before patch), `/tmp/inop-hr06a-target-final.log` (38/38), `/tmp/inop-hr06a-regression.log`, `/tmp/inop-hr06a-validation-run.log`, `/tmp/inop-packagehr06-validation.json`. Contract: `docs/HR_APPLICATION_LIFECYCLE.md`. Draft fixture now explicitly checks 409, then opens the job for the existing canonical pipeline test; partial Job metadata preservation assertions remain. History is atomically appended without truncation; defensive count/byte limit reports archiving requirement. Delivery pending records do not imply sent email; next increment implements the worker. Scoring event summaries are independently parent-scoped. All DB operations remain isolated loopback fixtures.
+
+| 06B | `feat(hr): add Application Kanban and interview workflow UI` (SHA recorded next update) | Targets 24/24; full 1196/1196; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Manual card ordering remains AUD-064/08; notification worker follows in 06C; no real SMTP claim |
+
+06B evidence: `/tmp/inop-hr06b-baseline.log` (old 06A UI fails new board/card contract; 2 failures), `/tmp/inop-hr06b-target-final.log` (24/24), `/tmp/inop-hr06b-regression.log`, `/tmp/inop-hr06b-validation-run.log`, `/tmp/inop-packagehr06b-validation.json`. StrictMode stays enabled in browser tests. Real isolated HTTP + Mongo tests prove keyboard drag persisted after refresh, independent vacancies, 409 rollback, 500 visible data, stale route/mutation protection, language no-refetch, read-only UI, 401/403/404/500, independently scoped roster and assignment revocation on focus with an old JWT. Backend scope checks remain authoritative. Application detail focus/visibility refresh resets an unsaved workflow draft to enforce current assignment; existing profile edit forms keep their draft policy. Server controls the processing lane. Search/sorting currently operate on the scoped loaded dataset; bounded server pagination belongs to 08. 06C is the next unfinished independent increment.

@@ -39,7 +39,7 @@ const JobDetail: React.FC = () => {
     if (!primary) return null;
     const [apps, people] = await Promise.allSettled([
       canReadApps ? getApplications(signal, scopeKey) : Promise.resolve([]),
-      canLink ? getCandidates(signal, scopeKey) : Promise.resolve([]),
+      canLink && primary.status === "open" ? getCandidates(signal, scopeKey) : Promise.resolve([]),
     ]);
     return { job: primary,
       applications: apps.status === "fulfilled" ? apps.value.filter(a => (typeof a.jobId === "string" ? a.jobId : a.jobId?.id) === jobId) : [],
@@ -260,7 +260,7 @@ const JobDetail: React.FC = () => {
             </div>
           </div>
 
-          {canLink && (
+          {canLink && job.status === "open" && (
             <div className="detail-card">
               <h3>{t("recruitment.jobDetail.linkCandidate")}</h3>
 

@@ -1,6 +1,8 @@
 const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const Application = require('../models/application.model');
+const User = require('../models/user.model');
+const { resourceFilter } = require('../services/hrResourceScope.service');
 const { applicationParents } = require('../services/hrResourceScope.service');
 const { scoreResponses, scopedScoreRecords } = require('../services/applicationScoreState.service');
 const { decorateApplications } = require('../services/recruitmentCatalog.service');
@@ -42,5 +44,13 @@ exports.history = async (req, res, next) => {
   try { const row = await Application.findOne(query(req)).select('events jobId candidateId').lean(); if (!row) return res.status(404).json({ message: 'Application not found.' });
     const { jobs, candidates } = await scopedScoreRecords(req, [row]); const canReadScore = jobs.has(String(row.jobId)) && candidates.has(String(row.candidateId));
     const events = [...(row.events || [])].reverse(); res.json({ total: events.length, items: events.slice(offset, offset + limit).map(({ commandHash: _hash, commandId: _key, ...event }) => event.type === 'score' && !canReadScore ? { ...event, before: { score: null, scoreStatus: 'restricted' }, after: { score: null, scoreStatus: 'restricted' }, reason: '' } : event), hasMore: offset + limit < events.length });
+  } catch (e) { next(e); }
+};
+exports.interviewers = async (req, res, next) => {
+  if (!mongoose.isObjectIdOrHexString(req.params.id)) return res.status(400).json({ message: 'Invalid Application id.' });
+  try {
+    if (!await Application.exists(query(req))) return res.status(404).json({ message: 'Application not found.' });
+    const users = await User.find({ $and: [{ isActive: true }, { $or: [{ _id: req.user.id }, resourceFilter(req, 'user')] }] }).select('_id name').sort({ name: 1 }).limit(50).lean();
+    res.json(users.map(u => ({ id: String(u._id), name: u.name })));
   } catch (e) { next(e); }
 };
