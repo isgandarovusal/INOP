@@ -3,6 +3,7 @@ const { recordActivity } = require("../services/activityLog.service");
 const Application = require("../models/application.model");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
+const { resourceFilter, applicationParents } = require('../services/hrResourceScope.service');
 const {
   calculateApplicationMatch,
 } = require("../services/applicationMatch.service");
@@ -30,8 +31,7 @@ exports.getApplications = async (req, res) => {
     const applications = await Application.find(
       buildScopedQuery(req)
     )
-      .populate("jobId")
-      .populate("candidateId")
+      .populate(applicationParents(req))
       .sort({ createdAt: -1 })
       .lean();
 
@@ -58,8 +58,7 @@ exports.getApplicationById = async (req, res) => {
         _id: req.params.id,
       })
     )
-      .populate("jobId")
-      .populate("candidateId")
+      .populate(applicationParents(req))
       .lean();
 
     if (!application) {
@@ -90,8 +89,8 @@ exports.createApplication = async (req, res) => {
     }
 
     const [job, candidate] = await Promise.all([
-      Job.findOne(buildScopedQuery(req, { _id: jobId })),
-      Candidate.findOne(buildScopedQuery(req, { _id: candidateId })),
+      Job.findOne({ $and: [{ _id: jobId }, resourceFilter(req, 'recruitment')] }),
+      Candidate.findOne({ $and: [{ _id: candidateId }, resourceFilter(req, 'candidate')] }),
     ]);
 
     if (!job) {
@@ -135,8 +134,7 @@ exports.createApplication = async (req, res) => {
     const saved = await application.save();
 
     const populated = await Application.findById(saved._id)
-      .populate("jobId")
-      .populate("candidateId")
+      .populate(applicationParents(req))
       .lean();
 
     try {
@@ -264,7 +262,9 @@ exports.updateApplicationStatus = async (req, res) => {
       }
     }
 
-    return res.status(200).json(updated);
+    const response = await Application.findById(updated._id)
+      .populate(applicationParents(req)).lean();
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Update application status error:", error);
 

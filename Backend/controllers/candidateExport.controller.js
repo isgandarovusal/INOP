@@ -4,6 +4,7 @@ const XLSX = require("xlsx");
 
 const Candidate = require("../models/candidate.model");
 const Application = require("../models/application.model");
+const { resourceFilter } = require('../services/hrResourceScope.service');
 
 function candidateRow(candidate) {
   return {
@@ -89,10 +90,9 @@ exports.exportCandidatePdf = async (req, res) => {
       });
     }
 
-    const candidate = await Candidate.findOne({
-      _id: candidateId,
-      ...getScopeFilter(req),
-    }).lean();
+    const candidate = await Candidate.findOne({ $and: [
+      { _id: candidateId }, resourceFilter(req, 'candidate'),
+    ] }).lean();
 
     if (!candidate) {
       return res.status(404).json({
@@ -101,15 +101,12 @@ exports.exportCandidatePdf = async (req, res) => {
       });
     }
 
-    const applications = await Application.find({
-      candidateId: candidate._id,
-      ...getScopeFilter(req),
-    })
+    const applications = await Application.find({ $and: [
+      { candidateId: candidate._id }, resourceFilter(req, 'application'),
+    ] })
       .select("jobId status score")
-      .populate(
-        "jobId",
-        "title department location type"
-      )
+      .populate({ path: 'jobId', select: 'title department location type',
+        match: resourceFilter(req, 'recruitment') })
       .sort({ createdAt: -1 })
       .lean();
 

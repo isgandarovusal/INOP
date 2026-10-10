@@ -1,0 +1,468 @@
+# GFC HR implementation tracker
+
+Baseline: `c74c49f41bb3a8a54566324c8902576a48a88e8f`, branch `work`. Local implementation and commits only; no production push/deployment. Existing data, secrets and user files must be preserved.
+
+## Resume protocol
+
+Read this file at each session start. Continue the first unfinished independent item. Never remove a finding; append new findings with a new stable ID. `TESTED` requires a named test and passing evidence for the current change. `OPEN` is unimplemented/unverified; `IN_PROGRESS` is active; `BLOCKED_EXTERNAL` requires approved access/provider or hosting configuration. Mock evidence never proves real external readiness. Each package updates this tracker in its commit. Commit SHAs are recorded after creation in the next tracker update and in the package report.
+
+Prior audit findings below are retained as the baseline backlog, not declared independently reverified. Existing working security invariants still require regression evidence.
+
+## Prior audit findings
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-001 | 01 | PDF authorize overwrites candidate.read with application.read | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| AUD-002 | 01 | Application list populated Candidate bypasses independent scope | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| AUD-003 | 01 | Application detail populated Job bypasses independent scope | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| AUD-004 | 01 | Application create reuses application.create scope for parents | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| AUD-005 | 01 | CV pipeline reuses final application.create scope for Job | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| AUD-006 | 02 | UI broad canManageRecruitment enables unrelated resource actions | OPEN | — |
+| AUD-007 | 02 | Recruitment-only route guard blocks other legitimate HR resources | OPEN | — |
+| AUD-008 | 02 | Frontend truthy none scope does not fail closed | OPEN | — |
+| AUD-009 | 13 | Live JWT and role.update escalation protection must remain intact | OPEN | — |
+| AUD-010 | 13 | Legacy hr role migration is not automatic and hosted state unknown | OPEN | — |
+| AUD-011 | 06 | Assigned creator field lacks explicit reassignment workflow | OPEN | — |
+| AUD-012 | 02 | Nested populated _id objects are not normalized to id | OPEN | — |
+| AUD-013 | 02 | JobDetail compares populated jobId object with string and loses applications | OPEN | — |
+| AUD-014 | 02 | Applied candidate IDs ignore objects and allow duplicate selection | OPEN | — |
+| AUD-015 | 02 | Populated links/filter/position mapping uses undefined identifiers | OPEN | — |
+| AUD-016 | 02 | Candidate new is silently mapped to applied | OPEN | — |
+| AUD-017 | 02 | Job preferredSkills lost on edit | OPEN | — |
+| AUD-018 | 02 | Partial Job update defaults overwrite department/location/type | OPEN | — |
+| AUD-019 | 02 | Zero experience becomes one on edit | OPEN | — |
+| AUD-020 | 02 | Job normalization drops timestamps and breaks newest sorting | OPEN | — |
+| AUD-021 | 02 | Candidate update ignores accepted cvFile | OPEN | — |
+| AUD-022 | 02 | Parsing stale response overwrites newer selected CV/manual fields | OPEN | — |
+| AUD-023 | 03 | Education/languages/certificates have no full HR review editors | OPEN | — |
+| AUD-024 | 02 | HR lists and details lack auth-context cancellation/reset | OPEN | — |
+| AUD-025 | 02 | Language-dependent effects refetch and reset forms | OPEN | — |
+| AUD-026 | 02 | Auxiliary Promise.all failure hides primary Job/Application data | OPEN | — |
+| AUD-027 | 02 | Error/notFound states are conflated or leave forms editable | OPEN | — |
+| AUD-028 | 06 | Activity log lacks scope fields for own/department visibility | OPEN | — |
+| AUD-029 | 06 | Best-effort generic activity log is not Application event history | OPEN | — |
+| AUD-030 | 10 | Hard deletion leaves orphan Applications/CV files | OPEN | — |
+| AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | OPEN | — |
+| AUD-032 | 02 | Canonical Candidate/CV pipeline unused by frontend job context | OPEN | — |
+| AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | OPEN | — |
+| AUD-034 | 08 | Extraction caps text only after potentially expensive extraction | OPEN | — |
+| AUD-035 | 03 | Phone parser loses valid separators/prefixes/international numbers | OPEN | — |
+| AUD-036 | 03 | Phone has no raw/normalized split or evidence | OPEN | — |
+| AUD-037 | 03 | Name extraction misidentifies headings and excludes Cyrillic | OPEN | — |
+| AUD-038 | 03 | First email may be employer/reference without provenance | OPEN | — |
+| AUD-039 | 03 | Employment dates are not parsed and unknown experience becomes zero | OPEN | — |
+| AUD-040 | 03 | Education structure/date/institution not extracted | OPEN | — |
+| AUD-041 | 03 | IT-only skill substring dictionary gives false positives and misses restaurant skills | OPEN | — |
+| AUD-042 | 03 | AZ/RU language labels and section variants are missing | OPEN | — |
+| AUD-043 | 03 | Certificate issuer/expiry/evidence not represented | OPEN | — |
+| AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | OPEN | — |
+| AUD-045 | 09 | Rule parser and static suggestions are presented as AI | OPEN | — |
+| AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | OPEN | — |
+| AUD-047 | 02 | Upload/processing/error strings have incomplete localization | OPEN | — |
+| AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
+| AUD-049 | 08 | Synchronous decompression/extraction may block requests | OPEN | — |
+| AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
+| AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | — |
+| AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | OPEN | — |
+| AUD-053 | 05 | Standalone aiMatchService and MatchScoreBadge unused | OPEN | — |
+| AUD-054 | 05 | Historical global match UI removed; restore only Application context | OPEN | — |
+| AUD-055 | 05 | Exact-string score ignores skill aliases and deduplication | OPEN | — |
+| AUD-056 | 05 | Empty Job/Candidate can score 100 and missing data receives credit | OPEN | — |
+| AUD-057 | 05 | Score only calculated on create and becomes stale | OPEN | — |
+| AUD-058 | 05 | Breakdown/version/hash/coverage not persisted | OPEN | — |
+| AUD-059 | 05 | Default zero conflates uncalculated and real zero | OPEN | — |
+| AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | OPEN | — |
+| AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
+| AUD-062 | 06 | Candidate-global statuses conflict with Application stages | OPEN | — |
+| AUD-063 | 06 | No processing state, revision CAS or transition validation | OPEN | — |
+| AUD-064 | 06 | DnD order not persisted and status requests can race | OPEN | — |
+| AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | OPEN | — |
+| AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | OPEN | — |
+| AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
+| AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
+| AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | OPEN | — |
+| AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | OPEN | — |
+| AUD-071 | 11 | No ingestion source identity or person-level deduplication | OPEN | — |
+| AUD-072 | 08 | HR lists unbounded with full populated documents | OPEN | — |
+| AUD-073 | 08 | CV parse then create double uploads file synchronously | OPEN | — |
+| AUD-074 | 08 | HR service requests lack signal/dedup despite safe main Dashboard implementation | OPEN | — |
+| AUD-075 | 08 | Search/filter/render all records without pagination/virtualization/debounce | OPEN | — |
+| AUD-076 | 08 | Compound filter/sort indexes missing | OPEN | — |
+| AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | OPEN | — |
+| AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | OPEN | — |
+| AUD-079 | 03 | DOCX has download but no native preview | OPEN | — |
+| AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | OPEN | — |
+| AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
+| AUD-082 | 12 | External website capabilities and administrator access unknown | OPEN | — |
+| AUD-083 | 12 | Signed identity/privacy/anti-malware required before external real CV ingestion | OPEN | — |
+
+## Package 01: P0 authorization
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P01-001 | Candidate PDF candidate.read scope independent of application.read | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-002 | Application list independently scoped Candidate projection | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-003 | Application detail independently scoped Job projection | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-004 | Application create validates Candidate read scope | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-005 | Application create validates Job read scope | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-006 | CV pipeline validates Job read scope independent of create grants | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-007 | all/own/department/assigned combinations | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-008 | Missing/none grants fail closed | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-009 | Allowed admin and HR workflows preserved | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-010 | Parent payload uses explicit safe projection | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-011 | Mixed-scope negative regression | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+| P01-012 | No external ingestion before P0 closure | TESTED | `Backend/tests/hrResourceScopes.test.cjs`: 85/85; baseline 75 failing / 78 |
+
+## Package 02: CRUD and data flow
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P02-001 | Normalize populated _id/id | OPEN | — |
+| P02-002 | JobDetail displays job-specific applications | OPEN | — |
+| P02-003 | JobDetail displays ranking | OPEN | — |
+| P02-004 | Preserve Candidate new status | OPEN | — |
+| P02-005 | Preserve preferredSkills on Job edit | OPEN | — |
+| P02-006 | Preserve department on Job edit | OPEN | — |
+| P02-007 | Preserve location on Job edit | OPEN | — |
+| P02-008 | Preserve type on Job edit | OPEN | — |
+| P02-009 | Preserve zero experience on Job edit | OPEN | — |
+| P02-010 | Candidate CV replacement persists file | OPEN | — |
+| P02-011 | Stale responses cannot replace current state | OPEN | — |
+| P02-012 | Secondary failure does not hide primary data | OPEN | — |
+| P02-013 | 401/403/404/500 distinct UI states | OPEN | — |
+| P02-014 | Language change does not reset edits | OPEN | — |
+| P02-015 | Permission change refetches and fails closed | OPEN | — |
+| P02-016 | Cancellation on context change | OPEN | — |
+| P02-017 | Create/edit/detail/list contract tests | OPEN | — |
+
+## Package 03: CV parsing and HR review
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P03-001 | Parse +994 50 123 45 67 | OPEN | — |
+| P03-002 | Parse +994 (50) 123-45-67 | OPEN | — |
+| P03-003 | Parse 0(50)1234567 | OPEN | — |
+| P03-004 | Parse 994501234567 | OPEN | — |
+| P03-005 | Parse +994-50-123-45-67 | OPEN | — |
+| P03-006 | Validate other international formats | OPEN | — |
+| P03-007 | Separate raw and normalized phone | OPEN | — |
+| P03-008 | Extract name and surname | OPEN | — |
+| P03-009 | Extract email | OPEN | — |
+| P03-010 | Extract employment history and dates | OPEN | — |
+| P03-011 | Extract education | OPEN | — |
+| P03-012 | Extract skills | OPEN | — |
+| P03-013 | Extract languages | OPEN | — |
+| P03-014 | Extract certificates | OPEN | — |
+| P03-015 | AZ CV fixtures | OPEN | — |
+| P03-016 | English CV fixtures | OPEN | — |
+| P03-017 | Russian CV fixtures | OPEN | — |
+| P03-018 | Restaurant operations/kitchen/cash skills | OPEN | — |
+| P03-019 | HACCP and food safety skills | OPEN | — |
+| P03-020 | Shift/customer service/management skills | OPEN | — |
+| P03-021 | Unknown fields not fabricated or zero | OPEN | — |
+| P03-022 | Persist source and evidence | OPEN | — |
+| P03-023 | Version extraction | OPEN | — |
+| P03-024 | Confidence and review status | OPEN | — |
+| P03-025 | HR edits all extracted fields | OPEN | — |
+| P03-026 | CV replacement parsing races | OPEN | — |
+| P03-027 | Scanned CV processing/unsupported state | OPEN | — |
+| P03-028 | Real OCR E2E only with tested implementation | OPEN | — |
+
+## Package 04: GFC brands and branches
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P04-001 | Expandable Brand catalog | OPEN | — |
+| P04-002 | KFC | OPEN | — |
+| P04-003 | Pizza Hut | OPEN | — |
+| P04-004 | Simit Sarayı | OPEN | — |
+| P04-005 | Create brand selector | OPEN | — |
+| P04-006 | Edit brand selector | OPEN | — |
+| P04-007 | Brand to branch to vacancy relation | OPEN | — |
+| P04-008 | Office and warehouse vacancies | OPEN | — |
+| P04-009 | Same position in different branches | OPEN | — |
+| P04-010 | New brand and branch extensibility | OPEN | — |
+| P04-011 | Legacy jobs not falsely backfilled | OPEN | — |
+| P04-012 | Brand and branch filters | OPEN | — |
+| P04-013 | Brand vacancy cards | OPEN | — |
+| P04-014 | Brand application contract | OPEN | — |
+| P04-015 | Brand analytics contract | OPEN | — |
+| P04-016 | Brand selection never replaces authorization | OPEN | — |
+
+## Package 05: Versioned ATS scoring
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P05-001 | Score Application plus Job only | OPEN | — |
+| P05-002 | Restore contextual match display | OPEN | — |
+| P05-003 | Empty data cannot score 100 | OPEN | — |
+| P05-004 | Real zero distinct from missing | OPEN | — |
+| P05-005 | Canonical skill aliases | OPEN | — |
+| P05-006 | Invalidate score after Job changes | OPEN | — |
+| P05-007 | Invalidate score after Candidate changes | OPEN | — |
+| P05-008 | Persist breakdown and evidence | OPEN | — |
+| P05-009 | Required skills | OPEN | — |
+| P05-010 | Preferred skills | OPEN | — |
+| P05-011 | Relevant experience | OPEN | — |
+| P05-012 | Education only when required | OPEN | — |
+| P05-013 | Certification only when required | OPEN | — |
+| P05-014 | Criterion weights | OPEN | — |
+| P05-015 | Score version | OPEN | — |
+| P05-016 | scoreStatus | OPEN | — |
+| P05-017 | calculatedAt | OPEN | — |
+| P05-018 | dataCoverage | OPEN | — |
+| P05-019 | Matched and missing criteria | OPEN | — |
+| P05-020 | Recalculation | OPEN | — |
+| P05-021 | Legacy compatibility | OPEN | — |
+| P05-022 | Insufficient data pending/incomplete | OPEN | — |
+| P05-023 | No protected characteristics | OPEN | — |
+| P05-024 | No automatic hire/reject | OPEN | — |
+| P05-025 | Same score JobDetail/Applications/Profile/Kanban | OPEN | — |
+
+## Package 06: Application Kanban
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P06-001 | Replace Candidate-global board | OPEN | — |
+| P06-002 | New application stage | OPEN | — |
+| P06-003 | AI processing separate from HR stage | OPEN | — |
+| P06-004 | Initial selection stage | OPEN | — |
+| P06-005 | Interview stage | OPEN | — |
+| P06-006 | Offered/Hired/Rejected decisions | OPEN | — |
+| P06-007 | Persist drag and drop | OPEN | — |
+| P06-008 | Independent status across vacancies | OPEN | — |
+| P06-009 | Interview schedule | OPEN | — |
+| P06-010 | Timezone | OPEN | — |
+| P06-011 | Interviewer | OPEN | — |
+| P06-012 | Interview result | OPEN | — |
+| P06-013 | Substatus and next action | OPEN | — |
+| P06-014 | Event before/after | OPEN | — |
+| P06-015 | Event actor/timestamp/reason | OPEN | — |
+| P06-016 | Transition validation | OPEN | — |
+| P06-017 | Revision and 409 conflicts | OPEN | — |
+| P06-018 | Optimistic UI rollback/refetch | OPEN | — |
+| P06-019 | Status filter | OPEN | — |
+| P06-020 | Search | OPEN | — |
+| P06-021 | Sorting | OPEN | — |
+| P06-022 | Profile quick edit | OPEN | — |
+| P06-023 | Permission change fail closed | OPEN | — |
+| P06-024 | Interview notification tests | OPEN | — |
+| P06-025 | SMTP failure does not hide successful status change | OPEN | — |
+
+## Package 07: HR analytics
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P07-001 | GFC overall dashboard | OPEN | — |
+| P07-002 | KFC dashboard | OPEN | — |
+| P07-003 | Pizza Hut dashboard | OPEN | — |
+| P07-004 | Simit Sarayı dashboard | OPEN | — |
+| P07-005 | Brand filter | OPEN | — |
+| P07-006 | Branch filter | OPEN | — |
+| P07-007 | Vacancy filter | OPEN | — |
+| P07-008 | Date filter | OPEN | — |
+| P07-009 | Source filter | OPEN | — |
+| P07-010 | Status filter | OPEN | — |
+| P07-011 | Active vacancies | OPEN | — |
+| P07-012 | New applications | OPEN | — |
+| P07-013 | Parsing/review queue | OPEN | — |
+| P07-014 | Source distribution | OPEN | — |
+| P07-015 | Application funnel | OPEN | — |
+| P07-016 | Interview pipeline | OPEN | — |
+| P07-017 | Offered/hired/rejected counts | OPEN | — |
+| P07-018 | Time in stage | OPEN | — |
+| P07-019 | Time to hire | OPEN | — |
+| P07-020 | Score distribution | OPEN | — |
+| P07-021 | Duplicate/review alerts | OPEN | — |
+| P07-022 | Integration health | OPEN | — |
+| P07-023 | Same scoped Application/Job datasets | OPEN | — |
+| P07-024 | Server aggregations | OPEN | — |
+| P07-025 | Small DTO without sensitive Candidate data | OPEN | — |
+| P07-026 | Correct empty state | OPEN | — |
+
+## Package 08: Performance and stability
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P08-001 | Scoped HR pagination | OPEN | — |
+| P08-002 | Bounded payloads | OPEN | — |
+| P08-003 | Safe projection | OPEN | — |
+| P08-004 | Appropriate indexes | OPEN | — |
+| P08-005 | Versioned backward-compatible transition | OPEN | — |
+| P08-006 | Job-specific queries | OPEN | — |
+| P08-007 | Searchable Candidate lookup | OPEN | — |
+| P08-008 | Debounce | OPEN | — |
+| P08-009 | Cancellation | OPEN | — |
+| P08-010 | Virtualization/lazy loading | OPEN | — |
+| P08-011 | Memoization | OPEN | — |
+| P08-012 | Large Kanban handling | OPEN | — |
+| P08-013 | 0-record benchmark | OPEN | — |
+| P08-014 | 5000-record benchmark | OPEN | — |
+| P08-015 | 50000-record benchmark | OPEN | — |
+| P08-016 | Response size measurement | OPEN | — |
+| P08-017 | Latency measurement | OPEN | — |
+| P08-018 | Query behavior | OPEN | — |
+| P08-019 | UI rendering measurement | OPEN | — |
+| P08-020 | Memory measurement | OPEN | — |
+| P08-021 | No unmeasured live performance claims | OPEN | — |
+| P08-022 | Loading and skeleton | OPEN | — |
+| P08-023 | Error and empty | OPEN | — |
+| P08-024 | Retry | OPEN | — |
+| P08-025 | Accessibility | OPEN | — |
+| P08-026 | Responsive | OPEN | — |
+
+## Package 09: Real AI provider
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P09-001 | Remove hardcoded AI suggestions | OPEN | — |
+| P09-002 | Configurable backend adapter | OPEN | — |
+| P09-003 | Title and responsibilities context | OPEN | — |
+| P09-004 | Restaurant/brand context | OPEN | — |
+| P09-005 | Experience and criteria context | OPEN | — |
+| P09-006 | Structured required/preferred skills | OPEN | — |
+| P09-007 | Explanation | OPEN | — |
+| P09-008 | Confidence/uncertainty | OPEN | — |
+| P09-009 | Source context | OPEN | — |
+| P09-010 | HR approval/edit | OPEN | — |
+| P09-011 | Schema validation | OPEN | — |
+| P09-012 | Timeout | OPEN | — |
+| P09-013 | Bounded retry | OPEN | — |
+| P09-014 | Rate limit | OPEN | — |
+| P09-015 | Cost budget | OPEN | — |
+| P09-016 | Usage logging without sensitive input | OPEN | — |
+| P09-017 | AI-assisted CV review | OPEN | — |
+| P09-018 | Explicit unavailable state | OPEN | — |
+| P09-019 | Mock never presented as real AI | OPEN | — |
+| P09-020 | Untrusted CV prompt injection defense | OPEN | — |
+| P09-021 | Data disclosure controls | OPEN | — |
+| P09-022 | Adapter mock tests | OPEN | — |
+| P09-023 | Real AI E2E with actual provider credentials | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
+
+## Package 10: Durable storage and background processing
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P10-001 | Private object storage adapter | OPEN | — |
+| P10-002 | Authorized file access | OPEN | — |
+| P10-003 | Original CV retention | OPEN | — |
+| P10-004 | Parsing metadata | OPEN | — |
+| P10-005 | Source identity | OPEN | — |
+| P10-006 | Existing file migration plan | OPEN | — |
+| P10-007 | Existing file fallback | OPEN | — |
+| P10-008 | Bounded parsing jobs | OPEN | — |
+| P10-009 | OCR jobs | OPEN | — |
+| P10-010 | AI jobs | OPEN | — |
+| P10-011 | Email jobs | OPEN | — |
+| P10-012 | Ingestion jobs | OPEN | — |
+| P10-013 | Idempotency | OPEN | — |
+| P10-014 | Job state | OPEN | — |
+| P10-015 | Retry/failure monitoring | OPEN | — |
+| P10-016 | Reuse infrastructure | OPEN | — |
+| P10-017 | Justify additional resources first | OPEN | — |
+| P10-018 | Real storage durability test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
+| P10-019 | Real storage recovery test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
+| P10-020 | Access control tests before real CV acceptance | OPEN | — |
+
+## Package 11: Outlook Microsoft Graph
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P11-001 | Approved GFC mailbox adapter | OPEN | — |
+| P11-002 | OAuth/application permission choice | OPEN | — |
+| P11-003 | Least privilege mailbox scope | OPEN | — |
+| P11-004 | Token lifecycle | OPEN | — |
+| P11-005 | Polling/delta or webhook | OPEN | — |
+| P11-006 | Pagination | OPEN | — |
+| P11-007 | Subscription renewal if used | OPEN | — |
+| P11-008 | Attachment ingestion | OPEN | — |
+| P11-009 | Deduplication | OPEN | — |
+| P11-010 | Retries | OPEN | — |
+| P11-011 | Rate limits | OPEN | — |
+| P11-012 | Sync health | OPEN | — |
+| P11-013 | Subject/recipient/vacancy matching | OPEN | — |
+| P11-014 | Ambiguous matching HR review | OPEN | — |
+| P11-015 | No token/CV logging | OPEN | — |
+| P11-016 | Tenant setup checklist | OPEN | — |
+| P11-017 | Mailbox setup checklist | OPEN | — |
+| P11-018 | Admin consent checklist | OPEN | — |
+| P11-019 | Credential setup checklist | OPEN | — |
+| P11-020 | Real mailbox E2E requires access | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
+
+## Package 12: External career sources
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P12-001 | Public kfc.az research | OPEN | — |
+| P12-002 | Public pizzahut.az research | OPEN | — |
+| P12-003 | Public JobSearch research | OPEN | — |
+| P12-004 | First-party API/webhook evidence | OPEN | — |
+| P12-005 | Actual form destination evidence | OPEN | — |
+| P12-006 | Email notification evidence | OPEN | — |
+| P12-007 | CSV/admin export evidence | OPEN | — |
+| P12-008 | Official partner API evidence | OPEN | — |
+| P12-009 | Approved adapter interfaces | OPEN | — |
+| P12-010 | Actual email/Google Forms channels only | OPEN | — |
+| P12-011 | No unauthorized private scraping/login bypass | OPEN | — |
+| P12-012 | BLOCKED_EXTERNAL_ACCESS with required access | OPEN | — |
+| P12-013 | Approved alternative integration path | OPEN | — |
+| P12-014 | Public form abuse/rate limit | OPEN | — |
+| P12-015 | Upload validation | OPEN | — |
+| P12-016 | Anti-malware gate | OPEN | — |
+| P12-017 | Signed source identity | OPEN | — |
+| P12-018 | Idempotency | OPEN | — |
+| P12-019 | Privacy controls | OPEN | — |
+| P12-020 | Real external integration E2E requires approved access | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
+
+## Package 13: E2E security and readiness
+
+| ID | Acceptance criterion | Status | Evidence |
+|---|---|---|---|
+| P13-001 | Disposition every prior finding | OPEN | — |
+| P13-002 | Source to ingestion E2E | OPEN | — |
+| P13-003 | Private storage E2E | OPEN | — |
+| P13-004 | Extraction/OCR E2E | OPEN | — |
+| P13-005 | HR review E2E | OPEN | — |
+| P13-006 | Candidate and Application E2E | OPEN | — |
+| P13-007 | Scoring and Kanban E2E | OPEN | — |
+| P13-008 | Interview/decision/analytics E2E | OPEN | — |
+| P13-009 | Three brands | OPEN | — |
+| P13-010 | Multiple branches | OPEN | — |
+| P13-011 | Same Candidate multiple vacancies | OPEN | — |
+| P13-012 | PDF/DOCX/scanned documents | OPEN | — |
+| P13-013 | AZ/EN/RU fixtures | OPEN | — |
+| P13-014 | Mixed scopes | OPEN | — |
+| P13-015 | Duplicate CV | OPEN | — |
+| P13-016 | Retries and provider outage | OPEN | — |
+| P13-017 | Stale requests/concurrent updates | OPEN | — |
+| P13-018 | Large datasets | OPEN | — |
+| P13-019 | Frontend/backend compatibility | OPEN | — |
+| P13-020 | Security/privacy/retention | OPEN | — |
+| P13-021 | Separate local mock and real external evidence | OPEN | — |
+| P13-022 | All package commit SHAs | OPEN | — |
+| P13-023 | Full finding disposition | OPEN | — |
+| P13-024 | Tests and benchmarks | OPEN | — |
+| P13-025 | API/model/frontend changes | OPEN | — |
+| P13-026 | AI/Outlook/external setup | OPEN | — |
+| P13-027 | Production risks | OPEN | — |
+| P13-028 | Ready and blocked modules | OPEN | — |
+
+## Execution ledger
+
+| Package | Commit | Validation | Remaining risk |
+|---|---|---|---|
+| 01 | `fix(hr): enforce independent recruitment resource scopes` (SHA recorded next package) | Target 85/85; full regression 1020/1020; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | Scope-denied parents return null; UI normalization/lifecycle remains package 02 |
+
+## External prerequisites
+
+- AI provider credentials and approved processing/privacy configuration; no real AI E2E claim without access.
+- Durable private storage credentials/configuration and recovery evidence before accepting real CVs.
+- GFC Graph tenant, approved mailbox list, mailbox permission restrictions, admin consent and secure credentials.
+- Approved website API/webhook/email/export access. Public pages do not authorize private CV collection.
+- Production deployment, migration, new paid resources and permission policy changes require separate decisions. No new staging or Atlas cluster.
+
+## New findings
+
+Append here; never delete earlier findings.
+
+Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-final-target.log`, `/tmp/inop-hr01-regression.log`, `/tmp/inop-packagehr01-validation.json`. Full suite ran 84 new checks plus 936 existing checks; final target rerun includes one additional missing-department check. Test DBs are uniquely owned loopback databases, never Atlas.

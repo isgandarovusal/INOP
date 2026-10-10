@@ -5,6 +5,7 @@ const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
 const Application = require("../models/application.model");
+const { resourceFilter } = require('../services/hrResourceScope.service');
 
 const {
   extractCvTextFromFile,
@@ -144,10 +145,9 @@ exports.createCandidateFromCv = async (req, res) => {
         });
       }
 
-      job = await Job.findOne({
-        _id: jobId,
-        ...(req.dataScope || {}),
-      }).lean();
+      job = await Job.findOne({ $and: [
+        { _id: jobId }, resourceFilter(req, 'recruitment'),
+      ] }).lean();
 
       if (!job) {
         await cleanupFile(req.file);
