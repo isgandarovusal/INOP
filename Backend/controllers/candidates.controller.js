@@ -1,3 +1,4 @@
+const { logFailure } = require("../services/safeErrorLog.service");
 const mongoose = require("mongoose");
 const { invalidateScores } = require("../services/applicationScoreState.service");
 const { recordActivity } = require("../services/activityLog.service");
@@ -81,7 +82,7 @@ exports.getCandidates = async (req, res) => {
 
     return res.status(200).json(candidates);
   } catch (error) {
-    console.error("Get candidates error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Namizədlər alınarkən server xətası baş verdi.",
@@ -113,7 +114,7 @@ exports.getCandidateById = async (req, res) => {
 
     return res.status(200).json(candidate);
   } catch (error) {
-    console.error("Get candidate error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Namizəd alınarkən server xətası baş verdi.",
@@ -214,15 +215,12 @@ exports.createCandidate = async (req, res) => {
         description: `Namizəd yaradıldı: ${saved.name} (${saved.role})`,
       });
     } catch (activityError) {
-      console.error(
-        "Candidate create activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     return res.status(201).json(saved);
   } catch (error) {
-    console.error("Create candidate error:", error);
+    logFailure(error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -393,15 +391,12 @@ exports.updateCandidate = async (req, res) => {
         description: `Namizəd yeniləndi: ${updated.name} (${updated.role})`,
       });
     } catch (activityError) {
-      console.error(
-        "Candidate update activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update candidate error:", error);
+    logFailure(error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -475,16 +470,13 @@ exports.updateCandidateStatus = async (req, res) => {
           description: `Namizəd statusu dəyişdirildi: ${updated.name} (${existing.status} → ${updated.status})`,
         });
       } catch (activityError) {
-        console.error(
-          "Candidate status activity log error:",
-          activityError
-        );
+        logFailure(activityError);
       }
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update candidate status error:", error);
+    logFailure(error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -530,17 +522,14 @@ exports.deleteCandidate = async (req, res) => {
         description: `Namizəd silindi: ${deleted.name} (${deleted.role})`,
       });
     } catch (activityError) {
-      console.error(
-        "Candidate delete activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     return res.status(200).json({
       message: "Namizəd silindi.",
     });
   } catch (error) {
-    console.error("Delete candidate error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message:

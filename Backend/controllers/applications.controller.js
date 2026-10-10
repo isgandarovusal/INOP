@@ -1,3 +1,4 @@
+const { logFailure } = require("../services/safeErrorLog.service");
 const mongoose = require("mongoose");
 const { creationEvent } = require("../services/applicationLifecycle.service");
 const { scoreResponses } = require("../services/applicationScoreState.service");
@@ -39,7 +40,7 @@ exports.getApplications = async (req, res) => {
 
     return res.status(200).json(await decorateApplications(req, await scoreResponses(req, applications)));
   } catch (error) {
-    console.error("Get applications error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Müraciətlər alınarkən server xətası baş verdi.",
@@ -73,7 +74,7 @@ exports.getApplicationById = async (req, res) => {
 
     return res.status(200).json((await decorateApplications(req, await scoreResponses(req, [application])))[0]);
   } catch (error) {
-    console.error("Get application error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Müraciət alınarkən server xətası baş verdi.",
@@ -142,15 +143,12 @@ exports.createApplication = async (req, res) => {
         description: `Müraciət yaradıldı: ${populated?.candidateId?.name || "Namizəd"} → ${populated?.jobId?.title || "Vakansiya"}`,
       });
     } catch (activityError) {
-      console.error(
-        "Application create activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     return res.status(201).json((await decorateApplications(req, await scoreResponses(req, [populated])))[0]);
   } catch (error) {
-    console.error("Create application error:", error);
+    logFailure(error);
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -204,17 +202,14 @@ exports.deleteApplication = async (req, res) => {
         description: `Müraciət silindi: ${deleted?.candidateId?.name || "Namizəd"} → ${deleted?.jobId?.title || "Vakansiya"}`,
       });
     } catch (activityError) {
-      console.error(
-        "Application delete activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     return res.status(200).json({
       message: "Müraciət silindi.",
     });
   } catch (error) {
-    console.error("Delete application error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Müraciət silinərkən server xətası baş verdi.",

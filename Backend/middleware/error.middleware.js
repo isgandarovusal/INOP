@@ -1,3 +1,4 @@
+const { logFailure, safeStatus: errorStatus } = require("../services/safeErrorLog.service");
 const multer = require("multer");
 
 function apiErrorPayload(message, extras = {}) {
@@ -42,7 +43,7 @@ function notFoundHandler(req, res) {
 }
 
 function globalErrorHandler(error, req, res, _next) {
-  console.error("Unhandled API error:", error);
+  logFailure(error);
 
   if (res.headersSent) {
     return;
@@ -101,21 +102,13 @@ function globalErrorHandler(error, req, res, _next) {
     );
   }
 
-  const statusCode = Number(error?.statusCode || error?.status || 500);
-  const safeStatus = statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
-  const isProduction = process.env.NODE_ENV === "production";
-
+  const safeStatus = errorStatus(error);
+  // JSON parser messages contain excerpts from the untrusted request body.
+  // Unknown errors/cause/stack are never echoed, including in development.
   return res.status(safeStatus).json(
     apiErrorPayload(
-      safeStatus >= 500
-        ? "Server xətası baş verdi."
-        : error?.message || "Sorğu emal edilə bilmədi.",
-      {
-        code: error?.code || (safeStatus >= 500 ? "INTERNAL_SERVER_ERROR" : "REQUEST_ERROR"),
-        ...(isProduction || !error?.message
-          ? {}
-          : { detail: error.message }),
-      }
+      safeStatus >= 500 ? "Server xətası baş verdi." : "Sorğu emal edilə bilmədi.",
+      { code: error?.code || (safeStatus >= 500 ? "INTERNAL_SERVER_ERROR" : "REQUEST_ERROR") }
     )
   );
 }

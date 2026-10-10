@@ -1,3 +1,4 @@
+const { logFailure } = require("../services/safeErrorLog.service");
 const { recordActivity } = require("../services/activityLog.service");
 const mongoose = require("mongoose");
 const { invalidateScores } = require("../services/applicationScoreState.service");
@@ -178,7 +179,7 @@ exports.getJobs = async (req, res) => {
 
     return res.status(200).json(await decorateJobs(req, jobs));
   } catch (error) {
-    console.error("Get jobs error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Vakansiyalar alınarkən server xətası baş verdi.",
@@ -209,7 +210,7 @@ exports.getJobById = async (req, res) => {
 
     return res.status(200).json((await decorateJobs(req, [job]))[0]);
   } catch (error) {
-    console.error("Get job error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Vakansiya alınarkən server xətası baş verdi.",
@@ -249,12 +250,12 @@ exports.createJob = async (req, res) => {
         description: `Vakansiya yaradıldı: ${saved.title}`,
       });
     } catch (activityError) {
-      console.error("Job create activity log error:", activityError);
+      logFailure(activityError);
     }
 
     return res.status(201).json(saved);
   } catch (error) {
-    console.error("Create job error:", error);
+    logFailure(error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -441,12 +442,12 @@ exports.updateJob = async (req, res) => {
         description: `Vakansiya yeniləndi: ${updated.title}`,
       });
     } catch (activityError) {
-      console.error("Job update activity log error:", activityError);
+      logFailure(activityError);
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update job error:", error);
+    logFailure(error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -490,14 +491,14 @@ exports.deleteJob = async (req, res) => {
         description: `Vakansiya silindi: ${deleted.title}`,
       });
     } catch (activityError) {
-      console.error("Job delete activity log error:", activityError);
+      logFailure(activityError);
     }
 
     return res.status(200).json({
       message: "Vakansiya silindi.",
     });
   } catch (error) {
-    console.error("Delete job error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message: "Vakansiya silinərkən server xətası baş verdi.",

@@ -1,3 +1,4 @@
+const { logFailure } = require("../services/safeErrorLog.service");
 const fs = require("fs/promises");
 const { creationEvent } = require("../services/applicationLifecycle.service");
 const mongoose = require("mongoose");
@@ -100,7 +101,7 @@ async function cleanupFile(file) {
     await fs.unlink(file.path);
   } catch (error) {
     if (error.code !== "ENOENT") {
-      console.error("CV cleanup error:", error);
+      logFailure(error);
     }
   }
 }
@@ -304,10 +305,7 @@ exports.createCandidateFromCv = async (req, res) => {
         description: `Namizəd CV-dən yaradıldı: ${savedCandidate.name} (${savedCandidate.role})`,
       });
     } catch (activityError) {
-      console.error(
-        "Candidate pipeline activity log error:",
-        activityError
-      );
+      logFailure(activityError);
     }
 
     if (savedApplication?._id) {
@@ -320,10 +318,7 @@ exports.createCandidateFromCv = async (req, res) => {
           description: `Müraciət CV pipeline-dan yaradıldı: ${savedCandidate.name} → ${job.title}`,
         });
       } catch (activityError) {
-        console.error(
-          "Candidate pipeline application activity log error:",
-          activityError
-        );
+        logFailure(activityError);
       }
     }
 
@@ -351,10 +346,7 @@ exports.createCandidateFromCv = async (req, res) => {
       match,
     });
   } catch (error) {
-    console.error(
-      "Create candidate from CV error:",
-      error
-    );
+    logFailure(error);
 
     if (savedApplication?._id) {
       try {
@@ -362,10 +354,7 @@ exports.createCandidateFromCv = async (req, res) => {
           _id: savedApplication._id,
         });
       } catch (cleanupError) {
-        console.error(
-          "Application rollback error:",
-          cleanupError
-        );
+        logFailure(cleanupError);
       }
     }
 
@@ -375,10 +364,7 @@ exports.createCandidateFromCv = async (req, res) => {
           _id: savedCandidate._id,
         });
       } catch (cleanupError) {
-        console.error(
-          "Candidate rollback error:",
-          cleanupError
-        );
+        logFailure(cleanupError);
       }
     }
 

@@ -1,3 +1,4 @@
+const { logFailure } = require("../services/safeErrorLog.service");
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
 const XLSX = require("xlsx");
@@ -72,7 +73,7 @@ exports.exportCandidatesExcel = async (req, res) => {
 
     return res.send(buffer);
   } catch (error) {
-    console.error("Candidate Excel export error:", error);
+    logFailure(error);
 
     return res.status(500).json({
       message:
@@ -205,10 +206,7 @@ exports.exportCandidatePdf = async (req, res) => {
 
     doc.end();
   } catch (error) {
-    console.error(
-      "Candidate PDF export error:",
-      error
-    );
+    logFailure(error);
 
     if (!res.headersSent) {
       return res.status(500).json({
