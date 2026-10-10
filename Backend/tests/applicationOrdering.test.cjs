@@ -15,7 +15,7 @@ test('Application placement is scoped, persistent and revision controlled', asyn
   let first = await make(), middle = await make(), last = await make();
   await t.test('same-stage reorder persists without changing score, decision or stage time', async () => {
     const previous = await Application.findById(last._id).lean();
-    const r = await place('own', last, null, first, { commandId: 'ordering-command-0001' });
+    const r = await place('own', last, null, first, { commandId: 'ordering-command-0001', status: 'Applied' });
     assert.equal(r.status, 200); assert.ok(r.data.boardOrder); assert.equal(r.data.status, previous.status);
     assert.equal(r.data.stageEnteredAt, previous.stageEnteredAt.toISOString()); assert.equal(r.data.processingState, 'idle');
     const stored = await Application.findById(last._id).lean(); assert.equal(stored.boardOrder, r.data.boardOrder); assert.equal(stored.__v, 1);
@@ -25,7 +25,7 @@ test('Application placement is scoped, persistent and revision controlled', asyn
     assert.equal((await h.request('own', 'GET', `/applications/${last._id}`)).data.boardOrder, stored.boardOrder);
   });
   await t.test('idempotent placement replay preserves one event', async () => {
-    const replay = await place('own', { ...last, __v: 0 }, null, first, { commandId: 'ordering-command-0001' }); assert.equal(replay.status, 200);
+    const replay = await place('own', { ...last, __v: 0 }, null, first, { commandId: 'ordering-command-0001', status: 'Applied' }); assert.equal(replay.status, 200);
     assert.equal((await Application.findById(last._id)).events.length, 1);
     assert.equal((await place('own', last, first, middle, { commandId: 'ordering-command-0001' })).status, 409);
   });

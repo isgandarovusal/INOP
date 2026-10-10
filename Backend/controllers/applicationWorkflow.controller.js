@@ -44,7 +44,8 @@ exports.update = async (req, res, next) => {
     const before = workflowSnapshot(current), after = workflowSnapshot({ ...current, ...update });
     if (JSON.stringify(before) === JSON.stringify(after)) return res.json(await response(req));
     if ((current.events?.length || 0) >= 1000) return res.status(409).json({ message: 'Application history needs archiving before further changes.', code: 'HISTORY_LIMIT' });
-    const event = { id: crypto.randomUUID(), type: update.status && update.status !== current.status ? 'status' : Object.keys(update).length === 1 && update.boardOrder ? 'reorder' : 'workflow', actor: req.user.id, at: new Date(), revision: (current.__v || 0) + 1,
+    const onlyOrder = update.boardOrder && JSON.stringify({ ...before, boardOrder: after.boardOrder }) === JSON.stringify(after);
+    const event = { id: crypto.randomUUID(), type: update.status && update.status !== current.status ? 'status' : onlyOrder ? 'reorder' : 'workflow', actor: req.user.id, at: new Date(), revision: (current.__v || 0) + 1,
       before, after, reason: req.body.reason?.trim() || '', ...(key ? { commandId: key, commandHash: hash } : {}) };
     const rescheduled = update.interview && (!current.interview || String(update.interview.startsAt) !== String(current.interview.startsAt) || update.interview.timezone !== current.interview.timezone || String(update.interview.interviewerId) !== String(current.interview.interviewerId));
     if ((update.status && update.status !== current.status || rescheduled) && ['Interview', 'Offered'].includes(after.status)) event.delivery = { state: 'pending', attempts: 0 };

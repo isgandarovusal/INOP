@@ -586,3 +586,15 @@ Initial target failures were fixture mistakes: a prior test had already populate
 Local commit pending creation. Target **142/142**, full serial **1398/1398**, authorization **632/632**, smoke **13/13**, TS/build PASS, lint **0 errors / 9 warnings**. Evidence: `/tmp/inop-hr08c5b-baseline.log` (missing route), `/tmp/inop-hr08c5b-target-final.log`, `/tmp/inop-hr08c5b-regression.log`, `/tmp/inop-packagehr08c5b-validation.json` (preserved completed 08C5B metadata). Contract: `docs/HR_BOARD_PAGINATION_CONTRACT.md`.
 
 One bounded initial API returns complete scoped counts for eight disjoint lanes; per-lane signed cursors return only that column and adjacent-page anchors. Independent parent redaction/search, own/department/assigned/all, forged/borrowed cursors, boundary 409, empty lanes and permission revocation during aggregate are tested. New endpoint is additive; existing consumers still use their former lists until 08C5C. No whole-cohort transaction or live query/performance claim. AUD-064 and P08-012 remain OPEN until browser persistence/paging tests. `Frontend/tests/hrBoardUI.test.cjs` is the next prepared baseline and is intentionally excluded from this commit and 1398-test run. No production operations.
+
+08C5B commit: `1c1ba805ed33091774bfe5706b3b764138cd2836` (6 files); its complete 1398-test run and gates are recorded above.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-099 | 08C5B follow-up | A placement accompanied by the unchanged status is incorrectly classified as workflow instead of reorder | TESTED | `applicationOrdering.test.cjs` now sends status Applied with the placement and checks reorder event, unchanged stage time/processing and idempotent replay; `hrBoardUI.test.cjs` initially reproduces workflow vs reorder |
+
+## 08C5B follow-up — semantic event classification
+
+Only the controller, its existing regression test and this tracker are included in the local follow-up commit. Event classification now compares persisted before/after values: status changes are status; order-only changes are reorder, including an explicitly repeated unchanged status; other workflow changes remain workflow. Scope, revision/CAS, command identity and notification rules are unchanged.
+
+Evidence: `/tmp/inop-hr08c5c-target.log` reproduces the workflow/reorder difference, `/tmp/inop-hr08c5c-target-final.log` **79/79**, `/tmp/inop-hr08c5c-regression.log` **1411/1411**, `/tmp/inop-packagehr08c5c-validation.json`: TS/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. The full run validates the current working tree, including pending 08C5C frontend changes; it is not represented as a clean-HEAD-only test of this smaller commit. Those frontend files/test stay outside the classification commit and are preserved for the next increment. AUD-064 remains OPEN until that UI increment is committed; no production action.
