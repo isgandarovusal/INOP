@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const { resourceFilter } = require('./hrResourceScope.service');
 const { getPermissionScope } = require('../middleware/auth.middleware');
+const { orderKey } = require('./applicationOrdering.service');
 const transitions = Object.freeze({
   Applied: ['Screening', 'Shortlisted', 'Interview', 'Offered', 'Rejected'],
   Screening: ['Applied', 'Shortlisted', 'Interview', 'Offered', 'Rejected'],
@@ -98,14 +99,15 @@ async function prepareWorkflow(req, current) {
     update.assignedTo = id;
   }
   if ((update.substatus ?? current.substatus) === 'scheduled' && !(update.interview === null ? null : update.interview || current.interview)?.startsAt) throw failure('Scheduled interviews require a date.');
-  if (!Object.keys(update).length) throw failure('No workflow fields supplied.');
+  if (!Object.keys(update).length && body.placement === undefined) throw failure('No workflow fields supplied.');
+  if (body.boardOrder !== undefined) throw failure('Card order is server-managed.');
   return update;
 }
 function workflowSnapshot(value) {
-  return { status: value.status, substatus: value.substatus || '', interview: value.interview || null, nextAction: value.nextAction || null, assignedTo: value.assignedTo || null, notes: value.notes || '' };
+  return { status: value.status, substatus: value.substatus || '', interview: value.interview || null, nextAction: value.nextAction || null, assignedTo: value.assignedTo || null, notes: value.notes || '', boardOrder: orderKey(value) };
 }
 function commandHash(body) {
-  return crypto.createHash('sha256').update(JSON.stringify(Object.fromEntries(['status', 'substatus', 'interview', 'nextAction', 'assignedTo', 'notes', 'reason', 'reopen'].filter(k => body[k] !== undefined).map(k => [k, body[k]])))).digest('hex');
+  return crypto.createHash('sha256').update(JSON.stringify(Object.fromEntries(['status', 'substatus', 'interview', 'nextAction', 'assignedTo', 'notes', 'reason', 'reopen', 'placement'].filter(k => body[k] !== undefined).map(k => [k, body[k]])))).digest('hex');
 }
 function creationEvent(req) { return { id: crypto.randomUUID(), type: 'create', actor: req.user.id, at: new Date(), revision: 0, before: null, after: { status: 'Applied' }, reason: '' }; }
 module.exports = { transitions, prepareWorkflow, workflowSnapshot, commandHash, creationEvent, localTime };

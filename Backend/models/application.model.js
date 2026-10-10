@@ -38,6 +38,8 @@ const applicationSchema = new mongoose.Schema(
     },
 
     events: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    // No legacy backfill: the board uses an equivalent id-derived fallback.
+    boardOrder: { type: String, default: function () { return `a0${this._id}V`; }, maxlength: 512, match: /^[A-Za-z][0-9A-Za-z]+$/ },
     source: { type: new mongoose.Schema({
       key: { type: String, enum: ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form'] },
       receivedAt: Date,
@@ -94,6 +96,7 @@ applicationSchema.index({ departmentId: 1, createdAt: -1, _id: -1 });
 applicationSchema.index({ assignedTo: 1, createdAt: -1, _id: -1 });
 applicationSchema.index({ jobId: 1, createdAt: -1, _id: -1 });
 applicationSchema.index({ jobId: 1, _id: 1 });
+applicationSchema.index({ jobId: 1, status: 1, boardOrder: 1, _id: 1 }, { collation: { locale: 'simple' } });
 applicationSchema.index({ candidateId: 1, createdAt: -1, _id: -1 });
 applicationSchema.index({ 'events.delivery.state': 1, 'events.delivery.nextAttemptAt': 1 });
 
