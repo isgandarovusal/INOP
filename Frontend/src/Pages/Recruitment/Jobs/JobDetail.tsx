@@ -1,5 +1,5 @@
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
-import { applicationScoreOrder } from "../../../Services/rankingService";
+import { useHRRankingPage } from "../../../Hooks/useHRRankingPage";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useMemo, useState } from "react";
@@ -13,7 +13,7 @@ import { getJobById } from "../../../Services/jobsService";
 import {
   createApplication,
 } from "../../../Services/applicationsService";
-import { getApplicationPage, getCandidatePage } from "../../../Services/hrPageService";
+import { getCandidatePage } from "../../../Services/hrPageService";
 import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
 import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import HRPageControls from "../../../Components/HRPageControls";
@@ -37,7 +37,7 @@ const JobDetail: React.FC = () => {
   const job = result.data;
   const [candidateSearch, setCandidateSearch] = useState('');
   const search = useDebouncedSearch(candidateSearch);
-  const apps = useHRPage('application', { jobId: job?.id }, getApplicationPage, { enabled: !!job && canReadApps });
+  const apps = useHRRankingPage(job?.id, !!job && canReadApps);
   const people = useHRPage('candidate', { excludeJobId: job?.id, q: search }, getCandidatePage, { enabled: !!job && canLink && job.status === 'open' });
   const applications = useMemo(() => apps.data?.items ?? [], [apps.data]);
   const candidates = useMemo(() => people.data?.items ?? [], [people.data]);
@@ -61,9 +61,7 @@ const JobDetail: React.FC = () => {
           typeof app.candidateId === "string"
             ? candidateById.get(app.candidateId)
             : app.candidateId,
-      }))
-      .filter((r) => r.candidate)
-      .sort((a, b) => applicationScoreOrder(a.app, b.app));
+      }));
   }, [applications, candidateById]);
 
   const applicableCandidates = useMemo(
@@ -145,11 +143,12 @@ const JobDetail: React.FC = () => {
           <div className="detail-card">
             <h3>
               {t("recruitment.jobDetail.rankedCandidates", {
-                count: ranked.length,
+                count: apps.data?.total ?? ranked.length,
               })}
             </h3>
 
-            <p role="note">{t("hrPage.pageSort")}</p>
+            <p role="note">{t("hrPage.vacancyRanking")}</p>
+            {apps.changed && <p role="alert">{t("hrPage.rankingChanged")}</p>}
             {canReadApps && apps.status !== "ready" ? <HRResourceState status={apps.status} retry={apps.reload} /> : ranked.length === 0 ? (
               <EmptyState
                 icon={<UserSquare2 size={26} />}
@@ -162,22 +161,16 @@ const JobDetail: React.FC = () => {
                   <div
                     key={app.id}
                     className="ranking-row"
-                    onClick={() =>
-                      navigate(
-                        `/app/recruitment/candidates/${candidate!.id}`,
-                      )
-                    }
-                    style={{ cursor: "pointer" }}
                   >
-                    <span className="ranking-row__rank">{idx + 1}</span>
+                    <span className="ranking-row__rank">{(apps.page - 1) * (apps.data?.pageSize ?? 30) + idx + 1}</span>
 
                     <div className="ranking-row__info">
                       <p className="ranking-row__name">
-                        {candidate!.name}
+                        {candidate ? <button type="button" onClick={() => navigate(`/app/recruitment/candidates/${candidate.id}`)}>{candidate.name}</button> : t("hrStates.restricted")}
                       </p>
 
                       <p className="ranking-row__meta">
-                        {candidate!.experience ?? t("cvReview.unknown")}{" "}
+                        {candidate?.experience ?? t("cvReview.unknown")}{" "}
                         {t("recruitment.jobs.years")} ·{" "}
                         <Badge tone="accent">
                           {t(`recruitment.applicationStatus.${app.status}`)}

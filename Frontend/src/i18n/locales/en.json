@@ -1260,6 +1260,8 @@
     "pagination": "Recruitment pagination",
     "summary": "Page {{page}} · {{shown}} shown · {{total}} matching records",
     "pageSort": "Score/name ordering applies to this page. Use filters to narrow the cohort.",
+    "vacancyRanking": "Current match order across all permitted applications for this vacancy. Unscored applications appear last.",
+    "rankingChanged": "The ranking changed. Reload from the first page.",
     "sortScorePage": "Score (this page)",
     "sortNamePage": "Name (this page)",
     "lookup": "Search all authorized filter options",

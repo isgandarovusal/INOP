@@ -122,3 +122,6 @@ exports.brands = async (req, res, next) => {
     res.json({ version: 'hr-page-v1', items, page: p.page, pageSize: p.pageSize, total, hasMore: start + items.length < total, nextCursor: null });
   } catch (e) { if (e.code === 50) return res.status(503).json({ message: 'Query timed out. Narrow filters and retry.' }); next(e); }
 };
+
+// Internal shared page projection; ranking retains the established list DTO.
+exports.clip = clip; exports.fields = fields;

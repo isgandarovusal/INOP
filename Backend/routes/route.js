@@ -102,6 +102,7 @@ const hrPaged = require('../controllers/hrPaged.controller');
 router.get('/hr/v2/brands', ...authorize('recruitment', 'read'), hrPaged.brands);
 router.get('/hr/v2/branches', ...authorize('recruitment', 'read'), hrPaged.list('branches'));
 router.get('/hr/v2/jobs', ...authorize('recruitment', 'read'), hrPaged.list('jobs'));
+router.get('/hr/v2/application-ranking', ...authorize('application', 'read'), require('../controllers/hrRanking.controller').get);
 router.get('/hr/v2/candidates', ...authorize('candidate', 'read'), hrPaged.list('candidates'));
 router.get('/hr/v2/applications', ...authorize('application', 'read'), hrPaged.list('applications'));
 router.get('/hr/analytics', ...authorize('application', 'read'), requirePermission('recruitment', 'read'), require('../controllers/hrAnalytics.controller').get);

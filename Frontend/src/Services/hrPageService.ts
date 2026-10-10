@@ -26,3 +26,5 @@ export const getBrandPage = (query: HRPageQuery, signal?: AbortSignal, scopeKey?
 export const getBranchPage = (query: HRPageQuery, signal?: AbortSignal, scopeKey?: string) => page('branches', query, raw => {
   const row = raw as RecruitmentBranch; return { ...row, id: row?._id };
 }, signal, scopeKey);
+
+export const getApplicationRankingPage = (query: Pick<HRPageQuery, 'jobId' | 'after' | 'pageSize'>, signal?: AbortSignal, scopeKey?: string): Promise<HRPage<Application>> => page('application-ranking', query, normalizeApplication, signal, scopeKey);
