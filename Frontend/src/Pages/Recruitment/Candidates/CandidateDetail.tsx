@@ -1,9 +1,10 @@
+import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import CandidateApplicationMatches from "../../../Components/CandidateApplicationMatches";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import HRResourceState from "../../../Components/HRResourceState";
 import { auditErrorStatus, useAuditResource } from "../../../Hooks/useAuditResource";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -40,8 +41,18 @@ const CandidateDetail: React.FC = () => {
   const candidate = result.data;
   const fileContext = JSON.stringify([id, candidate?.cvUrl, candidate?.cvOriginal?.sha256, user?.id, user?.role, user?.departmentId, user?.permissions]);
   const cv = usePrivateFile(fileContext);
-  const [deleting, setDeleting] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const context = useHRActionContext(JSON.stringify([id, candidate?.revision, candidate?.cvUrl, candidate?.cvOriginal?.sha256]));
+  const controllers = useRef(new Map<AbortController, string>());
+  useEffect(() => {
+    const pending = controllers.current;
+    const key = context.key;
+    return () => { for (const [controller, started] of pending) if (started === key) { controller.abort(); pending.delete(controller); } };
+  }, [context.key]);
+  const [busy, setBusy] = useState({ key: '', deleting: false, exporting: false });
+  const [actionError, setActionError] = useState<{ key: string; status: ReturnType<typeof auditErrorStatus> }>({ key: '', status: 'ready' });
+  const deleting = busy.key === context.key && busy.deleting, exporting = busy.key === context.key && busy.exporting;
+  const setDeleting = (deleting: boolean) => setBusy(previous => ({ key: context.key, exporting: previous.key === context.key && previous.exporting, deleting }));
+  const setExporting = (exporting: boolean) => setBusy(previous => ({ key: context.key, deleting: previous.key === context.key && previous.deleting, exporting }));
 
   const canUpdate = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
@@ -49,11 +60,14 @@ const CandidateDetail: React.FC = () => {
 
   const handleExportPdf = async () => {
     if (!candidate || !canExportPdf || exporting) return;
+    const key = context.key, controller = new AbortController(); controllers.current.set(controller, key);
+    setActionError({ key, status: 'ready' });
 
     try {
       setExporting(true);
 
-      const blob = await exportCandidatePdf(candidate.id);
+      const blob = await exportCandidatePdf(candidate.id, controller.signal);
+      if (context.current.current !== key || controller.signal.aborted) return;
 
       downloadBlob(
         blob,
@@ -62,6 +76,8 @@ const CandidateDetail: React.FC = () => {
 
       toast.success(t("recruitment.candidates.exportSuccess"));
     } catch (err: unknown) {
+      if (context.current.current !== key || controller.signal.aborted) return;
+      setActionError({ key, status: auditErrorStatus(err) });
       toast.error(
         getErrorMessage(
           err,
@@ -69,7 +85,8 @@ const CandidateDetail: React.FC = () => {
         ),
       );
     } finally {
-      setExporting(false);
+      controllers.current.delete(controller);
+      if (context.current.current === key) setExporting(false);
     }
   };
 
@@ -81,19 +98,25 @@ const CandidateDetail: React.FC = () => {
     );
 
     if (!confirmed) return;
+    const key = context.key, controller = new AbortController(); controllers.current.set(controller, key);
+    setActionError({ key, status: 'ready' });
 
     try {
       setDeleting(true);
-      await deleteCandidate(candidate.id);
+      await deleteCandidate(candidate.id, controller.signal);
+      if (context.current.current !== key || controller.signal.aborted) return;
 
       toast.success(t("recruitment.candidateDetail.deleted"));
       navigate("/app/recruitment/candidates");
     } catch (err: unknown) {
+      if (context.current.current !== key || controller.signal.aborted) return;
+      setActionError({ key, status: auditErrorStatus(err) });
       toast.error(
         getErrorMessage(err, t("recruitment.candidateDetail.deleteError")),
       );
     } finally {
-      setDeleting(false);
+      controllers.current.delete(controller);
+      if (context.current.current === key) setDeleting(false);
     }
   };
 
@@ -103,6 +126,7 @@ const CandidateDetail: React.FC = () => {
 
   return (
     <div className="candidate-detail-page">
+      {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
       <CvReviewEvidence review={candidate.cvReview} />
       <CandidateApplicationMatches candidateId={candidate.id} />
       {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}

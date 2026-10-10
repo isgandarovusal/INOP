@@ -465,7 +465,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 08A | `4c0a4eee3e735d0f5c8abe70b37a0e6bfc5f7bad` | Targets 25/25; current final serial full 1267/1267; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Frontend transition 08B; large-data plans/measurements 08D; AUD-090 concurrent Source download investigation remains OPEN |
 
-| 08B | `feat(hr): consume bounded recruitment pages and lazy evidence` (SHA recorded next update) | Targets 54/54; full 1289/1289; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Page-local score/name order explicitly labeled; global ranking/manual order/parsing/benchmarks remain 08C–08D; Source concurrency finding AUD-090 remains OPEN |
+| 08B | `148fa8171a7b98744dca507c13abcb7feea77717` | Targets 54/54; full 1289/1289; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Page-local score/name order explicitly labeled; global ranking/manual order/parsing/benchmarks remain 08C–08D; Source concurrency finding AUD-090 remains OPEN |
+
+| 08C1 | `fix(hr): cancel stale Candidate detail actions` (SHA recorded next update) | Target 46/46; full 1298/1298; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Client abort does not roll back accepted server mutations; manual order/ranking/parsing/benchmarks remain OPEN |
 
 ## External prerequisites
 
@@ -529,8 +531,14 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 | AUD-092 | 08B | Paged static populate serialized Mongoose Candidate internals instead of a plain projected DTO | TESTED | Initial HR lifecycle/35-record page failures; `hrPagination` now asserts plain parent id/name, no `$__`/`_doc` for calculated and legacy scores; independent parent scope remains enforced |
 | AUD-093 | 08B | Application normalizer omitted createdAt/updatedAt, breaking newest order | TESTED | `applicationLifecycleUI`: newest ordering uses preserved API timestamps; no candidate-global/legacy score used |
 | AUD-094 | 08C | Global trustworthy ranking is not available after bounded-page transition | OPEN | 08B explicitly labels score/name order as page-local. Follow-up must rank the scoped full cohort using current fingerprints, without fake stale/hidden scores or unbounded response |
-| AUD-095 | 08C | Candidate detail PDF export/delete callbacks are not keyed to route/permission context | OPEN | `CandidateDetail.tsx` awaits then downloads/navigates without context check; isolated stale-download reproduction and fix follow in 08C |
+| AUD-095 | 08C1 | Candidate detail PDF export/delete callbacks are not keyed to route/permission context | TESTED | `candidateActions.test.cjs`: baseline starts 1 unauthorized stale download (expected 0); final 9/9 covers revoked permission, profile navigation, delayed delete, HTTP states, real Bearer PDF and legal deletion |
 
 08B targets: `/tmp/inop-hr08b-baseline.log` reproduces 35 versus required 30 rows; `/tmp/inop-hr08b-target-current.log` 54/54 backend pagination, new browser page tests and matching UI checks. Existing HR lifecycle/brand/workflow checks are included in full regression. New catalog options are searchable across pages; lazy evidence fetches once on demand, not for every row; 403 and late responses retain primary rows and mask unavailable scores. The retained Source download finding AUD-090 remains OPEN. No live benchmark/provider/SMTP/durability claim is made. Next independent increment is 08C stability/order/ranking, then 08D measurements.
 
 08B final validation: `/tmp/inop-hr08b-regression.log` 1289/1289; `/tmp/inop-packagehr08b-validation.json` and `/tmp/inop-hr08b-validation-run.log`. The earlier lookup test failures were strict locator/translated label mismatches; response and DOM inspection confirmed correct backend/option data. Final assertions use accessible exact roles/names and retain independent server response checks.
+
+08C1 evidence: `/tmp/inop-hr08c1-baseline.log` reproduces a delayed PDF download after local permission revocation. `/tmp/inop-hr08c1-target-final.log` 46/46 (9 new action checks plus existing CV review/lifecycle/service contracts). `CandidateDetail` now binds PDF export/deletion controllers, busy/error state and callbacks to actor/role/permission, route and current Candidate/CV revision; it cancels only requests belonging to the obsolete context. Optional AbortSignal preserves existing service calls and server API contracts. Action HTTP 401/403/404/500 is shown separately from still-authorized profile data; old callbacks cannot download, navigate or alter feedback in another context.
+
+Cancellation does not undo a deletion already accepted by the server. This increment protects client lifecycle, not transactional rollback; orphan/retention/recovery work remains package 10. Job/Candidate forms already use context-keyed inner components with unmount guards; no unsupported claim that those are unguarded is added. Manual order AUD-064, global ranking AUD-094, parsing isolation AUD-034/049 and 0/5000/50000 measurements remain open.
+
+08C1 final full evidence: `/tmp/inop-hr08c1-regression.log` 1298/1298; `/tmp/inop-hr08c1-validation-run.log`, `/tmp/inop-packagehr08c-validation.json` (08C1). No production data or network integration used.

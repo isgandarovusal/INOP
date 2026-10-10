@@ -364,9 +364,9 @@ export async function updateCandidateStatus(
 }
 
 export async function deleteCandidate(
-  id: string
+  id: string, signal?: AbortSignal
 ): Promise<void> {
-  await API.delete(`/candidates/${id}`);
+  await API.delete(`/candidates/${id}`, { signal });
 }
 
 export async function exportCandidatesExcel(): Promise<Blob> {
@@ -381,12 +381,12 @@ export async function exportCandidatesExcel(): Promise<Blob> {
 }
 
 export async function exportCandidatePdf(
-  id: string
+  id: string, signal?: AbortSignal
 ): Promise<Blob> {
   const response = await API.get(
     `/candidate-export/${id}/pdf`,
     {
-      responseType: "blob",
+      signal, responseType: "blob",
     }
   );
 
