@@ -3,6 +3,8 @@ const crypto = require("crypto");
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
 const RevokedToken = require("../models/revokedToken.model");
+const mongoose = require("mongoose");
+const { permissionScope } = require("../services/authorizationPolicy.service");
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -32,7 +34,15 @@ exports.verifyToken = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, getJwtSecret());
+    const decoded = jwt.verify(token, getJwtSecret(), {
+      algorithms: ["HS256"],
+      issuer: process.env.JWT_ISSUER || "inop",
+      audience: process.env.JWT_AUDIENCE || "inop-users",
+    });
+    if (!decoded || typeof decoded !== "object" || !Number.isFinite(decoded.exp) ||
+        !mongoose.Types.ObjectId.isValid(decoded.id)) {
+      return res.status(401).json({ message: "Authentication token keçərsizdir." });
+    }
 
     const tokenHash = crypto
       .createHash("sha256")
@@ -43,7 +53,7 @@ exports.verifyToken = async (req, res, next) => {
       RevokedToken.exists({ tokenHash }),
       User.findById(decoded.id)
         .select(
-          "_id name email role departmentId position managerId isActive"
+          "_id name email role departmentId position managerId isActive tokenVersion"
         )
         .lean(),
     ]);
@@ -65,6 +75,16 @@ exports.verifyToken = async (req, res, next) => {
         message: "Bu istifadəçi hesabı deaktiv edilib.",
       });
     }
+
+    if ((decoded.tokenVersion ?? 0) !== (user.tokenVersion ?? 0)) {
+      return res.status(401).json({ message: "Authentication token artıq etibarlı deyil." });
+    }
+
+    const role = await getRole(user.role);
+    if (!role) {
+      return res.status(403).json({ message: "İstifadəçi rolu aktiv deyil və ya mövcud deyil." });
+    }
+    req.authRole = role;
 
     req.authToken = token;
     req.auth = decoded;
@@ -89,13 +109,13 @@ exports.verifyToken = async (req, res, next) => {
       });
     }
 
-    if (error.name === "JsonWebTokenError") {
+    if (error.name === "JsonWebTokenError" || error.name === "NotBeforeError") {
       return res.status(401).json({
         message: "Authentication token keçərsizdir.",
       });
     }
 
-    console.error("Authentication error:", error);
+    console.error("Authentication error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Authentication zamanı server xətası baş verdi.",
@@ -110,24 +130,8 @@ async function getRole(roleKey) {
   }).lean();
 }
 
-function permissionMatches(permission, resource, action) {
-  const resourceMatches =
-    permission.resource === "*" ||
-    permission.resource === resource;
-
-  const actionMatches =
-    permission.action === "*" ||
-    permission.action === action;
-
-  return resourceMatches && actionMatches;
-}
-
 function getPermissionScope(permissions, resource, action) {
-  const matchedPermission = permissions.find((permission) =>
-    permissionMatches(permission, resource, action)
-  );
-
-  return matchedPermission?.scope || null;
+  return permissionScope(permissions, resource, action);
 }
 
 exports.requirePermission = (resource, action) => {
@@ -178,7 +182,7 @@ exports.requirePermission = (resource, action) => {
 
       next();
     } catch (error) {
-      console.error("Permission check error:", error);
+      console.error("Permission check error:", error?.name || "Error");
 
       return res.status(500).json({
         message:
@@ -257,7 +261,7 @@ exports.requireAnyPermission = (permissions) => {
           "Bu əməliyyat üçün kifayət qədər icazəniz yoxdur.",
       });
     } catch (error) {
-      console.error("Permission check error:", error);
+      console.error("Permission check error:", error?.name || "Error");
 
       return res.status(500).json({
         message:

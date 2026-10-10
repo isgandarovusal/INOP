@@ -7,11 +7,13 @@ const departmentSchema = new mongoose.Schema(
       required: true,
       trim: true,
       unique: true,
+      maxlength: 200,
     },
     description: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 2000,
     },
     isActive: {
       type: Boolean,

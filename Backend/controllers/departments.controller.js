@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 const Department = require("../models/department.model");
+const User = require("../models/user.model");
+const Job = require("../models/job.model");
+const Candidate = require("../models/candidate.model");
+const Application = require("../models/application.model");
+const { listRecords } = require("../utils/listQuery");
+const { sendError } = require("../utils/sendError");
 const { recordActivity } = require("../services/activityLog.service");
 
 function validId(id) {
@@ -10,6 +16,15 @@ function clean(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function serializeDepartment(department) {
+  const result = department.toObject ? department.toObject() : department;
+  return { ...result, id: String(result._id) };
+}
+
+function scopedQuery(req, id) {
+  return { $and: [{ _id: id }, req.dataScope || {}] };
+}
+
 exports.getDepartments = async (req, res) => {
   try {
     const query = {};
@@ -18,18 +33,13 @@ exports.getDepartments = async (req, res) => {
       Object.assign(query, req.dataScope);
     }
 
-    const departments = await Department.find(query)
-      .sort({ name: 1 })
-      .lean();
+    const departments = await listRecords(Department, query, req, res, { sort: { name: 1, _id: 1 } });
 
     return res.status(200).json({
-      departments,
+      departments: departments.map(serializeDepartment),
     });
   } catch (error) {
-    console.error("Get departments error:", error);
-    return res.status(500).json({
-      message: "Şöbələri yükləmək mümkün olmadı.",
-    });
+    return sendError(res, error, "Şöbələri yükləmək mümkün olmadı.");
   }
 };
 
@@ -43,11 +53,7 @@ exports.getDepartmentById = async (req, res) => {
       });
     }
 
-    const query = { _id: id };
-
-    if (req.dataScope && Object.keys(req.dataScope).length > 0) {
-      Object.assign(query, req.dataScope);
-    }
+    const query = scopedQuery(req, id);
 
     const department = await Department.findOne(query).lean();
 
@@ -58,10 +64,10 @@ exports.getDepartmentById = async (req, res) => {
     }
 
     return res.status(200).json({
-      department,
+      department: serializeDepartment(department),
     });
   } catch (error) {
-    console.error("Get department error:", error);
+    console.error("Get department error:", error?.name || "Error");
     return res.status(500).json({
       message: "Şöbəni yükləmək mümkün olmadı.",
     });
@@ -70,6 +76,9 @@ exports.getDepartmentById = async (req, res) => {
 
 exports.createDepartment = async (req, res) => {
   try {
+    if (req.permission?.scope === "department" || req.permission?.scope === "assigned") {
+      return res.status(403).json({ message: "Bu məlumat səviyyəsində yeni şöbə yaratmaq olmaz." });
+    }
     const name = clean(req.body.name);
     const description = clean(req.body.description);
 
@@ -104,15 +113,19 @@ exports.createDepartment = async (req, res) => {
         description: `Şöbə yaradıldı: ${department.name}`,
       });
     } catch (activityError) {
-      console.error("Create department activity log error:", activityError);
+      console.error("Create department activity log error:", activityError?.name || "Error");
     }
 
     return res.status(201).json({
       message: "Şöbə uğurla yaradıldı.",
-      department,
+      department: serializeDepartment(department),
     });
   } catch (error) {
-    console.error("Create department error:", error);
+    console.error("Create department error:", error?.name || "Error");
+
+    if (error.name === "ValidationError" || error.name === "CastError") {
+      return res.status(400).json({ message: "Şöbə məlumatları düzgün deyil." });
+    }
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -136,11 +149,7 @@ exports.updateDepartment = async (req, res) => {
       });
     }
 
-    const query = { _id: id };
-
-    if (req.dataScope && Object.keys(req.dataScope).length > 0) {
-      Object.assign(query, req.dataScope);
-    }
+    const query = scopedQuery(req, id);
 
     const department = await Department.findOne(query);
 
@@ -158,6 +167,12 @@ exports.updateDepartment = async (req, res) => {
           message: "Şöbə adı boş ola bilməz.",
         });
       }
+
+      const duplicate = await Department.exists({
+        _id: { $ne: id },
+        name: { $regex: `^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" },
+      });
+      if (duplicate) return res.status(409).json({ message: "Bu adda şöbə artıq mövcuddur." });
 
       department.name = name;
     }
@@ -187,15 +202,19 @@ exports.updateDepartment = async (req, res) => {
         description: `Şöbə yeniləndi: ${department.name}`,
       });
     } catch (activityError) {
-      console.error("Update department activity log error:", activityError);
+      console.error("Update department activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
       message: "Şöbə uğurla yeniləndi.",
-      department,
+      department: serializeDepartment(department),
     });
   } catch (error) {
-    console.error("Update department error:", error);
+    console.error("Update department error:", error?.name || "Error");
+    if (error.name === "ValidationError" || error.name === "CastError") {
+      return res.status(400).json({ message: "Şöbə məlumatları düzgün deyil." });
+    }
+    if (error.code === 11000) return res.status(409).json({ message: "Bu adda şöbə artıq mövcuddur." });
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -219,19 +238,20 @@ exports.deleteDepartment = async (req, res) => {
       });
     }
 
-    const query = { _id: id };
-
-    if (req.dataScope && Object.keys(req.dataScope).length > 0) {
-      Object.assign(query, req.dataScope);
-    }
-
-    const department = await Department.findOneAndDelete(query);
+    const query = scopedQuery(req, id);
+    const department = await Department.findOne(query);
 
     if (!department) {
       return res.status(404).json({
         message: "Şöbə tapılmadı.",
       });
     }
+
+    const references = await Promise.all([User, Job, Candidate, Application].map((model) => model.exists({ departmentId: id })));
+    if (references.some(Boolean)) {
+      return res.status(409).json({ message: "İstifadəçiləri və ya işə qəbul qeydləri olan şöbə silinə bilməz." });
+    }
+    await department.deleteOne();
 
     try {
       await recordActivity({
@@ -242,14 +262,14 @@ exports.deleteDepartment = async (req, res) => {
         description: `Şöbə silindi: ${department.name}`,
       });
     } catch (activityError) {
-      console.error("Delete department activity log error:", activityError);
+      console.error("Delete department activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
       message: "Şöbə uğurla silindi.",
     });
   } catch (error) {
-    console.error("Delete department error:", error);
+    console.error("Delete department error:", error?.name || "Error");
     return res.status(500).json({
       message: "Şöbəni silmək mümkün olmadı.",
     });

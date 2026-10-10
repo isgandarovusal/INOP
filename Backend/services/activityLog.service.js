@@ -19,6 +19,7 @@ async function recordActivity({
       ? req.user.id
       : null,
     userName: req.user?.name || "",
+    departmentId: req.user?.departmentId || "",
     action: String(action).trim().toLowerCase(),
     entityType: String(entityType).trim(),
     entityId: String(entityId || "").trim(),

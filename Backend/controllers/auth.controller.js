@@ -4,6 +4,8 @@ const crypto = require("crypto");
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
 const RevokedToken = require("../models/revokedToken.model");
+// Match the cost of a real password comparison for unknown email addresses.
+const DUMMY_PASSWORD_HASH = "$2b$12$sy5SQ7czSYr2Rd5vLvD9Qu6LrSG1pXCj.qZJcV9S0AOprlyQIbY8C";
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -47,10 +49,14 @@ function createToken(user) {
       role: user.role,
       email: user.email,
       jti: crypto.randomUUID(),
+      tokenVersion: user.tokenVersion || 0,
     },
     getJwtSecret(),
     {
       expiresIn: process.env.JWT_EXPIRES_IN || "8h",
+      algorithm: "HS256",
+      issuer: process.env.JWT_ISSUER || "inop",
+      audience: process.env.JWT_AUDIENCE || "inop-users",
     }
   );
 }
@@ -59,25 +65,24 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body || {};
 
-    if (!email || !password) {
+    if (typeof email !== "string" || typeof password !== "string" ||
+        !email.trim() || !password || email.length > 254) {
       return res.status(400).json({
         message: "Email və şifrə tələb olunur.",
       });
     }
+    if (Buffer.byteLength(password, "utf8") > 72) {
+      return res.status(400).json({ message: "Şifrə ən çox 72 UTF-8 bayt olmalıdır." });
+    }
 
     const user = await User.findOne({
       email: String(email).trim().toLowerCase(),
-    }).select("+password");
+    }).select("+password +tokenVersion");
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
       return res.status(401).json({
         message: "Email və ya şifrə yanlışdır.",
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(403).json({
-        message: "Bu hesab deaktiv edilib.",
       });
     }
 
@@ -89,8 +94,17 @@ exports.login = async (req, res) => {
       });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({ message: "Bu hesab deaktiv edilib." });
+    }
+
+    const role = await Role.findOne({ key: user.role, isActive: true }).select("permissions").lean();
+    if (!role) {
+      return res.status(403).json({ message: "İstifadəçi rolu aktiv deyil və ya mövcud deyil." });
+    }
+
     const token = createToken(user);
-    const permissions = await getUserPermissions(user.role);
+    const permissions = role.permissions || [];
 
     return res.status(200).json({
       message: "Login uğurludur.",
@@ -98,7 +112,7 @@ exports.login = async (req, res) => {
       user: publicUser(user, permissions),
     });
   } catch (error) {
-    console.error("Auth login error:", error);
+    console.error("Auth login error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Login zamanı server xətası baş verdi.",
@@ -122,7 +136,7 @@ exports.me = async (req, res) => {
       user: publicUser(user, permissions),
     });
   } catch (error) {
-    console.error("Auth me error:", error);
+    console.error("Auth me error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "İstifadəçi məlumatları alınarkən server xətası baş verdi.",
@@ -155,14 +169,14 @@ exports.logout = async (req, res) => {
         userId: req.user?.id || null,
         expiresAt,
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     );
 
     return res.status(200).json({
       message: "Logout uğurla tamamlandı.",
     });
   } catch (error) {
-    console.error("Auth logout error:", error);
+    console.error("Auth logout error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Logout zamanı server xətası baş verdi.",

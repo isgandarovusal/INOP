@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const ActivityLog = require("../models/activityLog.model");
+const { listRecords, searchFilter } = require("../utils/listQuery");
+const { sendError } = require("../utils/sendError");
 
 function validObjectId(id) {
   return mongoose.Types.ObjectId.isValid(id);
@@ -7,19 +9,8 @@ function validObjectId(id) {
 
 exports.getActivityLogs = async (req, res) => {
   try {
-    const query = {};
-
-    if (
-      req.dataScope &&
-      Object.keys(req.dataScope).length > 0
-    ) {
-      Object.assign(query, req.dataScope);
-    }
-
-    const logs = await ActivityLog.find(query)
-      .sort({ createdAt: -1 })
-      .limit(500)
-      .lean();
+    const query = { $and: [req.dataScope || {}, searchFilter(req.query || {}, ["userName", "description", "entityType"])] };
+    const logs = await listRecords(ActivityLog, query, req, res);
 
     return res.status(200).json({
       activityLogs: logs.map((log) => ({
@@ -34,11 +25,7 @@ exports.getActivityLogs = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error("Get activity logs error:", error);
-
-    return res.status(500).json({
-      message: "Fəaliyyət jurnalını yükləmək mümkün olmadı.",
-    });
+    return sendError(res, error, "Fəaliyyət jurnalını yükləmək mümkün olmadı.");
   }
 };
 
@@ -51,7 +38,10 @@ exports.createActivityLog = async (req, res) => {
       description,
     } = req.body;
 
-    if (!action || !entityType || !description) {
+    if (typeof action !== "string" || !action.trim() || action.length > 100 ||
+        typeof entityType !== "string" || !entityType.trim() || entityType.length > 100 ||
+        typeof description !== "string" || !description.trim() || description.length > 2000 ||
+        typeof entityId !== "string" || entityId.length > 200) {
       return res.status(400).json({
         message:
           "action, entityType və description tələb olunur.",
@@ -63,6 +53,7 @@ exports.createActivityLog = async (req, res) => {
         ? req.user.id
         : null,
       userName: req.user.name || "",
+      departmentId: req.user.departmentId || "",
       action: String(action).trim().toLowerCase(),
       entityType: String(entityType).trim(),
       entityId: String(entityId || "").trim(),
@@ -85,7 +76,7 @@ exports.createActivityLog = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Create activity log error:", error);
+    console.error("Create activity log error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Fəaliyyəti qeydə almaq mümkün olmadı.",

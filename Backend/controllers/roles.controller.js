@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const Role = require("../models/role.model");
 const User = require("../models/user.model");
 const { recordActivity } = require("../services/activityLog.service");
+const { unrestricted, canDelegate, privileged, permissionScope } = require("../services/authorizationPolicy.service");
+const { getDataScope } = require("../middleware/dataScope.middleware");
 
 const VALID_SCOPES = new Set([
   "all",
@@ -25,8 +27,20 @@ function validateObjectId(id) {
   return mongoose.Types.ObjectId.isValid(id);
 }
 
+async function mayManageRole(req, res, role, permissions) {
+  const actor = req.authRole || await Role.findOne({ key: req.user.role, isActive: true }).lean();
+  const actorPermissions = actor?.permissions || [];
+  if (unrestricted(actorPermissions)) return true;
+  if ((role && (role.key === "admin" || privileged(role.permissions))) ||
+      (permissions && !canDelegate(actorPermissions, permissions))) {
+    res.status(403).json({ message: "Bu rolu idarə etmək üçün kifayət qədər icazəniz yoxdur." });
+    return false;
+  }
+  return true;
+}
+
 function normalizePermissions(value) {
-  if (!Array.isArray(value)) {
+  if (!Array.isArray(value) || value.length > 1000) {
     return {
       error: "permissions array olmalıdır.",
     };
@@ -46,7 +60,8 @@ function normalizePermissions(value) {
     const action = normalizeString(item.action).toLowerCase();
     const scope = normalizeString(item.scope || "all").toLowerCase();
 
-    if (!resource || !action) {
+    if (!resource || !action || resource.length > 100 || action.length > 64 ||
+        !/^(\*|[a-z][a-z0-9_.]*)$/.test(resource) || !/^(\*|[a-z][a-z0-9_]*)$/.test(action)) {
       return {
         error: "Permission üçün resource və action tələb olunur.",
       };
@@ -94,8 +109,10 @@ function serializeRole(role, userCount = 0) {
   };
 }
 
-async function getUserCounts() {
+async function getUserCounts(dataScope) {
+  if (dataScope === null) return new Map();
   const counts = await User.aggregate([
+    { $match: dataScope || {} },
     {
       $group: {
         _id: "$role",
@@ -111,20 +128,28 @@ async function getUserCounts() {
 
 exports.getRoles = async (req, res) => {
   try {
+    const actor = req.authRole || await Role.findOne({ key: req.user.role, isActive: true }).lean();
+    const permissions = actor?.permissions || [];
+    const userScope = getDataScope({ ...req, permission: { resource: "user", scope: permissionScope(permissions, "user", "read") } });
+    const assignmentReader = !unrestricted(permissions) &&
+      ["create", "update"].some((action) => permissionScope(permissions, "user", action)) &&
+      !["create", "update", "delete"].some((action) => permissionScope(permissions, "role", action));
     const [roles, userCounts] = await Promise.all([
       Role.find({})
         .sort({ isSystemRole: -1, name: 1 })
+        .limit(1000)
         .lean(),
-      getUserCounts(),
+      getUserCounts(userScope),
     ]);
 
     return res.status(200).json({
-      roles: roles.map((role) =>
+      roles: roles.filter((role) => !assignmentReader ||
+        (role.isActive && !privileged(role.permissions) && canDelegate(permissions, role.permissions))).map((role) =>
         serializeRole(role, userCounts.get(role.key) || 0)
       ),
     });
   } catch (error) {
-    console.error("Get roles error:", error);
+    console.error("Get roles error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Rolları yükləmək mümkün olmadı.",
@@ -150,15 +175,15 @@ exports.getRoleById = async (req, res) => {
       });
     }
 
-    const userCount = await User.countDocuments({
-      role: role.key,
-    });
+    const actor = req.authRole || await Role.findOne({ key: req.user.role, isActive: true }).lean();
+    const scope = getDataScope({ ...req, permission: { resource: "user", scope: permissionScope(actor?.permissions || [], "user", "read") } });
+    const userCount = scope === null ? 0 : await User.countDocuments({ $and: [{ role: role.key }, scope] });
 
     return res.status(200).json({
       role: serializeRole(role, userCount),
     });
   } catch (error) {
-    console.error("Get role error:", error);
+    console.error("Get role error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Rolu yükləmək mümkün olmadı.",
@@ -172,11 +197,12 @@ exports.createRole = async (req, res) => {
     const key = normalizeKey(req.body.key);
     const description = normalizeString(req.body.description);
 
-    if (!name || !key) {
+    if (!name || name.length > 200 || !/^[a-z][a-z0-9_]{0,63}$/.test(key)) {
       return res.status(400).json({
         message: "Rol adı və key tələb olunur.",
       });
     }
+    if (key === "admin") return res.status(400).json({ message: "Administrator rolu sistem quraşdırması tərəfindən idarə edilir." });
 
     const permissionResult = normalizePermissions(
       req.body.permissions || []
@@ -187,6 +213,8 @@ exports.createRole = async (req, res) => {
         message: permissionResult.error,
       });
     }
+
+    if (!await mayManageRole(req, res, null, permissionResult.permissions)) return;
 
     const existing = await Role.findOne({ key }).lean();
 
@@ -214,7 +242,7 @@ exports.createRole = async (req, res) => {
         description: `Rol yaradıldı: ${role.name} (${role.key})`,
       });
     } catch (activityError) {
-      console.error("Create role activity log error:", activityError);
+      console.error("Create role activity log error:", activityError?.name || "Error");
     }
 
     return res.status(201).json({
@@ -222,7 +250,7 @@ exports.createRole = async (req, res) => {
       role: serializeRole(role, 0),
     });
   } catch (error) {
-    console.error("Create role error:", error);
+    console.error("Create role error:", error?.name || "Error");
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -254,6 +282,8 @@ exports.updateRole = async (req, res) => {
       });
     }
 
+    if (!await mayManageRole(req, res, role)) return;
+
     if (req.body.name !== undefined) {
       const name = normalizeString(req.body.name);
 
@@ -273,10 +303,13 @@ exports.updateRole = async (req, res) => {
     if (req.body.key !== undefined) {
       const requestedKey = normalizeKey(req.body.key);
 
-      if (!requestedKey) {
+      if (!/^[a-z][a-z0-9_]{0,63}$/.test(requestedKey)) {
         return res.status(400).json({
           message: "Rol key boş ola bilməz.",
         });
+      }
+      if (requestedKey === "admin" && role.key !== "admin") {
+        return res.status(400).json({ message: "Administrator rolunun key-i qorunur." });
       }
 
       if (role.isSystemRole && requestedKey !== role.key) {
@@ -286,6 +319,12 @@ exports.updateRole = async (req, res) => {
       }
 
       if (requestedKey !== role.key) {
+        // MongoDB standalone deployments do not support multi-document
+        // transactions. Keep referenced keys stable so no user loses access
+        // during a partially applied rename; the display name remains editable.
+        if (await User.exists({ role: role.key })) {
+          return res.status(409).json({ message: "İstifadəçilərə təyin olunmuş rolun key-i dəyişdirilə bilməz." });
+        }
         const existing = await Role.findOne({
           key: requestedKey,
           _id: { $ne: role._id },
@@ -312,6 +351,11 @@ exports.updateRole = async (req, res) => {
         });
       }
 
+      if (role.key === "admin" && !unrestricted(permissionResult.permissions)) {
+        return res.status(400).json({ message: "Administratorun tam sistem icazələri saxlanmalıdır." });
+      }
+      if (!await mayManageRole(req, res, role, permissionResult.permissions)) return;
+
       role.permissions = permissionResult.permissions;
     }
 
@@ -330,7 +374,7 @@ exports.updateRole = async (req, res) => {
         description: `Rol yeniləndi: ${role.name} (${role.key})`,
       });
     } catch (activityError) {
-      console.error("Update role activity log error:", activityError);
+      console.error("Update role activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
@@ -338,7 +382,7 @@ exports.updateRole = async (req, res) => {
       role: serializeRole(role, userCount),
     });
   } catch (error) {
-    console.error("Update role error:", error);
+    console.error("Update role error:", error?.name || "Error");
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -375,6 +419,8 @@ exports.updateRoleStatus = async (req, res) => {
         message: "Rol tapılmadı.",
       });
     }
+
+    if (!await mayManageRole(req, res, role)) return;
 
     if (!req.body.isActive && role.isSystemRole) {
       return res.status(400).json({
@@ -413,7 +459,7 @@ exports.updateRoleStatus = async (req, res) => {
           : `Rol deaktiv edildi: ${role.name} (${role.key})`,
       });
     } catch (activityError) {
-      console.error("Update role status activity log error:", activityError);
+      console.error("Update role status activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
@@ -423,7 +469,7 @@ exports.updateRoleStatus = async (req, res) => {
       role: serializeRole(role, userCount),
     });
   } catch (error) {
-    console.error("Update role status error:", error);
+    console.error("Update role status error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Rol statusunu dəyişmək mümkün olmadı.",
@@ -448,6 +494,8 @@ exports.deleteRole = async (req, res) => {
         message: "Rol tapılmadı.",
       });
     }
+
+    if (!await mayManageRole(req, res, role)) return;
 
     if (role.isSystemRole) {
       return res.status(400).json({
@@ -477,7 +525,7 @@ exports.deleteRole = async (req, res) => {
         description: `Rol silindi: ${role.name} (${role.key})`,
       });
     } catch (activityError) {
-      console.error("Delete role activity log error:", activityError);
+      console.error("Delete role activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
@@ -488,7 +536,7 @@ exports.deleteRole = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Delete role error:", error);
+    console.error("Delete role error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Rolu silmək mümkün olmadı.",

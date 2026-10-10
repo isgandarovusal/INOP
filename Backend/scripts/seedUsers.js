@@ -1,9 +1,11 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: process.env.BACKEND_ENV_FILE || path.resolve(__dirname, "../.env") });
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/user.model");
+const Department = require("../models/department.model");
 
 const users = [
   {
@@ -19,7 +21,7 @@ const users = [
     name: "Aysel Huseynova",
     email: "hr@inop.com",
     password: "password123",
-    role: "hr",
+    role: "hr_manager",
     departmentId: "dep_hr",
     position: "HR Manager",
     isActive: true,
@@ -45,15 +47,27 @@ const users = [
 ];
 
 async function seedUsers() {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Demo accounts cannot be seeded in production. Create an administrator using the deployment bootstrap script.");
+  }
   const mongoUri = process.env.MONGO_URI || process.env.CS;
 
   if (!mongoUri) {
     throw new Error("MONGO_URI is not configured.");
   }
 
-  await mongoose.connect(mongoUri);
+  mongoose.set("maxTimeMS", 10000);
+  await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 15000 });
 
   console.log("MongoDB connected.");
+
+  const departmentIds = {};
+  for (const [key, name] of Object.entries({ dep_hr: "Human Resources", dep_ops: "Operations" })) {
+    const department = await Department.findOneAndUpdate({ name }, {
+      $setOnInsert: { name, description: `${name} demo department` },
+    }, { upsert: true, returnDocument: "after", setDefaultsOnInsert: true });
+    departmentIds[key] = String(department._id);
+  }
 
   for (const input of users) {
     const email = input.email.toLowerCase();
@@ -70,6 +84,7 @@ async function seedUsers() {
     await User.create({
       ...input,
       email,
+      departmentId: departmentIds[input.departmentId],
       password: hashedPassword,
     });
 
@@ -85,7 +100,11 @@ async function seedUsers() {
 }
 
 seedUsers().catch(async (error) => {
-  console.error("User seed failed:", error);
+  const configurationMessages = [
+    "Demo accounts cannot be seeded in production. Create an administrator using the deployment bootstrap script.",
+    "MONGO_URI is not configured.",
+  ];
+  console.error("User seed failed:", configurationMessages.includes(error.message) ? error.message : error.name);
 
   try {
     await mongoose.disconnect();

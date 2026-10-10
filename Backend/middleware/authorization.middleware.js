@@ -21,6 +21,11 @@ exports.authorize = (resource, action) => {
         });
       }
 
+      req.authorizedScopes ||= {};
+      req.authorizedScopes[`${resource}:${action}`] = {
+        permission: { ...req.permission }, dataScope: { ...req.dataScope },
+      };
+
       next();
     },
   ];
@@ -38,6 +43,11 @@ exports.authorizeAny = (permissions) => {
             "Bu məlumat səviyyəsinə giriş üçün kifayət qədər icazəniz yoxdur.",
         });
       }
+
+      req.authorizedScopes ||= {};
+      req.authorizedScopes[`${req.permission.resource}:${req.permission.action}`] = {
+        permission: { ...req.permission }, dataScope: { ...req.dataScope },
+      };
 
       next();
     },

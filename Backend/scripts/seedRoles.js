@@ -55,6 +55,8 @@ const roles = [
       permission("user", "read", "department"),
       permission("user", "create", "department"),
       permission("user", "update", "department"),
+      permission("department", "read", "department"),
+      permission("role", "read", "all"),
 
       permission("activity_log", "read", "department"),
     ],
@@ -285,7 +287,7 @@ const roles = [
 ];
 
 async function seedRoles() {
-  const mongoUri = process.env.MONGO_URI;
+  const mongoUri = process.env.MONGO_URI || process.env.CS;
 
   if (!mongoUri) {
     throw new Error(
@@ -293,20 +295,21 @@ async function seedRoles() {
     );
   }
 
-  await mongoose.connect(mongoUri);
+  mongoose.set("maxTimeMS", 10000);
+  await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 15000 });
 
   for (const roleData of roles) {
     await Role.findOneAndUpdate(
       { key: roleData.key },
-      roleData,
+      { $setOnInsert: roleData },
       {
         upsert: true,
-        new: true,
+        returnDocument: "after",
         setDefaultsOnInsert: true,
       }
     );
 
-    console.log(`Role synced: ${roleData.key}`);
+    console.log(`Role ready: ${roleData.key}`);
   }
 
   const count = await Role.countDocuments();
@@ -319,7 +322,7 @@ async function seedRoles() {
 }
 
 seedRoles().catch(async (error) => {
-  console.error("Role seed error:", error);
+  console.error(`Role seed failed (${error.name}): check database connectivity and role configuration.`);
 
   try {
     await mongoose.disconnect();

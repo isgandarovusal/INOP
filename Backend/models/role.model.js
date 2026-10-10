@@ -72,6 +72,8 @@ const roleSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    userMutationLockToken: { type: String, select: false },
+    userMutationLockUntil: { type: Date, select: false },
   },
   {
     timestamps: true,

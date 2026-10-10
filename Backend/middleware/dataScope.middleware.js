@@ -1,5 +1,16 @@
+const mongoose = require("mongoose");
+
+const AUDIT_RESOURCES = new Set([
+  "audit", "audit.template", "audit.source_document", "audit.finding", "audit.assignment",
+  "audit.analytics", "audit.approval", "audit.closure", "audit.action", "audit.execution",
+  "audit.timeline", "audit.activity", "audit.report", "audit.score", "audit.workflow",
+  "audit.notification", "audit.permission", "audit.export", "occupational_safety_audit",
+  "occupational_safety_details",
+]);
+
 function buildScopeFilter(req) {
   const scope = req.permission?.scope;
+  const resource = req.permission?.resource;
 
   if (!scope) {
     return null;
@@ -14,9 +25,16 @@ function buildScopeFilter(req) {
       return null;
     }
 
-    return {
-      departmentId: req.user.departmentId,
-    };
+    if (resource === "department") {
+      return mongoose.Types.ObjectId.isValid(req.user.departmentId)
+        ? { _id: req.user.departmentId } : null;
+    }
+    const departmentResources = new Set([
+      "user", "candidate", "application", "recruitment", "recruitment.analytics",
+      "activity_log", "audit", "audit.template", "audit.source_document", "restaurant",
+    ]);
+    return departmentResources.has(resource) || AUDIT_RESOURCES.has(resource)
+      ? { departmentId: req.user.departmentId } : null;
   }
 
   if (scope === "assigned") {
@@ -24,9 +42,14 @@ function buildScopeFilter(req) {
       return null;
     }
 
-    return {
-      assignedTo: req.user.id,
-    };
+    if (resource === "user") return { managerId: req.user.id };
+    // Audit controllers additionally resolve assignment membership through the
+    // parent audit. Preserve this filter for their existing middleware chain.
+    if (AUDIT_RESOURCES.has(resource)) {
+      return { assignedTo: req.user.id };
+    }
+    return ["candidate", "application", "recruitment", "restaurant"].includes(resource)
+      ? { assignedTo: req.user.id } : null;
   }
 
   if (scope === "own") {
@@ -34,9 +57,16 @@ function buildScopeFilter(req) {
       return null;
     }
 
-    return {
-      createdBy: req.user.id,
-    };
+    if (resource === "user" || resource === "profile") return { _id: req.user.id };
+    if (resource === "activity_log" || resource === "audit.notification") {
+      return { userId: req.user.id };
+    }
+    if (resource === "audit.source_document") return { uploadedBy: req.user.id };
+    if (["candidate", "application", "recruitment", "department", "audit", "audit.template", "restaurant"].includes(resource) ||
+        AUDIT_RESOURCES.has(resource)) {
+      return { createdBy: req.user.id };
+    }
+    return null;
   }
 
   return null;
