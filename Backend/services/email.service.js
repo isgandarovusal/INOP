@@ -11,7 +11,7 @@ function getSmtpConfig() {
     return null;
   }
 
-  if (!Number.isInteger(port) || port <= 0) {
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
     return null;
   }
 
@@ -34,6 +34,9 @@ function createTransporter(config) {
     port: config.port,
     secure: config.secure,
     auth: config.auth,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -76,7 +79,7 @@ function buildNotificationEmail({ title, message }) {
   };
 }
 
-async function sendEmail({ to, title, message }) {
+async function sendEmail({ to, title, message, signal, messageId }) {
   const recipient = String(to || "").trim().toLowerCase();
 
   if (!recipient) {
@@ -103,13 +106,19 @@ async function sendEmail({ to, title, message }) {
     message,
   });
 
-  const result = await transporter.sendMail({
+  if (signal?.aborted) { transporter.close(); throw Error('EMAIL_CANCELLED'); }
+  const cancel = () => transporter.close();
+  signal?.addEventListener('abort', cancel, { once: true });
+  let result;
+  try { result = await transporter.sendMail({
     from: config.from,
     to: recipient,
     subject: email.subject,
     text: email.text,
     html: email.html,
-  });
+    ...(/^<inop-[a-f0-9-]{36}@notifications\.invalid>$/.test(messageId || '') ? { messageId } : {}),
+  }); } catch { throw Error(signal?.aborted ? 'EMAIL_CANCELLED' : 'EMAIL_DELIVERY_FAILED'); }
+  finally { signal?.removeEventListener('abort', cancel); transporter.close(); }
 
   return {
     sent: true,

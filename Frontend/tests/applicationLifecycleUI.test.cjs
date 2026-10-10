@@ -3,7 +3,7 @@ const { withBrowserFixture } = require('./helpers/browser.cjs');
 const Application = require('../../Backend/models/application.model');
 const harness = `import React from 'react';import {createRoot} from 'react-dom/client';import {BrowserRouter,Routes,Route,useNavigate} from 'react-router-dom';import {AuthContext} from '/src/Context/AuthContext.ts';import i18n from '/src/i18n/index.ts';import '/src/Styles/recruitment.css';import Apps from '/src/Pages/Recruitment/Applications/ApplicationsList.tsx';const Detail=React.lazy(()=>import('/src/Pages/Recruitment/Applications/ApplicationDetail.tsx'));const Candidates=React.lazy(()=>import('/src/Pages/Recruitment/Candidates/CandidatesList.tsx'));import api from '/src/api/axios.ts';api.defaults.baseURL='/api';window.changeLanguage=l=>i18n.changeLanguage(l);function App(){window.navigateTest=useNavigate();const [user,setUser]=React.useState(window.testUser);window.setTestUser=setUser;return React.createElement(AuthContext.Provider,{value:{user,isLoading:false}},React.createElement(React.Suspense,{fallback:'Loading module'},React.createElement(Routes,null,React.createElement(Route,{path:'/app/recruitment/applications',element:React.createElement(Apps)}),React.createElement(Route,{path:'/app/recruitment/applications/:id',element:React.createElement(Detail)}),React.createElement(Route,{path:'/app/recruitment/candidates',element:React.createElement(Candidates)}))));}createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(BrowserRouter,null,React.createElement(App))));`;
 test('Application UI persists scoped workflow, handles conflicts and discards stale responses', async t => withBrowserFixture(harness, async h => {
-  const candidate = (await h.request('admin', 'POST', '/candidates', { name: 'Workflow applicant', role: 'Cashier', skills: ['Cash handling'] })).data;
+  const candidate = (await h.request('admin', 'POST', '/candidates', { name: 'Workflow applicant', email: 'workflow@example.invalid', role: 'Cashier', skills: ['Cash handling'] })).data;
   const job = async title => (await h.request('admin', 'POST', '/jobs', { title, department: 'HR', description: 'Hiring', requiredSkills: ['Cash handling'] })).data;
   const firstJob = await job('First workplace'), secondJob = await job('Second workplace');
   const apply = async j => (await h.request('admin', 'POST', '/applications', { candidateId: candidate._id, jobId: j._id })).data;
@@ -137,6 +137,15 @@ test('Application UI persists scoped workflow, handles conflicts and discards st
     await h.open('assigned', detail(first._id)); await form().waitFor();
     await Application.updateOne({ _id: first._id }, { $set: { assignedTo: h.actors.admin._id } });
     await h.page.evaluate(() => window.dispatchEvent(new Event('focus'))); await h.page.locator('[data-hr-state=not-found]').waitFor(); assert.equal(await form().count(), 0);
+  });
+  await t.test('blocked/failed notification is visible without hiding the successful interview', async () => {
+    const { createNotificationWorker } = require('../../Backend/services/applicationNotificationWorker.service');
+    await createNotificationWorker().runOnce(); await h.open('admin', detail(first._id)); await form().waitFor();
+    await h.page.getByText('Bildiriş: Konfiqurasiya tələb olunur', { exact: true }).waitFor();
+    let clock = new Date(); const worker = createNotificationWorker({ available: () => true, now: () => clock, send: async () => { throw Error('Synthetic SMTP outage'); } });
+    await worker.runOnce(1); clock = new Date(clock.getTime() + 61000); await worker.runOnce(1); clock = new Date(clock.getTime() + 301000); await worker.runOnce(1);
+    await h.page.evaluate(() => window.dispatchEvent(new Event('focus'))); await h.page.getByText('Bildiriş: Göndərmə xətası', { exact: true }).waitFor();
+    assert.equal(await form().getByLabel('Status', { exact: true }).inputValue(), 'interview'); assert.equal((await Application.findById(first._id)).status, 'Interview');
   });
   assert.deepEqual(h.pageErrors, []);
 }));

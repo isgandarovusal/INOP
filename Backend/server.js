@@ -55,6 +55,9 @@ const MONGO_URI = process.env.MONGO_URI || process.env.CS;
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('db connected');
+    if (process.env.HR_NOTIFICATION_WORKER_ENABLED !== 'false') {
+      require('./services/applicationNotificationWorker.service').createNotificationWorker().start();
+    }
     app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
   })
   .catch((err) => console.error('Failed to connect to MongoDB:', err));

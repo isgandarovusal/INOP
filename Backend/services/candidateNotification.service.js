@@ -2,16 +2,20 @@ const { sendEmail } = require("./email.service");
 
 const NOTIFIABLE_STATUSES = new Set(["Interview", "Offered"]);
 
-function buildStatusMessage({ candidateName, jobTitle, status }) {
+function buildStatusMessage({ candidateName, jobTitle, status, interview }) {
   const name = candidateName || "Namizəd";
   const job = jobTitle || "vakansiya";
 
   if (status === "Interview") {
+    let schedule = 'Müsahibənin vaxtı və əlavə məlumatlar HR komandası tərəfindən sizinlə paylaşılacaq.';
+    if (interview?.startsAt && interview?.timezone) {
+      try { schedule = `Müsahibə: ${new Intl.DateTimeFormat('az-AZ', { timeZone: interview.timezone, dateStyle: 'medium', timeStyle: 'short' }).format(new Date(interview.startsAt))} (${interview.timezone}).`; } catch { /* do not invent a schedule */ }
+    }
     return {
       subject: `INOP: ${job} üzrə müsahibə mərhələsi`,
       message:
         `Salam ${name},\n\n${job} vakansiyası üzrə müraciətiniz müsahibə mərhələsinə keçib. ` +
-        "Müsahibənin vaxtı və əlavə məlumatlar HR komandası tərəfindən sizinlə paylaşılacaq.\n\nINOP HR",
+        schedule + "\n\nINOP HR",
     };
   }
 
@@ -23,7 +27,7 @@ function buildStatusMessage({ candidateName, jobTitle, status }) {
   };
 }
 
-async function notifyCandidateStatus({ application, actor }) {
+async function notifyCandidateStatus({ application, actor, signal, messageId }) {
   const status = application?.status;
 
   if (!NOTIFIABLE_STATUSES.has(status)) {
@@ -51,6 +55,7 @@ async function notifyCandidateStatus({ application, actor }) {
     candidateName: candidate?.name,
     jobTitle: application?.jobId?.title || candidate?.role,
     status,
+    interview: application.interview,
   });
 
   try {
@@ -58,6 +63,7 @@ async function notifyCandidateStatus({ application, actor }) {
       to: recipient,
       title: content.subject,
       message: content.message,
+      signal, messageId,
     });
 
     return {
@@ -66,19 +72,16 @@ async function notifyCandidateStatus({ application, actor }) {
       skipped: Boolean(result.skipped),
       reason: result.reason || "",
       messageId: result.messageId || "",
+      code: result.sent ? 'DELIVERED' : result.skipped ? 'SMTP_NOT_CONFIGURED' : 'DELIVERY_FAILED',
       actorId: actor?.id || null,
     };
-  } catch (error) {
-    console.error(
-      "Candidate notification failed:",
-      error.message
-    );
-
+  } catch {
     return {
       attempted: true,
       sent: false,
       skipped: false,
-      reason: error.message || "Email delivery failed.",
+      reason: "Email delivery failed.",
+      code: 'DELIVERY_FAILED',
     };
   }
 }

@@ -77,7 +77,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-063 | 06 | No processing state, revision CAS or transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-064 | 06/08 | DnD order not persisted and status requests can race | OPEN | Stage persistence/race/rollback TESTED in 06B; manual within-column ordering remains package 08, not silently closed |
 | AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
-| AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | OPEN | — |
+| AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
@@ -246,8 +246,8 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P06-021 | Sorting | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | P06-022 | Profile quick edit | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | P06-023 | Permission change fail closed | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
-| P06-024 | Interview notification tests | OPEN | — |
-| P06-025 | SMTP failure does not hide successful status change | OPEN | — |
+| P06-024 | Interview notification tests | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
+| P06-025 | SMTP failure does not hide successful status change | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
 
 ## Package 07: HR analytics
 
@@ -454,14 +454,12 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | 01 | `a832bd76f918d6a142e3086c1a5be108935a0000` | Target 85/85; full regression 1020/1020; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | Scope-denied parents return null; UI normalization/lifecycle remains package 02 |
 | 02A | `80fa2d709b3213a7f6a3abc60072cebeb5a57562` | Full regression 1029/1029; HR + summary target 44/44; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | UI lifecycle and edit form criteria still OPEN; replaced old files retained for migration |
 | 02B | `10f01026948e8b2bc0ad2b2f9fcd018d144b668e` | Full regression 1051/1051; HR browser targets 30/30; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings (baseline 13) | CV review/extraction and contextual score contracts remain packages 03/05; no external ingestion activated |
-
 | 03 | `bb561691b0faafd635bcc7b217b24a9455c3d7fe` | Full regression 1101/1101; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | OCR is not implemented; historical unknown zeros not rewritten; old files retained for package 10 |
-
 | 04 | `942df3fc87fe8bda9c148fcb12e267b9c0165c84` | Full regression 1124/1124; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | HR locations do not expose audit Restaurants; no legacy brand backfill; analytics execution remains package 07 |
-
 | 05 | `2d2cb13af787542756437af20213edfc6ed4c9c9` | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
-
 | 06A | `659084198ed19a8f23ae8a186eb35b47dc85165d` | Full regression 1172/1172; targets 38/38; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | DnD/interview UI and notification worker remain 06B/06C; real SMTP not claimed |
+| 06B | `b23d77674c0f6a4ed41f91e2c99eea8be900d0dc` | Targets 24/24; full 1196/1196; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Manual card ordering remains AUD-064/08; notification worker follows in 06C; no real SMTP claim |
+| 06C | `fix(hr): deliver Application notifications through a scoped outbox` (SHA recorded next update) | Targets 35/35; full 1212/1212; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | SMTP at-least-once, real receipt unverified; explicit retry/archive UI remains 10 |
 
 ## External prerequisites
 
@@ -502,6 +500,13 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 
 06A evidence: `/tmp/inop-hr06a-baseline.log` (11 failed / 14 before patch), `/tmp/inop-hr06a-target-final.log` (38/38), `/tmp/inop-hr06a-regression.log`, `/tmp/inop-hr06a-validation-run.log`, `/tmp/inop-packagehr06-validation.json`. Contract: `docs/HR_APPLICATION_LIFECYCLE.md`. Draft fixture now explicitly checks 409, then opens the job for the existing canonical pipeline test; partial Job metadata preservation assertions remain. History is atomically appended without truncation; defensive count/byte limit reports archiving requirement. Delivery pending records do not imply sent email; next increment implements the worker. Scoring event summaries are independently parent-scoped. All DB operations remain isolated loopback fixtures.
 
-| 06B | `feat(hr): add Application Kanban and interview workflow UI` (SHA recorded next update) | Targets 24/24; full 1196/1196; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Manual card ordering remains AUD-064/08; notification worker follows in 06C; no real SMTP claim |
 
 06B evidence: `/tmp/inop-hr06b-baseline.log` (old 06A UI fails new board/card contract; 2 failures), `/tmp/inop-hr06b-target-final.log` (24/24), `/tmp/inop-hr06b-regression.log`, `/tmp/inop-hr06b-validation-run.log`, `/tmp/inop-packagehr06b-validation.json`. StrictMode stays enabled in browser tests. Real isolated HTTP + Mongo tests prove keyboard drag persisted after refresh, independent vacancies, 409 rollback, 500 visible data, stale route/mutation protection, language no-refetch, read-only UI, 401/403/404/500, independently scoped roster and assignment revocation on focus with an old JWT. Backend scope checks remain authoritative. Application detail focus/visibility refresh resets an unsaved workflow draft to enforce current assignment; existing profile edit forms keep their draft policy. Server controls the processing lane. Search/sorting currently operate on the scoped loaded dataset; bounded server pagination belongs to 08. 06C is the next unfinished independent increment.
+
+06C evidence: `/tmp/inop-hr06c-baseline.log` reproduces raw provider error disclosure using the previous commit's transport source with a synthetic stub; `/tmp/inop-hr06c-target-final.log` (35/35), `/tmp/inop-hr06c-transport-final.log`, `/tmp/inop-hr06c-regression.log`, `/tmp/inop-hr06c-validation-run.log`, `/tmp/inop-packagehr06c-validation.json`. The worker and status persistence use isolated owned loopback databases. No email is sent externally. Durable event claims/recovery, current role/parent scopes, assignment revocation, latest schedule only, three attempts/backoff/timeout, revision/timestamp preservation and UI blocked/failed visibility are tested. All P06 criteria now have test evidence; AUD-064 manual card order is still explicitly OPEN for 08. Next independent package is 07 analytics.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | OPEN | 06C API tests expose safe codes; UI currently exposes delivery state, explicit retry/monitoring UI remains package 10 |
+| AUD-089 | 06C | SMTP lacks transport bounds and can return/log raw provider diagnostics | TESTED | `applicationNotifications.test.cjs` synthetic transport: old source fails sanitized-error assertion, new bounded/closing transport passes |
+| EXT-SMTP-001 | 06/10 | Approved company SMTP credentials, consent and actual delivery/receipt test | BLOCKED_EXTERNAL | Missing configuration and mocked delivery are tested; real SMTP receipt/bounces are not verified |
