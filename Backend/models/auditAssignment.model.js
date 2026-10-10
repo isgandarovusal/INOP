@@ -48,6 +48,11 @@ new mongoose.Schema(
 });
 
 
+auditAssignmentSchema.index({ auditor: 1, status: 1, auditId: 1 });
+auditAssignmentSchema.index({ auditId: 1, auditor: 1 });
+
+auditAssignmentSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
+
 module.exports =
 mongoose.model(
 "AuditAssignment",

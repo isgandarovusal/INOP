@@ -1,18 +1,14 @@
+const { listRecords } = require("../utils/listQuery");
 const AuditTimeline =
 require("../models/auditTimeline.model");
 
 
-exports.getTimeline=async(req,res)=>{
+exports.getTimeline=async(req,res,next)=>{
 
 try{
 
 const data =
-await AuditTimeline.find({
- auditId:req.params.auditId
-})
-.sort({
- createdAt:-1
-});
+await listRecords(AuditTimeline, { auditId: req.audit._id }, req, res);
 
 
 res.json({
@@ -22,6 +18,7 @@ res.json({
 
 
 }catch(e){
+if (e.status || e.statusCode) return next(e);
 
 res.status(500).json({
  success:false

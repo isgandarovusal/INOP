@@ -56,7 +56,13 @@ const auditActionSchema = new mongoose.Schema(
  },
 
 
+ createdBy: String,
+
+ completedBy: String,
+
  completedAt:Date,
+
+ verifiedAt: Date,
 
 
  verifiedBy:String,
@@ -70,6 +76,12 @@ const auditActionSchema = new mongoose.Schema(
  timestamps:true
 });
 
+
+auditActionSchema.index({ auditId: 1, status: 1, createdAt: -1 });
+
+auditActionSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
+
+auditActionSchema.index({ auditId: 1, updatedAt: -1 });
 
 module.exports =
 mongoose.model(

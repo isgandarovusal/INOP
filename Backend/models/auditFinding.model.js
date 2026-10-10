@@ -14,6 +14,8 @@ const auditFindingSchema = new mongoose.Schema(
   ref:"AuditExecution"
  },
 
+ createdBy: String,
+
  title:{
   type:String,
   required:true
@@ -82,6 +84,12 @@ const auditFindingSchema = new mongoose.Schema(
  timestamps:true
 });
 
+
+auditFindingSchema.index({ auditId: 1, status: 1, createdAt: -1 });
+
+auditFindingSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
+
+auditFindingSchema.index({ auditId: 1, updatedAt: -1 });
 
 module.exports =
 mongoose.model(

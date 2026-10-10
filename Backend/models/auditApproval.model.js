@@ -22,6 +22,8 @@ const auditApprovalSchema = new mongoose.Schema(
  },
 
 
+ reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
  requestedBy:{
   type:mongoose.Schema.Types.ObjectId,
   ref:"User"
@@ -60,6 +62,8 @@ const auditApprovalSchema = new mongoose.Schema(
  timestamps:true
 });
 
+
+auditApprovalSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
 
 module.exports =
  mongoose.model(

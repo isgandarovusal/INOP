@@ -73,7 +73,7 @@ exports.getAuditReport = async (req, res) => {
       data: report,
     });
   } catch (error) {
-    console.error("Audit report error:", error);
+    console.error("Audit report error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,

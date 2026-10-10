@@ -1,4 +1,6 @@
 const Audit = require("../models/audit.model");
+const { listRecords } = require("../utils/listQuery");
+const { getAuditScopeFilter } = require("../middleware/auditScope.middleware");
 
 function buildAuditFilter(req, auditType) {
   const filter = {
@@ -7,22 +9,22 @@ function buildAuditFilter(req, auditType) {
 
   const { status, restaurantId, from, to } = req.query;
 
-  if (status) {
+  if (typeof status === "string") {
     filter.status = status;
   }
 
-  if (restaurantId) {
+  if (typeof restaurantId === "string") {
     filter.restaurantId = restaurantId;
   }
 
   if (from || to) {
     filter.date = {};
 
-    if (from) {
+    if (typeof from === "string") {
       filter.date.$gte = from;
     }
 
-    if (to) {
+    if (typeof to === "string") {
       filter.date.$lte = to;
     }
   }
@@ -30,14 +32,13 @@ function buildAuditFilter(req, auditType) {
   return filter;
 }
 
-exports.getStandardAudits = async (req, res) => {
+exports.getStandardAudits = async (req, res, next) => {
   try {
-    const filter = buildAuditFilter(req, "standard");
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
+    const filter = { $and: [scope, buildAuditFilter(req, "standard")] };
 
-    const audits = await Audit.find(filter).sort({
-      date: -1,
-      createdAt: -1,
-    });
+    const audits = await listRecords(Audit, filter, req, res, { sort: { date: -1, createdAt: -1, _id: -1 } });
 
     res.json({
       success: true,
@@ -46,7 +47,8 @@ exports.getStandardAudits = async (req, res) => {
       data: audits,
     });
   } catch (error) {
-    console.error("Standard audit error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Standard audit error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -55,14 +57,13 @@ exports.getStandardAudits = async (req, res) => {
   }
 };
 
-exports.getServiceAudits = async (req, res) => {
+exports.getServiceAudits = async (req, res, next) => {
   try {
-    const filter = buildAuditFilter(req, "service");
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
+    const filter = { $and: [scope, buildAuditFilter(req, "service")] };
 
-    const audits = await Audit.find(filter).sort({
-      date: -1,
-      createdAt: -1,
-    });
+    const audits = await listRecords(Audit, filter, req, res, { sort: { date: -1, createdAt: -1, _id: -1 } });
 
     res.json({
       success: true,
@@ -71,7 +72,8 @@ exports.getServiceAudits = async (req, res) => {
       data: audits,
     });
   } catch (error) {
-    console.error("Service audit error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Service audit error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,

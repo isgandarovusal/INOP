@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Audit = require("../models/audit.model");
+const { listRecords } = require("../utils/listQuery");
 const { recordActivity } = require("../services/activityLog.service");
 const {
   getAssignedAuditFilter,
@@ -19,16 +20,8 @@ function buildAuditIdentifierFilter(identifier) {
   };
 }
 
-function normalizeAuditPayload(body, req) {
-  return {
-    ...body,
-    id: body.id,
-    restaurantId: body.restaurantId,
-    auditorId: req.user?.id || "unknown",
-    auditType: body.auditType,
-    date: body.date,
-  };
-}
+const { normalizeAuditPayload } = require("../services/auditPayload.service");
+const { badRequest } = require("../services/auditPolicy.service");
 
 async function getAuditFilter(req, extra = {}) {
   const scopeFilter = await getAssignedAuditFilter(req);
@@ -60,7 +53,7 @@ async function getAuditFilter(req, extra = {}) {
   };
 }
 
-async function getAudits(req, res) {
+async function getAudits(req, res, next) {
   try {
     const filter = await getAuditFilter(req);
 
@@ -70,14 +63,12 @@ async function getAudits(req, res) {
       });
     }
 
-    const audits = await Audit.find(filter).sort({
-      date: -1,
-      createdAt: -1,
-    });
+    const audits = await listRecords(Audit, filter, req, res, { sort: { date: -1, createdAt: -1, _id: -1 } });
 
     res.json(audits);
   } catch (error) {
-    console.error("Failed to fetch audits:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Failed to fetch audits:", error?.name || "Error");
     res.status(500).json({
       message: "Failed to fetch audits",
     });
@@ -105,14 +96,14 @@ async function getAuditById(req, res) {
 
     res.json(audit);
   } catch (error) {
-    console.error("Failed to fetch audit:", error);
+    console.error("Failed to fetch audit:", error?.name || "Error");
     res.status(500).json({
       message: "Failed to fetch audit",
     });
   }
 }
 
-async function createAudit(req, res) {
+async function createAudit(req, res, next) {
   try {
     const payload = normalizeAuditPayload(req.body, req);
 
@@ -136,14 +127,14 @@ async function createAudit(req, res) {
       } catch (logError) {
         console.error(
           "Failed to create activity log for audit:",
-          logError
-        );
+          logError?.name || "Error");
       }
     }
 
     res.status(201).json(audit);
   } catch (error) {
-    console.error("Failed to create audit:", error);
+    if (error.statusCode) return next(error);
+    console.error("Failed to create audit:", error?.name || "Error");
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -164,11 +155,8 @@ async function createAudit(req, res) {
   }
 }
 
-async function updateAudit(req, res) {
+async function updateAudit(req, res, next) {
   try {
-    const payload = normalizeAuditPayload(req.body, req);
-
-    delete payload.id;
 
     const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
 
@@ -178,13 +166,17 @@ async function updateAudit(req, res) {
       });
     }
 
-    delete payload.auditorId;
+    const existing = await Audit.findOne(filter).lean();
+    if (!existing) throw badRequest('Audit not found', 404);
+    if (['completed', 'cancelled'].includes(existing.status)) throw badRequest('A closed audit cannot be edited', 409);
+    if (req.body.status !== undefined && req.body.status !== existing.status) throw badRequest('Use the workflow status endpoint');
+    const payload = normalizeAuditPayload(req.body, req, false, existing);
 
     const audit = await Audit.findOneAndUpdate(
-      filter,
+      { $and: [filter, { status: existing.status, updatedAt: existing.updatedAt }] },
       { $set: payload },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
@@ -208,14 +200,14 @@ async function updateAudit(req, res) {
       } catch (logError) {
         console.error(
           "Failed to create activity log for audit:",
-          logError
-        );
+          logError?.name || "Error");
       }
     }
 
     res.json(audit);
   } catch (error) {
-    console.error("Failed to update audit:", error);
+    if (error.statusCode) return next(error);
+    console.error("Failed to update audit:", error?.name || "Error");
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -230,7 +222,7 @@ async function updateAudit(req, res) {
   }
 }
 
-async function deleteAudit(req, res) {
+async function deleteAudit(req, res, next) {
   try {
     const filter = await getAuditFilter(req, buildAuditIdentifierFilter(req.params.id));
 
@@ -240,7 +232,11 @@ async function deleteAudit(req, res) {
       });
     }
 
-    const audit = await Audit.findOneAndDelete(filter);
+    const audit = await Audit.findOneAndUpdate(
+      { $and: [filter, { status: { $nin: ['completed', 'cancelled'] } }] },
+      { $set: { deletedAt: new Date(), status: 'cancelled' } },
+      { returnDocument: 'after', runValidators: true },
+    );
 
     if (!audit) {
       return res.status(404).json({
@@ -261,8 +257,7 @@ async function deleteAudit(req, res) {
       } catch (logError) {
         console.error(
           "Failed to create activity log for audit:",
-          logError
-        );
+          logError?.name || "Error");
       }
     }
 
@@ -270,7 +265,8 @@ async function deleteAudit(req, res) {
       message: "Audit deleted successfully",
     });
   } catch (error) {
-    console.error("Failed to delete audit:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Failed to delete audit:", error?.name || "Error");
 
     res.status(500).json({
       message: "Failed to delete audit",
@@ -557,8 +553,7 @@ async function getAuditAnalytics(req, res) {
   } catch (error) {
     console.error(
       "Failed to calculate audit analytics:",
-      error
-    );
+      error?.name || "Error");
 
     res.status(500).json({
       message: "Failed to calculate audit analytics",

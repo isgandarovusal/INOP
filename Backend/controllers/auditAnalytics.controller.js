@@ -1,4 +1,5 @@
 const Audit = require("../models/audit.model");
+const { getAuditScopeFilter } = require("../middleware/auditScope.middleware");
 
 function safeNumber(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -11,7 +12,10 @@ function round(value, decimals = 2) {
 
 exports.getSummary = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const result = await Audit.aggregate([
+      { $match: scope },
       {
         $group: {
           _id: {
@@ -30,6 +34,7 @@ exports.getSummary = async (req, res) => {
     ]);
 
     const totalResult = await Audit.aggregate([
+      { $match: scope },
       {
         $count: "total",
       },
@@ -48,7 +53,7 @@ exports.getSummary = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit summary analytics error:", error);
+    console.error("Audit summary analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -59,7 +64,10 @@ exports.getSummary = async (req, res) => {
 
 exports.getByType = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const result = await Audit.aggregate([
+      { $match: scope },
       {
         $group: {
           _id: {
@@ -87,7 +95,7 @@ exports.getByType = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit type analytics error:", error);
+    console.error("Audit type analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -98,7 +106,10 @@ exports.getByType = async (req, res) => {
 
 exports.getTrend = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const result = await Audit.aggregate([
+      { $match: scope },
       {
         $group: {
           _id: {
@@ -132,7 +143,7 @@ exports.getTrend = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit trend analytics error:", error);
+    console.error("Audit trend analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -143,7 +154,10 @@ exports.getTrend = async (req, res) => {
 
 exports.getServiceAnalytics = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const [summary] = await Audit.aggregate([
+      { $match: scope },
       {
         $match: {
           auditType: "service",
@@ -276,7 +290,7 @@ exports.getServiceAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Service analytics error:", error);
+    console.error("Service analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -287,7 +301,10 @@ exports.getServiceAnalytics = async (req, res) => {
 
 exports.getStandardAnalytics = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const [summary] = await Audit.aggregate([
+      { $match: scope },
       {
         $match: {
           auditType: "standard",
@@ -408,7 +425,7 @@ exports.getStandardAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Standard analytics error:", error);
+    console.error("Standard analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -419,7 +436,10 @@ exports.getStandardAnalytics = async (req, res) => {
 
 exports.getSafetyAnalytics = async (req, res) => {
   try {
+    const scope = await getAuditScopeFilter(req);
+    if (scope === null) return res.status(403).json({ success: false, message: "Audit access denied" });
     const [summary] = await Audit.aggregate([
+      { $match: scope },
       {
         $match: {
           auditType: "occupational-safety",
@@ -576,7 +596,7 @@ exports.getSafetyAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Safety analytics error:", error);
+    console.error("Safety analytics error:", error?.name || "Error");
 
     res.status(500).json({
       success: false,

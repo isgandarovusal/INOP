@@ -16,6 +16,8 @@ const auditExecutionSchema = new mongoose.Schema(
  },
 
 
+ checklistSnapshot: mongoose.Schema.Types.Mixed,
+
  answers:[
   {
    questionId:String,
@@ -105,6 +107,8 @@ const auditExecutionSchema = new mongoose.Schema(
  timestamps:true
 });
 
+
+auditExecutionSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
 
 module.exports =
 mongoose.model(

@@ -45,6 +45,8 @@ const auditClosureSchema = new mongoose.Schema(
   }
 );
 
+auditClosureSchema.index({ auditId: 1, createdAt: -1, _id: -1 });
+
 module.exports = mongoose.model(
   "AuditClosure",
   auditClosureSchema

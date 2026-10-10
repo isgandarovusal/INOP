@@ -52,6 +52,7 @@ const auditActivitySchema = new mongoose.Schema(
 auditActivitySchema.index({
   auditId: 1,
   createdAt: -1,
+  _id: -1,
 });
 
 module.exports =

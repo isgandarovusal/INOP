@@ -60,6 +60,8 @@ const auditNotificationSchema = new mongoose.Schema(
 });
 
 
+auditNotificationSchema.index({ userId: 1, createdAt: -1, _id: -1 });
+
 module.exports =
 mongoose.model(
  "AuditNotification",
