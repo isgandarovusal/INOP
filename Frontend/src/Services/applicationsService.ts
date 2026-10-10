@@ -5,7 +5,7 @@ import { normalizeJob } from "./jobsService";
 import { normalizeCandidate } from "./candidatesService";
 import type {
   Application,
-  ApplicationStatus,
+  ApplicationStatus, ApplicationMatch,
 } from "../Types/recruitment";
 
 function backendStatus(
@@ -63,7 +63,7 @@ function frontendStatus(
   }
 }
 
-function normalizeApplication(raw: unknown): Application {
+export function normalizeApplication(raw: unknown): Application {
   const data =
     typeof raw === "object" && raw !== null
       ? (raw as Record<string, unknown>)
@@ -94,7 +94,10 @@ function normalizeApplication(raw: unknown): Application {
     jobId,
     candidateId,
 
-    score: Number(data.score ?? 0),
+    revision: typeof data.__v === 'number' ? data.__v : 0,
+    score: data.scoreStatus === 'calculated' && typeof data.score === 'number' && Number.isFinite(data.score) && data.score >= 0 && data.score <= 100 ? data.score : null,
+    scoreStatus: ['pending', 'incomplete', 'calculated', 'stale', 'legacy', 'restricted'].includes(String(data.scoreStatus)) ? data.scoreStatus as Application['scoreStatus'] : 'legacy',
+    matching: data.matching && typeof data.matching === 'object' && 'version' in data.matching && 'criteria' in data.matching && Array.isArray(data.matching.criteria) ? data.matching as ApplicationMatch : null,
 
     status: frontendStatus(status),
 
@@ -165,4 +168,8 @@ export async function deleteApplication(
   id: string
 ): Promise<void> {
   await API.delete(`/applications/${id}`);
+}
+
+export async function recalculateApplicationMatch(id: string, input: { expectedRevision?: number; relevantExperienceYears?: number | null; reason?: string } = {}): Promise<Application> {
+  return normalizeApplication((await API.post(`/applications/${id}/recalculate`, input)).data);
 }

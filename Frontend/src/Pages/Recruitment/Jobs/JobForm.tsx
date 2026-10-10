@@ -30,6 +30,8 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const [experience, setExperience] = useState(initial?.experience ?? 0);
   const [status, setStatus] = useState<"open" | "closed" | "draft">(initial?.status ?? "open");
 
+  const [requiredEducation, setRequiredEducation] = useState<string[]>(initial?.requiredEducation ?? []);
+  const [requiredCertificates, setRequiredCertificates] = useState<string[]>(initial?.requiredCertificates ?? []);
   const [preferredSkills, setPreferredSkills] = useState<string[]>(initial?.preferredSkills ?? []);
   const [department, setDepartment] = useState(initial?.department ?? "HR");
   const [location, setLocation] = useState(initial?.location ?? "Remote");
@@ -83,7 +85,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         position, brandId, branchId,
         description,
         requiredSkills,
-        preferredSkills,
+        preferredSkills, requiredEducation, requiredCertificates,
         department, location, type,
         experience,
         status,
@@ -135,6 +137,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" value={location} onChange={e => setLocation(e.target.value)} required /></div>
         <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
         <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
+        <div className="form-group form-group--full"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
         <div className="form-group form-group--full"><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
         <div className="form-group">
           <label>{t("recruitment.jobForm.position")}</label>

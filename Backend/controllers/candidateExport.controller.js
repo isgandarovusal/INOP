@@ -4,6 +4,7 @@ const XLSX = require("xlsx");
 
 const Candidate = require("../models/candidate.model");
 const Application = require("../models/application.model");
+const { scoreResponses } = require("../services/applicationScoreState.service");
 const { resourceFilter } = require('../services/hrResourceScope.service');
 
 function candidateRow(candidate) {
@@ -101,15 +102,16 @@ exports.exportCandidatePdf = async (req, res) => {
       });
     }
 
-    const applications = await Application.find({ $and: [
+    const records = await Application.find({ $and: [
       { candidateId: candidate._id }, resourceFilter(req, 'application'),
     ] })
-      .select("jobId status score")
+      .select("candidateId jobId status score scoreStatus matching matchingReview")
       .populate({ path: 'jobId', select: 'title department location type',
         match: resourceFilter(req, 'recruitment') })
       .sort({ createdAt: -1 })
       .lean();
 
+    const applications = await scoreResponses(req, records);
     const doc = new PDFDocument({
       margin: 50,
     });
@@ -193,8 +195,8 @@ exports.exportCandidatePdf = async (req, res) => {
             )
             .text(
               `Match score: ${
-                application.score ?? 0
-              }%`
+                application.score === null ? "Awaiting evaluation" : `${application.score}%`
+              }`
             )
             .moveDown(0.5);
         }

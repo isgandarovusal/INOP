@@ -37,9 +37,12 @@ const applicationSchema = new mongoose.Schema(
       index: true,
     },
 
+    matching: { type: mongoose.Schema.Types.Mixed, default: null },
+    scoreStatus: { type: String, default: "pending", enum: ["pending", "incomplete", "calculated", "stale", "legacy"] },
+    matchingReview: { type: mongoose.Schema.Types.Mixed, default: null },
     score: {
       type: Number,
-      default: 0,
+      default: null,
       min: 0,
       max: 100,
     },

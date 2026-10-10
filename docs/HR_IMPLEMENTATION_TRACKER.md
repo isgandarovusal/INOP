@@ -64,14 +64,14 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
 | AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | — |
 | AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | OPEN | — |
-| AUD-053 | 05 | Standalone aiMatchService and MatchScoreBadge unused | OPEN | — |
-| AUD-054 | 05 | Historical global match UI removed; restore only Application context | OPEN | — |
-| AUD-055 | 05 | Exact-string score ignores skill aliases and deduplication | OPEN | — |
-| AUD-056 | 05 | Empty Job/Candidate can score 100 and missing data receives credit | OPEN | — |
-| AUD-057 | 05 | Score only calculated on create and becomes stale | OPEN | — |
-| AUD-058 | 05 | Breakdown/version/hash/coverage not persisted | OPEN | — |
-| AUD-059 | 05 | Default zero conflates uncalculated and real zero | OPEN | — |
-| AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | OPEN | — |
+| AUD-053 | 05 | Standalone aiMatchService and MatchScoreBadge unused | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-054 | 05 | Historical global match UI removed; restore only Application context | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-055 | 05 | Exact-string score ignores skill aliases and deduplication | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-056 | 05 | Empty Job/Candidate can score 100 and missing data receives credit | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-057 | 05 | Score only calculated on create and becomes stale | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-058 | 05 | Breakdown/version/hash/coverage not persisted | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-059 | 05 | Default zero conflates uncalculated and real zero | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
 | AUD-062 | 06 | Candidate-global statuses conflict with Application stages | OPEN | — |
 | AUD-063 | 06 | No processing state, revision CAS or transition validation | OPEN | — |
@@ -193,31 +193,31 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P05-001 | Score Application plus Job only | OPEN | — |
-| P05-002 | Restore contextual match display | OPEN | — |
-| P05-003 | Empty data cannot score 100 | OPEN | — |
-| P05-004 | Real zero distinct from missing | OPEN | — |
-| P05-005 | Canonical skill aliases | OPEN | — |
-| P05-006 | Invalidate score after Job changes | OPEN | — |
-| P05-007 | Invalidate score after Candidate changes | OPEN | — |
-| P05-008 | Persist breakdown and evidence | OPEN | — |
-| P05-009 | Required skills | OPEN | — |
-| P05-010 | Preferred skills | OPEN | — |
-| P05-011 | Relevant experience | OPEN | — |
-| P05-012 | Education only when required | OPEN | — |
-| P05-013 | Certification only when required | OPEN | — |
-| P05-014 | Criterion weights | OPEN | — |
-| P05-015 | Score version | OPEN | — |
-| P05-016 | scoreStatus | OPEN | — |
-| P05-017 | calculatedAt | OPEN | — |
-| P05-018 | dataCoverage | OPEN | — |
-| P05-019 | Matched and missing criteria | OPEN | — |
-| P05-020 | Recalculation | OPEN | — |
-| P05-021 | Legacy compatibility | OPEN | — |
-| P05-022 | Insufficient data pending/incomplete | OPEN | — |
-| P05-023 | No protected characteristics | OPEN | — |
-| P05-024 | No automatic hire/reject | OPEN | — |
-| P05-025 | Same score JobDetail/Applications/Profile/Kanban | OPEN | — |
+| P05-001 | Score Application plus Job only | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-002 | Restore contextual match display | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-003 | Empty data cannot score 100 | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-004 | Real zero distinct from missing | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-005 | Canonical skill aliases | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-006 | Invalidate score after Job changes | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-007 | Invalidate score after Candidate changes | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-008 | Persist breakdown and evidence | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-009 | Required skills | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-010 | Preferred skills | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-011 | Relevant experience | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-012 | Education only when required | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-013 | Certification only when required | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-014 | Criterion weights | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-015 | Score version | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-016 | scoreStatus | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-017 | calculatedAt | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-018 | dataCoverage | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-019 | Matched and missing criteria | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-020 | Recalculation | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-021 | Legacy compatibility | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-022 | Insufficient data pending/incomplete | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-023 | No protected characteristics | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-024 | No automatic hire/reject | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
+| P05-025 | Same score JobDetail/Applications/Profile/Kanban | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 
 ## Package 06: Application Kanban
 
@@ -457,7 +457,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 03 | `bb561691b0faafd635bcc7b217b24a9455c3d7fe` | Full regression 1101/1101; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | OCR is not implemented; historical unknown zeros not rewritten; old files retained for package 10 |
 
-| 04 | `feat(hr): add scoped brand and workplace catalogs` (SHA recorded next update) | Full regression 1124/1124; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | HR locations do not expose audit Restaurants; no legacy brand backfill; analytics execution remains package 07 |
+| 04 | `942df3fc87fe8bda9c148fcb12e267b9c0165c84` | Full regression 1124/1124; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | HR locations do not expose audit Restaurants; no legacy brand backfill; analytics execution remains package 07 |
+
+| 05 | `feat(hr): version contextual Application matching` (SHA recorded next update) | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
 
 ## External prerequisites
 
@@ -482,10 +484,16 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 
 | ID | Package | Finding | Status | Evidence |
 |---|---|---|---|---|
-| AUD-084 | 05 | Unused frontend ranking formula differs from backend; remove/align contextual authority | OPEN | `Frontend/src/Services/rankingService.ts`; unknown experience now remains nullable; complete score work pending |
+| AUD-084 | 05 | Unused frontend ranking formula differs from backend; remove/align contextual authority | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-085 | 03 | Concurrent CV replacements can commit older extraction over the latest file | TESTED | `Backend/tests/cvConcurrency.test.cjs`: gated slow PDF vs newer DOCX, 409 CAS, stale revision, legacy __v |
 | AUD-086 | 03 | Numeric age can be misread as years of employment | TESTED | `Backend/tests/cvExtraction.test.cjs`: age excluded from experience and evidence |
 
 03 evidence: `/tmp/inop-hr03-final-regression.log`, `/tmp/inop-hr03-validation-run.log`, `/tmp/inop-packagehr03-validation.json`. This package does not implement OCR or statistically calibrated confidence. Unknown legacy experience zeros cannot be distinguished from actual historical zeros and are not mass rewritten. Old replaced files are retained for the package 10 migration/retention policy. Concurrent replacement rejects an older writer with 409; rejected files are not silently deleted. Heuristic evidence is reviewable and never presented as real AI output. Original DOCX download survives secondary preview outages; permission failures fail closed.
 
 04 evidence: `/tmp/inop-hr04-baseline.log` (17/17 failing before patch), `/tmp/inop-hr04-target-final.log`, `/tmp/inop-hr04-final-regression.log`, `/tmp/inop-packagehr04-validation.json`. New brand/branch APIs, permissions and additive DB/index contract: `docs/HR_CATALOG_CONTRACT.md`. Catalog writes reuse recruitment.create all; branch CRUD retains recruitment provenance scopes. No production operations or seed were run.
+
+| AUD-087 | 05 | Derived Application score/evidence can disclose unreadable parent criteria | TESTED | `applicationScoreState.test.cjs`, `applicationMatchingUI.test.cjs`: independently denied parents suppress score, proof and contextual review |
+
+05 final guard verification: completely absent parent inputs return pending safely; all-zero custom weights are rejected. Target matching/state tests rerun 24/24 after these guards.
+
+05 evidence: `/tmp/inop-hr05-baseline.log` (11/11 failing before patch), `/tmp/inop-hr05-target.log`, `/tmp/inop-hr05-final-browser.log`, `/tmp/inop-hr05-final-regression.log`, `/tmp/inop-packagehr05-validation.json`. Contract and limitations: `docs/HR_MATCHING_CONTRACT.md`. Existing lifecycle test's numeric legacy score assertion now verifies restricted derived data while preserving the row visibility/count, missing parent names and prohibited edit assertions. Recalculation never changes stage. No bulk legacy rewrite or external provider call. The Application board is a score-consistent display; lifecycle/DnD work remains package 06.

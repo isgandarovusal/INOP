@@ -261,7 +261,8 @@ exports.createCandidateFromCv = async (req, res) => {
     if (job) {
       match = calculateApplicationMatch(
         job,
-        savedCandidate
+        savedCandidate,
+        { application: { jobId: job._id, candidateId: savedCandidate._id } }
       );
 
       savedApplication =
@@ -278,7 +279,7 @@ exports.createCandidateFromCv = async (req, res) => {
           assignedTo:
             req.user?.id || null,
 
-          score: match.score,
+          score: match.score, matching: match, scoreStatus: match.scoreStatus,
 
           notes:
             stringValue(req.body.notes),

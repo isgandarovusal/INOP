@@ -30,6 +30,9 @@ export interface Job {
 
   requiredSkills: string[];
   preferredSkills: string[];
+  requiredEducation?: string[];
+  requiredCertificates?: string[];
+  criterionWeights?: Partial<Record<"skills" | "preferred" | "experience" | "education" | "certificates", number>>;
 
   experienceYears: number;
   experience: number;
@@ -132,7 +135,10 @@ export interface Application {
   createdBy?: string | null;
   assignedTo?: string | null;
 
-  score: number;
+  revision?: number;
+  score: number | null;
+  scoreStatus: "pending" | "incomplete" | "calculated" | "stale" | "legacy" | "restricted";
+  matching?: ApplicationMatch | null;
   status: ApplicationStatus;
   notes?: string;
 
@@ -140,4 +146,13 @@ export interface Application {
 
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface MatchCriterion {
+  key: string; known: boolean; weight: number; ratio: number | null; source: string;
+  matched?: string[]; missing?: string[]; value?: number | null; required?: number;
+}
+export interface ApplicationMatch {
+  version: string; calculatedAt: string; dataCoverage: number; reason: string | null;
+  jobHash: string; candidateHash: string; criteria: MatchCriterion[];
 }

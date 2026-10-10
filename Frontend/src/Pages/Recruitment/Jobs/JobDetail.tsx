@@ -1,3 +1,5 @@
+import MatchScoreBadge from "../../../Components/MatchScoreBadge";
+import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useCallback, useMemo, useState } from "react";
@@ -76,7 +78,7 @@ const JobDetail: React.FC = () => {
             : app.candidateId,
       }))
       .filter((r) => r.candidate)
-      .sort((a, b) => b.app.score - a.app.score);
+      .sort((a, b) => applicationScoreOrder(a.app, b.app));
   }, [applications, candidateById]);
 
   const applicableCandidates = useMemo(
@@ -202,7 +204,7 @@ const JobDetail: React.FC = () => {
                     </div>
 
                     <span className="ranking-row__score">
-                      {app.score}
+                      <MatchScoreBadge application={app} onUpdated={loadJobDetail} />
                     </span>
                   </div>
                 ))}

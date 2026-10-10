@@ -1,145 +1,79 @@
-function normalizeList(values) {
-  if (!Array.isArray(values)) return [];
-
-  return values
-    .map((value) => String(value || "").trim().toLowerCase())
-    .filter(Boolean);
-}
-
-function calculateSkillMatch(candidateSkills, jobSkills) {
-  const candidate = normalizeList(candidateSkills);
-  const required = normalizeList(jobSkills);
-
-  if (required.length === 0) {
-    return {
-      score: 1,
-      matched: [],
-      missing: [],
-    };
-  }
-
-  const matched = required.filter((requiredSkill) =>
-    candidate.some(
-      (candidateSkill) =>
-        candidateSkill === requiredSkill
-    )
-  );
-
-  const missing = required.filter(
-    (requiredSkill) => !matched.includes(requiredSkill)
-  );
-
-  return {
-    score: matched.length / required.length,
-    matched,
-    missing,
+const crypto = require('node:crypto');
+const VERSION = 'ats-v1';
+const normalize = value => String(value || '').normalize('NFKC').toLowerCase().replace(/\u0307/g, '').replace(/\s+/g, ' ').trim();
+const aliases = new Map();
+for (const names of [
+  ['cash handling', 'kassa', 'касса', 'cashier operations'], ['food safety', 'qida təhlükəsizliyi', 'пищевая безопасность'],
+  ['customer service', 'müştəri xidməti', 'обслуживание клиентов'], ['shift management', 'növbə idarəetməsi', 'управление сменой'],
+  ['kitchen operations', 'mətbəx əməliyyatları', 'работа на кухне'], ['team management', 'komanda idarəetməsi', 'управление командой'],
+  ['haccp', 'hazard analysis and critical control points'], ['javascript', 'js'], ['typescript', 'ts'], ['node.js', 'nodejs'],
+  ['secondary school', 'tam orta təhsil', 'среднее образование'], ['vocational education', 'peşə təhsili', 'профессиональное образование'],
+]) for (const name of names) aliases.set(normalize(name), names[0]);
+const canonical = value => aliases.get(normalize(value)) || normalize(value);
+const list = values => [...new Set((Array.isArray(values) ? values : []).map(canonical).filter(Boolean))];
+const protectedCriterion = value => /(?:^|[^\p{L}\p{N}])(?:age|gender|sex|male|female|nationality|ethnicity|race|religion|pregnant|yaş|cins|kişi|qadın|milliyyət|возраст|пол|мужчина|женщина|национальность|раса|религия)(?:$|[^\p{L}\p{N}])/iu.test(String(value));
+const roleAliases = new Map();
+for (const names of [['cashier', 'kassir', 'кассир'], ['restaurant manager', 'restoran müdiri', 'менеджер ресторана'], ['cook', 'aşpaz', 'повар'], ['shift manager', 'növbə müdiri', 'менеджер смены']]) for (const name of names) roleAliases.set(normalize(name), names[0]);
+const role = value => roleAliases.get(normalize(value)) || normalize(value);
+const hash = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+function candidateFacts(c) {
+  return { role: role(c?.role), skills: list(c?.skills), experience: c?.experience ?? null,
+    education: normalize(c?.education), certificates: list(c?.certificates), reviewedFields: [...(c?.reviewedFields || [])].sort(),
+    reviewStatus: c?.cvReview?.reviewStatus || null,
+    history: (c?.employmentHistory || []).map(h => ({ title: role(h.title), start: h.start ?? null, end: h.end ?? null, ongoing: h.ongoing === true })),
   };
 }
-
-function calculateExperienceMatch(candidateExperience, requiredExperience) {
-  const candidate = Math.max(
-    0,
-    Number(candidateExperience) || 0
-  );
-
-  const required = Math.max(
-    0,
-    Number(requiredExperience) || 0
-  );
-
-  if (required === 0) {
-    return {
-      score: 1,
-      candidate,
-      required,
-    };
-  }
-
-  return {
-    score: Math.min(candidate / required, 1),
-    candidate,
-    required,
-  };
+function jobFacts(j) {
+  return { role: role(j?.title), requiredSkills: list(j?.requiredSkills), preferredSkills: list(j?.preferredSkills),
+    experienceYears: j?.experienceYears || 0, education: list(j?.requiredEducation), certificates: list(j?.requiredCertificates), weights: j?.criterionWeights || {} };
 }
-
-function calculateApplicationMatch(job, candidate) {
-  const requiredMatch = calculateSkillMatch(
-    candidate?.skills,
-    job?.requiredSkills
-  );
-
-  const preferredMatch = calculateSkillMatch(
-    candidate?.skills,
-    job?.preferredSkills
-  );
-
-  const experienceMatch = calculateExperienceMatch(
-    candidate?.experience,
-    job?.experienceYears
-  );
-
-  const hasPreferredSkills =
-    Array.isArray(job?.preferredSkills) &&
-    job.preferredSkills.length > 0;
-
-  let weightedScore;
-  let weights;
-
-  if (hasPreferredSkills) {
-    weights = {
-      requiredSkills: 0.6,
-      experience: 0.25,
-      preferredSkills: 0.15,
-    };
-
-    weightedScore =
-      requiredMatch.score * weights.requiredSkills +
-      experienceMatch.score * weights.experience +
-      preferredMatch.score * weights.preferredSkills;
-  } else {
-    weights = {
-      requiredSkills: 0.7,
-      experience: 0.3,
-    };
-
-    weightedScore =
-      requiredMatch.score * weights.requiredSkills +
-      experienceMatch.score * weights.experience;
+function fingerprints(j, c) { return { jobHash: hash(jobFacts(j)), candidateHash: hash(candidateFacts(c)) }; }
+function relevantExperience(j, c, application, hashes) {
+  const review = application?.matchingReview;
+  if (review && review.jobHash === hashes.jobHash && review.candidateHash === hashes.candidateHash && Number.isFinite(review.relevantExperienceYears) && review.relevantExperienceYears >= 0)
+    return { value: review.relevantExperienceYears, source: 'application.hr-review' };
+  if (role(j.title) && role(j.title) === role(c.role) && typeof c.experience === 'number' && Number.isFinite(c.experience) && c.experience >= 0)
+    return { value: c.experience, source: 'candidate.experience:matching-role' };
+  const ranges = [];
+  for (const h of c.employmentHistory || []) {
+    if (role(h.title) !== role(j.title) || !h.start?.month || !h.end?.month) continue;
+    const start = h.start.year * 12 + h.start.month - 1, end = h.end.year * 12 + h.end.month - 1;
+    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) ranges.push([start, end]);
   }
-
-  const score = Math.max(
-    0,
-    Math.min(100, Math.round(weightedScore * 100))
-  );
-
-  return {
-    score,
-
-    breakdown: {
-      requiredSkills: Math.round(
-        requiredMatch.score * 100
-      ),
-      preferredSkills: Math.round(
-        preferredMatch.score * 100
-      ),
-      experience: Math.round(
-        experienceMatch.score * 100
-      ),
-    },
-
-    matchedSkills: requiredMatch.matched,
-    missingSkills: requiredMatch.missing,
-
-    matchedPreferredSkills: preferredMatch.matched,
-    missingPreferredSkills: preferredMatch.missing,
-
-    experienceMatch:
-      experienceMatch.score >= 1,
-
-    weights,
-  };
+  if (!ranges.length) return { value: null, source: 'candidate.employmentHistory:unknown' };
+  ranges.sort((a, b) => a[0] - b[0]); const merged = [];
+  for (const r of ranges) { const last = merged.at(-1); if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push([...r]); }
+  return { value: merged.reduce((sum, r) => sum + r[1] - r[0], 0) / 12, source: 'candidate.employmentHistory:dated-matching-role' };
 }
-
-module.exports = {
-  calculateApplicationMatch,
-};
+function calculateApplicationMatch(job, candidate, { application } = {}) {
+  const hashes = fingerprints(job, candidate), facts = jobFacts(job);
+  const result = { version: VERSION, ...hashes, score: null, scoreStatus: 'pending', calculatedAt: new Date(), dataCoverage: 0, criteria: [], reason: 'requirements_missing' };
+  if (!job?._id || !candidate?._id || !application || String(application.jobId) !== String(job?._id) || String(application.candidateId) !== String(candidate?._id)) return { ...result, reason: 'application_context_required' };
+  if ([...facts.requiredSkills, ...facts.preferredSkills, ...facts.education, ...facts.certificates].some(protectedCriterion)) return { ...result, reason: 'protected_criteria_forbidden' };
+  const known = (key, values) => values?.length > 0 || candidate.reviewedFields?.includes(key) || candidate.cvReview?.reviewStatus === 'confirmed';
+  const defaultWeights = { skills: .6, preferred: .15, experience: .25, education: .1, certificates: .1 };
+  const addSkills = (key, needed, values, field) => {
+    if (!needed.length) return; const have = list(values), matched = needed.filter(s => have.includes(s)), missing = needed.filter(s => !have.includes(s));
+    result.criteria.push({ key, known: known(field, values), matched, missing, ratio: matched.length / needed.length, source: `candidate.${field}` });
+  };
+  addSkills('skills', facts.requiredSkills, candidate.skills, 'skills');
+  addSkills('preferred', facts.preferredSkills, candidate.skills, 'skills');
+  if (facts.experienceYears > 0) {
+    const e = relevantExperience(job, candidate, application, hashes);
+    result.criteria.push({ key: 'experience', known: e.value !== null, value: e.value, required: facts.experienceYears, ratio: e.value === null ? null : Math.min(e.value / facts.experienceYears, 1), source: e.source });
+  }
+  if (facts.education.length) {
+    const education = canonical(candidate.education);
+    const matched = facts.education.filter(e => education === e || normalize(candidate.education).includes(e));
+    result.criteria.push({ key: 'education', known: known('education', candidate.education), matched, missing: facts.education.filter(e => !matched.includes(e)), ratio: matched.length / facts.education.length, source: 'candidate.education' });
+  }
+  addSkills('certificates', facts.certificates, candidate.certificates, 'certificates');
+  const total = result.criteria.reduce((n, c) => n + (facts.weights[c.key] ?? defaultWeights[c.key]), 0);
+  if (!total) return result;
+  result.criteria = result.criteria.map(c => ({ ...c, weight: (facts.weights[c.key] ?? defaultWeights[c.key]) / total }));
+  result.dataCoverage = Math.round(result.criteria.reduce((n, c) => n + (c.known ? c.weight : 0), 0) * 10000) / 10000;
+  if (candidate.cvReview?.version && candidate.cvReview.reviewStatus !== 'confirmed') return { ...result, reason: 'hr_review_required' };
+  if (result.criteria.some(c => c.weight > 0 && !c.known)) return { ...result, scoreStatus: 'incomplete', reason: 'facts_missing' };
+  return { ...result, score: Math.max(0, Math.min(100, Math.round(result.criteria.reduce((n, c) => n + c.weight * (c.ratio || 0), 0) * 100))), scoreStatus: 'calculated', reason: null };
+}
+module.exports = { VERSION, canonical, fingerprints, calculateApplicationMatch, protectedCriterion };

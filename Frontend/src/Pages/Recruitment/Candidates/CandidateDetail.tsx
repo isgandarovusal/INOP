@@ -1,3 +1,4 @@
+import CandidateApplicationMatches from "../../../Components/CandidateApplicationMatches";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import HRResourceState from "../../../Components/HRResourceState";
 import { auditErrorStatus, useAuditResource } from "../../../Hooks/useAuditResource";
@@ -103,6 +104,7 @@ const CandidateDetail: React.FC = () => {
   return (
     <div className="candidate-detail-page">
       <CvReviewEvidence review={candidate.cvReview} />
+      <CandidateApplicationMatches candidateId={candidate.id} />
       {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
       {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
       <PageHeader

@@ -1093,5 +1093,40 @@
     "remote": "Uzaqdan",
     "allBrands": "Bütün brendlər",
     "allBranches": "Bütün filiallar"
+  },
+  "hrMatch": {
+    "pending": "Qiymətləndirmə gözləyir",
+    "incomplete": "Məlumat natamamdır",
+    "calculated": "Hesablanıb",
+    "stale": "Yenidən qiymətləndirmə gözləyir",
+    "legacy": "Qiymətləndirmə gözləyir",
+    "restricted": "Qiymətləndirməyə giriş yoxdur",
+    "explanation": "Uyğunluğun izahı",
+    "coverage": "Məlumat əhatəsi",
+    "calculatedAt": "Hesablanma tarixi",
+    "skills": "Məcburi bacarıqlar",
+    "preferred": "Arzuolunan bacarıqlar",
+    "experience": "Müvafiq təcrübə",
+    "education": "Zəruri təhsil",
+    "certificates": "Zəruri sertifikatlar",
+    "missing": "Çatışmayan meyarlar",
+    "recalculate": "Yenidən hesabla",
+    "recalculating": "Hesablanır…",
+    "reviewedExperience": "HR tərəfindən yoxlanmış müvafiq təcrübə (il)",
+    "reviewReason": "Yoxlamanın əsası",
+    "retryError": "Qiymətləndirməni yeniləmək mümkün olmadı",
+    "applications": "Vakansiyalar üzrə uyğunluq",
+    "empty": "Bu namizədin görünən müraciəti yoxdur",
+    "requiredEducation": "Zəruri təhsil (yalnız iş tələb edirsə)",
+    "requiredCertificates": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+    "board": "Application Kanban",
+    "table": "Cədvəl",
+    "reason": {
+      "hr_review_required": "HR review təsdiqi tələb olunur",
+      "facts_missing": "Zəruri faktlar çatışmır",
+      "requirements_missing": "Vakansiya meyarları verilməyib",
+      "application_context_required": "Müraciət konteksti tələb olunur",
+      "protected_criteria_forbidden": "Qorunan şəxsi xüsusiyyətlər qiymətləndirilmir"
+    }
   }
 }

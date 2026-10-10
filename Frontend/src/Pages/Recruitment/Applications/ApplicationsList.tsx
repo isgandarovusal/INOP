@@ -1,3 +1,6 @@
+import MatchScoreBadge from "../../../Components/MatchScoreBadge";
+import ApplicationKanban from "../../../Components/ApplicationKanban";
+import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +46,7 @@ const ApplicationsList: React.FC = () => {
   const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
   const loading = result.status === "loading";
   const [error, setError] = useState(false);
+  const [view, setView] = useState<"table" | "board">("table");
   const [brandFilter, setBrandFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
@@ -79,7 +83,7 @@ const ApplicationsList: React.FC = () => {
       .filter(r => branchFilter === "all" || (r.job?.branchId || "unset") === branchFilter)
       .filter((r) => jobFilter === "all" || r.job?.id === jobFilter)
       .filter((r) => statusFilter === "all" || r.app.status === statusFilter)
-      .sort((a, b) => b.app.score - a.app.score);
+      .sort((a, b) => applicationScoreOrder(a.app, b.app));
   }, [applications, jobs, jobFilter, statusFilter, brandFilter, branchFilter]);
 
   const handleDelete = async () => {
@@ -122,6 +126,7 @@ const ApplicationsList: React.FC = () => {
       />
 
       <div className="filter-bar">
+        <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
         <select aria-label={t('hrCatalog.brand')} value={brandFilter} onChange={e => { setBrandFilter(e.target.value); setBranchFilter('all'); }}><option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.map(j => j.brandId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}</select>
         <select aria-label={t('hrCatalog.branch')} value={branchFilter} onChange={e => setBranchFilter(e.target.value)}><option value="all">{t('hrCatalog.allBranches')}</option>{[...new Set(jobs.filter(j => brandFilter === 'all' || j.brandId === brandFilter).map(j => j.branchId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.branchId === id)?.branchName || t("hrCatalog.unavailable")}</option>)}</select>
         <select className="input-field" style={{ width: 220 }} value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
@@ -159,7 +164,7 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      <div className="admin-table-container">
+      {view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} /> : <div className="admin-table-container">
         <table>
           <thead>
             <tr>
@@ -232,7 +237,7 @@ const ApplicationsList: React.FC = () => {
                     {job?.position ?? t("hrStates.restricted")}
                     {job?.brandId && <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId)}{job.branchName ? ` · ${job.branchName}` : ""}</small>}
                   </td>
-                  <td>{app.score}</td>
+                  <td><MatchScoreBadge application={app} onUpdated={load} /></td>
                   <td>
                     {canUpdate ? (
                       <select
@@ -278,7 +283,7 @@ const ApplicationsList: React.FC = () => {
             )}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {deleteTarget && (
         <ConfirmDialog

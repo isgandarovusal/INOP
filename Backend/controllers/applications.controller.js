@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { scoreResponses } = require("../services/applicationScoreState.service");
 const { decorateApplications } = require("../services/recruitmentCatalog.service");
 const { recordActivity } = require("../services/activityLog.service");
 const Application = require("../models/application.model");
@@ -36,7 +37,7 @@ exports.getApplications = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    return res.status(200).json(await decorateApplications(req, applications));
+    return res.status(200).json(await decorateApplications(req, await scoreResponses(req, applications)));
   } catch (error) {
     console.error("Get applications error:", error);
 
@@ -69,7 +70,7 @@ exports.getApplicationById = async (req, res) => {
       });
     }
 
-    return res.status(200).json((await decorateApplications(req, [application]))[0]);
+    return res.status(200).json((await decorateApplications(req, await scoreResponses(req, [application])))[0]);
   } catch (error) {
     console.error("Get application error:", error);
 
@@ -117,20 +118,11 @@ exports.createApplication = async (req, res) => {
       });
     }
 
-    const matchResult = calculateApplicationMatch(
-      job,
-      candidate
-    );
-
-    const application = new Application({
-      jobId,
-      candidateId,
-      departmentId: req.user?.departmentId || "",
-      createdBy: req.user?.id || null,
-      assignedTo: req.user?.id || null,
-      score: matchResult.score,
-      notes: String(notes).trim(),
-    });
+    const application = new Application({ jobId, candidateId,
+      departmentId: req.user?.departmentId || '', createdBy: req.user?.id || null, assignedTo: req.user?.id || null,
+      notes: String(notes).trim() });
+    const matchResult = calculateApplicationMatch(job, candidate, { application });
+    application.matching = matchResult; application.score = matchResult.score; application.scoreStatus = matchResult.scoreStatus;
 
     const saved = await application.save();
 
@@ -153,7 +145,7 @@ exports.createApplication = async (req, res) => {
       );
     }
 
-    return res.status(201).json((await decorateApplications(req, [populated]))[0]);
+    return res.status(201).json((await decorateApplications(req, await scoreResponses(req, [populated])))[0]);
   } catch (error) {
     console.error("Create application error:", error);
 
@@ -265,7 +257,7 @@ exports.updateApplicationStatus = async (req, res) => {
 
     const response = await Application.findById(updated._id)
       .populate(applicationParents(req)).lean();
-    return res.status(200).json((await decorateApplications(req, [response]))[0]);
+    return res.status(200).json((await decorateApplications(req, await scoreResponses(req, [response])))[0]);
   } catch (error) {
     console.error("Update application status error:", error);
 

@@ -97,6 +97,7 @@ auditTimelineRoutes
 
 router.use('/audit-permission', auditPermissionRoutes);
 const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller');
+router.post('/applications/:id/recalculate', ...authorize('application', 'update'), require('../controllers/applicationMatching.controller').recalculate);
 router.get('/hr/brands', ...authorize('recruitment', 'read'), recruitmentCatalog.brands);
 router.post('/hr/brands', ...authorize('recruitment', 'create'), recruitmentCatalog.createBrand);
 router.get('/hr/branches', ...authorize('recruitment', 'read'), recruitmentCatalog.branches);

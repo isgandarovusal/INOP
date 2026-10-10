@@ -1030,5 +1030,40 @@
     "remote": "Удалённо",
     "allBrands": "Все бренды",
     "allBranches": "Все филиалы"
+  },
+  "hrMatch": {
+    "pending": "Ожидает оценки",
+    "incomplete": "Недостаточно данных",
+    "calculated": "Рассчитано",
+    "stale": "Ожидает пересчёта",
+    "legacy": "Ожидает оценки",
+    "restricted": "Доступ к оценке ограничен",
+    "explanation": "Объяснение оценки",
+    "coverage": "Покрытие данных",
+    "calculatedAt": "Дата расчёта",
+    "skills": "Обязательные навыки",
+    "preferred": "Желательные навыки",
+    "experience": "Релевантный опыт",
+    "education": "Необходимое образование",
+    "certificates": "Обязательные сертификаты",
+    "missing": "Недостающие критерии",
+    "recalculate": "Пересчитать",
+    "recalculating": "Расчёт…",
+    "reviewedExperience": "Подтверждённый HR релевантный опыт (лет)",
+    "reviewReason": "Основание проверки",
+    "retryError": "Не удалось обновить оценку",
+    "applications": "Соответствие по вакансиям",
+    "empty": "Нет доступных заявок кандидата",
+    "requiredEducation": "Обязательное образование (если необходимо для работы)",
+    "requiredCertificates": "Обязательные сертификаты (если необходимы для работы)",
+    "board": "Application Kanban",
+    "table": "Таблица",
+    "reason": {
+      "hr_review_required": "Требуется подтверждение HR",
+      "facts_missing": "Не хватает необходимых фактов",
+      "requirements_missing": "Нет критериев вакансии",
+      "application_context_required": "Требуется контекст заявки",
+      "protected_criteria_forbidden": "Защищённые личные признаки не оцениваются"
+    }
   }
 }

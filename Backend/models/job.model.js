@@ -51,6 +51,9 @@ const jobSchema = new mongoose.Schema(
       default: [],
     },
 
+    requiredEducation: { type: [String], default: [] },
+    requiredCertificates: { type: [String], default: [] },
+    criterionWeights: { type: mongoose.Schema.Types.Mixed, default: {} },
     experienceYears: {
       type: Number,
       default: 0,

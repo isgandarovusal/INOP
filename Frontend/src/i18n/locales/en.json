@@ -1069,5 +1069,40 @@
     "remote": "Remote",
     "allBrands": "All brands",
     "allBranches": "All branches"
+  },
+  "hrMatch": {
+    "pending": "Awaiting evaluation",
+    "incomplete": "Incomplete information",
+    "calculated": "Calculated",
+    "stale": "Awaiting recalculation",
+    "legacy": "Awaiting evaluation",
+    "restricted": "Matching access restricted",
+    "explanation": "Match explanation",
+    "coverage": "Data coverage",
+    "calculatedAt": "Calculated at",
+    "skills": "Required skills",
+    "preferred": "Preferred skills",
+    "experience": "Relevant experience",
+    "education": "Required education",
+    "certificates": "Required certificates",
+    "missing": "Missing criteria",
+    "recalculate": "Recalculate",
+    "recalculating": "Calculating…",
+    "reviewedExperience": "HR verified relevant experience (years)",
+    "reviewReason": "Review evidence/reason",
+    "retryError": "Could not refresh matching",
+    "applications": "Matching per vacancy",
+    "empty": "No visible applications for this candidate",
+    "requiredEducation": "Required education (only when necessary for this job)",
+    "requiredCertificates": "Required certificates (only when necessary for this job)",
+    "board": "Application Kanban",
+    "table": "Table",
+    "reason": {
+      "hr_review_required": "HR review approval is required",
+      "facts_missing": "Required facts are missing",
+      "requirements_missing": "Vacancy criteria are missing",
+      "application_context_required": "Application context is required",
+      "protected_criteria_forbidden": "Protected personal traits are never evaluated"
+    }
   }
 }

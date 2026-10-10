@@ -66,6 +66,7 @@ const candidateSchema = new mongoose.Schema(
       trim: true,
     },
 
+    reviewedFields: { type: [String], default: [] },
     skills: {
       type: [String],
       default: [],

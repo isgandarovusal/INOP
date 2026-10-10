@@ -90,7 +90,7 @@ test('HR pages isolate data, drafts, errors and permission contexts', async t =>
   });
   await t.test('application-only role sees redacted parents rather than dropped records', async () => {
     await h.models.Role.updateOne({ key: 'test_own' }, { $push: { permissions: { resource: 'application', action: 'read', scope: 'all' } } });
-    await h.open('own', '/app/recruitment/applications'); await h.page.locator('tbody tr').filter({ hasText: '47' }).waitFor();
+    await h.open('own', '/app/recruitment/applications'); await h.page.locator('tbody tr [data-score-status=restricted]').first().waitFor();
     assert.equal(await h.page.locator('tbody tr').count(), 2);
     assert.equal(await h.page.getByText('Ranked applicant', { exact: true }).count(), 0);
     assert.equal(await h.page.locator('tbody select').count(), 0);

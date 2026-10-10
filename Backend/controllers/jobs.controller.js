@@ -1,6 +1,8 @@
 const { recordActivity } = require("../services/activityLog.service");
 const mongoose = require("mongoose");
+const { invalidateScores } = require("../services/applicationScoreState.service");
 const Job = require("../models/job.model");
+const { protectedCriterion } = require("../services/applicationMatch.service");
 const { validateLocation, decorateJobs } = require("../services/recruitmentCatalog.service");
 
 function getScopeFilter(req) {
@@ -106,6 +108,9 @@ function buildJobPayload(req) {
     description: normalizeString(req.body.description),
     requiredSkills,
     preferredSkills,
+    requiredEducation: normalizeSkills(req.body.requiredEducation),
+    requiredCertificates: normalizeSkills(req.body.requiredCertificates),
+    criterionWeights: req.body.criterionWeights ?? {},
     experienceYears,
     status:
       req.body.status === undefined
@@ -114,7 +119,12 @@ function buildJobPayload(req) {
   };
 }
 
+function validWeights(weights) {
+  return weights && typeof weights === 'object' && !Array.isArray(weights) && (!Object.keys(weights).length || Object.values(weights).some(v => v > 0)) && Object.entries(weights).every(([k, v]) => ['skills', 'preferred', 'experience', 'education', 'certificates'].includes(k) && typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100);
+}
 function validateJobPayload(payload) {
+  if (payload.requiredEducation === null || payload.requiredCertificates === null || !validWeights(payload.criterionWeights)) return "Invalid scoring requirements or weights.";
+  if ([...payload.requiredSkills || [], ...payload.preferredSkills || [], ...payload.requiredEducation || [], ...payload.requiredCertificates || []].some(protectedCriterion)) return "Protected personal traits cannot be matching criteria.";
   if (!payload.title) {
     return "Vakansiya adı tələb olunur.";
   }
@@ -267,7 +277,7 @@ exports.updateJob = async (req, res) => {
     }
 
     const allowedFields = [
-      "brandId", "branchId",
+      "brandId", "branchId", "requiredEducation", "requiredCertificates", "criterionWeights",
       "title",
       "department",
       "location",
@@ -287,6 +297,10 @@ exports.updateJob = async (req, res) => {
       }
     }
 
+    for (const field of ['requiredEducation', 'requiredCertificates']) {
+      if (update[field] !== undefined) { update[field] = normalizeSkills(update[field]); if (update[field] === null) return res.status(400).json({ message: 'Invalid scoring requirements.' }); }
+    }
+    if (update.criterionWeights !== undefined && !validWeights(update.criterionWeights)) return res.status(400).json({ message: 'Invalid scoring weights.' });
     if (update.title !== undefined) {
       update.title = normalizeString(update.title);
 
@@ -373,6 +387,7 @@ exports.updateJob = async (req, res) => {
       }
     }
 
+    if ([...update.requiredSkills || [], ...update.preferredSkills || [], ...update.requiredEducation || [], ...update.requiredCertificates || []].some(protectedCriterion)) return res.status(400).json({ message: "Protected personal traits cannot be matching criteria." });
     if (update.experienceYears !== undefined) {
       update.experienceYears = parseExperienceYears(
         update.experienceYears
@@ -416,6 +431,7 @@ exports.updateJob = async (req, res) => {
       });
     }
 
+    await invalidateScores("jobId", updated._id);
     try {
       await recordActivity({
         req,

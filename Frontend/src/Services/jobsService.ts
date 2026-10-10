@@ -21,6 +21,9 @@ export interface JobInput {
 
   requiredSkills: string[];
   preferredSkills?: string[];
+  requiredEducation?: string[];
+  requiredCertificates?: string[];
+  criterionWeights?: Job["criterionWeights"];
 
   experienceYears?: number;
   experience?: number;
@@ -120,6 +123,9 @@ export function normalizeJob(raw: unknown): Job {
 
     requiredSkills: stringArray(data.requiredSkills),
     preferredSkills: stringArray(data.preferredSkills),
+    requiredEducation: stringArray(data.requiredEducation),
+    requiredCertificates: stringArray(data.requiredCertificates),
+    criterionWeights: typeof data.criterionWeights === "object" && data.criterionWeights !== null ? data.criterionWeights as Job["criterionWeights"] : {},
 
     experienceYears,
     experience: experienceYears,
@@ -150,6 +156,9 @@ function toBackendPayload(input: JobInput) {
     description: input.description || "",
     requiredSkills: input.requiredSkills || [],
     preferredSkills: input.preferredSkills || [],
+    requiredEducation: input.requiredEducation || [],
+    requiredCertificates: input.requiredCertificates || [],
+    criterionWeights: input.criterionWeights || {},
     experienceYears: Number(
       input.experienceYears ?? input.experience ?? 0
     ),
@@ -195,7 +204,7 @@ export async function updateJob(
   input: Partial<JobInput>
 ): Promise<Job> {
   const payload: Record<string, unknown> = {};
-  for (const field of ["brandId", "branchId", "department", "location", "type", "description", "requiredSkills", "preferredSkills"] as const) {
+  for (const field of ["requiredEducation", "requiredCertificates", "criterionWeights", "brandId", "branchId", "department", "location", "type", "description", "requiredSkills", "preferredSkills"] as const) {
     if (input[field] !== undefined) payload[field] = input[field];
   }
   if (input.title !== undefined || input.position !== undefined) payload.title = input.title ?? input.position;

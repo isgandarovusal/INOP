@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { invalidateScores } = require("../services/applicationScoreState.service");
 const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
 const { reviewForFile, contactPhone, manualReview, historyInput } = require('../services/cvReview.service');
@@ -182,6 +183,7 @@ exports.createCandidate = async (req, res) => {
       ...contactPhone(req.body.phone !== undefined ? req.body.phone : extracted?.parsed?.phoneRaw),
       education: req.body.education !== undefined ? normalizeString(req.body.education) : extracted?.parsed?.education || '',
 
+      reviewedFields: ["role", "skills", "experience", "education", "certificates", "employmentHistory"].filter(key => req.body[key] !== undefined),
       skills: req.body.skills !== undefined ? normalizeArray(req.body.skills) : extracted?.parsed?.skills || [],
       experience: req.body.experience !== undefined ? experience : extracted?.parsed?.experience ?? null,
 
@@ -360,6 +362,7 @@ exports.updateCandidate = async (req, res) => {
      * createdBy
      * assignedTo
      */
+    update.reviewedFields = [...new Set([...(req.file ? [] : current.reviewedFields || []), ...["role", "skills", "experience", "education", "certificates", "employmentHistory"].filter(key => req.body[key] !== undefined)])];
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: id,
@@ -380,6 +383,7 @@ exports.updateCandidate = async (req, res) => {
       });
     }
 
+    await invalidateScores("candidateId", updated._id);
     try {
       await recordActivity({
         req,
