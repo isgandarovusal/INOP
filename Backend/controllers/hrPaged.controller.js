@@ -13,7 +13,7 @@ const fields = {
   branches: 'code name brandId kind location status createdAt updatedAt',
   jobs: 'requiredSkills title department location type status brandId branchId experienceYears createdAt updatedAt',
   candidates: 'experience name role status email phone skills cvUrl cvOriginal cvReview.version cvReview.processingStatus cvReview.reviewStatus createdAt updatedAt',
-  applications: 'jobId candidateId status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
+  applications: 'jobId candidateId boardOrder status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
 };
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function parameters(req, kind) {
@@ -125,3 +125,4 @@ exports.brands = async (req, res, next) => {
 
 // Internal shared page projection; ranking retains the established list DTO.
 exports.clip = clip; exports.fields = fields;
+exports.parameters = parameters; exports.lookup = lookup;
