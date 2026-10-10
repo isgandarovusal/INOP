@@ -3,6 +3,7 @@ import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
+import HRRoute from "./HRRoute";
 import AppShell from "../Layouts/AppShell/AppShell";
 const Login = lazy(() => import("../Pages/Auth/Login/Login"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
@@ -60,20 +61,29 @@ const ROUTES: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
           { path: "dashboard", element: <Dashboard /> },
-          {
-            element: <RoleRoute section="recruitment" />,
-            children: [
-              { path: "recruitment/jobs", element: <JobsList /> },
-              { path: "recruitment/jobs/new", element: <JobForm /> },
-              { path: "recruitment/jobs/:id", element: <JobDetail /> },
-              { path: "recruitment/jobs/:id/edit", element: <JobForm /> },
-              { path: "recruitment/candidates", element: <CandidatesList /> },
-              { path: "recruitment/candidates/new", element: <CandidateForm /> },
-              { path: "recruitment/candidates/:id", element: <CandidateDetail /> },
-              { path: "recruitment/candidates/:id/edit", element: <CandidateForm /> },
-              { path: "recruitment/applications", element: <ApplicationsList /> },
-            ],
-          },
+          { element: <HRRoute resource="recruitment" action="read" />, children: [
+            { path: "recruitment/jobs", element: <JobsList /> },
+            { path: "recruitment/jobs/:id", element: <JobDetail /> },
+          ] },
+          { element: <HRRoute resource="recruitment" action="create" />, children: [
+            { path: "recruitment/jobs/new", element: <JobForm /> },
+          ] },
+          { element: <HRRoute resource="recruitment" action="update" />, children: [
+            { path: "recruitment/jobs/:id/edit", element: <JobForm /> },
+          ] },
+          { element: <HRRoute resource="candidate" action="read" />, children: [
+            { path: "recruitment/candidates", element: <CandidatesList /> },
+            { path: "recruitment/candidates/:id", element: <CandidateDetail /> },
+          ] },
+          { element: <HRRoute resource="candidate" action="create" />, children: [
+            { path: "recruitment/candidates/new", element: <CandidateForm /> },
+          ] },
+          { element: <HRRoute resource="candidate" action="update" />, children: [
+            { path: "recruitment/candidates/:id/edit", element: <CandidateForm /> },
+          ] },
+          { element: <HRRoute resource="application" action="read" />, children: [
+            { path: "recruitment/applications", element: <ApplicationsList /> },
+          ] },
           {
             element: <RoleRoute section="audit" />,
             children: [

@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -50,6 +50,10 @@ const getCandidateStatusBadgeVariant = (
   }
 };
 
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+const loadCandidates = (_id: string, signal?: AbortSignal, scopeKey?: string) => getCandidates(signal, scopeKey);
+
 const CandidatesList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -57,8 +61,9 @@ const CandidatesList: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const result = useAuditResource("list", "candidate", loadCandidates);
+  const candidates = useMemo(() => result.data ?? [], [result.data]);
+  const loading = result.status === "loading";
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -67,26 +72,7 @@ const CandidatesList: React.FC = () => {
   const canUpdate = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
 
-  const fetchCandidates = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await getCandidates();
-      setCandidates(data);
-    } catch (err: unknown) {
-      const message =
-        getErrorMessage(err, t("recruitment.candidates.loadingError"));
-
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void fetchCandidates();
-  }, [fetchCandidates]);
+  const fetchCandidates = result.reload;
 
   const handleStatusChange = useCallback(
     async (
@@ -98,22 +84,17 @@ const CandidatesList: React.FC = () => {
       try {
         await updateCandidateStatus(candidateId, newStatus);
 
-        setCandidates((prev) =>
-          prev.map((candidate) =>
-            candidate.id === candidateId
-              ? { ...candidate, status: newStatus }
-              : candidate,
-          ),
-        );
+        fetchCandidates();
 
         toast.success(t("recruitment.candidates.statusUpdated"));
       } catch (err: unknown) {
+        setError(getErrorMessage(err, t("somethingWentWrong")));
         toast.error(
           getErrorMessage(err, t("recruitment.candidates.statusUpdateError")),
         );
       }
     },
-    [canUpdate, t],
+    [canUpdate, t, fetchCandidates],
   );
 
   const handleExportExcel = async () => {
@@ -128,6 +109,7 @@ const CandidatesList: React.FC = () => {
 
       toast.success(t("recruitment.candidates.exportSuccess"));
     } catch (err: unknown) {
+      setError(getErrorMessage(err, t("somethingWentWrong")));
       toast.error(
         getErrorMessage(
           err,
@@ -158,12 +140,11 @@ const CandidatesList: React.FC = () => {
 
       await deleteCandidate(candidate.id);
 
-      setCandidates((prev) =>
-        prev.filter((item) => item.id !== candidate.id),
-      );
+      fetchCandidates();
 
       toast.success(t("recruitment.candidates.deleted"));
     } catch (err: unknown) {
+      setError(getErrorMessage(err, t("somethingWentWrong")));
       toast.error(
         getErrorMessage(err, t("recruitment.candidates.deleteError")),
       );
@@ -187,6 +168,8 @@ const CandidatesList: React.FC = () => {
       return nameMatch || roleMatch || skillMatch;
     });
   }, [candidates, searchQuery]);
+
+  if (result.status !== "ready") return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
     <div className="page-container">

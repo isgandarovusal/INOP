@@ -24,6 +24,7 @@ export interface CandidateInput {
   certificates?: string[];
 
   cvFile?: File | null;
+  jobId?: string;
 }
 
 function normalizeCandidateStatus(
@@ -182,6 +183,10 @@ export async function createCandidate(
   input: CandidateInput
 ): Promise<Candidate> {
   const formData = new FormData();
+  if (input.jobId) {
+    if (!input.cvFile) throw new Error("A CV is required for the vacancy CV workflow.");
+    formData.append("jobId", input.jobId);
+  }
 
   formData.append("name", input.name);
 
@@ -247,11 +252,11 @@ export async function createCandidate(
   }
 
   const response = await API.post(
-    "/candidates",
+    input.jobId ? "/candidates/from-cv" : "/candidates",
     formData
   );
 
-  return normalizeCandidate(response.data);
+  return normalizeCandidate(input.jobId ? response.data.candidate : response.data);
 }
 
 export async function updateCandidate(

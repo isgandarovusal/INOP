@@ -997,5 +997,23 @@
         "restaurantsWillAppear": "Restaurants you add will show up here."
       }
     }
+  },
+  "hrStates": {
+    "cvRequired": "Choose a CV for this vacancy workflow.",
+    "cvForJob": "Create candidate from CV for this vacancy",
+    "loading": "Loading HR data…",
+    "not-found": "Data was not found or is no longer available.",
+    "unauthenticated": "Your session has expired. Please sign in again.",
+    "forbidden": "You do not have permission to access this HR data.",
+    "server-error": "The server could not load this data. Please retry.",
+    "error": "Data could not be loaded. Please retry.",
+    "retry": "Retry",
+    "restricted": "Restricted or unavailable",
+    "secondaryError": "Supporting data could not be loaded. Primary data remains available.",
+    "parsing": "Extracting CV text…",
+    "department": "Department",
+    "location": "Location",
+    "type": "Job type",
+    "preferredSkills": "Preferred skills"
   }
 }

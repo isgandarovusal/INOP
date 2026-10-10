@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -10,7 +10,7 @@ import Badge, { type BadgeTone } from "../../../Components/Badge";
 import { getJobs, deleteJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
-import { canManageRecruitment } from "../../../Utils/permissions";
+import { hasPermission } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Record<JobStatus, BadgeTone> = {
@@ -19,14 +19,22 @@ const STATUS_TONE: Record<JobStatus, BadgeTone> = {
   draft: "warning",
 };
 
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+const loadJobs = (_id: string, signal?: AbortSignal, scopeKey?: string) => getJobs(signal, scopeKey);
+
 const JobsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageRecruitment(user) : false;
+  const canCreate = hasPermission(user, "recruitment", "create");
+  const canUpdate = hasPermission(user, "recruitment", "update");
+  const canDelete = hasPermission(user, "recruitment", "delete");
+  const canManage = canUpdate || canDelete;
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  const result = useAuditResource("list", "recruitment", loadJobs);
+  const jobs = useMemo(() => result.data ?? [], [result.data]);
+  const loading = result.status === "loading";
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Job | null>(null);
@@ -41,26 +49,7 @@ const JobsList: React.FC = () => {
     setStatusFilter("all");
   };
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await getJobs();
-      setJobs(result);
-    } catch (err: unknown) {
-      console.error("Failed to load jobs:", err);
-      setError(
-        getErrorMessage(err, t("recruitment.jobs.loadError")),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const load = result.reload;
 
   const filtered = useMemo(() => {
     return jobs
@@ -77,14 +66,14 @@ const JobsList: React.FC = () => {
   }, [jobs, query, statusFilter]);
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !canDelete) return;
 
     const id = deleteTarget.id;
     setDeletingId(id);
 
     try {
       await deleteJob(id);
-      setJobs((prev) => prev.filter((job) => job.id !== id));
+      load();
       setDeleteTarget(null);
     } catch (err: unknown) {
       console.error("Failed to delete job:", err);
@@ -93,6 +82,8 @@ const JobsList: React.FC = () => {
       setDeletingId(null);
     }
   };
+
+  if (result.status !== "ready") return <HRResourceState status={result.status} retry={load} />;
 
   return (
     <div className="recruitment-list-page">
@@ -103,7 +94,7 @@ const JobsList: React.FC = () => {
           shown: filtered.length,
         })}
         actions={
-          canManage && (
+          canCreate && (
             <button className="btn-add recruitment-action--create" onClick={() => navigate("/app/recruitment/jobs/new")}>
               <Plus size={16} />
               {t("recruitment.jobs.newJob")}
@@ -236,7 +227,7 @@ const JobsList: React.FC = () => {
                   {canManage && (
                     <td>
                       <div className="row-actions">
-                        <button
+                        {canUpdate && <button
                           className="icon-btn icon-btn--edit"
                           title={t("recruitment.jobs.edit")}
                           onClick={() =>
@@ -244,8 +235,8 @@ const JobsList: React.FC = () => {
                           }
                         >
                           <Pencil size={15} />
-                        </button>
-                        <button
+                        </button>}
+                        {canDelete && <button
                           className="icon-btn icon-btn--danger"
                           title={t("recruitment.jobs.delete")}
                           disabled={deletingId === job.id}
@@ -256,7 +247,7 @@ const JobsList: React.FC = () => {
                           ) : (
                             <Trash2 size={15} />
                           )}
-                        </button>
+                        </button>}
                       </div>
                     </td>
                   )}

@@ -38,9 +38,8 @@ export function hasPermission(
     return false;
   }
 
-  return (user.permissions || []).some((permission) =>
-    permissionMatches(permission, resource, action),
-  );
+  const scope = getPermissionScope(user, resource, action);
+  return scope !== null && scope !== "none";
 }
 
 export function getPermissionScope(
@@ -61,7 +60,7 @@ export function getPermissionScope(
 
 const SECTION_PERMISSIONS: Record<Section, [string, string][]> = {
   dashboard: [["dashboard", "read"]],
-  recruitment: [["recruitment", "read"]],
+  recruitment: [["recruitment", "read"], ["candidate", "read"], ["application", "read"]],
   audit: [["audit", "read"]],
   users: [["user", "read"]],
   departments: [["department", "read"]],

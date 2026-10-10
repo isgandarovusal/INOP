@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardList, Loader2, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -10,10 +10,9 @@ import {
   deleteApplication,
   updateApplicationStatus,
 } from "../../../Services/applicationsService";
-import { getJobs } from "../../../Services/jobsService";
-import type { Application, ApplicationStatus, Job } from "../../../Types/recruitment";
+import type { Application, ApplicationStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
-import { canManageRecruitment } from "../../../Utils/permissions";
+import { hasPermission } from "../../../Utils/permissions";
 import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Partial<Record<ApplicationStatus, BadgeTone>> = {
@@ -26,15 +25,22 @@ const STATUS_TONE: Partial<Record<ApplicationStatus, BadgeTone>> = {
   hired: "success",
 };
 
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+const loadApplications = (_id: string, signal?: AbortSignal, scopeKey?: string) => getApplications(signal, scopeKey);
+
 const ApplicationsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const canManage = user ? canManageRecruitment(user) : false;
+  const canUpdate = hasPermission(user, "application", "update");
+  const canDelete = hasPermission(user, "application", "delete");
+  const canManage = canDelete;
 
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  const result = useAuditResource("list", "application", loadApplications);
+  const applications = useMemo(() => result.data ?? [], [result.data]);
+  const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
+  const loading = result.status === "loading";
   const [error, setError] = useState(false);
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
@@ -49,29 +55,7 @@ const ApplicationsList: React.FC = () => {
     setStatusFilter("all");
   };
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-
-    try {
-      const [appResult, jobResult] = await Promise.all([
-        getApplications(),
-        getJobs(),
-      ]);
-
-      setApplications(appResult);
-      setJobs(jobResult);
-    } catch (loadError) {
-      console.error("Applications load error:", loadError);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const load = result.reload;
 
   const rows = useMemo(() => {
     const jobMap = new Map(jobs.map((job) => [job.id, job]));
@@ -88,25 +72,22 @@ const ApplicationsList: React.FC = () => {
             ? undefined
             : app.candidateId,
       }))
-      .filter((r) => r.job && r.candidate)
-      .filter((r) => jobFilter === "all" || r.job!.id === jobFilter)
+      .filter((r) => jobFilter === "all" || r.job?.id === jobFilter)
       .filter((r) => statusFilter === "all" || r.app.status === statusFilter)
       .sort((a, b) => b.app.score - a.app.score);
   }, [applications, jobs, jobFilter, statusFilter]);
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !canDelete) return;
 
     setDeletingId(deleteTarget.id);
 
     try {
       await deleteApplication(deleteTarget.id);
-      setApplications((prev) =>
-        prev.filter((application) => application.id !== deleteTarget.id),
-      );
+      load();
       setDeleteTarget(null);
     } catch (deleteError) {
-      console.error("Application delete error:", deleteError);
+      console.error("Application delete error:", deleteError); setError(true);
     } finally {
       setDeletingId(null);
     }
@@ -116,20 +97,17 @@ const ApplicationsList: React.FC = () => {
     appId: string,
     status: ApplicationStatus,
   ) => {
+    if (!canUpdate) return;
     try {
       await updateApplicationStatus(appId, status);
 
-      setApplications((prev) =>
-        prev.map((application) =>
-          application.id === appId
-            ? { ...application, status }
-            : application,
-        ),
-      );
+      load();
     } catch (statusError) {
-      console.error("Application status update error:", statusError);
+      console.error("Application status update error:", statusError); setError(true);
     }
   };
+
+  if (result.status !== "ready") return <HRResourceState status={result.status} retry={load} />;
 
   return (
     <div className="recruitment-list-page">
@@ -236,19 +214,19 @@ const ApplicationsList: React.FC = () => {
                 <tr key={app.id} className={deletingId === app.id ? "row--removing" : ""}>
                   <td
                     className="cell-title cell-title--clickable"
-                    onClick={() => navigate(`/app/recruitment/candidates/${candidate!.id}`)}
+                    onClick={() => candidate && navigate(`/app/recruitment/candidates/${candidate.id}`)}
                   >
-                    {candidate!.name}
+                    {candidate?.name ?? t("hrStates.restricted")}
                   </td>
                   <td
                     className="cell-title cell-title--clickable"
-                    onClick={() => navigate(`/app/recruitment/jobs/${job!.id}`)}
+                    onClick={() => job && navigate(`/app/recruitment/jobs/${job.id}`)}
                   >
-                    {job!.position}
+                    {job?.position ?? t("hrStates.restricted")}
                   </td>
                   <td>{app.score}</td>
                   <td>
-                    {canManage ? (
+                    {canUpdate ? (
                       <select
                         className="input-field"
                         style={{ width: 150, padding: "6px 10px" }}

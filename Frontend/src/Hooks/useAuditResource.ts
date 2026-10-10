@@ -14,7 +14,7 @@ export function auditErrorStatus(error: unknown): AuditLoadStatus {
   return "error";
 }
 
-export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>) {
+export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>, options: { refreshOnFocus?: boolean } = {}) {
   const { user, isLoading } = useAuth();
   const [revision, setRevision] = useState(0);
   const reload = useCallback(() => setRevision(value => value + 1), []);
@@ -36,11 +36,12 @@ export function useAuditResource<T>(id: string | undefined, resource: string, lo
   }, [id, key, authKey, blocked, load]);
 
   useEffect(() => {
+    if (options.refreshOnFocus === false) return;
     const visible = () => { if (document.visibilityState === "visible") reload(); };
     window.addEventListener("focus", reload);
     document.addEventListener("visibilitychange", visible);
     return () => { window.removeEventListener("focus", reload); document.removeEventListener("visibilitychange", visible); };
-  }, [reload]);
+  }, [reload, options.refreshOnFocus]);
 
   // Never render data belonging to a previous audit or permission context,
   // including the render before an effect's cleanup has run.

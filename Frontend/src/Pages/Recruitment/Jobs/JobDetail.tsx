@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -12,70 +12,43 @@ import {
   createApplication,
 } from "../../../Services/applicationsService";
 import { getCandidates } from "../../../Services/candidatesService";
-import type {
-  Job,
-  Application,
-  Candidate,
-} from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
-import { canManageRecruitment } from "../../../Utils/permissions";
+import { hasPermission } from "../../../Utils/permissions";
+
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
 
 const JobDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const canManage = user ? canManageRecruitment(user) : false;
+  const canEdit = hasPermission(user, "recruitment", "update");
+  const canLink = hasPermission(user, "application", "create") && hasPermission(user, "candidate", "read");
+  const canReadApps = hasPermission(user, "application", "read");
 
-  const [job, setJob] = useState<Job | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState(true);
   const [linking, setLinking] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const loadJobDetail = useCallback(async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [jobResult, appResult, candidateResult] = await Promise.all([
-        getJobById(id),
-        getApplications(),
-        canManage ? getCandidates() : Promise.resolve([]),
-      ]);
-
-      setJob(jobResult ?? null);
-      setApplications(appResult.filter((a) => a.jobId === id));
-      setCandidates(candidateResult);
-    } catch (err: unknown) {
-      console.error("Failed to load job detail:", err);
-
-      const error = err as {
-        response?: {
-          data?: {
-            message?: string;
-          };
-        };
-        message?: string;
-      };
-
-      setError(
-        error.response?.data?.message ||
-          error.message ||
-          t("recruitment.jobDetail.loadError"),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [canManage, id, t]);
-
-  useEffect(() => {
-    void loadJobDetail();
-  }, [loadJobDetail]);
+  const load = useCallback(async (jobId: string, signal?: AbortSignal, scopeKey?: string) => {
+    const primary = await getJobById(jobId, signal, scopeKey);
+    if (!primary) return null;
+    const [apps, people] = await Promise.allSettled([
+      canReadApps ? getApplications(signal, scopeKey) : Promise.resolve([]),
+      canLink ? getCandidates(signal, scopeKey) : Promise.resolve([]),
+    ]);
+    return { job: primary,
+      applications: apps.status === "fulfilled" ? apps.value.filter(a => (typeof a.jobId === "string" ? a.jobId : a.jobId?.id) === jobId) : [],
+      candidates: people.status === "fulfilled" ? people.value : [],
+      secondaryError: apps.status === "rejected" || people.status === "rejected",
+    };
+  }, [canReadApps, canLink]);
+  const result = useAuditResource(id, "recruitment", load);
+  const job = result.data?.job;
+  const applications = useMemo(() => result.data?.applications ?? [], [result.data]);
+  const candidates = useMemo(() => result.data?.candidates ?? [], [result.data]);
+  const loadJobDetail = result.reload;
 
   const candidateById = useMemo(
     () => new Map(candidates.map((candidate) => [candidate.id, candidate])),
@@ -86,8 +59,8 @@ const JobDetail: React.FC = () => {
     () =>
       new Set(
         applications
-          .filter((application) => typeof application.candidateId === "string")
-          .map((application) => application.candidateId),
+          .map((application) => typeof application.candidateId === "string" ? application.candidateId : application.candidateId?.id)
+          .filter((candidateId): candidateId is string => Boolean(candidateId)),
       ),
     [applications],
   );
@@ -134,46 +107,12 @@ const JobDetail: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="empty-state">
-        <Loader2 size={24} className="spin" />
-      </div>
-    );
-  }
-
-  if (error && !job) {
-    return (
-      <div>
-        <EmptyState
-          icon={<UserSquare2 size={28} />}
-          title={t("somethingWentWrong")}
-          hint={error}
-        />
-        <div style={{ textAlign: "center", marginTop: "12px" }}>
-          <button
-            className="btn-secondary"
-            onClick={() => void loadJobDetail()}
-          >
-            {t("recruitment.jobDetail.retry")}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!job) {
-    return (
-      <EmptyState
-        icon={<UserSquare2 size={28} />}
-        title={t("recruitment.jobDetail.notFound")}
-        hint={t("recruitment.jobDetail.deletedHint")}
-      />
-    );
-  }
+  if (result.status !== "ready" || !job) return <HRResourceState status={result.status} retry={result.reload} />;
 
   return (
     <div className="job-detail-page">
+      {error && <div role="alert">{error}</div>}
+      {result.data?.secondaryError && <div role="alert">{t("hrStates.secondaryError")}</div>}
       <PageHeader
         title={job.position}
         subtitle={`${t("recruitment.jobDetail.yearsExperience", {
@@ -188,7 +127,7 @@ const JobDetail: React.FC = () => {
               <ArrowLeft size={15} /> {t("recruitment.jobDetail.back")}
             </button>
 
-            {canManage && (
+            {canEdit && (
               <button
                 className="btn-add"
                 onClick={() =>
@@ -202,6 +141,7 @@ const JobDetail: React.FC = () => {
         }
       />
 
+      {hasPermission(user, "candidate", "create") && hasPermission(user, "application", "create") && <button type="button" onClick={() => navigate(`/app/recruitment/candidates/new?jobId=${encodeURIComponent(job.id)}`)}>{t("hrStates.cvForJob")}</button>}
       <div className="detail-grid">
         <div>
           <div className="detail-card">
@@ -316,7 +256,7 @@ const JobDetail: React.FC = () => {
             </div>
           </div>
 
-          {canManage && (
+          {canLink && (
             <div className="detail-card">
               <h3>{t("recruitment.jobDetail.linkCandidate")}</h3>
 

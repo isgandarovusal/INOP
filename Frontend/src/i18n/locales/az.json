@@ -1021,5 +1021,23 @@
         "restaurantsWillAppear": "Əlavə etdiyiniz restoranlar burada görünəcək."
       }
     }
+  },
+  "hrStates": {
+    "cvRequired": "Bu vakansiya axını üçün CV seçin.",
+    "cvForJob": "Vakansiya üçün CV-dən namizəd yarat",
+    "loading": "HR məlumatları yüklənir…",
+    "not-found": "Məlumat tapılmadı və ya artıq əlçatan deyil.",
+    "unauthenticated": "Sessiya bitib. Yenidən daxil olun.",
+    "forbidden": "Bu HR məlumatına giriş icazəniz yoxdur.",
+    "server-error": "Server məlumatı yükləyə bilmədi. Yenidən cəhd edin.",
+    "error": "Məlumat yüklənmədi. Yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et",
+    "restricted": "Məhdud və ya əlçatmaz",
+    "secondaryError": "Köməkçi məlumat yüklənmədi. Əsas məlumat göstərilir.",
+    "parsing": "CV mətni çıxarılır…",
+    "department": "Departament",
+    "location": "Məkan",
+    "type": "İş tipi",
+    "preferredSkills": "Arzuolunan bacarıqlar"
   }
 }

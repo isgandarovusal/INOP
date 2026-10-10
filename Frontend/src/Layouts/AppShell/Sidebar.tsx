@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Context/AuthContext";
 import {
   canAccessSection,
+  hasPermission,
   ROLE_LABELS,
   type Section,
 } from "../../Utils/permissions";
@@ -35,6 +36,7 @@ interface NavItem {
   labelKey: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   section: Section;
+  resource?: string;
   end?: boolean;
 }
 
@@ -61,18 +63,21 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       {
         to: "/app/recruitment/jobs",
+        resource: "recruitment",
         labelKey: "navigation.jobs",
         icon: Briefcase,
         section: "recruitment",
       },
       {
         to: "/app/recruitment/candidates",
+        resource: "candidate",
         labelKey: "navigation.candidates",
         icon: UserSquare2,
         section: "recruitment",
       },
       {
         to: "/app/recruitment/applications",
+        resource: "application",
         labelKey: "navigation.applications",
         icon: ClipboardList,
         section: "recruitment",
@@ -199,7 +204,7 @@ const Sidebar: React.FC = () => {
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter((item) =>
-      canAccessSection(user, item.section)
+      item.resource ? hasPermission(user, item.resource, "read") : canAccessSection(user, item.section)
     ),
   })).filter((group) => group.items.length > 0);
 

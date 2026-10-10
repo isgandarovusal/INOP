@@ -1,7 +1,12 @@
+import { useMounted } from "../../../Hooks/useMounted";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PageState from "../../../Components/PageState";
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import { useAuth } from "../../../Context/useAuth";
+import { hasPermission } from "../../../Utils/permissions";
+import type { Job, JobType } from "../../../Types/recruitment";
 import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -9,67 +14,26 @@ import PageHeader from "../../../Components/PageHeader";
 import TagInput from "../../../Components/TagInput";
 import { createJob, getJobById, updateJob } from "../../../Services/jobsService";
 
-const JobForm: React.FC = () => {
+const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const mounted = useMounted();
 
-  const [position, setPosition] = useState("");
-  const [description, setDescription] = useState("");
-  const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
-  const [experience, setExperience] = useState(1);
-  const [status, setStatus] = useState<"open" | "closed" | "draft">("open");
+  const [position, setPosition] = useState(initial?.position ?? "");
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [requiredSkills, setRequiredSkills] = useState<string[]>(initial?.requiredSkills ?? []);
+  const [experience, setExperience] = useState(initial?.experience ?? 0);
+  const [status, setStatus] = useState<"open" | "closed" | "draft">(initial?.status ?? "open");
 
-  const [loading, setLoading] = useState(isEdit);
+  const [preferredSkills, setPreferredSkills] = useState<string[]>(initial?.preferredSkills ?? []);
+  const [department, setDepartment] = useState(initial?.department ?? "HR");
+  const [location, setLocation] = useState(initial?.location ?? "Remote");
+  const [type, setType] = useState<JobType>(initial?.type ?? "Full-time");
   const [saving, setSaving] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-
-    let mounted = true;
-
-    const loadJob = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const job = await getJobById(id);
-
-        if (!mounted) return;
-
-        if (!job) {
-          setError(t("recruitment.jobForm.notFound"));
-          return;
-        }
-
-        setPosition(job.position || "");
-        setDescription(job.description || "");
-        setRequiredSkills(job.requiredSkills || []);
-        setExperience(job.experience || 1);
-        setStatus(job.status || "open");
-      } catch (err: unknown) {
-        if (!mounted) return;
-
-        console.error("Failed to load job:", err);
-        setError(
-          getErrorMessage(err, t("recruitment.jobForm.loadError")),
-        );
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadJob();
-
-    return () => {
-      mounted = false;
-    };
-  }, [id, t]);
 
   const handleAiSuggestRequirements = () => {
     if (!position.trim()) {
@@ -101,6 +65,7 @@ const JobForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
 
     if (!position.trim()) {
       setError(t("recruitment.jobForm.positionRequired"));
@@ -115,60 +80,33 @@ const JobForm: React.FC = () => {
         position,
         description,
         requiredSkills,
-        preferredSkills: [],
+        preferredSkills,
+        department, location, type,
         experience,
         status,
       };
 
       if (isEdit && id) {
         await updateJob(id, payload);
+        if (!mounted.current) return;
         toast.success(t("recruitment.jobForm.updated"));
       } else {
         await createJob(payload);
+        if (!mounted.current) return;
         toast.success(t("recruitment.jobForm.created"));
       }
 
       navigate("/app/recruitment/jobs");
     } catch (err: unknown) {
+      if (!mounted.current) return;
       console.error("Failed to save job:", err);
       setError(
         getErrorMessage(err, t("recruitment.jobForm.genericError")),
       );
     } finally {
-      setSaving(false);
+      if (mounted.current) setSaving(false);
     }
   };
-
-  if (loading) {
-    return <PageState type="loading" />;
-  }
-
-  if (isEdit && error && !position && !description && requiredSkills.length === 0) {
-    return (
-      <div>
-        <PageHeader
-          title={t("recruitment.jobForm.editTitle")}
-          subtitle={t("recruitment.jobForm.subtitle")}
-        />
-
-        <div className="empty-state">
-          <AlertCircle size={28} />
-          <p className="empty-state__title">
-            {t("somethingWentWrong")}
-          </p>
-          <p className="empty-state__hint">{error}</p>
-          <div style={{ marginTop: "12px" }}>
-            <button
-              className="btn-secondary"
-              onClick={() => navigate("/app/recruitment/jobs")}
-            >
-              {t("recruitment.jobForm.backToJobs")}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="job-form-page">
@@ -189,11 +127,18 @@ const JobForm: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" value={department} onChange={e => setDepartment(e.target.value)} required /></div>
+        <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" value={location} onChange={e => setLocation(e.target.value)} required /></div>
+        <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
+        <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
+        <div className="form-group form-group--full"><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
         <div className="form-group">
           <label>{t("recruitment.jobForm.position")}</label>
           <input
             type="text"
             className="input"
+            name="position"
+            aria-label={t("recruitment.jobForm.position")}
             value={position}
             onChange={(e) => setPosition(e.target.value)}
             placeholder={t("recruitment.jobForm.positionPlaceholder")}
@@ -207,6 +152,8 @@ const JobForm: React.FC = () => {
             type="number"
             className="input"
             min={0}
+            name="experience"
+            aria-label={t("recruitment.jobForm.experience")}
             value={experience}
             onChange={(e) => setExperience(Number(e.target.value))}
           />
@@ -283,4 +230,12 @@ const JobForm: React.FC = () => {
   );
 };
 
+const JobForm: React.FC = () => {
+  const { id } = useParams(); const { user } = useAuth();
+  const result = useAuditResource(id, "recruitment", getJobById, { refreshOnFocus: false });
+  const key = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  if (!hasPermission(user, "recruitment", id ? "update" : "create")) return <HRResourceState status="forbidden" />;
+  if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
+  return <JobFormFields key={key} initial={result.data ?? undefined} />;
+};
 export default JobForm;

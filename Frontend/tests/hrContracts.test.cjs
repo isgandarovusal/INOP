@@ -4,6 +4,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { withBrowserFixture } = require('./helpers/browser.cjs');
 const Candidate = require('../../Backend/models/candidate.model');
+const Application = require('../../Backend/models/application.model');
+const PDFDocument = require('node:module').createRequire(path.resolve(__dirname, '../../Backend/package.json'))('pdfkit');
 const { uploadsDir } = require('../../Backend/middleware/privateUpload.middleware');
 const harness = `
 import React from 'react';import {createRoot} from 'react-dom/client';import {BrowserRouter,useNavigate} from 'react-router-dom';
@@ -27,6 +29,22 @@ test('HR services preserve IDs, partial updates, new status and CV replacement',
     return { job, candidate, app, updatedJob, replaced, listed, detail };
   });
   try {
+    await t.test('vacancy CV service uses canonical pipeline and creates a linked Application', async () => {
+      const doc = new PDFDocument(), chunks = [];
+      const ready = new Promise(resolve => { doc.on('data', c => chunks.push(c)); doc.on('end', () => resolve(Buffer.concat(chunks))); });
+      doc.text('Synthetic Pipeline Applicant\nCashier\npipeline@example.invalid'); doc.end();
+      let linked;
+      try {
+        linked = await h.page.evaluate(async ({ jobId, bytes }) => window.hr.candidates.createCandidate({
+          jobId, name: 'Reviewed pipeline applicant', role: 'Cashier', status: 'new',
+          cvFile: new File([new Uint8Array(bytes)], 'pipeline.pdf', { type: 'application/pdf' }),
+        }), { jobId: result.job.id, bytes: [...await ready] });
+        assert.equal(linked.name, 'Reviewed pipeline applicant'); assert.equal(linked.status, 'new');
+        assert.equal(await Application.countDocuments({ candidateId: linked.id, jobId: result.job.id }), 1);
+      } finally {
+        if (/^\/uploads\/[a-f0-9-]{36}\.pdf$/.test(linked?.cvUrl || '')) await fs.unlink(path.join(uploadsDir, path.basename(linked.cvUrl)));
+      }
+    });
     await t.test('populated parents have stable normalized id and title/position', () => {
       for (const a of [result.app, result.detail, result.listed.find(a => a.id === result.app.id)]) {
         assert.equal(a.jobId.id, result.job.id); assert.equal(a.jobId.position, 'Cashier');
@@ -52,7 +70,7 @@ test('HR services preserve IDs, partial updates, new status and CV replacement',
     });
     await t.test('dashboard summary preserves new instead of mapping it to applied', async () => {
       const r = await h.request('admin', 'GET', '/candidates/dashboard-summary');
-      assert.equal(r.status, 200); assert.ok(r.data.statusBreakdown.some(s => s.status === 'new' && s.value === 1));
+      assert.equal(r.status, 200); assert.ok(r.data.statusBreakdown.some(s => s.status === 'new' && s.value === 2));
       assert.equal(r.data.statusBreakdown.some(s => s.status === 'applied'), false);
     });
     await t.test('scope-denied parents stay null in frontend normalization', async () => {

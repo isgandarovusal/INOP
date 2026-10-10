@@ -1,14 +1,13 @@
-import PageState from "../../../Components/PageState";
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  AlertCircle,
   ArrowLeft,
   FileDown,
   FileText,
   Loader2,
-  RefreshCw,
   Trash2,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -20,7 +19,6 @@ import {
   getCandidateById,
   getCandidateCv,
 } from "../../../Services/candidatesService";
-import type { Candidate } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
@@ -37,98 +35,14 @@ const CandidateDetail: React.FC = () => {
 
   const fileContext = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
   const cv = usePrivateFile(fileContext);
-  const [candidate, setCandidate] = useState<Candidate | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const result = useAuditResource(id, "candidate", getCandidateById);
+  const candidate = result.data;
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   const canUpdate = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
   const canExportPdf = hasPermission(user, "application", "read");
-
-  const loadCandidate = useCallback(async () => {
-    if (!id) {
-      setError(t("recruitment.candidateDetail.notFound"));
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await getCandidateById(id);
-
-      if (!data) {
-        setCandidate(null);
-        setError(t("recruitment.candidateDetail.notFound"));
-        return;
-      }
-
-      setCandidate(data);
-    } catch (err: unknown) {
-      setCandidate(null);
-      setError(
-        getErrorMessage(err, t("recruitment.candidateDetail.loadError")),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [id, t]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      if (!id) {
-        setCandidate(null);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await getCandidateById(id);
-
-        if (cancelled) return;
-
-        if (!data) {
-          setCandidate(null);
-          setError(t("recruitment.candidateDetail.notFound"));
-          return;
-        }
-
-        setCandidate(data);
-      } catch (err: unknown) {
-        if (cancelled) return;
-
-        const error = err as {
-          response?: { data?: { message?: string } };
-          message?: string;
-        };
-
-        setCandidate(null);
-        setError(
-          error.response?.data?.message ||
-            error.message ||
-            t("recruitment.candidateDetail.loadError"),
-        );
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, t]);
 
   const handleExportPdf = async () => {
     if (!candidate || !canExportPdf || exporting) return;
@@ -180,47 +94,7 @@ const CandidateDetail: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <PageState type="loading" />;
-  }
-
-  if (error || !candidate) {
-    return (
-      <div className="candidate-detail-page">
-        <PageHeader
-          title={t("recruitment.candidateDetail.title")}
-          subtitle={t("recruitment.candidateDetail.subtitle")}
-        />
-
-        <div className="alert alert--danger">
-          <AlertCircle size={18} />
-          <span>
-            {error || t("recruitment.candidateDetail.notFound")}
-          </span>
-        </div>
-
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={loadCandidate}
-          >
-            <RefreshCw size={16} />
-            {t("recruitment.candidateDetail.retry")}
-          </button>
-
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft size={16} />
-            {t("recruitment.candidateDetail.back")}
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (result.status !== "ready" || !candidate) return <HRResourceState status={result.status} retry={result.reload} />;
 
   const cvUrl = candidate.cvUrl || "";
 

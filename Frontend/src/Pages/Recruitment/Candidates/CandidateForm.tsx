@@ -1,7 +1,11 @@
+import { useMounted } from "../../../Hooks/useMounted";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import PageState from "../../../Components/PageState";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import HRResourceState from "../../../Components/HRResourceState";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
+import { useAuth } from "../../../Context/useAuth";
+import { hasPermission } from "../../../Utils/permissions";
 import { AlertCircle, FileText, Loader2, UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
@@ -12,7 +16,7 @@ import {
   parseCandidateCv,
   updateCandidate,
 } from "../../../Services/candidatesService";
-import type { CandidateStatus } from "../../../Types/recruitment";
+import type { Candidate, CandidateStatus, Job } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 
 const ACCEPTED_CV_TYPES = [
@@ -22,84 +26,31 @@ const ACCEPTED_CV_TYPES = [
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const CandidateForm: React.FC = () => {
+const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ initial, job }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const mounted = useMounted();
 
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [education, setEducation] = useState("");
-  const [experience, setExperience] = useState(0);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [certificates, setCertificates] = useState<string[]>([]);
+  const [name, setName] = useState(initial?.name ?? "");
+  const [role, setRole] = useState(initial?.role ?? "");
+  const [email, setEmail] = useState(initial?.email ?? "");
+  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [education, setEducation] = useState(initial?.education ?? "");
+  const [experience, setExperience] = useState(initial?.experience ?? 0);
+  const [skills, setSkills] = useState<string[]>(initial?.skills ?? []);
+  const [languages, setLanguages] = useState<string[]>(initial?.languages ?? []);
+  const [certificates, setCertificates] = useState<string[]>(initial?.certificates ?? []);
   const [cvFile, setCvFile] = useState<File | null>(null);
-  const [existingCvName, setExistingCvName] = useState<string | null>(null);
+  const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvUrl?.split("/").pop() ?? null);
   
-  const [loading, setLoading] = useState(isEdit);
+  const parsing = useRef<{ sequence: number; controller?: AbortController }>({ sequence: 0 });
   const [saving, setSaving] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) {
-      return;
-    }
-
-    let mounted = true;
-
-    const loadCandidate = async () => {
-      try {
-        setError(null);
-
-        const candidate = await getCandidateById(id);
-
-        if (!mounted) return;
-
-        if (!candidate) {
-          setError("Namizəd tapılmadı.");
-          return;
-        }
-
-        setName(candidate.name || "");
-        setRole(candidate.role || "");
-        setEmail(candidate.email || "");
-        setPhone(candidate.phone || "");
-        setEducation(candidate.education || "");
-        setExperience(candidate.experience || 0);
-        setSkills(candidate.skills || []);
-        setLanguages(candidate.languages || []);
-        setCertificates(candidate.certificates || []);
-
-        if (candidate.cvUrl) {
-          const fileName = candidate.cvUrl.split("/").pop() || candidate.cvUrl;
-          setExistingCvName(fileName);
-        } else {
-          setExistingCvName(null);
-        }
-      } catch (err: unknown) {
-        if (!mounted) return;
-
-        setError(
-          getErrorMessage(err, t("recruitment.candidateForm.genericError")),
-        );
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadCandidate();
-
-    return () => {
-      mounted = false;
-    };
-  }, [id, t]);
+  useEffect(() => () => { parsing.current.sequence++; parsing.current.controller?.abort(); }, []);
 
   const validateCvFile = (file: File): boolean => {
     if (!ACCEPTED_CV_TYPES.includes(file.type)) {
@@ -116,6 +67,9 @@ const CandidateForm: React.FC = () => {
   };
 
   const handleCvChange = async (file: File | null) => {
+    parsing.current.controller?.abort();
+    const sequence = ++parsing.current.sequence;
+    setAiGenerating(false);
     if (!file) {
       setCvFile(null);
       return;
@@ -129,28 +83,25 @@ const CandidateForm: React.FC = () => {
     setExistingCvName(null);
     setError(null);
     setAiGenerating(true);
+    const controller = new AbortController(); parsing.current.controller = controller;
 
     try {
-      const parsed = await parseCandidateCv(file);
+      const parsed = await parseCandidateCv(file, controller.signal);
+      if (sequence !== parsing.current.sequence || controller.signal.aborted) return;
 
-      setName(parsed.name || "");
-      setRole(parsed.role || "");
-      setEmail(parsed.email || "");
-      setPhone(parsed.phone || "");
-      setEducation(parsed.education || "");
-      setExperience(Number(parsed.experience || 0));
-      setSkills(Array.isArray(parsed.skills) ? parsed.skills : []);
-      setLanguages(
-        Array.isArray(parsed.languages) ? parsed.languages : [],
-      );
-      setCertificates(
-        Array.isArray(parsed.certificates)
-          ? parsed.certificates
-          : [],
-      );
+      if (parsed.name) setName(parsed.name);
+      if (parsed.role) setRole(parsed.role);
+      if (parsed.email) setEmail(parsed.email);
+      if (parsed.phone) setPhone(parsed.phone);
+      if (parsed.education) setEducation(parsed.education);
+      if (parsed.experience != null) setExperience(Number(parsed.experience));
+      if (parsed.skills?.length) setSkills(parsed.skills);
+      if (parsed.languages?.length) setLanguages(parsed.languages);
+      if (parsed.certificates?.length) setCertificates(parsed.certificates);
 
       toast.success(t("recruitment.candidateForm.aiSuccess"));
     } catch (err: unknown) {
+      if (sequence !== parsing.current.sequence || controller.signal.aborted) return;
       setError(
         getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
@@ -161,12 +112,15 @@ const CandidateForm: React.FC = () => {
         ),
       );
     } finally {
-      setAiGenerating(false);
+      if (sequence === parsing.current.sequence) setAiGenerating(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
+    if (aiGenerating || saving) return;
+    if (job && !cvFile) { setError(t("hrStates.cvRequired")); return; }
     if (!name.trim()) {
       setError(t("recruitment.candidateForm.nameRequired"));
       return;
@@ -188,11 +142,13 @@ const CandidateForm: React.FC = () => {
         languages,
         certificates,
         cvFile,
+        jobId: job?.id,
       };
 
       if (isEdit && id) {
         // Edit zamanı mövcud ATS statusunu qoruyuruq.
         await updateCandidate(id, payload);
+        if (!mounted.current) return;
         toast.success(t("recruitment.candidateForm.updated"));
       } else {
         // Namizəd yaradılarkən vakansiya konteksti olmadığı üçün
@@ -202,24 +158,24 @@ const CandidateForm: React.FC = () => {
           ...payload,
           status: "new" as CandidateStatus,
         });
+        if (!mounted.current) return;
         toast.success(t("recruitment.candidateForm.created"));
       }
       navigate("/app/recruitment/candidates");
     } catch (err: unknown) {
+      if (!mounted.current) return;
       setError(
         getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
     } finally {
-      setSaving(false);
+      if (mounted.current) setSaving(false);
     }
   };
 
-  if (loading) {
-    return <PageState type="loading" />;
-  }
 
   return (
     <div className="candidate-form-page">
+      {job && <p>{job.position}</p>}
       <PageHeader
         title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}
         subtitle={t("recruitment.candidateForm.subtitle")}
@@ -256,7 +212,7 @@ const CandidateForm: React.FC = () => {
               onDrop={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleCvChange(e.dataTransfer.files?.[0] || null);
+                if (!saving) void handleCvChange(e.dataTransfer.files?.[0] || null);
               }}
             >
               {cvFile ? (
@@ -274,7 +230,8 @@ const CandidateForm: React.FC = () => {
                   <button
                     type="button"
                     className="btn-secondary candidate-cv-upload__remove"
-                    onClick={() => setCvFile(null)}
+                    disabled={saving}
+                    onClick={() => void handleCvChange(null)}
                     aria-label={t("recruitment.candidateForm.removeCv")}
                   >
                     <X size={16} />
@@ -311,7 +268,7 @@ const CandidateForm: React.FC = () => {
                     <UploadCloud size={16} />
                   )}
                   {aiGenerating
-                    ? "Analyzing CV..."
+                    ? t("hrStates.parsing")
                     : cvFile || existingCvName
                       ? t("recruitment.candidateForm.chooseAnotherCv")
                       : t("recruitment.candidateForm.chooseCv")}
@@ -319,7 +276,7 @@ const CandidateForm: React.FC = () => {
                     type="file"
                     accept=".pdf,.docx"
                     style={{ display: "none" }}
-                    disabled={aiGenerating}
+                    disabled={saving}
                     onChange={(e) =>
                       handleCvChange(e.target.files?.[0] || null)
                     }
@@ -358,7 +315,7 @@ const CandidateForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="candidate-fields">
+            <fieldset className="candidate-fields" disabled={aiGenerating || saving}>
               <div className="form-group">
                 <label className="candidate-field-label">
                   {t("recruitment.candidateForm.fullName")} <span className="candidate-field-required">*</span>
@@ -366,6 +323,8 @@ const CandidateForm: React.FC = () => {
                 <input
                   type="text"
                   className="input"
+                  name="name"
+                  aria-label={t("recruitment.candidateForm.fullName")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -379,6 +338,8 @@ const CandidateForm: React.FC = () => {
                 <input
                   type="text"
                   className="input"
+                  name="role"
+                  aria-label={t("recruitment.candidateForm.position")}
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 />
@@ -389,6 +350,8 @@ const CandidateForm: React.FC = () => {
                 <input
                   type="email"
                   className="input"
+                  name="email"
+                  aria-label={t("recruitment.candidateForm.email")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -399,6 +362,8 @@ const CandidateForm: React.FC = () => {
                 <input
                   type="text"
                   className="input"
+                  name="phone"
+                  aria-label={t("recruitment.candidateForm.phone")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
@@ -410,6 +375,8 @@ const CandidateForm: React.FC = () => {
                   type="number"
                   className="input"
                   min={0}
+                  name="experience"
+                  aria-label={t("recruitment.candidateForm.experience")}
                   value={experience}
                   onChange={(e) => setExperience(Number(e.target.value))}
                 />
@@ -426,7 +393,7 @@ const CandidateForm: React.FC = () => {
                   placeholder={t("recruitment.candidateForm.skillPlaceholder")}
                 />
               </div>
-            </div>
+            </fieldset>
           </section>
 
           {/* Actions */}
@@ -442,7 +409,7 @@ const CandidateForm: React.FC = () => {
             <button
               type="submit"
               className="btn-primary"
-              disabled={saving}
+              disabled={saving || aiGenerating}
             >
               {saving ? <Loader2 size={16} className="spin" /> : null}
               {isEdit
@@ -455,4 +422,18 @@ const CandidateForm: React.FC = () => {
   );
 };
 
+import { getJobById } from "../../../Services/jobsService";
+
+const CandidateForm: React.FC = () => {
+  const { id } = useParams(); const { user } = useAuth();
+  const [search] = useSearchParams(); const jobId = id ? undefined : search.get("jobId") ?? undefined;
+  const job = useAuditResource(jobId, "recruitment", getJobById, { refreshOnFocus: false });
+  const result = useAuditResource(id, "candidate", getCandidateById, { refreshOnFocus: false });
+  const key = JSON.stringify([id, jobId, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  if (!hasPermission(user, "candidate", id ? "update" : "create")) return <HRResourceState status="forbidden" />;
+  if (jobId && !hasPermission(user, "application", "create")) return <HRResourceState status="forbidden" />;
+  if (jobId && job.status !== "ready") return <HRResourceState status={job.status} retry={job.reload} />;
+  if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
+  return <CandidateFormFields key={key} initial={result.data ?? undefined} job={job.data ?? undefined} />;
+};
 export default CandidateForm;
