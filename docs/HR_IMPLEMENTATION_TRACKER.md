@@ -331,11 +331,11 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P09-014 | Rate limit | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-015 | Cost budget | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-016 | Usage logging without sensitive input | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
-| P09-017 | AI-assisted CV review | OPEN | — |
+| P09-017 | AI-assisted CV review | IN_PROGRESS | 09C1 profession-only evidence/validation adapter in development; HTTP/UI current-scope, stale-source and HR approval still required |
 | P09-018 | Explicit unavailable state | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
 | P09-019 | Mock never presented as real AI | TESTED | `hrAiUI` and `hrAiAuthorization`: HR-reviewed create/edit, explicit translated unavailable and mock identity, immutable context, independent scope |
-| P09-020 | Untrusted CV prompt injection defense | OPEN | — |
-| P09-021 | Data disclosure controls | OPEN | — |
+| P09-020 | Untrusted CV prompt injection defense | IN_PROGRESS | 09C1 profession-only evidence/validation adapter in development; HTTP/UI current-scope, stale-source and HR approval still required |
+| P09-021 | Data disclosure controls | IN_PROGRESS | 09C1 profession-only evidence/validation adapter in development; HTTP/UI current-scope, stale-source and HR approval still required |
 | P09-022 | Adapter mock tests | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-023 | Real AI E2E with actual provider credentials | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 
@@ -690,3 +690,11 @@ First UI fixture used a guessed position-label selector and produced failures; i
 Remaining: P09-017/020/021 minimized AI-assisted CV review, real provider P09-023, durable AI evidence/job history in P10, broader AUD-047 upload error localization, AUD-073 draft/double upload and AUD-090 Source concurrency finding. No external call, production write, new infrastructure, secret change or push.
 
 09B corrected read-only archived UI baseline `/tmp/inop-hr09b-static-baseline-corrected.log` reproduces **3 manufactured skills vs expected 0** without any provider configuration; final current UI **19/19**. Previous missing-container and label-fixture failures remain distinct from this actual static-behavior proof. Every owned fixture cleanup completed; no production test records or files were used.
+
+09B commit: `0b8c4d2f0154ab04580eb5257942d092ac469def` (17 files), 1534 full / 87 focused / 19 final UI tests and recorded gates. No push.
+
+## 09C1 — minimized professional CV evidence adapter foundation
+
+Target `/tmp/inop-hr09c1-target-final.log` **101/101**, full serial `/tmp/inop-hr09c1-regression.log` **1567/1567**, authorization **632/632**, smoke **13/13**, TS/build PASS, lint **0 errors / 9 warnings**, diff check clean. Validation metadata preserved at `/tmp/inop-packagehr09c1-validation.json`. Local commit pending creation. Only existing cv-text professional evidence is eligible, bounded and filtered. Contact/name/raw CV/file/identity fields are excluded, protected criteria and Unicode/contact patterns checked. No new facts, dates, credentials, matching score or hire/reject decision are inferred. Each output requires same-field literal evidence at token boundaries, preventing 4 from 14 years and Go from mango. Input snapshots and source identity are separate and immutable. Job/CV use the same existing capacity, budget and provider protocol rather than separate unbounded queues.
+
+External CV review additionally requires HR_AI_CV_REVIEW_APPROVED=true; no setting or credential was enabled. Mock transport proves local schema/privacy/capacity invariants only. HTTP/UI authorization, revision/source recheck and explicit HR apply are next; P09-017/020/021 stay IN_PROGRESS, P09-023 BLOCKED_EXTERNAL. Foundation limitations and setup: `docs/HR_AI_CV_REVIEW_CONTRACT.md`. Raw original-source AI extraction, broader histories and OCR remain package 10/13 work, not a claim of this evidence-review increment. Existing full-field manual HR review remains unchanged. No production operation or push.

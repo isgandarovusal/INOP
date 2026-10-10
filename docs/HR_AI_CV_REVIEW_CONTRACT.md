@@ -1,0 +1,23 @@
+# AI-assisted professional CV review
+
+09C1 implements the minimized, evidence-backed adapter foundation. HTTP/UI approval integration is the next increment; no source, upload, public ingestion or existing Candidate contract is enabled or changed by this foundation. P09-017/020/021 remain IN_PROGRESS until that integration and its scope/lifecycle tests pass. Real AI E2E remains BLOCKED_EXTERNAL.
+
+## Data boundary
+
+Only a server-loaded Candidate with an extracted rule-parser review and original SHA-256 can supply context. Allowed cv-text evidence fields are skills, languages, certificates, education, role and explicit experience. Raw CV, private file contents/URL/name, Candidate ID/name/email/phone, contact fields, unknown sections and full histories are excluded. Context holds up to 24 identified facts, each bounded to 500 characters. Unsupported/scanned OCR, missing legacy provenance and empty eligible context are explicit AI_NO_REVIEW_CONTEXT=422; existing manual HR review remains available, with unknown values preserved.
+
+Known Candidate name matches, email/URL/contact patterns, private-key/token indicators, phone-like digit sequences, control/format characters, markup and common AZ/EN/RU protected criteria exclude an excerpt rather than being forwarded. Unicode compatibility and non-ASCII decimal phone digits are checked. This is conservative filtering of a narrow profession-only source, not a general guarantee that every possible PII/secret or third-party identity can be recognized. Excluded or truncated evidence must be reviewed locally. Whole CVs and contact/name extraction are deliberately not sent. Professional AI review requires separate HR_AI_CV_REVIEW_APPROVED=true plus normal backend provider configuration and approved data-processing/retention terms; the flag alone does not configure an AI provider or prove a lawful production setup. No flag/credential is changed here.
+
+## Evidence and human control
+
+Input is untrusted JSON facts with e1..e24 source references, separated from system instructions. No tools, external URLs or execution of document instructions. Strict output is status, professional proposals and uncertainty. Each proposal includes field/value, same-field evidence IDs, explanation and nullable confidence. Values must literally occur at Unicode token boundaries in each cited excerpt; references to other fields, missing IDs, duplicate facts, invented qualifications, numerical substrings, protected criteria, invalid confidence or decision/extra fields are rejected. Thus 4 years cannot be invented from 14 years, and Go cannot be inferred from mango. Experience must be explicitly numeric 0–80; missing is never zero. Semantic interpretation and provider confidence are still not factual guarantees or calibrated scores.
+
+The adapter cannot discover facts missing from the existing eligible extraction evidence, translate arbitrary qualifications into unsupported new facts, infer dates/years from histories or perform OCR. Rules/manual review handle names, contacts, dates and all existing editors. Broader professional source extraction/OCR is retained in package 10/13, not claimed solved by reviewing the present facts.
+
+Provenance includes schema version/provider/model/mock mode/context hash; a separate local source identity covers original hash, parser version, Candidate revision and millisecond updatedAt for integration's future stale guards. No criteria or Candidate fields are persisted by the adapter. HR approval/edit and normal current Candidate read/update authorization are required by the upcoming integration. Rule evidence remains rule-based rather than being relabeled as an AI-created source.
+
+## Shared limits and evidence
+
+Job and CV calls use the same process-wide two slots, conservative cross-instance MongoDB budget/actor quota, fixed official HTTPS provider endpoint, strict structured response, streamed byte bounds, timeout/cancellation, bounded retry and sanitized counters/errors. No mock provider can be configured at runtime. Missing approval is denied before budget or transport operations.
+
+Backend/tests/hrAiCvReview.test.cjs verifies minimization, Unicode/contact/protected exclusions, empty/OCR/legacy states, bounds, immutable snapshots, identity/revision, same-field literal evidence, false skill/numeric substrings, explicit unknown, decision rejection and synthetic transport/shared capacity. hrAiProvider and hrAiAuthorization preserve the completed Job contracts. These tests do not establish real AI factual quality, provider retention, OCR, storage durability, hosted privacy compliance or a complete original-CV AI extraction flow.
