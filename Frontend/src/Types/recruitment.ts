@@ -129,6 +129,7 @@ export type ApplicationStatus =
 export interface Application {
   id: string;
   _id?: string;
+  boardOrder?: string;
 
   jobId: string | Job | null;
   candidateId: string | Candidate | null;

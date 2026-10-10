@@ -7,7 +7,7 @@ import { isAxiosError } from "axios";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ClipboardList, Loader2, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
@@ -18,6 +18,7 @@ import Badge, { type BadgeTone } from "../../../Components/Badge";
 import {
   deleteApplication,
   updateApplicationStatus,
+  type ApplicationPlacement,
 } from "../../../Services/applicationsService";
 import type { Application, ApplicationStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
@@ -38,6 +39,7 @@ import HRResourceState from "../../../Components/HRResourceState";
 import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
 import HRPageControls from "../../../Components/HRPageControls";
 import { getApplicationPage, canonicalHRStatus } from "../../../Services/hrPageService";
+import { useHRBoard } from "../../../Hooks/useHRBoard";
 
 const ApplicationsList: React.FC = () => {
   const { t } = useTranslation();
@@ -49,7 +51,7 @@ const ApplicationsList: React.FC = () => {
 
   const [params] = useSearchParams();
   const [view, setView] = useState<"table" | "board">(params.get('view') === 'board' ? 'board' : 'table');
-  const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus> }>({ key: '', statuses: {} });
+  const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus>; cards?: Application[] }>({ key: '', statuses: {} });
   const [mutation, setMutation] = useState<{ key: string; error: string }>({ key: '', error: '' });
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'score' | 'newest' | 'name'>('score');
@@ -58,15 +60,20 @@ const ApplicationsList: React.FC = () => {
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | ApplicationStatus>("all");
   const debouncedSearch = useDebouncedSearch(search);
-  const result = useHRPage("application", { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter }, getApplicationPage);
+  const filters = { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter };
+  const table = useHRPage("application", filters, getApplicationPage, { enabled: view === 'table' });
+  const board = useHRBoard(filters, view === 'board');
+  const result = view === 'board' ? board : table;
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
-  const context = useHRActionContext(JSON.stringify([debouncedSearch, jobFilter, statusFilter, brandFilter, branchFilter, result.page]));
+  const context = useHRActionContext(JSON.stringify([debouncedSearch, jobFilter, statusFilter, brandFilter, branchFilter, view, view === 'table' ? table.page : 1]));
+  const controllers = useRef(new Set<AbortController>());
+  useEffect(() => { const current = controllers.current; return () => { for (const c of current) c.abort(); current.clear(); }; }, [context.key]);
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
-  const applications = useMemo(() => result.data?.items ?? [], [result.data]);
+  const applications = useMemo(() => view === 'board' ? Object.values(board.columns).flatMap(column => column?.items || []) : table.data?.items || [], [view, board.columns, table.data]);
   const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
   const loading = result.status === "loading";
-  const visibleApplications = useMemo(() => applications.map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
+  const visibleApplications = useMemo(() => (optimistic.key === context.key && optimistic.cards || applications).map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
   const [selection, setSelection] = useState<{ key: string; target: Application } | null>(null);
   const deleteTarget = selection?.key === context.key ? selection.target : null;
   const setDeleteTarget = (target: Application | null) => setSelection(target ? { key: context.key, target } : null);
@@ -118,21 +125,25 @@ const ApplicationsList: React.FC = () => {
   const handleStatusChange = async (
     appId: string,
     status: ApplicationStatus,
+    placement?: ApplicationPlacement,
+    ordered?: Application[],
   ) => {
     if (!canUpdate || optimistic.key === context.key && optimistic.statuses[appId]) return;
     const app = applications.find(a => a.id === appId); if (!app) return;
     const key = context.key;
-    setOptimistic(previous => ({ key, statuses: { ...(previous.key === key ? previous.statuses : {}), [appId]: status } }));
+    const controller = new AbortController(); controllers.current.add(controller);
+    setOptimistic(previous => ({ key, statuses: { ...(previous.key === key ? previous.statuses : {}), [appId]: status }, ...(ordered ? { cards: ordered } : {}) }));
     setMutation({ key, error: '' });
     try {
-      await updateApplicationStatus(appId, status, app.revision);
-      if (context.current.current === key) load();
+      await updateApplicationStatus(appId, status, app.revision, placement, controller.signal);
+      if (!controller.signal.aborted && context.current.current === key) load();
     } catch (err) {
-      if (context.current.current === key) {
+      if (!controller.signal.aborted && context.current.current === key) {
         setMutation({ key, error: isAxiosError(err) && err.response?.status === 409 ? t('hrWorkflow.conflict') : getErrorMessage(err, t('somethingWentWrong')) });
         if (isAxiosError(err) && [401, 403, 404, 409].includes(err.response?.status || 0)) load();
       }
     } finally {
+      controllers.current.delete(controller);
       if (context.current.current === key) setOptimistic(previous => { const statuses = { ...(previous.key === key ? previous.statuses : {}) }; delete statuses[appId]; return { key, statuses }; });
     }
   };
@@ -180,8 +191,8 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      <p role="note">{t("hrPage.pageSort")}</p>
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
+      <p role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
         <table>
           <thead>
             <tr>
@@ -279,7 +290,7 @@ const ApplicationsList: React.FC = () => {
         </table>
       </div>}
 
-      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== "ready"} />
+      {view === 'table' && <HRPageControls data={table.data} page={table.page} onPage={table.setPage} disabled={table.status !== "ready"} />}
       {deleteTarget && (
         <ConfirmDialog
           title={t("recruitment.applications.removeTitle")}

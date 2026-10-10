@@ -1173,7 +1173,8 @@
       "create": "Created",
       "status": "Stage change",
       "workflow": "Workflow change",
-      "score": "Matching"
+      "score": "Matching",
+      "reorder": "Card reordered"
     },
     "processingState": {
       "idle": "Processing not active",
@@ -1269,5 +1270,15 @@
     "branchLookup": "Find branch",
     "jobLookup": "Find vacancy",
     "jobFilter": "Vacancy filter"
+  },
+  "hrBoard": {
+    "previous": "Previous cards",
+    "next": "Next cards",
+    "page": "Page {{page}}",
+    "pages": "{{stage}} card pages",
+    "empty": "No applications in this stage.",
+    "changed": "The card page failed or changed. Reload from the first page.",
+    "manualOrder": "Card order is saved for this vacancy.",
+    "selectVacancy": "Choose one vacancy and clear other filters to save card order."
   }
 }

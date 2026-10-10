@@ -96,6 +96,7 @@ export function normalizeApplication(raw: unknown): Application {
     assignedTo: typeof data.assignedTo === "string" ? data.assignedTo : null,
 
     revision: typeof data.__v === 'number' ? data.__v : 0,
+    boardOrder: typeof data.boardOrder === 'string' ? data.boardOrder : undefined,
     substatus: typeof data.substatus === 'string' ? data.substatus : '',
     stageEnteredAt: typeof data.stageEnteredAt === 'string' ? data.stageEnteredAt : undefined,
     processingState: ['idle','queued','running','completed','failed','unsupported'].includes(String(data.processingState)) ? data.processingState as Application['processingState'] : 'idle',
@@ -160,13 +161,13 @@ export async function createApplication(
 
 export async function updateApplicationStatus(
   id: string,
-  status: ApplicationStatus, expectedRevision?: number
+  status: ApplicationStatus, expectedRevision?: number, placement?: ApplicationPlacement, signal?: AbortSignal
 ): Promise<Application> {
   const response = await API.patch(
     `/applications/${id}/status`,
     {
-      status: backendStatus(status), expectedRevision, commandId: crypto.randomUUID(),
-    }
+      status: backendStatus(status), expectedRevision, commandId: crypto.randomUUID(), ...(placement ? { placement } : {}),
+    }, { signal }
   );
 
   return normalizeApplication(response.data);
@@ -183,10 +184,13 @@ export async function recalculateApplicationMatch(id: string, input: { expectedR
 }
 
 export interface ApplicationWorkflowInput {
+  placement?: ApplicationPlacement;
   expectedRevision?: number; status?: ApplicationStatus; assignedTo?: string; substatus?: string; notes?: string; reason?: string; reopen?: boolean;
   interview?: { localStart?: string; startsAt?: string; timezone: string; durationMinutes: number; interviewerId: string; result: ApplicationInterview['result'] } | null;
   nextAction?: { kind: ApplicationNextAction['kind']; localDueAt?: string; dueAt?: string | null; timezone?: string; notes?: string } | null;
 }
+export interface ApplicationAnchor { id: string; expectedRevision: number }
+export interface ApplicationPlacement { before: ApplicationAnchor | null; after: ApplicationAnchor | null }
 export async function updateApplicationWorkflow(id: string, input: ApplicationWorkflowInput): Promise<Application> {
   return normalizeApplication((await API.patch(`/applications/${id}/workflow`, { ...input, ...(input.status ? { status: backendStatus(input.status) } : {}), commandId: crypto.randomUUID() })).data);
 }

@@ -1197,7 +1197,8 @@
       "create": "Yaradılma",
       "status": "Mərhələ dəyişikliyi",
       "workflow": "Axın dəyişikliyi",
-      "score": "Qiymətləndirmə"
+      "score": "Qiymətləndirmə",
+      "reorder": "Kart sırası dəyişdirildi"
     },
     "processingState": {
       "idle": "Emal aktiv deyil",
@@ -1293,5 +1294,15 @@
     "branchLookup": "Filial axtar",
     "jobLookup": "Vakansiya axtar",
     "jobFilter": "Vakansiya filtri"
+  },
+  "hrBoard": {
+    "previous": "Əvvəlki kartlar",
+    "next": "Növbəti kartlar",
+    "page": "Səhifə {{page}}",
+    "pages": "{{stage}} kart səhifələri",
+    "empty": "Bu mərhələdə müraciət yoxdur.",
+    "changed": "Kart səhifəsi yüklənmədi və ya dəyişib. İlk səhifəni yenidən yükləyin.",
+    "manualOrder": "Bu vakansiyada kart sırası saxlanılır.",
+    "selectVacancy": "Kart sırasını saxlamaq üçün bir vakansiya seçin və digər filtrləri təmizləyin."
   }
 }

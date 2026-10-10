@@ -75,7 +75,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
 | AUD-062 | 06 | Candidate-global statuses conflict with Application stages | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-063 | 06 | No processing state, revision CAS or transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
-| AUD-064 | 06/08 | DnD order not persisted and status requests can race | OPEN | Stage persistence/race/rollback TESTED in 06B; 08C5A server placement/CAS/history tests pass; bounded board/UI persistence still OPEN, not silently closed |
+| AUD-064 | 06/08 | DnD order not persisted and status requests can race | TESTED | `applicationOrdering`, `hrBoard`, `hrBoardUI`, existing lifecycle UI: scoped atomic status/order, target/neighbor conflict, actual keyboard drag and refresh persistence, page-two anchors, rollback and stale permission response |
 | AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
@@ -295,7 +295,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P08-009 | Cancellation | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-010 | Virtualization/lazy loading | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-011 | Memoization | OPEN | — |
-| P08-012 | Large Kanban handling | OPEN | — |
+| P08-012 | Large Kanban handling | IN_PROGRESS | `hrBoardUI` proves lane counts and bounded independent next/back for 35/20 records; 5000/50000 production-build measurements remain 08D |
 | P08-013 | 0-record benchmark | OPEN | — |
 | P08-014 | 5000-record benchmark | OPEN | — |
 | P08-015 | 50000-record benchmark | OPEN | — |
@@ -598,3 +598,15 @@ One bounded initial API returns complete scoped counts for eight disjoint lanes;
 Only the controller, its existing regression test and this tracker are included in the local follow-up commit. Event classification now compares persisted before/after values: status changes are status; order-only changes are reorder, including an explicitly repeated unchanged status; other workflow changes remain workflow. Scope, revision/CAS, command identity and notification rules are unchanged.
 
 Evidence: `/tmp/inop-hr08c5c-target.log` reproduces the workflow/reorder difference, `/tmp/inop-hr08c5c-target-final.log` **79/79**, `/tmp/inop-hr08c5c-regression.log` **1411/1411**, `/tmp/inop-packagehr08c5c-validation.json`: TS/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. The full run validates the current working tree, including pending 08C5C frontend changes; it is not represented as a clean-HEAD-only test of this smaller commit. Those frontend files/test stay outside the classification commit and are preserved for the next increment. AUD-064 remains OPEN until that UI increment is committed; no production action.
+
+08C5B classification follow-up commit: `92e7282a8da5bddd5af8a2f57921aea5d546b70e` (3 files), checked without any push or other staged files.
+
+## 08C5C — bounded, persisted, cancelable Kanban UI
+
+Local commit pending creation. `AUD-064` is TESTED. Targets **79/79** (server ordering/board, new browser board and prior lifecycle/page suites), full serial **1411/1411**, authorization **632/632**, smoke **13/13**, TS/build PASS, lint **0 errors / 9 warnings**. Artifacts: `/tmp/inop-hr08c5c-baseline.log` (old board has no bounded lane contract), `/tmp/inop-hr08c5c-target-final.log`, `/tmp/inop-hr08c5c-regression.log`, `/tmp/inop-packagehr08c5c-validation.json`. These source files are unchanged since that final run; splitting the validated classification into its preceding commit did not require rerunning unchanged tests.
+
+Actual keyboard reorder persists through refresh, uses offpage neighbor anchors and atomically carries permitted stage changes. Stage pages replace bounded card slices; old global table refetch is disabled in board view. Primary data survive secondary 500; secondary 401/403/404 mask cards and loaded filter parents. Cursor 409 supplies restart; mutation 409 rolls back/refetches. Translation produces zero requests. AbortSignal plus actor/filter/view keys suppress late mutation/permission responses. Three locales and accessible native lane controls are included. Contract and limitations: `docs/HR_BOARD_UI_CONTRACT.md`.
+
+Initial UI test correctly detected AUD-099; it is fixed in the preceding classification commit rather than weakening its assertion. A TypeScript check also caught boardOrder accidentally inserted in Candidate instead of Application; it was moved to the correct interface before final TS/build/full gates. Neither failure is described as a passing first attempt.
+
+P08-012 is IN_PROGRESS until 08D large datasets/production-build measurements; P08-011 memoization, 013–022 benchmarks/skeleton, 025–026 accessibility/responsive and remaining localization requirements are retained. Generic Source concurrent-download finding AUD-090 is still OPEN. The board is bounded, not a claim of a transactional whole-cohort snapshot or hosted performance. No production data, secrets, deployment or provider call. Next independent work is 08D measurements and remaining HR UI stability criteria, followed by packages 09–13.
