@@ -48,7 +48,7 @@ test('Job skills proposals preserve independent current server authority without
         if(kind==='job-change')await Job.updateOne({_id:target._id},{$set:{description:'Concurrent update'}});
         if(kind==='branch-change')await Branch.updateOne({_id:branch._id},{$set:{name:'Concurrent branch name'}});
       };
-      try {const r=await request(actor,target._id,{...body,...(kind==='branch-change'?{branchId:String(branch._id)}:{})});assert.equal(r.status,status);assert.equal(r.data.requiredSkills,undefined);assert.equal(r.data.provenance,undefined);}
+      try {const r=await request(actor,target._id,{...body,...(kind==='branch-change'?{branchId:String(branch._id)}:{})});assert.equal(r.status,status);if(kind==='department')assert.equal(r.data.code,'AI_AUTHORIZATION_CHANGED');assert.equal(r.data.requiredSkills,undefined);assert.equal(r.data.provenance,undefined);}
       finally {hook=async()=>{};await h.models.Role.updateOne({_id:role._id},{$set:{permissions:original}});await h.models.User.updateOne({_id:h.actors.own._id},{$set:{isActive:true,departmentId:'dep_A'}});await RevokedToken.deleteMany({});await Job.updateOne({_id:jobs.peer._id},{$set:{assignedTo:h.actors.assigned._id}});}
     });
     await t.test('unconfigured provider is explicit 503; no synthetic fallback or data writes',async()=>{

@@ -42,7 +42,7 @@ exports.suggest = async (req, res) => {
       req.authRole = { permissions: await getRolePermissions(req.user.role) };
       const grant = req.authRole.permissions.find(p => (p.resource === 'recruitment' || p.resource === '*') && (p.action === action || p.action === '*'));
       if (!grant || grant.scope === 'none') throw fail('AI_PERMISSION_CHANGED', 'Recruitment permission is no longer available.', 403);
-      if (identity(req) !== expected) throw fail('AI_CONTEXT_CHANGED', 'Authorization changed. Review and retry.', 409);
+      if (identity(req) !== expected) throw fail('AI_AUTHORIZATION_CHANGED', 'Authorization changed. Reload the current profile.', 409);
       return true;
     };
     if (!await refresh()) return;

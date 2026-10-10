@@ -1,3 +1,4 @@
+import CvReviewAssistant from "../../../Components/CvReviewAssistant";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import CvHistoryEditor from "../../../Components/CvHistoryEditor";
 import { useMounted } from "../../../Hooks/useMounted";
@@ -53,6 +54,8 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvOriginal?.originalName ?? initial?.cvUrl?.split("/").pop() ?? null);
   
   const parsing = useRef<{ sequence: number; controller?: AbortController }>({ sequence: 0 });
+  const [sourceChanged, setSourceChanged] = useState(false), [sourceEpoch, setSourceEpoch] = useState(0);
+  const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [saving, setSaving] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +77,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   };
 
   const handleCvChange = async (file: File | null) => {
+    setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
     const sequence = ++parsing.current.sequence;
     setAiGenerating(false);
@@ -86,6 +90,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
       return;
     }
 
+    setSourceChanged(true);
     setCvFile(file);
     setExistingCvName(null);
     setError(null);
@@ -187,6 +192,8 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   };
 
 
+  if (accessDenied) return <HRResourceState status={accessDenied} />;
+  const eligibleAiReview = id && initial?.cvOriginal?.sha256 && initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based" && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
   return (
     <div className="candidate-form-page">
       {job && <p>{job.position}</p>}
@@ -331,6 +338,20 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
             </div>
 
             <CvReviewEvidence review={review} />
+            {eligibleAiReview && id && initial?.cvOriginal?.sha256 ? <CvReviewAssistant
+              key={JSON.stringify([id, initial.revision, initial.cvOriginal.sha256, sourceEpoch, role, education, experience, skills, languages, certificates])}
+              id={id} hash={initial.cvOriginal.sha256} revision={initial.revision ?? 0} onAccessDenied={setAccessDenied}
+              onApprove={rows => {
+                for (const row of rows) {
+                  if (row.field === "skills") setSkills(prev => [...new Set([...prev, row.value])]);
+                  if (row.field === "languages") setLanguages(prev => [...new Set([...prev, row.value])]);
+                  if (row.field === "certificates") setCertificates(prev => [...new Set([...prev, row.value])]);
+                  if (row.field === "education") setEducation(row.value);
+                  if (row.field === "role") setRole(row.value);
+                  if (row.field === "experience") setExperience(Number(row.value));
+                }
+                setConfirmReview(false);
+              }} /> : <p role="note">{t("hrCvAi.saveFirst")}</p>}
             <fieldset className="candidate-fields" disabled={aiGenerating || saving}>
               <div className="form-group">
                 <label className="candidate-field-label">

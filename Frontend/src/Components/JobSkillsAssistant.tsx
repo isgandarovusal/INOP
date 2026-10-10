@@ -31,6 +31,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
       const status = isAxiosError(e) ? e.response?.status : undefined;
       if (status === 401 || status === 403 || status === 404) { onAccessDenied(status === 401 ? "unauthenticated" : status === 403 ? "forbidden" : "not-found"); return; }
       const code = isAxiosError(e) ? e.response?.data?.code : e && typeof e === "object" && "code" in e ? e.code : undefined;
+      if (code === "AI_AUTHORIZATION_CHANGED") { onAccessDenied("forbidden"); return; }
       const message = code === "AI_CONTEXT_CHANGED" ? "changed" : code === "AI_TIMEOUT" ? "timeout" : code === "AI_INVALID_OUTPUT" ? "invalid" : code === "AI_INVALID_CONTEXT" ? "context" : status === 429 ? "limited" : "unavailable";
       setError(message);
     } finally { if (!controller.signal.aborted && sequence === request.current.sequence) setPending(false); }
@@ -49,7 +50,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
         {[...proposal.requiredSkills, ...proposal.preferredSkills].map(row => <p key={row.name}><strong>{row.name}</strong> — {row.reason} · {t("hrAi.confidence")}: {row.confidence === null ? t("hrAi.unknown") : `${Math.round(row.confidence * 100)}%`}</p>)}
         <TagInput label={t("hrAi.required")} values={required} onChange={setRequired} />
         <TagInput label={t("hrAi.preferred")} values={preferred} onChange={setPreferred} />
-        <button type="button" className="btn-secondary" onClick={() => onApprove(required, preferred)}>{t("hrAi.approve")}</button>
+        <button type="button" className="btn-secondary" onClick={() => { setProposal(null); onApprove(required, preferred); }}>{t("hrAi.approve")}</button>
       </>}
       {proposal.uncertainty.map((note, index) => <p key={index}>{note}</p>)}
       <button type="button" onClick={() => setProposal(null)}>{t("hrAi.dismiss")}</button>

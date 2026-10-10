@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const review=require('../services/hrAiCvReview.service'),{createProvider}=require('../services/hrAiProvider.service');
-const source={name:'Private Person',email:'private@example.invalid',phone:'+994 50 123 45 67',cvUrl:'/uploads/private.pdf',cvOriginal:{sha256:'a'.repeat(64),originalName:'Private Person.pdf'},cvReview:{version:'rules-2',processingStatus:'extracted',fields:{skills:{source:'cv-text',evidence:['Food safety','Cash handling']},languages:{source:'cv-text',evidence:['English']},experience:{source:'cv-text',evidence:['14 years']},name:{source:'cv-text',evidence:['Private Person']},email:{source:'cv-text',evidence:['private@example.invalid']},phone:{source:'cv-text',evidence:['+994 50 123 45 67']}}},__v:2,updatedAt:new Date('2026-10-11T10:00:00.123Z')};
+const source={name:'Private Person',email:'private@example.invalid',phone:'+994 50 123 45 67',cvUrl:'/uploads/private.pdf',cvOriginal:{sha256:'a'.repeat(64),originalName:'Private Person.pdf'},cvReview:{version:'rules-2',provider:'rule-based',processingStatus:'extracted',fields:{skills:{source:'cv-text',evidence:['Food safety','Cash handling']},languages:{source:'cv-text',evidence:['English']},experience:{source:'cv-text',evidence:['14 years']},name:{source:'cv-text',evidence:['Private Person']},email:{source:'cv-text',evidence:['private@example.invalid']},phone:{source:'cv-text',evidence:['+994 50 123 45 67']}}},__v:2,updatedAt:new Date('2026-10-11T10:00:00.123Z')};
 const env={HR_AI_PROVIDER:'openai',HR_AI_MODEL:'synthetic-test-model',OPENAI_API_KEY:'synthetic-not-real-key',HR_AI_DAILY_BUDGET_USD:'1',HR_AI_INPUT_USD_PER_MILLION:'1',HR_AI_OUTPUT_USD_PER_MILLION:'2',HR_AI_CV_REVIEW_APPROVED:'true',HR_AI_TIMEOUT_MS:'100',HR_AI_RETRIES:'0'};
 const actorId='000000000000000000000001',input=review.buildContext(source),result={status:'suggested',proposals:[{field:'skills',value:'Food safety',evidenceIds:['e1'],reason:'Literal evidence supplied for review.',confidence:null}],uncertainty:['HR must confirm current validity.']};
 const response=data=>new Response(JSON.stringify({choices:[{finish_reason:'stop',message:{content:JSON.stringify(data)}}],usage:{prompt_tokens:100,completion_tokens:50}}),{headers:{'Content-Type':'application/json'}});
@@ -11,6 +11,10 @@ test('CV AI review receives only bounded eligible professional evidence, never t
   const value=structuredClone(source);value.cvReview.fields.skills.evidence=[quote];const context=review.buildContext(value);assert.ok(!JSON.stringify(context).includes(quote));
  });
  await t.test('empty/unsupported OCR/legacy evidence never becomes a fabricated AI context',()=>{for(const candidate of [{},{...source,cvReview:{processingStatus:'unsupported_ocr'}},{...source,cvOriginal:{}},{...source,cvReview:{processingStatus:'extracted',fields:{}}}])assert.throws(()=>review.buildContext(candidate),e=>e.code==='AI_NO_REVIEW_CONTEXT'&&e.status===422);});
+ await t.test('unregistered legacy parser and corrected-name aliases fail closed',()=>{
+  assert.throws(()=>review.buildContext({...source,cvReview:{...source.cvReview,provider:'unknown-import'}}),e=>e.code==='AI_NO_REVIEW_CONTEXT');
+  const data=structuredClone(source);data.name='Corrected identity';data.cvReview.fields.name.evidence=['Name: Original Person'];data.cvReview.fields.skills.evidence=['Original Person Cash handling'];assert.ok(!JSON.stringify(review.buildContext(data)).includes('Original Person'));
+ });
  await t.test('input limits and snapshot identity prevent extra data and caller mutation',()=>{
   for(const value of [{...input,email:source.email},{...input,facts:Array(25).fill(input.facts[0])},{...input,facts:[input.facts[0],input.facts[0]]},{...input,facts:[{...input.facts[0],quote:'x'.repeat(501)}]}])assert.throws(()=>review.context(value),e=>e.code==='AI_INVALID_CONTEXT');
   const copy=structuredClone(input),snapshot=review.context(copy);copy.facts[0].quote='Changed';assert.equal(snapshot.facts[0].quote,'Food safety');assert.notEqual(review.identity(source),review.identity({...source,__v:3}));assert.notEqual(review.identity(source),review.identity({...source,updatedAt:new Date('2026-10-11T10:00:00.124Z')}));
@@ -25,6 +29,9 @@ test('CV structured proposals must cite same-field literal evidence; unknown and
   assert.equal(review.validate({...result,proposals:[{...result.proposals[0],field:'experience',value:'14',evidenceIds:['e4']}]},input).proposals[0].value,'14');
  });
  await t.test('no final decisions and insufficient evidence have an explicit empty state',()=>{assert.throws(()=>review.validate({...result,hire:true},input),e=>e.code==='AI_INVALID_OUTPUT');assert.deepEqual(review.validate({status:'insufficient_context',proposals:[],uncertainty:['No confirmed qualification.']},input).proposals,[]);});
+ await t.test('multiple conflicting values cannot silently overwrite a singleton field',()=>{
+  const facts=review.context({version:input.version,facts:[{id:'e1',field:'role',quote:'Chef or cashier'}]});const row={field:'role',value:'Chef',evidenceIds:['e1'],reason:'Literal professional title',confidence:null};assert.throws(()=>review.validate({...result,proposals:[row,{...row,value:'cashier'}]},facts),e=>e.code==='AI_INVALID_OUTPUT');
+ });
 });
 test('CV provider uses the shared bounded adapter only with explicit external-review approval',async t=>{
  await t.test('missing external review approval denies any transport or budget operation',async()=>{let calls=0;const p=createProvider({env:{...env,HR_AI_CV_REVIEW_APPROVED:undefined},testTransport:()=>{calls++;return response(result);},budget:{async reserve(){calls++;}}});await assert.rejects(p.suggestCv(input,{actorId}),e=>e.code==='AI_UNAVAILABLE');assert.equal(calls,0);});

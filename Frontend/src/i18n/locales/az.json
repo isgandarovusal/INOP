@@ -434,7 +434,7 @@
     "candidateForm": {
       "editTitle": "Namizədi Redaktə Et",
       "newTitle": "Yeni Namizəd / CV Analizi",
-      "subtitle": "Mənbələrdən gələn CV-ləri AI ilə təhlil edin və avtomatik ATS-ə yerləşdirin",
+      "subtitle": "CV-ni qayda əsaslı parser ilə çıxarın, məlumatları yoxlayın və konkret vakansiyaya müraciət yaradın.",
       "aiImportTitle": "AI CV İdxalı və Analizi",
       "aiImportDescription": "CV mətnini daxil edin və namizəd məlumatlarını AI ilə avtomatik çıxarın.",
       "aiAnalyzeTitle": "CV mətnini AI ilə analiz edin",
@@ -443,12 +443,12 @@
       "cvDocument": "CV sənədi",
       "cvDescription": "Namizədin CV faylını əlavə edin və ya mövcud faylı dəyişdirin.",
       "dragCv": "CV faylını buraya sürükləyin",
-      "cvFormats": "PDF, DOC və DOCX — maksimum 5 MB",
+      "cvFormats": "PDF və DOCX — maksimum 5 MB",
       "chooseCv": "CV seç",
       "chooseAnotherCv": "Başqa CV seç",
       "removeCv": "CV faylını sil",
       "candidateInformation": "Namizəd məlumatları",
-      "candidateInformationDescription": "Əsas namizəd məlumatlarını daxil edin və ya AI tərəfindən çıxarılan məlumatları yoxlayın.",
+      "candidateInformationDescription": "Çıxarılmış və əl ilə daxil edilmiş faktları yoxlayın; professional AI təklifləri ayrıca HR təsdiqi tələb edir.",
       "fullName": "Ad və Soyad",
       "email": "Email",
       "phone": "Telefon",
@@ -458,14 +458,14 @@
       "skillPlaceholder": "Bacarıq əlavə et...",
       "cancel": "Ləğv Et",
       "update": "Yenilə",
-      "saveAndRedirect": "AI Analizi İlə Saxla və ATS-ə Yönləndir",
-      "cvFormatError": "CV yalnız PDF, DOC və ya DOCX formatında ola bilər",
+      "saveAndRedirect": "Namizədi yadda saxla",
+      "cvFormatError": "CV yalnız PDF və ya DOCX formatında ola bilər",
       "cvSizeError": "CV faylının ölçüsü maksimum 5 MB ola bilər",
       "enterCvText": "Zəhmət olmasa təhlil üçün CV mətnini daxil edin",
       "aiSuccess": "AI CV-ni uğurla analiz etdi və sahələri doldurdu!",
       "nameRequired": "Ad və soyad mütləqdir",
       "updated": "Namizəd məlumatları yeniləndi",
-      "created": "Yeni namizəd AI analizi ilə Kanban lövhəsinə əlavə olundu!",
+      "created": "Namizəd yaradıldı.",
       "genericError": "Xəta baş verdi",
       "position": "Vəzifə"
     },
@@ -1328,5 +1328,22 @@
     "context": "Vakansiya kontekstini və seçilmiş filialı yoxlayın.",
     "limited": "AI sorğu limiti və ya büdcəsi bitib. Əl ilə davam edə bilərsiniz.",
     "changed": "İcazə, vakansiya və ya filial dəyişib. Məlumatı yenidən açıb yoxlayın."
+  },
+  "hrCvAi": {
+    "label": "Professional CV üçün AI review",
+    "scope": "Yalnız çıxarılmış professional evidence yoxlanılır. Kontaktlar, ad, tarixlər və xam CV ötürülmür; bu, tam CV extraction və ya matching deyil.",
+    "generate": "Professional CV üçün AI təklifini soruş",
+    "approve": "Seçdiyim faktları yoxlayıb formaya tətbiq et",
+    "saveFirst": "AI review üçün namizədi və CV-ni saxlayıb yenidən açın. Yeni/replacement və legacy/OCR sənədləri əl ilə yoxlayın.",
+    "sourceUnavailable": "Orijinal CV faylı əlçatan deyil. AI review dayandırıldı; namizəd məlumatlarını əl ilə yoxlaya bilərsiniz.",
+    "noEvidence": "Uyğun professional evidence yoxdur. Original CV və sahələri əl ilə yoxlayın.",
+    "fields": {
+      "skills": "Bacarıq",
+      "languages": "Dil",
+      "certificates": "Sertifikat",
+      "education": "Təhsil",
+      "role": "Vəzifə",
+      "experience": "Təcrübə (il)"
+    }
   }
 }

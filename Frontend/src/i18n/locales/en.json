@@ -410,7 +410,7 @@
     "candidateForm": {
       "editTitle": "Edit Candidate",
       "newTitle": "New Candidate / CV Analysis",
-      "subtitle": "Analyze CVs from different sources with AI and automatically add them to the ATS",
+      "subtitle": "Extract CV fields with the rule-based parser, review facts and create an application for a specific vacancy.",
       "aiImportTitle": "AI CV Import & Analysis",
       "aiImportDescription": "Enter CV text and automatically extract candidate information with AI.",
       "aiAnalyzeTitle": "Analyze CV text with AI",
@@ -419,12 +419,12 @@
       "cvDocument": "CV Document",
       "cvDescription": "Add the candidate's CV file or replace the existing file.",
       "dragCv": "Drag the CV file here",
-      "cvFormats": "PDF, DOC and DOCX — maximum 5 MB",
+      "cvFormats": "PDF and DOCX — maximum 5 MB",
       "chooseCv": "Choose CV",
       "chooseAnotherCv": "Choose another CV",
       "removeCv": "Remove CV file",
       "candidateInformation": "Candidate Information",
-      "candidateInformationDescription": "Enter the candidate's basic information or review information extracted by AI.",
+      "candidateInformationDescription": "Review extracted and manually entered facts; professional AI proposals require separate HR approval.",
       "fullName": "Full Name",
       "email": "Email",
       "phone": "Phone",
@@ -434,14 +434,14 @@
       "skillPlaceholder": "Add a skill...",
       "cancel": "Cancel",
       "update": "Update",
-      "saveAndRedirect": "Save with AI Analysis & Send to ATS",
-      "cvFormatError": "CV must be in PDF, DOC, or DOCX format",
+      "saveAndRedirect": "Save candidate",
+      "cvFormatError": "CV must be PDF or DOCX",
       "cvSizeError": "CV file size must not exceed 5 MB",
       "enterCvText": "Please enter CV text for analysis",
       "aiSuccess": "AI successfully analyzed the CV and filled in the fields!",
       "nameRequired": "Name and surname are required",
       "updated": "Candidate information updated",
-      "created": "New candidate added to the Kanban board with AI analysis!",
+      "created": "Candidate created.",
       "genericError": "An error occurred",
       "position": "Position"
     },
@@ -1304,5 +1304,22 @@
     "context": "Check vacancy context and the selected branch.",
     "limited": "AI request limit or budget reached. You can continue manually.",
     "changed": "Permission, vacancy or branch changed. Reload and review."
+  },
+  "hrCvAi": {
+    "label": "Professional CV AI review",
+    "scope": "Only extracted professional evidence is reviewed. Contacts, name, dates and raw CV are not sent; this is not full CV extraction or matching.",
+    "generate": "Request professional CV AI proposal",
+    "approve": "Apply selected reviewed facts to form",
+    "saveFirst": "Save and reopen the Candidate/CV for AI review. Review new/replacement and legacy/OCR sources manually.",
+    "sourceUnavailable": "Original CV file is unavailable. AI review stopped; Candidate facts can be reviewed manually.",
+    "noEvidence": "No eligible professional evidence. Review the original CV and fields manually.",
+    "fields": {
+      "skills": "Skill",
+      "languages": "Language",
+      "certificates": "Certificate",
+      "education": "Education",
+      "role": "Position",
+      "experience": "Experience (years)"
+    }
   }
 }

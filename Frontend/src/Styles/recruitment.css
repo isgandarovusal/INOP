@@ -4307,3 +4307,6 @@
 .hr-candidates-page [role=region]:focus-visible { outline: 3px solid var(--accent-color, #2563eb); outline-offset: 2px; }
 [data-job-skills-assistant] { min-width: 0; overflow-wrap: anywhere; }
 [data-job-skills-assistant] button { max-width: 100%; white-space: normal; }
+
+[data-cv-ai-assistant] { min-width: 0; overflow-wrap: anywhere; }
+[data-cv-ai-assistant] button { max-width: 100%; white-space: normal; }

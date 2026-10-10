@@ -52,6 +52,8 @@ async function sendPrivateFile(req, res, filename, displayName) {
 }
 function sourceQuery(id) { return mongoose.isValidObjectId(id) ? { $or: [{ _id: id }, { id }] } : { id }; }
 exports.sourceQuery = sourceQuery;
+// Internal server helper only; callers must first authorize the owning record.
+exports.readBoundedPrivateFile = readBoundedPrivateFile;
 exports.candidate = async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Namizəd ID-si düzgün deyil.' });
   const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).lean();

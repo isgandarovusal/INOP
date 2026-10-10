@@ -102,6 +102,7 @@ const hrPaged = require('../controllers/hrPaged.controller');
 const hrAi = require('../controllers/hrAi.controller');
 router.post('/hr/ai/job-skills', ...authorize('recruitment', 'create'), hrAi.suggest);
 router.post('/jobs/:id/ai-skills', ...authorize('recruitment', 'update'), requirePermission('recruitment', 'read'), hrAi.suggest);
+router.post('/candidates/:id/ai-review', ...authorize('candidate', 'update'), requirePermission('candidate', 'read'), require('../controllers/hrAiCvReview.controller').get);
 router.get('/hr/v2/brands', ...authorize('recruitment', 'read'), hrPaged.brands);
 router.get('/hr/v2/branches', ...authorize('recruitment', 'read'), hrPaged.list('branches'));
 router.get('/hr/v2/jobs', ...authorize('recruitment', 'read'), hrPaged.list('jobs'));
