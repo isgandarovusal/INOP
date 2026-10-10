@@ -41,11 +41,11 @@ function notFoundHandler(req, res) {
   );
 }
 
-function globalErrorHandler(error, req, res, _next) {
-  console.error("Unhandled API error:", error);
+function globalErrorHandler(error, req, res, next) {
+  console.error(`API error (${error?.name || "Error"}), request ${req.requestId || "unknown"}.`);
 
   if (res.headersSent) {
-    return;
+    return next(error);
   }
 
   if (error instanceof multer.MulterError) {
@@ -112,7 +112,7 @@ function globalErrorHandler(error, req, res, _next) {
         : error?.message || "Sorğu emal edilə bilmədi.",
       {
         code: error?.code || (safeStatus >= 500 ? "INTERNAL_SERVER_ERROR" : "REQUEST_ERROR"),
-        ...(isProduction || !error?.message
+        ...(isProduction || safeStatus >= 500 || !error?.message
           ? {}
           : { detail: error.message }),
       }

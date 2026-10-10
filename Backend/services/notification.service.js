@@ -75,8 +75,7 @@ async function notifyUser({
     } catch (error) {
       console.error(
         "Notification email delivery failed:",
-        error.message
-      );
+        error?.name || "Error");
 
       emailResult = {
         sent: false,

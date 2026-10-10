@@ -1,4 +1,6 @@
 const nodemailer = require("nodemailer");
+let cachedTransporter;
+let cachedConfig;
 
 function getSmtpConfig() {
   const host = String(process.env.SMTP_HOST || "").trim();
@@ -11,7 +13,7 @@ function getSmtpConfig() {
     return null;
   }
 
-  if (!Number.isInteger(port) || port <= 0) {
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
     return null;
   }
 
@@ -29,12 +31,29 @@ function getSmtpConfig() {
 }
 
 function createTransporter(config) {
-  return nodemailer.createTransport({
+  const signature = JSON.stringify(config);
+  if (cachedTransporter && signature === cachedConfig) return cachedTransporter;
+  closeEmailTransport();
+  cachedTransporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
     secure: config.secure,
     auth: config.auth,
+    pool: true,
+    maxConnections: 2,
+    maxMessages: 50,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
   });
+  cachedConfig = signature;
+  return cachedTransporter;
+}
+
+function closeEmailTransport() {
+  cachedTransporter?.close();
+  cachedTransporter = undefined;
+  cachedConfig = undefined;
 }
 
 function escapeHtml(value) {
@@ -122,4 +141,5 @@ module.exports = {
   getSmtpConfig,
   buildNotificationEmail,
   sendEmail,
+  closeEmailTransport,
 };

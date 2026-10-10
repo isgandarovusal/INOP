@@ -1,61 +1,50 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+const path = require("node:path");
+const mongoose = require("mongoose");
+require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
+const { createApp, validateEnvironment } = require("./app");
 
-const routes = require('./routes/route');
-const setupSwagger = require('./swagger');
-const {
-  standardizeErrorResponses,
-  notFoundHandler,
-  globalErrorHandler,
-} = require('./middleware/error.middleware');
+async function start(env = process.env) {
+  validateEnvironment(env);
+  mongoose.set("maxTimeMS", 10000);
+  await mongoose.connect(env.MONGO_URI || env.CS, {
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 10000,
+    maxPoolSize: 20,
+    autoIndex: env.NODE_ENV !== "production",
+  });
+  const app = createApp({ env });
+  const server = await new Promise((resolve, reject) => {
+    const listener = app.listen(Number(env.PORT || 3001), "0.0.0.0", () => resolve(listener));
+    listener.once("error", reject);
+  });
+  server.requestTimeout = 30000;
+  server.headersTimeout = 15000;
+  console.log(`INOP API listening on port ${server.address().port}`);
+  let stopping = false;
+  const shutdown = async () => {
+    if (stopping) return;
+    stopping = true;
+    const timeout = setTimeout(() => process.exit(1), 10000).unref();
+    server.close(async () => {
+      require("./services/email.service").closeEmailTransport();
+      await mongoose.disconnect();
+      clearTimeout(timeout);
+    });
+    server.closeIdleConnections();
+  };
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
+  return { app, server, shutdown };
+}
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+if (require.main === module) {
+  start().catch(async (error) => {
+    // Connection errors may contain credentials in a URI. Never log that URI.
+    console.error(`INOP startup failed (${error.name}): check runtime configuration and database connectivity.`);
+    await mongoose.disconnect();
+    process.exitCode = 1;
+  });
+}
 
-// Security Middlewares
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-
-// Standardize API error responses
-app.use(standardizeErrorResponses);
-
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { message: 'Çoxlu sorğu göndərildi, xahiş olunur 15 dəqiqə sonra yenidən cəhd edin.' }
-});
-app.use('/api/', limiter);
-
-// Static uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Public health check for deployment platforms
-app.get('/health', (_req, res) => {
-  res.status(200).json({ success: true, status: 'ok' });
-});
-
-// Swagger
-setupSwagger(app);
-
-// API Routes
-app.use('/api', routes);
-
-// 404 + global error handling
-app.use(notFoundHandler);
-app.use(globalErrorHandler);
-
-// MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || process.env.CS;
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('db connected');
-    app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
-  })
-  .catch((err) => console.error('Failed to connect to MongoDB:', err));
+module.exports = { start };
