@@ -32,13 +32,14 @@ test('Application UI persists scoped workflow, handles conflicts and discards st
     assert.equal((await Application.findById(second._id)).status, 'Applied');
     await h.page.getByRole('button', { name: 'Cədvəl', exact: true }).click();
     await h.page.locator('select').filter({ has: h.page.locator('option[value=processing]') }).selectOption('processing');
+    await h.page.locator('tbody tr').filter({hasText:'Second workplace'}).waitFor();
     assert.equal(await h.page.locator('tbody tr').count(), 1); assert.ok((await h.page.locator('tbody').textContent()).includes('Second workplace'));
   });
   await t.test('search and sort operate on the scoped Application dataset', async () => {
     await h.open('admin', '/app/recruitment/applications'); await h.page.getByRole('searchbox').waitFor();
-    await h.page.getByRole('searchbox').fill('Second workplace'); assert.equal(await h.page.locator('tbody tr').count(), 1);
+    await h.page.getByRole('searchbox').fill('Second workplace'); await h.page.waitForResponse(r => r.url().includes('/hr/v2/applications?') && new URL(r.url()).searchParams.get('q') === 'Second workplace'); await h.page.locator('tbody tr').filter({hasText:'First workplace'}).waitFor({state:'detached'}); assert.equal(await h.page.locator('tbody tr').count(), 1);
     assert.ok((await h.page.locator('tbody').textContent()).includes('Second workplace'));
-    await h.page.getByRole('searchbox').fill(''); await h.page.getByLabel('Sıralama', { exact: true }).selectOption('newest');
+    await h.page.getByRole('searchbox').fill(''); await h.page.waitForResponse(r => r.url().includes('/hr/v2/applications?') && !new URL(r.url()).searchParams.get('q')); await h.page.getByLabel('Sıralama', { exact: true }).selectOption('newest');
     assert.ok((await h.page.locator('tbody tr').first().textContent()).includes('Second workplace'));
   });
   await t.test('interview time, interviewer, outcome, substatus, next action and history persist', async () => {

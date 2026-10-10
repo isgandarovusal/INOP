@@ -18,7 +18,7 @@ test('Versioned HR pages are bounded, independently scoped and cursor-safe', asy
   for (const [actor, count] of [['admin', 5], ['hr', 5], ['own', 2], ['department', 4], ['assigned', 1]]) for (const kind of ['jobs', 'candidates', 'applications']) await t.test(`${actor}: ${kind} bounded page and count share the primary scope`, async () => {
     const r = await get(actor, kind, '?pageSize=1'); assert.equal(r.status, 200); assert.equal(r.data.version, 'hr-page-v1'); assert.equal(r.data.total, count); assert.equal(r.data.items.length, 1); assert.equal(r.data.hasMore, count > 1);
     const json = JSON.stringify(r.data); assert.ok(!json.includes('HEAVY_DESCRIPTION')); assert.ok(!json.includes('PRIVATE_EVIDENCE')); assert.ok(!json.includes('PRIVATE_NOTES')); assert.ok(!json.includes('PRIVATE_EVENT'));
-    if (kind === 'applications') { assert.equal(r.data.items[0].candidateId.email, undefined); assert.equal(r.data.items[0].matching.summary, true); assert.deepEqual(r.data.items[0].matching.criteria, []); assert.equal(r.data.items[0].score, 100); }
+    if (kind === 'applications') { assert.equal(r.data.items[0].candidateId.email, undefined); assert.match(r.data.items[0].candidateId._id, /^[a-f0-9]{24}$/); assert.match(r.data.items[0].candidateId.name, /^Applicant /); assert.ok(!json.includes('$__')); assert.equal(r.data.items[0].matching.summary, true); assert.deepEqual(r.data.items[0].matching.criteria, []); assert.equal(r.data.items[0].score, 100); }
   });
   await t.test('same-timestamp records page without overlap; cursor binds user/permissions/filters', async () => {
     await Candidate.updateMany({}, { $set: { createdAt: new Date('2026-01-01') } }, { timestamps: false });
@@ -64,6 +64,36 @@ test('Versioned HR pages are bounded, independently scoped and cursor-safe', asy
   });
   await t.test('bad paging/filter inputs cannot request unbounded data or inject a scope', async () => {
     for (const [kind, q] of [['jobs', '?pageSize=100000'], ['jobs', '?page=0'], ['candidates', '?pageSize=NaN'], ['jobs', '?q[$ne]=x'], ['jobs', '?sort=score'], ['applications', '?status=Invented'], ['applications', '?jobId=wrong'], ['candidates', '?brandId=kfc'], ['jobs', '?createdBy=foreign']]) assert.equal((await get('admin', kind, q)).status, 400);
+  });
+  await t.test('paginated catalog lookups preserve global brands and independent branch scopes', async () => {
+    const Branch = require('../models/recruitmentBranch.model'), Brand = require('../models/recruitmentBrand.model');
+    await Brand.insertMany(Array.from({ length: 35 }, (_, i) => ({ _id: `custom-${i}`, name: `Custom brand ${i}` })));
+    await Branch.insertMany(made.map((row, i) => ({ code: `branch-${i}`, name: `Branch ${i}`, brandId: 'kfc', kind: 'restaurant', createdBy: row.job.createdBy, assignedTo: row.job.assignedTo, departmentId: row.job.departmentId })));
+    const brands = await get('own', 'brands', '?pageSize=2'); assert.equal(brands.status, 200); assert.equal(brands.data.total, 38); assert.deepEqual(brands.data.items.map(b => b.id), ['kfc', 'pizza-hut']);
+    const second = await get('admin', 'brands', '?pageSize=2&page=2'); assert.equal(second.data.items[0].id, 'simit-sarayi'); assert.equal(second.data.items.length, 2);
+    const custom = await get('own', 'brands', '?q=Custom%20brand%2034'); assert.equal(custom.data.total, 1); assert.equal(custom.data.items[0].id, 'custom-34');
+    for (const [actor, count] of [['admin', 5], ['own', 2], ['department', 4], ['assigned', 1]]) {
+      const branches = await get(actor, 'branches', '?sort=name&brandId=kfc'); assert.equal(branches.status, 200); assert.equal(branches.data.total, count); assert.ok(branches.data.items.every(b => b.createdBy === undefined && b.departmentId === undefined));
+    }
+    assert.equal((await get('own', 'branches', '?q=Branch%203')).data.total, 0);
+    for (const kind of ['brands', 'branches']) assert.equal((await get('none', kind)).status, 403);
+    for (const [kind, query] of [['brands', '?after=invalid'], ['brands', '?brandId=kfc'], ['branches', '?jobId=' + made[0].job._id]]) assert.equal((await get('admin', kind, query)).status, 400);
+  });
+  await t.test('processing filter is server-owned and legacy missing scores retain plain parent DTOs', async () => {
+    await Application.updateOne({ _id: made[0].app._id }, { $set: { processingState: 'running' }, $unset: { matching: 1 } });
+    const page = await get('admin', 'applications', '?status=Processing'); assert.equal(page.status, 200); assert.equal(page.data.total, 1); const row = page.data.items[0];
+    assert.equal(row.status, 'Applied'); assert.equal(row.processingState, 'running'); assert.equal(row.score, null); assert.equal(row.scoreStatus, 'legacy');
+    assert.equal(row.candidateId.name, 'Applicant 0'); assert.equal(row.candidateId._doc, undefined); assert.equal(row.candidateId.$__, undefined);
+    assert.equal((await get('admin', 'jobs', '?q=Cash%20handling')).data.total, 5);
+  });
+  await t.test('bounded skill previews preserve real counts and full detail remains editable', async () => {
+    const skills = Array.from({ length: 40 }, (_, i) => `Skill ${i}`);
+    await Job.updateOne({ _id: made[0].job._id }, { $set: { requiredSkills: skills } }); await Candidate.updateOne({ _id: made[0].candidate._id }, { $set: { skills } });
+    for (const [kind, row, field] of [['jobs', made[0].job, 'requiredSkills'], ['candidates', made[0].candidate, 'skills']]) {
+      const page = await get('admin', kind, '?q=' + (kind === 'jobs' ? 'Vacancy%200' : 'Applicant%200'));
+      assert.equal(page.status, 200); assert.equal(page.data.items[0][field].length, 12); assert.equal(page.data.items[0][field + 'Count'], 40);
+      const detail = await h.request('admin', 'GET', '/' + kind + '/' + row._id); assert.equal(detail.data[field].length, 40);
+    }
   });
   await t.test('compound index supports a real scoped newest-page query without collection scan', async () => {
     const plan = await Candidate.find({ createdBy: h.actors.own._id }).sort({ createdAt: -1, _id: -1 }).hint({ createdBy: 1, createdAt: -1, _id: -1 }).limit(2).explain('executionStats');

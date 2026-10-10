@@ -1253,5 +1253,17 @@
       "configured_not_verified": "Configured; live result unverified",
       "not_configured": "Not configured"
     }
+  },
+  "hrPage": {
+    "pagination": "Recruitment pagination",
+    "summary": "Page {{page}} · {{shown}} shown · {{total}} matching records",
+    "pageSort": "Score/name ordering applies to this page. Use filters to narrow the cohort.",
+    "sortScorePage": "Score (this page)",
+    "sortNamePage": "Name (this page)",
+    "lookup": "Search all authorized filter options",
+    "brandLookup": "Find brand",
+    "branchLookup": "Find branch",
+    "jobLookup": "Find vacancy",
+    "jobFilter": "Vacancy filter"
   }
 }

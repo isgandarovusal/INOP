@@ -1,3 +1,4 @@
+import HRScopeFilters from "../../../Components/HRScopeFilters";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import ApplicationKanban from "../../../Components/ApplicationKanban";
 import { applicationTransitions } from "../../../Utils/applicationWorkflow";
@@ -15,7 +16,6 @@ import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/ConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
 import {
-  getApplications,
   deleteApplication,
   updateApplicationStatus,
 } from "../../../Services/applicationsService";
@@ -35,8 +35,9 @@ const STATUS_TONE: Partial<Record<ApplicationStatus, BadgeTone>> = {
 };
 
 import HRResourceState from "../../../Components/HRResourceState";
-import { useAuditResource } from "../../../Hooks/useAuditResource";
-const loadApplications = (_id: string, signal?: AbortSignal, scopeKey?: string) => getApplications(signal, scopeKey);
+import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
+import HRPageControls from "../../../Components/HRPageControls";
+import { getApplicationPage, canonicalHRStatus } from "../../../Services/hrPageService";
 
 const ApplicationsList: React.FC = () => {
   const { t } = useTranslation();
@@ -46,25 +47,29 @@ const ApplicationsList: React.FC = () => {
   const canDelete = hasPermission(user, "application", "delete");
   const canManage = canDelete;
 
-  const result = useAuditResource("list", "application", loadApplications);
-  const applications = useMemo(() => result.data ?? [], [result.data]);
-  const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
-  const loading = result.status === "loading";
-  const [error, setError] = useState(false);
   const [params] = useSearchParams();
   const [view, setView] = useState<"table" | "board">(params.get('view') === 'board' ? 'board' : 'table');
-  const context = useHRActionContext();
   const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus> }>({ key: '', statuses: {} });
   const [mutation, setMutation] = useState<{ key: string; error: string }>({ key: '', error: '' });
-  const visibleApplications = useMemo(() => applications.map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'score' | 'newest' | 'name'>('score');
   const [brandFilter, setBrandFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | ApplicationStatus>("all");
-  const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const debouncedSearch = useDebouncedSearch(search);
+  const result = useHRPage("application", { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter }, getApplicationPage);
+  const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
+  const context = useHRActionContext(JSON.stringify([debouncedSearch, jobFilter, statusFilter, brandFilter, branchFilter, result.page]));
+  const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
+  const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
+  const applications = useMemo(() => result.data?.items ?? [], [result.data]);
+  const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
+  const loading = result.status === "loading";
+  const visibleApplications = useMemo(() => applications.map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
+  const [selection, setSelection] = useState<{ key: string; target: Application } | null>(null);
+  const deleteTarget = selection?.key === context.key ? selection.target : null;
+  const setDeleteTarget = (target: Application | null) => setSelection(target ? { key: context.key, target } : null);
 
   const filtersActive =
     search.trim() !== "" || jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
@@ -91,27 +96,22 @@ const ApplicationsList: React.FC = () => {
             ? undefined
             : app.candidateId,
       }))
-      .filter(r => brandFilter === "all" || (r.job?.brandId || "unset") === brandFilter)
-      .filter(r => branchFilter === "all" || (r.job?.branchId || "unset") === branchFilter)
-      .filter((r) => jobFilter === "all" || r.job?.id === jobFilter)
-      .filter((r) => statusFilter === "all" || (statusFilter === "processing" ? r.app.status === "applied" && ["queued", "running"].includes(r.app.processingState || "") : r.app.status === statusFilter))
-      .filter(r => !search.trim() || [r.candidate?.name, r.job?.position, r.job?.brandName, r.job?.branchName].some(value => value?.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())))
       .sort((a, b) => sort === 'newest' ? new Date(b.app.createdAt || 0).getTime() - new Date(a.app.createdAt || 0).getTime() : sort === 'name' ? (a.candidate?.name || '').localeCompare(b.candidate?.name || '') : applicationScoreOrder(a.app, b.app));
-  }, [visibleApplications, jobs, jobFilter, statusFilter, brandFilter, branchFilter, search, sort]);
+  }, [visibleApplications, jobs, sort]);
 
   const handleDelete = async () => {
     if (!deleteTarget || !canDelete) return;
 
+    const key = context.key;
     setDeletingId(deleteTarget.id);
 
     try {
       await deleteApplication(deleteTarget.id);
-      load();
-      setDeleteTarget(null);
+      if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (deleteError) {
-      console.error("Application delete error:", deleteError); setError(true);
+      if (context.current.current === key) setMutation({ key, error: getErrorMessage(deleteError, t("somethingWentWrong")) });
     } finally {
-      setDeletingId(null);
+      if (context.current.current === key) setDeletingId(null);
     }
   };
 
@@ -137,30 +137,21 @@ const ApplicationsList: React.FC = () => {
     }
   };
 
-  if (result.status !== "ready") return <HRResourceState status={result.status} retry={load} />;
+  if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={load} />;
 
   return (
     <div className="recruitment-list-page">
       <PageHeader
         title={t("recruitment.applications.title")}
-        subtitle={t("recruitment.applications.totalShown", { total: applications.length, shown: rows.length })}
+        subtitle={t("recruitment.applications.totalShown", { total: result.data?.total ?? 0, shown: rows.length })}
       />
 
       {mutation.key === context.key && mutation.error && <p role="alert">{mutation.error} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
-        <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(`hrWorkflow.sort${s.charAt(0).toUpperCase() + s.slice(1)}`)}</option>)}</select>
+        <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrWorkflow.sortNewest' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
         <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
-        <select aria-label={t('hrCatalog.brand')} value={brandFilter} onChange={e => { setBrandFilter(e.target.value); setBranchFilter('all'); }}><option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.map(j => j.brandId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}</select>
-        <select aria-label={t('hrCatalog.branch')} value={branchFilter} onChange={e => setBranchFilter(e.target.value)}><option value="all">{t('hrCatalog.allBranches')}</option>{[...new Set(jobs.filter(j => brandFilter === 'all' || j.brandId === brandFilter).map(j => j.branchId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.branchId === id)?.branchName || t("hrCatalog.unavailable")}</option>)}</select>
-        <select className="input-field" style={{ width: 220 }} value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
-          <option value="all">{t("recruitment.applications.allJobs")}</option>
-          {jobs.map((j) => (
-            <option key={j.id} value={j.id}>
-              {j.position}
-            </option>
-          ))}
-        </select>
+        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} job={jobFilter} onJob={setJobFilter} />
         <select
           className="input-field"
           style={{ width: 170 }}
@@ -189,7 +180,8 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      {view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
+      <p role="note">{t("hrPage.pageSort")}</p>
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? <ApplicationKanban applications={rows.map(r => r.app)} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
         <table>
           <thead>
             <tr>
@@ -206,25 +198,6 @@ const ApplicationsList: React.FC = () => {
                 <td colSpan={canManage ? 5 : 4}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
-                  </div>
-                </td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={canManage ? 5 : 4}>
-                  <EmptyState
-                    icon={<ClipboardList size={28} />}
-                    title={t("common.somethingWentWrong")}
-                    hint={t("recruitment.applications.loadError")}
-                  />
-                  <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
-                    <button
-                      type="button"
-                      className="btn-secondary"
-                      onClick={load}
-                    >
-                      {t("recruitment.applications.retry")}
-                    </button>
                   </div>
                 </td>
               </tr>
@@ -306,6 +279,7 @@ const ApplicationsList: React.FC = () => {
         </table>
       </div>}
 
+      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== "ready"} />
       {deleteTarget && (
         <ConfirmDialog
           title={t("recruitment.applications.removeTitle")}

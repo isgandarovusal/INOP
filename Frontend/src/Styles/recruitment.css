@@ -4265,3 +4265,10 @@
 .hr-analytics-page .filter-bar label { display: flex; flex-direction: column; gap: .3rem; }
 .hr-analytics-page [aria-pressed=true] { outline: 2px solid var(--accent-color, #2563eb); }
 @media (max-width: 650px) { .hr-analytics-sections { grid-template-columns: 1fr; } .hr-analytics-page select, .hr-analytics-page input { max-width: 100%; } }
+
+.hr-page-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px 0; }
+.hr-page-controls span { flex: 1 1 220px; }
+
+.hr-filter-lookups { flex: 1 1 100%; min-width: 0; }
+.hr-filter-lookups > div { display: flex; flex-wrap: wrap; gap: 16px; }
+.hr-filter-lookups section { flex: 1 1 220px; min-width: 0; }

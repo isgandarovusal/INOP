@@ -122,6 +122,7 @@ export function normalizeJob(raw: unknown): Job {
         : "",
 
     requiredSkills: stringArray(data.requiredSkills),
+    requiredSkillsCount: typeof data.requiredSkillsCount === "number" && Number.isInteger(data.requiredSkillsCount) && data.requiredSkillsCount >= 0 ? data.requiredSkillsCount : undefined,
     preferredSkills: stringArray(data.preferredSkills),
     requiredEducation: stringArray(data.requiredEducation),
     requiredCertificates: stringArray(data.requiredCertificates),

@@ -108,6 +108,8 @@ export function normalizeApplication(raw: unknown): Application {
     status: frontendStatus(status),
 
     notes: typeof data.notes === "string" ? data.notes : "",
+    createdAt: typeof data.createdAt === "string" ? data.createdAt : undefined,
+    updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : undefined,
     appliedAt:
       typeof data.appliedAt === "string"
         ? data.appliedAt

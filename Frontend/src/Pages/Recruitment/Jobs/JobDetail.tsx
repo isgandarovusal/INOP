@@ -2,7 +2,7 @@ import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -11,10 +11,13 @@ import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
 import { getJobById } from "../../../Services/jobsService";
 import {
-  getApplications,
   createApplication,
 } from "../../../Services/applicationsService";
-import { getCandidates } from "../../../Services/candidatesService";
+import { getApplicationPage, getCandidatePage } from "../../../Services/hrPageService";
+import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
+import { useHRActionContext } from "../../../Hooks/useHRActionContext";
+import HRPageControls from "../../../Components/HRPageControls";
+import SearchInput from "../../../Components/SearchInput";
 import { useAuth } from "../../../Context/useAuth";
 import { hasPermission } from "../../../Utils/permissions";
 
@@ -30,42 +33,24 @@ const JobDetail: React.FC = () => {
   const canLink = hasPermission(user, "application", "create") && hasPermission(user, "candidate", "read");
   const canReadApps = hasPermission(user, "application", "read");
 
-  const [linking, setLinking] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async (jobId: string, signal?: AbortSignal, scopeKey?: string) => {
-    const primary = await getJobById(jobId, signal, scopeKey);
-    if (!primary) return null;
-    const [apps, people] = await Promise.allSettled([
-      canReadApps ? getApplications(signal, scopeKey) : Promise.resolve([]),
-      canLink && primary.status === "open" ? getCandidates(signal, scopeKey) : Promise.resolve([]),
-    ]);
-    return { job: primary,
-      applications: apps.status === "fulfilled" ? apps.value.filter(a => (typeof a.jobId === "string" ? a.jobId : a.jobId?.id) === jobId) : [],
-      candidates: people.status === "fulfilled" ? people.value : [],
-      secondaryError: apps.status === "rejected" || people.status === "rejected",
-    };
-  }, [canReadApps, canLink]);
-  const result = useAuditResource(id, "recruitment", load);
-  const job = result.data?.job;
-  const applications = useMemo(() => result.data?.applications ?? [], [result.data]);
-  const candidates = useMemo(() => result.data?.candidates ?? [], [result.data]);
-  const loadJobDetail = result.reload;
+  const result = useAuditResource(id, "recruitment", getJobById);
+  const job = result.data;
+  const [candidateSearch, setCandidateSearch] = useState('');
+  const search = useDebouncedSearch(candidateSearch);
+  const apps = useHRPage('application', { jobId: job?.id }, getApplicationPage, { enabled: !!job && canReadApps });
+  const people = useHRPage('candidate', { excludeJobId: job?.id, q: search }, getCandidatePage, { enabled: !!job && canLink && job.status === 'open' });
+  const applications = useMemo(() => apps.data?.items ?? [], [apps.data]);
+  const candidates = useMemo(() => people.data?.items ?? [], [people.data]);
+  const context = useHRActionContext(id);
+  const [action, setAction] = useState({ key: '', busy: false, selected: '', error: '' });
+  const currentAction = action.key === context.key ? action : { busy: false, selected: '', error: '' };
+  const linking = currentAction.busy, selectedCandidate = currentAction.selected, error = currentAction.error;
+  const setSelectedCandidate = (selected: string) => setAction(previous => ({ key: context.key, busy: previous.key === context.key && previous.busy, error: '', selected }));
+  const loadJobDetail = () => { apps.reload(); people.reload(); };
 
   const candidateById = useMemo(
     () => new Map(candidates.map((candidate) => [candidate.id, candidate])),
     [candidates],
-  );
-
-  const appliedCandidateIds = useMemo(
-    () =>
-      new Set(
-        applications
-          .map((application) => typeof application.candidateId === "string" ? application.candidateId : application.candidateId?.id)
-          .filter((candidateId): candidateId is string => Boolean(candidateId)),
-      ),
-    [applications],
   );
 
   const ranked = useMemo(() => {
@@ -82,15 +67,15 @@ const JobDetail: React.FC = () => {
   }, [applications, candidateById]);
 
   const applicableCandidates = useMemo(
-    () => candidates.filter((candidate) => !appliedCandidateIds.has(candidate.id)),
-    [candidates, appliedCandidateIds],
+    () => candidates,
+    [candidates],
   );
 
   const handleLink = async () => {
-    if (!id || !selectedCandidate) return;
+    if (!id || !selectedCandidate || !canLink || job?.status !== "open" || !candidates.some(c => c.id === selectedCandidate)) return;
+    const key = context.key;
 
-    setLinking(true);
-    setError(null);
+    setAction({ key, busy: true, selected: selectedCandidate, error: "" });
 
     try {
       await createApplication({
@@ -98,15 +83,11 @@ const JobDetail: React.FC = () => {
         candidateId: selectedCandidate,
       });
 
-      setSelectedCandidate("");
-      await loadJobDetail();
+      if (context.current.current === key) { setSelectedCandidate(""); loadJobDetail(); }
     } catch (err: unknown) {
-      console.error("Failed to create application:", err);
-      setError(
-        getErrorMessage(err, t("recruitment.jobDetail.linkError")),
-      );
+      if (context.current.current === key) setAction(previous => ({ ...previous, key, error: getErrorMessage(err, t("recruitment.jobDetail.linkError")) }));
     } finally {
-      setLinking(false);
+      if (context.current.current === key) setAction(previous => ({ ...previous, busy: false }));
     }
   };
 
@@ -115,7 +96,7 @@ const JobDetail: React.FC = () => {
   return (
     <div className="job-detail-page">
       {error && <div role="alert">{error}</div>}
-      {result.data?.secondaryError && <div role="alert">{t("hrStates.secondaryError")}</div>}
+
       {job.branchName && <p>{t("hrCatalog.branch")}: {job.branchName}</p>}
       <PageHeader
         title={job.position + (job.brandId ? ` · ${job.brandName || brandLabel(job.brandId)}` : "")}
@@ -145,7 +126,7 @@ const JobDetail: React.FC = () => {
         }
       />
 
-      {hasPermission(user, "candidate", "create") && hasPermission(user, "application", "create") && <button type="button" onClick={() => navigate(`/app/recruitment/candidates/new?jobId=${encodeURIComponent(job.id)}`)}>{t("hrStates.cvForJob")}</button>}
+      {job.status === "open" && hasPermission(user, "candidate", "create") && hasPermission(user, "application", "create") && <button type="button" onClick={() => navigate(`/app/recruitment/candidates/new?jobId=${encodeURIComponent(job.id)}`)}>{t("hrStates.cvForJob")}</button>}
       <div className="detail-grid">
         <div>
           <div className="detail-card">
@@ -168,7 +149,8 @@ const JobDetail: React.FC = () => {
               })}
             </h3>
 
-            {ranked.length === 0 ? (
+            <p role="note">{t("hrPage.pageSort")}</p>
+            {canReadApps && apps.status !== "ready" ? <HRResourceState status={apps.status} retry={apps.reload} /> : ranked.length === 0 ? (
               <EmptyState
                 icon={<UserSquare2 size={26} />}
                 title={t("recruitment.jobDetail.noApplications")}
@@ -210,6 +192,7 @@ const JobDetail: React.FC = () => {
                 ))}
               </div>
             )}
+            {canReadApps && <HRPageControls data={apps.data} page={apps.page} onPage={apps.setPage} disabled={apps.status !== "ready"} />}
           </div>
         </div>
 
@@ -264,7 +247,8 @@ const JobDetail: React.FC = () => {
             <div className="detail-card">
               <h3>{t("recruitment.jobDetail.linkCandidate")}</h3>
 
-              {applicableCandidates.length === 0 ? (
+              <SearchInput value={candidateSearch} onChange={setCandidateSearch} placeholder={t("recruitment.candidates.searchPlaceholder")} />
+              {people.status !== "ready" ? <HRResourceState status={people.status} retry={people.reload} /> : applicableCandidates.length === 0 ? (
                 <p
                   style={{
                     fontSize: "0.85rem",
@@ -298,7 +282,7 @@ const JobDetail: React.FC = () => {
                   <button
                     className="btn-primary"
                     style={{ width: "100%" }}
-                    disabled={!selectedCandidate || linking}
+                    disabled={!selectedCandidate || !candidates.some(c => c.id === selectedCandidate) || linking}
                     onClick={handleLink}
                   >
                     {linking ? (
@@ -310,6 +294,7 @@ const JobDetail: React.FC = () => {
                   </button>
                 </>
               )}
+              <HRPageControls data={people.data} page={people.page} onPage={people.setPage} disabled={people.status !== "ready"} />
             </div>
           )}
         </div>

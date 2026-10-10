@@ -29,6 +29,7 @@ export interface Job {
   description: string;
 
   requiredSkills: string[];
+  requiredSkillsCount?: number;
   preferredSkills: string[];
   requiredEducation?: string[];
   requiredCertificates?: string[];
@@ -74,6 +75,7 @@ export interface Candidate {
   status: CandidateStatus;
 
   skills: string[];
+  skillsCount?: number;
   experience: number | null;
   phoneRaw?: string;
   employmentHistory?: CvHistoryEntry[];
@@ -158,6 +160,7 @@ export interface MatchCriterion {
   matched?: string[]; missing?: string[]; value?: number | null; required?: number;
 }
 export interface ApplicationMatch {
+  summary?: boolean;
   version: string; calculatedAt: string; dataCoverage: number; reason: string | null;
   jobHash: string; candidateHash: string; criteria: MatchCriterion[];
 }

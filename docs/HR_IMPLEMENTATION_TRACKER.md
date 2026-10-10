@@ -83,10 +83,10 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 | AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
 | AUD-071 | 11 | No ingestion source identity or person-level deduplication | OPEN | — |
-| AUD-072 | 08 | HR lists unbounded with full populated documents | OPEN | — |
+| AUD-072 | 08 | HR lists unbounded with full populated documents | TESTED | 08B consumers use bounded independent projected pages; legacy array routes deliberately preserved for API compatibility |
 | AUD-073 | 08 | CV parse then create double uploads file synchronously | OPEN | — |
-| AUD-074 | 08 | HR service requests lack signal/dedup despite safe main Dashboard implementation | OPEN | — |
-| AUD-075 | 08 | Search/filter/render all records without pagination/virtualization/debounce | OPEN | — |
+| AUD-074 | 08 | HR service requests lack signal/dedup despite safe main Dashboard implementation | TESTED | `hrPaginationUI`: StrictMode one list request, canceled stale filters, zero language refetch; shared readJson auth fingerprint |
+| AUD-075 | 08 | Search/filter/render all records without pagination/virtualization/debounce | TESTED | `hrPaginationUI`: 35-record baseline renders 35; final pages render 30 then 5, debounced single query and server context filters; 50k measurements still 08D |
 | AUD-076 | 08 | Compound filter/sort indexes missing | TESTED | `hrPagination.test.cjs`: owned local index creation and hinted IXSCAN; actual unhinted large-data plans remain 08D |
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | OPEN | — |
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | OPEN | — |
@@ -284,16 +284,16 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P08-001 | Scoped HR pagination | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-002 | Bounded payloads | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-003 | Safe projection | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-004 | Appropriate indexes | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-005 | Versioned backward-compatible transition | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-006 | Job-specific queries | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-007 | Searchable Candidate lookup | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
-| P08-008 | Debounce | OPEN | — |
-| P08-009 | Cancellation | OPEN | — |
-| P08-010 | Virtualization/lazy loading | OPEN | — |
+| P08-001 | Scoped HR pagination | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-002 | Bounded payloads | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-003 | Safe projection | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-004 | Appropriate indexes | TESTED | `Backend/tests/hrPagination.test.cjs`: owned local compound IXSCAN usability; actual unhinted large-data plans remain 08D |
+| P08-005 | Versioned backward-compatible transition | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-006 | Job-specific queries | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-007 | Searchable Candidate lookup | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-008 | Debounce | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-009 | Cancellation | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-010 | Virtualization/lazy loading | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-011 | Memoization | OPEN | — |
 | P08-012 | Large Kanban handling | OPEN | — |
 | P08-013 | 0-record benchmark | OPEN | — |
@@ -306,8 +306,8 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P08-020 | Memory measurement | OPEN | — |
 | P08-021 | No unmeasured live performance claims | OPEN | — |
 | P08-022 | Loading and skeleton | OPEN | — |
-| P08-023 | Error and empty | OPEN | — |
-| P08-024 | Retry | OPEN | — |
+| P08-023 | Error and empty | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
+| P08-024 | Retry | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-025 | Accessibility | OPEN | — |
 | P08-026 | Responsive | OPEN | — |
 
@@ -463,7 +463,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 07 | `2e44f1321dad611c42677b88b2bade1f5b3fff8b` | Targets 40/40; full 1242/1242; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Linked-profile review cohort only; transactional snapshot not claimed; large-data benchmark and paging remain 08; real integrations remain external |
 
-| 08A | `feat(hr): add scoped recruitment page APIs` (SHA recorded next update) | Targets 25/25; current final serial full 1267/1267; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Frontend transition 08B; large-data plans/measurements 08D; AUD-090 concurrent Source download investigation remains OPEN |
+| 08A | `4c0a4eee3e735d0f5c8abe70b37a0e6bfc5f7bad` | Targets 25/25; current final serial full 1267/1267; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Frontend transition 08B; large-data plans/measurements 08D; AUD-090 concurrent Source download investigation remains OPEN |
+
+| 08B | `feat(hr): consume bounded recruitment pages and lazy evidence` (SHA recorded next update) | Targets 54/54; full 1289/1289; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Page-local score/name order explicitly labeled; global ranking/manual order/parsing/benchmarks remain 08C–08D; Source concurrency finding AUD-090 remains OPEN |
 
 ## External prerequisites
 
@@ -523,3 +525,12 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 08A evidence: `Backend/tests/hrPagination.test.cjs` 25/25, `/tmp/inop-hr08a-target-final.log`; TS/build/lint, 13 smoke and 632 authorization in `/tmp/inop-packagehr08a-validation.json`. Backend page contract and non-unique additive index inventory are in `docs/HR_PAGINATION_CONTRACT.md`. Existing array endpoints remain backward compatible; frontend remains unbounded until 08B. P08-001–007 evidence applies to the server contract, not an assertion that the whole package is complete. Manual ordering, parsing isolation and 0/5000/50000 benchmark evidence remain OPEN. No production DDL or deployment performed.
 
 08A final serial regression: `/tmp/inop-hr08a-regression-final.log` 1267/1267, including the corrected denied-parent 404 contract assertion. The earlier parallel Source download failure remains AUD-090, not suppressed or declared resolved.
+
+| AUD-092 | 08B | Paged static populate serialized Mongoose Candidate internals instead of a plain projected DTO | TESTED | Initial HR lifecycle/35-record page failures; `hrPagination` now asserts plain parent id/name, no `$__`/`_doc` for calculated and legacy scores; independent parent scope remains enforced |
+| AUD-093 | 08B | Application normalizer omitted createdAt/updatedAt, breaking newest order | TESTED | `applicationLifecycleUI`: newest ordering uses preserved API timestamps; no candidate-global/legacy score used |
+| AUD-094 | 08C | Global trustworthy ranking is not available after bounded-page transition | OPEN | 08B explicitly labels score/name order as page-local. Follow-up must rank the scoped full cohort using current fingerprints, without fake stale/hidden scores or unbounded response |
+| AUD-095 | 08C | Candidate detail PDF export/delete callbacks are not keyed to route/permission context | OPEN | `CandidateDetail.tsx` awaits then downloads/navigates without context check; isolated stale-download reproduction and fix follow in 08C |
+
+08B targets: `/tmp/inop-hr08b-baseline.log` reproduces 35 versus required 30 rows; `/tmp/inop-hr08b-target-current.log` 54/54 backend pagination, new browser page tests and matching UI checks. Existing HR lifecycle/brand/workflow checks are included in full regression. New catalog options are searchable across pages; lazy evidence fetches once on demand, not for every row; 403 and late responses retain primary rows and mask unavailable scores. The retained Source download finding AUD-090 remains OPEN. No live benchmark/provider/SMTP/durability claim is made. Next independent increment is 08C stability/order/ranking, then 08D measurements.
+
+08B final validation: `/tmp/inop-hr08b-regression.log` 1289/1289; `/tmp/inop-packagehr08b-validation.json` and `/tmp/inop-hr08b-validation-run.log`. The earlier lookup test failures were strict locator/translated label mismatches; response and DOM inspection confirmed correct backend/option data. Final assertions use accessible exact roles/names and retain independent server response checks.

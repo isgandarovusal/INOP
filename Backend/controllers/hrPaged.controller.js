@@ -1,14 +1,18 @@
+const Branch = require('../models/recruitmentBranch.model');
+const Brand = require('../models/recruitmentBrand.model');
+const { defaultBrands } = require('../services/recruitmentCatalog.service');
 const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const Job = require('../models/job.model'), Candidate = require('../models/candidate.model'), Application = require('../models/application.model');
 const { resourceFilter, aggregateResourceFilter, applicationParents } = require('../services/hrResourceScope.service');
 const { scoreResponses } = require('../services/applicationScoreState.service');
 const { decorateJobs, decorateApplications } = require('../services/recruitmentCatalog.service');
-const resources = { jobs: 'recruitment', candidates: 'candidate', applications: 'application' };
-const models = { jobs: Job, candidates: Candidate, applications: Application };
+const resources = { jobs: 'recruitment', candidates: 'candidate', applications: 'application', branches: 'recruitment', brands: 'recruitment' };
+const models = { jobs: Job, candidates: Candidate, applications: Application, branches: Branch };
 const fields = {
-  jobs: 'title department location type status brandId branchId experienceYears createdAt updatedAt',
-  candidates: 'name role status email phone skills cvUrl cvOriginal cvReview.version cvReview.processingStatus cvReview.reviewStatus createdAt updatedAt',
+  branches: 'code name brandId kind location status createdAt updatedAt',
+  jobs: 'requiredSkills title department location type status brandId branchId experienceYears createdAt updatedAt',
+  candidates: 'experience name role status email phone skills cvUrl cvOriginal cvReview.version cvReview.processingStatus cvReview.reviewStatus createdAt updatedAt',
   applications: 'jobId candidateId status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
 };
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -18,14 +22,15 @@ function parameters(req, kind) {
   const page = q.page === undefined ? 1 : Number(q.page), pageSize = q.pageSize === undefined ? 30 : Number(q.pageSize), sort = q.sort || 'newest';
   if (!Number.isInteger(page) || page < 1 || page > 10000 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100 || !['newest', 'name'].includes(sort) || kind === 'applications' && sort !== 'newest') throw Error('Invalid pagination or sort.');
   for (const key of ['branchId', 'jobId', 'candidateId', 'excludeJobId']) if (q[key]) { if (!mongoose.isObjectIdOrHexString(q[key])) throw Error('Invalid resource filter.'); if (key !== 'excludeJobId') extra[key] = new mongoose.Types.ObjectId(q[key]); }
-  if (kind === 'jobs' && (q.jobId || q.candidateId || q.excludeJobId) || kind === 'candidates' && (q.brandId || q.branchId || q.jobId || q.candidateId) || kind === 'applications' && q.excludeJobId) throw Error('Filter does not apply to this resource.');
-  if (q.brandId) { if (q.brandId !== 'unset' && !/^[a-z0-9][a-z0-9-]{0,59}$/.test(q.brandId)) throw Error('Invalid brand filter.'); if (kind === 'jobs') extra.brandId = q.brandId === 'unset' ? null : q.brandId; }
+  if (kind === 'brands' && (q.status || q.brandId || q.branchId || q.jobId || q.candidateId || q.excludeJobId || q.after) || kind === 'branches' && (q.branchId || q.jobId || q.candidateId || q.excludeJobId) || kind === 'jobs' && (q.jobId || q.candidateId || q.excludeJobId) || kind === 'candidates' && (q.brandId || q.branchId || q.jobId || q.candidateId) || kind === 'applications' && q.excludeJobId) throw Error('Filter does not apply to this resource.');
+  if (q.brandId) { if (q.brandId !== 'unset' && !/^[a-z0-9][a-z0-9-]{0,59}$/.test(q.brandId)) throw Error('Invalid brand filter.'); if (kind === 'jobs' || kind === 'branches') extra.brandId = q.brandId === 'unset' ? null : q.brandId; }
   if (q.status) {
-    const choices = kind === 'jobs' ? ['Open', 'Closed', 'Draft'] : kind === 'candidates' ? ['new', 'applied', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected'] : ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
-    if (!choices.includes(q.status)) throw Error('Invalid status filter.'); extra.status = q.status;
+    const choices = kind === 'branches' ? ['active', 'inactive'] : kind === 'jobs' ? ['Open', 'Closed', 'Draft'] : kind === 'candidates' ? ['new', 'applied', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected'] : ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected', 'Processing'];
+    if (!choices.includes(q.status)) throw Error('Invalid status filter.');
+    if (kind === 'applications' && q.status === 'Processing') { extra.status = 'Applied'; extra.processingState = { $in: ['queued', 'running'] }; } else extra.status = q.status;
   }
   const search = q.q?.trim() ? new RegExp(escape(q.q.trim()), 'i') : null;
-  if (search && kind !== 'applications') extra.$or = (kind === 'jobs' ? ['title', 'department', 'location'] : ['name', 'role', 'skills']).map(field => ({ [field]: search }));
+  if (search && kind !== 'applications') extra.$or = (kind === 'brands' ? ['name'] : kind === 'branches' ? ['name', 'code', 'location'] : kind === 'jobs' ? ['title', 'department', 'location', 'requiredSkills'] : ['name', 'role', 'skills']).map(field => ({ [field]: search }));
   const fingerprint = crypto.createHash('sha256').update(JSON.stringify([req.user.id, req.user.departmentId, req.authRole.permissions, resource, { ...q, page: undefined, after: undefined }])).digest('hex');
   let after;
   if (q.after) {
@@ -37,12 +42,13 @@ function parameters(req, kind) {
   return { page, pageSize, sort, extra, search, after, fingerprint };
 }
 function clip(record, kind) {
-  const row = { ...record };
+  const row = { ...(record.toObject?.() || record) };
   for (const key of ['title', 'name', 'role', 'department', 'location', 'cvUrl']) if (typeof row[key] === 'string') row[key] = row[key].slice(0, 200);
   if (typeof row.email === 'string') row.email = row.email.slice(0, 254);
   if (typeof row.phone === 'string') row.phone = row.phone.slice(0, 80);
   if (typeof row.type === 'string') row.type = row.type.slice(0, 50);
-  if (Array.isArray(row.skills)) row.skills = row.skills.slice(0, 12).map(s => String(s).slice(0, 120));
+  if (Array.isArray(row.requiredSkills)) { row.requiredSkillsCount = row.requiredSkills.length; row.requiredSkills = row.requiredSkills.slice(0, 12).map(s => String(s).slice(0, 120)); }
+  if (Array.isArray(row.skills)) { row.skillsCount = row.skills.length; row.skills = row.skills.slice(0, 12).map(s => String(s).slice(0, 120)); }
   if (kind === 'applications') {
     if (row.matching) row.matching = { version: row.matching.version, calculatedAt: row.matching.calculatedAt, dataCoverage: row.matching.dataCoverage, reason: row.matching.reason, criteria: [], summary: true };
     if (row.jobId && typeof row.jobId === 'object') row.jobId = clip(row.jobId, 'jobs');
@@ -94,8 +100,25 @@ exports.list = kind => async (req, res, next) => {
     if (kind === 'jobs') items = await decorateJobs(req, items);
     if (kind === 'applications') {
       const parents = applicationParents(req); parents[0].select = 'name role'; parents[1].select = 'title status brandId branchId';
-      items = await Application.populate(items, parents); items = await decorateApplications(req, await scoreResponses(req, items));
+      items = await Application.populate(items, parents.map(parent => ({ ...parent, options: { lean: true } }))); items = await decorateApplications(req, await scoreResponses(req, items));
     }
     res.json({ version: 'hr-page-v1', items: items.map(row => clip(row, kind)), page: p.page, pageSize: p.pageSize, total, hasMore, nextCursor });
+  } catch (e) { if (e.code === 50) return res.status(503).json({ message: 'Query timed out. Narrow filters and retry.' }); next(e); }
+};
+
+// Brands are a shared catalog under the existing recruitment.read contract.
+// Defaults are immutable in code; reads never seed or rewrite stored records.
+exports.brands = async (req, res, next) => {
+  let p; try { p = parameters(req, 'brands'); } catch (e) { return res.status(400).json({ message: e.message }); }
+  try {
+    const defaults = defaultBrands.filter(b => !p.search || p.search.test(b.name));
+    const query = { _id: { $nin: defaultBrands.map(b => b.id) }, ...(p.search ? { name: p.search } : {}) };
+    const start = (p.page - 1) * p.pageSize, fixed = defaults.slice(start, start + p.pageSize);
+    const [custom, count] = await Promise.all([
+      fixed.length === p.pageSize ? [] : Brand.find(query).select('name active').sort({ name: 1, _id: 1 }).skip(Math.max(0, start - defaults.length)).limit(p.pageSize - fixed.length).maxTimeMS(5000).lean(),
+      Brand.countDocuments(query).maxTimeMS(5000),
+    ]);
+    const items = [...fixed, ...custom.map(b => ({ id: b._id, name: b.name, active: b.active }))], total = defaults.length + count;
+    res.json({ version: 'hr-page-v1', items, page: p.page, pageSize: p.pageSize, total, hasMore: start + items.length < total, nextCursor: null });
   } catch (e) { if (e.code === 50) return res.status(503).json({ message: 'Query timed out. Narrow filters and retry.' }); next(e); }
 };

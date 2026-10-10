@@ -9,9 +9,10 @@ test('Trusted Application matching is consistent across vacancy, profile, table 
   const app = await apply(job), zero = await apply(other);
   const badge = id => h.page.locator(`[data-application-score="${id}"]`);
   await t.test('table distinguishes a genuine zero from a missing score and exposes criterion evidence', async () => {
-    await h.open('admin', '/app/recruitment/applications'); await badge(app._id).waitFor();
+    h.wire.length = 0; await h.open('admin', '/app/recruitment/applications'); await badge(app._id).waitFor();
+    assert.equal(h.wire.filter(r => r.path === '/api/applications/' + app._id).length, 0, 'Evidence is not fetched for collapsed summaries');
     assert.equal(await badge(app._id).locator('strong').textContent(), '100%'); assert.equal(await badge(zero._id).locator('strong').textContent(), '0%');
-    await badge(app._id).locator('summary').filter({ hasText: 'Uyğunluğun izahı' }).click(); assert.match(await badge(app._id).textContent(), /cash handling/);
+    await badge(app._id).locator('summary').filter({ hasText: 'Uyğunluğun izahı' }).click(); await badge(app._id).getByText(/cash handling/).waitFor(); assert.match(await badge(app._id).textContent(), /cash handling/); assert.equal(h.wire.filter(r => r.path === '/api/applications/' + app._id).length, 1);
   });
   await t.test('JobDetail and Candidate profile show the same per-vacancy scores', async () => {
     await h.open('admin', '/app/recruitment/jobs/' + job._id); await badge(app._id).waitFor(); assert.equal(await badge(app._id).locator('strong').textContent(), '100%'); assert.equal(await badge(zero._id).count(), 0);
@@ -36,6 +37,24 @@ test('Trusted Application matching is consistent across vacancy, profile, table 
     await badge(incomplete._id).getByRole('spinbutton').fill('2'); assert.equal(await badge(incomplete._id).getByRole('button', { name: 'Yenidən hesabla', exact: true }).isDisabled(), true);
     await badge(incomplete._id).getByRole('textbox').fill('HR verified employment dates'); await badge(incomplete._id).getByRole('button', { name: 'Yenidən hesabla', exact: true }).click();
     await h.page.locator(`[data-application-score="${incomplete._id}"][data-score-status=calculated]`).waitFor(); assert.equal(await badge(incomplete._id).locator('strong').textContent(), '100%');
+  });
+  await t.test('a denied lazy evidence request retains the primary row, hides the old score without an unintended aggregate/detail refetch', async () => {
+    const pattern = '**/api/applications/' + app._id;
+    await h.page.route(pattern, r => r.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"Evidence revoked"}' }));
+    try {
+      await h.open('admin', '/app/recruitment/applications'); await badge(app._id).waitFor();
+      await badge(app._id).locator('summary').filter({ hasText: 'Uyğunluğun izahı' }).click(); await badge(app._id).locator('details[open] [data-hr-state=forbidden]').waitFor();
+      assert.equal(await h.page.locator('tbody tr').count(), 3); assert.ok(!await badge(app._id).textContent().then(text => text.includes('100%')));
+    } finally { await h.page.unroute(pattern); }
+  });
+  await t.test('late evidence cannot write after permission revocation', async () => {
+    let release, entered; const gate = new Promise(r => release = r), started = new Promise(r => entered = r), pattern = '**/api/applications/' + app._id;
+    const response = await h.request('admin', 'GET', '/applications/' + app._id);
+    await h.page.route(pattern, async r => { entered(); await gate; await r.fulfill({ contentType: 'application/json', body: JSON.stringify(response.data) }); });
+    try {
+      await h.open('admin', '/app/recruitment/applications'); await badge(app._id).waitFor(); await badge(app._id).locator('summary').filter({ hasText: 'Uyğunluğun izahı' }).click(); await started;
+      const profile = await h.profile('admin'); profile.permissions = []; await h.page.evaluate(p => window.setTestUser(p), profile); await h.page.locator('[data-hr-state=forbidden]').waitFor(); release(); await h.page.waitForLoadState('networkidle'); assert.equal(await badge(app._id).count(), 0);
+    } finally { release(); await h.page.unroute(pattern); }
   });
   await t.test('parent permissions and permission revocation remove scores and evidence immediately', async () => {
     await h.models.Role.create({ key: 'matching_app_only', name: 'App only', permissions: [{ resource: 'application', action: 'read', scope: 'all' }] });

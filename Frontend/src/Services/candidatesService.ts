@@ -79,6 +79,7 @@ export function normalizeCandidate(raw: unknown): Candidate {
         : "applied",
 
     skills: stringArray(data.skills),
+    skillsCount: typeof data.skillsCount === "number" && Number.isInteger(data.skillsCount) && data.skillsCount >= 0 ? data.skillsCount : undefined,
 
     experience: data.experience == null || data.experience === "" ? null : Number(data.experience),
     phoneRaw: typeof data.phoneRaw === "string" ? data.phoneRaw : undefined,

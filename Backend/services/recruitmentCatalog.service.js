@@ -27,7 +27,9 @@ async function validateLocation(req, fields, current = {}) {
 async function decorateJobs(req, records) {
   const list = records.map(j => j.toObject?.() || j);
   const ids = [...new Set(list.map(j => j.branchId).filter(Boolean).map(String))];
-  const [catalog, branches] = await Promise.all([brands(), Branch.find({ $and: [{ _id: { $in: ids } }, resourceFilter(req, 'recruitment')] }).select('name').lean()]);
+  const brandIds = [...new Set(list.map(j => j.brandId).filter(Boolean))];
+  const [custom, branches] = await Promise.all([Brand.find({ _id: { $in: brandIds } }).select('name active').lean(), Branch.find({ $and: [{ _id: { $in: ids } }, resourceFilter(req, 'recruitment')] }).select('name').lean()]);
+  const catalog = [...defaultBrands, ...custom.filter(b => !defaultBrands.some(d => d.id === b._id)).map(b => ({ id: b._id, name: b.name }))];
   const branchNames = new Map(branches.map(b => [String(b._id), b.name]));
   return list.map(j => ({ ...j, brandId: j.brandId ?? null, branchId: j.branchId ?? null,
     brandName: catalog.find(b => b.id === j.brandId)?.name ?? null,

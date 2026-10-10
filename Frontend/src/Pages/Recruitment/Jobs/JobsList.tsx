@@ -1,3 +1,4 @@
+import HRScopeFilters from "../../../Components/HRScopeFilters";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useMemo, useState } from "react";
@@ -8,7 +9,7 @@ import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/ConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
-import { getJobs, deleteJob } from "../../../Services/jobsService";
+import { deleteJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
 import { hasPermission } from "../../../Utils/permissions";
@@ -21,8 +22,10 @@ const STATUS_TONE: Record<JobStatus, BadgeTone> = {
 };
 
 import HRResourceState from "../../../Components/HRResourceState";
-import { useAuditResource } from "../../../Hooks/useAuditResource";
-const loadJobs = (_id: string, signal?: AbortSignal, scopeKey?: string) => getJobs(signal, scopeKey);
+import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
+import { useHRActionContext } from "../../../Hooks/useHRActionContext";
+import HRPageControls from "../../../Components/HRPageControls";
+import { getJobPage, canonicalHRStatus } from "../../../Services/hrPageService";
 
 const JobsList: React.FC = () => {
   const { t } = useTranslation();
@@ -33,16 +36,23 @@ const JobsList: React.FC = () => {
   const canDelete = hasPermission(user, "recruitment", "delete");
   const canManage = canUpdate || canDelete;
 
-  const result = useAuditResource("list", "recruitment", loadJobs);
-  const jobs = useMemo(() => result.data ?? [], [result.data]);
-  const loading = result.status === "loading";
   const [query, setQuery] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
-  const [deleteTarget, setDeleteTarget] = useState<Job | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
+  const [mutation, setMutation] = useState({ key: '', error: '' });
+  const search = useDebouncedSearch(query);
+  const result = useHRPage('recruitment', { q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage);
+  const context = useHRActionContext(JSON.stringify([search, brandFilter, branchFilter, statusFilter, result.page]));
+  const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
+  const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
+  const jobs = useMemo(() => result.data?.items ?? [], [result.data]);
+  const loading = result.status === 'loading';
+  const error = mutation.key === context.key ? mutation.error : '';
+  const [selection, setSelection] = useState<{ key: string; target: Job } | null>(null);
+  const deleteTarget = selection?.key === context.key ? selection.target : null;
+  const setDeleteTarget = (target: Job | null) => setSelection(target ? { key: context.key, target } : null);
 
   const filtersActive =
     query.trim() !== "" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
@@ -54,48 +64,32 @@ const JobsList: React.FC = () => {
 
   const load = result.reload;
 
-  const filtered = useMemo(() => {
-    return jobs
-      .filter(j => brandFilter === "all" || (j.brandId || "unset") === brandFilter)
-      .filter(j => branchFilter === "all" || (j.branchId || "unset") === branchFilter)
-      .filter((j) => statusFilter === "all" || j.status === statusFilter)
-      .filter((j) => {
-        if (!query.trim()) return true;
-        const q = query.toLowerCase();
-        return (
-          j.position.toLowerCase().includes(q) ||
-          j.requiredSkills.some((s) => s.toLowerCase().includes(q))
-        );
-      })
-      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-  }, [jobs, query, statusFilter, brandFilter, branchFilter]);
+  const filtered = jobs;
 
   const handleDelete = async () => {
     if (!deleteTarget || !canDelete) return;
 
-    const id = deleteTarget.id;
+    const id = deleteTarget.id; const key = context.key;
     setDeletingId(id);
 
     try {
       await deleteJob(id);
-      load();
-      setDeleteTarget(null);
+      if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (err: unknown) {
-      console.error("Failed to delete job:", err);
-      setError(getErrorMessage(err, t("somethingWentWrong")));
+      if (context.current.current === key) setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
     } finally {
-      setDeletingId(null);
+      if (context.current.current === key) setDeletingId(null);
     }
   };
 
-  if (result.status !== "ready") return <HRResourceState status={result.status} retry={load} />;
+  if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={load} />;
 
   return (
     <div className="recruitment-list-page">
       <PageHeader
         title={t("recruitment.jobs.title")}
         subtitle={t("recruitment.jobs.totalShown", {
-          total: jobs.length,
+          total: result.data?.total ?? 0,
           shown: filtered.length,
         })}
         actions={
@@ -108,9 +102,9 @@ const JobsList: React.FC = () => {
         }
       />
 
+      {error && <p role="alert">{error} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
-        <select aria-label={t('hrCatalog.brand')} value={brandFilter} onChange={e => { setBrandFilter(e.target.value); setBranchFilter('all'); }}><option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.map(j => j.brandId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}</select>
-        <select aria-label={t('hrCatalog.branch')} value={branchFilter} onChange={e => setBranchFilter(e.target.value)}><option value="all">{t('hrCatalog.allBranches')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.filter(j => brandFilter === 'all' || j.brandId === brandFilter).map(j => j.branchId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.branchId === id)?.branchName || t('hrCatalog.unavailable')}</option>)}</select>
+        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} />
         <SearchInput
           value={query}
           onChange={setQuery}
@@ -139,7 +133,7 @@ const JobsList: React.FC = () => {
         )}
       </div>
 
-      <div className="admin-table-container">
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : <div className="admin-table-container">
         <table>
           <thead>
             <tr>
@@ -160,24 +154,6 @@ const JobsList: React.FC = () => {
                 <td colSpan={canManage ? 5 : 4}>
                   <div className="empty-state">
                     <Loader2 size={24} className="spin" />
-                  </div>
-                </td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={canManage ? 5 : 4}>
-                  <EmptyState
-                    icon={<Briefcase size={28} />}
-                    title={t("somethingWentWrong")}
-                    hint={error}
-                  />
-                  <div style={{ textAlign: "center", marginTop: "12px" }}>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => void load()}
-                    >
-                      {t("recruitment.jobs.retry")}
-                    </button>
                   </div>
                 </td>
               </tr>
@@ -219,8 +195,8 @@ const JobsList: React.FC = () => {
                           {s}
                         </Badge>
                       ))}
-                      {job.requiredSkills.length > 3 && (
-                        <Badge tone="neutral">+{job.requiredSkills.length - 3}</Badge>
+                      {(job.requiredSkillsCount ?? job.requiredSkills.length) > 3 && (
+                        <Badge tone="neutral">+{(job.requiredSkillsCount ?? job.requiredSkills.length) - 3}</Badge>
                       )}
                     </div>
                   </td>
@@ -264,7 +240,9 @@ const JobsList: React.FC = () => {
             )}
           </tbody>
         </table>
-      </div>
+      </div>}
+
+      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== "ready"} />
 
       {deleteTarget && (
         <ConfirmDialog

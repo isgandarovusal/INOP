@@ -1277,5 +1277,17 @@
       "configured_not_verified": "Konfiqurasiya var; canlı nəticə yoxlanılmayıb",
       "not_configured": "Konfiqurasiya yoxdur"
     }
+  },
+  "hrPage": {
+    "pagination": "HR səhifələmə",
+    "summary": "Səhifə {{page}} · {{shown}} göstərilir · {{total}} uyğun qeyd",
+    "pageSort": "Bal/ad sıralaması bu səhifəyə aiddir. Qrupu daraltmaq üçün filtrlərdən istifadə edin.",
+    "sortScorePage": "Bal (bu səhifə)",
+    "sortNamePage": "Ad (bu səhifə)",
+    "lookup": "Bütün icazəli filtr seçimlərində axtar",
+    "brandLookup": "Brend axtar",
+    "branchLookup": "Filial axtar",
+    "jobLookup": "Vakansiya axtar",
+    "jobFilter": "Vakansiya filtri"
   }
 }

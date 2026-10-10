@@ -2,13 +2,11 @@ import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  AlertCircle,
   FileSpreadsheet,
   LayoutGrid,
   List,
   Loader2,
   Plus,
-  RefreshCw,
   Search,
   Trash2,
 } from "lucide-react";
@@ -18,7 +16,6 @@ import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
   deleteCandidate,
   exportCandidatesExcel,
-  getCandidates,
 } from "../../../Services/candidatesService";
 import { hasPermission } from "../../../Utils/permissions";
 import { useAuth } from "../../../Context/useAuth";
@@ -49,8 +46,10 @@ const getCandidateStatusBadgeVariant = (
 };
 
 import HRResourceState from "../../../Components/HRResourceState";
-import { useAuditResource } from "../../../Hooks/useAuditResource";
-const loadCandidates = (_id: string, signal?: AbortSignal, scopeKey?: string) => getCandidates(signal, scopeKey);
+import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
+import { useHRActionContext } from "../../../Hooks/useHRActionContext";
+import HRPageControls from "../../../Components/HRPageControls";
+import { getCandidatePage } from "../../../Services/hrPageService";
 
 const CandidatesList: React.FC = () => {
   const { t } = useTranslation();
@@ -59,12 +58,19 @@ const CandidatesList: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const result = useAuditResource("list", "candidate", loadCandidates);
-  const candidates = useMemo(() => result.data ?? [], [result.data]);
+  const search = useDebouncedSearch(searchQuery);
+  const result = useHRPage("candidate", { q: search }, getCandidatePage);
+  const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
+  const context = useHRActionContext(JSON.stringify([search, result.page]));
+  const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
+  const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
+  const candidates = useMemo(() => result.data?.items ?? [], [result.data]);
   const loading = result.status === "loading";
-  const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [exporting, setExporting] = useState(false);
+  const [mutation, setMutation] = useState({ key: "", error: "" });
+  const error = mutation.key === context.key ? mutation.error : "";
+  const [exportBusy, setExportBusy] = useState<{ key: string; busy: boolean }>({ key: "", busy: false });
+  const exporting = exportBusy.key === context.key && exportBusy.busy;
+  const setExporting = (busy: boolean) => setExportBusy({ key: context.key, busy });
 
   const canCreate = hasPermission(user, "candidate", "create");
   const canDelete = hasPermission(user, "candidate", "delete");
@@ -73,17 +79,20 @@ const CandidatesList: React.FC = () => {
 
   const handleExportExcel = async () => {
     if (exporting) return;
+    const key = context.key;
 
     try {
       setExporting(true);
 
       const blob = await exportCandidatesExcel();
 
+      if (context.current.current !== key) return;
       downloadBlob(blob, "candidates.xlsx");
 
       toast.success(t("recruitment.candidates.exportSuccess"));
     } catch (err: unknown) {
-      setError(getErrorMessage(err, t("somethingWentWrong")));
+      if (context.current.current !== key) return;
+      setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
       toast.error(
         getErrorMessage(
           err,
@@ -91,7 +100,7 @@ const CandidatesList: React.FC = () => {
         ),
       );
     } finally {
-      setExporting(false);
+      if (context.current.current === key) setExporting(false);
     }
   };
 
@@ -108,42 +117,31 @@ const CandidatesList: React.FC = () => {
     );
 
     if (!confirmed) return;
+    const key = context.key;
 
     try {
       setDeletingId(candidate.id);
 
       await deleteCandidate(candidate.id);
 
+      if (context.current.current !== key) return;
       fetchCandidates();
 
       toast.success(t("recruitment.candidates.deleted"));
     } catch (err: unknown) {
-      setError(getErrorMessage(err, t("somethingWentWrong")));
+      if (context.current.current !== key) return;
+      setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
       toast.error(
         getErrorMessage(err, t("recruitment.candidates.deleteError")),
       );
     } finally {
-      setDeletingId(null);
+      if (context.current.current === key) setDeletingId(null);
     }
   };
 
-  const filteredCandidates = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+  const filteredCandidates = candidates;
 
-    if (!query) return candidates;
-
-    return candidates.filter((candidate) => {
-      const nameMatch = candidate.name.toLowerCase().includes(query);
-      const roleMatch = candidate.role?.toLowerCase().includes(query);
-      const skillMatch = candidate.skills?.some((skill) =>
-        skill.toLowerCase().includes(query),
-      );
-
-      return nameMatch || roleMatch || skillMatch;
-    });
-  }, [candidates, searchQuery]);
-
-  if (result.status !== "ready") return <HRResourceState status={result.status} retry={fetchCandidates} />;
+  if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
     <div className="page-container">
@@ -237,7 +235,8 @@ const CandidatesList: React.FC = () => {
         </div>
       </div>
 
-      {loading ? (
+      {error && <p role="alert">{error} <button type="button" onClick={fetchCandidates}>{t("hrStates.retry")}</button></p>}
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={fetchCandidates} /> : loading ? (
         <div
           style={{
             display: "flex",
@@ -246,35 +245,6 @@ const CandidatesList: React.FC = () => {
           }}
         >
           <Loader2 size={24} className="spin" />
-        </div>
-      ) : error ? (
-        <div
-          className="alert alert--danger"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "16px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <AlertCircle size={18} />
-            <span>{error}</span>
-          </div>
-
-          <button
-            className="btn-secondary"
-            onClick={() => void fetchCandidates()}
-          >
-            <RefreshCw size={16} />
-            {t("recruitment.candidates.retry")}
-          </button>
         </div>
       ) : filteredCandidates.length === 0 ? (
         <div
@@ -428,6 +398,7 @@ const CandidatesList: React.FC = () => {
           </table>
         </div>
       )}
+      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== "ready"} />
     </div>
   );
 };
