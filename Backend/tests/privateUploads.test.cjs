@@ -4,6 +4,19 @@ const { withAuditFixture } = require('./helpers/auditFixture.cjs');
 const { uploadsDir } = require('../middleware/privateUpload.middleware');
 const Candidate = require('../models/candidate.model'), Source = require('../models/auditSourceDocument.model');
 
+// Generate real ZIP fixtures with Node only, so the Alpine runtime test needs no Python.
+function officeZip(xml) {
+  const zlib = require('node:zlib'), chunks = [], central = []; let offset = 0;
+  for (const [name, text] of [['[Content_Types].xml', '<Types/>'], ['word/document.xml', xml]]) {
+    const filename = Buffer.from(name), raw = Buffer.from(text), compressed = zlib.deflateRawSync(raw), crc = zlib.crc32(raw);
+    const local = Buffer.alloc(30); local.writeUInt32LE(0x04034b50); local.writeUInt16LE(20, 4); local.writeUInt16LE(8, 8); local.writeUInt32LE(crc, 14); local.writeUInt32LE(compressed.length, 18); local.writeUInt32LE(raw.length, 22); local.writeUInt16LE(filename.length, 26);
+    const entry = Buffer.alloc(46); entry.writeUInt32LE(0x02014b50); entry.writeUInt16LE(20, 4); entry.writeUInt16LE(20, 6); entry.writeUInt16LE(8, 10); entry.writeUInt32LE(crc, 16); entry.writeUInt32LE(compressed.length, 20); entry.writeUInt32LE(raw.length, 24); entry.writeUInt16LE(filename.length, 28); entry.writeUInt32LE(offset, 42);
+    chunks.push(local, filename, compressed); central.push(entry, filename); offset += local.length + filename.length + compressed.length;
+  }
+  const directory = Buffer.concat(central), end = Buffer.alloc(22); end.writeUInt32LE(0x06054b50); end.writeUInt16LE(2, 8); end.writeUInt16LE(2, 10); end.writeUInt32LE(directory.length, 12); end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...chunks, directory, end]);
+}
+
 test('Private uploads require owning-record scope and validate bounded multipart content', async t => withAuditFixture(async h => {
   const owned = [], scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'inop-upload-test-'));
   await fs.mkdir(uploadsDir, { recursive: true });
@@ -79,16 +92,11 @@ test('Private uploads require owning-record scope and validate bounded multipart
       assert.equal((await raw('admin', h.apiBase + `/audit-source-documents/${d.data.id}/file`)).status, 200);
     });
     await t.test('DOCX content is a bounded real ZIP; valid upload/parse survives and expansion bombs fail', async () => {
-      const { execFileSync } = require('node:child_process');
-      const fixture = path.join(scratch, 'valid.docx');
-      execFileSync('python3', ['-c', `import zipfile,sys; z=zipfile.ZipFile(sys.argv[1],"w",zipfile.ZIP_DEFLATED); z.writestr("[Content_Types].xml","<Types/>"); z.writestr("word/document.xml",'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Synthetic Applicant</w:t></w:r></w:p></w:body></w:document>'); z.close()`, fixture]);
       const mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      const bytes = await fs.readFile(fixture);
+      const bytes = officeZip('<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Synthetic Applicant</w:t></w:r></w:p></w:body></w:document>');
       assert.equal((await upload('admin', '/candidates', 'cv', 'valid.docx', mime, bytes, { name: 'Synthetic', role: 'Synthetic' })).status, 201);
       assert.equal((await upload('admin', '/candidates/parse-cv', 'cv', 'valid.docx', mime, bytes)).status, 200);
-      const bomb = path.join(scratch, 'bomb.docx');
-      execFileSync('python3', ['-c', 'import zipfile,sys; z=zipfile.ZipFile(sys.argv[1],"w",zipfile.ZIP_DEFLATED); z.writestr("[Content_Types].xml","<Types/>"); z.writestr("word/document.xml","x"*(21*1024*1024)); z.close()', bomb]);
-      assert.equal((await upload('admin', '/candidates/parse-cv', 'cv', 'bomb.docx', mime, await fs.readFile(bomb))).status, 400);
+      assert.equal((await upload('admin', '/candidates/parse-cv', 'cv', 'bomb.docx', mime, officeZip('x'.repeat(21 * 1024 * 1024)))).status, 400);
     });
     for (const [label, name, mime, bytes] of [
       ['active HTML', 'unsafe.html', 'text/html', '<html>unsafe</html>'], ['MIME mismatch', 'unsafe.pdf', 'text/html', pdf],
