@@ -343,13 +343,13 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P10-001 | Private object storage adapter | OPEN | — |
+| P10-001 | Private object storage adapter | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-002 | Authorized file access | OPEN | — |
 | P10-003 | Original CV retention | OPEN | — |
 | P10-004 | Parsing metadata | OPEN | — |
 | P10-005 | Source identity | OPEN | — |
-| P10-006 | Existing file migration plan | OPEN | — |
-| P10-007 | Existing file fallback | OPEN | — |
+| P10-006 | Existing file migration plan | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
+| P10-007 | Existing file fallback | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-008 | Bounded parsing jobs | OPEN | — |
 | P10-009 | OCR jobs | OPEN | — |
 | P10-010 | AI jobs | OPEN | — |
@@ -358,8 +358,8 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-013 | Idempotency | OPEN | — |
 | P10-014 | Job state | OPEN | — |
 | P10-015 | Retry/failure monitoring | OPEN | — |
-| P10-016 | Reuse infrastructure | OPEN | — |
-| P10-017 | Justify additional resources first | OPEN | — |
+| P10-016 | Reuse infrastructure | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
+| P10-017 | Justify additional resources first | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-018 | Real storage durability test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 | P10-019 | Real storage recovery test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 | P10-020 | Access control tests before real CV acceptance | OPEN | — |
@@ -729,3 +729,11 @@ All enumerated package 09 local adapter/security/HTTP/UI acceptance IDs now have
 ## 10A — privacy prerequisites for durable processing
 
 Negative baseline `/tmp/inop-hr10a-privacy-baseline.log` **0/9 passed**; targeted `/tmp/inop-hr10a-target.log` **126/126** covers new privacy checks plus existing private upload and mixed HR parent scope tests. Full serial `/tmp/inop-hr10a-regression.log` **1628/1628**, TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632** via `/tmp/inop-hr10a-validation.log` and `/tmp/inop-packagehr10a-validation.json`. Only docs/tracker changed after source freeze; local commit pending creation. Contract/limits: `docs/HR_ERROR_PRIVACY.md`. This is a small prerequisite, not completion of storage, quarantine, jobs, retention or all package 10 acceptance IDs. No production, external transport, env or storage change.
+
+10A commit: `65b86c2a5afafe3e0b585a6c83ec9760448caa25` (10 files), 126 target / 1628 full regression, 632 authorization / 13 smoke, TypeScript/build PASS, lint 0 errors / 9 warnings. No push.
+
+## 10B1 — private object storage adapter foundation
+
+In progress. New adapter/test/contract are intentionally not wired into runtime upload/download or a new schema. Target `/tmp/inop-hr10b-target.log` **31/31** is entirely synthetic mock/DNS/HTTPS-injected proof, not real provider access. Fixed endpoint private SigV4, conditional encryption, immutable SHA/size, bounded slots/deadlines and no public URLs/deletion/retry are covered. No new resource, credential, migration or live request. Native filesystem still ephemeral; AUD-050 remains OPEN. Contract, external setup and proposed migration/fallback/backup approval: `docs/HR_PRIVATE_STORAGE_CONTRACT.md`.
+
+Existing application code is unchanged after 10A's 1628 full regression; the new unwired module has its own 31 tests. No unexecuted 1659-test full-suite total is claimed. Final `/tmp/inop-hr10b-validation.log` and `/tmp/inop-packagehr10b-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Local commit pending creation. Real object ownership/bucket policy/conditional write compatibility/durability/recovery and malware/retention are not verified. P10-001/006/007/016/017 in progress; P10-018/019 BLOCKED_EXTERNAL. Next: current-owning-resource read integration, then durable manifests/jobs/quarantine/source drafts.

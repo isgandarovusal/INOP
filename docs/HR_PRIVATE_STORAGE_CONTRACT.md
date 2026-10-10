@@ -1,0 +1,37 @@
+# Package 10 — private object storage and recovery gate
+
+## 10B1: local adapter foundation, not an activated upload migration
+
+`hrPrivateObjectStorage.service` provides a server-only S3-compatible private object adapter using native Node HTTPS/crypto, without a new dependency, resource, SDK credential file or public/signed download URL. Nothing imports it into the runtime upload routes yet. Existing Native Node filesystem behavior is unchanged and remains ephemeral; this foundation does not resolve AUD-050 or authorize real CV acceptance. `prepare` derives an opaque UUIDv4 key, SHA-256, bounded size and MIME from validated server bytes. `put(reference, bytes)` verifies an immutable copy of that identity; conditional If-None-Match=* prevents replacement. `get(reference)` returns only bounded exact-size, exact-SHA verified bytes. MIME/ZIP validation and malware scanning belong to the trusted upload/quarantine caller, not this adapter.
+
+Both operations require HTTPS SigV4, encrypted PUT (AES256), private/no-store metadata and fixed validated endpoint/bucket/region. Secrets/session token are sent only in provider authorization headers, never metadata/reference/errors/logs. Root HTTPS DNS hostname only; embedded credentials, paths/query/fragments/IPs/private host suffixes/non-default ports are denied. Native transport checks all DNS answers for private/link-local/reserved/mapped/tunnel ranges and pins one validated public answer; TLS verification stays enabled and redirects are never followed. Public address validation is a network defense, not validation of provider ownership or bucket policy.
+
+Two shared process-local operations, zero queue, eight-second full deadline, bounded input (5 MiB), bounded GET (reference size) and PUT response (4 KiB), cancellation and sanitized errors are enforced. No automatic retry, delete or overwrite. A timed-out PUT is STORAGE_WRITE_UNCERTAIN: reconcile the same reserved key by authorized verified read, never allocate a replacement or blindly retry/erase it. If-None-Match behavior, encryption, object ownership and backup/versioning must be tested with the actual approved provider. PUT 200 is an acknowledgement, not proof of a durable backup or successful restore. Keys/reference hashes do not confer access; future callers must independently authorize current owning Candidate/Source/Job and recheck after I/O before returning bytes.
+
+The narrow server contract is `{provider: s3, key, sha256, size, mimeType}`. Unknown/prototype-inherited properties, path keys, invalid hashes, unsupported MIME, empty/oversize and mismatched writes fail before network. References contain no file/Candidate name, contact, JWT, provider secret, public URL or authorization grant. Original display names remain local HR metadata. No collision was observed in 1000 generated synthetic references; this is not a mathematical guarantee. Conditional provider writes remain the collision safeguard. Authorized retention deletion and durable reservation/manifests are next, not implemented by this foundation.
+
+## Configuration required only for approved activation
+
+No variables are set by this work. Future adapter configuration names:
+
+- HR_CV_STORAGE_PROVIDER=s3 (unset/disabled is explicitly STORAGE_NOT_CONFIGURED; no environment-selectable mock)
+- HR_CV_STORAGE_ENDPOINT, HR_CV_STORAGE_BUCKET, HR_CV_STORAGE_REGION
+- HR_CV_STORAGE_ACCESS_KEY_ID, HR_CV_STORAGE_SECRET_ACCESS_KEY
+- HR_CV_STORAGE_SESSION_TOKEN (optional temporary credentials)
+
+Use an approved existing private bucket/container only after provider choice, least-privilege key prefix access, server-side encryption, blocked public ACL/policy, retention, versioning/recovery and cost/residency/processing terms are reviewed. An endpoint value/secret must be placed securely in hosting configuration, not chat/repo/logs. No assumption that an object store already exists or that a new paid resource is approved. Real durability/recovery remains BLOCKED_EXTERNAL (P10-018/019). Original CV/extraction metadata may be sensitive even in test data; external adapters stay disabled until storage/access/recovery/quarantine/privacy gates pass.
+
+## Safe existing-file migration/fallback plan
+
+1. Read-only inventory of current Candidate original references, hashes/size/provenance and source identity; distinguish missing, legacy unknown and unreferenced files. Do not infer a hash/ownership from a filename or guess a brand/department.
+2. Reserve one durable server-owned key and manifest per original/revision before upload. Dry-run produces counts/reason codes only, not contents/secret URLs. Current caller must have explicit appropriate server authority; no automatic bulk migration on startup.
+3. Validate current immutable source, content/hash/size and quarantine/scan state. Upload conditionally, verify by bounded read-back and verify source identity still current before a per-record CAS updates a private reference. Never send CV bytes to an AI/storage mock labeled as real.
+4. During transition, a record with no object reference can use its existing authorized local file. A record with an object reference must use that reference and fail closed on missing/corrupt/unavailable data; never fall back to a different local file with a matching name.
+5. Preserve old bytes and manifest until verified retention/recovery checks and explicit migration approval. No automatic local/object deletion. Wrong/missing provenance goes to review. Reconcile interrupted/uncertain uploads by known manifest/key and verified bytes; show retry/failure status.
+6. Backup inventory and encrypted originals/metadata using the approved provider before production migration. Restore into an isolated authorized target and verify exact hashes/access boundaries. Production migration/cleanup/provider activation requires separate approval; rollback disables new intake and preserves private authorized read of verified references, never restores public uploads/old authorization holes.
+
+This is a plan, not an executed migration or hosted backup assertion. Runtime read integration, manifest/background processing, original retention/deletion, malware quarantine and source drafts remain tracked separately.
+
+## Proof and limits
+
+`hrPrivateObjectStorage.test.cjs`: disabled/unconfigured, header/path/config/reference abuse, UUID/size/hash, independent deterministic signing fixture, private conditional encrypted writes, exact verified reads, caller mutation, temporary token privacy, provider errors/redirects/conflicts, timeout/cancellation/bounded capacity and native DNS pinning with injected DNS/HTTPS. All object/DNS/HTTPS responses are synthetic; no external bucket is contacted, no resource/credential is created, and no real provider persistence/recovery/price/E2E is claimed. Existing 10A application regression remains separately recorded; the foundation is unwired and cannot change existing upload behavior.
