@@ -316,27 +316,27 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
 | P09-001 | Remove hardcoded AI suggestions | OPEN | — |
-| P09-002 | Configurable backend adapter | OPEN | — |
-| P09-003 | Title and responsibilities context | OPEN | — |
-| P09-004 | Restaurant/brand context | OPEN | — |
-| P09-005 | Experience and criteria context | OPEN | — |
-| P09-006 | Structured required/preferred skills | OPEN | — |
-| P09-007 | Explanation | OPEN | — |
-| P09-008 | Confidence/uncertainty | OPEN | — |
-| P09-009 | Source context | OPEN | — |
+| P09-002 | Configurable backend adapter | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-003 | Title and responsibilities context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-004 | Restaurant/brand context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-005 | Experience and criteria context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-006 | Structured required/preferred skills | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-007 | Explanation | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-008 | Confidence/uncertainty | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-009 | Source context | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-010 | HR approval/edit | OPEN | — |
-| P09-011 | Schema validation | OPEN | — |
-| P09-012 | Timeout | OPEN | — |
-| P09-013 | Bounded retry | OPEN | — |
-| P09-014 | Rate limit | OPEN | — |
-| P09-015 | Cost budget | OPEN | — |
-| P09-016 | Usage logging without sensitive input | OPEN | — |
+| P09-011 | Schema validation | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-012 | Timeout | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-013 | Bounded retry | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-014 | Rate limit | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-015 | Cost budget | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
+| P09-016 | Usage logging without sensitive input | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-017 | AI-assisted CV review | OPEN | — |
 | P09-018 | Explicit unavailable state | OPEN | — |
 | P09-019 | Mock never presented as real AI | OPEN | — |
 | P09-020 | Untrusted CV prompt injection defense | OPEN | — |
 | P09-021 | Data disclosure controls | OPEN | — |
-| P09-022 | Adapter mock tests | OPEN | — |
+| P09-022 | Adapter mock tests | TESTED | `hrAiProvider.test.cjs`: 47/47; adapter-only bounds/contract, real provider E2E blocked |
 | P09-023 | Real AI E2E with actual provider credentials | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 
 ## Package 10: Durable storage and background processing
@@ -660,3 +660,13 @@ Baseline evidence: `/tmp/inop-hr08d3-ui-baseline.log` 15 negative failures/21 ch
 Expanded test initially sampled Candidate table layout before switching out of grid mode; moving the measurement after the switch preserved the assertions. The corrected test then found the real desktop/tablet Candidate overflow:hidden rule; the fix is scoped to hr-candidates-page. CV review's old English aria-label selector was updated to the exact current AZ name; its unknown month=null storage assertion remains. Job detail overflow was traced to the decorative right:-150px glow, not hidden data, and corrected. Failed intermediate logs are preserved rather than represented as PASS.
 
 All enumerated P08 acceptance IDs have test/measurement evidence for the documented local workload. Remaining cross-package findings are kept: AUD-047 broader upload/provider error localization remains OPEN for 09/13; AUD-073 parse/create double upload is explicitly retained for package 10's durable draft flow; AUD-090 concurrent Source native PDF timeout remains OPEN/root cause unconfirmed. No real OCR/provider/SMTP/durable storage/Graph/website readiness is claimed. Provider variable names/presence were inspected without reading/reporting values: HR_AI_PROVIDER, HR_AI_MODEL, OPENAI_API_KEY, AZURE_OPENAI_API_KEY, ANTHROPIC_API_KEY are absent from injected bindings and Backend .env names. P09-023 stays BLOCKED_EXTERNAL, independent adapter/security/mock/UI work is next. No production push/deployment performed.
+
+08D3 commit: `ee41a48e1fbf4dd7af2bd9591f1207f85ea5bde0` (19 files), 1447/1447 full regression and the recorded final gates. No push performed.
+
+## 09A — disabled-by-default structured AI adapter
+
+Target `/tmp/inop-hr09a-target-final.log`: **47/47**. Full serial regression **1494/1494**, authorization **632/632**, smoke **13/13**, TypeScript/production build PASS, lint **0 errors / 9 warnings**. Local commit pending creation. Evidence: `/tmp/inop-hr09a-regression.log`, `/tmp/inop-hr09a-validation.log`, `/tmp/inop-packagehr09a-validation.json`. Contract: `docs/HR_AI_PROVIDER_CONTRACT.md`. The adapter is independent of HTTP/UI integrations; mock validation of professional title/responsibilities/brand/workplace/experience/skills context is not a live provider proof.
+
+Two process-local active requests, bounded stream/timeout/retry, atomic cross-instance daily budget and hashed actor quotas, sanitized errors and aggregate-only usage counters are tested. Reservations remain conservative after failure; billing/provider-side limits and model compatibility require approved external configuration. TTL is declared for a new counters collection but no production DDL is executed. Protected lexical criteria are checked in skill names, reasons and uncertainty; human approval is still required for semantic bias/accuracy.
+
+P09-001 and AUD-052 remain OPEN until 09B removes the existing Job form hardcoded suggestions. P09-010 approval/edit and 018/019 UI states remain OPEN until the UI and server authorization increment; P09-017/020/021 CV-assisted review/prompt minimization remain OPEN for 09C. P09-023 remains BLOCKED_EXTERNAL. No provider call, production operation, secret, new infrastructure or push.
