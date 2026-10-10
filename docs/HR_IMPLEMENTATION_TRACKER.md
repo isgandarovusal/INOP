@@ -350,7 +350,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-005 | Source identity | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-006 | Existing file migration plan | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
-| P10-008 | Bounded parsing jobs | OPEN | — |
+| P10-008 | Bounded parsing jobs | IN_PROGRESS | 10C2 parse-only durable foundation in development; HTTP/UI, OCR/AI/ingestion still unfinished |
 | P10-009 | OCR jobs | OPEN | — |
 | P10-010 | AI jobs | OPEN | — |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
@@ -515,7 +515,7 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 
 | ID | Package | Finding | Status | Evidence |
 |---|---|---|---|---|
-| AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | TESTED | 06C API tests expose safe codes; UI currently exposes delivery state, explicit retry/monitoring UI remains package 10 |
+| AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | TESTED | 10C1 `applicationDeliveryRetry`, `applicationNotifications`, `applicationDeliveryUI`, `applicationLifecycleUI`: safe reasons, bounded audited/CAS manual retry/current actor, 67 target / 1714 full tests. Real SMTP receipt remains BLOCKED_EXTERNAL |
 | AUD-089 | 06C | SMTP lacks transport bounds and can return/log raw provider diagnostics | TESTED | `applicationNotifications.test.cjs` synthetic transport: old source fails sanitized-error assertion, new bounded/closing transport passes |
 | EXT-SMTP-001 | 06/10 | Approved company SMTP credentials, consent and actual delivery/receipt test | BLOCKED_EXTERNAL | Missing configuration and mocked delivery are tested; real SMTP receipt/bounces are not verified |
 
@@ -757,3 +757,11 @@ All object transport is synthetic; real durability/recovery/provider policy/acce
 In progress. Final targets `/tmp/inop-hr10c1-target-final.log` **67/67** after the optional-revision TypeScript correction; final `/tmp/inop-hr10c1-validation-final.log` and `/tmp/inop-packagehr10c1-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full serial `/tmp/inop-hr10c1-regression.log` **1714/1714**. Local commit pending creation; final gates correspond to the frozen source, only docs/tracker changed afterwards. Contract/limits: `docs/HR_NOTIFICATION_RETRY_CONTRACT.md`. Current server independent parent scopes, whole event/revision CAS, command replay, workflow/stale bounds, current retry actor and safe visible codes are tested without SMTP/provider access.
 
 Negative backend corrected baseline reproduces missing route (404); first omitted Job description and later null interview mutation are fixture failures, preserved separately. Corrected read-only UI baseline proves AZ/EN/RU missing reason labels; its preceding readiness selector failure is not represented as three independent language proofs. Build initially caught optional revision; current UI requires known integer instead of guessing. Generic jobs/storage/drafts/retention/quarantine remain unfinished; external SMTP receipt stays BLOCKED_EXTERNAL. No production, secret, migration, resource, external email or push.
+
+10C1 commit: `dddd640d7e699a5309588bd1a391f50d37ee7581` (15 files), 67 final targets / 1714 full regression, 632 authorization / 13 smoke, TypeScript/build PASS, lint 0 errors / 9 warnings. AUD-088's evidence cell is updated here to the actual completed UI/retry proof; its original 06C API-only wording was inadvertently retained in the preceding commit, not a different test status. No push.
+
+## 10C2 — durable current-source parsing queue foundation
+
+In progress. New model/service/test are unconnected to runtime routes/worker/UI, disabled by default and do not change current CRUD/SMTP flows. Existing 10C1 application source remains unchanged with **1714/1714** full evidence. New owned-DB actual parser/queue tests plus document processing/private storage/privacy regression run separately; no unexecuted sum is called a full-suite run. Final `/tmp/inop-hr10c2-target-final.log` **66/66** (18 new queue checks plus document worker/private storage/privacy), `/tmp/inop-hr10c2-validation-final.log` and `/tmp/inop-packagehr10c2-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Local commit pending creation. Contract/DDL and explicit remaining work: `docs/HR_CV_PROCESSING_CONTRACT.md`.
+
+Parse-only durable metadata, atomic unique global/actor slots and source-context replay, current source/role, bounded lease/deadline/retry and private structured result/HR approval requirement are implemented. There is no automatic Candidate mutation or saved rawText/sections/CV bytes/keys/token. Scans explicitly block for OCR. Native original durability, object writer/drafts, retention/orphans/quarantine and real external provider remain unfinished. No TTL/retention policy, schema migration/backfill, hosting flag or production DDL is activated. Next independent increment: authenticated Candidate-bound queue/status and HR-visible lifecycle/retry/review; then durable source manifests/quarantine, AI/OCR/ingestion preparation and packages 11–13.
