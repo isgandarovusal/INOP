@@ -1,235 +1,97 @@
-const path = require("path");
-const AuditSourceDocument =
-  require("../models/auditSourceDocument.model");
+const crypto = require("node:crypto");
+const mongoose = require("mongoose");
+const AuditSourceDocument = require("../models/auditSourceDocument.model");
+const AuditTemplate = require("../models/auditTemplate.model");
+const AuditExecution = require("../models/auditExecution.model");
 const { recordActivity } = require("../services/activityLog.service");
-
+const { cleanupUploadedFile, removeStoredFile, isSafeFilename } = require("../services/fileStorage.service");
+const {
+  requireScope, readScope, text, queryText, enumValue, identifierFilter,
+  objectId, requestError, errorResponse,
+} = require("../services/auditLibrary.service");
+const { listRecords } = require("../utils/listQuery");
+const AUDIT_TYPES = ["service", "standard", "occupational-safety"];
 
 function normalizeDocument(doc) {
-  if (!doc) return null;
-
-  const item = doc.toObject
-    ? doc.toObject()
-    : doc;
-
+  const item = doc.toObject ? doc.toObject() : doc;
   return {
-    ...item,
-    id: String(item._id || item.id),
-    _id: undefined,
+    ...item, id: String(item._id || item.id), _id: undefined,
+    filePath: `/uploads/${item.fileName}`,
+    url: `/uploads/${item.fileName}`,
   };
 }
 
-
+async function log(req, action, document) {
+  try {
+    await recordActivity({ req, action, entityType: "audit_source_document", entityId: document._id,
+      description: `Audit source document ${action}: ${document.originalName}` });
+  } catch (error) { console.error("Audit source activity error:", error?.name || "Error"); }
+}
 
 exports.getDocuments = async (req, res) => {
-
   try {
-
     const filter = {};
-
-
-    if (req.query.templateId) {
-      filter.templateId = req.query.templateId;
-    }
-
-
-    if (req.query.brandId) {
-      filter.brandId = req.query.brandId;
-    }
-
-
-    if (req.query.auditType) {
-      filter.auditType = req.query.auditType;
-    }
-
-
-    const documents =
-      await AuditSourceDocument
-        .find(filter)
-        .sort({
-          createdAt: -1,
-        })
-        .lean();
-
-
-    res.json(
-      documents.map(normalizeDocument)
-    );
-
-
-  } catch(error) {
-
-    console.error(
-      "getDocuments error:",
-      error
-    );
-
-    res.status(500).json({
-      message:
-        "Audit fayllarını yükləmək mümkün olmadı.",
-    });
-
-  }
-
+    for (const field of ["templateId", "brandId", "organizationId", "auditType"]) queryText(req, filter, field);
+    if (filter.auditType) enumValue(filter.auditType, "auditType", AUDIT_TYPES);
+    const documents = await listRecords(AuditSourceDocument,
+      { $and: [requireScope(req, "audit.source_document"), filter] }, req, res);
+    return res.json(documents.map(normalizeDocument));
+  } catch (error) { return errorResponse(res, error, "Audit documents could not be loaded."); }
 };
-
-
 
 exports.uploadDocument = async (req, res) => {
-
   try {
-
-    if (!req.file) {
-      return res.status(400).json({
-        message:
-          "Fayl seçilməyib.",
-      });
+    requireScope(req, "audit.source_document");
+    if (!req.file) throw requestError("A file is required.");
+    const body = req.body || {};
+    const templateId = text(body.templateId, "templateId", { max: 150 });
+    let organizationId = text(body.organizationId, "organizationId");
+    let brandId = text(body.brandId, "brandId");
+    let auditType = body.auditType === undefined ? "service" : enumValue(body.auditType, "auditType", AUDIT_TYPES);
+    if (templateId) {
+      const template = await AuditTemplate.findOne({ $and: [{ _id: objectId(templateId) }, await readScope(req, "audit.template")] }).lean();
+      if (!template) throw requestError("Audit template not found.", 404);
+      if (organizationId && organizationId !== template.organizationId || brandId && brandId !== template.brandId ||
+          body.auditType && body.auditType !== template.auditType) throw requestError("Document metadata must match its template.");
+      organizationId = template.organizationId;
+      brandId = template.brandId;
+      auditType = template.auditType;
     }
-
-
-    const {
-      templateId = "",
-      organizationId = "",
-      brandId = "",
-      auditType = "service",
-      uploadedBy = "",
-    } = req.body;
-
-
-    const document =
-      await AuditSourceDocument.create({
-
-        id:
-          `source-${Date.now()}`,
-
-        templateId,
-
-        organizationId,
-
-        brandId,
-
-        auditType,
-
-        fileName:
-          req.file.filename,
-
-        name:
-          req.file.originalname,
-
-        originalName:
-          req.file.originalname,
-
-        mimeType:
-          req.file.mimetype,
-
-        size:
-          req.file.size,
-
-        storageKey:
-          path.join(
-            "uploads",
-            req.file.filename
-          ),
-
-        filePath:
-          req.file.path,
-
-        status:
-          "uploaded",
-
-        uploadedBy,
-
-      });
-
-    try {
-      await recordActivity({
-        req,
-        action: "create",
-        entityType: "audit_source_document",
-        entityId: document._id,
-        description: `Audit source document yükləndi: ${document.originalName || document.name || document.id}`,
-      });
-    } catch (activityError) {
-      console.error(
-        "Audit source document activity log error:",
-        activityError
-      );
-    }
-
-
-    res.status(201).json(
-      normalizeDocument(document)
-    );
-
-
-  } catch(error) {
-
-    console.error(
-      "uploadDocument error:",
-      error
-    );
-
-
-    res.status(500).json({
-      message:
-        "Audit faylını saxlamaq mümkün olmadı.",
+    const document = await AuditSourceDocument.create({
+      id: `source-${crypto.randomUUID()}`, templateId, organizationId, brandId, auditType,
+      fileName: req.file.filename, name: req.file.originalname, originalName: req.file.originalname,
+      mimeType: req.file.mimetype, size: req.file.size,
+      storageKey: `uploads/${req.file.filename}`, filePath: `uploads/${req.file.filename}`, status: "uploaded",
+      uploadedBy: req.user.id, assignedTo: req.user.id, departmentId: req.user.departmentId || "",
     });
-
+    await log(req, "create", document);
+    return res.status(201).json(normalizeDocument(document));
+  } catch (error) {
+    try { await cleanupUploadedFile(req.file); } catch (cleanupError) { console.error("Upload cleanup failed:", cleanupError?.name || "Error"); }
+    return errorResponse(res, error, "Audit document could not be saved.");
   }
-
 };
 
-
-
-exports.deleteDocument = async(req,res)=>{
-
+exports.deleteDocument = async (req, res) => {
   try {
-
-    const document =
-      await AuditSourceDocument.findOneAndDelete({
-        id:req.params.id,
-      });
-
-
-    if(!document){
-
-      return res.status(404).json({
-        message:
-          "Audit faylı tapılmadı.",
-      });
-
+    const scope = requireScope(req, "audit.source_document");
+    const filter = { $and: [scope, identifierFilter(req.params.id)] };
+    const document = await AuditSourceDocument.findOne(filter).lean();
+    if (!document) throw requestError("Audit document not found.", 404);
+    const identifiers = [String(document._id), document.id].filter(Boolean);
+    const references = [{ sourceDocumentIds: { $in: identifiers } }];
+    if (mongoose.isObjectIdOrHexString(document.templateId)) references.push({ _id: document.templateId });
+    const templates = await AuditTemplate.find({ $or: references }).select("_id").lean();
+    if (templates.length && await AuditExecution.exists({ checklistId: { $in: templates.map(template => template._id) } })) {
+      throw requestError("This source document belongs to an executed checklist and must be retained.", 409);
     }
-
-    try {
-      await recordActivity({
-        req,
-        action: "delete",
-        entityType: "audit_source_document",
-        entityId: document._id,
-        description: `Audit source document silindi: ${document.originalName || document.name || document.id}`,
-      });
-    } catch (activityError) {
-      console.error(
-        "Audit source document activity log error:",
-        activityError
-      );
-    }
-
-
-    res.json({
-      success:true,
-      id:req.params.id,
-    });
-
-
-  } catch(error){
-
-    console.error(error);
-
-    res.status(500).json({
-      message:
-        "Delete error",
-    });
-
-  }
-
+    // Remove both current ObjectId and historical source-* references.
+    await AuditTemplate.updateMany({ sourceDocumentIds: { $in: identifiers } },
+      { $pull: { sourceDocumentIds: { $in: identifiers } } });
+    const deleted = await AuditSourceDocument.findOneAndDelete({ $and: [scope, { _id: document._id }] });
+    if (!deleted) throw requestError("Audit document not found.", 404);
+    if (document.fileName && isSafeFilename(document.fileName)) await removeStoredFile(document.fileName);
+    await log(req, "delete", document);
+    return res.json({ success: true, id: req.params.id });
+  } catch (error) { return errorResponse(res, error, "Audit document could not be deleted."); }
 };

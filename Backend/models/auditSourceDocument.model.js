@@ -93,7 +93,10 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
     uploadedBy: {
       type: String,
       default: "",
+      index: true,
     },
+    departmentId: { type: String, default: "", trim: true, index: true },
+    assignedTo: { type: String, default: "", trim: true, index: true },
   },
   {
     timestamps: true,
@@ -106,6 +109,10 @@ AuditSourceDocumentSchema.index({
   auditType: 1,
   createdAt: -1,
 });
+AuditSourceDocumentSchema.index({ fileName: 1 });
+AuditSourceDocumentSchema.index({ departmentId: 1, createdAt: -1 });
+AuditSourceDocumentSchema.index({ uploadedBy: 1, createdAt: -1 });
+AuditSourceDocumentSchema.index({ assignedTo: 1, createdAt: -1 });
 
 
 module.exports =

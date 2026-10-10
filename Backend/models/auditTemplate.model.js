@@ -89,6 +89,7 @@ const AuditTemplateSchema = new mongoose.Schema(
     visitCount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     status: {
@@ -111,12 +112,15 @@ const AuditTemplateSchema = new mongoose.Schema(
     createdBy: {
       type: String,
       default: "",
+      index: true,
     },
 
     updatedBy: {
       type: String,
       default: "",
     },
+    departmentId: { type: String, default: "", trim: true, index: true },
+    assignedTo: { type: String, default: "", trim: true, index: true },
   },
   {
     timestamps: true,
@@ -128,6 +132,9 @@ AuditTemplateSchema.index({
   auditType: 1,
   status: 1,
 });
+AuditTemplateSchema.index({ createdBy: 1, updatedAt: -1 });
+AuditTemplateSchema.index({ assignedTo: 1, updatedAt: -1 });
+AuditTemplateSchema.index({ departmentId: 1, updatedAt: -1 });
 
 module.exports =
   mongoose.models.AuditTemplate ||

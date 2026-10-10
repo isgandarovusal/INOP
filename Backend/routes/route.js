@@ -11,18 +11,11 @@ const { cvParseUpload } = require("../middleware/cvParse.middleware");
 const cvController = require("../controllers/cv.controller");
 const { requireAssignedAuditAccess } = require("../middleware/auditScope.middleware");
 const { withAuditMutation } = require("../services/auditMutation.service");
+const { withAuditLibraryMutation } = require("../services/auditLibraryMutation.service");
 
 const express = require('express');
-const multer = require('multer');
 const router = express.Router();
-const auditDocumentStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, 'uploads/'),
-  filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-});
-
-const auditDocumentUpload = multer({
-  storage: auditDocumentStorage,
-});
+const { auditDocumentUpload } = require('../middleware/uploads.middleware');
 
 
 const jobsController = require('../controllers/jobs.controller');
@@ -135,6 +128,14 @@ router.put(
   withAuditMutation(auditsController.updateAudit)
 );
 
+router.post(
+  '/audits/:id/attachments',
+  ...authorize('audit', 'update'),
+  requireAssignedAuditAccess,
+  auditDocumentUpload.single('file'),
+  withAuditMutation(require('../controllers/auditAttachments.controller').uploadAuditAttachment)
+);
+
 router.delete(
   '/audits/:id',
   ...authorize('audit', 'delete'),
@@ -175,6 +176,12 @@ router.delete(
 
 // Audit Template API
 router.get(
+  '/audit-templates/:id/checklist',
+  ...authorize('audit.template', 'read'),
+  auditTemplatesController.getTemplateChecklist
+);
+
+router.get(
   '/audit-templates',
   ...authorize('audit.template', 'read'),
   auditTemplatesController.getTemplates
@@ -189,19 +196,19 @@ router.get(
 router.post(
   '/audit-templates',
   ...authorize('audit.template', 'create'),
-  auditTemplatesController.createTemplate
+  withAuditLibraryMutation(auditTemplatesController.createTemplate)
 );
 
 router.put(
   '/audit-templates/:id',
   ...authorize('audit.template', 'update'),
-  auditTemplatesController.updateTemplate
+  withAuditLibraryMutation(auditTemplatesController.updateTemplate)
 );
 
 router.delete(
   '/audit-templates/:id',
   ...authorize('audit.template', 'delete'),
-  auditTemplatesController.deleteTemplate
+  withAuditLibraryMutation(auditTemplatesController.deleteTemplate)
 );
 
 // Audit Source Documents
@@ -215,13 +222,13 @@ router.post(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'create'),
   auditDocumentUpload.single('file'),
-  auditSourceDocumentsController.uploadDocument
+  withAuditLibraryMutation(auditSourceDocumentsController.uploadDocument)
 );
 
 router.delete(
   '/audit-source-documents/:id',
   ...authorize('audit.source_document', 'delete'),
-  auditSourceDocumentsController.deleteDocument
+  withAuditLibraryMutation(auditSourceDocumentsController.deleteDocument)
 );
 
 // Jobs Endpoints
