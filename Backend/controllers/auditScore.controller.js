@@ -1,89 +1,36 @@
-const Audit = require("../models/audit.model");
-const { recordActivity } = require("../services/activityLog.service");
-const {
-  findAuditByIdentifier,
-  userHasAuditAccess,
-} = require("../middleware/auditScope.middleware");
+const Audit = require('../models/audit.model');
+const AuditExecution = require('../models/auditExecution.model');
+const { recordActivity } = require('../services/activityLog.service');
+const { normalizeAuditPayload } = require('../services/auditPayload.service');
+const { badRequest, scoreAnswers } = require('../services/auditPolicy.service');
+const { assertAuditEditable } = require('../services/auditRelations.service');
+const { executionTemplate } = require('../services/auditExecutionTemplate.service');
 
-exports.calculateScore = async (req, res) => {
+exports.calculateScore = async (req, res, next) => {
   try {
-    const auditId = req.params.id;
-
-    const auditInfo = await findAuditByIdentifier(auditId);
-
-    if (!auditInfo) {
-      return res.status(404).json({
-        success: false,
-        message: "Audit not found",
-      });
+    assertAuditEditable(req);
+    const audit = await Audit.findById(req.audit._id).lean();
+    if (!audit) throw badRequest('Audit not found', 404);
+    const execution = await AuditExecution.findOne({ auditId: audit._id, status: { $in: ['completed', 'approved'] } })
+      .sort({ createdAt: -1 }).lean();
+    let metrics, score;
+    if (execution) {
+      score = scoreAnswers(await executionTemplate(req, execution), execution.answers).totalScore;
+      metrics = { overallPercentage: score };
+    } else {
+      const body = audit.scores ? { scores: audit.scores } : {};
+      const derived = normalizeAuditPayload(body, req, false, audit);
+      const names = ['overallPercentage', 'foundCritical', 'foundMajor', 'foundMinor', 'foundTotal', 'compliancePercentage', 'passed', 'totalScore', 'maxScore', 'scorePercentage'];
+      metrics = Object.fromEntries(names.filter(key => derived[key] !== undefined).map(key => [key, derived[key]]));
+      score = audit.auditType === 'standard' ? metrics.compliancePercentage : audit.auditType === 'occupational-safety' ? metrics.scorePercentage : metrics.overallPercentage;
+      if (score === undefined) throw badRequest('No valid primary observations exist for scoring');
     }
-
-    if (req.permission?.scope === "assigned") {
-      const allowed = await userHasAuditAccess(req, auditId);
-
-      if (!allowed) {
-        return res.status(403).json({
-          success: false,
-          message: "Bu Audit-in score-unu dəyişmək icazəniz yoxdur.",
-        });
-      }
-    }
-
-    const audit = await Audit.findById(auditInfo._id);
-
-    if (!audit) {
-      return res.status(404).json({
-        success: false,
-        message: "Audit not found",
-      });
-    }
-
-    const checks = Array.isArray(audit.checks)
-      ? audit.checks
-      : Array.isArray(audit.checklist)
-        ? audit.checklist
-        : [];
-
-    const total = checks.length;
-
-    const passed = checks.filter(
-      (item) => item.status === "passed"
-    ).length;
-
-    const score = total
-      ? Math.round((passed / total) * 100)
-      : 0;
-
-    audit.overallPercentage = score;
-
-    await audit.save();
-
+    const updated = await Audit.findOneAndUpdate({ _id: audit._id, status: audit.status, updatedAt: audit.updatedAt },
+      { $set: metrics }, { returnDocument: 'after', runValidators: true });
+    if (!updated) throw badRequest('Audit changed; reload it and try again', 409);
     try {
-      await recordActivity({
-        req,
-        action: "calculate",
-        entityType: "audit_score",
-        entityId: audit._id,
-        description: `Audit score hesablandı: ${score}%`,
-      });
-    } catch (activityError) {
-      console.error(
-        "Audit score activity log error:",
-        activityError
-      );
-    }
-
-    return res.json({
-      success: true,
-      score,
-      data: audit,
-    });
-  } catch (error) {
-    console.error("Score calculation error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Score error",
-    });
-  }
+      await recordActivity({ req, action: 'calculate', entityType: 'audit_score', entityId: audit._id, description: `Audit score calculated: ${score}%` });
+    } catch (error) { console.error('Audit score activity error:', error?.name || "Error"); }
+    return res.json({ success: true, score, data: updated });
+  } catch (error) { return next(error); }
 };

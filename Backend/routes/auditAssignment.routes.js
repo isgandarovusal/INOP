@@ -1,3 +1,4 @@
+const { withAuditMutation } = require("../services/auditMutation.service");
 const router = require("express").Router();
 
 const controller = require("../controllers/auditAssignment.controller");
@@ -11,7 +12,7 @@ router.post(
   "/",
   ...authorize("audit.assignment", "create"),
   requireAssignedAuditAccess,
-  controller.assignAudit
+  withAuditMutation(controller.assignAudit)
 );
 
 router.get(

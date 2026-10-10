@@ -1,3 +1,4 @@
+const { listRecords } = require("../utils/listQuery");
 const mongoose = require("mongoose");
 const AuditNotification = require("../models/auditNotification.model");
 const User = require("../models/user.model");
@@ -8,20 +9,17 @@ const {
   userHasAuditAccess,
 } = require("../middleware/auditScope.middleware");
 
-exports.getNotifications = async (req, res) => {
+exports.getNotifications = async (req, res, next) => {
   try {
-    const notifications = await AuditNotification.find({
-      userId: req.user.id,
-    }).sort({
-      createdAt: -1,
-    });
+    const notifications = await listRecords(AuditNotification, { userId: req.user.id }, req, res);
 
     return res.json({
       success: true,
       data: notifications,
     });
   } catch (error) {
-    console.error("Get notifications error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Get notifications error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -30,7 +28,7 @@ exports.getNotifications = async (req, res) => {
   }
 };
 
-exports.createNotification = async (req, res) => {
+exports.createNotification = async (req, res, next) => {
   try {
     if (!req.user?.id) {
       return res.status(401).json({
@@ -79,7 +77,7 @@ exports.createNotification = async (req, res) => {
       });
     }
 
-    if (req.permission?.scope === "assigned") {
+    if (req.permission?.scope !== "all") {
       const allowed = await userHasAuditAccess(req, auditId);
 
       if (!allowed) {
@@ -99,6 +97,7 @@ exports.createNotification = async (req, res) => {
       }
     }
 
+    if (!await userHasAuditAccess(req, audit._id)) return res.status(403).json({ success: false, message: 'Audit access denied' });
     const notificationResult = await notifyUser({
       auditId: audit._id,
       userId: targetUser._id,
@@ -125,8 +124,7 @@ exports.createNotification = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Audit notification activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(201).json({
@@ -135,7 +133,8 @@ exports.createNotification = async (req, res) => {
       email: notificationResult.email,
     });
   } catch (error) {
-    console.error("Create notification error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Create notification error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -144,7 +143,7 @@ exports.createNotification = async (req, res) => {
   }
 };
 
-exports.markRead = async (req, res) => {
+exports.markRead = async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
@@ -162,7 +161,8 @@ exports.markRead = async (req, res) => {
         read: true,
       },
       {
-        new: true,
+        returnDocument: 'after',
+        runValidators: true,
       }
     );
 
@@ -178,7 +178,8 @@ exports.markRead = async (req, res) => {
       data: notification,
     });
   } catch (error) {
-    console.error("Mark notification read error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Mark notification read error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,

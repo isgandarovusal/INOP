@@ -1,3 +1,8 @@
+const { listRecords } = require("../utils/listQuery");
+const AuditExecution = require('../models/auditExecution.model');
+const AuditApproval = require('../models/auditApproval.model');
+const { badRequest } = require('../services/auditPolicy.service');
+const { assertRelatedRecord, assertAuditEditable } = require('../services/auditRelations.service');
 const AuditFinding = require("../models/auditFinding.model");
 const { recordActivity } = require("../services/activityLog.service");
 const {
@@ -6,7 +11,7 @@ const {
 } = require("../middleware/auditScope.middleware");
 const { createAuditActivity } = require("./auditActivity.controller");
 
-exports.getFindings = async (req, res) => {
+exports.getFindings = async (req, res, next) => {
   try {
     const auditId = req.params.auditId;
 
@@ -30,18 +35,15 @@ exports.getFindings = async (req, res) => {
       }
     }
 
-    const data = await AuditFinding.find({
-      auditId: audit._id,
-    }).sort({
-      createdAt: -1,
-    });
+    const data = await listRecords(AuditFinding, { auditId: audit._id }, req, res);
 
     return res.json({
       success: true,
       data,
     });
   } catch (error) {
-    console.error("Get findings error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Get findings error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -50,7 +52,7 @@ exports.getFindings = async (req, res) => {
   }
 };
 
-exports.createFinding = async (req, res) => {
+exports.createFinding = async (req, res, next) => {
   try {
     const auditId = req.body.auditId;
 
@@ -74,9 +76,13 @@ exports.createFinding = async (req, res) => {
       }
     }
 
+    assertAuditEditable(req);
+    const executionId = await assertRelatedRecord(AuditExecution, req.body.executionId, audit._id, 'Execution');
     const finding = await AuditFinding.create({
       auditId: audit._id,
-      executionId: req.body.executionId || undefined,
+      executionId,
+      createdBy: req.user.id,
+      status: "open",
       title: req.body.title,
       description: req.body.description || "",
       severity: req.body.severity || "medium",
@@ -85,6 +91,7 @@ exports.createFinding = async (req, res) => {
     });
 
     await createAuditActivity({
+      userId: req.user.id,
       auditId: audit._id,
       action: "created",
       resource: "finding",
@@ -109,8 +116,7 @@ exports.createFinding = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Audit finding activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(201).json({
@@ -118,11 +124,31 @@ exports.createFinding = async (req, res) => {
       data: finding,
     });
   } catch (error) {
-    console.error("Create finding error:", error);
+    if (error.statusCode) return next(error);
+    console.error("Create finding error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
       message: "Finding creation error",
     });
   }
+};
+
+exports.updateFindingStatus = async (req, res, next) => {
+  try {
+    assertAuditEditable(req);
+    const finding = await AuditFinding.findById(req.params.id);
+    if (!finding) throw badRequest('Finding not found', 404);
+    const status = req.body.status;
+    const allowed = { open: ['assigned', 'in-progress'], assigned: ['in-progress'], 'in-progress': ['resolved'], resolved: ['closed', 'in-progress'], closed: [] };
+    if (!allowed[finding.status]?.includes(status)) throw badRequest('Invalid finding status transition', 409);
+    if (status === 'closed') {
+      const approval = await AuditApproval.findOne({ auditId: req.audit._id, findingId: finding._id }).sort({ createdAt: -1 });
+      if (!approval || approval.status !== 'approved' || !approval.approvedAt || new Date(approval.approvedAt) < new Date(finding.updatedAt)) throw badRequest('Current finding approval is required');
+    }
+    const updated = await AuditFinding.findOneAndUpdate({ _id: finding._id, status: finding.status }, { $set: { status } }, { returnDocument: 'after', runValidators: true });
+    if (!updated) throw badRequest('Finding changed; reload it and try again', 409);
+    await createAuditActivity({ auditId: req.audit._id, userId: req.user.id, action: 'updated', resource: 'finding', description: `Finding ${status}`, metadata: { findingId: finding._id } });
+    return res.json({ success: true, data: updated });
+  } catch (error) { return next(error); }
 };

@@ -1,3 +1,9 @@
+const { listRecords } = require("../utils/listQuery");
+const mongoose = require('mongoose');
+const User = require('../models/user.model');
+const { getPermissionScope } = require('../middleware/auth.middleware');
+const { badRequest } = require('../services/auditPolicy.service');
+const { assertAuditEditable } = require('../services/auditRelations.service');
 const AuditAssignment =
   require("../models/auditAssignment.model");
 const { recordActivity } = require("../services/activityLog.service");
@@ -7,16 +13,28 @@ const {
 } = require("./auditActivity.controller");
 
 const {
-  notifyUser,
-} = require("../services/notification.service");
+  notifyUserBestEffort: notifyUser,
+} = require("../services/auditNotificationDelivery.service");
 
 
-exports.assignAudit = async (req, res) => {
+exports.assignAudit = async (req, res, next) => {
   try {
-    const assignment =
-      await AuditAssignment.create(req.body);
+    assertAuditEditable(req);
+    const managementScope = await getPermissionScope(req.user.role, 'audit', 'update');
+    if (managementScope !== 'all' && !(managementScope === 'department' && req.user.departmentId && String(req.audit.departmentId) === String(req.user.departmentId))) {
+      throw badRequest('Audit management permission is required to assign auditors', 403);
+    }
+    if (!mongoose.Types.ObjectId.isValid(req.body.auditor)) throw badRequest('Invalid auditor id');
+    const auditor = await User.findOne({ _id: req.body.auditor, isActive: true }).select('_id role').lean();
+    if (!auditor || !await getPermissionScope(auditor.role, 'audit.execution', 'read')) throw badRequest('Auditor is not authorized to execute audits');
+    const assignment = await AuditAssignment.findOneAndUpdate(
+      { auditId: req.audit._id, auditor: auditor._id },
+      { $setOnInsert: { assignedBy: req.user.id, status: 'assigned' } },
+      { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true },
+    );
 
     await createAuditActivity({
+      userId: req.user.id,
       auditId: assignment.auditId,
       action: "created",
       resource: "assignment",
@@ -40,8 +58,7 @@ exports.assignAudit = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Audit assignment activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     await notifyUser({
@@ -59,7 +76,8 @@ exports.assignAudit = async (req, res) => {
     });
 
   } catch (e) {
-    console.error(e);
+    if (e.status || e.statusCode) return next(e);
+    console.error(e?.name || "Error");
 
     res.status(500).json({
       success: false,
@@ -69,12 +87,10 @@ exports.assignAudit = async (req, res) => {
 };
 
 
-exports.getAssignments = async (req, res) => {
+exports.getAssignments = async (req, res, next) => {
   try {
     const data =
-      await AuditAssignment.find({
-        auditId: req.params.auditId,
-      });
+      await listRecords(AuditAssignment, { auditId: req.audit._id }, req, res);
 
     res.json({
       success: true,
@@ -82,7 +98,8 @@ exports.getAssignments = async (req, res) => {
     });
 
   } catch (e) {
-    console.error(e);
+    if (e.status || e.statusCode) return next(e);
+    console.error(e?.name || "Error");
 
     res.status(500).json({
       success: false,

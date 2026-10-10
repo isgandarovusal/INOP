@@ -1,3 +1,5 @@
+const { canTransition, badRequest } = require("../services/auditPolicy.service");
+const { assertAuditCompletion } = require("../services/auditCompletion.service");
 const Audit = require("../models/audit.model");
 const { recordActivity } = require("../services/activityLog.service");
 const {
@@ -5,7 +7,7 @@ const {
   userHasAuditAccess,
 } = require("../middleware/auditScope.middleware");
 
-exports.updateAuditStatus = async (req, res) => {
+exports.updateAuditStatus = async (req, res, next) => {
   try {
     const auditId = req.params.id;
     const { status } = req.body;
@@ -60,20 +62,24 @@ exports.updateAuditStatus = async (req, res) => {
     }
 
     const previousStatus = existingAudit.status;
+    if (!canTransition(previousStatus, status)) throw badRequest('Invalid audit status transition', 409);
+    if (status === 'completed') await assertAuditCompletion(existingAudit);
 
-    const audit = await Audit.findByIdAndUpdate(
-      auditInfo._id,
+
+    const audit = await Audit.findOneAndUpdate(
+      { _id: auditInfo._id, status: previousStatus, updatedAt: existingAudit.updatedAt },
       {
         $set: {
           status,
         },
       },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
 
+    if (!audit) throw badRequest("Audit changed; reload it and try again", 409);
     if (previousStatus !== status) {
       try {
         await recordActivity({
@@ -86,8 +92,7 @@ exports.updateAuditStatus = async (req, res) => {
       } catch (activityError) {
         console.error(
           "Audit workflow activity log error:",
-          activityError
-        );
+          activityError?.name || "Error");
       }
     }
 
@@ -96,7 +101,8 @@ exports.updateAuditStatus = async (req, res) => {
       data: audit,
     });
   } catch (error) {
-    console.error("Audit status update error:", error);
+    if (error.statusCode) return next(error);
+    console.error("Audit status update error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,

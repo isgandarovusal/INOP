@@ -1,10 +1,11 @@
 const Audit = require("../models/audit.model");
+const { listRecords } = require("../utils/listQuery");
 const { recordActivity } = require("../services/activityLog.service");
 const {
   getAssignedAuditFilter,
 } = require("../middleware/auditScope.middleware");
 
-exports.getOccupationalSafetyAudits = async (req, res) => {
+exports.getOccupationalSafetyAudits = async (req, res, next) => {
   try {
     const scopeFilter = await getAssignedAuditFilter(req);
 
@@ -20,18 +21,15 @@ exports.getOccupationalSafetyAudits = async (req, res) => {
       ...scopeFilter,
     };
 
-    const audits = await Audit.find(filter)
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
+    const audits = await listRecords(Audit, filter, req, res);
 
     return res.json({
       success: true,
       data: audits,
     });
   } catch (error) {
-    console.error("Occupational safety audit list error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Occupational safety audit list error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -40,7 +38,7 @@ exports.getOccupationalSafetyAudits = async (req, res) => {
   }
 };
 
-exports.createOccupationalSafetyAudit = async (req, res) => {
+exports.createOccupationalSafetyAudit = async (req, res, next) => {
   try {
     if (!req.user?.id) {
       return res.status(401).json({
@@ -49,49 +47,8 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
       });
     }
 
-    const audit = await Audit.create({
-      id: req.body.id,
-      restaurantId: req.body.restaurantId,
-      auditorId: req.user.id,
-      auditType: "occupational-safety",
-      date: req.body.date,
-      shift: req.body.shift || "",
-      status: req.body.status || "draft",
-      template: req.body.template,
-      scores: req.body.scores,
-      checks: Array.isArray(req.body.checks)
-        ? req.body.checks
-        : [],
-      serviceTimeObservations: Array.isArray(
-        req.body.serviceTimeObservations
-      )
-        ? req.body.serviceTimeObservations
-        : [],
-      findings: Array.isArray(req.body.findings)
-        ? req.body.findings
-        : [],
-      recommendations: Array.isArray(
-        req.body.recommendations
-      )
-        ? req.body.recommendations
-        : [],
-      overallPercentage:
-        typeof req.body.overallPercentage === "number"
-          ? req.body.overallPercentage
-          : 0,
-      comments: req.body.comments || "",
-      photos: Array.isArray(req.body.photos)
-        ? req.body.photos
-        : [],
-      attachments: Array.isArray(req.body.attachments)
-        ? req.body.attachments
-        : [],
-      metadata:
-        req.body.metadata &&
-        typeof req.body.metadata === "object"
-          ? req.body.metadata
-          : {},
-    });
+    const { normalizeAuditPayload } = require('../services/auditPayload.service');
+    const audit = await Audit.create(normalizeAuditPayload({ ...req.body, auditType: 'occupational-safety' }, req));
 
     try {
       await recordActivity({
@@ -104,8 +61,7 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Occupational safety audit activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(201).json({
@@ -113,7 +69,8 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
       data: audit,
     });
   } catch (error) {
-    console.error("Create safety audit error:", error);
+    if (error.statusCode) return next(error);
+    console.error("Create safety audit error:", error?.name || "Error");
 
     if (error?.code === 11000) {
       return res.status(409).json({

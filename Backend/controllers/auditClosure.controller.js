@@ -1,12 +1,9 @@
+const { listRecords } = require("../utils/listQuery");
+const { assertAuditCompletion } = require("../services/auditCompletion.service");
+const { canTransition, badRequest } = require("../services/auditPolicy.service");
 const mongoose = require("mongoose");
 const Audit =
   require("../models/audit.model");
-
-const AuditFinding =
-  require("../models/auditFinding.model");
-
-const AuditApproval =
-  require("../models/auditApproval.model");
 
 const AuditClosure =
   require("../models/auditClosure.model");
@@ -20,20 +17,21 @@ const {
 } = require("./auditActivity.controller");
 
 const {
-  notifyUser,
-} = require("../services/notification.service");
+  notifyUserBestEffort: notifyUser,
+} = require("../services/auditNotificationDelivery.service");
 
 
 // CLOSE AUDIT
-exports.closeAudit = async (req, res) => {
+exports.closeAudit = async (req, res, next) => {
   try {
     const {
-      auditId,
       executionId,
       comment,
     } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(auditId)) {
+    const auditId = req.audit._id;
+    if (comment !== undefined && typeof comment !== "string") throw badRequest("Closure comment must be text");
+    if (executionId && !mongoose.Types.ObjectId.isValid(executionId)) {
       return res.status(400).json({
         success: false,
         message: "Invalid audit id",
@@ -50,55 +48,32 @@ exports.closeAudit = async (req, res) => {
       });
     }
 
-    const [openFindings, approval] =
-      await Promise.all([
-        AuditFinding.countDocuments({
-          auditId,
-          status: {
-            $ne: "closed",
-          },
-        }),
-        AuditApproval.findOne({
-          auditId,
-        }).sort({
-          createdAt: -1,
-        }),
-      ]);
+    if (!canTransition(audit.status, 'completed') || audit.status === 'completed') throw badRequest('Audit is not ready for closure', 409);
+    const { approval, execution } = await assertAuditCompletion(audit, executionId);
+    const changed = await Audit.findOneAndUpdate({ _id: auditId, status: audit.status, updatedAt: audit.updatedAt }, { $set: { status: 'completed' } }, { returnDocument: 'after', runValidators: true });
+    if (!changed) throw badRequest('Audit changed; reload it and try again', 409);
 
-    if (openFindings > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Open findings exist",
-      });
-    }
-
-    if (
-      approval &&
-      approval.status !== "approved"
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Approval required",
-      });
-    }
-
-    const closure =
-      await AuditClosure.create({
+    let closure;
+    try {
+      closure = await AuditClosure.create({
         auditId,
-        executionId,
+        executionId: execution._id,
         approvalStatus:
-          approval?.status || "approved",
+          approval.status,
         comment,
         closedBy: req.user?.id || null,
       });
+    } catch (error) {
+      await Audit.findOneAndUpdate({ _id: auditId, status: 'completed', updatedAt: changed.updatedAt }, { $set: { status: audit.status } }, { runValidators: true });
+      throw error;
+    }
 
-    audit.status = "completed";
 
-    await audit.save();
 
     const [, assignment] =
       await Promise.all([
         createAuditActivity({
+          userId: req.user.id,
           auditId: audit._id,
           action: "closed",
           resource: "closure",
@@ -117,7 +92,7 @@ exports.closeAudit = async (req, res) => {
             createdAt: -1,
           })
           .select("auditor")
-          .lean(),
+          .lean().catch(error => { console.error("Audit closure recipient lookup failed:", error?.name || "Error"); return null; }),
       ]);
 
     try {
@@ -131,8 +106,7 @@ exports.closeAudit = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Audit closure activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     if (assignment?.auditor) {
@@ -152,7 +126,8 @@ exports.closeAudit = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    if (error.statusCode) return next(error);
+    console.error(error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -170,15 +145,10 @@ exports.closeAudit = async (req, res) => {
 
 
 // GET CLOSURE
-exports.getClosure = async (req, res) => {
+exports.getClosure = async (req, res, next) => {
   try {
     const data =
-      await AuditClosure.find({
-        auditId: req.params.auditId,
-      })
-      .sort({
-        createdAt: -1,
-      });
+      await listRecords(AuditClosure, { auditId: req.audit._id }, req, res);
 
     return res.json({
       success: true,
@@ -186,7 +156,8 @@ exports.getClosure = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    if (error.statusCode) return next(error);
+    console.error(error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({

@@ -1,3 +1,4 @@
+const { listRecords } = require("../utils/listQuery");
 const mongoose = require("mongoose");
 const AuditActivity = require("../models/auditActivity.model");
 
@@ -39,14 +40,14 @@ const createAuditActivity = async ({
       metadata,
     });
   } catch (error) {
-    console.error("Audit activity creation error:", error.message);
+    console.error("Audit activity creation error:", error?.name || "Error");
     return null;
   }
 };
 
-const getAuditHistory = async (req, res) => {
+const getAuditHistory = async (req, res, next) => {
   try {
-    const { auditId } = req.params;
+    const auditId = req.audit?._id || req.params.auditId;
 
     if (!auditId) {
       return res.status(400).json({
@@ -62,9 +63,7 @@ const getAuditHistory = async (req, res) => {
       });
     }
 
-    const activities = await AuditActivity.find({ auditId })
-      .sort({ createdAt: -1 })
-      .lean();
+    const activities = await listRecords(AuditActivity, { auditId }, req, res);
 
     const User = getUserModel();
 
@@ -100,7 +99,8 @@ const getAuditHistory = async (req, res) => {
       data: activities,
     });
   } catch (error) {
-    console.error("Get audit history error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Get audit history error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -109,11 +109,10 @@ const getAuditHistory = async (req, res) => {
   }
 };
 
-const createActivity = async (req, res) => {
+const createActivity = async (req, res, next) => {
   try {
     const {
       auditId,
-      userId,
       action,
       resource,
       description,
@@ -128,8 +127,8 @@ const createActivity = async (req, res) => {
     }
 
     const activity = await createAuditActivity({
-      auditId,
-      userId,
+      auditId: req.audit._id,
+      userId: req.user.id,
       action,
       resource,
       description,
@@ -148,7 +147,8 @@ const createActivity = async (req, res) => {
       data: activity,
     });
   } catch (error) {
-    console.error("Create audit activity error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Create audit activity error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -157,9 +157,9 @@ const createActivity = async (req, res) => {
   }
 };
 
-const getAuditTimeline = async (req, res) => {
+const getAuditTimeline = async (req, res, next) => {
   try {
-    const { auditId } = req.params;
+    const auditId = req.audit?._id || req.params.auditId;
 
     if (!auditId) {
       return res.status(400).json({
@@ -188,9 +188,7 @@ const getAuditTimeline = async (req, res) => {
       }
     }
 
-    const activities = await AuditActivity.find({ auditId })
-      .sort({ createdAt: 1 })
-      .lean();
+    const activities = await listRecords(AuditActivity, { auditId }, req, res, { sort: { createdAt: 1, _id: 1 } });
 
     return res.status(200).json({
       success: true,
@@ -198,7 +196,8 @@ const getAuditTimeline = async (req, res) => {
       data: activities,
     });
   } catch (error) {
-    console.error("Get audit timeline error:", error);
+    if (error.status || error.statusCode) return next(error);
+    console.error("Get audit timeline error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,

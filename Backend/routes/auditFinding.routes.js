@@ -1,3 +1,4 @@
+const { withAuditMutation } = require("../services/auditMutation.service");
 const router = require("express").Router();
 
 const controller = require("../controllers/auditFinding.controller");
@@ -18,7 +19,9 @@ router.post(
   "/",
   ...authorize("audit.finding", "create"),
   requireAssignedAuditAccess,
-  controller.createFinding
+  withAuditMutation(controller.createFinding)
 );
+
+router.patch('/:id/status', ...authorize('audit.finding', 'update'), requireAssignedAuditAccess, withAuditMutation(controller.updateFindingStatus));
 
 module.exports = router;

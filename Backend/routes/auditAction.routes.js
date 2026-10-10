@@ -1,3 +1,4 @@
+const { withAuditMutation } = require("../services/auditMutation.service");
 const express = require("express");
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.post(
   "/",
   ...authorize("audit.action", "create"),
   requireAssignedAuditAccess,
-  createAction
+  withAuditMutation(createAction)
 );
 
 router.get(
@@ -30,7 +31,7 @@ router.put(
   "/:id/status",
   ...authorize("audit.action", "update"),
   requireAssignedAuditAccess,
-  updateActionStatus
+  withAuditMutation(updateActionStatus)
 );
 
 module.exports = router;

@@ -1,3 +1,4 @@
+const { withAuditMutation } = require("../services/auditMutation.service");
 const express = require("express");
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.patch(
   "/:id/details",
   ...authorize("occupational_safety_details", "update"),
   requireAssignedAuditAccess,
-  updateSafetyDetails
+  withAuditMutation(updateSafetyDetails)
 );
 
 module.exports = router;

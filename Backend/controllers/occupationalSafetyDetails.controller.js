@@ -43,7 +43,7 @@ exports.getSafetyDetails = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get safety details error:", error);
+    console.error("Get safety details error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,
@@ -52,7 +52,7 @@ exports.getSafetyDetails = async (req, res) => {
   }
 };
 
-exports.updateSafetyDetails = async (req, res) => {
+exports.updateSafetyDetails = async (req, res, next) => {
   try {
     const auditId = req.params.id;
 
@@ -77,6 +77,11 @@ exports.updateSafetyDetails = async (req, res) => {
       }
     }
 
+    const { assertAuditEditable } = require('../services/auditRelations.service');
+    const { badRequest } = require('../services/auditPolicy.service');
+    assertAuditEditable(req);
+    if (req.body.riskLevel && !['low', 'medium', 'high', 'critical'].includes(req.body.riskLevel)) throw badRequest('Invalid risk level');
+    if (req.body.deadline && !Number.isFinite(Date.parse(req.body.deadline))) throw badRequest('Invalid safety deadline');
     const safetyDetails = {
       riskLevel: req.body.riskLevel || "low",
       violations: Array.isArray(req.body.violations)
@@ -95,7 +100,7 @@ exports.updateSafetyDetails = async (req, res) => {
         },
       },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
@@ -118,8 +123,7 @@ exports.updateSafetyDetails = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Occupational safety details activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.json({
@@ -127,7 +131,8 @@ exports.updateSafetyDetails = async (req, res) => {
       data: audit.safetyDetails,
     });
   } catch (error) {
-    console.error("Update safety details error:", error);
+    if (error.statusCode) return next(error);
+    console.error("Update safety details error:", error?.name || "Error");
 
     return res.status(500).json({
       success: false,

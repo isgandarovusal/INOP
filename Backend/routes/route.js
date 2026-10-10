@@ -10,6 +10,7 @@ const { cvUpload } = require("../middleware/cvUpload.middleware");
 const { cvParseUpload } = require("../middleware/cvParse.middleware");
 const cvController = require("../controllers/cv.controller");
 const { requireAssignedAuditAccess } = require("../middleware/auditScope.middleware");
+const { withAuditMutation } = require("../services/auditMutation.service");
 
 const express = require('express');
 const multer = require('multer');
@@ -78,6 +79,8 @@ router.use('/audit-score', auditScoreRoutes);
 router.use('/audit-dashboard', auditDashboardRoutes);
 router.use('/audit-notification', auditNotificationRoutes);
 router.use('/audit-approval', auditApprovalRoutes);
+router.use('/audit-execution', require('./auditExecution.routes'));
+router.use('/audit-actions', require('./auditAction.routes'));
 router.use('/audit-closure', auditClosureRoutes);
 router.use('/audit-export', auditExportRoutes);
 router.use("/candidate-export", candidateExportRoutes);
@@ -129,13 +132,13 @@ router.put(
   '/audits/:id',
   ...authorize('audit', 'update'),
   requireAssignedAuditAccess,
-  auditsController.updateAudit
+  withAuditMutation(auditsController.updateAudit)
 );
 
 router.delete(
   '/audits/:id',
   ...authorize('audit', 'delete'),
-  auditsController.deleteAudit
+  withAuditMutation(auditsController.deleteAudit)
 );
 
 
