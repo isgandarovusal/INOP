@@ -1,8 +1,11 @@
-type Props = { url: string; type?: string; name: string; onClose: () => void };
-export default function PrivateFilePreview({ url, type, name, onClose }: Props) {
+import { useTranslation } from 'react-i18next';
+type Props = { url: string; type?: string; text?: string; name: string; onClose: () => void };
+export default function PrivateFilePreview({ url, type, text, name, onClose }: Props) {
+  const { t } = useTranslation();
   return <div role="dialog" aria-label={name} className="audit-card">
-    <button type="button" onClick={onClose}>Bağla</button>
+    <button type="button" onClick={onClose}>{t('cvReview.close', { defaultValue: 'Bağla' })}</button>
     {type === "application/pdf" && <iframe referrerPolicy="no-referrer" src={url} title={name} style={{ width: "100%", height: "65vh" }} />}
-    <a href={url} download={name}>Endir: {name}</a>
+    {text !== undefined && <><p>{t('cvReview.textPreview', { defaultValue: 'Extracted text preview; original layout may differ.' })}</p><pre style={{ whiteSpace: 'pre-wrap', maxHeight: '65vh', overflow: 'auto' }}>{text}</pre></>}
+    <a href={url} download={name}>{t('cvReview.download', { defaultValue: 'Endir' })}: {name}</a>
   </div>;
 }

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
+const { reviewForFile, contactPhone, manualReview, historyInput } = require('../services/cvReview.service');
 
 const candidateStatusValues =
   Candidate.schema.path("status").enumValues;
@@ -56,7 +57,7 @@ function normalizeStatus(value) {
 
 function parseExperience(value) {
   if (value === undefined || value === null || value === "") {
-    return 0;
+    return null;
   }
 
   const experience = Number(value);
@@ -73,6 +74,7 @@ exports.getCandidates = async (req, res) => {
     const candidates = await Candidate.find(
       buildScopedQuery(req)
     )
+      .select('-cvReview.fields -employmentHistory -educationHistory -certificationHistory')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -147,7 +149,7 @@ exports.createCandidate = async (req, res) => {
       req.body.experience
     );
 
-    if (experience === null) {
+    if (experience === null && req.body.experience !== undefined && req.body.experience !== null && req.body.experience !== "") {
       return res.status(400).json({
         message: "Təcrübə ili düzgün rəqəm olmalıdır.",
       });
@@ -163,24 +165,36 @@ exports.createCandidate = async (req, res) => {
      * departmentId / createdBy / assignedTo
      * client request-dən qəbul edilmir.
      */
+    const extracted = await reviewForFile(req.file);
+    const histories = {};
+    for (const field of ['employmentHistory', 'educationHistory', 'certificationHistory']) {
+      if (req.body[field] !== undefined) {
+        histories[field] = historyInput(req.body[field]);
+        if (histories[field] === null) return res.status(400).json({ message: 'CV history düzgün deyil.' });
+      }
+    }
     const candidate = new Candidate({
       name,
       role,
       status,
 
-      email: normalizeString(req.body.email),
-      phone: normalizeString(req.body.phone),
-      education: normalizeString(req.body.education),
+      email: req.body.email !== undefined ? normalizeString(req.body.email) : extracted?.parsed?.email || '',
+      ...contactPhone(req.body.phone !== undefined ? req.body.phone : extracted?.parsed?.phoneRaw),
+      education: req.body.education !== undefined ? normalizeString(req.body.education) : extracted?.parsed?.education || '',
 
-      skills: normalizeArray(req.body.skills),
-      experience,
+      skills: req.body.skills !== undefined ? normalizeArray(req.body.skills) : extracted?.parsed?.skills || [],
+      experience: req.body.experience !== undefined ? experience : extracted?.parsed?.experience ?? null,
 
-      languages: normalizeArray(req.body.languages),
-      certificates: normalizeArray(
-        req.body.certificates
-      ),
+      languages: req.body.languages !== undefined ? normalizeArray(req.body.languages) : extracted?.parsed?.languages || [],
+      certificates: req.body.certificates !== undefined ? normalizeArray(req.body.certificates) : extracted?.parsed?.certificates || [],
 
       cvUrl,
+      cvOriginal: extracted?.original,
+      cvReview: extracted?.review,
+      employmentHistory: extracted?.parsed?.employmentHistory || [],
+      educationHistory: extracted?.parsed?.educationHistory || [],
+      certificationHistory: extracted?.parsed?.certificationHistory || [],
+      ...histories,
 
       departmentId: req.user.departmentId || "",
       createdBy: req.user.id,
@@ -232,6 +246,11 @@ exports.updateCandidate = async (req, res) => {
 
     const update = {};
     if (req.file) update.cvUrl = `/uploads/${req.file.filename}`;
+    const current = await Candidate.findOne(buildScopedQuery(req, { _id: id }));
+    if (!current) return res.status(404).json({ message: "Namizəd tapılmadı və ya giriş icazəniz yoxdur." });
+    const expected = req.body.expectedRevision;
+    if (expected !== undefined && (!Number.isInteger(Number(expected)) || Number(expected) < 0)) return res.status(400).json({ message: 'Revision düzgün deyil.' });
+    if (expected !== undefined && Number(expected) !== (current.__v ?? 0)) return res.status(409).json({ message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.', code: 'REVISION_CONFLICT' });
 
     if (req.body.name !== undefined) {
       const name = normalizeString(req.body.name);
@@ -274,7 +293,7 @@ exports.updateCandidate = async (req, res) => {
     }
 
     if (req.body.phone !== undefined) {
-      update.phone = normalizeString(req.body.phone);
+      Object.assign(update, contactPhone(req.body.phone));
     }
 
     if (req.body.education !== undefined) {
@@ -293,7 +312,7 @@ exports.updateCandidate = async (req, res) => {
         req.body.experience
       );
 
-      if (experience === null) {
+      if (experience === null && req.body.experience !== null && req.body.experience !== "") {
         return res.status(400).json({
           message:
             "Təcrübə ili düzgün rəqəm olmalıdır.",
@@ -314,6 +333,24 @@ exports.updateCandidate = async (req, res) => {
         req.body.certificates
       );
     }
+    for (const field of ['employmentHistory', 'educationHistory', 'certificationHistory']) {
+      if (req.body[field] !== undefined) {
+        update[field] = historyInput(req.body[field]);
+        if (update[field] === null) return res.status(400).json({ message: 'CV history düzgün deyil.' });
+      }
+    }
+
+    const extracted = await reviewForFile(req.file);
+    if (extracted) {
+      update.cvOriginal = extracted.original; update.cvReview = extracted.review;
+      update.employmentHistory ??= extracted.parsed?.employmentHistory || [];
+      update.educationHistory ??= extracted.parsed?.educationHistory || [];
+      update.certificationHistory ??= extracted.parsed?.certificationHistory || [];
+    } else {
+      const review = manualReview(req, current, update);
+      if (review === null) return res.status(400).json({ message: 'CV review status düzgün deyil.' });
+      if (review !== undefined) update.cvReview = review;
+    }
 
     /*
      * Authorization fields are intentionally ignored.
@@ -326,8 +363,9 @@ exports.updateCandidate = async (req, res) => {
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: id,
+        __v: current.__v === undefined ? { $exists: false } : current.__v,
       }),
-      update,
+      { $set: update, $inc: { __v: 1 } },
       {
         new: true,
         runValidators: true,
@@ -335,6 +373,7 @@ exports.updateCandidate = async (req, res) => {
     );
 
     if (!updated) {
+      if (await Candidate.exists(buildScopedQuery(req, { _id: id }))) return res.status(409).json({ message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.', code: 'REVISION_CONFLICT' });
       return res.status(404).json({
         message:
           "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",

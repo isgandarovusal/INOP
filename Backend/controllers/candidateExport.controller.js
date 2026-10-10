@@ -14,7 +14,7 @@ function candidateRow(candidate) {
     Phone: candidate.phone || "",
     Role: candidate.role || "",
     Status: candidate.status || "",
-    ExperienceYears: candidate.experience ?? 0,
+    ExperienceYears: candidate.experience ?? "",
     Skills: Array.isArray(candidate.skills)
       ? candidate.skills.join(", ")
       : "",
@@ -147,7 +147,7 @@ exports.exportCandidatePdf = async (req, res) => {
     line("Phone", candidate.phone);
     line(
       "Experience",
-      `${candidate.experience ?? 0} years`
+      candidate.experience == null ? "Unknown" : `${candidate.experience} years`
     );
     line("Education", candidate.education);
     line(

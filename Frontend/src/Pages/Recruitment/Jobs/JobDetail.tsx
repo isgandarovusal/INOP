@@ -191,7 +191,7 @@ const JobDetail: React.FC = () => {
                       </p>
 
                       <p className="ranking-row__meta">
-                        {candidate!.experience}{" "}
+                        {candidate!.experience ?? t("cvReview.unknown")}{" "}
                         {t("recruitment.jobs.years")} ·{" "}
                         <Badge tone="accent">
                           {t(`recruitment.applicationStatus.${app.status}`)}

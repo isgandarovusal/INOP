@@ -1,5 +1,6 @@
+import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import HRResourceState from "../../../Components/HRResourceState";
-import { useAuditResource } from "../../../Hooks/useAuditResource";
+import { auditErrorStatus, useAuditResource } from "../../../Hooks/useAuditResource";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,6 +19,7 @@ import {
   exportCandidatePdf,
   getCandidateById,
   getCandidateCv,
+  parseCandidateCv,
 } from "../../../Services/candidatesService";
 import { useTranslation } from "react-i18next";
 import { hasPermission } from "../../../Utils/permissions";
@@ -33,10 +35,10 @@ const CandidateDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const fileContext = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
-  const cv = usePrivateFile(fileContext);
   const result = useAuditResource(id, "candidate", getCandidateById);
   const candidate = result.data;
+  const fileContext = JSON.stringify([id, candidate?.cvUrl, candidate?.cvOriginal?.sha256, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  const cv = usePrivateFile(fileContext);
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
 
@@ -100,6 +102,9 @@ const CandidateDetail: React.FC = () => {
 
   return (
     <div className="candidate-detail-page">
+      <CvReviewEvidence review={candidate.cvReview} />
+      {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
+      {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
       <PageHeader
         title={candidate.name}
         subtitle={
@@ -201,7 +206,7 @@ const CandidateDetail: React.FC = () => {
           <strong>
             {t("recruitment.candidateDetail.experience")}:
           </strong>{" "}
-          {candidate.experience}{" "}
+          {candidate.experience ?? t("cvReview.unknown")}{" "}
           {t("recruitment.candidateDetail.years")}
         </p>
 
@@ -229,7 +234,20 @@ const CandidateDetail: React.FC = () => {
             <strong>
               {t("recruitment.candidateDetail.cv")}:
             </strong>{" "}
-            <button type="button" disabled={cv.loading || !hasPermission(user, "candidate", "read")} onClick={() => void cv.open(signal => getCandidateCv(candidate.id, signal))}>
+            <button type="button" disabled={cv.loading || !hasPermission(user, "candidate", "read")} onClick={() => void cv.open(async signal => {
+              const blob = await getCandidateCv(candidate.id, signal);
+              if (candidate.cvUrl?.endsWith('.docx')) {
+                try {
+                  const parsed = await parseCandidateCv(new File([blob], 'preview.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), signal);
+                  return { blob, text: parsed.rawText };
+                } catch (error) {
+                  const status = auditErrorStatus(error);
+                  if (signal.aborted || status === 'unauthenticated' || status === 'forbidden') throw error;
+                  return { blob, text: t('cvReview.previewUnavailable') };
+                }
+              }
+              return blob;
+            })}>
               <FileText size={16} />
               {cv.loading ? t("audit.checklist.builder.loading") : t("recruitment.candidateDetail.openCv")}
             </button>
@@ -238,7 +256,7 @@ const CandidateDetail: React.FC = () => {
         )}
       </div>
 
-      {cv.url && <PrivateFilePreview url={cv.url} type={cv.type} name={cvUrl.split("/").pop() || "cv"} onClose={cv.close} />}
+      {cv.url && <PrivateFilePreview url={cv.url} type={cv.type} text={cv.text} name={candidate.cvOriginal?.originalName || cvUrl.split("/").pop() || "cv"} onClose={cv.close} />}
 
       <div
         style={{

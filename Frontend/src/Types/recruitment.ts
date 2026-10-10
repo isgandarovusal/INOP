@@ -59,6 +59,7 @@ export interface CandidateFile {
 export interface Candidate {
   id: string;
   _id?: string;
+  revision?: number;
 
   name: string;
   role: string;
@@ -66,7 +67,13 @@ export interface Candidate {
   status: CandidateStatus;
 
   skills: string[];
-  experience: number;
+  experience: number | null;
+  phoneRaw?: string;
+  employmentHistory?: CvHistoryEntry[];
+  educationHistory?: CvHistoryEntry[];
+  certificationHistory?: CvHistoryEntry[];
+  cvOriginal?: { originalName?: string; mimeType?: string; size?: number; sha256?: string };
+  cvReview?: CvReview;
 
   cvUrl?: string;
   cv?: CandidateFile | null;
@@ -83,6 +90,22 @@ export interface Candidate {
 
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface CvHistoryEntry {
+  raw: string;
+  organization: string | null;
+  title: string | null;
+  start: { year: number; month: number | null } | null;
+  end: { year: number; month: number | null } | null;
+  ongoing: boolean;
+}
+export interface CvReview {
+  version?: string; provider?: string; confidenceKind?: string;
+  processingStatus?: "extracted" | "unsupported_ocr" | "failed";
+  reviewStatus?: "pending" | "confirmed" | "corrected";
+  fields?: Record<string, { source: string; evidence: string[]; confidence: number | null }>;
+  warnings?: string[]; correctedFields?: string[];
 }
 
 export type ApplicationStatus =

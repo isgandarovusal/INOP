@@ -13,7 +13,7 @@ export function privateFileErrorMessage(status: AuditLoadStatus | null) {
 export function usePrivateFile(contextKey: string) {
   const currentKey = useRef(contextKey);
   const operation = useRef<{ controller: AbortController; url?: string } | null>(null);
-  const [result, setResult] = useState<{ key: string; loading: boolean; url?: string; type?: string; error?: AuditLoadStatus }>({ key: "", loading: false });
+  const [result, setResult] = useState<{ key: string; loading: boolean; url?: string; type?: string; text?: string; error?: AuditLoadStatus }>({ key: "", loading: false });
   const dispose = useCallback(() => {
     operation.current?.controller.abort();
     if (operation.current?.url) URL.revokeObjectURL(operation.current.url);
@@ -21,19 +21,20 @@ export function usePrivateFile(contextKey: string) {
   }, []);
   useLayoutEffect(() => { currentKey.current = contextKey; return dispose; }, [contextKey, dispose]);
   const close = useCallback(() => { dispose(); setResult({ key: contextKey, loading: false }); }, [contextKey, dispose]);
-  const open = useCallback(async (load: (signal: AbortSignal) => Promise<Blob>) => {
+  const open = useCallback(async (load: (signal: AbortSignal) => Promise<Blob | { blob: Blob; text: string }>) => {
     dispose();
     const request = { controller: new AbortController(), url: undefined as string | undefined };
     operation.current = request; setResult({ key: contextKey, loading: true });
     try {
-      const blob = await load(request.controller.signal);
+      const loaded = await load(request.controller.signal);
+      const blob = loaded instanceof Blob ? loaded : loaded.blob;
       if (request.controller.signal.aborted || operation.current !== request || currentKey.current !== contextKey) return;
       request.url = URL.createObjectURL(blob);
-      setResult({ key: contextKey, loading: false, url: request.url, type: blob.type });
+      setResult({ key: contextKey, loading: false, url: request.url, type: blob.type, text: loaded instanceof Blob ? undefined : loaded.text });
     } catch (error) {
       if (!request.controller.signal.aborted && operation.current === request && currentKey.current === contextKey) setResult({ key: contextKey, loading: false, error: auditErrorStatus(error) });
     }
   }, [contextKey, dispose]);
-  const visible: { loading: boolean; url?: string; type?: string; error?: AuditLoadStatus } = result.key === contextKey ? result : { loading: false };
+  const visible: { loading: boolean; url?: string; type?: string; text?: string; error?: AuditLoadStatus } = result.key === contextKey ? result : { loading: false };
   return { ...visible, open, close };
 }

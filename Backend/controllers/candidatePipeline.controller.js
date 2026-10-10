@@ -7,9 +7,7 @@ const Job = require("../models/job.model");
 const Application = require("../models/application.model");
 const { resourceFilter } = require('../services/hrResourceScope.service');
 
-const {
-  extractCvTextFromFile,
-} = require("../services/cvParser.service");
+const { reviewForFile, contactPhone, historyInput } = require('../services/cvReview.service');
 
 const {
   parseStructuredCv,
@@ -28,7 +26,7 @@ function stringValue(value) {
 }
 
 function listValue(value, fallback = []) {
-  if (value === undefined || value === null || value === "") {
+  if (value === undefined || value === null) {
     return Array.isArray(fallback) ? fallback : [];
   }
 
@@ -62,10 +60,11 @@ function listValue(value, fallback = []) {
     .filter(Boolean);
 }
 
-function numberValue(value, fallback = 0) {
-  if (value === undefined || value === null || value === "") {
-    return Number(fallback) || 0;
+function numberValue(value, fallback = null) {
+  if (value === undefined) {
+    return fallback == null ? null : Number(fallback);
   }
+  if (value === null || value === "") return null;
 
   const parsed = Number(value);
 
@@ -116,21 +115,8 @@ exports.createCandidateFromCv = async (req, res) => {
       });
     }
 
-    const cvText = await extractCvTextFromFile(
-      req.file.path,
-      req.file.originalname
-    );
-
-    if (!cvText) {
-      await cleanupFile(req.file);
-
-      return res.status(422).json({
-        message:
-          "CV faylından oxuna bilən mətn tapılmadı.",
-      });
-    }
-
-    const parsed = parseStructuredCv(cvText);
+    const extracted = await reviewForFile(req.file);
+    const parsed = extracted.parsed || parseStructuredCv('');
 
     const jobId = stringValue(req.body.jobId);
 
@@ -203,7 +189,7 @@ exports.createCandidateFromCv = async (req, res) => {
       parsed.experience
     );
 
-    if (experience === null) {
+    if (experience === null && req.body.experience !== undefined && req.body.experience !== null && req.body.experience !== "") {
       await cleanupFile(req.file);
 
       return res.status(400).json({
@@ -212,22 +198,28 @@ exports.createCandidateFromCv = async (req, res) => {
       });
     }
 
+    const histories = {};
+    for (const field of ['employmentHistory', 'educationHistory', 'certificationHistory']) {
+      if (req.body[field] !== undefined) {
+        histories[field] = historyInput(req.body[field]);
+        if (histories[field] === null) {
+          await cleanupFile(req.file);
+          return res.status(400).json({ message: 'CV history düzgün deyil.' });
+        }
+      }
+    }
     savedCandidate = await Candidate.create({
       name,
       role,
       status,
 
       email:
-        stringValue(req.body.email) ||
-        parsed.email,
+        req.body.email !== undefined ? stringValue(req.body.email) : parsed.email,
 
-      phone:
-        stringValue(req.body.phone) ||
-        parsed.phone,
+      ...contactPhone(req.body.phone !== undefined ? req.body.phone : parsed.phoneRaw),
 
       education:
-        stringValue(req.body.education) ||
-        parsed.education,
+        req.body.education !== undefined ? stringValue(req.body.education) : parsed.education,
 
       skills: listValue(
         req.body.skills,
@@ -247,6 +239,12 @@ exports.createCandidateFromCv = async (req, res) => {
       ),
 
       cvUrl: `/uploads/${req.file.filename}`,
+      cvOriginal: extracted.original,
+      cvReview: extracted.review,
+      employmentHistory: parsed.employmentHistory,
+      educationHistory: parsed.educationHistory,
+      certificationHistory: parsed.certificationHistory,
+      ...histories,
 
       departmentId:
         req.user?.departmentId || "",
@@ -328,6 +326,8 @@ exports.createCandidateFromCv = async (req, res) => {
         name: parsed.name,
         email: parsed.email,
         phone: parsed.phone,
+        phoneRaw: parsed.phoneRaw,
+        extraction: extracted.review,
         role: parsed.role,
         education: parsed.education,
         skills: parsed.skills,

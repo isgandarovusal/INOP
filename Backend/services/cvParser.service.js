@@ -8,6 +8,7 @@ const MAX_EXTRACTED_TEXT_LENGTH = 100_000;
 function normalizeExtractedText(text) {
   return String(text || "")
     .replace(/\r\n/g, "\n")
+    .replace(/^\s*--\s*\d+\s+of\s+\d+\s*--\s*$/gm, "")
     .replace(/[ \t]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim()

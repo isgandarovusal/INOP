@@ -57,7 +57,7 @@ const KanbanCandidateCard = React.memo(
           </strong>
 
           <span className="recruitment-kanban__meta">
-            {candidate.experience} {yearsExperienceLabel}
+            {candidate.experience ?? "—"} {yearsExperienceLabel}
           </span>
         </div>
       )}

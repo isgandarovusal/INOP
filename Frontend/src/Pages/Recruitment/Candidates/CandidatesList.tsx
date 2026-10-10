@@ -386,7 +386,7 @@ const CandidatesList: React.FC = () => {
                     </td>
 
                     <td>
-                      {candidate.experience}{" "}
+                      {candidate.experience ?? t("cvReview.unknown")}{" "}
                       {t("recruitment.candidates.years")}
                     </td>
 

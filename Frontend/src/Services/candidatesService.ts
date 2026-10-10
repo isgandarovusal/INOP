@@ -4,6 +4,7 @@ import { readJson } from "../api/readRequest";
 import type {
   Candidate,
   CandidateStatus,
+  CvHistoryEntry, CvReview,
 } from "../Types/recruitment";
 
 export interface CandidateInput {
@@ -18,7 +19,12 @@ export interface CandidateInput {
   education?: string;
 
   skills?: string[];
-  experience?: number;
+  experience?: number | null;
+  employmentHistory?: CvHistoryEntry[];
+  educationHistory?: CvHistoryEntry[];
+  certificationHistory?: CvHistoryEntry[];
+  reviewStatus?: "pending" | "confirmed" | "corrected";
+  expectedRevision?: number;
 
   languages?: string[];
   certificates?: string[];
@@ -62,6 +68,7 @@ export function normalizeCandidate(raw: unknown): Candidate {
           ? data._id
           : "",
     _id: typeof data._id === "string" ? data._id : undefined,
+    revision: typeof data.__v === "number" ? data.__v : 0,
 
     name: typeof data.name === "string" ? data.name : "",
     role: typeof data.role === "string" ? data.role : "Unspecified",
@@ -73,7 +80,13 @@ export function normalizeCandidate(raw: unknown): Candidate {
 
     skills: stringArray(data.skills),
 
-    experience: Number(data.experience ?? 0),
+    experience: data.experience == null || data.experience === "" ? null : Number(data.experience),
+    phoneRaw: typeof data.phoneRaw === "string" ? data.phoneRaw : undefined,
+    employmentHistory: Array.isArray(data.employmentHistory) ? data.employmentHistory as CvHistoryEntry[] : [],
+    educationHistory: Array.isArray(data.educationHistory) ? data.educationHistory as CvHistoryEntry[] : [],
+    certificationHistory: Array.isArray(data.certificationHistory) ? data.certificationHistory as CvHistoryEntry[] : [],
+    cvOriginal: data.cvOriginal as Candidate["cvOriginal"],
+    cvReview: data.cvReview as CvReview | undefined,
 
     cvUrl: typeof data.cvUrl === "string" ? data.cvUrl : "",
 
@@ -158,7 +171,12 @@ export interface ParsedCvResult {
   role: string;
   education: string;
   skills: string[];
-  experience: number;
+  experience: number | null;
+  phoneRaw?: string;
+  employmentHistory?: CvHistoryEntry[];
+  educationHistory?: CvHistoryEntry[];
+  certificationHistory?: CvHistoryEntry[];
+  extraction?: CvReview;
   languages: string[];
   certificates: string[];
   sections: Record<string, string>;
@@ -225,7 +243,7 @@ export async function createCandidate(
   if (input.experience !== undefined) {
     formData.append(
       "experience",
-      String(input.experience)
+      input.experience == null ? "" : String(input.experience)
     );
   }
 
@@ -249,6 +267,9 @@ export async function createCandidate(
 
   if (input.cvFile) {
     formData.append("cv", input.cvFile);
+  }
+  for (const field of ["employmentHistory", "educationHistory", "certificationHistory"] as const) {
+    if (input[field] !== undefined) formData.append(field, JSON.stringify(input[field]));
   }
 
   const response = await API.post(
@@ -306,16 +327,20 @@ export async function updateCandidate(
   if (input.certificates !== undefined) {
     payload.certificates = input.certificates;
   }
+  for (const field of ["employmentHistory", "educationHistory", "certificationHistory", "reviewStatus", "expectedRevision"] as const) {
+    if (input[field] !== undefined) payload[field] = input[field];
+  }
 
   let body: Record<string, unknown> | FormData = payload;
   if (input.cvFile) {
     const form = new FormData();
     for (const [key, value] of Object.entries(payload)) {
-      if (Array.isArray(value)) {
+      if (key === "employmentHistory" || key === "educationHistory" || key === "certificationHistory") form.append(key, JSON.stringify(value));
+      else if (Array.isArray(value)) {
         if (!value.length) form.append(key, "");
         else value.forEach(item => form.append(key, String(item)));
       }
-      else form.append(key, String(value));
+      else form.append(key, value == null ? "" : String(value));
     }
     form.append("cv", input.cvFile);
     body = form;

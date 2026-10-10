@@ -1,0 +1,17 @@
+import { useTranslation } from 'react-i18next';
+import type { CvReview } from '../Types/recruitment';
+
+export default function CvReviewEvidence({ review }: { review?: CvReview }) {
+  const { t } = useTranslation();
+  if (!review?.version) return null;
+  return <section data-cv-review={review.processingStatus}>
+    <h3>{t('cvReview.heading')}</h3><p>{t('cvReview.ruleBased')} · {review.version} · {t(`cvReview.${review.reviewStatus ?? 'pending'}`)}</p>
+    {review.processingStatus !== 'extracted' && <p role="alert">{t(`cvReview.${review.processingStatus ?? 'failed'}`)}</p>}
+    <p>{t('cvReview.confidenceExplanation')}</p>
+    <details><summary>{t('cvReview.evidence')}</summary>{Object.entries(review.fields ?? {}).map(([field, value]) => <div key={field}>
+      <strong>{field}</strong>: {value.confidence == null ? t('cvReview.unknown') : `${Math.round(value.confidence * 100)}/100`}
+      {review.correctedFields?.includes(field) && <span> · {t('cvReview.corrected')}</span>}
+      {value.evidence.map((quote, i) => <blockquote key={i}>{quote}</blockquote>)}
+    </div>)}</details>
+  </section>;
+}

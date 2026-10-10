@@ -19,7 +19,8 @@ function overlapRatio(have: string[], need: string[]): number {
   return matched.length / need.length;
 }
 
-export function computeCandidateScore(candidate: Candidate, job: Job): number {
+export function computeCandidateScore(candidate: Candidate, job: Job): number | null {
+  if (candidate.experience == null) return null;
   const requiredScore = overlapRatio(candidate.skills, job.requiredSkills);
   const preferredScore = overlapRatio(candidate.skills, job.preferredSkills);
   const experienceScore =

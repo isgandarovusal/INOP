@@ -34,7 +34,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-020 | 02 | Job normalization drops timestamps and breaks newest sorting | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-021 | 02 | Candidate update ignores accepted cvFile | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-022 | 02 | Parsing stale response overwrites newer selected CV/manual fields | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
-| AUD-023 | 03 | Education/languages/certificates have no full HR review editors | OPEN | — |
+| AUD-023 | 03 | Education/languages/certificates have no full HR review editors | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-024 | 02 | HR lists and details lack auth-context cancellation/reset | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-025 | 02 | Language-dependent effects refetch and reset forms | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-026 | 02 | Auxiliary Promise.all failure hides primary Job/Application data | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
@@ -44,20 +44,20 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-030 | 10 | Hard deletion leaves orphan Applications/CV files | OPEN | — |
 | AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | OPEN | — |
 | AUD-032 | 02 | Canonical Candidate/CV pipeline unused by frontend job context | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
-| AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | OPEN | — |
+| AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-034 | 08 | Extraction caps text only after potentially expensive extraction | OPEN | — |
-| AUD-035 | 03 | Phone parser loses valid separators/prefixes/international numbers | OPEN | — |
-| AUD-036 | 03 | Phone has no raw/normalized split or evidence | OPEN | — |
-| AUD-037 | 03 | Name extraction misidentifies headings and excludes Cyrillic | OPEN | — |
-| AUD-038 | 03 | First email may be employer/reference without provenance | OPEN | — |
-| AUD-039 | 03 | Employment dates are not parsed and unknown experience becomes zero | OPEN | — |
-| AUD-040 | 03 | Education structure/date/institution not extracted | OPEN | — |
-| AUD-041 | 03 | IT-only skill substring dictionary gives false positives and misses restaurant skills | OPEN | — |
-| AUD-042 | 03 | AZ/RU language labels and section variants are missing | OPEN | — |
-| AUD-043 | 03 | Certificate issuer/expiry/evidence not represented | OPEN | — |
-| AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | OPEN | — |
+| AUD-035 | 03 | Phone parser loses valid separators/prefixes/international numbers | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-036 | 03 | Phone has no raw/normalized split or evidence | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-037 | 03 | Name extraction misidentifies headings and excludes Cyrillic | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-038 | 03 | First email may be employer/reference without provenance | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-039 | 03 | Employment dates are not parsed and unknown experience becomes zero | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-040 | 03 | Education structure/date/institution not extracted | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-041 | 03 | IT-only skill substring dictionary gives false positives and misses restaurant skills | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-042 | 03 | AZ/RU language labels and section variants are missing | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-043 | 03 | Certificate issuer/expiry/evidence not represented | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-045 | 09 | Rule parser and static suggestions are presented as AI | OPEN | — |
-| AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | OPEN | — |
+| AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-047 | 02 | Upload/processing/error strings have incomplete localization | OPEN | — |
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | OPEN | — |
@@ -90,7 +90,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-076 | 08 | Compound filter/sort indexes missing | OPEN | — |
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | OPEN | — |
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | OPEN | — |
-| AUD-079 | 03 | DOCX has download but no native preview | OPEN | — |
+| AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | OPEN | — |
 | AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
 | AUD-082 | 12 | External website capabilities and administrator access unknown | OPEN | — |
@@ -139,34 +139,34 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P03-001 | Parse +994 50 123 45 67 | OPEN | — |
-| P03-002 | Parse +994 (50) 123-45-67 | OPEN | — |
-| P03-003 | Parse 0(50)1234567 | OPEN | — |
-| P03-004 | Parse 994501234567 | OPEN | — |
-| P03-005 | Parse +994-50-123-45-67 | OPEN | — |
-| P03-006 | Validate other international formats | OPEN | — |
-| P03-007 | Separate raw and normalized phone | OPEN | — |
-| P03-008 | Extract name and surname | OPEN | — |
-| P03-009 | Extract email | OPEN | — |
-| P03-010 | Extract employment history and dates | OPEN | — |
-| P03-011 | Extract education | OPEN | — |
-| P03-012 | Extract skills | OPEN | — |
-| P03-013 | Extract languages | OPEN | — |
-| P03-014 | Extract certificates | OPEN | — |
-| P03-015 | AZ CV fixtures | OPEN | — |
-| P03-016 | English CV fixtures | OPEN | — |
-| P03-017 | Russian CV fixtures | OPEN | — |
-| P03-018 | Restaurant operations/kitchen/cash skills | OPEN | — |
-| P03-019 | HACCP and food safety skills | OPEN | — |
-| P03-020 | Shift/customer service/management skills | OPEN | — |
-| P03-021 | Unknown fields not fabricated or zero | OPEN | — |
-| P03-022 | Persist source and evidence | OPEN | — |
-| P03-023 | Version extraction | OPEN | — |
-| P03-024 | Confidence and review status | OPEN | — |
-| P03-025 | HR edits all extracted fields | OPEN | — |
-| P03-026 | CV replacement parsing races | OPEN | — |
-| P03-027 | Scanned CV processing/unsupported state | OPEN | — |
-| P03-028 | Real OCR E2E only with tested implementation | OPEN | — |
+| P03-001 | Parse +994 50 123 45 67 | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-002 | Parse +994 (50) 123-45-67 | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-003 | Parse 0(50)1234567 | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-004 | Parse 994501234567 | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-005 | Parse +994-50-123-45-67 | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-006 | Validate other international formats | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-007 | Separate raw and normalized phone | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-008 | Extract name and surname | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-009 | Extract email | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-010 | Extract employment history and dates | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-011 | Extract education | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-012 | Extract skills | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-013 | Extract languages | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-014 | Extract certificates | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-015 | AZ CV fixtures | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-016 | English CV fixtures | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-017 | Russian CV fixtures | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-018 | Restaurant operations/kitchen/cash skills | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-019 | HACCP and food safety skills | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-020 | Shift/customer service/management skills | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-021 | Unknown fields not fabricated or zero | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-022 | Persist source and evidence | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-023 | Version extraction | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-024 | Confidence and review status | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-025 | HR edits all extracted fields | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-026 | CV replacement parsing races | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-027 | Scanned CV processing/unsupported state | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
+| P03-028 | Real OCR E2E only with tested implementation | OPEN | Deferred to background/OCR package 10; scanned originals retained as unsupported_ocr, not claimed extracted |
 
 ## Package 04: GFC brands and branches
 
@@ -453,7 +453,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 |---|---|---|---|
 | 01 | `a832bd76f918d6a142e3086c1a5be108935a0000` | Target 85/85; full regression 1020/1020; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | Scope-denied parents return null; UI normalization/lifecycle remains package 02 |
 | 02A | `80fa2d709b3213a7f6a3abc60072cebeb5a57562` | Full regression 1029/1029; HR + summary target 44/44; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | UI lifecycle and edit form criteria still OPEN; replaced old files retained for migration |
-| 02B | `fix(hr): isolate recruitment page lifecycle and permissions` (SHA recorded next update) | Full regression 1051/1051; HR browser targets 30/30; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings (baseline 13) | CV review/extraction and contextual score contracts remain packages 03/05; no external ingestion activated |
+| 02B | `10f01026948e8b2bc0ad2b2f9fcd018d144b668e` | Full regression 1051/1051; HR browser targets 30/30; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings (baseline 13) | CV review/extraction and contextual score contracts remain packages 03/05; no external ingestion activated |
+
+| 03 | `feat(hr): add evidence-based CV extraction and review` (SHA recorded next update) | Full regression 1101/1101; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | OCR is not implemented; historical unknown zeros not rewritten; old files retained for package 10 |
 
 ## External prerequisites
 
@@ -473,3 +475,13 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 02A evidence: `/tmp/inop-hr02a-final-regression.log`, `/tmp/inop-hr02a-summary-contracts.log`, `/tmp/inop-hr02a-final-smoke.log`, `/tmp/inop-packagehr02-validation.json`. Baseline frontend reproduces partial Job update 400. Existing summary tests now assert actual new status, preserving identical scope/count/privacy assertions.
 
 02B artifacts: `/tmp/inop-hr02b-verified-regression.log`, `/tmp/inop-hr02b-lifecycle-final.log`, `/tmp/inop-hr02b-contract-final.log`, `/tmp/inop-packagehr02b-validation.json`. Baseline frontend lifecycle: 18 failures / 19 checks. Final suite includes canonical PDF pipeline and Job-specific ranking. Form focus refresh is disabled to preserve unsaved drafts; list/detail focus refresh remains enabled and server-authorized. All test DBs are isolated loopback fixtures; CV race tests use explicitly synthetic mock responses.
+
+### Additional findings (append-only)
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-084 | 05 | Unused frontend ranking formula differs from backend; remove/align contextual authority | OPEN | `Frontend/src/Services/rankingService.ts`; unknown experience now remains nullable; complete score work pending |
+| AUD-085 | 03 | Concurrent CV replacements can commit older extraction over the latest file | TESTED | `Backend/tests/cvConcurrency.test.cjs`: gated slow PDF vs newer DOCX, 409 CAS, stale revision, legacy __v |
+| AUD-086 | 03 | Numeric age can be misread as years of employment | TESTED | `Backend/tests/cvExtraction.test.cjs`: age excluded from experience and evidence |
+
+03 evidence: `/tmp/inop-hr03-final-regression.log`, `/tmp/inop-hr03-validation-run.log`, `/tmp/inop-packagehr03-validation.json`. This package does not implement OCR or statistically calibrated confidence. Unknown legacy experience zeros cannot be distinguished from actual historical zeros and are not mass rewritten. Old replaced files are retained for the package 10 migration/retention policy. Concurrent replacement rejects an older writer with 409; rejected files are not silently deleted. Heuristic evidence is reviewable and never presented as real AI output. Original DOCX download survives secondary preview outages; permission failures fail closed.

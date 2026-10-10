@@ -22,6 +22,7 @@ exports.parseCv = async (req, res) => {
     if (!text) {
       return res.status(422).json({
         message: "CV faylından oxuna bilən mətn tapılmadı.",
+        code: 'OCR_REQUIRED', processingStatus: 'unsupported_ocr',
       });
     }
 
@@ -34,10 +35,11 @@ exports.parseCv = async (req, res) => {
       ...parsed,
     });
   } catch (error) {
-    console.error("Parse CV error:", error);
+    console.error("Parse CV failed:", error?.name || "ExtractionError");
 
     return res.status(422).json({
       message: "CV emal edilərkən xəta baş verdi.",
+      code: 'EXTRACTION_FAILED', processingStatus: 'failed',
     });
   }
 };

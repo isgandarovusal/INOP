@@ -1,3 +1,5 @@
+import CvReviewEvidence from "../../../Components/CvReviewEvidence";
+import CvHistoryEditor from "../../../Components/CvHistoryEditor";
 import { useMounted } from "../../../Hooks/useMounted";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useEffect, useRef, useState } from "react";
@@ -16,7 +18,7 @@ import {
   parseCandidateCv,
   updateCandidate,
 } from "../../../Services/candidatesService";
-import type { Candidate, CandidateStatus, Job } from "../../../Types/recruitment";
+import type { Candidate, CandidateStatus, Job, CvHistoryEntry, CvReview } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 
 const ACCEPTED_CV_TYPES = [
@@ -36,14 +38,19 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   const [name, setName] = useState(initial?.name ?? "");
   const [role, setRole] = useState(initial?.role ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
-  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [phone, setPhone] = useState(initial?.phoneRaw || initial?.phone || "");
   const [education, setEducation] = useState(initial?.education ?? "");
-  const [experience, setExperience] = useState(initial?.experience ?? 0);
+  const [experience, setExperience] = useState<number | null>(initial?.experience ?? null);
+  const [employmentHistory, setEmploymentHistory] = useState<CvHistoryEntry[]>(initial?.employmentHistory ?? []);
+  const [educationHistory, setEducationHistory] = useState<CvHistoryEntry[]>(initial?.educationHistory ?? []);
+  const [certificationHistory, setCertificationHistory] = useState<CvHistoryEntry[]>(initial?.certificationHistory ?? []);
+  const [review, setReview] = useState<CvReview | undefined>(initial?.cvReview);
+  const [confirmReview, setConfirmReview] = useState(false);
   const [skills, setSkills] = useState<string[]>(initial?.skills ?? []);
   const [languages, setLanguages] = useState<string[]>(initial?.languages ?? []);
   const [certificates, setCertificates] = useState<string[]>(initial?.certificates ?? []);
   const [cvFile, setCvFile] = useState<File | null>(null);
-  const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvUrl?.split("/").pop() ?? null);
+  const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvOriginal?.originalName ?? initial?.cvUrl?.split("/").pop() ?? null);
   
   const parsing = useRef<{ sequence: number; controller?: AbortController }>({ sequence: 0 });
   const [saving, setSaving] = useState(false);
@@ -92,16 +99,20 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
       if (parsed.name) setName(parsed.name);
       if (parsed.role) setRole(parsed.role);
       if (parsed.email) setEmail(parsed.email);
-      if (parsed.phone) setPhone(parsed.phone);
+      if (parsed.phoneRaw || parsed.phone) setPhone(parsed.phoneRaw || parsed.phone);
       if (parsed.education) setEducation(parsed.education);
-      if (parsed.experience != null) setExperience(Number(parsed.experience));
+      setExperience(parsed.experience == null ? null : Number(parsed.experience));
+      setEmploymentHistory(parsed.employmentHistory ?? []); setEducationHistory(parsed.educationHistory ?? []); setCertificationHistory(parsed.certificationHistory ?? []);
+      setReview(parsed.extraction); setConfirmReview(false);
       if (parsed.skills?.length) setSkills(parsed.skills);
       if (parsed.languages?.length) setLanguages(parsed.languages);
       if (parsed.certificates?.length) setCertificates(parsed.certificates);
 
-      toast.success(t("recruitment.candidateForm.aiSuccess"));
+      toast.success(t("cvReview.extracted"));
     } catch (err: unknown) {
       if (sequence !== parsing.current.sequence || controller.signal.aborted) return;
+      const processing = (err as { response?: { data?: { processingStatus?: "unsupported_ocr" | "failed" } } }).response?.data?.processingStatus;
+      if (processing) setReview({ version: "rules-2", provider: "rule-based", processingStatus: processing, reviewStatus: "pending" });
       setError(
         getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
@@ -141,6 +152,9 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
         skills,
         languages,
         certificates,
+        employmentHistory, educationHistory, certificationHistory,
+        reviewStatus: confirmReview ? "confirmed" as const : undefined,
+        expectedRevision: initial?.revision,
         cvFile,
         jobId: job?.id,
       };
@@ -315,6 +329,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
               </div>
             </div>
 
+            <CvReviewEvidence review={review} />
             <fieldset className="candidate-fields" disabled={aiGenerating || saving}>
               <div className="form-group">
                 <label className="candidate-field-label">
@@ -377,8 +392,8 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
                   min={0}
                   name="experience"
                   aria-label={t("recruitment.candidateForm.experience")}
-                  value={experience}
-                  onChange={(e) => setExperience(Number(e.target.value))}
+                  value={experience ?? ""}
+                  onChange={(e) => setExperience(e.target.value === "" ? null : Number(e.target.value))}
                 />
               </div>
 
@@ -393,6 +408,13 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
                   placeholder={t("recruitment.candidateForm.skillPlaceholder")}
                 />
               </div>
+              <div className="form-group"><label>{t("cvReview.education")}<textarea name="education" value={education} onChange={e => setEducation(e.target.value)} /></label></div>
+              <TagInput label={t("cvReview.languages")} values={languages} onChange={setLanguages} />
+              <TagInput label={t("cvReview.certificates")} values={certificates} onChange={setCertificates} />
+              <CvHistoryEditor label={t("cvReview.employmentHistory")} entries={employmentHistory} onChange={setEmploymentHistory} />
+              <CvHistoryEditor label={t("cvReview.educationHistory")} entries={educationHistory} onChange={setEducationHistory} />
+              <CvHistoryEditor label={t("cvReview.certificates")} entries={certificationHistory} onChange={setCertificationHistory} />
+              {isEdit && review?.version && !cvFile && <label><input name="confirmReview" type="checkbox" checked={confirmReview} onChange={e => setConfirmReview(e.target.checked)} />{t("cvReview.confirm")}</label>}
             </fieldset>
           </section>
 

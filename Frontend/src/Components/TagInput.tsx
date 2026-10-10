@@ -65,6 +65,7 @@ const TagInput: React.FC<TagInputProps> = ({
 
         <input
           type="text"
+          aria-label={label}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleKeyDown}
