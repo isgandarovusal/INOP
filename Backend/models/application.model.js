@@ -87,6 +87,15 @@ applicationSchema.index(
   { unique: true }
 );
 
+// Scoped newest-page traversal; DDL is verified only in isolated local DBs.
+applicationSchema.index({ createdAt: -1, _id: -1 });
+applicationSchema.index({ createdBy: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ departmentId: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ assignedTo: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ jobId: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ candidateId: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ 'events.delivery.state': 1, 'events.delivery.nextAttemptAt': 1 });
+
 module.exports =
   mongoose.models.Application ||
   mongoose.model("Application", applicationSchema);

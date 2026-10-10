@@ -85,6 +85,13 @@ const jobSchema = new mongoose.Schema(
   }
 );
 
+// Scoped newest-page traversal; DDL is verified only in isolated local DBs.
+jobSchema.index({ createdAt: -1, _id: -1 });
+jobSchema.index({ createdBy: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ departmentId: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ assignedTo: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ brandId: 1, branchId: 1, status: 1, createdAt: -1, _id: -1 });
+
 module.exports =
   mongoose.models.Job ||
   mongoose.model("Job", jobSchema);

@@ -98,6 +98,10 @@ auditTimelineRoutes
 router.use('/audit-permission', auditPermissionRoutes);
 const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller');
 const applicationWorkflow = require('../controllers/applicationWorkflow.controller');
+const hrPaged = require('../controllers/hrPaged.controller');
+router.get('/hr/v2/jobs', ...authorize('recruitment', 'read'), hrPaged.list('jobs'));
+router.get('/hr/v2/candidates', ...authorize('candidate', 'read'), hrPaged.list('candidates'));
+router.get('/hr/v2/applications', ...authorize('application', 'read'), hrPaged.list('applications'));
 router.get('/hr/analytics', ...authorize('application', 'read'), requirePermission('recruitment', 'read'), require('../controllers/hrAnalytics.controller').get);
 router.patch('/applications/:id/workflow', ...authorize('application', 'update'), applicationWorkflow.update);
 router.patch('/applications/:id/assignment', ...authorize('application', 'update'), applicationWorkflow.update);

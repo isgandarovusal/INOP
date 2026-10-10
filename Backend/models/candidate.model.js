@@ -132,6 +132,12 @@ const candidateSchema = new mongoose.Schema(
   }
 );
 
+// Scoped newest-page traversal; DDL is verified only in isolated local DBs.
+candidateSchema.index({ createdAt: -1, _id: -1 });
+candidateSchema.index({ createdBy: 1, createdAt: -1, _id: -1 });
+candidateSchema.index({ departmentId: 1, createdAt: -1, _id: -1 });
+candidateSchema.index({ assignedTo: 1, createdAt: -1, _id: -1 });
+
 module.exports =
   mongoose.models.Candidate ||
   mongoose.model("Candidate", candidateSchema);

@@ -87,7 +87,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-073 | 08 | CV parse then create double uploads file synchronously | OPEN | — |
 | AUD-074 | 08 | HR service requests lack signal/dedup despite safe main Dashboard implementation | OPEN | — |
 | AUD-075 | 08 | Search/filter/render all records without pagination/virtualization/debounce | OPEN | — |
-| AUD-076 | 08 | Compound filter/sort indexes missing | OPEN | — |
+| AUD-076 | 08 | Compound filter/sort indexes missing | TESTED | `hrPagination.test.cjs`: owned local index creation and hinted IXSCAN; actual unhinted large-data plans remain 08D |
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | OPEN | — |
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | OPEN | — |
 | AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
@@ -284,13 +284,13 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P08-001 | Scoped HR pagination | OPEN | — |
-| P08-002 | Bounded payloads | OPEN | — |
-| P08-003 | Safe projection | OPEN | — |
-| P08-004 | Appropriate indexes | OPEN | — |
-| P08-005 | Versioned backward-compatible transition | OPEN | — |
-| P08-006 | Job-specific queries | OPEN | — |
-| P08-007 | Searchable Candidate lookup | OPEN | — |
+| P08-001 | Scoped HR pagination | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-002 | Bounded payloads | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-003 | Safe projection | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-004 | Appropriate indexes | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-005 | Versioned backward-compatible transition | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-006 | Job-specific queries | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
+| P08-007 | Searchable Candidate lookup | TESTED | `Backend/tests/hrPagination.test.cjs`: 25/25 backend page contract; frontend consumer transition remains 08B |
 | P08-008 | Debounce | OPEN | — |
 | P08-009 | Cancellation | OPEN | — |
 | P08-010 | Virtualization/lazy loading | OPEN | — |
@@ -461,7 +461,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | 06B | `b23d77674c0f6a4ed41f91e2c99eea8be900d0dc` | Targets 24/24; full 1196/1196; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Manual card ordering remains AUD-064/08; notification worker follows in 06C; no real SMTP claim |
 | 06C | `121fc7196571114c1d070de4e4d25dfeffe72e55` | Targets 35/35; full 1212/1212; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | SMTP at-least-once, real receipt unverified; explicit retry/archive UI remains 10 |
 
-| 07 | `feat(hr): add scoped GFC recruitment analytics` (SHA recorded next update) | Targets 40/40; full 1242/1242; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Linked-profile review cohort only; transactional snapshot not claimed; large-data benchmark and paging remain 08; real integrations remain external |
+| 07 | `2e44f1321dad611c42677b88b2bade1f5b3fff8b` | Targets 40/40; full 1242/1242; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Linked-profile review cohort only; transactional snapshot not claimed; large-data benchmark and paging remain 08; real integrations remain external |
+
+| 08A | `feat(hr): add scoped recruitment page APIs` (SHA recorded next update) | Targets 25/25; current final serial full 1267/1267; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Frontend transition 08B; large-data plans/measurements 08D; AUD-090 concurrent Source download investigation remains OPEN |
 
 ## External prerequisites
 
@@ -514,3 +516,10 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 | EXT-SMTP-001 | 06/10 | Approved company SMTP credentials, consent and actual delivery/receipt test | BLOCKED_EXTERNAL | Missing configuration and mocked delivery are tested; real SMTP receipt/bounces are not verified |
 
 07 evidence: `/tmp/inop-hr07a-target-final.log` (17 backend checks), `/tmp/inop-hr07-target-final.log` (40/40, including 10 existing HR contract checks), `/tmp/inop-hr07-regression.log`, `/tmp/inop-hr07-validation-run.log`, `/tmp/inop-packagehr07-validation.json`. Contract: `docs/HR_ANALYTICS_CONTRACT.md`. Backend derives aggregate counters from independent Application/Job scopes, with separately protected Candidate metrics; internal streaming score facts are never returned in the DTO. UI covers GFC/three brands, branch/Job/date/source/status filters, empty/null versus real zero, three locales, no language refetch, stale response/permission protection, malformed envelope, 403/500/retry and mobile overflow. Source values are server-set on new manual/CV pipeline records; old unknown data is not rewritten. Catalog caps do not reduce totals and are explicitly flagged. Package 08 is next: bounded HR pagination/projections/indexes, searchable lookups, manual lane ordering, render/query benchmarks and remaining localization/stability findings. No live-performance or connected-provider claim is made.
+
+| AUD-090 | 13 | Source-document native PDF download timed out under concurrent full regression; root cause unconfirmed | OPEN | `/tmp/inop-hr08a-regression.log`: 4 failures including dependent fixture assertions; isolated `sourceDocuments.test.cjs` 23/23 and serial full run 1267/1267 pass. Source/Audit implementation unchanged by 08A. Investigate without weakening download assertions |
+| AUD-091 | 08A | New Application parent-ID filtering could disclose an unreadable parent cohort count | TESTED | `/tmp/inop-hr08a-parent-filter-baseline.log` reproduces 200 versus expected 404; `hrPagination.test.cjs` now checks independent parent read plus indistinguishable missing/denied 404 |
+
+08A evidence: `Backend/tests/hrPagination.test.cjs` 25/25, `/tmp/inop-hr08a-target-final.log`; TS/build/lint, 13 smoke and 632 authorization in `/tmp/inop-packagehr08a-validation.json`. Backend page contract and non-unique additive index inventory are in `docs/HR_PAGINATION_CONTRACT.md`. Existing array endpoints remain backward compatible; frontend remains unbounded until 08B. P08-001–007 evidence applies to the server contract, not an assertion that the whole package is complete. Manual ordering, parsing isolation and 0/5000/50000 benchmark evidence remain OPEN. No production DDL or deployment performed.
+
+08A final serial regression: `/tmp/inop-hr08a-regression-final.log` 1267/1267, including the corrected denied-parent 404 contract assertion. The earlier parallel Source download failure remains AUD-090, not suppressed or declared resolved.
