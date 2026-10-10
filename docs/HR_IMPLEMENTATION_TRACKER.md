@@ -22,7 +22,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-008 | 02 | Frontend truthy none scope does not fail closed | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-009 | 13 | Live JWT and role.update escalation protection must remain intact | OPEN | — |
 | AUD-010 | 13 | Legacy hr role migration is not automatic and hosted state unknown | OPEN | — |
-| AUD-011 | 06 | Assigned creator field lacks explicit reassignment workflow | OPEN | — |
+| AUD-011 | 06 | Assigned creator field lacks explicit reassignment workflow | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-012 | 02 | Nested populated _id objects are not normalized to id | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-013 | 02 | JobDetail compares populated jobId object with string and loses applications | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-014 | 02 | Applied candidate IDs ignore objects and allow duplicate selection | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
@@ -39,10 +39,10 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-025 | 02 | Language-dependent effects refetch and reset forms | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-026 | 02 | Auxiliary Promise.all failure hides primary Job/Application data | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-027 | 02 | Error/notFound states are conflated or leave forms editable | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
-| AUD-028 | 06 | Activity log lacks scope fields for own/department visibility | OPEN | — |
-| AUD-029 | 06 | Best-effort generic activity log is not Application event history | OPEN | — |
+| AUD-028 | 06 | Activity log lacks scope fields for own/department visibility | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
+| AUD-029 | 06 | Best-effort generic activity log is not Application event history | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-030 | 10 | Hard deletion leaves orphan Applications/CV files | OPEN | — |
-| AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | OPEN | — |
+| AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-032 | 02 | Canonical Candidate/CV pipeline unused by frontend job context | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-034 | 08 | Extraction caps text only after potentially expensive extraction | OPEN | — |
@@ -74,7 +74,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
 | AUD-062 | 06 | Candidate-global statuses conflict with Application stages | OPEN | — |
-| AUD-063 | 06 | No processing state, revision CAS or transition validation | OPEN | — |
+| AUD-063 | 06 | No processing state, revision CAS or transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-064 | 06 | DnD order not persisted and status requests can race | OPEN | — |
 | AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | OPEN | — |
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | OPEN | — |
@@ -230,16 +230,16 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P06-005 | Interview stage | OPEN | — |
 | P06-006 | Offered/Hired/Rejected decisions | OPEN | — |
 | P06-007 | Persist drag and drop | OPEN | — |
-| P06-008 | Independent status across vacancies | OPEN | — |
+| P06-008 | Independent status across vacancies | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | P06-009 | Interview schedule | OPEN | — |
 | P06-010 | Timezone | OPEN | — |
 | P06-011 | Interviewer | OPEN | — |
 | P06-012 | Interview result | OPEN | — |
 | P06-013 | Substatus and next action | OPEN | — |
-| P06-014 | Event before/after | OPEN | — |
-| P06-015 | Event actor/timestamp/reason | OPEN | — |
-| P06-016 | Transition validation | OPEN | — |
-| P06-017 | Revision and 409 conflicts | OPEN | — |
+| P06-014 | Event before/after | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
+| P06-015 | Event actor/timestamp/reason | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
+| P06-016 | Transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
+| P06-017 | Revision and 409 conflicts | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | P06-018 | Optimistic UI rollback/refetch | OPEN | — |
 | P06-019 | Status filter | OPEN | — |
 | P06-020 | Search | OPEN | — |
@@ -459,7 +459,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 04 | `942df3fc87fe8bda9c148fcb12e267b9c0165c84` | Full regression 1124/1124; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | HR locations do not expose audit Restaurants; no legacy brand backfill; analytics execution remains package 07 |
 
-| 05 | `feat(hr): version contextual Application matching` (SHA recorded next update) | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
+| 05 | `2d2cb13af787542756437af20213edfc6ed4c9c9` | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
+
+| 06A | `feat(hr): persist scoped Application lifecycle and history` (SHA recorded next update) | Full regression 1172/1172; targets 38/38; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | DnD/interview UI and notification worker remain 06B/06C; real SMTP not claimed |
 
 ## External prerequisites
 
@@ -497,3 +499,5 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 05 final guard verification: completely absent parent inputs return pending safely; all-zero custom weights are rejected. Target matching/state tests rerun 24/24 after these guards.
 
 05 evidence: `/tmp/inop-hr05-baseline.log` (11/11 failing before patch), `/tmp/inop-hr05-target.log`, `/tmp/inop-hr05-final-browser.log`, `/tmp/inop-hr05-final-regression.log`, `/tmp/inop-packagehr05-validation.json`. Contract and limitations: `docs/HR_MATCHING_CONTRACT.md`. Existing lifecycle test's numeric legacy score assertion now verifies restricted derived data while preserving the row visibility/count, missing parent names and prohibited edit assertions. Recalculation never changes stage. No bulk legacy rewrite or external provider call. The Application board is a score-consistent display; lifecycle/DnD work remains package 06.
+
+06A evidence: `/tmp/inop-hr06a-baseline.log` (11 failed / 14 before patch), `/tmp/inop-hr06a-target-final.log` (38/38), `/tmp/inop-hr06a-regression.log`, `/tmp/inop-hr06a-validation-run.log`, `/tmp/inop-packagehr06-validation.json`. Contract: `docs/HR_APPLICATION_LIFECYCLE.md`. Draft fixture now explicitly checks 409, then opens the job for the existing canonical pipeline test; partial Job metadata preservation assertions remain. History is atomically appended without truncation; defensive count/byte limit reports archiving requirement. Delivery pending records do not imply sent email; next increment implements the worker. Scoring event summaries are independently parent-scoped. All DB operations remain isolated loopback fixtures.

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { creationEvent } = require("../services/applicationLifecycle.service");
 const { scoreResponses } = require("../services/applicationScoreState.service");
 const { decorateApplications } = require("../services/recruitmentCatalog.service");
 const { recordActivity } = require("../services/activityLog.service");
@@ -9,9 +10,7 @@ const { resourceFilter, applicationParents } = require('../services/hrResourceSc
 const {
   calculateApplicationMatch,
 } = require("../services/applicationMatch.service");
-const {
-  notifyCandidateStatus,
-} = require("../services/candidateNotification.service");
+
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -33,6 +32,7 @@ exports.getApplications = async (req, res) => {
     const applications = await Application.find(
       buildScopedQuery(req)
     )
+      .select("-events")
       .populate(applicationParents(req))
       .sort({ createdAt: -1 })
       .lean();
@@ -60,6 +60,7 @@ exports.getApplicationById = async (req, res) => {
         _id: req.params.id,
       })
     )
+      .select("-events")
       .populate(applicationParents(req))
       .lean();
 
@@ -84,6 +85,7 @@ exports.createApplication = async (req, res) => {
   try {
     const { jobId, candidateId, notes = "" } = req.body;
 
+    if (typeof notes !== "string" || notes.length > 5000) return res.status(400).json({ message: "Notes must be text up to 5000 characters." });
     if (!validateObjectId(jobId) || !validateObjectId(candidateId)) {
       return res.status(400).json({
         message: "Job və Candidate ID-ləri düzgün deyil.",
@@ -107,6 +109,7 @@ exports.createApplication = async (req, res) => {
       });
     }
 
+    if (job.status !== "Open") return res.status(409).json({ message: "This vacancy is not accepting applications.", code: "JOB_NOT_OPEN" });
     const existing = await Application.findOne({
       jobId,
       candidateId,
@@ -120,7 +123,7 @@ exports.createApplication = async (req, res) => {
 
     const application = new Application({ jobId, candidateId,
       departmentId: req.user?.departmentId || '', createdBy: req.user?.id || null, assignedTo: req.user?.id || null,
-      notes: String(notes).trim() });
+      notes: notes.trim(), events: [creationEvent(req)] });
     const matchResult = calculateApplicationMatch(job, candidate, { application });
     application.matching = matchResult; application.score = matchResult.score; application.scoreStatus = matchResult.scoreStatus;
 
@@ -167,111 +170,7 @@ exports.createApplication = async (req, res) => {
   }
 };
 
-exports.updateApplicationStatus = async (req, res) => {
-  try {
-    if (!validateObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Müraciət ID-si düzgün deyil.",
-      });
-    }
-
-    const allowedStatuses = [
-      "Applied",
-      "Screening",
-      "Shortlisted",
-      "Interview",
-      "Offered",
-      "Hired",
-      "Rejected",
-    ];
-
-    const { status } = req.body;
-
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({
-        message: "Müraciət statusu düzgün deyil.",
-      });
-    }
-
-    const existing = await Application.findOne(
-      buildScopedQuery(req, {
-        _id: req.params.id,
-      })
-    );
-
-    if (!existing) {
-      return res.status(404).json({
-        message:
-          "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
-      });
-    }
-
-    const updated = await Application.findOneAndUpdate(
-      buildScopedQuery(req, {
-        _id: req.params.id,
-      }),
-      { status },
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .populate("jobId")
-      .populate("candidateId");
-
-    if (!updated) {
-      return res.status(404).json({
-        message:
-          "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
-      });
-    }
-
-    if (existing.status !== updated.status) {
-      try {
-        await notifyCandidateStatus({
-          application: updated,
-          actor: req.user,
-        });
-      } catch (notificationError) {
-        console.error(
-          "Candidate status notification error:",
-          notificationError
-        );
-      }
-
-      try {
-        await recordActivity({
-          req,
-          action: "status_change",
-          entityType: "application",
-          entityId: updated._id,
-          description: `Müraciət statusu dəyişdirildi: ${updated?.candidateId?.name || "Namizəd"} → ${updated?.jobId?.title || "Vakansiya"} (${existing.status} → ${updated.status})`,
-        });
-      } catch (activityError) {
-        console.error(
-          "Application status activity log error:",
-          activityError
-        );
-      }
-    }
-
-    const response = await Application.findById(updated._id)
-      .populate(applicationParents(req)).lean();
-    return res.status(200).json((await decorateApplications(req, await scoreResponses(req, [response])))[0]);
-  } catch (error) {
-    console.error("Update application status error:", error);
-
-    if (error?.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Müraciət statusu düzgün deyil.",
-      });
-    }
-
-    return res.status(500).json({
-      message: "Müraciət statusu yenilənərkən server xətası baş verdi.",
-    });
-  }
-};
+exports.updateApplicationStatus = require('./applicationWorkflow.controller').update;
 
 exports.deleteApplication = async (req, res) => {
   try {

@@ -59,6 +59,7 @@ exports.createActivityLog = async (req, res) => {
     }
 
     const activityLog = await ActivityLog.create({
+      departmentId: req.user?.departmentId || "", createdBy: req.user?.id || null, assignedTo: req.user?.id || null,
       userId: validObjectId(req.user.id)
         ? req.user.id
         : null,

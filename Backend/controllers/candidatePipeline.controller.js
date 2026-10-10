@@ -1,4 +1,5 @@
 const fs = require("fs/promises");
+const { creationEvent } = require("../services/applicationLifecycle.service");
 const mongoose = require("mongoose");
 const { recordActivity } = require("../services/activityLog.service");
 
@@ -115,6 +116,10 @@ exports.createCandidateFromCv = async (req, res) => {
       });
     }
 
+    if (req.body.notes !== undefined && (typeof req.body.notes !== 'string' || req.body.notes.length > 5000)) {
+      await cleanupFile(req.file);
+      return res.status(400).json({ message: 'Notes must be text up to 5000 characters.' });
+    }
     const extracted = await reviewForFile(req.file);
     const parsed = extracted.parsed || parseStructuredCv('');
 
@@ -145,6 +150,10 @@ exports.createCandidateFromCv = async (req, res) => {
       }
     }
 
+    if (job && job.status !== 'Open') {
+      await cleanupFile(req.file);
+      return res.status(409).json({ message: 'This vacancy is not accepting applications.', code: 'JOB_NOT_OPEN' });
+    }
     const name =
       stringValue(req.body.name) ||
       parsed.name;
@@ -279,7 +288,7 @@ exports.createCandidateFromCv = async (req, res) => {
           assignedTo:
             req.user?.id || null,
 
-          score: match.score, matching: match, scoreStatus: match.scoreStatus,
+          score: match.score, matching: match, scoreStatus: match.scoreStatus, events: [creationEvent(req)],
 
           notes:
             stringValue(req.body.notes),

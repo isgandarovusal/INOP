@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const activityLogSchema = new mongoose.Schema(
   {
+    departmentId: { type: String, default: "", index: true },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

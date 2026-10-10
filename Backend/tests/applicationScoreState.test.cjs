@@ -38,6 +38,9 @@ test('Application matching is versioned, scoped, invalidated and explicitly reca
     await h.models.Role.create({ key: 'app_only', name: 'Application only', permissions: [{ resource: 'application', action: '*', scope: 'all' }] });
     await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'app_only' } });
     const r = await h.request('peer', 'GET', '/applications/' + row.app._id); assert.equal(r.status, 200); assert.equal(r.data.scoreStatus, 'restricted'); assert.equal(r.data.matching, null); assert.equal(r.data.score, null);
+    const history = await h.request('peer', 'GET', '/applications/' + row.app._id + '/history');
+    assert.ok(history.data.items.some(e => e.type === 'score'));
+    for (const event of history.data.items.filter(e => e.type === 'score')) { assert.equal(event.after.score, null); assert.equal(event.after.scoreStatus, 'restricted'); assert.equal(event.before.jobHash, undefined); }
     assert.equal((await h.request('peer', 'POST', `/applications/${row.app._id}/recalculate`, {})).status, 403);
   });
   for (const actor of ['own', 'department', 'assigned']) await t.test(`${actor} can recalculate allowed records but not foreign applications`, async () => {

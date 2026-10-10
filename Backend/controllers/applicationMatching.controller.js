@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('node:crypto');
 const Application = require('../models/application.model');
 const { scopedScoreRecords, scoreResponses } = require('../services/applicationScoreState.service');
 const { applicationParents } = require('../services/hrResourceScope.service');
@@ -26,8 +27,12 @@ exports.recalculate = async (req, res, next) => {
       }
     }
     const matching = calculateApplicationMatch(job, candidate, { application: { ...current, ...update } });
+    const summary = m => ({ score: m?.score ?? null, scoreStatus: m?.scoreStatus || 'legacy', version: m?.version || null, jobHash: m?.jobHash || null, candidateHash: m?.candidateHash || null });
+    const event = { id: crypto.randomUUID(), type: 'score', actor: req.user.id, at: new Date(), revision: (current.__v || 0) + 1,
+      before: summary(current.matching || { score: current.score }), after: summary(matching), reason: update.matchingReview?.reason || '' };
+    if ((current.events?.length || 0) >= 1000 || mongoose.mongo.BSON.calculateObjectSize({ ...current, ...update, matching, events: [...(current.events || []), event] }) > 8 * 1024 * 1024) return res.status(409).json({ message: 'Application history needs archiving.', code: 'HISTORY_LIMIT' });
     const saved = await Application.findOneAndUpdate({ $and: [query, { __v: current.__v ?? { $exists: false } }] },
-      { $set: { ...update, matching, score: matching.score, scoreStatus: matching.scoreStatus }, $inc: { __v: 1 } }, { returnDocument: 'after', runValidators: true });
+      { $set: { ...update, matching, score: matching.score, scoreStatus: matching.scoreStatus }, $push: { events: event }, $inc: { __v: 1 } }, { returnDocument: 'after', runValidators: true });
     if (!saved) return res.status(409).json({ message: 'Application changed; reload before recalculating.', code: 'REVISION_CONFLICT' });
     const response = await Application.findById(saved._id).populate(applicationParents(req)).lean();
     res.json((await decorateApplications(req, await scoreResponses(req, [response])))[0]);

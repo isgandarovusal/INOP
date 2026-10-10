@@ -20,16 +20,23 @@ test('HR services preserve IDs, partial updates, new status and CV replacement',
     const { jobs, candidates, applications } = window.hr;
     const job = await jobs.createJob({ position: 'Cashier', department: 'Operations', location: 'Baku', type: 'Part-time', description: 'Synthetic job', requiredSkills: ['Cash handling'], preferredSkills: ['Customer service'], experience: 0, status: 'draft' });
     const candidate = await candidates.createCandidate({ name: 'Synthetic applicant', role: 'Cashier', status: 'new', skills: ['Cash handling'], experience: 0 });
+    let draftDenied;
+    try { await applications.createApplication({ jobId: job.id, candidateId: candidate.id }); }
+    catch (e) { draftDenied = e.response?.status; }
+    await jobs.updateJob(job.id, { status: 'open' });
     const app = await applications.createApplication({ jobId: job.id, candidateId: candidate.id });
+    await jobs.updateJob(job.id, { status: 'draft' });
     const updatedJob = await jobs.updateJob(job.id, { description: 'Only this field changes' });
     const cv = new File(['%PDF-1.4\nSynthetic replacement\n%%EOF'], 'replacement.pdf', { type: 'application/pdf' });
     const replaced = await candidates.updateCandidate(candidate.id, { cvFile: cv, skills: ['Cash handling', 'Food safety'], languages: [], name: 'Reviewed applicant' });
     const listed = await applications.getApplications();
     const detail = await applications.getApplicationById(app.id);
-    return { job, candidate, app, updatedJob, replaced, listed, detail };
+    return { job, candidate, app, updatedJob, replaced, listed, detail, draftDenied };
   });
   try {
+    await t.test('Draft vacancy refuses Applications through the actual frontend service', () => assert.equal(result.draftDenied, 409));
     await t.test('vacancy CV service uses canonical pipeline and creates a linked Application', async () => {
+      await h.page.evaluate(id => window.hr.jobs.updateJob(id, { status: "open" }), result.job.id);
       const doc = new PDFDocument(), chunks = [];
       const ready = new Promise(resolve => { doc.on('data', c => chunks.push(c)); doc.on('end', () => resolve(Buffer.concat(chunks))); });
       doc.text('Synthetic Pipeline Applicant\nCashier\npipeline@example.invalid'); doc.end();

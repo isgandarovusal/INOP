@@ -16,7 +16,8 @@ async function scopedScoreRecords(req, applications) {
 }
 async function scoreResponses(req, records) {
   const { jobs, candidates } = await scopedScoreRecords(req, records);
-  return records.map(a => {
+  return records.map(record => {
+    const { events: _events, ...a } = record;
     const job = jobs.get(String(a.jobId?._id || a.jobId)), candidate = candidates.get(String(a.candidateId?._id || a.candidateId));
     if (!job || !candidate) return { ...a, score: null, scoreStatus: 'restricted', matching: null, matchingReview: undefined };
     const matching = a.matching;

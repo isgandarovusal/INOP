@@ -37,6 +37,12 @@ const applicationSchema = new mongoose.Schema(
       index: true,
     },
 
+    events: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    interview: { type: mongoose.Schema.Types.Mixed, default: null },
+    nextAction: { type: mongoose.Schema.Types.Mixed, default: null },
+    substatus: { type: String, default: "" },
+    stageEnteredAt: { type: Date, default: Date.now },
+    processingState: { type: String, enum: ["idle", "queued", "running", "completed", "failed", "unsupported"], default: "idle" },
     matching: { type: mongoose.Schema.Types.Mixed, default: null },
     scoreStatus: { type: String, default: "pending", enum: ["pending", "incomplete", "calculated", "stale", "legacy"] },
     matchingReview: { type: mongoose.Schema.Types.Mixed, default: null },

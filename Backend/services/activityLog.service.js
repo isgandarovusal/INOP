@@ -15,6 +15,7 @@ async function recordActivity({
   }
 
   return ActivityLog.create({
+    departmentId: req.user?.departmentId || "", createdBy: req.user?.id || null, assignedTo: req.user?.id || null,
     userId: mongoose.Types.ObjectId.isValid(req.user?.id)
       ? req.user.id
       : null,
