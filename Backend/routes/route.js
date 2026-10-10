@@ -286,7 +286,6 @@ router.get(
 router.post(
   '/candidates/from-cv',
   ...authorize('candidate', 'create'),
-  ...authorize('application', 'create'),
   cvUpload.single('cv'),
   candidatePipelineController.createCandidateFromCv
 );

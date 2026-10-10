@@ -3,6 +3,9 @@ const { recordActivity } = require("../services/activityLog.service");
 const Application = require("../models/application.model");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
+const { listRecords } = require("../utils/listQuery");
+const { sendError } = require("../utils/sendError");
+const { referenceScope } = require("../utils/referenceScope");
 const {
   calculateApplicationMatch,
 } = require("../services/applicationMatch.service");
@@ -27,21 +30,12 @@ function validateObjectId(id) {
 
 exports.getApplications = async (req, res) => {
   try {
-    const applications = await Application.find(
-      buildScopedQuery(req)
-    )
-      .populate("jobId")
-      .populate("candidateId")
-      .sort({ createdAt: -1 })
-      .lean();
+    const applications = await listRecords(Application, buildScopedQuery(req), req, res,
+      { populate: ["jobId", "candidateId"] });
 
     return res.status(200).json(applications);
   } catch (error) {
-    console.error("Get applications error:", error);
-
-    return res.status(500).json({
-      message: "Müraciətlər alınarkən server xətası baş verdi.",
-    });
+    return sendError(res, error, "Müraciətlər alınarkən server xətası baş verdi.");
   }
 };
 
@@ -71,7 +65,7 @@ exports.getApplicationById = async (req, res) => {
 
     return res.status(200).json(application);
   } catch (error) {
-    console.error("Get application error:", error);
+    console.error("Get application error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Müraciət alınarkən server xətası baş verdi.",
@@ -89,9 +83,12 @@ exports.createApplication = async (req, res) => {
       });
     }
 
+    const [jobScope, candidateScope] = await Promise.all([
+      referenceScope(req, "recruitment"), referenceScope(req, "candidate"),
+    ]);
     const [job, candidate] = await Promise.all([
-      Job.findOne(buildScopedQuery(req, { _id: jobId })),
-      Candidate.findOne(buildScopedQuery(req, { _id: candidateId })),
+      Job.findOne({ _id: jobId, deletedAt: null, status: "Open", ...jobScope }),
+      Candidate.findOne({ _id: candidateId, deletedAt: null, ...candidateScope }),
     ]);
 
     if (!job) {
@@ -150,13 +147,13 @@ exports.createApplication = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Application create activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(201).json(populated);
   } catch (error) {
-    console.error("Create application error:", error);
+    if (error.status === 403) return sendError(res, error);
+    console.error("Create application error:", error.name);
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -218,10 +215,11 @@ exports.updateApplicationStatus = async (req, res) => {
     const updated = await Application.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: req.params.id,
+        status: existing.status,
       }),
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     )
@@ -229,9 +227,8 @@ exports.updateApplicationStatus = async (req, res) => {
       .populate("candidateId");
 
     if (!updated) {
-      return res.status(404).json({
-        message:
-          "Müraciət tapılmadı və ya bu müraciəti dəyişmək üçün icazəniz yoxdur.",
+      return res.status(409).json({
+        message: "Application changed concurrently. Reload before updating its status.",
       });
     }
 
@@ -244,8 +241,7 @@ exports.updateApplicationStatus = async (req, res) => {
       } catch (notificationError) {
         console.error(
           "Candidate status notification error:",
-          notificationError
-        );
+          notificationError?.name || "Error");
       }
 
       try {
@@ -259,14 +255,13 @@ exports.updateApplicationStatus = async (req, res) => {
       } catch (activityError) {
         console.error(
           "Application status activity log error:",
-          activityError
-        );
+          activityError?.name || "Error");
       }
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update application status error:", error);
+    console.error("Update application status error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -314,15 +309,14 @@ exports.deleteApplication = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Application delete activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(200).json({
       message: "Müraciət silindi.",
     });
   } catch (error) {
-    console.error("Delete application error:", error);
+    console.error("Delete application error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Müraciət silinərkən server xətası baş verdi.",

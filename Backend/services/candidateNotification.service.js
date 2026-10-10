@@ -71,8 +71,7 @@ async function notifyCandidateStatus({ application, actor }) {
   } catch (error) {
     console.error(
       "Candidate notification failed:",
-      error.message
-    );
+      error?.name || "Error");
 
     return {
       attempted: true,

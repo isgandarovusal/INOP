@@ -5,6 +5,8 @@ const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
 const Application = require("../models/application.model");
+const { referenceScope } = require("../utils/referenceScope");
+const { sendError } = require("../utils/sendError");
 
 const {
   extractCvTextFromFile,
@@ -99,7 +101,7 @@ async function cleanupFile(file) {
     await fs.unlink(file.path);
   } catch (error) {
     if (error.code !== "ENOENT") {
-      console.error("CV cleanup error:", error);
+      console.error("CV cleanup error:", error?.name || "Error");
     }
   }
 }
@@ -136,6 +138,8 @@ exports.createCandidateFromCv = async (req, res) => {
     let job = null;
 
     if (jobId) {
+      await referenceScope(req, "application", "create");
+      const jobScope = await referenceScope(req, "recruitment");
       if (!mongoose.Types.ObjectId.isValid(jobId)) {
         await cleanupFile(req.file);
 
@@ -146,7 +150,9 @@ exports.createCandidateFromCv = async (req, res) => {
 
       job = await Job.findOne({
         _id: jobId,
-        ...(req.dataScope || {}),
+        deletedAt: null,
+        status: "Open",
+        ...jobScope,
       }).lean();
 
       if (!job) {
@@ -298,8 +304,7 @@ exports.createCandidateFromCv = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Candidate pipeline activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     if (savedApplication?._id) {
@@ -314,8 +319,7 @@ exports.createCandidateFromCv = async (req, res) => {
       } catch (activityError) {
         console.error(
           "Candidate pipeline application activity log error:",
-          activityError
-        );
+          activityError?.name || "Error");
       }
     }
 
@@ -343,8 +347,7 @@ exports.createCandidateFromCv = async (req, res) => {
   } catch (error) {
     console.error(
       "Create candidate from CV error:",
-      error
-    );
+      error?.name || "Error");
 
     if (savedApplication?._id) {
       try {
@@ -354,8 +357,7 @@ exports.createCandidateFromCv = async (req, res) => {
       } catch (cleanupError) {
         console.error(
           "Application rollback error:",
-          cleanupError
-        );
+          cleanupError?.name || "Error");
       }
     }
 
@@ -367,12 +369,13 @@ exports.createCandidateFromCv = async (req, res) => {
       } catch (cleanupError) {
         console.error(
           "Candidate rollback error:",
-          cleanupError
-        );
+          cleanupError?.name || "Error");
       }
     }
 
     await cleanupFile(req.file);
+    if (error.status === 403) return sendError(res, error);
+    if ([400, 413, 422, 503, 504].includes(error.status)) return sendError(res, error);
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({

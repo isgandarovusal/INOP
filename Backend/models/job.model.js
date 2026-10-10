@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema(
   {
+    deletedAt: { type: Date, default: null, index: true },
     title: {
       type: String,
       required: true,
@@ -79,6 +80,11 @@ const jobSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+jobSchema.index({ deletedAt: 1, departmentId: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ deletedAt: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ deletedAt: 1, assignedTo: 1, createdAt: -1, _id: -1 });
+jobSchema.index({ deletedAt: 1, createdBy: 1, createdAt: -1, _id: -1 });
 
 module.exports =
   mongoose.models.Job ||

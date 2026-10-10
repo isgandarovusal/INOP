@@ -13,6 +13,7 @@ const candidateStatusValues = [
 
 const candidateSchema = new mongoose.Schema(
   {
+    deletedAt: { type: Date, default: null, index: true },
     name: {
       type: String,
       required: true,
@@ -116,6 +117,11 @@ const candidateSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+candidateSchema.index({ deletedAt: 1, departmentId: 1, createdAt: -1, _id: -1 });
+candidateSchema.index({ deletedAt: 1, createdAt: -1, _id: -1 });
+candidateSchema.index({ deletedAt: 1, assignedTo: 1, createdAt: -1, _id: -1 });
+candidateSchema.index({ deletedAt: 1, createdBy: 1, createdAt: -1, _id: -1 });
 
 module.exports =
   mongoose.models.Candidate ||

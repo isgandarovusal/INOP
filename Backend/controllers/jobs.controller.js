@@ -1,6 +1,8 @@
 const { recordActivity } = require("../services/activityLog.service");
 const mongoose = require("mongoose");
 const Job = require("../models/job.model");
+const { listRecords, searchFilter } = require("../utils/listQuery");
+const { sendError } = require("../utils/sendError");
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -8,6 +10,7 @@ function getScopeFilter(req) {
 
 function buildScopedQuery(req, extra = {}) {
   return {
+    deletedAt: null,
     ...extra,
     ...getScopeFilter(req),
   };
@@ -154,19 +157,12 @@ function validateObjectId(id) {
 
 exports.getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find(
-      buildScopedQuery(req)
-    )
-      .sort({ createdAt: -1 })
-      .lean();
+    const jobs = await listRecords(Job,
+      buildScopedQuery(req, searchFilter(req.query, ["title", "department", "location"])), req, res);
 
     return res.status(200).json(jobs);
   } catch (error) {
-    console.error("Get jobs error:", error);
-
-    return res.status(500).json({
-      message: "Vakansiyalar alınarkən server xətası baş verdi.",
-    });
+    return sendError(res, error, "Vakansiyalar alınarkən server xətası baş verdi.");
   }
 };
 
@@ -193,7 +189,7 @@ exports.getJobById = async (req, res) => {
 
     return res.status(200).json(job);
   } catch (error) {
-    console.error("Get job error:", error);
+    console.error("Get job error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Vakansiya alınarkən server xətası baş verdi.",
@@ -231,12 +227,12 @@ exports.createJob = async (req, res) => {
         description: `Vakansiya yaradıldı: ${saved.title}`,
       });
     } catch (activityError) {
-      console.error("Job create activity log error:", activityError);
+      console.error("Job create activity log error:", activityError?.name || "Error");
     }
 
     return res.status(201).json(saved);
   } catch (error) {
-    console.error("Create job error:", error);
+    console.error("Create job error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -389,7 +385,7 @@ exports.updateJob = async (req, res) => {
       }),
       update,
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );
@@ -410,12 +406,12 @@ exports.updateJob = async (req, res) => {
         description: `Vakansiya yeniləndi: ${updated.title}`,
       });
     } catch (activityError) {
-      console.error("Job update activity log error:", activityError);
+      console.error("Job update activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update job error:", error);
+    console.error("Update job error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -437,10 +433,12 @@ exports.deleteJob = async (req, res) => {
       });
     }
 
-    const deleted = await Job.findOneAndDelete(
+    const deleted = await Job.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: req.params.id,
-      })
+      }),
+      { $set: { deletedAt: new Date(), status: "Closed" } },
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!deleted) {
@@ -459,14 +457,14 @@ exports.deleteJob = async (req, res) => {
         description: `Vakansiya silindi: ${deleted.title}`,
       });
     } catch (activityError) {
-      console.error("Job delete activity log error:", activityError);
+      console.error("Job delete activity log error:", activityError?.name || "Error");
     }
 
     return res.status(200).json({
       message: "Vakansiya silindi.",
     });
   } catch (error) {
-    console.error("Delete job error:", error);
+    console.error("Delete job error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Vakansiya silinərkən server xətası baş verdi.",

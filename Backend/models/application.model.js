@@ -73,6 +73,10 @@ applicationSchema.index(
   { jobId: 1, candidateId: 1 },
   { unique: true }
 );
+applicationSchema.index({ departmentId: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ createdAt: -1, _id: -1 });
+applicationSchema.index({ assignedTo: 1, createdAt: -1, _id: -1 });
+applicationSchema.index({ createdBy: 1, createdAt: -1, _id: -1 });
 
 module.exports =
   mongoose.models.Application ||

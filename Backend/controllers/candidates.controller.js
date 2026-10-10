@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
+const { listRecords, searchFilter } = require("../utils/listQuery");
+const { sendError } = require("../utils/sendError");
 
 const candidateStatusValues =
   Candidate.schema.path("status").enumValues;
@@ -11,6 +13,7 @@ function getScopeFilter(req) {
 
 function buildScopedQuery(req, extra = {}) {
   return {
+    deletedAt: null,
     ...extra,
     ...getScopeFilter(req),
   };
@@ -70,19 +73,12 @@ function parseExperience(value) {
 
 exports.getCandidates = async (req, res) => {
   try {
-    const candidates = await Candidate.find(
-      buildScopedQuery(req)
-    )
-      .sort({ createdAt: -1 })
-      .lean();
+    const candidates = await listRecords(Candidate,
+      buildScopedQuery(req, searchFilter(req.query, ["name", "role", "email"])), req, res);
 
     return res.status(200).json(candidates);
   } catch (error) {
-    console.error("Get candidates error:", error);
-
-    return res.status(500).json({
-      message: "Namizədlər alınarkən server xətası baş verdi.",
-    });
+    return sendError(res, error, "Namizədlər alınarkən server xətası baş verdi.");
   }
 };
 
@@ -110,7 +106,7 @@ exports.getCandidateById = async (req, res) => {
 
     return res.status(200).json(candidate);
   } catch (error) {
-    console.error("Get candidate error:", error);
+    console.error("Get candidate error:", error?.name || "Error");
 
     return res.status(500).json({
       message: "Namizəd alınarkən server xətası baş verdi.",
@@ -200,13 +196,12 @@ exports.createCandidate = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Candidate create activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(201).json(saved);
   } catch (error) {
-    console.error("Create candidate error:", error);
+    console.error("Create candidate error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -328,7 +323,7 @@ exports.updateCandidate = async (req, res) => {
       }),
       update,
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );
@@ -351,13 +346,12 @@ exports.updateCandidate = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Candidate update activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update candidate error:", error);
+    console.error("Update candidate error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -409,7 +403,7 @@ exports.updateCandidateStatus = async (req, res) => {
       }),
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );
@@ -433,14 +427,13 @@ exports.updateCandidateStatus = async (req, res) => {
       } catch (activityError) {
         console.error(
           "Candidate status activity log error:",
-          activityError
-        );
+          activityError?.name || "Error");
       }
     }
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.error("Update candidate status error:", error);
+    console.error("Update candidate status error:", error?.name || "Error");
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({
@@ -464,10 +457,12 @@ exports.deleteCandidate = async (req, res) => {
       });
     }
 
-    const deleted = await Candidate.findOneAndDelete(
+    const deleted = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: id,
-      })
+      }),
+      { $set: { deletedAt: new Date() } },
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!deleted) {
@@ -488,15 +483,14 @@ exports.deleteCandidate = async (req, res) => {
     } catch (activityError) {
       console.error(
         "Candidate delete activity log error:",
-        activityError
-      );
+        activityError?.name || "Error");
     }
 
     return res.status(200).json({
       message: "Namizəd silindi.",
     });
   } catch (error) {
-    console.error("Delete candidate error:", error);
+    console.error("Delete candidate error:", error?.name || "Error");
 
     return res.status(500).json({
       message:

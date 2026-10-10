@@ -1,9 +1,9 @@
 function normalizeList(values) {
   if (!Array.isArray(values)) return [];
 
-  return values
+  return [...new Set(values
     .map((value) => String(value || "").trim().toLowerCase())
-    .filter(Boolean);
+    .filter(Boolean))];
 }
 
 function calculateSkillMatch(candidateSkills, jobSkills) {
@@ -37,15 +37,9 @@ function calculateSkillMatch(candidateSkills, jobSkills) {
 }
 
 function calculateExperienceMatch(candidateExperience, requiredExperience) {
-  const candidate = Math.max(
-    0,
-    Number(candidateExperience) || 0
-  );
-
-  const required = Math.max(
-    0,
-    Number(requiredExperience) || 0
-  );
+  const finiteYears = (value) => Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
+  const candidate = finiteYears(candidateExperience);
+  const required = finiteYears(requiredExperience);
 
   if (required === 0) {
     return {
