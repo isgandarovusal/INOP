@@ -12,7 +12,7 @@ function resourceFilter(req, resource, action = 'read') {
 }
 
 const candidateSelect = 'name role status email phone skills experience education languages certificates createdAt updatedAt';
-const jobSelect = 'title department location type status requiredSkills preferredSkills experienceYears createdAt updatedAt';
+const jobSelect = 'brandId branchId title department location type status requiredSkills preferredSkills experienceYears createdAt updatedAt';
 
 function applicationParents(req) {
   return [

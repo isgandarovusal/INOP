@@ -1,3 +1,4 @@
+import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFields";
 import { useMounted } from "../../../Hooks/useMounted";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useState } from "react";
@@ -21,6 +22,8 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const navigate = useNavigate();
   const mounted = useMounted();
 
+  const [brandId, setBrandId] = useState<string | null>(initial?.brandId ?? null);
+  const [branchId, setBranchId] = useState<string | null>(initial?.branchId ?? null);
   const [position, setPosition] = useState(initial?.position ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [requiredSkills, setRequiredSkills] = useState<string[]>(initial?.requiredSkills ?? []);
@@ -77,7 +80,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
 
     try {
       const payload = {
-        position,
+        position, brandId, branchId,
         description,
         requiredSkills,
         preferredSkills,
@@ -127,6 +130,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       )}
 
       <form onSubmit={handleSubmit} className="form-grid">
+        <RecruitmentLocationFields brandId={brandId} branchId={branchId} onChange={(brand, branch) => { setBrandId(brand); setBranchId(branch); }} />
         <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" value={department} onChange={e => setDepartment(e.target.value)} required /></div>
         <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" value={location} onChange={e => setLocation(e.target.value)} required /></div>
         <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>

@@ -10,6 +10,10 @@ export type JobType =
   | "Internship";
 
 export interface Job {
+  brandId?: string | null;
+  branchId?: string | null;
+  brandName?: string | null;
+  branchName?: string | null;
   id: string;
   _id?: string;
 

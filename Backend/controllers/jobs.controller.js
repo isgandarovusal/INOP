@@ -1,6 +1,7 @@
 const { recordActivity } = require("../services/activityLog.service");
 const mongoose = require("mongoose");
 const Job = require("../models/job.model");
+const { validateLocation, decorateJobs } = require("../services/recruitmentCatalog.service");
 
 function getScopeFilter(req) {
   return req.dataScope || {};
@@ -91,6 +92,7 @@ function buildJobPayload(req) {
   );
 
   return {
+    brandId: req.body.brandId ?? null, branchId: req.body.branchId ?? null,
     title: normalizeString(req.body.title),
     department: normalizeString(
       req.body.department || req.user?.departmentId || ""
@@ -154,13 +156,17 @@ function validateObjectId(id) {
 
 exports.getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find(
-      buildScopedQuery(req)
-    )
+    const filters = {};
+    if (req.query.brandId) filters.brandId = String(req.query.brandId);
+    if (req.query.branchId) {
+      if (!mongoose.isObjectIdOrHexString(req.query.branchId)) return res.status(400).json({ message: 'Invalid branch filter.' });
+      filters.branchId = req.query.branchId;
+    }
+    const jobs = await Job.find({ $and: [getScopeFilter(req), filters] })
       .sort({ createdAt: -1 })
       .lean();
 
-    return res.status(200).json(jobs);
+    return res.status(200).json(await decorateJobs(req, jobs));
   } catch (error) {
     console.error("Get jobs error:", error);
 
@@ -191,7 +197,7 @@ exports.getJobById = async (req, res) => {
       });
     }
 
-    return res.status(200).json(job);
+    return res.status(200).json((await decorateJobs(req, [job]))[0]);
   } catch (error) {
     console.error("Get job error:", error);
 
@@ -213,6 +219,8 @@ exports.createJob = async (req, res) => {
       });
     }
 
+    const locationError = await validateLocation(req, payload);
+    if (locationError) return res.status(400).json({ message: locationError });
     const job = new Job({
       ...payload,
       departmentId: req.user?.departmentId || "",
@@ -259,6 +267,7 @@ exports.updateJob = async (req, res) => {
     }
 
     const allowedFields = [
+      "brandId", "branchId",
       "title",
       "department",
       "location",
@@ -383,6 +392,12 @@ exports.updateJob = async (req, res) => {
       });
     }
 
+    if (update.brandId !== undefined || update.branchId !== undefined) {
+      const current = await Job.findOne(buildScopedQuery(req, { _id: req.params.id })).lean();
+      if (!current) return res.status(404).json({ message: 'Job not found.' });
+      const locationError = await validateLocation(req, update, current);
+      if (locationError) return res.status(400).json({ message: locationError });
+    }
     const updated = await Job.findOneAndUpdate(
       buildScopedQuery(req, {
         _id: req.params.id,

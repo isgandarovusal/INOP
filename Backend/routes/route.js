@@ -96,6 +96,14 @@ auditTimelineRoutes
 
 
 router.use('/audit-permission', auditPermissionRoutes);
+const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller');
+router.get('/hr/brands', ...authorize('recruitment', 'read'), recruitmentCatalog.brands);
+router.post('/hr/brands', ...authorize('recruitment', 'create'), recruitmentCatalog.createBrand);
+router.get('/hr/branches', ...authorize('recruitment', 'read'), recruitmentCatalog.branches);
+router.get('/hr/branches/:id', ...authorize('recruitment', 'read'), recruitmentCatalog.branch);
+router.post('/hr/branches', ...authorize('recruitment', 'create'), recruitmentCatalog.createBranch);
+router.put('/hr/branches/:id', ...authorize('recruitment', 'update'), recruitmentCatalog.updateBranch);
+router.delete('/hr/branches/:id', ...authorize('recruitment', 'delete'), recruitmentCatalog.deleteBranch);
 
 // Audit API
 router.get('/audits/dashboard-summary', ...authorize('audit', 'read'), dashboardSummary.audits);

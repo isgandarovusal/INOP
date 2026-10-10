@@ -8,6 +8,8 @@ import type {
 } from "../Types/recruitment";
 
 export interface JobInput {
+  brandId?: string | null;
+  branchId?: string | null;
   title?: string;
   position?: string;
 
@@ -90,6 +92,10 @@ export function normalizeJob(raw: unknown): Job {
 
     title,
     position: title,
+    brandId: typeof data.brandId === "string" ? data.brandId : null,
+    branchId: typeof data.branchId === "string" ? data.branchId : null,
+    brandName: typeof data.brandName === "string" ? data.brandName : null,
+    branchName: typeof data.branchName === "string" ? data.branchName : null,
 
     department:
       typeof data.department === "string"
@@ -136,6 +142,7 @@ export function normalizeJob(raw: unknown): Job {
 
 function toBackendPayload(input: JobInput) {
   return {
+    brandId: input.brandId ?? null, branchId: input.branchId ?? null,
     title: input.title || input.position || "",
     department: input.department || "HR",
     location: input.location || "Remote",
@@ -188,7 +195,7 @@ export async function updateJob(
   input: Partial<JobInput>
 ): Promise<Job> {
   const payload: Record<string, unknown> = {};
-  for (const field of ["department", "location", "type", "description", "requiredSkills", "preferredSkills"] as const) {
+  for (const field of ["brandId", "branchId", "department", "location", "type", "description", "requiredSkills", "preferredSkills"] as const) {
     if (input[field] !== undefined) payload[field] = input[field];
   }
   if (input.title !== undefined || input.position !== undefined) payload.title = input.title ?? input.position;

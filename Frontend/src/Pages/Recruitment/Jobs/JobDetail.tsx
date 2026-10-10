@@ -1,3 +1,4 @@
+import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { getErrorMessage } from "../../../Utils/getErrorMessage";
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -113,8 +114,9 @@ const JobDetail: React.FC = () => {
     <div className="job-detail-page">
       {error && <div role="alert">{error}</div>}
       {result.data?.secondaryError && <div role="alert">{t("hrStates.secondaryError")}</div>}
+      {job.branchName && <p>{t("hrCatalog.branch")}: {job.branchName}</p>}
       <PageHeader
-        title={job.position}
+        title={job.position + (job.brandId ? ` · ${job.brandName || brandLabel(job.brandId)}` : "")}
         subtitle={`${t("recruitment.jobDetail.yearsExperience", {
           years: job.experience,
         })} · ${t(`recruitment.jobStatus.${job.status}`)}`}

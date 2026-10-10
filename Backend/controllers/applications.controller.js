@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { decorateApplications } = require("../services/recruitmentCatalog.service");
 const { recordActivity } = require("../services/activityLog.service");
 const Application = require("../models/application.model");
 const Candidate = require("../models/candidate.model");
@@ -35,7 +36,7 @@ exports.getApplications = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    return res.status(200).json(applications);
+    return res.status(200).json(await decorateApplications(req, applications));
   } catch (error) {
     console.error("Get applications error:", error);
 
@@ -68,7 +69,7 @@ exports.getApplicationById = async (req, res) => {
       });
     }
 
-    return res.status(200).json(application);
+    return res.status(200).json((await decorateApplications(req, [application]))[0]);
   } catch (error) {
     console.error("Get application error:", error);
 
@@ -152,7 +153,7 @@ exports.createApplication = async (req, res) => {
       );
     }
 
-    return res.status(201).json(populated);
+    return res.status(201).json((await decorateApplications(req, [populated]))[0]);
   } catch (error) {
     console.error("Create application error:", error);
 
@@ -264,7 +265,7 @@ exports.updateApplicationStatus = async (req, res) => {
 
     const response = await Application.findById(updated._id)
       .populate(applicationParents(req)).lean();
-    return res.status(200).json(response);
+    return res.status(200).json((await decorateApplications(req, [response]))[0]);
   } catch (error) {
     console.error("Update application status error:", error);
 

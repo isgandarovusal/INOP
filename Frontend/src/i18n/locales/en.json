@@ -1047,5 +1047,27 @@
     "confirm": "I reviewed the original CV and confirm these facts",
     "phoneRaw": "CV phone",
     "previewUnavailable": "Text preview is unavailable. You can download the original CV."
+  },
+  "hrCatalog": {
+    "brand": "Brand",
+    "branch": "Branch / workplace",
+    "unset": "Unspecified",
+    "unavailable": "Branch unavailable",
+    "loadError": "Catalog could not be loaded",
+    "addBranch": "Add branch",
+    "addBrand": "Add brand",
+    "code": "Code",
+    "name": "Name",
+    "branchCode": "Branch code",
+    "branchName": "Branch name",
+    "brandCode": "Brand code",
+    "brandName": "Brand name",
+    "kind": "Workplace type",
+    "restaurant": "Restaurant",
+    "office": "Central office",
+    "warehouse": "Warehouse",
+    "remote": "Remote",
+    "allBrands": "All brands",
+    "allBranches": "All branches"
   }
 }

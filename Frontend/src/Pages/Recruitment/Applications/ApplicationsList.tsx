@@ -1,3 +1,4 @@
+import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardList, Loader2, Trash2 } from "lucide-react";
@@ -42,16 +43,18 @@ const ApplicationsList: React.FC = () => {
   const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
   const loading = result.status === "loading";
   const [error, setError] = useState(false);
+  const [brandFilter, setBrandFilter] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtersActive =
-    jobFilter !== "all" || statusFilter !== "all";
+    jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
 
   const clearFilters = () => {
-    setJobFilter("all");
+    setJobFilter("all"); setBrandFilter("all"); setBranchFilter("all");
     setStatusFilter("all");
   };
 
@@ -72,10 +75,12 @@ const ApplicationsList: React.FC = () => {
             ? undefined
             : app.candidateId,
       }))
+      .filter(r => brandFilter === "all" || (r.job?.brandId || "unset") === brandFilter)
+      .filter(r => branchFilter === "all" || (r.job?.branchId || "unset") === branchFilter)
       .filter((r) => jobFilter === "all" || r.job?.id === jobFilter)
       .filter((r) => statusFilter === "all" || r.app.status === statusFilter)
       .sort((a, b) => b.app.score - a.app.score);
-  }, [applications, jobs, jobFilter, statusFilter]);
+  }, [applications, jobs, jobFilter, statusFilter, brandFilter, branchFilter]);
 
   const handleDelete = async () => {
     if (!deleteTarget || !canDelete) return;
@@ -117,6 +122,8 @@ const ApplicationsList: React.FC = () => {
       />
 
       <div className="filter-bar">
+        <select aria-label={t('hrCatalog.brand')} value={brandFilter} onChange={e => { setBrandFilter(e.target.value); setBranchFilter('all'); }}><option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>{[...new Set(jobs.map(j => j.brandId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}</select>
+        <select aria-label={t('hrCatalog.branch')} value={branchFilter} onChange={e => setBranchFilter(e.target.value)}><option value="all">{t('hrCatalog.allBranches')}</option>{[...new Set(jobs.filter(j => brandFilter === 'all' || j.brandId === brandFilter).map(j => j.branchId).filter((id): id is string => !!id))].map(id => <option key={id} value={id}>{jobs.find(j => j.branchId === id)?.branchName || t("hrCatalog.unavailable")}</option>)}</select>
         <select className="input-field" style={{ width: 220 }} value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
           <option value="all">{t("recruitment.applications.allJobs")}</option>
           {jobs.map((j) => (
@@ -223,6 +230,7 @@ const ApplicationsList: React.FC = () => {
                     onClick={() => job && navigate(`/app/recruitment/jobs/${job.id}`)}
                   >
                     {job?.position ?? t("hrStates.restricted")}
+                    {job?.brandId && <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId)}{job.branchName ? ` · ${job.branchName}` : ""}</small>}
                   </td>
                   <td>{app.score}</td>
                   <td>

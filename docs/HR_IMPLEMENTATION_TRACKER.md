@@ -80,7 +80,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | OPEN | — |
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
-| AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | OPEN | — |
+| AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 | AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | OPEN | — |
 | AUD-071 | 11 | No ingestion source identity or person-level deduplication | OPEN | — |
 | AUD-072 | 08 | HR lists unbounded with full populated documents | OPEN | — |
@@ -172,22 +172,22 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P04-001 | Expandable Brand catalog | OPEN | — |
-| P04-002 | KFC | OPEN | — |
-| P04-003 | Pizza Hut | OPEN | — |
-| P04-004 | Simit Sarayı | OPEN | — |
-| P04-005 | Create brand selector | OPEN | — |
-| P04-006 | Edit brand selector | OPEN | — |
-| P04-007 | Brand to branch to vacancy relation | OPEN | — |
-| P04-008 | Office and warehouse vacancies | OPEN | — |
-| P04-009 | Same position in different branches | OPEN | — |
-| P04-010 | New brand and branch extensibility | OPEN | — |
-| P04-011 | Legacy jobs not falsely backfilled | OPEN | — |
-| P04-012 | Brand and branch filters | OPEN | — |
-| P04-013 | Brand vacancy cards | OPEN | — |
-| P04-014 | Brand application contract | OPEN | — |
-| P04-015 | Brand analytics contract | OPEN | — |
-| P04-016 | Brand selection never replaces authorization | OPEN | — |
+| P04-001 | Expandable Brand catalog | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-002 | KFC | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-003 | Pizza Hut | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-004 | Simit Sarayı | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-005 | Create brand selector | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-006 | Edit brand selector | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-007 | Brand to branch to vacancy relation | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-008 | Office and warehouse vacancies | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-009 | Same position in different branches | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-010 | New brand and branch extensibility | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-011 | Legacy jobs not falsely backfilled | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-012 | Brand and branch filters | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-013 | Brand vacancy cards | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-014 | Brand application contract | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-015 | Brand analytics contract | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
+| P04-016 | Brand selection never replaces authorization | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 
 ## Package 05: Versioned ATS scoring
 
@@ -455,7 +455,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | 02A | `80fa2d709b3213a7f6a3abc60072cebeb5a57562` | Full regression 1029/1029; HR + summary target 44/44; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 13 existing warnings | UI lifecycle and edit form criteria still OPEN; replaced old files retained for migration |
 | 02B | `10f01026948e8b2bc0ad2b2f9fcd018d144b668e` | Full regression 1051/1051; HR browser targets 30/30; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings (baseline 13) | CV review/extraction and contextual score contracts remain packages 03/05; no external ingestion activated |
 
-| 03 | `feat(hr): add evidence-based CV extraction and review` (SHA recorded next update) | Full regression 1101/1101; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | OCR is not implemented; historical unknown zeros not rewritten; old files retained for package 10 |
+| 03 | `bb561691b0faafd635bcc7b217b24a9455c3d7fe` | Full regression 1101/1101; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | OCR is not implemented; historical unknown zeros not rewritten; old files retained for package 10 |
+
+| 04 | `feat(hr): add scoped brand and workplace catalogs` (SHA recorded next update) | Full regression 1124/1124; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | HR locations do not expose audit Restaurants; no legacy brand backfill; analytics execution remains package 07 |
 
 ## External prerequisites
 
@@ -485,3 +487,5 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 | AUD-086 | 03 | Numeric age can be misread as years of employment | TESTED | `Backend/tests/cvExtraction.test.cjs`: age excluded from experience and evidence |
 
 03 evidence: `/tmp/inop-hr03-final-regression.log`, `/tmp/inop-hr03-validation-run.log`, `/tmp/inop-packagehr03-validation.json`. This package does not implement OCR or statistically calibrated confidence. Unknown legacy experience zeros cannot be distinguished from actual historical zeros and are not mass rewritten. Old replaced files are retained for the package 10 migration/retention policy. Concurrent replacement rejects an older writer with 409; rejected files are not silently deleted. Heuristic evidence is reviewable and never presented as real AI output. Original DOCX download survives secondary preview outages; permission failures fail closed.
+
+04 evidence: `/tmp/inop-hr04-baseline.log` (17/17 failing before patch), `/tmp/inop-hr04-target-final.log`, `/tmp/inop-hr04-final-regression.log`, `/tmp/inop-packagehr04-validation.json`. New brand/branch APIs, permissions and additive DB/index contract: `docs/HR_CATALOG_CONTRACT.md`. Catalog writes reuse recruitment.create all; branch CRUD retains recruitment provenance scopes. No production operations or seed were run.

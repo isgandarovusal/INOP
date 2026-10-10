@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema(
   {
+    brandId: { type: String, default: null, index: true },
+    branchId: { type: mongoose.Schema.Types.ObjectId, ref: "RecruitmentBranch", default: null, index: true },
     title: {
       type: String,
       required: true,
