@@ -122,7 +122,7 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
-const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const EMAIL = /(?<![A-Z0-9._%+-])[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}(?![A-Z0-9.-])/gi;
 function extractEmail(text) {
   const lines = text.split("\n");
   const contact = lines.find(line => /(?:email|e-mail|e-poçt|elektron poçt|почта)\s*[:：]/iu.test(line) && line.match(EMAIL));
@@ -154,7 +154,7 @@ function extractPhone(text) {
 
 function extractName(text) {
   const explicit = text.match(/(?:^|\n)\s*(?:name|full name|ad(?:\s*soyad)?|ad[ıi] soyad[ıi]|ф[иi]о|имя(?: и фамилия)?)\s*[:：]\s*([^\n]+)/iu);
-  const valid = value => /^[\p{L}][\p{L}'’.-]*(?:\s+[\p{L}][\p{L}'’.-]*){1,4}$/u.test(value) && value.length <= 80;
+  const valid = value => value.length <= 80 && /^[\p{L}][\p{L}'’.-]*(?:\s+[\p{L}][\p{L}'’.-]*){1,4}$/u.test(value);
   if (explicit && valid(explicit[1].trim())) return explicit[1].trim();
   const ignored = /^(?:curriculum vitae|cv|resume|résumé|резюме|contact information|personal details|professional summary|restaurant manager|customer service)$/iu;
   for (const line of text.split("\n").map(line => line.trim()).filter(Boolean).slice(0, 8)) {

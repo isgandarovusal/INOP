@@ -45,7 +45,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-032 | 02 | Canonical Candidate/CV pipeline unused by frontend job context | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
-| AUD-034 | 08 | Extraction caps text only after potentially expensive extraction | OPEN | — |
+| AUD-034 | 08 | Extraction caps text only after potentially expensive extraction | TESTED | `documentProcessing`, `cvReview`, `cvReviewUI`: request worker deadline/input bounds, incremental PDF 50-page/100k limits and explicit partial-review warnings; DOCX still materializes a bounded ZIP inside the worker |
 | AUD-035 | 03 | Phone parser loses valid separators/prefixes/international numbers | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-036 | 03 | Phone has no raw/normalized split or evidence | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-037 | 03 | Name extraction misidentifies headings and excludes Cyrillic | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
@@ -60,7 +60,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-047 | 02 | Upload/processing/error strings have incomplete localization | OPEN | — |
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
-| AUD-049 | 08 | Synchronous decompression/extraction may block requests | OPEN | — |
+| AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
 | AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | — |
 | AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | OPEN | — |
@@ -467,7 +467,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | 08B | `148fa8171a7b98744dca507c13abcb7feea77717` | Targets 54/54; full 1289/1289; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Page-local score/name order explicitly labeled; global ranking/manual order/parsing/benchmarks remain 08C–08D; Source concurrency finding AUD-090 remains OPEN |
 
-| 08C1 | `fix(hr): cancel stale Candidate detail actions` (SHA recorded next update) | Target 46/46; full 1298/1298; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Client abort does not roll back accepted server mutations; manual order/ranking/parsing/benchmarks remain OPEN |
+| 08C1 | `37b90bf63a1d16bdaea3124367183558b67fc264` | Target 46/46; full 1298/1298; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Client abort does not roll back accepted server mutations; manual order/ranking/parsing/benchmarks remain OPEN |
 
 ## External prerequisites
 
@@ -541,4 +541,14 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 
 Cancellation does not undo a deletion already accepted by the server. This increment protects client lifecycle, not transactional rollback; orphan/retention/recovery work remains package 10. Job/Candidate forms already use context-keyed inner components with unmount guards; no unsupported claim that those are unguarded is added. Manual order AUD-064, global ranking AUD-094, parsing isolation AUD-034/049 and 0/5000/50000 measurements remain open.
 
-08C1 final full evidence: `/tmp/inop-hr08c1-regression.log` 1298/1298; `/tmp/inop-hr08c1-validation-run.log`, `/tmp/inop-packagehr08c-validation.json` (08C1). No production data or network integration used.
+08C1 final full evidence: `/tmp/inop-hr08c1-regression.log` 1298/1298; `/tmp/inop-hr08c1-validation-run.log`, `/tmp/inop-packagehr08c1-validation.json` (08C1). No production data or network integration used.
+
+| AUD-096 | 08C3 | Read-only Candidate users cannot preview DOCX: UI downloads with candidate.read then calls create-protected parse-cv | OPEN | `CandidateDetail.tsx` DOCX preview callback and `Backend/routes/route.js` parse-cv grant; implement/test an independently read-scoped original-file preview without accepting an arbitrary source upload as read permission |
+
+| AUD-097 | 08C2 | Unbounded email regex retries every suffix on a 100k unbroken token, monopolizing structured CV parsing after extraction | TESTED | `documentProcessing`: old parser exceeds 2-second child-process deadline; bounded-token parser passes without manufacturing suffix emails; structured parsing also runs in the worker |
+
+## 08C2 — bounded document workers
+
+Local commit pending creation; only this increment's files are staged. Target 97/97; full serial regression 1317/1317; authorization 632/632; smoke 13/13; TypeScript/build PASS; lint 0 errors / 9 warnings. Evidence: `/tmp/inop-hr08c2-target-final.log`, `/tmp/inop-hr08c2-regression.log`, `/tmp/inop-packagehr08c2-validation.json`. The malformed DOCX test initially expected single newlines; actual existing Mammoth paragraph semantics use double newlines. The corrected assertion preserves that existing behavior and content.
+
+Contract/limits and single-run before/after responsiveness measurements: `docs/HR_DOCUMENT_PROCESSING.md`; raw measurements `/tmp/inop-hr08c2-baseline.log`, `/tmp/inop-hr08c2-current-measurement.log`, old contact-parser proof `/tmp/inop-hr08c2-regex-baseline.json`. These are local synthetic observations, not hosted performance or OCR/provider readiness. No production data, new env variable, migration, seed or storage provisioning. V8 limits do not cap native/external memory; request workers are not durable jobs or an OS sandbox. Durable retry, malware quarantine, original retention/recovery and CV double-upload remain package 10 / AUD-073. Global ranking/manual order and larger-data measurements remain OPEN. Next independent increment: AUD-096 read-scoped original DOCX preview.

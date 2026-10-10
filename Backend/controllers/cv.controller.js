@@ -1,10 +1,8 @@
 const {
-  extractCvTextFromBuffer,
+  parseCvResultFromBuffer,
 } = require("../services/cvParser.service");
 
-const {
-  parseStructuredCv,
-} = require("../services/cvStructuredParser.service");
+
 
 exports.parseCv = async (req, res) => {
   try {
@@ -14,7 +12,7 @@ exports.parseCv = async (req, res) => {
       });
     }
 
-    const text = await extractCvTextFromBuffer(
+    const { text, parsed } = await parseCvResultFromBuffer(
       req.file.buffer,
       req.file.originalname
     );
@@ -26,7 +24,6 @@ exports.parseCv = async (req, res) => {
       });
     }
 
-    const parsed = parseStructuredCv(text);
 
     return res.status(200).json({
       fileName: req.file.originalname,
@@ -35,6 +32,7 @@ exports.parseCv = async (req, res) => {
       ...parsed,
     });
   } catch (error) {
+    if (['DOCUMENT_BUSY', 'DOCUMENT_TIMEOUT'].includes(error?.code)) return res.status(503).json({ message: 'CV processing is busy. Retry later.', code: error.code, processingStatus: 'failed' });
     console.error("Parse CV failed:", error?.name || "ExtractionError");
 
     return res.status(422).json({

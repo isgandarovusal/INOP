@@ -7,6 +7,7 @@ export default function CvReviewEvidence({ review }: { review?: CvReview }) {
   return <section data-cv-review={review.processingStatus}>
     <h3>{t('cvReview.heading')}</h3><p>{t('cvReview.ruleBased')} · {review.version} · {t(`cvReview.${review.reviewStatus ?? 'pending'}`)}</p>
     {review.processingStatus !== 'extracted' && <p role="alert">{t(`cvReview.${review.processingStatus ?? 'failed'}`)}</p>}
+    {review.warnings?.filter(code => ['text_limit', 'page_limit'].includes(code)).map(code => <p role="alert" key={code}>{t(`cvReview.${code}`)}</p>)}
     <p>{t('cvReview.confidenceExplanation')}</p>
     <details><summary>{t('cvReview.evidence')}</summary>{Object.entries(review.fields ?? {}).map(([field, value]) => <div key={field}>
       <strong>{field}</strong>: {value.confidence == null ? t('cvReview.unknown') : `${Math.round(value.confidence * 100)}/100`}

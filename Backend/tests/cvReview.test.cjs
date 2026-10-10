@@ -26,6 +26,28 @@ test('CV extraction/review preserves unknowns, source metadata and server author
       assert.equal(r.data.experience, null); assert.equal(r.data.extraction.provider, 'rule-based');
       assert.ok(r.data.skills.includes('Food safety')); assert.ok(r.data.extraction.fields.phone.evidence.length);
     });
+    await t.test('partial extraction is explicit in parse response and persisted HR review', async () => {
+      const bytes = documents.docx('A'.repeat(150000));
+      const parsed = await upload('admin', '/candidates/parse-cv', bytes, 'bounded.docx');
+      assert.equal(parsed.status, 200); assert.equal(parsed.data.rawText.length, 100000);
+      assert.ok(parsed.data.extraction.warnings.includes('text_limit'));
+      const saved = await upload('admin', '/candidates', bytes, 'bounded.docx', { name: 'Manual review required', role: 'Cashier' });
+      assert.equal(saved.status, 201); assert.ok(saved.data.cvReview.warnings.includes('text_limit'));
+      assert.equal(saved.data.cvReview.reviewStatus, 'pending');
+      const original = await h.request('admin', 'GET', `/candidates/${saved.data._id}/cv`);
+      assert.equal(original.status, 200); assert.deepEqual(original.buffer, bytes);
+    });
+    await t.test('busy document queue returns safe retryable 503 before accepting another upload', async () => {
+      const { pool } = require('../services/documentWorkerPool.service'); const signal = new AbortController();
+      const bytes = documents.docx('A'.repeat(150000));
+      const pending = Array.from({ length: 9 }, () => pool.run('extract', bytes, 'bounded.docx', { signal: signal.signal }));
+      const settled = Promise.allSettled(pending);
+      try {
+        const result = await upload('admin', '/candidates/parse-cv', bytes, 'bounded.docx');
+        assert.equal(result.status, 503); assert.equal(result.data.code, 'DOCUMENT_BUSY');
+        assert.equal(result.data.success, false); assert.ok(!JSON.stringify(result.data).includes('A'.repeat(50)));
+      } finally { signal.abort(); await settled; }
+    });
     let candidate;
     const bytes = await documents.pdf('Name: Synthetic Applicant\nPhone: +994 (50) 123-45-67\nSkills\nFood safety');
     await t.test('server persists original metadata/evidence; client cannot forge provenance/confidence', async () => {

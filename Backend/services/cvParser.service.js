@@ -1,66 +1,11 @@
-const fs = require("fs/promises");
-const path = require("path");
-const { PDFParse } = require("pdf-parse");
-const mammoth = require("mammoth");
-
-const MAX_EXTRACTED_TEXT_LENGTH = 100_000;
-
-function normalizeExtractedText(text) {
-  return String(text || "")
-    .replace(/\r\n/g, "\n")
-    .replace(/^\s*--\s*\d+\s+of\s+\d+\s*--\s*$/gm, "")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
-    .slice(0, MAX_EXTRACTED_TEXT_LENGTH);
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { pool, MAX_BYTES } = require('./documentWorkerPool.service');
+function parseCvResultFromBuffer(buffer, filename, options) { return pool.run('parse', buffer, filename, options); }
+function extractCvResultFromBuffer(buffer, filename, options) { return pool.run('extract', buffer, filename, options); }
+async function extractCvTextFromBuffer(buffer, filename, options) { return (await extractCvResultFromBuffer(buffer, filename, options)).text; }
+async function extractCvTextFromFile(filePath, filename, options) {
+  if ((await fs.stat(filePath)).size > MAX_BYTES) throw Object.assign(new Error('Document input limit exceeded.'), { code: 'DOCUMENT_LIMIT' });
+  return extractCvTextFromBuffer(await fs.readFile(filePath), filename || path.basename(filePath), options);
 }
-
-async function extractPdfText(buffer) {
-  const parser = new PDFParse({ data: buffer });
-
-  try {
-    const result = await parser.getText();
-    return normalizeExtractedText(result?.text);
-  } finally {
-    await parser.destroy();
-  }
-}
-
-async function extractDocxText(buffer) {
-  const result = await mammoth.extractRawText({ buffer });
-  return normalizeExtractedText(result?.value);
-}
-
-async function extractCvTextFromBuffer(buffer, filename) {
-  if (!Buffer.isBuffer(buffer)) {
-    throw new Error("CV faylı düzgün buffer formatında deyil.");
-  }
-
-  const extension = path.extname(filename || "").toLowerCase();
-
-  if (extension === ".pdf") {
-    return extractPdfText(buffer);
-  }
-
-  if (extension === ".docx") {
-    return extractDocxText(buffer);
-  }
-
-  throw new Error(
-    "Dəstəklənməyən CV formatıdır. Yalnız PDF və DOCX qəbul olunur."
-  );
-}
-
-async function extractCvTextFromFile(filePath, filename) {
-  const buffer = await fs.readFile(filePath);
-
-  return extractCvTextFromBuffer(
-    buffer,
-    filename || path.basename(filePath)
-  );
-}
-
-module.exports = {
-  extractCvTextFromBuffer,
-  extractCvTextFromFile,
-};
+module.exports = { parseCvResultFromBuffer, extractCvTextFromBuffer, extractCvTextFromFile, extractCvResultFromBuffer };

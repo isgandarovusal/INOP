@@ -59,6 +59,24 @@ test('HR review UI preserves unknowns, edits extracted facts and previews privat
       assert.equal(await h.page.getByRole('dialog').count(), 0);
       await h.page.unroute('**/api/candidates/parse-cv');
     });
+    await t.test('partial extraction warning remains visible and translated in AZ/EN/RU without refetch', async () => {
+      await Candidate.updateOne({ _id: candidate._id }, { $set: { 'cvReview.warnings': ['text_limit', 'page_limit'] } });
+      await h.open('admin', `/app/recruitment/candidates/${candidate._id}`);
+      await h.page.locator('[data-cv-review=extracted]').waitFor();
+      await h.page.getByRole('alert').filter({ hasText: '50' }).waitFor();
+      const requests = h.wire.length;
+      for (const language of ['az', 'en', 'ru']) {
+        const expected = await h.page.evaluate(async language => {
+          const { default: i18n } = await import('/src/i18n/index.ts'); await i18n.changeLanguage(language);
+          return ['text_limit', 'page_limit'].map(code => i18n.t('cvReview.' + code));
+        }, language);
+        for (const message of expected) {
+          assert.ok(message.length > 30 && !message.startsWith('cvReview.'));
+          await h.page.getByRole('alert').filter({ hasText: message }).waitFor();
+        }
+      }
+      assert.equal(h.wire.length, requests);
+    });
     assert.deepEqual(h.pageErrors, []);
   } finally { await fs.unlink(path.join(uploadsDir, path.basename(candidate.cvUrl))); }
 }));

@@ -1046,7 +1046,9 @@
     "educationHistory": "Education history",
     "confirm": "I reviewed the original CV and confirm these facts",
     "phoneRaw": "CV phone",
-    "previewUnavailable": "Text preview is unavailable. You can download the original CV."
+    "previewUnavailable": "Text preview is unavailable. You can download the original CV.",
+    "text_limit": "The extracted text reached its limit. Review the complete original CV before confirming.",
+    "page_limit": "Only the first 50 pages were processed. Review the complete original CV before confirming."
   },
   "hrCatalog": {
     "brand": "Brand",

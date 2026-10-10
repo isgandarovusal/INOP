@@ -1070,7 +1070,9 @@
     "educationHistory": "Təhsil tarixçəsi",
     "confirm": "Orijinal CV ilə məlumatları yoxladım və təsdiqləyirəm",
     "phoneRaw": "CV-də telefon",
-    "previewUnavailable": "Mətn önizləməsi mümkün olmadı. Orijinal CV-ni yükləyə bilərsiniz."
+    "previewUnavailable": "Mətn önizləməsi mümkün olmadı. Orijinal CV-ni yükləyə bilərsiniz.",
+    "text_limit": "Çıxarılan mətn həddə çatdı. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın.",
+    "page_limit": "Yalnız ilk 50 səhifə emal edildi. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın."
   },
   "hrCatalog": {
     "brand": "Brend",

@@ -1,15 +1,14 @@
 const crypto = require('node:crypto');
-const { extractCvTextFromBuffer } = require('./cvParser.service');
-const { parseStructuredCv, normalizePhone } = require('./cvStructuredParser.service');
+const { parseCvResultFromBuffer } = require('./cvParser.service');
+const { normalizePhone } = require('./cvStructuredParser.service');
 
 async function reviewForFile(file) {
   if (!file) return null;
   const original = { originalName: file.originalname, mimeType: file.mimetype,
     size: file.size, sha256: crypto.createHash('sha256').update(file.buffer).digest('hex') };
   try {
-    const text = await extractCvTextFromBuffer(file.buffer, file.originalname);
+    const { text, parsed } = await parseCvResultFromBuffer(file.buffer, file.originalname);
     if (!text) return { original, review: { version: 'rules-2', provider: 'rule-based', processingStatus: 'unsupported_ocr', reviewStatus: 'pending', fields: {}, warnings: ['ocr_required'] }, parsed: null };
-    const parsed = parseStructuredCv(text);
     return { original, review: { ...parsed.extraction, processingStatus: 'extracted' }, parsed };
   } catch {
     // Never log CV content or provider input on parsing failure.
