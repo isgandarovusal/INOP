@@ -33,7 +33,7 @@ export default function ApplicationKanban({ applications, reload, canChangeStatu
     const ordered = stages.flatMap(stage => stage === status ? destinationCards : columns[stage].filter(row => row.id !== app.id));
     await onStatusChange(app.id, status, placement, ordered);
   };
-  return <DragDropContext onDragEnd={result => { void dropped(result); }}><div className="hr-application-board" data-application-kanban>
+  return <DragDropContext onDragEnd={result => { void dropped(result); }}><div className="hr-application-board" data-application-kanban role="region" aria-label={t('hrMatch.board')} tabIndex={0}>
     {stages.map(stage => <Droppable key={stage} droppableId={stage} isDropDisabled={stage === 'processing' || !canChangeStatus}>
       {provided => <section ref={provided.innerRef} {...provided.droppableProps} data-board-lane={stage} aria-busy={laneState[stage]?.loading || undefined} aria-label={t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)}>
         <h3>{t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)} ({pages[stage]?.total ?? columns[stage].length})</h3>

@@ -111,6 +111,7 @@ const JobsList: React.FC = () => {
           placeholder={t("recruitment.jobs.searchPlaceholder")}
         />
         <select
+          aria-label={t('hrPage.statusFilter')}
           className="input-field"
           style={{ width: 160 }}
           value={statusFilter}
@@ -133,7 +134,7 @@ const JobsList: React.FC = () => {
         )}
       </div>
 
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : <div className="admin-table-container">
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.jobs.title')} tabIndex={0}>
         <table>
           <thead>
             <tr>

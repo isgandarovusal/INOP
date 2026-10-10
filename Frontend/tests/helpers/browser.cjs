@@ -7,7 +7,7 @@ const frontend = path.resolve(__dirname, '../..');
 const backendRequire = createRequire(path.resolve(frontend, '../Backend/package.json'));
 const { withAuditFixture } = backendRequire('./tests/helpers/auditFixture.cjs');
 
-exports.withBrowserFixture = async (source, callback) => withAuditFixture(async h => {
+exports.withBrowserFixture = async (source, callback, options = {}) => withAuditFixture(async h => {
   const { chromium } = require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
   const { createServer } = await import(path.join(frontend, 'node_modules/vite/dist/node/index.js'));
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'inop-browser-cache-'));
@@ -17,6 +17,9 @@ exports.withBrowserFixture = async (source, callback) => withAuditFixture(async 
       server: { host: '127.0.0.1', port: 0, strictPort: true },
       plugins: [{ name: 'isolated-browser-test', enforce: 'pre', resolveId(id) { if (id === '/__inop_test.js') return '\0inop-test.js'; }, load(id) {
         if (id === '\0inop-test.js') return source;
+        if (options.loadSource && id.startsWith(frontend + '/src/')) {
+          const overlay = options.loadSource(id); if (overlay !== undefined) return overlay;
+        }
         const baseline = process.env.INOP_BROWSER_BASELINE;
         if (baseline && /^[a-f0-9]{40}$/.test(baseline) && id.startsWith(frontend + '/src/')) {
           const result = spawnSync('git', ['show', `${baseline}:Frontend/${path.relative(frontend, id)}`], { cwd: frontend, encoding: 'utf8' });

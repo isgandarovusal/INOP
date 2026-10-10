@@ -21,7 +21,7 @@ test('HR review UI preserves unknowns, edits extracted facts and previews privat
       await h.open('admin', `/app/recruitment/candidates/${candidate._id}/edit`); await h.page.locator('input[name=name]').waitFor();
       assert.equal(await h.page.locator('input[name=experience]').inputValue(), '');
       assert.equal(await h.page.locator('input[name=phone]').inputValue(), '+994 (50) 123-45-67');
-      assert.equal(await h.page.locator('select[aria-label$="start month"]').first().inputValue(), '');
+      assert.equal(await h.page.getByRole('combobox', { name: 'İş tarixçəsi 1 Başlanğıc ay', exact: true }).inputValue(), '');
       assert.equal(await h.page.locator('[data-cv-review=extracted]').count(), 1);
     });
     await t.test('HR edits name/phone/zero/education/languages/certificates and confirms review', async () => {

@@ -205,6 +205,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         <div className="form-group form-group--full">
           <label>{t("recruitment.jobForm.description")}</label>
           <textarea
+            aria-label={t("recruitment.jobForm.description")}
             rows={4}
             className="input"
             value={description}

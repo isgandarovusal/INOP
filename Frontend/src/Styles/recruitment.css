@@ -4285,3 +4285,23 @@
 .hr-filter-lookups { flex: 1 1 100%; min-width: 0; }
 .hr-filter-lookups > div { display: flex; flex-wrap: wrap; gap: 16px; }
 .hr-filter-lookups section { flex: 1 1 220px; min-width: 0; }
+
+/* Bounded HR surfaces: keep wide content reachable without page overflow. */
+.recruitment-list-page, .recruitment-list-page * { box-sizing: border-box; }
+.recruitment-list-page { min-width: 0; max-width: 100%; }
+.recruitment-list-page .filter-bar { flex-wrap: wrap; }
+.recruitment-list-page .filter-bar > * { max-width: 100%; }
+.recruitment-list-page .admin-table-container { max-width: 100%; overflow-x: auto; }
+.recruitment-list-page .hr-application-board { min-width: 0; max-width: 100%; }
+.recruitment-list-page [role=region]:focus-visible { outline: 3px solid var(--accent-color, #2563eb); outline-offset: 2px; }
+.hr-skeleton { display: grid; gap: .75rem; width: 100%; padding: .5rem 0; }
+.hr-skeleton-row { height: 2.75rem; border-radius: .5rem; background: var(--border-color, #dfe5ef); opacity: .5; animation: hr-skeleton-pulse 1.4s ease-in-out infinite alternate; }
+@keyframes hr-skeleton-pulse { to { opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .hr-skeleton-row, [data-hr-state] .spin { animation: none; } }
+.recruitment-upload-button { position: relative; }
+.hr-private-file-input { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.recruitment-upload-button:focus-within { outline: 3px solid var(--accent-color, #2563eb); outline-offset: 3px; }
+/* Keep the decorative glow inside the viewport; do not clip actual detail data. */
+.job-detail-page::before { right: 0; max-width: 100%; }
+.hr-candidates-page .admin-table-container { max-width: 100%; overflow-x: auto; }
+.hr-candidates-page [role=region]:focus-visible { outline: 3px solid var(--accent-color, #2563eb); outline-offset: 2px; }

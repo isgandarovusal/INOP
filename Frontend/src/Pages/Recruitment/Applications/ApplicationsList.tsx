@@ -164,6 +164,7 @@ const ApplicationsList: React.FC = () => {
         <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
         <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} job={jobFilter} onJob={setJobFilter} />
         <select
+          aria-label={t('hrPage.statusFilter')}
           className="input-field"
           style={{ width: 170 }}
           value={statusFilter}
@@ -192,7 +193,7 @@ const ApplicationsList: React.FC = () => {
       </div>
 
       <p role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container">
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
         <table>
           <thead>
             <tr>

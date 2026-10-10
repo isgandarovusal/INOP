@@ -254,6 +254,7 @@ const JobDetail: React.FC = () => {
                 <>
                   <div className="form-group">
                     <select
+                      aria-label={t("recruitment.jobDetail.selectCandidate")}
                       className="input-field"
                       value={selectedCandidate}
                       onChange={(e) =>

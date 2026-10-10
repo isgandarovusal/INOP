@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/useAuth';
 import { useHRActionContext } from '../Hooks/useHRActionContext';
@@ -55,7 +55,8 @@ function Badge({ application, onUpdated }: { application: Application; onUpdated
     {error && <span role="alert">{error}</span>}
   </div>;
 }
-export default function MatchScoreBadge(props: { application: Application; onUpdated?: () => void }) {
+const MatchScoreBadge = memo(function MatchScoreBadge(props: { application: Application; onUpdated?: () => void }) {
   const context = useHRActionContext(props.application.id);
   return <Badge key={JSON.stringify([context.key, props.application.revision, props.application.scoreStatus, props.application.matching?.calculatedAt])} {...props} />;
-}
+});
+export default MatchScoreBadge;

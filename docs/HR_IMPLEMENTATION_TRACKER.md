@@ -89,7 +89,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-075 | 08 | Search/filter/render all records without pagination/virtualization/debounce | TESTED | `hrPaginationUI`: 35-record baseline renders 35; final pages render 30 then 5, debounced single query and server context filters; 50k measurements still 08D |
 | AUD-076 | 08 | Compound filter/sort indexes missing | TESTED | `hrPagination.test.cjs`: owned local index creation and hinted IXSCAN; actual unhinted large-data plans remain 08D |
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | TESTED | 08D counts Mongoose methods and unhinted plans: no per-row network N+1 claim; correlated internal parent lookup cost reproduced as AUD-100, replaced with indexed joins/batches |
-| AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | OPEN | — |
+| AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | TESTED | `hrAccessibility` with full App CSS: four viewports, table/board keyboard regions, forms/detail, CV chooser and three-language names; documented workflow coverage, not WCAG certification |
 | AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | OPEN | — |
 | AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
@@ -294,7 +294,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P08-008 | Debounce | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-009 | Cancellation | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-010 | Virtualization/lazy loading | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
-| P08-011 | Memoization | OPEN | — |
+| P08-011 | Memoization | TESTED | `hrAccessibility` 28/28 plus `cvReviewUI` 12/12: actual score render counter, current auth/language, skeleton/reduced motion, named filters/forms, native file chooser, keyboard scroll regions and 320/390/768/1280px list/board/form/detail with full App CSS; full 1447/1447 |
 | P08-012 | Large Kanban handling | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
 | P08-013 | 0-record benchmark | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
 | P08-014 | 5000-record benchmark | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
@@ -305,11 +305,11 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P08-019 | UI rendering measurement | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
 | P08-020 | Memory measurement | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
 | P08-021 | No unmeasured live performance claims | TESTED | 08D API/scopes/unhinted plans plus `benchmarkHrUI.cjs` production builds: 0/5000/50000, 6 current cases PASS; baseline 50k failures retained; raw bytes/paint/long tasks/CDP heap and explicit local-only limits in `HR_PERFORMANCE_MEASUREMENTS.md` |
-| P08-022 | Loading and skeleton | OPEN | — |
+| P08-022 | Loading and skeleton | TESTED | `hrAccessibility` 28/28 plus `cvReviewUI` 12/12: actual score render counter, current auth/language, skeleton/reduced motion, named filters/forms, native file chooser, keyboard scroll regions and 320/390/768/1280px list/board/form/detail with full App CSS; full 1447/1447 |
 | P08-023 | Error and empty | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-024 | Retry | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
-| P08-025 | Accessibility | OPEN | — |
-| P08-026 | Responsive | OPEN | — |
+| P08-025 | Accessibility | TESTED | `hrAccessibility` 28/28 plus `cvReviewUI` 12/12: actual score render counter, current auth/language, skeleton/reduced motion, named filters/forms, native file chooser, keyboard scroll regions and 320/390/768/1280px list/board/form/detail with full App CSS; full 1447/1447 |
+| P08-026 | Responsive | TESTED | `hrAccessibility` 28/28 plus `cvReviewUI` 12/12: actual score render counter, current auth/language, skeleton/reduced motion, named filters/forms, native file chooser, keyboard scroll regions and 320/390/768/1280px list/board/form/detail with full App CSS; full 1447/1447 |
 
 ## Package 09: Real AI provider
 
@@ -641,3 +641,22 @@ P08-012–021 and AUD-077 have evidence for the measured local workload: 0/5000/
 Gates `/tmp/inop-packagehr08d2-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. App/backend source is unchanged since 08D1's **1419/1419** full serial run; adding the exercised benchmark/helper and docs does not justify rerunning that entire unchanged application suite. The twelve comparative browser observations plus six independent current-only checks are benchmark assertions, not added to the node:test regression total.
 
 P08-011 memoization, P08-022 skeleton, P08-025/026 broader accessibility/responsive, AUD-047 localization and AUD-090 concurrent Source download remain tracked OPEN. CV double upload AUD-073 remains explicitly delegated to package 10's draft/durable storage flow, not forgotten or closed by original preview. Next independent increment: 08D3 remaining UI stability acceptance; then package 09 configurable AI with real E2E BLOCKED_EXTERNAL until approved credentials.
+
+08D2 commit: `8f08c3b063ed102769770acae3f822ef69a3312d` (4 files), final comparative process exit 0; six current cases PASS, four smaller baselines PASS, two 50k baselines FAILED_OR_TIMEOUT. No hosted performance claim.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-102 | 08D3 | Candidate CV input display:none prevents keyboard access to the native chooser | TESTED | Full-App-CSS negative baseline cannot reach file input with Tab; corrected `hrAccessibility` reaches it and opens native filechooser with Space without any upload |
+| AUD-103 | 08D3 | Job detail decorative pseudo-element extends beyond the mobile viewport | TESTED | Expanded full-CSS detail test fails page-width assertion; keeping the glow inside its container passes four-width Job/Candidate detail checks without clipping real data |
+
+## 08D3 — final package 08 UI stability checks
+
+Local commit pending creation. Full serial regression **1447/1447**, authorization **632/632**, smoke **13/13**, TS/build PASS, lint **0 errors / 9 warnings**, diff-check clean. Artifacts: `/tmp/inop-hr08d3-regression.log`, `/tmp/inop-hr08d3-validation-final.log`, `/tmp/inop-packagehr08d3-validation.json`. Final focused suite `/tmp/inop-hr08d3-corrected-final.log` **40/40** includes 28 accessibility/memoization checks and 12 CV review checks; existing board/page/matching/lifecycle protections run in the complete suite.
+
+P08-011/022/025/026 and AUD-078 now have concrete evidence for critical HR workflows. Skeletons are decorative/bounded, announce actual loading and respect reduced motion. Named focusable table/board regions retain reachable content and keyboard drag. Candidate grid/table toggle announces state. CV input is visually clipped while preserving keyboard interaction. Job fields/lookup and CV date names are localized. Memoization skips unchanged score props but still honors language/permission context and existing revision resets. Contract and tested limits: `docs/HR_UI_STABILITY.md`. No backend, API, routing, storage or permission policy changes.
+
+Baseline evidence: `/tmp/inop-hr08d3-ui-baseline.log` 15 negative failures/21 checks, `/tmp/inop-hr08d3-memo-baseline.log` confirms actual extra renders after correcting a stable-context fixture, `/tmp/inop-hr08d3-full-css-baseline.log` confirms unnamed Job description and keyboard-hidden CV input, `/tmp/inop-hr08d3-history-corrected-baseline.log` confirms hardcoded English date names. Initial history selector guessed the wrong translated Add label; it was corrected and the real date-name problem reproduced before patching.
+
+Expanded test initially sampled Candidate table layout before switching out of grid mode; moving the measurement after the switch preserved the assertions. The corrected test then found the real desktop/tablet Candidate overflow:hidden rule; the fix is scoped to hr-candidates-page. CV review's old English aria-label selector was updated to the exact current AZ name; its unknown month=null storage assertion remains. Job detail overflow was traced to the decorative right:-150px glow, not hidden data, and corrected. Failed intermediate logs are preserved rather than represented as PASS.
+
+All enumerated P08 acceptance IDs have test/measurement evidence for the documented local workload. Remaining cross-package findings are kept: AUD-047 broader upload/provider error localization remains OPEN for 09/13; AUD-073 parse/create double upload is explicitly retained for package 10's durable draft flow; AUD-090 concurrent Source native PDF timeout remains OPEN/root cause unconfirmed. No real OCR/provider/SMTP/durable storage/Graph/website readiness is claimed. Provider variable names/presence were inspected without reading/reporting values: HR_AI_PROVIDER, HR_AI_MODEL, OPENAI_API_KEY, AZURE_OPENAI_API_KEY, ANTHROPIC_API_KEY are absent from injected bindings and Backend .env names. P09-023 stays BLOCKED_EXTERNAL, independent adapter/security/mock/UI work is next. No production push/deployment performed.

@@ -1017,6 +1017,8 @@
     "preferredSkills": "Preferred skills"
   },
   "cvReview": {
+    "year": "year",
+    "month": "month",
     "close": "Close",
     "download": "Download",
     "textPreview": "Extracted text preview; original layout may differ.",
@@ -1258,6 +1260,7 @@
     }
   },
   "hrPage": {
+    "statusFilter": "Status filter",
     "pagination": "Recruitment pagination",
     "summary": "Page {{page}} · {{shown}} shown · {{total}} matching records",
     "pageSort": "Score/name ordering applies to this page. Use filters to narrow the cohort.",

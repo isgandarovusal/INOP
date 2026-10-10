@@ -144,7 +144,7 @@ const CandidatesList: React.FC = () => {
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
-    <div className="page-container">
+    <div className="page-container hr-candidates-page">
       <PageHeader
         title={t("recruitment.candidates.title")}
         subtitle={t("recruitment.candidates.subtitle")}
@@ -218,6 +218,8 @@ const CandidatesList: React.FC = () => {
             }
             onClick={() => setViewMode("grid")}
             title={t("hrWorkflow.candidateCards")}
+            aria-label={t("hrWorkflow.candidateCards")}
+            aria-pressed={viewMode === 'grid'}
           >
             <LayoutGrid size={18} />
           </button>
@@ -229,6 +231,8 @@ const CandidatesList: React.FC = () => {
             }
             onClick={() => setViewMode("list")}
             title={t("recruitment.candidates.listMode")}
+            aria-label={t("recruitment.candidates.listMode")}
+            aria-pressed={viewMode === 'list'}
           >
             <List size={18} />
           </button>
@@ -292,7 +296,7 @@ const CandidatesList: React.FC = () => {
           <p>{t('hrWorkflow.profileStatus')}: {t(`recruitment.candidateStatus.${c.status}`)}</p>
         </article>)}</div>
       ) : (
-        <div className="admin-table-container">
+        <div className="admin-table-container" role="region" aria-label={t('recruitment.candidates.title')} tabIndex={0}>
           <table className="data-table">
             <thead>
               <tr>

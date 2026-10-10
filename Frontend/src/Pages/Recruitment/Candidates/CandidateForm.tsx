@@ -289,7 +289,8 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
                   <input
                     type="file"
                     accept=".pdf,.docx"
-                    style={{ display: "none" }}
+                    className="hr-private-file-input"
+                    aria-label={t("recruitment.candidateForm.chooseCv")}
                     disabled={saving}
                     onChange={(e) =>
                       handleCvChange(e.target.files?.[0] || null)

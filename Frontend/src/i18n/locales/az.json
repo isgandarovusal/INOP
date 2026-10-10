@@ -1041,6 +1041,8 @@
     "preferredSkills": "Arzuolunan bacarıqlar"
   },
   "cvReview": {
+    "year": "il",
+    "month": "ay",
     "close": "Bağla",
     "download": "Endir",
     "textPreview": "Çıxarılmış mətn; orijinal sənədin görünüşü fərqli ola bilər.",
@@ -1282,6 +1284,7 @@
     }
   },
   "hrPage": {
+    "statusFilter": "Status filtri",
     "pagination": "HR səhifələmə",
     "summary": "Səhifə {{page}} · {{shown}} göstərilir · {{total}} uyğun qeyd",
     "pageSort": "Bal/ad sıralaması bu səhifəyə aiddir. Qrupu daraltmaq üçün filtrlərdən istifadə edin.",
