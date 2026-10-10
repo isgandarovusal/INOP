@@ -12,7 +12,7 @@ const types = {
   '.txt': 'text/plain', '.csv': 'text/csv', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
 };
-function invalid() { return new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'file'); }
+function invalid(field = 'file') { return new multer.MulterError('LIMIT_UNEXPECTED_FILE', field); }
 function validOfficeZip(bytes, required) {
   // Bound actual decompression before an Office parser can consume attacker ZIP data.
   let end = bytes.length - 22;
@@ -61,7 +61,7 @@ function privateUpload(field, extensions, persist = true) {
     fileFilter: (_req, file, cb) => {
       const extension = path.extname(file.originalname).toLowerCase();
       const safeName = !/[\\/\x00-\x1f\x7f]/.test(file.originalname) && file.originalname.length <= 255 && !file.originalname.startsWith('.');
-      cb(safeName && extensions.includes(extension) && file.mimetype.toLowerCase() === types[extension] ? null : invalid(), true);
+      cb(safeName && extensions.includes(extension) && file.mimetype.toLowerCase() === types[extension] ? null : invalid(field), true);
     },
   }).single(field);
   return (req, res, next) => parser(req, res, async error => {
@@ -72,7 +72,7 @@ function privateUpload(field, extensions, persist = true) {
     if (!req.file) return next();
     try {
       const extension = path.extname(req.file.originalname).toLowerCase();
-      if (!validContent(req.file.buffer, extension)) return next(invalid());
+      if (!validContent(req.file.buffer, extension)) return next(invalid(field));
       if (persist) {
         await fs.mkdir(uploadsDir, { recursive: true });
         req.file.filename = crypto.randomUUID() + extension;

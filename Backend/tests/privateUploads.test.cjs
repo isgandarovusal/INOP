@@ -105,7 +105,11 @@ test('Private uploads require owning-record scope and validate bounded multipart
       ['hidden name', '.unsafe.pdf', 'application/pdf', pdf], ['oversize', 'large.pdf', 'application/pdf', Buffer.concat([pdf, Buffer.alloc(5 * 1024 * 1024)])],
     ]) await t.test(`${label}: CV and source reject before storage`, async () => {
       const before = (await fs.readdir(uploadsDir)).sort();
-      for (const [endpoint, field] of [['/candidates', 'cv'], ['/audit-source-documents', 'file']]) assert.equal((await upload('admin', endpoint, field, name, mime, bytes, { name: 'Synthetic', role: 'Synthetic' })).status, label === 'oversize' ? 413 : 400);
+      for (const [endpoint, field] of [['/candidates', 'cv'], ['/audit-source-documents', 'file']]) {
+        const result = await upload('admin', endpoint, field, name, mime, bytes, { name: 'Synthetic', role: 'Synthetic' });
+        assert.equal(result.status, label === 'oversize' ? 413 : 400);
+        if (result.data.code === 'LIMIT_UNEXPECTED_FILE') assert.equal(result.data.field, field);
+      }
       assert.deepEqual((await fs.readdir(uploadsDir)).sort(), before);
     });
     await t.test('parse-only CV rejects forged content; source permission is checked before multipart', async () => {
