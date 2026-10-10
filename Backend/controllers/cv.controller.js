@@ -34,9 +34,9 @@ exports.parseCv = async (req, res) => {
       ...parsed,
     });
   } catch (error) {
-    console.error("Parse CV error:", error);
+    console.error("Parse CV error:", error.name);
 
-    return res.status(422).json({
+    return res.status([400, 413, 422, 503, 504].includes(error.status) ? error.status : 422).json({
       message: "CV emal edilərkən xəta baş verdi.",
     });
   }

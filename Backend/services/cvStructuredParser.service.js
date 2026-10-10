@@ -138,7 +138,7 @@ function extractName(text) {
       words.length >= 2 &&
       words.length <= 5 &&
       words.every((word) =>
-        /^[A-Za-zƏəĞğÇçŞşİiÖöÜü\s'-]+$/.test(word)
+        /^[\p{L}\p{M}'’-]+$/u.test(word)
       )
     ) {
       return line;
@@ -205,11 +205,9 @@ function extractSkills(text, sections) {
     text,
   ].join("\n");
 
-  const lowerSource = source.toLowerCase();
-
   return unique(
     COMMON_SKILLS.filter((skill) =>
-      lowerSource.includes(skill.toLowerCase())
+      containsTerm(source, skill)
     )
   );
 }
@@ -220,13 +218,16 @@ function extractLanguages(text, sections) {
     text,
   ].join("\n");
 
-  const lowerSource = source.toLowerCase();
-
   return unique(
     COMMON_LANGUAGES.filter((language) =>
-      lowerSource.includes(language.toLowerCase())
+      containsTerm(source, language)
     )
   );
+}
+
+function containsTerm(text, term) {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<![\\p{L}\\p{N}_])${escaped}(?![\\p{L}\\p{N}_])`, "iu").test(text);
 }
 
 function extractCertificates(sections) {
