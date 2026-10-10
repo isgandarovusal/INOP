@@ -296,14 +296,14 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P08-010 | Virtualization/lazy loading | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
 | P08-011 | Memoization | OPEN | — |
 | P08-012 | Large Kanban handling | IN_PROGRESS | `hrBoardUI` proves lane counts and bounded independent next/back for 35/20 records; 5000/50000 production-build measurements remain 08D |
-| P08-013 | 0-record benchmark | OPEN | — |
-| P08-014 | 5000-record benchmark | OPEN | — |
-| P08-015 | 50000-record benchmark | OPEN | — |
-| P08-016 | Response size measurement | OPEN | — |
-| P08-017 | Latency measurement | OPEN | — |
-| P08-018 | Query behavior | OPEN | — |
+| P08-013 | 0-record benchmark | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
+| P08-014 | 5000-record benchmark | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
+| P08-015 | 50000-record benchmark | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
+| P08-016 | Response size measurement | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
+| P08-017 | Latency measurement | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
+| P08-018 | Query behavior | IN_PROGRESS | `benchmarkHr.cjs`, `hrAnalyticsScale`, `HR_PERFORMANCE_MEASUREMENTS.md`: owned local 0/5000/50000 API/board scopes and query plans measured; production-build UI increment still pending |
 | P08-019 | UI rendering measurement | OPEN | — |
-| P08-020 | Memory measurement | OPEN | — |
+| P08-020 | Memory measurement | IN_PROGRESS | Shared API/client RSS and heap deltas recorded with explicit limits; production-build browser memory remains pending |
 | P08-021 | No unmeasured live performance claims | OPEN | — |
 | P08-022 | Loading and skeleton | OPEN | — |
 | P08-023 | Error and empty | TESTED | `hrPagination`, `hrPaginationUI`, `applicationMatchingUI`, existing HR lifecycle tests; server pages, filters, cancellation/lazy evidence, contextual lookup and error/retry contracts |
@@ -610,3 +610,22 @@ Actual keyboard reorder persists through refresh, uses offpage neighbor anchors 
 Initial UI test correctly detected AUD-099; it is fixed in the preceding classification commit rather than weakening its assertion. A TypeScript check also caught boardOrder accidentally inserted in Candidate instead of Application; it was moved to the correct interface before final TS/build/full gates. Neither failure is described as a passing first attempt.
 
 P08-012 is IN_PROGRESS until 08D large datasets/production-build measurements; P08-011 memoization, 013–022 benchmarks/skeleton, 025–026 accessibility/responsive and remaining localization requirements are retained. Generic Source concurrent-download finding AUD-090 is still OPEN. The board is bounded, not a claim of a transactional whole-cohort snapshot or hosted performance. No production data, secrets, deployment or provider call. Next independent work is 08D measurements and remaining HR UI stability criteria, followed by packages 09–13.
+
+08C5C commit: `d337755196aa17c8f7a83c508a3bea6d2a6880b6` (12 files), final evidence above. The user-requested classification follow-up remains a separate preserved commit; no push performed.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-100 | 08D1 | HR analytics reaches its unchanged ten-second deadline with 50000 synthetic Applications and returns 503 | TESTED | `/tmp/inop-hr08d-backend-first.json` reproduces ANALYTICS_TIMEOUT; fourth report gives 200/4686 ms; `hrAnalyticsScale.test.cjs` exercises final 50k output/count/score/payload and 875-parent cache boundaries |
+| AUD-101 | 08D1 | Expensive analytics can return old aggregates after current role-read revocation, account deactivation or department change | TESTED | Read-only git-show baseline d337755 fails three gated negative assertions with 200; current `hrAnalyticsScale` returns 403/409 without aggregates and tests revoked JWT=401 |
+
+## 08D1 — local scale evidence and bounded analytics execution
+
+Local commit pending creation. Full serial regression **1419/1419**, authorization **632/632**, smoke **13/13**, TS/build PASS, lint **0 errors / 9 warnings**. Artifacts: `/tmp/inop-hr08d-regression.log`, `/tmp/inop-packagehr08d-validation.json`. The additional JWT regression passes in this final full run; earlier targeted run **109/109** precedes that addition. Frontend production-benchmark helpers are prepared outside this backend increment; they are not included in this test count or commit.
+
+No API envelope, index, schema, environment, hosting or permission policy change. Equality parent joins are immediately independently filtered/projected before counts/metadata. Score facts are fetched in 250-record batches with a request-local 500-Job hash cache; no global actor cache and no protected personal traits are used. The same-batch eviction case preserves all permitted records. Yielding bounds event-loop monopolization; the existing ten-second query/score guard remains.
+
+Final authority checks happen after asynchronous Branch lookup, before output. Revoked JWT=401, removed grants/inactive account=403, changed role/department/permissions=409 ANALYTICS_CHANGED; responses contain no old aggregates. Existing admin/HR/all, own, department, assigned and independently denied-parent behavior remains tested. No automatic retry under old authority.
+
+Evidence: `/tmp/inop-hr08d-analytics-target-rechecked.log` **109/109** (before the additional JWT regression), `/tmp/inop-hr08d-authority-baseline.log` (three expected failing negative assertions), `/tmp/inop-hr08d-backend-first.json` (50k failure), `/tmp/inop-hr08d-backend-fourth.json` (all dataset sizes plus 15 scope checks). Source/query assumptions, exact measurements and memory limitations: `docs/HR_PERFORMANCE_MEASUREMENTS.md`. New benchmark uses only unique owned loopback fixtures; actual hosting/global limiter/proxy and browser paint are excluded. Negative RSS deltas are GC observations, not proof of reduced peak memory.
+
+P08-013–018/020 remain IN_PROGRESS until the next production-build browser increment. P08-011/022/025/026 and AUD-047 remain OPEN; AUD-090 concurrent Source timeout is retained, not silently fixed. No real AI, SMTP, Outlook, website, OCR or durable-storage readiness is claimed. Pending production benchmark helper/script are outside this backend increment and will receive their own tests/commit.

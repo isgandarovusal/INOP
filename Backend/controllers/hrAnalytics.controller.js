@@ -7,6 +7,8 @@ const { aggregateResourceFilter, resourceFilter } = require('../services/hrResou
 const { fingerprints, VERSION } = require('../services/applicationMatch.service');
 const { getSmtpConfig } = require('../services/email.service');
 const { brands: getBrands } = require('../services/recruitmentCatalog.service');
+const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
+const { setImmediate: yieldEventLoop } = require('node:timers/promises');
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
 const SOURCES = ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form', 'unknown'];
 function filters(query) {
@@ -25,33 +27,64 @@ function filters(query) {
   return { jobs, apps };
 }
 function parentLookup(req, model, localField, resource, projection, extra = {}) {
-  return { $lookup: { from: model.collection.name, let: { parentId: '$' + localField }, pipeline: [
-    { $match: { $and: [{ $expr: { $eq: ['$_id', '$$parentId'] } }, aggregateResourceFilter(req, resource), extra] } }, { $project: projection },
-  ], as: model === Job ? 'job' : 'candidate' } };
+  const scope = aggregateResourceFilter(req, resource), as = model === Job ? 'job' : 'candidate';
+  const deny = scope._id?.$in?.length === 0;
+  const checks = [{ $eq: [{ $type: '$' + localField }, 'objectId'] }];
+  if (!deny) for (const [key, value] of Object.entries({ ...scope, ...extra })) checks.push({ $eq: [{ $ifNull: ['$$parent.' + key, null] }, { $literal: value }] });
+  const safe = { _id: '$$parent._id' };
+  for (const field of Object.keys(projection)) {
+    const path = field.split('.'); let target = safe;
+    for (const part of path.slice(0, -1)) target = target[part] ||= {};
+    target[path.at(-1)] = '$$parent.' + field;
+  }
+  // Equality joins permit Mongo's indexed/SBE strategy. Filter each joined
+  // parent by its own grant before any count/metadata, and project immediately.
+  return [{ $lookup: { from: model.collection.name, localField, foreignField: '_id', as } },
+    { $set: { [as]: { $map: { input: { $filter: { input: '$' + as, as: 'parent', cond: deny ? false : { $and: checks } } }, as: 'parent', in: safe } } } }];
 }
 function base(req, criteria, scoring = false) {
   const jobs = scoring ? { title: 1, requiredSkills: 1, preferredSkills: 1, experienceYears: 1, requiredEducation: 1, requiredCertificates: 1, criterionWeights: 1 } : { status: 1, brandId: 1 };
   const candidates = scoring ? { role: 1, skills: 1, experience: 1, education: 1, certificates: 1, reviewedFields: 1, 'cvReview.reviewStatus': 1, 'cvReview.version': 1, employmentHistory: 1 } : { 'cvReview.version': 1, 'cvReview.reviewStatus': 1, 'cvReview.processingStatus': 1, 'cvOriginal.sha256': 1 };
   return [{ $match: { $and: [aggregateResourceFilter(req, 'application'), criteria.apps] } },
     { $project: scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
-    parentLookup(req, Job, 'jobId', 'recruitment', jobs, criteria.jobs), { $unwind: '$job' },
-    parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }];
+    ...parentLookup(req, Job, 'jobId', 'recruitment', jobs, criteria.jobs), { $unwind: '$job' },
+    ...parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }];
 }
 const number = (rows, key) => rows?.[0]?.[key] ?? 0;
 const dailyAverage = (sum, count) => count ? Math.round(sum / count / 86400000 * 100) / 100 : null;
 async function scoreDistribution(req, criteria) {
   const buckets = [0, 20, 40, 60, 80].map(min => ({ min, max: min === 80 ? 100 : min + 19, count: 0 }));
   const states = { pending: 0, incomplete: 0, stale: 0, legacy: 0, restricted: 0, calculated: 0 }; let checked = 0;
-  const cursor = Application.aggregate([...base(req, criteria, true), { $project: { score: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1, job: 1, candidate: 1 } }]).option({ maxTimeMS: 10000 }).cursor({ batchSize: 250 });
-  try { for await (const row of cursor) {
-    checked++; let state = Object.hasOwn(states, row.scoreStatus) ? row.scoreStatus : 'legacy';
-    if (!row.candidate) state = 'restricted';
-    else if (row.matching?.version !== VERSION) state = 'legacy';
-    else { const hashes = fingerprints(row.job, row.candidate); state = row.scoreStatus === 'stale' || hashes.jobHash !== row.matching.jobHash || hashes.candidateHash !== row.matching.candidateHash ? 'stale' : Object.hasOwn(states, row.matching.scoreStatus) ? row.matching.scoreStatus : 'legacy'; }
-    const score = row.matching?.score;
-    if (state === 'calculated' && (!Number.isFinite(score) || score < 0 || score > 100)) state = 'incomplete';
-    states[state]++; if (state === 'calculated') buckets[Math.min(4, Math.floor(score / 20))].count++;
-  } } finally { await cursor.close(); }
+  // Replace per-row correlated score lookups with bounded parent batches. Cache
+  // at most 500 Job facts in this request; never cache actor grants globally.
+  const jobCache = new Map(), deadline = Date.now() + 10000;
+  const checkDeadline = () => { if (Date.now() > deadline || req.res?.destroyed) throw Object.assign(new Error('Analytics deadline exceeded.'), { code: 50 }); };
+  const cursor = Application.find({ $and: [resourceFilter(req, 'application'), criteria.apps, ...(criteria.jobs._id ? [{ jobId: criteria.jobs._id }] : [])] }).select('jobId candidateId scoreStatus matching.version matching.jobHash matching.candidateHash matching.score matching.scoreStatus').sort({ _id: 1 }).maxTimeMS(10000).lean().cursor({ batchSize: 250 });
+  async function consume(rows) {
+    checkDeadline();
+    const ids = [...new Set(rows.filter(row => mongoose.isObjectIdOrHexString(row.jobId)).map(row => String(row.jobId)))];
+    const batchJobs = new Map(ids.filter(id => jobCache.has(id)).map(id => [id, jobCache.get(id)]));
+    const wanted = ids.filter(id => !jobCache.has(id));
+    const jobs = wanted.length ? await Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, { _id: { $in: wanted } }] }).select('title requiredSkills preferredSkills experienceYears requiredEducation requiredCertificates criterionWeights').maxTimeMS(10000).lean() : [];
+    const found = new Map(jobs.map(job => [String(job._id), { hash: fingerprints(job, {}).jobHash }]));
+    for (const id of wanted) { const value = found.get(id) || null; batchJobs.set(id, value); jobCache.set(id, value); if (jobCache.size > 500) jobCache.delete(jobCache.keys().next().value); }
+    const allowed = rows.filter(row => batchJobs.get(String(row.jobId)));
+    const candidates = allowed.length ? await Candidate.find({ $and: [resourceFilter(req, 'candidate'), { _id: { $in: allowed.map(row => row.candidateId).filter(id => mongoose.isObjectIdOrHexString(id)) } }] }).select('role skills experience education certificates reviewedFields cvReview.reviewStatus cvReview.version employmentHistory.title employmentHistory.start employmentHistory.end employmentHistory.ongoing').maxTimeMS(10000).lean() : [];
+    checkDeadline();
+    const candidateHashes = new Map(candidates.map(candidate => [String(candidate._id), fingerprints({}, candidate).candidateHash]));
+    for (const [index, row] of allowed.entries()) {
+      checked++; let state = Object.hasOwn(states, row.scoreStatus) ? row.scoreStatus : 'legacy';
+      const candidateHash = candidateHashes.get(String(row.candidateId));
+      if (!candidateHash) state = 'restricted';
+      else if (row.matching?.version !== VERSION) state = 'legacy';
+      else { state = row.scoreStatus === 'stale' || batchJobs.get(String(row.jobId)).hash !== row.matching.jobHash || candidateHash !== row.matching.candidateHash ? 'stale' : Object.hasOwn(states, row.matching.scoreStatus) ? row.matching.scoreStatus : 'legacy'; }
+      const score = row.matching?.score;
+      if (state === 'calculated' && (!Number.isFinite(score) || score < 0 || score > 100)) state = 'incomplete';
+      states[state]++; if (state === 'calculated') buckets[Math.min(4, Math.floor(score / 20))].count++;
+      if (index % 32 === 0) { await yieldEventLoop(); checkDeadline(); }
+    }
+  }
+  try { let rows = []; for await (const row of cursor) { rows.push(row); if (rows.length === 250) { await consume(rows); rows = []; } } if (rows.length) await consume(rows); } finally { await cursor.close(); }
   return { states, buckets, checked };
 }
 exports.get = async (req, res, next) => {
@@ -59,6 +92,8 @@ exports.get = async (req, res, next) => {
   const jobScope = resourceFilter(req, 'recruitment');
   if (jobScope._id?.$in?.length === 0) return res.status(403).json({ message: 'Scoped vacancy read permission is required.' });
   const at = new Date();
+  const authority = () => JSON.stringify([req.user.id, req.user.role, req.user.departmentId, req.authRole.permissions]);
+  const initialAuthority = authority();
   try {
     const pipeline = [...base(req, criteria), { $set: {
       sourceKey: { $cond: [{ $in: ['$source.key', SOURCES.slice(0, -1)] }, '$source.key', 'unknown'] },
@@ -83,6 +118,11 @@ exports.get = async (req, res, next) => {
     ]);
     const branchIds = [...new Set(optionJobs.map(j => j.branchId).filter(Boolean).map(String))];
     const branches = await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();
+    await verifyToken(req, res, () => {}); if (res.headersSent || res.destroyed) return;
+    req.authRole = { permissions: await getRolePermissions(req.user.role) };
+    const permits = resource => req.authRole.permissions.find(p => (p.resource === resource || p.resource === '*') && (p.action === 'read' || p.action === '*'));
+    if (['application', 'recruitment'].some(resource => !permits(resource) || permits(resource).scope === 'none')) return res.status(403).json({ message: 'Scoped Application and vacancy read permissions are required.' });
+    if (authority() !== initialAuthority) return res.status(409).json({ code: 'ANALYTICS_CHANGED', message: 'Permissions changed during analytics. Refresh and retry.' });
     const activeByBrand = active[0].brands;
     const total = number(metrics.totals, 'applications'), candidateScope = resourceFilter(req, 'candidate');
     res.json({ version: 'hr-analytics-v1', generatedAt: at, filters: req.query,
@@ -102,7 +142,7 @@ exports.get = async (req, res, next) => {
       integrations: { ai: 'not_integrated', outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
       options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
     });
-  } catch (e) { if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }
+  } catch (e) { if (res.destroyed) return; if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }
 };
 module.exports.STATUSES = STATUSES;
 module.exports.SOURCES = SOURCES;
