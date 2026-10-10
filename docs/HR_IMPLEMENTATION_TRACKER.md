@@ -353,11 +353,11 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-008 | Bounded parsing jobs | OPEN | — |
 | P10-009 | OCR jobs | OPEN | — |
 | P10-010 | AI jobs | OPEN | — |
-| P10-011 | Email jobs | OPEN | — |
+| P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
-| P10-013 | Idempotency | OPEN | — |
-| P10-014 | Job state | OPEN | — |
-| P10-015 | Retry/failure monitoring | OPEN | — |
+| P10-013 | Idempotency | IN_PROGRESS | 10C1 email-specific command/CAS/outbox/diagnostics tested (1714 full); generic CV/OCR/AI/ingestion jobs still unfinished |
+| P10-014 | Job state | IN_PROGRESS | 10C1 email-specific command/CAS/outbox/diagnostics tested (1714 full); generic CV/OCR/AI/ingestion jobs still unfinished |
+| P10-015 | Retry/failure monitoring | IN_PROGRESS | 10C1 email-specific command/CAS/outbox/diagnostics tested (1714 full); generic CV/OCR/AI/ingestion jobs still unfinished |
 | P10-016 | Reuse infrastructure | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-017 | Justify additional resources first | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-018 | Real storage durability test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
@@ -515,7 +515,7 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 
 | ID | Package | Finding | Status | Evidence |
 |---|---|---|---|---|
-| AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | OPEN | 06C API tests expose safe codes; UI currently exposes delivery state, explicit retry/monitoring UI remains package 10 |
+| AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | TESTED | 06C API tests expose safe codes; UI currently exposes delivery state, explicit retry/monitoring UI remains package 10 |
 | AUD-089 | 06C | SMTP lacks transport bounds and can return/log raw provider diagnostics | TESTED | `applicationNotifications.test.cjs` synthetic transport: old source fails sanitized-error assertion, new bounded/closing transport passes |
 | EXT-SMTP-001 | 06/10 | Approved company SMTP credentials, consent and actual delivery/receipt test | BLOCKED_EXTERNAL | Missing configuration and mocked delivery are tested; real SMTP receipt/bounces are not verified |
 
@@ -749,3 +749,11 @@ Existing application code is unchanged after 10A's 1628 full regression; the new
 Focused `/tmp/inop-hr10b2-target.log` **177/177**, including 23 new actual HTTP/object/local authorization checks and existing private upload, original preview, Candidate action, CV review/AI UI protection. Full `/tmp/inop-hr10b2-regression.log` **1682/1682**, final `/tmp/inop-hr10b2-validation.log` and `/tmp/inop-packagehr10b2-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Local commit pending creation; docs/tracker only changed after final source freeze. The new optional select:false/JSON-hidden Candidate blob is server-only with no default/backfill/index. No object upload route is enabled. Existing Candidate/Audit/Source/frontend contracts stay compatible; new storage is read-only until approved manifest/quarantine writer work. Whole-source DOCX/PDF extraction remains local, minimized AI only receives approved professional facts. Contract and precise limitations: `docs/HR_PRIVATE_STORAGE_CONTRACT.md`.
 
 All object transport is synthetic; real durability/recovery/provider policy/access/cost remain BLOCKED_EXTERNAL. Existing filesystem originals remain authorized but ephemeral; native replacement safely clears old blob reference and retains the old object. Retention/orphans/AUD-050 and P10-003/006/008–015 remain OPEN/IN_PROGRESS. No production DB/env/secret/resource/migration/push. Next: bounded durable job/manifests and HR-visible processing/retry diagnostics; real CV ingestion stays gated.
+
+10B2 commit: `c720a841b40573c4ef6cffee4b1e8c4575825db6` (7 files), 177 target / 1682 full regression, 632 authorization / 13 smoke, TypeScript/build PASS, lint 0 errors / 9 warnings. AUD-110 TESTED, native storage still ephemeral; no activated object writer/migration/push.
+
+## 10C1 — email diagnostics and audited manual retry
+
+In progress. Final targets `/tmp/inop-hr10c1-target-final.log` **67/67** after the optional-revision TypeScript correction; final `/tmp/inop-hr10c1-validation-final.log` and `/tmp/inop-packagehr10c1-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full serial `/tmp/inop-hr10c1-regression.log` **1714/1714**. Local commit pending creation; final gates correspond to the frozen source, only docs/tracker changed afterwards. Contract/limits: `docs/HR_NOTIFICATION_RETRY_CONTRACT.md`. Current server independent parent scopes, whole event/revision CAS, command replay, workflow/stale bounds, current retry actor and safe visible codes are tested without SMTP/provider access.
+
+Negative backend corrected baseline reproduces missing route (404); first omitted Job description and later null interview mutation are fixture failures, preserved separately. Corrected read-only UI baseline proves AZ/EN/RU missing reason labels; its preceding readiness selector failure is not represented as three independent language proofs. Build initially caught optional revision; current UI requires known integer instead of guessing. Generic jobs/storage/drafts/retention/quarantine remain unfinished; external SMTP receipt stays BLOCKED_EXTERNAL. No production, secret, migration, resource, external email or push.

@@ -200,3 +200,7 @@ export async function getApplicationHistory(id: string, offset = 0, signal?: Abo
 export async function getApplicationInterviewers(id: string, signal?: AbortSignal, scopeKey?: string) {
   return readJson<{ id: string; name: string }[]>(`/applications/${id}/interviewers`, { signal, scopeKey });
 }
+
+export async function retryApplicationDelivery(id: string, eventId: string, input: { expectedRevision: number; commandId: string; reason: string }, signal?: AbortSignal) {
+  return (await API.post<{ revision: number; eventId: string; delivery: NonNullable<ApplicationEvent['delivery']>; replayed: boolean }>(`/applications/${id}/notifications/${eventId}/retry`, input, { signal, suppressErrorToast: true })).data;
+}

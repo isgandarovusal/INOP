@@ -63,7 +63,7 @@ exports.history = async (req, res, next) => {
   try { const row = await Application.findOne(query(req)).select('events jobId candidateId').lean(); if (!row) return res.status(404).json({ message: 'Application not found.' });
     const { jobs, candidates } = await scopedScoreRecords(req, [row]); const canReadScore = jobs.has(String(row.jobId)) && candidates.has(String(row.candidateId));
     const events = [...(row.events || [])].reverse(); res.json({ total: events.length, items: events.slice(offset, offset + limit).map(({ commandHash: _hash, commandId: _key, delivery, ...event }) => {
-      if (delivery) event.delivery = Object.fromEntries(['state', 'attempts', 'code', 'at', 'sentAt', 'nextAttemptAt'].filter(k => delivery[k] !== undefined).map(k => [k, delivery[k]]));
+      if (delivery) event.delivery = Object.fromEntries(['state', 'attempts', 'priorAttempts', 'retryCount', 'code', 'at', 'sentAt', 'nextAttemptAt'].filter(k => delivery[k] !== undefined).map(k => [k, delivery[k]]));
       return event.type === 'score' && !canReadScore ? { ...event, before: { score: null, scoreStatus: 'restricted' }, after: { score: null, scoreStatus: 'restricted' }, reason: '' } : event;
     }), hasMore: offset + limit < events.length });
   } catch (e) { next(e); }

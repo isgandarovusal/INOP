@@ -169,4 +169,4 @@ export interface ApplicationMatch {
 export interface ApplicationInterview { startsAt: string; timezone: string; durationMinutes: number; interviewerId: string; result: 'pending' | 'passed' | 'failed' | 'no_show' | 'cancelled' }
 export interface ApplicationNextAction { kind: 'review' | 'call' | 'interview' | 'offer' | 'follow_up' | 'none'; dueAt: string | null; timezone?: string | null; notes: string }
 export interface ApplicationEvent { id: string; type: string; actor: string; at: string; revision: number; reason: string;
-  before: Record<string, unknown> | null; after: Record<string, unknown>; delivery?: { state: string; attempts: number; lastErrorCode?: string } }
+  before: Record<string, unknown> | null; after: Record<string, unknown>; delivery?: { state: string; attempts: number; code?: string; priorAttempts?: number; retryCount?: number; at?: string; sentAt?: string; nextAttemptAt?: string } }

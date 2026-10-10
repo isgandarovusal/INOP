@@ -1200,7 +1200,8 @@
       "status": "Mərhələ dəyişikliyi",
       "workflow": "Axın dəyişikliyi",
       "score": "Qiymətləndirmə",
-      "reorder": "Kart sırası dəyişdirildi"
+      "reorder": "Kart sırası dəyişdirildi",
+      "notification_retry": "Email üçün HR təkrar cəhdi"
     },
     "processingState": {
       "idle": "Emal aktiv deyil",
@@ -1344,6 +1345,32 @@
       "education": "Təhsil",
       "role": "Vəzifə",
       "experience": "Təcrübə (il)"
+    }
+  },
+  "hrDelivery": {
+    "attempts": "Göndəriş cəhdləri",
+    "nextAttempt": "Növbəti cəhd (yerli vaxt)",
+    "reason": "Təkrar göndəriş səbəbi",
+    "retry": "Bildirişi yenidən növbəyə əlavə et",
+    "warning": "Email yenidən göndərilə bilər. Təkrar çatdırılma ehtimalını yoxlayın; işə qəbul qərarı dəyişmir.",
+    "code": {
+      "SMTP_NOT_CONFIGURED": "Email xidməti konfiqurasiya edilməyib.",
+      "DELIVERY_FAILED": "Email göndərilə bilmədi.",
+      "SEND_TIMEOUT": "Göndəriş vaxtı bitdi; email çatmış ola bilər.",
+      "ATTEMPTS_EXHAUSTED": "Avtomatik cəhd limiti bitib.",
+      "AUTH_REVOKED": "Göndərişi başladan istifadəçinin icazəsi ləğv edilib.",
+      "PARENT_SCOPE_REVOKED": "Namizəd və ya vakansiyaya giriş artıq yoxdur.",
+      "MISSING_RECIPIENT": "Namizədin email ünvanı yoxdur.",
+      "STALE_WORKFLOW": "Bildiriş artıq cari mərhələyə uyğun deyil.",
+      "INVALID_EVENT": "Bildiriş hadisəsi etibarlı deyil.",
+      "DELIVERED": "Göndəriş xidməti email-i qəbul edib.",
+      "RETRY_QUEUED": "HR təkrar göndərişi növbəyə əlavə edib.",
+      "UNKNOWN": "Bildiriş vəziyyəti üçün əlavə yoxlama lazımdır."
+    },
+    "error": {
+      "smtp": "Email xidməti əlçatan deyil. Müraciət və mərhələ dəyişmədi.",
+      "conflict": "Bildiriş və ya müraciət dəyişib. Son məlumatı yenidən yükləyin.",
+      "failed": "Təkrar göndəriş növbəyə əlavə edilə bilmədi. Yenidən yoxlayın."
     }
   }
 }

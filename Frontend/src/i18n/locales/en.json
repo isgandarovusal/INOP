@@ -1176,7 +1176,8 @@
       "status": "Stage change",
       "workflow": "Workflow change",
       "score": "Matching",
-      "reorder": "Card reordered"
+      "reorder": "Card reordered",
+      "notification_retry": "HR notification retry"
     },
     "processingState": {
       "idle": "Processing not active",
@@ -1320,6 +1321,32 @@
       "education": "Education",
       "role": "Position",
       "experience": "Experience (years)"
+    }
+  },
+  "hrDelivery": {
+    "attempts": "Delivery attempts",
+    "nextAttempt": "Next attempt (local time)",
+    "reason": "Notification retry reason",
+    "retry": "Queue notification retry",
+    "warning": "An email may be sent again. Check for possible duplicate delivery; the hiring decision stays unchanged.",
+    "code": {
+      "SMTP_NOT_CONFIGURED": "Email service is not configured.",
+      "DELIVERY_FAILED": "Email delivery failed.",
+      "SEND_TIMEOUT": "Delivery timed out; the email may have been accepted.",
+      "ATTEMPTS_EXHAUSTED": "Automatic attempt limit reached.",
+      "AUTH_REVOKED": "The initiating user no longer has permission.",
+      "PARENT_SCOPE_REVOKED": "Candidate or vacancy access is no longer available.",
+      "MISSING_RECIPIENT": "Candidate email is missing.",
+      "STALE_WORKFLOW": "The notification no longer matches the current stage.",
+      "INVALID_EVENT": "The notification event is invalid.",
+      "DELIVERED": "The delivery service accepted the email.",
+      "RETRY_QUEUED": "HR queued a notification retry.",
+      "UNKNOWN": "Notification state needs further review."
+    },
+    "error": {
+      "smtp": "Email service is unavailable. The application and stage were unchanged.",
+      "conflict": "Notification or application changed. Reload the latest information.",
+      "failed": "Notification retry could not be queued. Check and retry."
     }
   }
 }

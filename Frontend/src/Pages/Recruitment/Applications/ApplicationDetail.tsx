@@ -1,3 +1,4 @@
+import ApplicationDelivery from '../../../Components/ApplicationDelivery';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -15,14 +16,16 @@ import HRResourceState from '../../../Components/HRResourceState';
 import MatchScoreBadge from '../../../Components/MatchScoreBadge';
 
 const historyLoad = (key: string, signal?: AbortSignal, scopeKey?: string) => { const [id, offset] = JSON.parse(key) as [string, number]; return getApplicationHistory(id, offset, signal, scopeKey); };
-function History({ id }: { id: string }) {
+function History({ app, reload }: { app: Application; reload: () => void }) {
   const { t } = useTranslation(); const [offset, setOffset] = useState(0);
+  const id = app.id, revision = app.revision;
   const result = useAuditResource(JSON.stringify([id, offset]), 'application', historyLoad);
+  const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(e.after.status || '').toLowerCase() === app.status) : undefined;
   return <section><h3>{t('hrWorkflow.history')}</h3>
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
       <ol>{result.data?.items.map(e => <li key={e.id}><time>{e.at}</time> · {t(`hrWorkflow.event.${e.type}`)} · {t('hrWorkflow.actor')}: {e.actor}
         <p>{e.before?.status ? t(`recruitment.applications.${String(e.before.status).toLowerCase()}`) : ''}{e.after.status ? ` → ${t(`recruitment.applications.${String(e.after.status).toLowerCase()}`)}` : ''} {e.reason}</p>
-        {e.delivery && <p>{t('hrWorkflow.delivery')}: {t(`hrWorkflow.deliveryState.${e.delivery.state}`)}</p>}
+        {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
       </li>)}</ol>
       {offset > 0 && <button type="button" onClick={() => setOffset(Math.max(0, offset - 50))}>{t('common.actions.previous')}</button>}
       {result.data?.hasMore && <button type="button" onClick={() => setOffset(offset + 50)}>{t('common.actions.next')}</button>}
@@ -93,6 +96,6 @@ export default function ApplicationDetail() {
     <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
     <MatchScoreBadge application={app} onUpdated={resource.reload} />
     {hasPermission(user, 'application', 'update') && <WorkflowForm key={context.key + ':' + app.revision} app={app} reload={resource.reload} />}
-    <History key={context.key + ':' + app.revision} id={app.id} />
+    <History key={context.key + ':' + app.revision} app={app} reload={resource.reload} />
   </div>;
 }

@@ -16,7 +16,7 @@ function createNotificationWorker({ send = notifyCandidateStatus, available = ()
   let busy = false, timer;
   async function finish(row, event, token, values) {
     return Application.updateOne({ _id: row._id, events: { $elemMatch: { id: event.id, 'delivery.token': token } } },
-      { $set: { 'events.$.delivery': { attempts: event.delivery.attempts || 0, ...values } } }, { timestamps: false });
+      { $set: { 'events.$.delivery': { attempts: event.delivery.attempts || 0, ...Object.fromEntries(['priorAttempts','retryCount','retryActor'].filter(k=>event.delivery[k]!==undefined).map(k=>[k,event.delivery[k]])), ...values } } }, { timestamps: false });
   }
   async function claim() {
     const at = now(), token = crypto.randomUUID();
@@ -33,9 +33,10 @@ function createNotificationWorker({ send = notifyCandidateStatus, available = ()
   async function process({ row, event, token }) {
     const isCurrent = value => value && value.status === event.after?.status && [...(value.events || [])].reverse().find(e => e.delivery && e.after?.status === value.status)?.id === event.id && !['cancelled', 'declined'].includes(value.substatus) && !(value.interview?.result === 'cancelled' && value.status === 'Interview');
     const stop = code => finish(row, event, token, { state: 'skipped', code, at: now() });
-    if (!['status', 'workflow'].includes(event.type) || !mongoose.isObjectIdOrHexString(event.actor) || !['Interview', 'Offered'].includes(event.after?.status)) return stop('INVALID_EVENT');
+    const actorId = event.delivery.retryActor !== undefined ? event.delivery.retryActor : event.actor;
+    if (!['status', 'workflow'].includes(event.type) || !mongoose.isObjectIdOrHexString(actorId) || !['Interview', 'Offered'].includes(event.after?.status)) return stop('INVALID_EVENT');
     if (!isCurrent(row)) return stop('STALE_WORKFLOW');
-    const actor = await User.findOne({ _id: event.actor, isActive: true }).select('_id role departmentId').lean();
+    const actor = await User.findOne({ _id: actorId, isActive: true }).select('_id role departmentId').lean();
     const role = actor && await Role.findOne({ key: String(actor.role).toLowerCase(), isActive: true }).select('permissions').lean();
     if (!role) return stop('AUTH_REVOKED');
     const req = { user: { id: String(actor._id), departmentId: actor.departmentId || '' }, authRole: role };

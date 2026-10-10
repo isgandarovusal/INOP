@@ -114,6 +114,7 @@ router.get('/hr/analytics', ...authorize('application', 'read'), requirePermissi
 router.patch('/applications/:id/workflow', ...authorize('application', 'update'), applicationWorkflow.update);
 router.patch('/applications/:id/assignment', ...authorize('application', 'update'), applicationWorkflow.update);
 router.get('/applications/:id/interviewers', ...authorize('application', 'read'), applicationWorkflow.interviewers);
+router.post('/applications/:id/notifications/:eventId/retry', ...authorize('application', 'update'), require('../controllers/applicationDelivery.controller').retry);
 router.get('/applications/:id/history', ...authorize('application', 'read'), applicationWorkflow.history);
 router.post('/applications/:id/recalculate', ...authorize('application', 'update'), require('../controllers/applicationMatching.controller').recalculate);
 router.get('/hr/brands', ...authorize('recruitment', 'read'), recruitmentCatalog.brands);
