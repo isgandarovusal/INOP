@@ -4254,3 +4254,14 @@
 .hr-application-detail fieldset label { display: flex; flex-direction: column; gap: .4rem; }
 .hr-application-detail ol { overflow-wrap: anywhere; }
 @media (max-width: 600px) { .hr-application-detail fieldset { grid-template-columns: 1fr; } .hr-application-board > section { min-width: 85vw; flex-basis: 85vw; } }
+
+.hr-analytics-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.hr-analytics-kpis article, .hr-analytics-sections section { border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); padding: 1rem; }
+.hr-analytics-kpis strong { font-size: 1.7rem; }
+.hr-analytics-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.hr-analytics-sections table { width: 100%; border-collapse: collapse; }
+.hr-analytics-sections th, .hr-analytics-sections td { text-align: start; padding: .4rem; }
+.hr-analytics-page .filter-bar { display: flex; flex-wrap: wrap; gap: .75rem; }
+.hr-analytics-page .filter-bar label { display: flex; flex-direction: column; gap: .3rem; }
+.hr-analytics-page [aria-pressed=true] { outline: 2px solid var(--accent-color, #2563eb); }
+@media (max-width: 650px) { .hr-analytics-sections { grid-template-columns: 1fr; } .hr-analytics-page select, .hr-analytics-page input { max-width: 100%; } }

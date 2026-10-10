@@ -1189,5 +1189,69 @@
       "blocked": "Configuration required",
       "skipped": "Not sent"
     }
+  },
+  "hrAnalytics": {
+    "title": "GFC HR analytics",
+    "subtitle": "Vacancies and application workflow",
+    "brands": "Brands",
+    "from": "Start date (UTC)",
+    "to": "End date (UTC)",
+    "source": "Application source",
+    "allSources": "All sources",
+    "cohort": "Applications follow the selected source, status and UTC date cohort. Active vacancies use current brand, branch and vacancy filters. All results respect access scopes.",
+    "empty": "No applications in this selection.",
+    "partial": "Candidate access is restricted for {{count}} applications; CV and score metrics cover readable profiles only.",
+    "count": "Count",
+    "funnel": "Application funnel",
+    "review": "CV review queue",
+    "linkedReview": "Counts readable profiles linked to the visible vacancies.",
+    "duplicates": "Additional profiles with the same CV file (HR review)",
+    "interviews": "Interview pipeline",
+    "unscheduled": "Time / result unknown",
+    "scores": "Trusted matching distribution",
+    "changed": "Data changed during calculation. Refresh and check again.",
+    "stageTime": "Time in stage",
+    "currentStage": "Elapsed time in the current stage; records without history are excluded from averages.",
+    "hireTime": "Application to hire",
+    "unknown": "No data",
+    "days": "{{count}} days",
+    "samples": "{{count}} valid samples",
+    "health": "Integration health",
+    "catalogCap": "The first 50 filter options are shown. Narrow the brand / branch selection; totals are not reduced by this cap.",
+    "kpi": {
+      "activeVacancies": "Active vacancies",
+      "applications": "Applications",
+      "newApplications": "New applications",
+      "processing": "Processing queue"
+    },
+    "sources": {
+      "manual": "HR entry",
+      "cv_upload": "CV upload",
+      "outlook": "Outlook",
+      "kfc": "KFC website channel",
+      "pizzahut": "Pizza Hut website channel",
+      "jobsearch": "JobSearch",
+      "external_form": "Approved external form",
+      "unknown": "Unknown source"
+    },
+    "reviewState": {
+      "pending": "Awaiting HR approval",
+      "failed": "Extraction failed",
+      "ocrRequired": "OCR required"
+    },
+    "integration": {
+      "ai": "AI provider",
+      "outlook": "Outlook",
+      "externalSites": "External websites",
+      "storage": "Private CV storage",
+      "smtp": "Email"
+    },
+    "healthState": {
+      "not_integrated": "Not integrated",
+      "not_connected": "Not connected",
+      "local_file_system": "Local filesystem; durability unverified",
+      "configured_not_verified": "Configured; live result unverified",
+      "not_configured": "Not configured"
+    }
   }
 }

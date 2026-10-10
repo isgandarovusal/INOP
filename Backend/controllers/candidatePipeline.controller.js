@@ -288,7 +288,7 @@ exports.createCandidateFromCv = async (req, res) => {
           assignedTo:
             req.user?.id || null,
 
-          score: match.score, matching: match, scoreStatus: match.scoreStatus, events: [creationEvent(req)],
+          score: match.score, matching: match, scoreStatus: match.scoreStatus, events: [creationEvent(req)], source: { key: 'cv_upload', receivedAt: new Date() },
 
           notes:
             stringValue(req.body.notes),

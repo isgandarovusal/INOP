@@ -4,7 +4,7 @@ const userRoutes = require("./user.routes");
 const departmentRoutes = require("./department.routes");
 const activityLogRoutes = require("./activityLog.routes");
 const rolesRoutes = require("./roles.routes");
-const { verifyToken } = require('../middleware/auth.middleware');
+const { verifyToken, requirePermission } = require('../middleware/auth.middleware');
 const { authorize } = require("../middleware/authorization.middleware");
 const { cvUpload } = require("../middleware/cvUpload.middleware");
 const { cvParseUpload } = require("../middleware/cvParse.middleware");
@@ -98,6 +98,7 @@ auditTimelineRoutes
 router.use('/audit-permission', auditPermissionRoutes);
 const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller');
 const applicationWorkflow = require('../controllers/applicationWorkflow.controller');
+router.get('/hr/analytics', ...authorize('application', 'read'), requirePermission('recruitment', 'read'), require('../controllers/hrAnalytics.controller').get);
 router.patch('/applications/:id/workflow', ...authorize('application', 'update'), applicationWorkflow.update);
 router.patch('/applications/:id/assignment', ...authorize('application', 'update'), applicationWorkflow.update);
 router.get('/applications/:id/interviewers', ...authorize('application', 'read'), applicationWorkflow.interviewers);

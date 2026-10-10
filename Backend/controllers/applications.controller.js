@@ -123,7 +123,7 @@ exports.createApplication = async (req, res) => {
 
     const application = new Application({ jobId, candidateId,
       departmentId: req.user?.departmentId || '', createdBy: req.user?.id || null, assignedTo: req.user?.id || null,
-      notes: notes.trim(), events: [creationEvent(req)] });
+      notes: notes.trim(), events: [creationEvent(req)], source: { key: 'manual', receivedAt: new Date() } });
     const matchResult = calculateApplicationMatch(job, candidate, { application });
     application.matching = matchResult; application.score = matchResult.score; application.scoreStatus = matchResult.scoreStatus;
 

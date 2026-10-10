@@ -1,0 +1,108 @@
+const mongoose = require('mongoose');
+const Application = require('../models/application.model');
+const Job = require('../models/job.model');
+const Candidate = require('../models/candidate.model');
+const Branch = require('../models/recruitmentBranch.model');
+const { aggregateResourceFilter, resourceFilter } = require('../services/hrResourceScope.service');
+const { fingerprints, VERSION } = require('../services/applicationMatch.service');
+const { getSmtpConfig } = require('../services/email.service');
+const { brands: getBrands } = require('../services/recruitmentCatalog.service');
+const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
+const SOURCES = ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form', 'unknown'];
+function filters(query) {
+  const jobs = {}, apps = {};
+  for (const [key, value] of Object.entries(query)) if (!['brandId', 'branchId', 'jobId', 'from', 'to', 'source', 'status'].includes(key) || typeof value !== 'string' || value.length > 80) throw Error('Invalid analytics filter.');
+  if (query.brandId) { if (query.brandId !== 'unset' && !/^[a-z0-9][a-z0-9-]{0,59}$/.test(query.brandId)) throw Error('Invalid brand filter.'); jobs.brandId = query.brandId === 'unset' ? null : query.brandId; }
+  for (const key of ['branchId', 'jobId']) if (query[key]) { if (!mongoose.isObjectIdOrHexString(query[key])) throw Error('Invalid resource filter.'); jobs[key === 'jobId' ? '_id' : key] = new mongoose.Types.ObjectId(query[key]); }
+  if (query.status) { if (!STATUSES.includes(query.status)) throw Error('Invalid status filter.'); apps.status = query.status; }
+  if (query.source) { if (!SOURCES.includes(query.source)) throw Error('Invalid source filter.'); apps['source.key'] = query.source === 'unknown' ? { $nin: SOURCES.slice(0, -1) } : query.source; }
+  for (const key of ['from', 'to']) if (query[key]) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(query[key])) throw Error('Dates must be YYYY-MM-DD UTC.');
+    const at = new Date(query[key] + 'T00:00:00.000Z'); if (!Number.isFinite(at.getTime()) || at.toISOString().slice(0, 10) !== query[key]) throw Error('Invalid calendar date.');
+    apps.createdAt ||= {}; apps.createdAt[key === 'from' ? '$gte' : '$lt'] = key === 'from' ? at : new Date(at.getTime() + 86400000);
+  }
+  if (apps.createdAt?.$gte && apps.createdAt?.$lt && apps.createdAt.$gte >= apps.createdAt.$lt) throw Error('Invalid date range.');
+  return { jobs, apps };
+}
+function parentLookup(req, model, localField, resource, projection, extra = {}) {
+  return { $lookup: { from: model.collection.name, let: { parentId: '$' + localField }, pipeline: [
+    { $match: { $and: [{ $expr: { $eq: ['$_id', '$$parentId'] } }, aggregateResourceFilter(req, resource), extra] } }, { $project: projection },
+  ], as: model === Job ? 'job' : 'candidate' } };
+}
+function base(req, criteria, scoring = false) {
+  const jobs = scoring ? { title: 1, requiredSkills: 1, preferredSkills: 1, experienceYears: 1, requiredEducation: 1, requiredCertificates: 1, criterionWeights: 1 } : { status: 1, brandId: 1 };
+  const candidates = scoring ? { role: 1, skills: 1, experience: 1, education: 1, certificates: 1, reviewedFields: 1, 'cvReview.reviewStatus': 1, 'cvReview.version': 1, employmentHistory: 1 } : { 'cvReview.version': 1, 'cvReview.reviewStatus': 1, 'cvReview.processingStatus': 1, 'cvOriginal.sha256': 1 };
+  return [{ $match: { $and: [aggregateResourceFilter(req, 'application'), criteria.apps] } },
+    { $project: scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
+    parentLookup(req, Job, 'jobId', 'recruitment', jobs, criteria.jobs), { $unwind: '$job' },
+    parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }];
+}
+const number = (rows, key) => rows?.[0]?.[key] ?? 0;
+const dailyAverage = (sum, count) => count ? Math.round(sum / count / 86400000 * 100) / 100 : null;
+async function scoreDistribution(req, criteria) {
+  const buckets = [0, 20, 40, 60, 80].map(min => ({ min, max: min === 80 ? 100 : min + 19, count: 0 }));
+  const states = { pending: 0, incomplete: 0, stale: 0, legacy: 0, restricted: 0, calculated: 0 }; let checked = 0;
+  const cursor = Application.aggregate([...base(req, criteria, true), { $project: { score: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1, job: 1, candidate: 1 } }]).option({ maxTimeMS: 10000 }).cursor({ batchSize: 250 });
+  try { for await (const row of cursor) {
+    checked++; let state = Object.hasOwn(states, row.scoreStatus) ? row.scoreStatus : 'legacy';
+    if (!row.candidate) state = 'restricted';
+    else if (row.matching?.version !== VERSION) state = 'legacy';
+    else { const hashes = fingerprints(row.job, row.candidate); state = row.scoreStatus === 'stale' || hashes.jobHash !== row.matching.jobHash || hashes.candidateHash !== row.matching.candidateHash ? 'stale' : Object.hasOwn(states, row.matching.scoreStatus) ? row.matching.scoreStatus : 'legacy'; }
+    const score = row.matching?.score;
+    if (state === 'calculated' && (!Number.isFinite(score) || score < 0 || score > 100)) state = 'incomplete';
+    states[state]++; if (state === 'calculated') buckets[Math.min(4, Math.floor(score / 20))].count++;
+  } } finally { await cursor.close(); }
+  return { states, buckets, checked };
+}
+exports.get = async (req, res, next) => {
+  let criteria; try { criteria = filters(req.query); } catch (e) { return res.status(400).json({ message: e.message }); }
+  const jobScope = resourceFilter(req, 'recruitment');
+  if (jobScope._id?.$in?.length === 0) return res.status(403).json({ message: 'Scoped vacancy read permission is required.' });
+  const at = new Date();
+  try {
+    const pipeline = [...base(req, criteria), { $set: {
+      sourceKey: { $cond: [{ $in: ['$source.key', SOURCES.slice(0, -1)] }, '$source.key', 'unknown'] },
+      hireAt: { $arrayElemAt: [{ $map: { input: { $filter: { input: { $ifNull: ['$events', []] }, as: 'e', cond: { $and: [{ $eq: ['$$e.type', 'status'] }, { $eq: ['$$e.after.status', 'Hired'] }] } } }, as: 'e', in: '$$e.at' } }, -1] },
+    } }, { $facet: {
+      totals: [{ $group: { _id: null, applications: { $sum: 1 }, restrictedCandidates: { $sum: { $cond: ['$candidate._id', 0, 1] } }, processing: { $sum: { $cond: [{ $in: ['$processingState', ['queued', 'running']] }, 1, 0] } } } }],
+      funnel: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
+      sources: [{ $group: { _id: '$sourceKey', count: { $sum: 1 } } }],
+      brands: [{ $group: { _id: { $ifNull: ['$job.brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }],
+      interviews: [{ $match: { status: 'Interview' } }, { $group: { _id: { $cond: [{ $in: ['$interview.result', ['pending', 'passed', 'failed', 'no_show', 'cancelled']] }, '$interview.result', 'unscheduled'] }, count: { $sum: 1 } } }],
+      stageTimes: [{ $match: { $expr: { $and: [{ $eq: [{ $type: '$stageEnteredAt' }, 'date'] }, { $lte: ['$stageEnteredAt', at] }] } } }, { $group: { _id: '$status', count: { $sum: 1 }, sumMs: { $sum: { $subtract: [at, '$stageEnteredAt'] } } } }],
+      hireTimes: [{ $match: { status: 'Hired', $expr: { $and: [{ $eq: [{ $type: '$hireAt' }, 'date'] }, { $eq: [{ $type: '$createdAt' }, 'date'] }, { $gte: ['$hireAt', '$createdAt'] }, { $lte: ['$hireAt', at] }] } } }, { $group: { _id: null, count: { $sum: 1 }, sumMs: { $sum: { $subtract: ['$hireAt', '$createdAt'] } } } }],
+      review: [{ $match: { 'candidate._id': { $exists: true }, 'candidate.cvReview.version': { $exists: true } } }, { $group: { _id: '$candidate._id', status: { $first: '$candidate.cvReview.reviewStatus' }, processing: { $first: '$candidate.cvReview.processingStatus' } } },
+        { $group: { _id: null, pending: { $sum: { $cond: [{ $ne: ['$status', 'confirmed'] }, 1, 0] } }, failed: { $sum: { $cond: [{ $eq: ['$processing', 'failed'] }, 1, 0] } }, ocrRequired: { $sum: { $cond: [{ $eq: ['$processing', 'unsupported_ocr'] }, 1, 0] } } } }],
+      duplicates: [{ $match: { 'candidate.cvOriginal.sha256': { $regex: '^[a-f0-9]{64}$' } } }, { $group: { _id: { hash: '$candidate.cvOriginal.sha256', candidate: '$candidate._id' } } }, { $group: { _id: '$_id.hash', candidates: { $sum: 1 } } }, { $match: { candidates: { $gt: 1 } } }, { $group: { _id: null, groups: { $sum: 1 }, extraProfiles: { $sum: { $subtract: ['$candidates', 1] } } } }],
+      deliveries: [{ $unwind: '$events' }, { $match: { 'events.delivery.state': { $in: ['pending', 'blocked', 'running', 'sent', 'failed', 'skipped'] } } }, { $group: { _id: '$events.delivery.state', count: { $sum: 1 } } }],
+    } }];
+    const [[metrics], scores, active, optionJobs, brands] = await Promise.all([
+      Application.aggregate(pipeline).option({ maxTimeMS: 10000 }), scoreDistribution(req, criteria),
+      Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open' }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
+      Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), getBrands(),
+    ]);
+    const branchIds = [...new Set(optionJobs.map(j => j.branchId).filter(Boolean).map(String))];
+    const branches = await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();
+    const activeByBrand = active[0].brands;
+    const total = number(metrics.totals, 'applications'), candidateScope = resourceFilter(req, 'candidate');
+    res.json({ version: 'hr-analytics-v1', generatedAt: at, filters: req.query,
+      coverage: { candidateReadable: !(candidateScope._id?.$in?.length === 0), restrictedCandidateApplications: number(metrics.totals, 'restrictedCandidates'), scoreScanConsistent: scores.checked === total },
+      totals: { activeVacancies: number(active[0].totals, 'count'), applications: total, newApplications: metrics.funnel.find(r => r._id === 'Applied')?.count || 0, processing: number(metrics.totals, 'processing') },
+      funnel: STATUSES.map(status => ({ status, count: metrics.funnel.find(r => r._id === status)?.count || 0 })),
+      sources: SOURCES.map(key => ({ key, count: metrics.sources.find(r => r._id === key)?.count || 0 })),
+      byBrand: [...new Set([...metrics.brands, ...activeByBrand].map(r => r._id))].slice(0, 50).map(id => ({ id, applications: metrics.brands.find(r => r._id === id)?.count || 0, activeVacancies: activeByBrand.find(r => r._id === id)?.count || 0 })),
+      byBrandTruncated: new Set([...metrics.brands, ...activeByBrand].map(r => r._id)).size > 50,
+      review: { pending: number(metrics.review, 'pending'), failed: number(metrics.review, 'failed'), ocrRequired: number(metrics.review, 'ocrRequired') },
+      duplicateAlerts: { groups: number(metrics.duplicates, 'groups'), extraProfiles: number(metrics.duplicates, 'extraProfiles') },
+      interviews: metrics.interviews.map(r => ({ result: r._id, count: r.count })),
+      timeInStage: STATUSES.map(status => { const r = metrics.stageTimes.find(r => r._id === status); return { status, samples: r?.count || 0, averageDays: dailyAverage(r?.sumMs, r?.count) }; }),
+      timeToHire: { samples: number(metrics.hireTimes, 'count'), averageDays: dailyAverage(number(metrics.hireTimes, 'sumMs'), number(metrics.hireTimes, 'count')) },
+      scores: scores.checked === total ? { states: scores.states, buckets: scores.buckets } : null,
+      deliveryQueue: metrics.deliveries.map(r => ({ state: r._id, count: r.count })),
+      integrations: { ai: 'not_integrated', outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
+      options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
+    });
+  } catch (e) { if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }
+};
+module.exports.STATUSES = STATUSES;
+module.exports.SOURCES = SOURCES;

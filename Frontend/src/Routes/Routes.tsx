@@ -14,6 +14,7 @@ const CandidatesList = lazy(() => import("../Pages/Recruitment/Candidates/Candid
 const CandidateForm = lazy(() => import("../Pages/Recruitment/Candidates/CandidateForm"));
 const CandidateDetail = lazy(() => import("../Pages/Recruitment/Candidates/CandidateDetail"));
 const ApplicationDetail = lazy(() => import("../Pages/Recruitment/Applications/ApplicationDetail"));
+const HRAnalytics = lazy(() => import("../Pages/Recruitment/Analytics/HRAnalytics"));
 const ApplicationsList = lazy(() => import("../Pages/Recruitment/Applications/ApplicationsList"));
 const RestaurantsList = lazy(() => import("../Pages/Audit/Restaurants/RestaurantsList"));
 const RestaurantForm = lazy(() => import("../Pages/Audit/Restaurants/RestaurantForm"));
@@ -84,6 +85,7 @@ const ROUTES: RouteObject[] = [
           ] },
           { element: <HRRoute resource="application" action="read" />, children: [
             { path: "recruitment/applications", element: <ApplicationsList /> },
+            { path: "recruitment/analytics", element: <HRAnalytics /> },
             { path: "recruitment/applications/:id", element: <ApplicationDetail /> },
           ] },
           {

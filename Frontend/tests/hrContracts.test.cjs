@@ -48,6 +48,7 @@ test('HR services preserve IDs, partial updates, new status and CV replacement',
         }), { jobId: result.job.id, bytes: [...await ready] });
         assert.equal(linked.name, 'Reviewed pipeline applicant'); assert.equal(linked.status, 'new');
         assert.equal(await Application.countDocuments({ candidateId: linked.id, jobId: result.job.id }), 1);
+        assert.equal((await Application.findOne({ candidateId: linked.id, jobId: result.job.id })).source.key, 'cv_upload');
       } finally {
         if (/^\/uploads\/[a-f0-9-]{36}\.pdf$/.test(linked?.cvUrl || '')) await fs.unlink(path.join(uploadsDir, path.basename(linked.cvUrl)));
       }

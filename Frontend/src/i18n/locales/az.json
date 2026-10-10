@@ -1213,5 +1213,69 @@
       "blocked": "Konfiqurasiya tələb olunur",
       "skipped": "Göndərilməyib"
     }
+  },
+  "hrAnalytics": {
+    "title": "GFC HR analitikası",
+    "subtitle": "Vakansiya və müraciət axını",
+    "brands": "Brendlər",
+    "from": "Başlanğıc tarix (UTC)",
+    "to": "Son tarix (UTC)",
+    "source": "Müraciət mənbəyi",
+    "allSources": "Bütün mənbələr",
+    "cohort": "Müraciətlər seçilmiş mənbə, status və UTC tarix intervalı üzrə hesablanır. Aktiv vakansiyalar cari brend, filial və vakansiya filtrinə əsaslanır. Bütün nəticələr giriş icazələri ilə məhdudlaşdırılır.",
+    "empty": "Bu seçimdə müraciət yoxdur.",
+    "partial": "{{count}} müraciətin namizəd məlumatı üçün giriş məhduddur; CV və score göstəriciləri yalnız görünən profilləri əhatə edir.",
+    "count": "Say",
+    "funnel": "Müraciət mərhələləri",
+    "review": "CV yoxlama növbəsi",
+    "linkedReview": "Burada görünən vakansiyalara bağlı, giriş icazəsi olan profillər hesablanır.",
+    "duplicates": "Eyni CV faylı olan əlavə profillər (HR yoxlaması)",
+    "interviews": "Müsahibə axını",
+    "unscheduled": "Vaxt / nəticə məlum deyil",
+    "scores": "Etibarlı uyğunluq göstəriciləri",
+    "changed": "Hesablama zamanı məlumat dəyişib. Yenilə və təkrar yoxla.",
+    "stageTime": "Mərhələdə keçən müddət",
+    "currentStage": "Cari mərhələyə girişdən keçən vaxt; tarixçəsi olmayan qeydlər orta müddətə daxil edilmir.",
+    "hireTime": "Müraciətdən işə qəbula qədər müddət",
+    "unknown": "Məlumat yoxdur",
+    "days": "{{count}} gün",
+    "samples": "{{count}} etibarlı nümunə",
+    "health": "İnteqrasiya vəziyyəti",
+    "catalogCap": "Filtr seçimlərinin ilk 50-si göstərilir. Daha dəqiq brend / filial seçin; ümumi saylar bu limitlə azaldılmır.",
+    "kpi": {
+      "activeVacancies": "Aktiv vakansiyalar",
+      "applications": "Müraciətlər",
+      "newApplications": "Yeni müraciətlər",
+      "processing": "Emal növbəsi"
+    },
+    "sources": {
+      "manual": "HR tərəfindən",
+      "cv_upload": "CV yüklənməsi",
+      "outlook": "Outlook",
+      "kfc": "KFC sayt kanalı",
+      "pizzahut": "Pizza Hut sayt kanalı",
+      "jobsearch": "JobSearch",
+      "external_form": "Təsdiqlənmiş xarici forma",
+      "unknown": "Mənbə məlum deyil"
+    },
+    "reviewState": {
+      "pending": "HR təsdiqi gözləyir",
+      "failed": "Extraction xətası",
+      "ocrRequired": "OCR tələb olunur"
+    },
+    "integration": {
+      "ai": "AI provider",
+      "outlook": "Outlook",
+      "externalSites": "Xarici saytlar",
+      "storage": "Private CV storage",
+      "smtp": "Email"
+    },
+    "healthState": {
+      "not_integrated": "İnteqrasiya edilməyib",
+      "not_connected": "Qoşulmayıb",
+      "local_file_system": "Lokal fayl sistemi; davamlı storage təsdiqlənməyib",
+      "configured_not_verified": "Konfiqurasiya var; canlı nəticə yoxlanılmayıb",
+      "not_configured": "Konfiqurasiya yoxdur"
+    }
   }
 }

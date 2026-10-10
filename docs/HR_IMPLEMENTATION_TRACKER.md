@@ -81,7 +81,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
-| AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | OPEN | — |
+| AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
 | AUD-071 | 11 | No ingestion source identity or person-level deduplication | OPEN | — |
 | AUD-072 | 08 | HR lists unbounded with full populated documents | OPEN | — |
 | AUD-073 | 08 | CV parse then create double uploads file synchronously | OPEN | — |
@@ -253,32 +253,32 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P07-001 | GFC overall dashboard | OPEN | — |
-| P07-002 | KFC dashboard | OPEN | — |
-| P07-003 | Pizza Hut dashboard | OPEN | — |
-| P07-004 | Simit Sarayı dashboard | OPEN | — |
-| P07-005 | Brand filter | OPEN | — |
-| P07-006 | Branch filter | OPEN | — |
-| P07-007 | Vacancy filter | OPEN | — |
-| P07-008 | Date filter | OPEN | — |
-| P07-009 | Source filter | OPEN | — |
-| P07-010 | Status filter | OPEN | — |
-| P07-011 | Active vacancies | OPEN | — |
-| P07-012 | New applications | OPEN | — |
-| P07-013 | Parsing/review queue | OPEN | — |
-| P07-014 | Source distribution | OPEN | — |
-| P07-015 | Application funnel | OPEN | — |
-| P07-016 | Interview pipeline | OPEN | — |
-| P07-017 | Offered/hired/rejected counts | OPEN | — |
-| P07-018 | Time in stage | OPEN | — |
-| P07-019 | Time to hire | OPEN | — |
-| P07-020 | Score distribution | OPEN | — |
-| P07-021 | Duplicate/review alerts | OPEN | — |
-| P07-022 | Integration health | OPEN | — |
-| P07-023 | Same scoped Application/Job datasets | OPEN | — |
-| P07-024 | Server aggregations | OPEN | — |
-| P07-025 | Small DTO without sensitive Candidate data | OPEN | — |
-| P07-026 | Correct empty state | OPEN | — |
+| P07-001 | GFC overall dashboard | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-002 | KFC dashboard | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-003 | Pizza Hut dashboard | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-004 | Simit Sarayı dashboard | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-005 | Brand filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-006 | Branch filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-007 | Vacancy filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-008 | Date filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-009 | Source filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-010 | Status filter | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-011 | Active vacancies | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-012 | New applications | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-013 | Parsing/review queue | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-014 | Source distribution | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-015 | Application funnel | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-016 | Interview pipeline | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-017 | Offered/hired/rejected counts | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-018 | Time in stage | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-019 | Time to hire | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-020 | Score distribution | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-021 | Duplicate/review alerts | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-022 | Integration health | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-023 | Same scoped Application/Job datasets | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-024 | Server aggregations | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-025 | Small DTO without sensitive Candidate data | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
+| P07-026 | Correct empty state | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
 
 ## Package 08: Performance and stability
 
@@ -459,7 +459,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | 05 | `2d2cb13af787542756437af20213edfc6ed4c9c9` | Full regression 1155/1155; target matching/state 24/24; browser 28/28 including prior lifecycle; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Conservative role/date aliases may require HR evidence; no global score or automatic hiring decisions |
 | 06A | `659084198ed19a8f23ae8a186eb35b47dc85165d` | Full regression 1172/1172; targets 38/38; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | DnD/interview UI and notification worker remain 06B/06C; real SMTP not claimed |
 | 06B | `b23d77674c0f6a4ed41f91e2c99eea8be900d0dc` | Targets 24/24; full 1196/1196; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Manual card ordering remains AUD-064/08; notification worker follows in 06C; no real SMTP claim |
-| 06C | `fix(hr): deliver Application notifications through a scoped outbox` (SHA recorded next update) | Targets 35/35; full 1212/1212; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | SMTP at-least-once, real receipt unverified; explicit retry/archive UI remains 10 |
+| 06C | `121fc7196571114c1d070de4e4d25dfeffe72e55` | Targets 35/35; full 1212/1212; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | SMTP at-least-once, real receipt unverified; explicit retry/archive UI remains 10 |
+
+| 07 | `feat(hr): add scoped GFC recruitment analytics` (SHA recorded next update) | Targets 40/40; full 1242/1242; authorization 632/632; smoke 13/13; TS/build PASS; lint 0 errors / 9 warnings | Linked-profile review cohort only; transactional snapshot not claimed; large-data benchmark and paging remain 08; real integrations remain external |
 
 ## External prerequisites
 
@@ -510,3 +512,5 @@ Package 01 validation artifacts: `/tmp/inop-hr01-baseline.log`, `/tmp/inop-hr01-
 | AUD-088 | 10 | Notification reason codes and terminal manual retry are not yet actionable in UI | OPEN | 06C API tests expose safe codes; UI currently exposes delivery state, explicit retry/monitoring UI remains package 10 |
 | AUD-089 | 06C | SMTP lacks transport bounds and can return/log raw provider diagnostics | TESTED | `applicationNotifications.test.cjs` synthetic transport: old source fails sanitized-error assertion, new bounded/closing transport passes |
 | EXT-SMTP-001 | 06/10 | Approved company SMTP credentials, consent and actual delivery/receipt test | BLOCKED_EXTERNAL | Missing configuration and mocked delivery are tested; real SMTP receipt/bounces are not verified |
+
+07 evidence: `/tmp/inop-hr07a-target-final.log` (17 backend checks), `/tmp/inop-hr07-target-final.log` (40/40, including 10 existing HR contract checks), `/tmp/inop-hr07-regression.log`, `/tmp/inop-hr07-validation-run.log`, `/tmp/inop-packagehr07-validation.json`. Contract: `docs/HR_ANALYTICS_CONTRACT.md`. Backend derives aggregate counters from independent Application/Job scopes, with separately protected Candidate metrics; internal streaming score facts are never returned in the DTO. UI covers GFC/three brands, branch/Job/date/source/status filters, empty/null versus real zero, three locales, no language refetch, stale response/permission protection, malformed envelope, 403/500/retry and mobile overflow. Source values are server-set on new manual/CV pipeline records; old unknown data is not rewritten. Catalog caps do not reduce totals and are explicitly flagged. Package 08 is next: bounded HR pagination/projections/indexes, searchable lookups, manual lane ordering, render/query benchmarks and remaining localization/stability findings. No live-performance or connected-provider claim is made.

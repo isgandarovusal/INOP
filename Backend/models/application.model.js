@@ -38,6 +38,10 @@ const applicationSchema = new mongoose.Schema(
     },
 
     events: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    source: { type: new mongoose.Schema({
+      key: { type: String, enum: ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form'] },
+      receivedAt: Date,
+    }, { _id: false }), default: null },
     interview: { type: mongoose.Schema.Types.Mixed, default: null },
     nextAction: { type: mongoose.Schema.Types.Mixed, default: null },
     substatus: { type: String, default: "" },

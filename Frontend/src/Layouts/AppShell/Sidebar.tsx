@@ -62,6 +62,9 @@ const NAV_GROUPS: NavGroup[] = [
     titleKey: "navigation.groups.recruitment",
     items: [
       {
+        to: "/app/recruitment/analytics", resource: "application", labelKey: "hrAnalytics.title", icon: BarChart3, section: "recruitment",
+      },
+      {
         to: "/app/recruitment/jobs",
         resource: "recruitment",
         labelKey: "navigation.jobs",

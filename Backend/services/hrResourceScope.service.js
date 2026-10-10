@@ -22,3 +22,13 @@ function applicationParents(req) {
 }
 
 module.exports = { resourceFilter, applicationParents };
+
+// Mongoose casts ownership IDs for find(), but not for aggregation $match.
+function aggregateResourceFilter(req, resource, action = 'read') {
+  const filter = resourceFilter(req, resource, action);
+  for (const field of ['createdBy', 'assignedTo']) if (filter[field]) {
+    filter[field] = new (require('mongoose').Types.ObjectId)(filter[field]);
+  }
+  return filter;
+}
+module.exports.aggregateResourceFilter = aggregateResourceFilter;
