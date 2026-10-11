@@ -2,7 +2,7 @@
 
 Baseline: `c74c49f41bb3a8a54566324c8902576a48a88e8f`, branch `work`. Local implementation and commits only; no production push/deployment. Existing data, secrets and user files must be preserved.
 
-Latest active continuation: [10D1 onward](#active-continuation-2026-10-11--10d1-creation-recovery). The user has resumed continuous work; the historical stop instruction below is superseded.
+Latest active continuation: **13K final local matrix/report gate**, following13J `0903b744127165448781d1605f9424b24610b07a`. All independent local implementations completed so far are preserved. Read the final13K section before using historical next/stop notes; external and deletion-policy gates are not inferred from earlier release authorization.
 
 Latest safe-stop checkpoint: [2026-10-11 checkpoint](#safe-stop-checkpoint-2026-10-11). Read that section before resuming; it supersedes older “next” notes without removing their history.
 
@@ -422,34 +422,34 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P13-001 | Disposition every prior finding | OPEN | — |
-| P13-002 | Source to ingestion E2E | OPEN | — |
-| P13-003 | Private storage E2E | OPEN | — |
-| P13-004 | Extraction/OCR E2E | OPEN | — |
-| P13-005 | HR review E2E | OPEN | — |
-| P13-006 | Candidate and Application E2E | OPEN | — |
-| P13-007 | Scoring and Kanban E2E | OPEN | — |
-| P13-008 | Interview/decision/analytics E2E | OPEN | — |
-| P13-009 | Three brands | OPEN | — |
-| P13-010 | Multiple branches | OPEN | — |
-| P13-011 | Same Candidate multiple vacancies | OPEN | — |
-| P13-012 | PDF/DOCX/scanned documents | OPEN | — |
-| P13-013 | AZ/EN/RU fixtures | OPEN | — |
-| P13-014 | Mixed scopes | OPEN | — |
-| P13-015 | Duplicate CV | OPEN | — |
-| P13-016 | Retries and provider outage | OPEN | — |
-| P13-017 | Stale requests/concurrent updates | OPEN | — |
-| P13-018 | Large datasets | OPEN | — |
-| P13-019 | Frontend/backend compatibility | OPEN | — |
-| P13-020 | Security/privacy/retention | OPEN | — |
-| P13-021 | Separate local mock and real external evidence | OPEN | — |
-| P13-022 | All package commit SHAs | OPEN | — |
-| P13-023 | Full finding disposition | OPEN | — |
-| P13-024 | Tests and benchmarks | OPEN | — |
-| P13-025 | API/model/frontend changes | OPEN | — |
-| P13-026 | AI/Outlook/external setup | OPEN | — |
-| P13-027 | Production risks | OPEN | — |
-| P13-028 | Ready and blocked modules | OPEN | — |
+| P13-001 | Disposition every prior finding | TESTED | HR_AUDIT_FINDING_DISPOSITION: every AUD-001–131 retained without gaps, 122 locally TESTED/7 BLOCKED_EXTERNAL/2 OPEN; named per-finding evidence, no DONE without test. |
+| P13-002 | Source to ingestion E2E | TESTED | hrRecruitmentE2E8/8 plus Source/Graph/relay actual local HTTP/Mongo receipts/parser/explicit HR; source transport synthetic, real external channel separately blocked. |
+| P13-003 | Private storage E2E | BLOCKED_EXTERNAL | Local private object/manifest/Source/read/one-PUT/recovery contracts tested; actual provider private policy/persistence/redeploy/encryption/restore unavailable P10-018/019. Mock is not storage E2E PASS. |
+| P13-004 | Extraction/OCR E2E | TESTED | cvExtraction/hrCvOcr/hrCvSourceOcr/SourceOCR UI: actual local Tesseract AZ/EN/RU image-only/text PDF/DOCX, strict hash/provenance/explicit approval; hosted OCR EXT-OCR-001 blocked. |
+| P13-005 | HR review E2E | TESTED | hrCvApproval/SourceApproval/SourceScore + actual browser/DB explicit confirmed corrections, unknown facts pending, thirteen-J validation/language proof; no auto HR decision. |
+| P13-006 | Candidate and Application E2E | TESTED | Joined E2E actual current independently scoped Candidate/Application creation, immutable reserved identities/replay/reconciliation; no automatic duplicate person merge. |
+| P13-007 | Scoring and Kanban E2E | TESTED | ApplicationMatching/scoreState/fairness/ordering/board and UI + joined E2E ATSv2 actual0/100/missing/legacy/stale/sameJob context; protected metadata excluded. |
+| P13-008 | Interview/decision/analytics E2E | TESTED | Joined E2E real HTTP status/409/interview Asia/Baku/explicitOffered-Hired/scoped analytics; synthetic SMTP failure preserves workflow, real receipt external. |
+| P13-009 | Three brands | TESTED | Catalog/analytics/scale/joined E2E KFC/Pizza Hut/Simit Sarayı, no guessed legacy brand. |
+| P13-010 | Multiple branches | TESTED | Catalog/UI/joined E2E brand→branch→Job, multiple restaurant/non-restaurant branches and independent scoped metadata. |
+| P13-011 | Same Candidate multiple vacancies | TESTED | Joined E2E sameCandidate secondJob independent status/score; lifecycle/board queries never candidate-global. |
+| P13-012 | PDF/DOCX/scanned documents | TESTED | Actual generated text PDF/DOCX/image-onlyPDF local parser/Tesseract and browser source/current-hash/review tests; unsupported legacy DOC stays explicit. |
+| P13-013 | AZ/EN/RU fixtures | TESTED | Real local AZ/EN/RU PDF/DOCX/scanned fixtures, normalized/raw +994 formats; no assertion of arbitrary real corpus accuracy. |
+| P13-014 | Mixed scopes | TESTED | hrResourceScopes + Source/private storage/lifecycle/query/mixed parent scopes, actual oldJWT/role/grant/assignment/dept revocation; authorization632 gate. |
+| P13-015 | Duplicate CV | TESTED | Source Review duplicateSHA/email/phone bounded5 candidate hints, Graph/relay receipt dedup and lost ack; explicit human review/no guessed auto merge. |
+| P13-016 | Retries and provider outage | TESTED | Source/task/Graph/provider/email bounded outage/retry/lifetime/lease tests and SourceRepair browser lost-ack sameUUID; real provider/scanner recovery separately blocked. |
+| P13-017 | Stale requests/concurrent updates | TESTED | Current browser/HTTP stale route/permission/source/async cancellation; CAS409/reorder/lostack; SourceDownloadRace focus/URL revocation and late-role suppression. |
+| P13-018 | Large datasets | TESTED | HR_PERFORMANCE_MEASUREMENTS owned0/5k/50k backend and actual production-build browser baseline/current; committed scale/query tests. Local named historical samples not hosted/currentHEAD latency claims. |
+| P13-019 | Frontend/backend compatibility | TESTED | hrContracts/scoped current HTTP/DTO normalization, current ATSv2 legacy compatibility, durable Source validation, full corrected frontend408/408 plus current build/TS. |
+| P13-020 | Security/privacy/retention | OPEN | Local security/access/privacy projection/prompt guards tested; legal deletion/retention AUD-030/051 decision and true scanner/storage/recovery gates remain unresolved. Real CV acceptance NO-GO. |
+| P13-021 | Separate local mock and real external evidence | TESTED | HR_RELEASE_E2E_MATRIX separates actual local Mongo/HTTP/parser/Tesseract/browser from synthetic Graph/AI/storage/AV/SMTP and all genuine external gates. |
+| P13-022 | All package commit SHAs | TESTED | HR_LOCAL_COMMIT_LEDGER inventories65 actual full SHA objects since c74 release and changed paths; final report-only commit SHA delivered after creation. |
+| P13-023 | Full finding disposition | TESTED | HR_AUDIT_FINDING_DISPOSITION has all131 stable IDs with current status/evidence/limits; all prior titles/history retained. |
+| P13-024 | Tests and benchmarks | TESTED | Current bound backend1819/frontend408, TS/build PASS lint0/9 smoke13/authorization632; fresh ATSv2 owned0/5k/50k24endpoint200/15 scopes plus retained production-build browser comparison with archived-source limitations. |
+| P13-025 | API/model/frontend changes | TESTED | Provider/task/source/signedrelay/catalog/ATSv2/board/DTO/readonly review and exact repair API documented in contracts + HR_IMPLEMENTATION_COMPLETION; no hidden migration/automatic provider activation. |
+| P13-026 | AI/Outlook/external setup | TESTED | HR_AI_PROVIDER_CONTRACT/OUTLOOK_ADAPTER/EXTERNAL_SOURCE_CAPABILITIES/NATIVE_MALWARE_SCANNER/PRIVATE_STORAGE and final setup list; actual access absent explicitly external. |
+| P13-027 | Production risks | TESTED | HR_RELEASE_E2E_MATRIX/DB_RELEASE_PREPARATION state unresolved durability/scan/retention/runtime/realtenant/backup/DDL gates and security-preserving roll-forward; no production operation. |
+| P13-028 | Ready and blocked modules | TESTED | HR_RELEASE_E2E_MATRIX explicitly separates locally verified core/default-off adapters from actual activation/realCV/production NO-GO. No hosted staging/resource declared created. |
 
 ## Execution ledger
 
@@ -1366,6 +1366,30 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | ID | Acceptance | Status | Evidence |
 |---|---|---|---|
 | P13-040 | Complete matrix failures investigated; explicit unconfirmed review/409 remains safe/localized and old raw-delete-message test obeys safe contract | TESTED | `/workspace/inop-hr13j-target.log`45/45, all existing row/persistence/current-auth assertions preserved |
-| ENV-HR-002 | Backend directory snapshot test cannot overlap frontend writes in shared legacy uploads directory | OPEN | First backend1817/1819 while frontend valid uploads add owned UUID; final runners must be separated; no file cleanup/validator weakening |
+| ENV-HR-002 | Backend directory snapshot test cannot overlap frontend writes in shared legacy uploads directory | TESTED | Known fixture limitation: complete runners serialized, final backend1819/frontend408 exit0. Frontend suites remain concurrent2; no filename-validation/assertion weakening or global upload cleanup. |
 
 `HR_FINAL_REGRESSION_CORRECTIONS.md` records both non-PASS full attempts and required serialized verification. Validationhr13j TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. P10 acceptance/disposition rows are updated to the now-tested local Source/Graph/relay contracts and true external activation gates; original history stays intact. No backend/data/policy/secret/provider/runtime/production/push/deploy change. Final full matrix/ledger/report remain pending; no fake scanner/storage PASS.
+
+
+13J commit `0903b744127165448781d1605f9424b24610b07a`, five paths; targets45/all gatesPASS; complete corrected source verified below.
+
+## 13K — final local completion / exhaustive disposition and release gate
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-041 | All current regression files execute without skipped/cancelled tests, bound to frozen source and preserved commits | TESTED | Backend1819/1819 after frontend408/408 concurrency2, both exit0;506 SHA-256 paths unchanged at0903b744127165448781d1605f9424b24610b07a; final report-only changes do not alter code |
+| P13-042 | Current ATSv2 owned0/5k/50k scoped API measurement retains all results/method limits and never claims hosted or synthetic provider readiness | TESTED | `/workspace/inop-hr13-final-atsv2-benchmark.json`,24endpoint200/15Admin-HR-own-department-assigned expected counts;31key/document plans; node benchmark exit0 |
+
+**No unfinished independent implementation is silently skipped.** The canonical acceptance rows now cover all13 packages, including original HR audit and every discovered AUD-001–131:122 locallyTESTED,7BLOCKED_EXTERNAL,2OPEN. All366 earlier stable acceptance IDs retained plus newP13-041/042 (368total). All65 existing HR/checkpoint commits since c74 release are preserved and inventoried with full SHAs/files in `HR_LOCAL_COMMIT_LEDGER.md`; this final report-only commit SHA is shown after creation (self-SHA cannot be embedded before commit). Every true external test is separated; no provider/storage/scanner PASS is fabricated. Historical next/stop notes are retained as history and superseded by this final gate.
+
+Final current complete runs: `/workspace/inop-hr13-final-frontend-corrected.log`408/408 concurrency2,200604.621001ms; `/workspace/inop-hr13-final-backend-isolated.log`1819/1819 concurrency1 after frontend completed,164013.10126ms. Both0fail/cancel/skip/todo, exit0 recorded in `/workspace/inop-hr13-final-exits.json`. Frozen manifest `/workspace/inop-hr13-final-corrected-source-sha256.json`506source/test files, credential filenames excluded, unchanged after suites and benchmark. Current13J TSapp/node/buildPASS, lint0errors/9baselinewarnings, smoke13/13authorization632/632. Failed first frontend399/408 and overlapped backend1817/1819 remain NOTPASS;13J and ENV-HR-002 explain actual correction/runner serialization. No original file is removed/reset to get green tests.
+
+Current standalone0/5k/50k benchmark completes24actual local GET200 cases and15scope comparisons. At50k paged Applications43.4ms/23,744bytes/30rows vs legacy8,267.8ms/162,222,693bytes/50,000; board266.6ms/66,689bytes/80cards; analytics4,956.0ms/2,871bytes/213Mongoose method observations. Indexed31row reads examine31keys/documents; no wire-getMore/p95/constant-time/memory/hosted guarantee is inferred. Prior production-build UI comparison remains explicitly archived-source evidence rather than a fake current isolated React CPU rerun. `HR_FINAL_API_BENCHMARK.md` has timings/limits.
+
+Final artifacts: `HR_IMPLEMENTATION_COMPLETION.md` package summary/current test evidence/API/model/frontend changes/setup/risk/readiness; `HR_RELEASE_E2E_MATRIX.md` every local-real versus synthetic/external scenario; `HR_AUDIT_FINDING_DISPOSITION.md` all131 findings; `HR_LOCAL_COMMIT_LEDGER.md`65fullSHA/path inventory; `HR_FINAL_API_BENCHMARK.md` current0/5k/50k.
+
+**Local core and default-off provider/worker/Source interfaces: verified to their documented scope. Real CV acceptance / hosted staging / production activation: NO-GO.** Remaining only genuine gates: actual private durable storage/redeploy/restore/encryption/backup P10-018/019; real ClamAV/definitions/EICAR EXT-AV-001; hosted OCR EXT-OCR-001; AI P09-023; tenant/Exchange/mailbox P11-003/020; website/admin/API/form/email/export channels P12external; real SMTP EXT-SMTP-001; approved runtime worker actor/profile/DDL/hosting metadata and privacy law/retention. Legacy ephemeral/multipart paths remain transitional until verified activation, not silently retired. No external integration is assumed from a public website or mock.
+
+**Genuine pending decision:** AUD-030/051 linked Candidate deletion must choose dependency409 versus archive/restore and lawful retention duration/basis/authority. Prior owned DELETE200 orphan reproduction retained; silence is not a policy approval. No mass deletion/migration/seed/index drop/role rewrite is performed. Legacy HR repair, hosted snapshot/index/backups and any migration require separate explicit approval/access; owned DDL rehearsal is not production verification.
+
+**Resume point:** obtain the external evidence/setup and explicit deletion/retention answer; implement/test only the newly unblocked item and update this tracker. Do not repeat completed local packages, infer expired stop instructions, enable new real intake, create infrastructure or push/deploy without separate authorization. All ignored/local/.env files and prior artifacts/caches/models are preserved. `/tmp` remains nearly full ENV-HR-001; tests use the owned workspace TMPDIR and remove only their own fresh caches/fixtures. Roll-forward/disable gated providers preserves current scoped private reads and security fixes; no automatic insecure rollback.
