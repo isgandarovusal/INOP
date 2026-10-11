@@ -1032,7 +1032,7 @@
     "pending": "Review pending",
     "confirmed": "HR confirmed",
     "corrected": "HR correction",
-    "unsupported_ocr": "This scanned CV requires OCR, which is not supported yet. Open the original file and review manually.",
+    "unsupported_ocr": "This scan requires separate OCR processing. OCR works only when configured; open the original and review the facts manually.",
     "failed": "Text could not be extracted. Review the original CV manually.",
     "extracted": "CV text extracted; HR review is required.",
     "confidenceExplanation": "These are heuristic rule estimates, not calibrated accuracy or hiring recommendations.",
@@ -1361,6 +1361,14 @@
       "apply": "Apply facts to draft",
       "confirmRequired": "Confirm the profile facts before saving.",
       "receipt": "Server-recorded HR approval"
+  },
+  "hrDocuments": {
+      "network": "Could not connect to CV processing. Try again.",
+      "unavailable": "CV processing is unavailable. Your draft is preserved; review the original manually.",
+      "timeout": "CV processing timed out. Your draft is preserved; try again later.",
+      "busy": "CV processing capacity is full. Try again later.",
+      "missing": "The CV processing endpoint is unavailable. Your draft is preserved.",
+      "invalid": "The CV request is invalid. Check the file and fields."
   },
   "hrProcessing": {
     "aiProfile": "Professional AI fact review",

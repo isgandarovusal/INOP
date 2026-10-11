@@ -2,6 +2,8 @@
 
 Baseline: `c74c49f41bb3a8a54566324c8902576a48a88e8f`, branch `work`. Local implementation and commits only; no production push/deployment. Existing data, secrets and user files must be preserved.
 
+Latest safe-stop checkpoint: [2026-10-11 checkpoint](#safe-stop-checkpoint-2026-10-11). Read that section before resuming; it supersedes older “next” notes without removing their history.
+
 ## Resume protocol
 
 Read this file at each session start. Continue the first unfinished independent item. Never remove a finding; append new findings with a new stable ID. `TESTED` requires a named test and passing evidence for the current change. `OPEN` is unimplemented/unverified; `IN_PROGRESS` is active; `BLOCKED_EXTERNAL` requires approved access/provider or hosting configuration. Mock evidence never proves real external readiness. Each package updates this tracker in its commit. Commit SHAs are recorded after creation in the next tracker update and in the package report.
@@ -58,7 +60,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-045 | 09 | Rule parser and static suggestions are presented as AI | TESTED | 09B removes static Job suggestions; 09C2 `hrAiCvUI` reproduces and corrects active AZ/EN/RU Candidate copy, distinguishes rules/manual/optional evidence AI and keeps mock identity visible. Earlier narrow evidence tests did not cover outer copy; correction is preserved below. |
 | AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | 09C2 `hrAiCvUI` has separate AZ/EN/RU negative DOC-copy assertions; current visible format/error text is PDF/DOCX only, matching server validation. Earlier evidence/type tests did not cover the active outer copy. |
-| AUD-047 | 02 | Upload/processing/error strings have incomplete localization | OPEN | — |
+| AUD-047 | 02 | Upload/processing/error strings have incomplete localization | IN_PROGRESS | 10C11–10C13 profile/OCR/AI/document errors in AZ/EN/RU; broader HR CRUD/backend validation/action strings remain open |
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
@@ -345,19 +347,19 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 |---|---|---|---|
 | P10-001 | Private object storage adapter | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-002 | Authorized file access | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
-| P10-003 | Original CV retention | IN_PROGRESS | 10C7 disabled manifest/archive preparation, source-bound immutable reservation/scan/readback, no deletion or Candidate attachment; actual provider/retention/recovery activation remains gated |
+| P10-003 | Original CV retention | IN_PROGRESS | 10C7 immutable manifest/archive and 10C10 exact-source optional attachment retain old originals; local synthetic provider/scanner/approval and real owned DB/HTTP tested. Actual provider, retention policy, backup/recovery and activation remain gated; no deletion or automatic migration. |
 | P10-004 | Parsing metadata | TESTED | 10C5 explicit source-bound HR approval and historical server receipt tested by `hrCvApproval`/`hrCvApprovalUI` (110 combined targets);  10C3 `hrCvProcessing`/`hrCvProcessingHttp`/`hrCvProcessingUI`: rules-2 source SHA/revision/full-context identity, private evidence metadata, current-result guard; 104 targets / 1766 full. HR facts remain read-only here; explicit correction uses existing Candidate edit. |
 | P10-005 | Source identity | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
-| P10-006 | Existing file migration plan | IN_PROGRESS | 10C6 internal scoped metadata-only dry-run inventory: 14/14 owned-loopback tests, current read/update, strict bounds/keyset, legacy review and no writes/provider/files; `HR_CV_MIGRATION_PREPARATION.md`. Actual manifest/writer/apply/backup/provider recovery still pending; no migration activated |
+| P10-006 | Existing file migration plan | IN_PROGRESS | 10C6 metadata-only scoped dry run plus 10C7 archive and 10C10 disabled per-record attachment preparation; no startup DDL or automatic apply. Actual backup/provider/scanner/recovery/retention approval and migration activation remain pending; HR legacy-role migration stays separate. |
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | TESTED | 10C2–10C3 actual queue/parser/HTTP/UI: unique bounded slots, lease/retry, private source checks; 104 targets / 1766 full. Parse only, disabled by default, exact DDL required; OCR/AI/ingestion separately OPEN. |
 | P10-009 | OCR jobs | TESTED | 10C9–10C11 real local scanned PDF/task/HTTP/UI/explicit approval and bounded repair retry; 1915 full. Default off, hosted Native prerequisites EXT-OCR-001 BLOCKED_EXTERNAL |
 | P10-010 | AI jobs | TESTED | 10C8/10C12 source-bound durable task, opt-in HTTP/worker/UI/review and repair retry; 169 targets / 1931 full; actual adapter with synthetic transport only, real provider P09-023 BLOCKED_EXTERNAL |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
-| P10-013 | Idempotency | IN_PROGRESS | 10C1 email command/CAS; 10C3–10C4 parse context/UUID command replay and atomic reservation tested (73 final targets). OCR/AI/ingestion job integrations remain OPEN; no real provider proof. |
-| P10-014 | Job state | IN_PROGRESS | 10C1 email outbox; 10C3–10C4 persisted parse state, lease/restart, source/authority cancellation and current UI tested (73 final targets). OCR/AI/ingestion job integrations remain OPEN. |
-| P10-015 | Retry/failure monitoring | IN_PROGRESS | 10C1 audited email retry; 10C4 parse-only repair retry/three lifetime attempts, capacity/CAS, current dual actor, safe UI diagnostics tested (73 final targets). Later job kinds and hosted operational monitoring remain unfinished. |
+| P10-013 | Idempotency | IN_PROGRESS | Email and source-bound parse/OCR/AI UUID replay, current actor/source CAS, exact kind/version and bounded retry are locally tested through 10C12; source drafts/ingestion idempotency and real provider evidence remain unfinished. |
+| P10-014 | Job state | IN_PROGRESS | Email plus persisted parse/OCR/AI state, lease/restart, authority/source cancellation and current review UI tested through 10C12. Source drafts/ingestion and hosted operational state remain unfinished. |
+| P10-015 | Retry/failure monitoring | IN_PROGRESS | Email, parse/OCR/AI repair retry and sanitized diagnostics are locally tested through 10C12; three lifetime attempts remain bounded. Ingestion monitoring and actual hosted/provider operational evidence remain unfinished. |
 | P10-016 | Reuse infrastructure | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-017 | Justify additional resources first | IN_PROGRESS | 10B1 unwired private adapter and migration/fallback plan; actual provider and runtime integration not yet verified |
 | P10-018 | Real storage durability test | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
@@ -977,3 +979,80 @@ First combined targets passed backend/old flows but the new UI asserted mixed-ca
 
 
 Final 10C12: `/tmp/inop-hr10c12-target-final.log` **169/169**, zero failures/skips/cancellations. `/tmp/inop-packagehr10c12-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full frozen-source serial `/tmp/inop-hr10c12-regression-final.log` **1931/1931**, no failures/skips/cancellations. `git diff --check` PASS. 24 package files only; local SHA recorded next tracker update. All prior commits preserved. Real AI/storage/recovery/hosting/SMTP/Graph/website access and pending deletion decision remain unverified; no program-completion/live intake claim. Continue remaining independent P10 source/error/draft/ingestion work then P11–13, no per-package approval wait/push/deploy.
+
+
+10C12 commit: `42c1a4a65e1a5bfd2dcc7df1fa49c887a76ee0f1`, 24 files, 169 targets / 1931 full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization; clean tree, no push.
+
+## 10C13 — localized upload/parsing error states and auth fail-closed UI
+
+| ID | Package | New finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-118 | 10C13 | Parsing 401/403 leaves a stale editable Candidate and raw server detail is presented instead of localized document error state | TESTED | Corrected pre-patch baseline fails document/auth expectations; actual editor/HTTP DTO targets 45/45 and final frozen-source 1943/1943. TypeScript/build PASS, lint 0/9, smoke 13/13, authorization 632/632; no raw detail/auth-stale editor. |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-053 | Stable localized document errors react to AZ/EN/RU without API refetch/draft loss or raw provider detail | TESTED | `hrCvDocumentErrorsUI` nine error cases × AZ/EN/RU, zero refetch and retained draft; targets 45/45, final frozen-source 1943/1943; TypeScript/build PASS, lint 0/9, smoke 13/13, authorization 632/632. |
+| P10-054 | Parsing auth failures hide editor, auxiliary errors preserve primary, existing cancellation/proof/save behavior preserved | TESTED | Actual UI 401/403 masking plus inherited approval/OCR/AI/lifecycle/cancellation/proof/save; targets 45/45, final frozen-source 1943/1943; TypeScript/build PASS, lint 0/9, smoke 13/13, authorization 632/632. |
+
+The first harness forgot the shared helper's required navigation hook and failed before the intended requests. That initial log is neither app proof nor PASS. The harness was corrected before the valid baseline; no production patch was applied to bypass a fixture problem. Corrected baseline reproduces missing localized states and auth masking. `/tmp/inop-hr10c13-target-first.log` **45/45**, zero failures/skips/cancellations. `/tmp/inop-packagehr10c13-validation.json` TypeScript/build PASS, lint 0 errors / 9 warnings, 13 smoke / 632 authorization. Full frozen-source suite underway. `HR_CV_DOCUMENT_ERROR_STATES.md` documents narrow scope and remaining broader localization. No backend/DB/env/provider/secret/resource/original/push/deploy changes; independent P10 and P11–13 work continues after local commit.
+
+## Safe-stop checkpoint 2026-10-11
+
+User explicitly requested a safe checkpoint and stop, superseding the earlier instruction to continue all packages in this turn. No new implementation package is started after 10C13. Preserve every prior commit and every tracked/untracked/ignored file, including `.env`; do not reset, clean, delete user files, seed/overwrite data, push, deploy or operate on production.
+
+### Git and validation binding
+
+- Branch `work`; checkpoint began at `42c1a4a65e1a5bfd2dcc7df1fa49c887a76ee0f1` (10C12). All predecessors are preserved. 10C7–10C12 complete SHAs and evidence remain in the chronological ledger above.
+- 10C13 contains only Candidate parsing presentation/auth fail-closed changes, its new helper/UI regression, three locales, contract document and this tracker (nine explicit paths). No backend, route, model, dependency, lockfile, secret, startup/hosting config or source original is changed.
+- Targeted `/tmp/inop-hr10c13-target-first.log`: **45/45**. Current package `/tmp/inop-packagehr10c13-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**, owned loopback DB only. Baseline/fixture failures are retained separately and are not PASS.
+- First full frozen-source run `/tmp/inop-hr10c13-regression-final.log` was **interrupted, not PASS** after extensive browser resource failures. `/tmp` is 100% full (about 9 MB free); the failed run records `ERR_INSUFFICIENT_RESOURCES`. A specific resource cause is not independently proven by that error alone. No cache/user file was deleted to free space. Exact owned runner PID was interrupted; no unrelated service was stopped.
+- Fresh full serial run uses `TMPDIR=/workspace/inop-hr10c13-checkpoint-tmp` (outside the repository, separate filesystem with available capacity) and writes `/workspace/inop-hr10c13-checkpoint-regression-final.log`. **Completion/commit pending at checkpoint preparation; final outcome is appended below before stopping.** Existing code/tests stay frozen during this run; only tracker notes change.
+- The first alternate-TMPDIR attempt `/workspace/inop-hr10c13-checkpoint-regression.log` was also interrupted, **not PASS**: the existing OCR test-model helper resolves its pinned model directory from `os.tmpdir()`, so the new root initially lacked those fixtures. The three existing public models were copied only after checking their exact pinned SHA-256; originals are untouched. Explicit `TMPDIR=... node Backend/scripts/prepareOcrTestModels.cjs` verifies the copied models without downloading or weakening integrity. Final run uses the prepared scratch root; code/tests were not changed to pass this setup issue.
+- Environment prerequisite for next session: check free disk space and available browser resources before tests. Do not rerun unchanged into the full `/tmp`; choose an owned scratch directory with capacity. Do not erase retained caches/logs or orphan DB/files indiscriminately. Earlier AUD-090 concurrency issue remains OPEN; a serial pass is not a fix for it.
+
+### Exact continuation point after checkpoint
+
+1. Read this tracker and run `git status --short --branch`, `git rev-parse HEAD`, `git log` before edits. Verify the final checkpoint commit/files and preserved history. If 10C13 final gates do not pass, resume **10C13 / P10-053/054 / AUD-118** first; do not commit or label that implementation complete blindly.
+2. Once 10C13 is committed, resume **P10-003/006**, then **P10-012**, **AUD-067/073**: reproduce the CV pipeline compensation/uncertain-write problem in an owned temporary loopback DB; determine a minimal source-draft/immutable original/idempotent ingestion contract to avoid parse→create double upload and orphan records/files. No source-draft, ingestion adapter or compensating-rollback fix has been implemented in this session. Architectural brainstorms are not completed code or approved access/retention policy.
+3. Current disabled original manifest/archive, per-record attachment, private reader and parse/OCR/AI queues are the tested foundations; preserve current independent resource scopes, source CAS, old-JWT/current-role checks, truthful provenance and explicit human apply/confirm/save. Do not replace existing architecture or enable real intake prematurely.
+4. **AUD-030/051 deletion policy is awaiting a genuine user decision**: archive/soft-delete with retained Applications/CVs versus reject dependent deletion with 409. No answer/approval is inferred. Owned local reproduction `/tmp/inop-hr10d-delete-baseline.json` proves current DELETE 200 removes Candidate, leaves Application/original, and canonical download becomes 404. Do not apply either policy without the answer. Continue unrelated work once asked to resume.
+5. Complete remaining independent P10 items before P11 local Graph adapter/setup/security preparation, then P12 approved-source interfaces/form security preparation, then P13 integrated matrix/disposition/release report. Missing credentials block only real external activation/E2E, not local contracts, mock/security tests or UI preparation. No whole-program completion is claimed.
+
+### Remaining program requirements (stable IDs retained)
+
+| Package | Remaining tracked work / scope |
+|---|---|
+| 01–08 | Original acceptance rows are locally TESTED with named evidence, but cross-package **AUD-047** (broader HR CRUD/backend validation/action localization), **AUD-073** (double upload), **AUD-090** (concurrent Source PDF failure) are not silently closed. Do not repeat completed implementations without a new regression. Existing performance report is local 0/5k/50k evidence, not hosted measurement. |
+| 09 | **P09-023 BLOCKED_EXTERNAL** real provider E2E/approved privacy/config. Existing synthetic adapter/AI UI tests are not live AI proof. |
+| 10 | **P10-003/006/013/014/015/016/017 IN_PROGRESS**, **P10-012/020 OPEN**, **P10-018/019 BLOCKED_EXTERNAL**. Original retention/migration apply/ingestion/idempotency/state/monitoring/reuse/pre-intake security still require remaining evidence. Local OCR/AI task/HTTP/HR-review evidence does not prove hosted OCR, real AI/storage/recovery/scanner readiness. **AUD-030/047/048/050/051/067/073** remain OPEN/IN_PROGRESS; 10C13 IDs depend on final gates. |
+| 11 | **P11-001–019 OPEN**, **P11-020 BLOCKED_EXTERNAL**: approved mailbox adapter; OAuth/application least privilege; token lifecycle; delta/pagination/subscription choice; attachment ingestion/dedup/retry/rate limits/health; source→vacancy matching/ambiguous review; no token/CV logging; tenant/mailbox/admin-consent/credentials setup checklist. **AUD-071/080** remain OPEN. No Graph adapter or real mailbox integration was implemented here. |
+| 12 | **P12-001–019 OPEN**, **P12-020 BLOCKED_EXTERNAL**: public source research and actual API/form/email/export/partner evidence; approved adapters/actual channels only; no private scraping/login bypass; blocked-access/alternative-path documentation; public form rate/abuse/upload/malware/signed source/idempotency/privacy. **AUD-081/082/083** remain OPEN. Public GETs of kfc.az, pizzahut.az and jobsearch.az/vacancies hit proxy tunnel 403 (`/tmp/inop-hr-external-public-research.json`); capabilities are unverified and must not be invented. |
+| 13 | **P13-001–028 OPEN**: every-finding disposition; full source→private storage→extraction/OCR→HR review→Candidate/Application→score/board/interview/decision/analytics E2E; three brands/multiple branches/same Candidate different vacancies; PDF/DOCX/scans and AZ/EN/RU; mixed scopes/duplicates/retry/outage/stale requests/concurrency/large datasets/compatibility/security/privacy/retention; separate synthetic versus external evidence; final SHAs/tests/benchmarks/API/model/UI/setup/risks/ready-versus-blocked report. **AUD-009/010/061/068/090** invariants require final evidence; existing narrow regressions do not silently close this final matrix. |
+
+All original finding rows and acceptance criteria remain intact. New AUD-113–118 and P10-032–054 are preserved alongside the original backlog. Status changes require actual test evidence; BLOCKED_EXTERNAL is not DONE.
+
+### External blockers and release conditions
+
+- **P10-018/019 + AUD-050**: approved private object storage/bucket ownership/conditional write policy, actual durability/recovery and backup evidence. Native Render legacy uploads remain ephemeral; synthetic storage does not resolve real persistence.
+- **AUD-048**: actual malware scanner/quarantine policy and integration; current trusted synthetic scan gate is preparation only, not antivirus certification. No new real external CV ingestion is enabled.
+- **AUD-051/030**: legal retention/deletion policy and pending user choice; original bytes are retained by preparation, not automatically removed.
+- **P09-023**: real AI provider access and approved professional-fact processing/privacy/budget configuration. No secrets in chat/repo/logs. Test-only transport is visibly MOCK TEST; real provider E2E is not PASS.
+- **EXT-OCR-001**: hosted Native OCR executable/pinned language models/resource limits. Actual local Tesseract 5.5.0 AZ/EN/RU tests are distinct from Render provisioning; optional OCR stays off by default.
+- **EXT-SMTP-001**: approved SMTP/company receipt/bounce evidence. Local outbox/retry tests do not prove delivery.
+- **P11-020**: approved GFC tenant/mailbox/least-privilege application consent and secure credentials; real Graph unavailable. Official Microsoft Graph documentation URLs also hit proxy tunnel 403 (`/tmp/inop-hr-graph-public-research.json`); do not represent unverified website content as reviewed.
+- **P12-020 / BLOCKED_EXTERNAL_ACCESS**: company/partner administrator or approved first-party API/webhook/email/export access; three websites' real forms/channels/capabilities remain unconfirmed. No unauthorized personal CV collection.
+- **Release stays NO-GO for real CV intake/hosted production readiness** until required durability/recovery/scan/privacy/current authorization and real integration gates are evidenced. No resource, env/secret, DDL/migration, hosting, production DB, push or deploy operation is authorized by this checkpoint.
+
+After final validation/commits, stop as requested. The next session resumes from the exact incomplete item above, not from Package 01 and not by repeating completed OCR/AI/approval packages.
+
+| ID | Scope | Finding | Status | Evidence |
+|---|---|---|---|---|
+| ENV-HR-001 | Local test environment | `/tmp` filesystem exhausted; browser resources fail during full regression | OPEN | `df` reports 100% / ~9 MB free; interrupted run records resource errors. Alternate owned scratch root is prepared with pinned OCR fixtures; no user cache/log/file is removed. Full final run outcome recorded below; original `/tmp` capacity remains unresolved. |
+
+Checkpoint integrity check: all **435** prior stable AUD/P acceptance IDs remain present; the only additions against 10C12 are **AUD-118, P10-053, P10-054** (438 current AUD/P IDs). All original 83 audit findings and all 13 package catalogs are present. Eight implementation/test/contract paths are SHA-256-bound in `/workspace/inop-hr10c13-checkpoint-source-binding.json`; tracker is deliberately excluded while final notes are updated. `git diff --check` and release-baseline ancestry PASS; no unrelated staged or untracked repository path exists at preparation.
+
+### Final checkpoint validation — PASS
+
+`/workspace/inop-hr10c13-checkpoint-regression-final.log`: **1943/1943**, **0 failures / 0 cancellations / 0 skips / 0 todo**, exit **0**, duration **357341.772743 ms**. Includes all previous suites and 12 new document error/auth tests. Source SHA-256 binding matches the eight frozen implementation/test/contract files. `/tmp/inop-hr10c13-target-first.log` **45/45**; `/tmp/inop-packagehr10c13-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Current implementation is validated; interrupted runs are not PASS. New test root successfully avoids the resource failure in this serial run; `/tmp` itself remains full, ENV-HR-001 OPEN, and AUD-090 concurrent test investigation remains OPEN.
+
+**10C13 / AUD-118 / P10-053 / P10-054 are locally TESTED**. All nine package paths are reviewed; `git diff --check` PASS. No backend/auth policy/source original/DB/env/secret/config changes. This checkpoint adds no new source-draft/ingestion or Graph/external implementation. P10 original retention/migration/source draft/ingestion/privacy and P11–13 remain incomplete exactly as listed above. No real-provider, hosted OCR, malware, recovery or release readiness is inferred from local/synthetic tests. Next continuation after the checkpoint is **P10-003/006 → P10-012 / AUD-067/073**, with deletion policy pending separately. Local implementation commit and final documentation commit follow; their actual SHA/report are recorded after creation. Stop after the checkpoint as requested; no push/deploy.

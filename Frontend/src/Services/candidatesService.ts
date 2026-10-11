@@ -193,7 +193,7 @@ export async function parseCandidateCv(
 
   const response = await API.post(
     "/candidates/parse-cv",
-    formData, { signal }
+    formData, { signal, suppressErrorToast: true }
   );
 
   return response.data;

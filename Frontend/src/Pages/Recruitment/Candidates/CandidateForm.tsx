@@ -1,4 +1,5 @@
 import {isAxiosError} from 'axios';
+import {hrDocumentErrorKey} from '../../../Utils/hrDocumentError';
 import CvProcessingApprovalReview from '../../../Components/CvProcessingApprovalReview';
 import type {CvProcessingJob} from '../../../Services/cvProcessingService';
 import CvReviewAssistant from "../../../Components/CvReviewAssistant";
@@ -72,6 +73,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [saving, setSaving] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [documentError,setDocumentError]=useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => () => { parsing.current.sequence++; parsing.current.controller?.abort(); }, []);
@@ -95,6 +97,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     if (file && !validateCvFile(file)) return;
     if (!file && !cvFile) return;
     setProcessingApproval(undefined);setConfirmReview(false);
+    setDocumentError('');
     setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
     const sequence = ++parsing.current.sequence;
@@ -132,15 +135,10 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
       if (sequence !== parsing.current.sequence || controller.signal.aborted) return;
       const processing = (err as { response?: { data?: { processingStatus?: "unsupported_ocr" | "failed" } } }).response?.data?.processingStatus;
       if (processing) setReview({ version: "rules-2", provider: "rule-based", processingStatus: processing, reviewStatus: "pending" });
-      setError(
-        getErrorMessage(err, t("recruitment.candidateForm.genericError")),
-      );
-      toast.error(
-        getErrorMessage(
-          err,
-          t("recruitment.candidateForm.genericError"),
-        ),
-      );
+      const status=isAxiosError(err)?err.response?.status:undefined;
+      if(status===401||status===403){setAccessDenied(status===401?'unauthenticated':'forbidden');return;}
+      const key=hrDocumentErrorKey(err);setError(null);setDocumentError(key);
+      toast.error(t(key));
     } finally {
       if (sequence === parsing.current.sequence) setAiGenerating(false);
     }
@@ -158,6 +156,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     }
 
     setSaving(true);
+    setDocumentError('');
     setError(null);
 
     try {
@@ -219,10 +218,10 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         subtitle={t("recruitment.candidateForm.subtitle")}
       />
 
-      {error && (
-        <div className="alert alert--danger">
+      {(error||documentError) && (
+        <div className="alert alert--danger" role="alert">
           <AlertCircle size={18} />
-          <span>{error}</span>
+          <span data-hr-document-error={documentError||undefined}>{documentError?t(documentError):error}</span>
         </div>
       )}
 

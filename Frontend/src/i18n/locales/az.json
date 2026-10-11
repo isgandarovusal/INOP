@@ -1056,7 +1056,7 @@
     "pending": "Yoxlama gözləyir",
     "confirmed": "HR təsdiqləyib",
     "corrected": "HR düzəlişi",
-    "unsupported_ocr": "Skan edilmiş CV OCR tələb edir. OCR hələ dəstəklənmir; faylı açıb məlumatları əl ilə yoxlayın.",
+    "unsupported_ocr": "Bu skan sənədi ayrıca OCR emalı tələb edir. OCR yalnız konfiqurasiya ediləndə işləyir; originalı açıb faktları əl ilə yoxlaya bilərsiniz.",
     "failed": "Mətn çıxarılmadı. Orijinal CV-ni açıb məlumatları yoxlayın.",
     "extracted": "CV mətni çıxarıldı; HR yoxlaması tələb olunur.",
     "confidenceExplanation": "Göstərici qayda əsaslı ehtimal qiymətləndirməsidir, statistik dəqiqlik və ya işə qəbul tövsiyəsi deyil.",
@@ -1385,6 +1385,14 @@
       "apply": "Faktları draft-a tətbiq et",
       "confirmRequired": "Profil faktlarını təsdiqləyin; sonra yadda saxlayın.",
       "receipt": "Serverdə qeydə alınmış HR təsdiqi"
+  },
+  "hrDocuments": {
+      "network": "CV emal xidməti ilə əlaqə qurulmadı. Yenidən cəhd edin.",
+      "unavailable": "CV emalı hazırda əlçatan deyil. Draft saxlanılır; originalı əl ilə yoxlayın.",
+      "timeout": "CV emalının vaxtı bitdi. Draft saxlanılır; sonra yenidən cəhd edin.",
+      "busy": "CV emal limiti doludur. Sonra yenidən cəhd edin.",
+      "missing": "CV emal endpoint-i mövcud deyil. Draft saxlanılır.",
+      "invalid": "CV sorğusu düzgün deyil. Faylı və sahələri yoxlayın."
   },
   "hrProcessing": {
     "aiProfile": "Peşəkar faktların AI yoxlaması",
