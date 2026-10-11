@@ -167,7 +167,7 @@ function validateObjectId(id) {
 
 exports.getJobs = async (req, res) => {
   try {
-    const filters = {};
+    const filters = { archivedAt: null };
     if (req.query.brandId) filters.brandId = String(req.query.brandId);
     if (req.query.branchId) {
       if (!mongoose.isObjectIdOrHexString(req.query.branchId)) return res.status(400).json({ message: 'Invalid branch filter.' });
@@ -276,6 +276,9 @@ exports.updateJob = async (req, res) => {
         message: "Vakansiya ID-si düzgün deyil.",
       });
     }
+
+    const current = await Job.findOne(buildScopedQuery(req, { _id: req.params.id })).select('archivedAt');
+    if (current?.archivedAt) return res.status(409).json({ code: 'JOB_ARCHIVED', message: 'Restore the vacancy before editing.' });
 
     const allowedFields = [
       "brandId", "branchId", "requiredEducation", "requiredCertificates", "criterionWeights",
@@ -416,9 +419,9 @@ exports.updateJob = async (req, res) => {
     }
     const updated = await Job.findOneAndUpdate(
       buildScopedQuery(req, {
-        _id: req.params.id,
+        _id: req.params.id, archivedAt: null,
       }),
-      update,
+      { $set: update, $inc: { __v: 1 } },
       {
         new: true,
         runValidators: true,
@@ -461,47 +464,4 @@ exports.updateJob = async (req, res) => {
   }
 };
 
-exports.deleteJob = async (req, res) => {
-  try {
-    if (!validateObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Vakansiya ID-si düzgün deyil.",
-      });
-    }
-
-    const deleted = await Job.findOneAndDelete(
-      buildScopedQuery(req, {
-        _id: req.params.id,
-      })
-    );
-
-    if (!deleted) {
-      return res.status(404).json({
-        message:
-          "Vakansiya tapılmadı və ya bu vakansiyanı silmək üçün icazəniz yoxdur.",
-      });
-    }
-
-    try {
-      await recordActivity({
-        req,
-        action: "delete",
-        entityType: "job",
-        entityId: deleted._id,
-        description: `Vakansiya silindi: ${deleted.title}`,
-      });
-    } catch (activityError) {
-      logFailure(activityError);
-    }
-
-    return res.status(200).json({
-      message: "Vakansiya silindi.",
-    });
-  } catch (error) {
-    logFailure(error);
-
-    return res.status(500).json({
-      message: "Vakansiya silinərkən server xətası baş verdi.",
-    });
-  }
-};
+exports.deleteJob = require('./jobArchive.controller').archive;

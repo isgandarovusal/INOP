@@ -51,7 +51,7 @@ test('Candidate archive/restore preserves linked applications, history and sourc
  await t.test('Permanent deletion fields and malformed archive filters fail closed',async()=>{
   assert.equal((await h.request('admin','DELETE',`/candidates/${c._id}`,{permanent:true})).status,400);
   assert.equal((await h.request('admin','GET','/hr/v2/candidates?archived=all')).status,400);
-  assert.equal((await h.request('admin','GET','/hr/v2/jobs?archived=true')).status,400);
+  assert.equal((await h.request('admin','GET','/hr/v2/applications?archived=true')).status,400);
   assert.ok(await Candidate.exists({_id:c._id}));assert.ok(await Application.exists({_id:app._id}));
  });
 }));

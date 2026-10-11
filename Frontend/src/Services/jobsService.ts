@@ -85,6 +85,9 @@ export function normalizeJob(raw: unknown): Job {
       : "Full-time";
 
   return {
+    archivedAt: typeof data.archivedAt === "string" ? data.archivedAt : null,
+    archivedBy: typeof data.archivedBy === "string" ? data.archivedBy : null,
+    revision: typeof data.__v === "number" ? data.__v : undefined,
     id:
       typeof data.id === "string"
         ? data.id
@@ -217,7 +220,10 @@ export async function updateJob(
 }
 
 export async function deleteJob(
-  id: string
+  id: string, signal?: AbortSignal, expectedRevision?: number
 ): Promise<void> {
-  await API.delete(`/jobs/${id}`);
+  await API.delete(`/jobs/${id}`, {signal, data: expectedRevision === undefined ? undefined : {expectedRevision}});
 }
+
+export async function restoreJob(id:string, expectedRevision:number, signal?:AbortSignal):Promise<void>{await API.post(`/jobs/${id}/restore`,{expectedRevision},{signal});}
+export const getJobArchiveHistory=(id:string,signal?:AbortSignal,scopeKey?:string):Promise<{items:{action:"archive"|"restore";actor:string;at:string;reason:string;revision:number}[];limit:number}>=>readJson(`/jobs/${id}/archive-history`,{signal,scopeKey});

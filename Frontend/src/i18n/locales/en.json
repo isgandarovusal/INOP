@@ -1529,5 +1529,11 @@
     "readOnly": "This candidate is archived. An authorized HR/Admin must restore it before editing.",
     "history": "Archive history",
     "historyLimit": "Latest 50 actions shown. Full history is retained."
-  }
+  },
+  "hrJobArchive": {
+  "active": "Active vacancies",
+  "visibility": "Vacancy visibility",
+  "confirm": "Archive {{name}}? Applications and history will be retained.",
+  "readOnly": "This vacancy is archived and does not accept new applications. An authorized HR/Admin must restore it before editing."
+}
 }

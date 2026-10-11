@@ -19,7 +19,7 @@ const wrap = operation => async (req, res) => {
 // Aggregation does not perform Mongoose query casting. Reuse the list query's
 // ObjectId casting so own/assigned references cannot silently miss their rows.
 const filter = (model, req) => model.find(req.dataScope).cast(model);
-exports.jobs = wrap(async req => ({ total: await Job.countDocuments(filter(Job, req)) }));
+exports.jobs = wrap(async req => ({ total: await Job.countDocuments({ $and: [filter(Job, req), { archivedAt: null }] }) }));
 exports.applications = wrap(async req => ({ total: await Application.countDocuments(filter(Application, req)) }));
 exports.candidates = wrap(async req => {
   const [data] = await Candidate.aggregate([

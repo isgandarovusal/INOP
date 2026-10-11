@@ -153,7 +153,7 @@ exports.createCandidateFromCv = async (req, res) => {
       }
     }
 
-    if (job && job.status !== 'Open') {
+    if (job && (job.archivedAt || job.status !== 'Open')) {
       await cleanupFile(req.file);
       return res.status(409).json({ message: 'This vacancy is not accepting applications.', code: 'JOB_NOT_OPEN' });
     }
@@ -224,7 +224,7 @@ exports.createCandidateFromCv = async (req, res) => {
     // Job scope/status are checked again after parsing, using current grants.
     if(jobId){job=await Job.findOne({$and:[{_id:jobId},resourceFilter(req,'recruitment')]}).lean();
       if(!job)throw Object.assign(new Error('Job is unavailable.'),{status:404,code:'JOB_UNAVAILABLE'});
-      if(job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
+      if(job.archivedAt||job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
     }
     const candidateId = new mongoose.Types.ObjectId();
     const candidatePayload = {
@@ -287,7 +287,7 @@ exports.createCandidateFromCv = async (req, res) => {
       if(await recovery.creation(req,true)!==authority)throw Object.assign(new Error('Authorization changed.'),{status:403,code:'HR_PERMISSION_CHANGED'});
       job=await Job.findOne({$and:[{_id:jobId},resourceFilter(req,'recruitment')]}).lean();
       if(!job)throw Object.assign(new Error('Job is unavailable.'),{status:404,code:'JOB_UNAVAILABLE'});
-      if(job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
+      if(job.archivedAt||job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
       match = calculateApplicationMatch(
         job,
         savedCandidate,

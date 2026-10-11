@@ -113,8 +113,8 @@ exports.get = async (req, res, next) => {
     } }];
     const [[metrics], scores, active, optionJobs, brands] = await Promise.all([
       Application.aggregate(pipeline).option({ maxTimeMS: 10000 }), scoreDistribution(req, criteria),
-      Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open' }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
-      Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), getBrands(),
+      Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open', archivedAt: null }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
+      Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, {archivedAt:null}] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), getBrands(),
     ]);
     const branchIds = [...new Set(optionJobs.map(j => j.branchId).filter(Boolean).map(String))];
     const branches = await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();

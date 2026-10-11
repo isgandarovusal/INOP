@@ -6,7 +6,7 @@ const { resourceFilter } = require('../services/hrResourceScope.service');
 const { validateLocation, decorateJobs } = require('../services/recruitmentCatalog.service');
 const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
 const identity = req => JSON.stringify([req.user.id, req.user.role, req.user.departmentId, req.authRole.permissions]);
-const jobQuery = (req, id) => Job.findOne({ $and: [{ _id: id }, resourceFilter(req, 'recruitment', 'read'), resourceFilter(req, 'recruitment', 'update')] }).select('title description brandId branchId location experienceYears requiredSkills preferredSkills updatedAt').maxTimeMS(1000).lean();
+const jobQuery = (req, id) => Job.findOne({ $and: [{ _id: id, archivedAt: null }, resourceFilter(req, 'recruitment', 'read'), resourceFilter(req, 'recruitment', 'update')] }).select('title description brandId branchId location experienceYears requiredSkills preferredSkills updatedAt').maxTimeMS(1000).lean();
 const fail = (code, message, status) => Object.assign(new Error(message), { code, status });
 exports.suggest = async (req, res) => {
   res.set('Cache-Control', 'private, no-store');

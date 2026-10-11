@@ -3,13 +3,13 @@ import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Briefcase, Loader2, Pencil, Plus, Archive, RotateCcw } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/HRConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
-import { deleteJob } from "../../../Services/jobsService";
+import { deleteJob, restoreJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
 import { useAuth } from "../../../Context/useAuth";
 import { hasPermission } from "../../../Utils/permissions";
@@ -36,6 +36,7 @@ const JobsList: React.FC = () => {
   const canDelete = hasPermission(user, "recruitment", "delete");
   const canManage = canUpdate || canDelete;
 
+  const [archived, setArchived] = useState("false");
   const [query, setQuery] = useState("");
   const [brandFilter, setBrandFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
@@ -43,8 +44,8 @@ const JobsList: React.FC = () => {
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
   const [mutation, setMutation] = useState({ key: '', error: '' });
   const search = useDebouncedSearch(query);
-  const result = useHRPage('recruitment', { q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage);
-  const context = useHRActionContext(JSON.stringify([search, brandFilter, branchFilter, statusFilter, result.page]));
+  const result = useHRPage('recruitment', { archived, q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage);
+  const context = useHRActionContext(JSON.stringify([archived, search, brandFilter, branchFilter, statusFilter, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
   const jobs = useMemo(() => result.data?.items ?? [], [result.data]);
@@ -73,7 +74,7 @@ const JobsList: React.FC = () => {
     setDeletingId(id);
 
     try {
-      await deleteJob(id);
+      await deleteJob(id, undefined, deleteTarget.revision);
       if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (err: unknown) {
       if (context.current.current === key) setMutation({ key, error: hrCrudErrorKey(err) });
@@ -81,6 +82,8 @@ const JobsList: React.FC = () => {
       if (context.current.current === key) setDeletingId(null);
     }
   };
+
+  const handleRestore = async(job:Job)=>{const key=context.key;setDeletingId(job.id);try{await restoreJob(job.id,job.revision??0);if(context.current.current===key)load();}catch(err){if(context.current.current===key)setMutation({key,error:hrCrudErrorKey(err)});}finally{if(context.current.current===key)setDeletingId(null);}};
 
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={load} />;
 
@@ -104,6 +107,7 @@ const JobsList: React.FC = () => {
 
       {error && <p role="alert">{t(error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
+        <select className="input-field" aria-label={t("hrJobArchive.visibility")} value={archived} onChange={e=>setArchived(e.target.value)}><option value="false">{t("hrJobArchive.active")}</option><option value="true">{t("hrArchive.archiveList")}</option></select>
         <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} />
         <SearchInput
           value={query}
@@ -212,7 +216,8 @@ const JobsList: React.FC = () => {
                   {canManage && (
                     <td>
                       <div className="row-actions">
-                        {canUpdate && <button
+                        {job.archivedAt && canUpdate && <button type="button" className="icon-btn" title={t("hrArchive.restore")} disabled={deletingId===job.id} onClick={()=>{void handleRestore(job);}}><RotateCcw size={15}/></button>}
+                        {canUpdate && !job.archivedAt && <button
                           className="icon-btn icon-btn--edit"
                           title={t("recruitment.jobs.edit")}
                           onClick={() =>
@@ -221,16 +226,16 @@ const JobsList: React.FC = () => {
                         >
                           <Pencil size={15} />
                         </button>}
-                        {canDelete && <button
+                        {canDelete && !job.archivedAt && <button
                           className="icon-btn icon-btn--danger"
-                          title={t("recruitment.jobs.delete")}
+                          title={t("hrArchive.archive")}
                           disabled={deletingId === job.id}
                           onClick={() => setDeleteTarget(job)}
                         >
                           {deletingId === job.id ? (
                             <Loader2 size={15} className="spin" />
                           ) : (
-                            <Trash2 size={15} />
+                            <Archive size={15} />
                           )}
                         </button>}
                       </div>
@@ -247,9 +252,10 @@ const JobsList: React.FC = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title={t("recruitment.jobs.deleteTitle")}
-          message={t("recruitment.jobs.deleteMessage", {
-            position: deleteTarget.position,
+          title={t("hrArchive.archive")}
+          confirmLabel={t("hrArchive.archive")}
+          message={t("hrJobArchive.confirm", {
+            name: deleteTarget.position,
           })}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}

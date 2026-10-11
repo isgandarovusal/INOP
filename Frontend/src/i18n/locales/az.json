@@ -1553,5 +1553,11 @@
     "readOnly": "Bu namizəd arxivdədir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir.",
     "history": "Arxiv tarixçəsi",
     "historyLimit": "Son 50 əməliyyat göstərilir. Tam tarixçə saxlanılır."
-  }
+  },
+  "hrJobArchive": {
+  "active": "Aktiv vakansiyalar",
+  "visibility": "Vakansiya siyahısı",
+  "confirm": "{{name}} arxivlənsin? Müraciətlər və tarixçə qorunacaq.",
+  "readOnly": "Bu vakansiya arxivdədir. Yeni müraciət qəbul etmir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir."
+}
 }

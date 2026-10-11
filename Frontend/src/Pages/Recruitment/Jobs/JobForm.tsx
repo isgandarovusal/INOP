@@ -202,11 +202,14 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
 };
 
 const JobForm: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { id } = useParams(); const { user } = useAuth();
   const result = useAuditResource(id, "recruitment", getJobById, { refreshOnFocus: false });
   const key = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
   if (!hasPermission(user, "recruitment", id ? "update" : "create")) return <HRResourceState status="forbidden" />;
   if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
+  if(result.data?.archivedAt) return <div className="hr-workspace"><p role="status">{t("hrJobArchive.readOnly")}</p><button type="button" onClick={()=>navigate(`/app/recruitment/jobs/${id}`)}>{t("recruitment.jobDetail.back")}</button></div>;
   return <JobFormFields key={key} initial={result.data ?? undefined} />;
 };
 export default JobForm;

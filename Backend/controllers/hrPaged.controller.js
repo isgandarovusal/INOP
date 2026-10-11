@@ -11,15 +11,15 @@ const resources = { jobs: 'recruitment', candidates: 'candidate', applications: 
 const models = { jobs: Job, candidates: Candidate, applications: Application, branches: Branch };
 const fields = {
   branches: 'code name brandId kind location status createdAt updatedAt',
-  jobs: 'requiredSkills title department location type status brandId branchId experienceYears createdAt updatedAt',
+  jobs: 'archivedAt archivedBy __v requiredSkills title department location type status brandId branchId experienceYears createdAt updatedAt',
   candidates: 'archivedAt archivedBy __v experience name role status email phone skills cvUrl cvOriginal cvReview.version cvReview.processingStatus cvReview.reviewStatus createdAt updatedAt',
   applications: 'jobId candidateId boardOrder status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
 };
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function parameters(req, kind) {
   const q = req.query, extra = {}, resource = resources[kind];
-  if (q.archived !== undefined && (kind !== 'candidates' || !['true','false'].includes(q.archived))) throw Error('Invalid archive filter.');
-  if (kind === 'candidates') extra.archivedAt = q.archived === 'true' ? { $ne: null } : null;
+  if (q.archived !== undefined && (!['candidates','jobs'].includes(kind) || !['true','false'].includes(q.archived))) throw Error('Invalid archive filter.');
+  if (['candidates','jobs'].includes(kind)) extra.archivedAt = q.archived === 'true' ? { $ne: null } : null;
   for (const [key, value] of Object.entries(q)) if (!['q', 'page', 'pageSize', 'sort', 'status', 'brandId', 'branchId', 'jobId', 'candidateId', 'after', 'excludeJobId', 'archived'].includes(key) || typeof value !== 'string' || value.length > (key === 'after' ? 320 : 80)) throw Error('Invalid page filter.');
   const page = q.page === undefined ? 1 : Number(q.page), pageSize = q.pageSize === undefined ? 30 : Number(q.pageSize), sort = q.sort || 'newest';
   if (!Number.isInteger(page) || page < 1 || page > 10000 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100 || !['newest', 'name'].includes(sort) || kind === 'applications' && sort !== 'newest') throw Error('Invalid pagination or sort.');

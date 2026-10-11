@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema(
   {
+    archivedAt: { type: Date, default: null },
+    archivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    archiveHistory: { type: [new mongoose.Schema({action:{type:String,enum:['archive','restore'],required:true},actor:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},at:{type:Date,required:true},reason:{type:String,default:'',maxlength:500},revision:{type:Number,required:true}}, {_id:false})], select:false, default:[] },
     brandId: { type: String, default: null, index: true },
     branchId: { type: mongoose.Schema.Types.ObjectId, ref: "RecruitmentBranch", default: null, index: true },
     title: {

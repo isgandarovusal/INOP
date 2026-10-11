@@ -1,3 +1,4 @@
+import JobArchiveHistory from "../../../Components/JobArchiveHistory";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { useHRRankingPage } from "../../../Hooks/useHRRankingPage";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
@@ -9,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
-import { getJobById } from "../../../Services/jobsService";
+import { getJobById, restoreJob } from "../../../Services/jobsService";
 import {
   createApplication,
 } from "../../../Services/applicationsService";
@@ -38,7 +39,7 @@ const JobDetail: React.FC = () => {
   const [candidateSearch, setCandidateSearch] = useState('');
   const search = useDebouncedSearch(candidateSearch);
   const apps = useHRRankingPage(job?.id, !!job && canReadApps);
-  const people = useHRPage('candidate', { excludeJobId: job?.id, q: search }, getCandidatePage, { enabled: !!job && canLink && job.status === 'open' });
+  const people = useHRPage('candidate', { excludeJobId: job?.id, q: search }, getCandidatePage, { enabled: !!job && canLink && !job.archivedAt && job.status === 'open' });
   const applications = useMemo(() => apps.data?.items ?? [], [apps.data]);
   const candidates = useMemo(() => people.data?.items ?? [], [people.data]);
   const context = useHRActionContext(id);
@@ -69,8 +70,10 @@ const JobDetail: React.FC = () => {
     [candidates],
   );
 
+  const handleRestore = async()=>{if(!job||!canEdit)return;const key=context.key;setAction({key,busy:true,selected:selectedCandidate,error:""});try{await restoreJob(job.id,job.revision??0);if(context.current.current===key)result.reload();}catch(err){if(context.current.current===key)setAction({key,busy:false,selected:selectedCandidate,error:hrCrudErrorKey(err)});}finally{if(context.current.current===key)setAction(old=>({...old,busy:false}));}};
+
   const handleLink = async () => {
-    if (!id || !selectedCandidate || !canLink || job?.status !== "open" || !candidates.some(c => c.id === selectedCandidate)) return;
+    if (!id || !selectedCandidate || !canLink || job?.archivedAt || job?.status !== "open" || !candidates.some(c => c.id === selectedCandidate)) return;
     const key = context.key;
 
     setAction({ key, busy: true, selected: selectedCandidate, error: "" });
@@ -110,7 +113,7 @@ const JobDetail: React.FC = () => {
               <ArrowLeft size={15} /> {t("recruitment.jobDetail.back")}
             </button>
 
-            {canEdit && (
+            {canEdit && !job.archivedAt && (
               <button
                 className="btn-add"
                 onClick={() =>
@@ -124,7 +127,9 @@ const JobDetail: React.FC = () => {
         }
       />
 
-      {job.status === "open" && hasPermission(user, "candidate", "create") && hasPermission(user, "application", "create") && <button type="button" onClick={() => navigate(`/app/recruitment/candidates/new?jobId=${encodeURIComponent(job.id)}`)}>{t("hrStates.cvForJob")}</button>}
+      {!job.archivedAt && job.status === "open" && hasPermission(user, "candidate", "create") && hasPermission(user, "application", "create") && <button type="button" onClick={() => navigate(`/app/recruitment/candidates/new?jobId=${encodeURIComponent(job.id)}`)}>{t("hrStates.cvForJob")}</button>}
+      {job.archivedAt&&<section className="hr-notice"><p role="status">{t("hrJobArchive.readOnly")}</p>{canEdit&&<button type="button" className="btn-secondary" disabled={linking} onClick={()=>{void handleRestore();}}>{t("hrArchive.restore")}</button>}</section>}
+      <JobArchiveHistory key={job.id+":"+job.revision} id={job.id} revision={job.revision}/>
       <div className="detail-grid">
         <div>
           <div className="detail-card">
@@ -236,7 +241,7 @@ const JobDetail: React.FC = () => {
             </div>
           </div>
 
-          {canLink && job.status === "open" && (
+          {canLink && !job.archivedAt && job.status === "open" && (
             <div className="detail-card">
               <h3>{t("recruitment.jobDetail.linkCandidate")}</h3>
 

@@ -34,7 +34,7 @@ function createApproval({original,available}){
    if(row.state!=='ready'||row.taskVersion!=='intake-rules-1'||row.result?.requiresApproval!==true||row.scan?.sha256!==row.original.sha256||row.original.sha256!==input.expectedHash)throw fail('INTAKE_SOURCE_CHANGED');
    if(row.approval){if(row.approval.contextHash!==hash(sourceContext(row))||row.approval.profileHash!==commandHash||String(row.approval.actor)!==fresh.user.id||row.approval.departmentId!==(fresh.user.departmentId||'')||row.approval.sourceUpdatedAt.toISOString()!==input.expectedUpdatedAt)throw fail('INTAKE_APPROVAL_CONFLICT');}
    else if(row.updatedAt.toISOString()!==input.expectedUpdatedAt)throw fail('INTAKE_SOURCE_CHANGED');
-   let job;if(jobId){job=await Job.findOne({$and:[{_id:jobId},resourceFilter(fresh,'recruitment')]}).maxTimeMS(1000).lean();if(!job)throw fail('INTAKE_JOB_UNAVAILABLE',404);if(job.status!=='Open')throw fail('JOB_NOT_OPEN');}
+   let job;if(jobId){job=await Job.findOne({$and:[{_id:jobId},resourceFilter(fresh,'recruitment')]}).maxTimeMS(1000).lean();if(!job)throw fail('INTAKE_JOB_UNAVAILABLE',404);if(job.archivedAt||job.status!=='Open')throw fail('JOB_NOT_OPEN');}
    return{row,fresh,job};
   };
   let context=await guard();await original(req,id);context=await guard();

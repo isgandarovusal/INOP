@@ -111,7 +111,7 @@ exports.createApplication = async (req, res) => {
     }
 
     if (candidate.archivedAt) return res.status(409).json({code:'CANDIDATE_ARCHIVED',message:'Restore the archived Candidate before creating an Application.'});
-    if (job.status !== "Open") return res.status(409).json({ message: "This vacancy is not accepting applications.", code: "JOB_NOT_OPEN" });
+    if (job.archivedAt || job.status !== "Open") return res.status(409).json({ message: "This vacancy is not accepting applications.", code: "JOB_NOT_OPEN" });
     const existing = await Application.findOne({
       jobId,
       candidateId,

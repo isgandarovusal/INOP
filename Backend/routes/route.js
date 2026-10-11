@@ -275,6 +275,10 @@ router.delete(
   auditSourceDocumentsController.deleteDocument
 );
 
+router.post('/jobs/:id/archive', ...authorize('recruitment', 'delete'), require('../controllers/jobArchive.controller').archive);
+router.post('/jobs/:id/restore', ...authorize('recruitment', 'update'), require('../controllers/jobArchive.controller').restore);
+router.get('/jobs/:id/archive-history', ...authorize('recruitment', 'read'), require('../controllers/jobArchive.controller').history);
+
 // Jobs Endpoints
 router.get(
   '/jobs',
