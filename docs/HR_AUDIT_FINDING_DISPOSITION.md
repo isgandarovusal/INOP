@@ -153,3 +153,14 @@ All original131 findings retained; current136 dispositions:128 TESTED locally,7 
 | AUD-135 | 14F/15A | Authorized deletion of a linked Job orphans the retained Application job context | TESTED | Explicit approved archive/restore in a95401a; actual Job archive7/7 backend + UI4/4, target120 backend/55 browser. Parent/Application/history retained, active lists/count/options exclude archive, current grant/CAS409/restore positive and negative tests. Prior orphan reproduction retained; no permanent delete or migration. |
 
 | AUD-136 | 15D | OCR language-only regression starts counting before the independent initial duplicate read | TESTED |7309cb7 waits for actual duplicate-ready UI and asserts exactly one initial duplicate read before AZ/EN/RU zero-refetch assertions. Real browser/HTTP/OCR4/4, production code unchanged; initial failed full441/443 is retained, not relabeled PASS. |
+
+##16 — Renewed HR UI/performance findings
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-137 | 16A | Generic nested state plus four skeletons creates538px blank opening panel | TESTED | Actual production before538px→after64px on every10-screen run; deadline/slow/manual retry/stale/permission tests; full frontend509/509. |
+| AUD-138 | 16A | Job ranking waits for the separately authorized primary Job request | TESTED | Parallel route-ID ranking read; actual held-primary regression starts ranking before Job returns, secondary UI stays hidden until readable Job. Backend authorization unchanged. |
+| AUD-139 | 16B | Shared input padding overlaps the search icon on HR filters | TESTED | Actual screenshots, HR-specific icon/clear-control spacing,14-page×4-width computed padding/keyboard/overflow matrix, full509/509. |
+| AUD-140 | 16C | Global important flex overrides analytics grid; rich candidate page incurs offscreen layout/paint | TESTED | Browser cascade identified real overriding rule; only HR grid corrected, candidate content-visibility with deferred-card keyboard/current-permission tests. Three-run local5k paint medians120.4→67.5ms; board increase/remaining long tasks retained in report. Hosted performance unverified. |
+
+All prior findings and external/legal limits remain unchanged. No real storage/scanner/OCR/provider/mailbox or hosted deployment is certified through these local tests.

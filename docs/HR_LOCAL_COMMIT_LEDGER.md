@@ -1435,3 +1435,60 @@ docs(hr): record archive analytics and main release verification
 - `A docs/HR_MAIN_RELEASE_REPORT.md`
 
 Main fast-forward and remote development deletion are verified in HR_MAIN_RELEASE_REPORT. The subsequent report-only confirmation is identified by its actual SHA in Git/final output; it cannot embed its own future SHA. No prior Git object is removed.
+
+##16 — HR premium UI and measured loading/render packages
+
+### cfed60344fed9d5caaf4c11b242fe2c64c0bbb27
+
+fix(hr): bound loading and parallelize authorized job ranking
+
+13 changed paths:
+
+- `A Frontend/scripts/profileHRWorkspace.cjs`
+- `M Frontend/src/Components/AuditResourceState.tsx`
+- `M Frontend/src/Components/HRResourceState.tsx`
+- `M Frontend/src/Hooks/useAuditResource.ts`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobDetail.tsx`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `M Frontend/tests/helpers/productionBrowser.cjs`
+- `M Frontend/tests/hrAccessibility.test.cjs`
+- `A Frontend/tests/hrLoadingLifecycle.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### a1d2b76b998b44b843d6bdd65040687d6286bec9
+
+feat(hr): unify premium workspace and real analytics charts
+
+16 changed paths:
+
+- `A Frontend/src/Components/HRHistogram.tsx`
+- `A Frontend/src/Components/HRNavigation.tsx`
+- `M Frontend/src/Layouts/AppShell/AppShell.tsx`
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CvIntakeDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CvIntakeQueue.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `A Frontend/tests/hrPremiumWorkspace.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `A docs/HR_PREMIUM_WORKSPACE_REPORT.md`
+
+### d5ffbe7ebf8e166be027f2b828add10c3a91ee86
+
+perf(hr): defer offscreen cards and preserve analytics grid
+
+3 changed paths:
+
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/tests/hrPremiumWorkspace.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+Full source/test proof belongs to d5ffbe7; subsequent report-only commits do not change the532 frozen source inputs. Existing main push proof follows once verified. No development branch is recreated.
