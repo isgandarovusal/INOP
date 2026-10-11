@@ -1022,6 +1022,12 @@
       }
     }
   },
+  "hrWorkspace": {
+    "recruitment": "İşə qəbul",
+    "navigation": "HR naviqasiyası",
+    "cohort": "Hesablama və görünən məlumatlar",
+    "updated": "Son yenilənmə"
+},
   "hrStates": {
     "timeout": "Sorğunun vaxtı bitdi. Yenidən cəhd edin.",    "slow": "Sorğu gözləniləndən uzun çəkir. Yenidən cəhd edə bilərsiniz.",
     "cvRequired": "Bu vakansiya axını üçün CV seçin.",

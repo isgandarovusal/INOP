@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import HRNavigation from "../../Components/HRNavigation";
+import HRResourceState from "../../Components/HRResourceState";
 
 const AppShell: React.FC = () => {
   const hr = useLocation().pathname.startsWith("/app/recruitment/");
@@ -8,8 +10,9 @@ const AppShell: React.FC = () => {
     <div className={hr ? "admin-layout hr-shell" : "admin-layout"}>
       <Sidebar />
       <main className="admin-main">
+        {hr && <HRNavigation />}
         <Suspense
-          fallback={
+          fallback={hr ? <HRResourceState status="loading" /> :
             <div className="route-loading route-loading--content" role="status" aria-live="polite">
               <div className="route-loading__content-state">
                 <div className="route-loading__line route-loading__line--wide" />

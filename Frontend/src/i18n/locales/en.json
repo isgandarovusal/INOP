@@ -998,6 +998,12 @@
       }
     }
   },
+  "hrWorkspace": {
+    "recruitment": "Recruitment",
+    "navigation": "HR navigation",
+    "cohort": "Calculation and data visibility",
+    "updated": "Last updated"
+},
   "hrStates": {
     "timeout": "The request timed out. Please retry.",    "slow": "This is taking longer than expected. You can retry.",
     "cvRequired": "Choose a CV for this vacancy workflow.",

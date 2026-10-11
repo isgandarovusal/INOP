@@ -199,7 +199,8 @@ const CandidateDetail: React.FC = () => {
       {archiveConfirm===context.key&&<HRConfirmDialog title={t('hrArchive.archive')} message={t('hrArchive.confirm',{name:candidate.name})} confirmLabel={t('hrArchive.archive')} loading={deleting} onConfirm={()=>{void handleDelete();}} onCancel={()=>setArchiveConfirm(null)}/>}
       {candidate.archivedAt&&<p className="hr-notice" role="status">{t('hrArchive.readOnly')}</p>}
       {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
-      <div className="detail-card">
+      <div className="detail-card hr-profile-facts">
+        <span className="hr-person-avatar hr-person-avatar--profile" aria-hidden="true">{candidate.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span>
         <h4>{t("recruitment.candidateDetail.mainInformation")}</h4>
 
         <p>

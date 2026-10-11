@@ -187,10 +187,9 @@ const JobsList: React.FC = () => {
                   className={deletingId === job.id ? "row--removing" : ""}
                 >
                   <td
-                    className="cell-title cell-title--clickable"
-                    onClick={() => navigate(`/app/recruitment/jobs/${job.id}`)}
+                    className="cell-title"
                   >
-                    <span>{job.position}</span>
+                    <button type="button" className="hr-row-title" onClick={() => navigate(`/app/recruitment/jobs/${job.id}`)}>{job.position}</button>
                     <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId) || t("hrCatalog.unset")}{job.branchName ? ` · ${job.branchName}` : ""}</small>
                   </td>
                   <td className="cell-muted">

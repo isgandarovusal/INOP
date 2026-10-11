@@ -1,3 +1,4 @@
+import Badge from '../../../Components/Badge';
 import HRConfirmDialog from '../../../Components/HRConfirmDialog';
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
@@ -301,8 +302,9 @@ const CandidatesList: React.FC = () => {
         </div>
       ) : viewMode === "grid" ? (
         <div className="hr-candidate-grid">{filteredCandidates.map(c => <article key={c.id} className="recruitment-kanban__card">
-          <button type="button" onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role}</p>
-          <p>{t('hrWorkflow.profileStatus')}: {t(`recruitment.candidateStatus.${c.status}`)}</p>
+          <div className="hr-person-card-heading"><span className="hr-person-avatar" aria-hidden="true">{c.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role || t('cvReview.unknown')}</p></div></div>
+          <div className="hr-person-card-contact">{c.email && <span>{c.email}</span>}{c.phone && <span>{c.phone}</span>}</div><div className="tag-list">{c.skills.slice(0,3).map(s=><Badge key={s} tone="neutral">{s}</Badge>)}</div>
+          <p className="hr-person-card-status"><Badge tone={getCandidateStatusBadgeVariant(c.status)}>{t(`recruitment.candidateStatus.${c.status}`)}</Badge></p>
         </article>)}</div>
       ) : (
         <div className="admin-table-container" role="region" aria-label={t('recruitment.candidates.title')} tabIndex={0}>

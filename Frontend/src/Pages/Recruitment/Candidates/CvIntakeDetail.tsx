@@ -23,7 +23,7 @@ export default function CvIntakeDetail(){
   if(context.current.current===key&&!c.signal.aborted)setAction({key,status:'ready',busy:false});
  };
  if(!hasPermission(user,'candidate','read'))return <HRResourceState status='forbidden'/>;
- if(!enabled)return <p role='alert'>{t('hrDocuments.unavailable')}</p>;
+ if(!enabled)return <main className='hr-workspace hr-page' data-hr-feature-disabled><PageHeader title={t('hrIntake.queue')} subtitle={t('hrIntake.queueNotice')}/><p className='hr-notice' role='alert'>{t('hrDocuments.unavailable')}</p></main>;
  if(result.status!=='ready'||!result.data)return <HRResourceState status={result.status} retry={result.reload}/>;
  const source=result.data,readable=source.state==='ready'||source.state==='blocked'&&source.code==='OCR_REQUIRED';
  return <main className='hr-workspace hr-page' data-source-detail><PageHeader title={source.original.originalName} subtitle={t('hrIntake.queueNotice')}/>
