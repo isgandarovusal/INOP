@@ -63,7 +63,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-045 | 09 | Rule parser and static suggestions are presented as AI | TESTED | 09B removes static Job suggestions; 09C2 `hrAiCvUI` reproduces and corrects active AZ/EN/RU Candidate copy, distinguishes rules/manual/optional evidence AI and keeps mock identity visible. Earlier narrow evidence tests did not cover outer copy; correction is preserved below. |
 | AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | 09C2 `hrAiCvUI` has separate AZ/EN/RU negative DOC-copy assertions; current visible format/error text is PDF/DOCX only, matching server validation. Earlier evidence/type tests did not cover the active outer copy. |
 | AUD-047 | 02 | Upload/processing/error strings have incomplete localization | IN_PROGRESS | 10C11–10C13 profile/OCR/AI/document errors in AZ/EN/RU; broader HR CRUD/backend validation/action strings remain open |
-| AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | OPEN | — |
+| AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | BLOCKED_EXTERNAL | 13C native adapter14/14 and hash-bound Source/relay quarantine tests; actual scanner/definitions/EICAR absent, legacy upload activation not certified |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
 | AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | — |
@@ -1259,3 +1259,15 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-031 | ats-v2 hides stored v1 percentages as legacy, explicit recalculation/current parent checks retained | TESTED | applicationScoreState, hrRanking/hrAnalytics, frontend Matching/analytics22/22; no bulk migration |
 
 `HR_ATS_V2_COMPATIBILITY.md` documents required version change and per-field known semantics. `/workspace/inop-hr13b-target.log`137/137; after added actual partial Source regression `/workspace/inop-hr13b-final-added.log`32/32; UI22/22,0fail/skip/cancel. Validationhr13b TS/build PASS lint0/9 smoke13 authorization632. Candidate partial confirmation no longer invents zero. Legacy v1 remains stored, status-aware clients hide until authorized explicit recalc. Native scanner files are a separate next increment and are not staged into13B. Current final complete matrix remains pending; no real provider/production/env/DDL/push/deploy.
+
+13B commit `ee4b4f8` (full SHA in ledger), eight paths; targets137/additional32/UI22/all gatesPASS.
+
+## 13C — native scanner preparation, full backend trust regression
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-071 | Default-off Native Node clamscan adapter: fresh signatures, stdin-only private bytes, stripped environment and strict verdict/hash | TESTED | hrClamScan14/14 includes synthetic executable environment proof; actual scanner NOT PASS |
+| P10-072 | Scanner deadline/abort/output bounds and retained noncooperative capacity fail closed | TESTED | hrClamScan14/14, no new install/resource/activation |
+| EXT-AV-001 | Real deployed ClamAV/signature/EICAR/quarantine/recovery evidence | BLOCKED_EXTERNAL | clamscan/clamdscan unavailable; approved runtime preparation + real harmless fixture test required |
+
+`HR_NATIVE_MALWARE_SCANNER.md` has activation/outage/recovery checklist. `/workspace/inop-hr13c-av-final.log`14/14; complete frozen backend `/workspace/inop-hr13c-backend-full.log`1789/1789,0fail/skip/cancel; validationhr13c TS/build PASS lint0/9 smoke13 authorization632. Source OCR test was added after full-run file list capture and is explicitly NOT included in1789; initial synthetic store missing-error fixture corrected and new baseline retained separately. Parallel Source/lifecycle/intake frontend `/workspace/inop-hr13-source-concurrent.log`55/55 passes, but does NOT establish AUD-090 root cause; retained OPEN. No real scanner/storage/provider/production/env/DDL/push/deploy. Four explicit scanner/docs/tracker paths; OCR files belong next separate increment.
