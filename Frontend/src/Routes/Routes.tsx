@@ -11,6 +11,7 @@ const JobsList = lazy(() => import("../Pages/Recruitment/Jobs/JobsList"));
 const JobForm = lazy(() => import("../Pages/Recruitment/Jobs/JobForm"));
 const JobDetail = lazy(() => import("../Pages/Recruitment/Jobs/JobDetail"));
 const CandidatesList = lazy(() => import("../Pages/Recruitment/Candidates/CandidatesList"));
+const CvIntakeQueue=lazy(()=>import("../Pages/Recruitment/Candidates/CvIntakeQueue"));
 const CandidateForm = lazy(() => import("../Pages/Recruitment/Candidates/CandidateForm"));
 const CandidateDetail = lazy(() => import("../Pages/Recruitment/Candidates/CandidateDetail"));
 const ApplicationDetail = lazy(() => import("../Pages/Recruitment/Applications/ApplicationDetail"));
@@ -75,6 +76,7 @@ const ROUTES: RouteObject[] = [
           ] },
           { element: <HRRoute resource="candidate" action="read" />, children: [
             { path: "recruitment/candidates", element: <CandidatesList /> },
+            {path:"recruitment/cv-intake",element:<CvIntakeQueue/>},
             { path: "recruitment/candidates/:id", element: <CandidateDetail /> },
           ] },
           { element: <HRRoute resource="candidate" action="create" />, children: [

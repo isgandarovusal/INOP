@@ -1483,6 +1483,13 @@
     }
   },
   "hrIntake": {
+    "queue": "Private CV mənbə növbəsi",
+    "queueNotice": "Vakansiyaya bağlanmamış mənbələr funnel-dan ayrıdır. Saylar cari namizəd/mənbə scope-u və bağlı qeydə giriş əsasında hesablanır.",
+    "allStates": "Bütün vəziyyətlər",
+    "pendingReview": "HR yoxlamasını gözləyir",
+    "recoveryPending": "Command bərpasını gözləyir",
+    "empty": "Cari scope/filtr üzrə mənbə yoxdur.",
+
     "retryUpload": "Eyni upload command-ını təkrar yoxla",
     "notice": "Bir private original arxa planda emal olunur. Qeyd yaratmazdan əvvəl bütün faktları yoxlayın və açıq şəkildə təsdiqləyin.",
     "test": "MOCK TEST storage/scanner — real CV-lər üçün təsdiqlənməyib.",

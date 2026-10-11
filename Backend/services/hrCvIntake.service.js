@@ -47,7 +47,8 @@ function createIntake({enabled=false,store,scanner,parse=parser.parseCvResultFro
   return{processed,evidenceMode};
  }
  async function original(req,id){available();if(!mongoose.isObjectIdOrHexString(id))throw fail('INTAKE_INPUT',400);const before=await scoped(req,id);if(!['ready','blocked'].includes(before.row.state)||before.row.scan?.sha256!==before.row.original.sha256||(before.row.state==='blocked'&&before.row.code!=='OCR_REQUIRED'))throw fail('INTAKE_ORIGINAL_UNAVAILABLE',403);return bounded(async signal=>{const received=await store.get(storage.reference(before.row.blob),{signal});if(!Buffer.isBuffer(received))throw fail('INTAKE_READBACK',409);const bytes=Buffer.from(received);if(bytes.length!==before.row.original.size||hash(bytes)!==before.row.original.sha256)throw fail('INTAKE_READBACK',409);const after=await scoped(req,id);if(signal.aborted)throw fail('INTAKE_TIMEOUT');if(after.identity!==before.identity||originalIdentity(after.row)!==originalIdentity(before.row))throw fail('INTAKE_CONTEXT_CHANGED',409);return{bytes,mimeType:before.row.original.mimeType};});}
+ const list=require('./hrCvIntakeList.service').createList({available,ddl,evidenceMode});
  const {approve,reconcile}=require('./hrCvIntakeApproval.service').createApproval({original,available});
- return Object.freeze({enqueue,get,original,runOnce,approve,reconcile,assertAvailable:available});
+ return Object.freeze({enqueue,get,original,runOnce,approve,reconcile,list,assertAvailable:available});
 }
 module.exports={createIntake};

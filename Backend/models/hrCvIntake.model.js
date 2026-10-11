@@ -14,5 +14,7 @@ schema.index({commandKey:1},{unique:true,name:'hr_intake_command_unique'});
 schema.index({queueSlot:1},{unique:true,name:'hr_intake_queue_slot',partialFilterExpression:{queueSlot:{$type:'number'}}});
 schema.index({createdBy:1,actorSlot:1},{unique:true,name:'hr_intake_actor_slot',partialFilterExpression:{actorSlot:{$type:'number'}}});
 schema.index({state:1,nextAttemptAt:1,leaseUntil:1,createdAt:1},{name:'hr_intake_claim'});
+for(const field of ['createdBy','departmentId','assignedTo'])schema.index({[field]:1,createdAt:-1,_id:-1},{name:'hr_intake_'+field+'_page'});
+schema.index({createdAt:-1,_id:-1},{name:'hr_intake_page'});
 // No startup DDL, TTL, retention/deletion or automatic Candidate creation.
 module.exports=mongoose.models.HrCvIntake||mongoose.model('HrCvIntake',schema);

@@ -191,7 +191,7 @@ const CandidatesList: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <>{hasPermission(user, "application", "read") && <button type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}</>
+        <>{import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}{hasPermission(user, "application", "read") && <button type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}</>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}

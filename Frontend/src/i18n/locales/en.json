@@ -1459,6 +1459,13 @@
     }
   },
   "hrIntake": {
+    "queue": "Private CV source queue",
+    "queueNotice": "Unassigned sources are separate from vacancy funnels. Counts use current Candidate/source scope and current linked parent access.",
+    "allStates": "All states",
+    "pendingReview": "Pending HR review",
+    "recoveryPending": "Pending command recovery",
+    "empty": "No sources in the current scope/filter.",
+
     "retryUpload": "Retry the same upload command",
     "notice": "One private original is processed in the background. Review all facts and explicitly confirm before creating records.",
     "test": "MOCK TEST storage/scanner — not verified for real CVs.",
