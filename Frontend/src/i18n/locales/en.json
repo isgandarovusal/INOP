@@ -1350,6 +1350,9 @@
     }
   },
   "hrProcessing": {
+    "readOnly": "Current permission is read-only; processing cannot be started or retried.",
+    "retry": "Retry only after repairing the file/storage issue",
+    "retries": "Manual retries",
     "title": "Background CV processing",
     "notice": "The existing original uses a rule-based parser. The profile changes only when HR edits and saves it.",
     "show": "Show processing history",

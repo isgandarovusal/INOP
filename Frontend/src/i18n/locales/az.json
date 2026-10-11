@@ -1374,6 +1374,9 @@
     }
   },
   "hrProcessing": {
+    "readOnly": "Cari icazə yalnız oxumağa imkan verir; emalı başlatmaq və ya retry etmək olmaz.",
+    "retry": "Yalnız fayl/storage problemi düzəldilibsə yenidən növbəyə al",
+    "retries": "Manual retry sayı",
     "title": "CV background emalı",
     "notice": "Mövcud original qayda parseri ilə emal olunur. Profil yalnız HR tərəfindən redaktə və yadda saxlananda dəyişir.",
     "show": "Emal tarixçəsini göstər",
@@ -1409,7 +1412,7 @@
       "OCR_REQUIRED": "Skan sənədi OCR tələb edir; OCR hazır deyil.",
       "AUTH_REVOKED": "Cari giriş icazəsi ləğv edilib.",
       "SOURCE_CHANGED": "Mənbə və ya profil dəyişib.",
-      "SOURCE_MISSING": "Original fayl mövcud deyil.",
+      "SOURCE_MISSING": "Orijinal fayl mövcud deyil.",
       "RESULT_LIMIT": "Nəticə dəstəklənən ölçünü keçir.",
       "INPUT_LIMIT": "Original dəstəklənən ölçünü keçir.",
       "STORAGE_NOT_CONFIGURED": "Private storage konfiqurasiya edilməyib.",

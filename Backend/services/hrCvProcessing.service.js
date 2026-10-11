@@ -16,7 +16,7 @@ async function actor(id) {
 async function candidate(req,id,update=true) {
  return Candidate.findOne({$and:[{_id:id},resourceFilter(req,'candidate'),...(update?[resourceFilter(req,'candidate','update')]:[])]}).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob').maxTimeMS(1000).lean();
 }
-function dto(row,result) { return {id:String(row._id),candidateId:String(row.candidateId),kind:row.kind,state:row.state,attempts:row.attempts,code:row.code,source:{sha256:row.sourceHash,revision:row.sourceRevision,contextHash:row.sourceFingerprint},createdAt:row.createdAt,updatedAt:row.updatedAt,nextAttemptAt:row.nextAttemptAt||null,events:row.events,...(result?{result}:{} )}; }
+function dto(row,result) { return {id:String(row._id),candidateId:String(row.candidateId),kind:row.kind,state:row.state,attempts:row.attempts,manualRetries:row.manualRetries??0,code:row.code,source:{sha256:row.sourceHash,revision:row.sourceRevision,contextHash:row.sourceFingerprint},createdAt:row.createdAt,updatedAt:row.updatedAt,nextAttemptAt:row.nextAttemptAt||null,events:(row.events||[]).map(({state,code,at,attempt})=>({state,code,at,attempt})),...(result?{result}:{} )}; }
 async function indexes() {
  let values;try{values=await Jobs.collection.indexes();}catch{throw fail('PROCESSING_QUEUE_NOT_READY');}
  const required=[['hr_processing_context_unique',{contextKey:1},null],['hr_processing_queue_slot',{queueSlot:1},{queueSlot:{$type:'number'}}],['hr_processing_actor_slot',{actorId:1,actorSlot:1},{actorSlot:{$type:'number'}}]];
@@ -64,6 +64,37 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
   const fresh=await actor(req.user.id),latest=await candidate(fresh,id,false);if(identity(fresh)!==auth)throw fail('PROCESSING_AUTH_CHANGED',403);if(!latest)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
   return {items:jobs.map(job=>({...dto(job),currentSource:fingerprint(latest)===job.sourceFingerprint})),limit:20};
  }
+ async function retry(req,id,input) {
+  available();
+  if(!require('mongoose').isObjectIdOrHexString(id)||!input||Object.keys(input).some(k=>!['expectedRevision','expectedHash','expectedUpdatedAt','commandId'].includes(k))||!Number.isInteger(input.expectedRevision)||input.expectedRevision<0||typeof input.expectedHash!=='string'||!/^[a-f0-9]{64}$/.test(input.expectedHash)||typeof input.expectedUpdatedAt!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(input.expectedUpdatedAt)||!Number.isFinite(Date.parse(input.expectedUpdatedAt))||new Date(input.expectedUpdatedAt).toISOString()!==input.expectedUpdatedAt||typeof input.commandId!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(input.commandId||''))throw fail('PROCESSING_INVALID_INPUT',400);
+  const current=await actor(req.user.id),auth=identity(current),job=await Jobs.findById(id).select('+retryCommandHash').maxTimeMS(1000).lean();
+  if(!job)throw fail('PROCESSING_JOB_UNAVAILABLE',404);
+  const parent=await candidate(current,job.candidateId);
+  if(!parent)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
+  if((parent.__v||0)!==input.expectedRevision||parent.cvOriginal?.sha256!==input.expectedHash||fingerprint(parent)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
+  // Keep original creator authority, and also require the current retry actor.
+  // Retry does not replace a revoked creator with another user's privilege.
+  const origin=await actor(job.actorId),originAuth=identity(origin);
+  if(!await candidate(origin,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);
+  await indexes();
+  const fresh=await actor(req.user.id),freshOrigin=await actor(job.actorId),latest=await candidate(fresh,job.candidateId);
+  if(identity(fresh)!==auth||identity(freshOrigin)!==originAuth)throw fail('PROCESSING_AUTH_CHANGED',403);
+  if(!latest||!await candidate(freshOrigin,job.candidateId))throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
+  if(fingerprint(latest)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
+  const commandHash=hash(JSON.stringify([req.user.id,input.commandId])),replay=row=>({...dto(row),replayed:true});
+  if(job.retryCommandHash===commandHash)return replay(job);
+  const count=job.manualRetries??0;
+  if(job.state!=='blocked'||!['SOURCE_MISSING','STORAGE_NOT_CONFIGURED'].includes(job.code)||!Number.isInteger(job.attempts)||job.attempts<1||job.attempts>=3||!Number.isInteger(count)||count<0||count>=2||job.updatedAt?.toISOString()!==input.expectedUpdatedAt)throw fail('PROCESSING_RETRY_CONFLICT',409);
+  for(let i=0;i<8;i++) {
+   const queueSlot=slot();if(!Number.isInteger(queueSlot)||queueSlot<0||queueSlot>63)throw fail('PROCESSING_INVALID_CONFIG',400);
+   try {
+    const row=await Jobs.findOneAndUpdate({_id:job._id,state:job.state,code:job.code,attempts:job.attempts,updatedAt:job.updatedAt},{$set:{state:'queued',code:'QUEUED',queueSlot,actorSlot:i%4,nextAttemptAt:now(),retryActorId:req.user.id,retryCommandHash:commandHash},$inc:{manualRetries:1},$unset:{result:1,leaseToken:1,leaseUntil:1},$push:{events:{state:'queued',code:'MANUAL_RETRY',at:now(),attempt:job.attempts,actorId:req.user.id}}},{returnDocument:'after'}).maxTimeMS(1000).lean();
+    if(row)return {...dto(row),replayed:false};
+    const raced=await Jobs.findById(id).select('+retryCommandHash').maxTimeMS(1000).lean();if(raced?.retryCommandHash===commandHash)return replay(raced);throw fail('PROCESSING_RETRY_CONFLICT',409);
+   }catch(error){if(error.code!==11000)throw error;const raced=await Jobs.findById(id).select('+retryCommandHash').maxTimeMS(1000).lean();if(raced?.retryCommandHash===commandHash)return replay(raced);}
+  }
+  throw fail('PROCESSING_QUEUE_FULL',429);
+ }
  let busy=false,timer;
  async function finish(job,token,state,code,result) {
   const terminal=!['queued','running','retry'].includes(state),at=now();
@@ -75,6 +106,8 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
    const execute=async()=>{
     const req=await actor(job.actorId),auth=identity(req),row=await candidate(req,job.candidateId);
     if(!row)throw fail('PROCESSING_AUTH_REVOKED',403);
+    const retryActor=job.retryActorId?await actor(job.retryActorId):null,retryAuth=retryActor?identity(retryActor):null;
+    if(retryActor&&!await candidate(retryActor,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);
     if(fingerprint(row)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
     const bytes=await read(row,{signal:controller.signal});if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');if(!bytes)throw fail('PROCESSING_SOURCE_MISSING',404);
     if(hash(bytes)!==job.sourceHash)throw fail('PROCESSING_SOURCE_CHANGED',409);
@@ -83,6 +116,7 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
     if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
     const latest=await actor(job.actorId),fresh=await candidate(latest,job.candidateId);
     if(identity(latest)!==auth||!fresh)throw fail('PROCESSING_AUTH_REVOKED',403);
+    if(retryActor){const latestRetry=await actor(job.retryActorId);if(identity(latestRetry)!==retryAuth||!await candidate(latestRetry,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);}
     if(fingerprint(fresh)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
     if(!output.parsed)return {state:'blocked',code:'OCR_REQUIRED'};
     // No raw text, file bytes/key/name, token or exception payload in job result.
@@ -106,7 +140,7 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
    await indexes();
    const at=now();await Jobs.updateMany({state:'running',leaseUntil:{$lte:at},attempts:{$gte:3}},{$set:{state:'failed',code:'ATTEMPTS_EXHAUSTED'},$unset:{leaseToken:1,leaseUntil:1,queueSlot:1,actorSlot:1,nextAttemptAt:1},$push:{events:{state:'failed',code:'ATTEMPTS_EXHAUSTED',at,attempt:3}}}).maxTimeMS(1000);
    for(;processed<Math.max(1,Math.min(Number(limit)||2,4));processed++){
-    const at=now(),token=crypto.randomUUID(),job=await Jobs.findOneAndUpdate({attempts:{$lt:3},$or:[{state:{$in:['queued','retry']},nextAttemptAt:{$lte:at}},{state:'running',leaseUntil:{$lte:at}}]},{$set:{state:'running',leaseToken:token,leaseUntil:new Date(at.getTime()+60000),code:'PROCESSING'},$inc:{attempts:1},$push:{events:{state:'running',code:'PROCESSING',at}}},{returnDocument:'after',sort:{createdAt:1,_id:1}}).select('+leaseToken').maxTimeMS(1000).lean();
+    const at=now(),token=crypto.randomUUID(),job=await Jobs.findOneAndUpdate({attempts:{$lt:3},$or:[{state:{$in:['queued','retry']},nextAttemptAt:{$lte:at}},{state:'running',leaseUntil:{$lte:at}}]},{$set:{state:'running',leaseToken:token,leaseUntil:new Date(at.getTime()+60000),code:'PROCESSING'},$inc:{attempts:1},$push:{events:{state:'running',code:'PROCESSING',at}}},{returnDocument:'after',sort:{createdAt:1,_id:1}}).select('+leaseToken +retryActorId').maxTimeMS(1000).lean();
     if(!job)break;await work(job,token);
    }
    return{processed};
@@ -114,6 +148,6 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
  }
  function start(){available();if(timer)return;timer=setInterval(()=>void runOnce().catch(()=>console.error('CV processing temporarily unavailable.')),5000);timer.unref();}
  function stop(){clearInterval(timer);timer=undefined;}
- return{enqueue,get,list,runOnce,start,stop};
+ return{enqueue,get,list,retry,runOnce,start,stop};
 }
 module.exports={createProcessing,fingerprint};
