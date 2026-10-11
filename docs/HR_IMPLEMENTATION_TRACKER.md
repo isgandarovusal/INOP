@@ -351,7 +351,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-006 | Existing file migration plan | IN_PROGRESS | 10C6 internal scoped metadata-only dry-run inventory: 14/14 owned-loopback tests, current read/update, strict bounds/keyset, legacy review and no writes/provider/files; `HR_CV_MIGRATION_PREPARATION.md`. Actual manifest/writer/apply/backup/provider recovery still pending; no migration activated |
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | TESTED | 10C2–10C3 actual queue/parser/HTTP/UI: unique bounded slots, lease/retry, private source checks; 104 targets / 1766 full. Parse only, disabled by default, exact DDL required; OCR/AI/ingestion separately OPEN. |
-| P10-009 | OCR jobs | OPEN | — |
+| P10-009 | OCR jobs | IN_PROGRESS | 10C9 disabled OCR task profile; real local image-only AZ/EN/RU extraction and five-scope queue tests; HTTP/UI and hosted Native runtime remain pending |
 | P10-010 | AI jobs | IN_PROGRESS | 10C8 disabled internal durable professional AI profile on existing queue, exact kind/version, current-source guards and schema/provenance; HTTP/UI integration and real provider remain pending |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
@@ -886,3 +886,28 @@ The original first target run failed because the new fixture used invalid model 
 P10-010 stays IN_PROGRESS: the adapter/queue is internal and disabled, HTTP/UI integration and real AI are not claimed complete. No P10 storage/OCR/ingestion/privacy gate is silently closed. Original audit/acceptance IDs and P11–13 remain preserved; external access remains BLOCKED_EXTERNAL, and independent work continues after local commit. No provider/environment activation, DDL/migration/resource/secret/production/push.
 
 Final 10C8 evidence: `/tmp/inop-hr10c8-target-final.log` **84/84** AI/parse/HTTP/retry/approval, `/tmp/inop-packagehr10c8-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c8-regression-final.log` serial full **1865/1865**, zero failures/skips/cancellations, frozen source. `git diff --check` PASS. Six package files only; local SHA recorded next tracker update. P10 stays partial; next independent increment is bounded optional OCR profile with real local scanned-PDF tests and explicit missing runtime/language status, then authenticated task diagnostics/review, ingestion/drafts/orphans and P11–13. No push/deploy.
+
+
+10C8 commit: `aa11a9d6155fdebdbff9b970ef86eba306578856`, six files, 84 combined targets / 1865 full, TypeScript/build PASS, lint 0/9, smoke 13 / authorization 632; working tree clean, no push.
+
+## 10C9 — real local bounded OCR preparation
+
+| ID | Package | New finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-113 | 10C9 | Real Russian scanned CV recognizes HACCP as Cyrillic НАССР, so exact-only structured extraction loses the professional acronym | TESTED | `/tmp/inop-hr10c9-target-second.log` and `target-third.log` fail the unchanged HACCP expectation; narrow OCR acronym/raw-evidence correction, 85 combined targets / 1885 full |
+| AUD-114 | 10C9 | Approval rejection cleanup test compares a shared upload directory globally and falsely counts another concurrent test's generated PDF as an orphan | TESTED | `/tmp/inop-hr10c9-target-final.log` fails on other test's `test-UUID.pdf`; exact process/request-owned write observation fixes isolation without weakening original/cleanup assertions, 85 combined targets / 1885 full |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-039 | Actual image-only AZ/EN/RU OCR with known/unknown facts and engine/model evidence | TESTED | `hrCvOcrProcessing` 20/20; 85 combined targets / 1885 full; actual Tesseract 5.5.0 and pinned official test models, not mock OCR |
+| P10-040 | Bounded pages/geometry/text/bytes/deadline/capacity and explicit runtime/language/unsupported states | TESTED | `hrCvOcrProcessing` 20/20; 85 combined targets / 1885 full; overlong CV fails without silent truncation |
+| P10-041 | No inherited secrets, private temporary files, own cleanup and explicit cleanup failure | TESTED | `hrCvOcrProcessing` 20/20; 85 combined targets / 1885 full; native process shim tests separate from actual OCR |
+| P10-042 | Durable OCR source/scope/version boundaries, private review-only provenance, null confidence/no auto decision | TESTED | `hrCvOcrProcessing` 20/20; 85 combined targets / 1885 full; real original reader/queue/five scopes plus negative and raced cases |
+
+First targets caught unknown email as the existing raw parser's empty string (new OCR DTO now omits empty/null fields), a fixture expecting wrong-kind approval before enabling the parsing profile, the real Cyrillic acronym loss, and concurrent test-directory interference. All are retained; no failed log is PASS and no assertion for required HACCP was removed. Final combined `/tmp/inop-hr10c9-target-final2.log`: **85/85** OCR/AI/parse/approval/document worker, zero failures/skips/cancellations. Build/full gates pending.
+
+`docs/HR_CV_OCR_PROCESSING.md` separates real local OCR from synthetic security tests, limits and hosted runtime prerequisites. Models are test artifacts outside Git, explicit preparation only; no runtime/hosting download, dependency/env/secret/start change or resource provisioning. Default parse HTTP/UI and rules-2 parser/scoring contracts are preserved. OCR/AI HTTP/review integration, source draft/attachment/migration/privacy/ingestion and P11–13 remain open; storage/recovery/real AI/SMTP/Graph/website provider access remains BLOCKED_EXTERNAL. Continue independent work after local commit, no confirmation wait and no push/deploy.
+
+Final 10C9 evidence: `/tmp/inop-hr10c9-target-final2.log` **85/85**, including **20/20** new OCR checks (real AZ/EN/RU scanned PDFs separated from synthetic security shims). `/tmp/inop-packagehr10c9-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c9-regression-final.log`: full serial **1885/1885**, zero failures/skips/cancellations on frozen source. `git diff --check` PASS. Eight package files only; exact local SHA recorded next update.
+
+User decision requested asynchronously for AUD-030/051 deletion lifecycle (archive/restore versus rejecting deletion with dependencies); dependent deletion behavior stays unchanged until an answer. Other independent P10 source retention/attachment, queue UI/ingestion and P11–13 continue without per-package confirmation. All production/env/resource/secret/push restrictions remain.
