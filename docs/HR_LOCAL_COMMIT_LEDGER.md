@@ -1492,3 +1492,16 @@ perf(hr): defer offscreen cards and preserve analytics grid
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
 
 Full source/test proof belongs to d5ffbe7; subsequent report-only commits do not change the532 frozen source inputs. Existing main push proof follows once verified. No development branch is recreated.
+
+###2b89bb67b8883b098a4cc6acfc261a1686deb30d
+
+docs(hr): record premium UI regression and production-build measurements
+
+4 changed paths:
+
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `M docs/HR_AUDIT_FINDING_DISPOSITION.md`
+- `M docs/HR_LOCAL_COMMIT_LEDGER.md`
+- `M docs/HR_PREMIUM_WORKSPACE_REPORT.md`
+
+Normal fast-forward existing-main push and exact remote parity verified. Post-push hosting remains proxy-blocked; final report-only confirmation is identified by its actual Git SHA after commit. All532 tested source inputs remain unchanged.
