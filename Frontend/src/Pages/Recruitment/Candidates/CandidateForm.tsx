@@ -288,7 +288,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
       {(error||documentError) && (
         <div className="alert alert--danger" role="alert">
           <AlertCircle size={18} />
-          <span data-hr-document-error={documentError||undefined}>{documentError?t(documentError):error}</span>
+          <span data-hr-document-error={documentError||undefined}>{documentError?t(documentError):error?t(error):null}</span>
         </div>
       )}
 

@@ -1,0 +1,9 @@
+# Final matrix corrections —13J
+
+The first complete frontend pass reported399/408. Four CV parsing/AI/OCR approval checks (and their parent tests) timed out because CandidateForm stored safe translation keys but one shared JSX error branch rendered those keys literally. The fix translates that branch at render time, retaining keys in state. Existing unconfirmed-review/409/manual draft/server provenance tests now pass; extra AZ/EN/RU assertions require no data refetch or premature PUT/confirmation.
+
+One prior pagination test expected raw server error text. That conflicts with the already tested13E privacy contract. Its assertion now requires the translated generic500 error and explicitly forbids the raw diagnostic; row count, retained backend Job and late permission-context checks remain unchanged. No error handling or test was disabled.
+
+Targeted45/45 across approval/AI/OCR/pagination/CRUD browser tests, TS/build PASS, lint0 errors/9 existing warnings, smoke13 and authorization632. The full frontend matrix must be rerun against the corrected source; the earlier399/408 is not PASS.
+
+The simultaneous complete backend pass reported1817/1819. Its one child failure (plus parent) compared the whole shared legacy uploads directory before/after a rejected control-character filename. A concurrent frontend valid PDF upload added a different UUID file between snapshots. That is cross-runner fixture interference, not proof that the rejected filename was persisted. No filename-validation assertion is weakened, and no existing file is deleted. Final backend and frontend full runners are serialized relative to one another; frontend browser suites still run concurrently2 to cover the PDF race. Final clean evidence must be recorded separately, rather than counting the failed run as a pass.
