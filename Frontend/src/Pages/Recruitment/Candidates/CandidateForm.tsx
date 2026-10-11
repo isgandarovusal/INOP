@@ -1,3 +1,5 @@
+import {enqueueCvIntake,getCvIntake,approveCvIntake,downloadCvIntake,reconcileCvIntake} from '../../../Services/cvIntakeService';
+import type {CvIntakeSource,CvIntakeApproval} from '../../../Services/cvIntakeService';
 import {isAxiosError} from 'axios';
 import {hrDocumentErrorKey} from '../../../Utils/hrDocumentError';
 import CvProcessingApprovalReview from '../../../Components/CvProcessingApprovalReview';
@@ -33,24 +35,31 @@ const ACCEPTED_CV_TYPES = [
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processingJobId?: string }> = ({ initial, job, processingJobId }) => {
+const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processingJobId?: string; source?:CvIntakeSource }> = ({ initial, job, processingJobId, source }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const mounted = useMounted();
+  const durable = !isEdit && import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED === 'true';
+  const draft = source?.approvedProfile ?? source?.result?.parsed;
+  const [intakeSource,setIntakeSource]=useState<CvIntakeSource|undefined>(source);
+  const [intakeAttempt,setIntakeAttempt]=useState<CvIntakeApproval|'reserved'|null>(source?.approvalState?'reserved':null);
+  const intakeCommand=useRef<{file:File;command:string}|null>(null);
+  const savingSource=useRef<AbortController|null>(null);
 
-  const [name, setName] = useState(initial?.name ?? "");
-  const [role, setRole] = useState(initial?.role ?? "");
-  const [email, setEmail] = useState(initial?.email ?? "");
-  const [phone, setPhone] = useState(initial?.phoneRaw || initial?.phone || "");
-  const [education, setEducation] = useState(initial?.education ?? "");
-  const [experience, setExperience] = useState<number | null>(initial?.experience ?? null);
-  const [employmentHistory, setEmploymentHistory] = useState<CvHistoryEntry[]>(initial?.employmentHistory ?? []);
-  const [educationHistory, setEducationHistory] = useState<CvHistoryEntry[]>(initial?.educationHistory ?? []);
-  const [certificationHistory, setCertificationHistory] = useState<CvHistoryEntry[]>(initial?.certificationHistory ?? []);
-  const [review, setReview] = useState<CvReview | undefined>(initial?.cvReview);
+
+  const [name, setName] = useState(initial?.name ?? draft?.name ?? "");
+  const [role, setRole] = useState(initial?.role ?? draft?.role ?? "");
+  const [email, setEmail] = useState(initial?.email ?? draft?.email ?? "");
+  const [phone, setPhone] = useState(initial?.phoneRaw || initial?.phone || draft?.phoneRaw || draft?.phone || "");
+  const [education, setEducation] = useState(initial?.education ?? draft?.education ?? "");
+  const [experience, setExperience] = useState<number | null>(initial?.experience ?? draft?.experience ?? null);
+  const [employmentHistory, setEmploymentHistory] = useState<CvHistoryEntry[]>(initial?.employmentHistory ?? draft?.employmentHistory ?? []);
+  const [educationHistory, setEducationHistory] = useState<CvHistoryEntry[]>(initial?.educationHistory ?? draft?.educationHistory ?? []);
+  const [certificationHistory, setCertificationHistory] = useState<CvHistoryEntry[]>(initial?.certificationHistory ?? draft?.certificationHistory ?? []);
+  const [review, setReview] = useState<CvReview | undefined>(initial?.cvReview ?? source?.result?.review);
   const [confirmReview, setConfirmReview] = useState(false);
   const [processingApproval,setProcessingApproval]=useState<CvProcessingApproval|undefined>();
   function applyProcessing(job:CvProcessingJob){
@@ -63,11 +72,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     setReview(job.result!.review);setConfirmReview(false);
     setProcessingApproval({jobId:job.id,contextHash:job.source.contextHash,expectedJobUpdatedAt:job.updatedAt});
   }
-  const [skills, setSkills] = useState<string[]>(initial?.skills ?? []);
-  const [languages, setLanguages] = useState<string[]>(initial?.languages ?? []);
-  const [certificates, setCertificates] = useState<string[]>(initial?.certificates ?? []);
+  const [skills, setSkills] = useState<string[]>(initial?.skills ?? draft?.skills ?? []);
+  const [languages, setLanguages] = useState<string[]>(initial?.languages ?? draft?.languages ?? []);
+  const [certificates, setCertificates] = useState<string[]>(initial?.certificates ?? draft?.certificates ?? []);
   const [cvFile, setCvFile] = useState<File | null>(null);
-  const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvOriginal?.originalName ?? initial?.cvUrl?.split("/").pop() ?? null);
+  const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvOriginal?.originalName ?? initial?.cvUrl?.split("/").pop() ?? source?.original.originalName ?? null);
   
   const parsing = useRef<{ sequence: number; controller?: AbortController }>({ sequence: 0 });
   const [sourceChanged, setSourceChanged] = useState(false), [sourceEpoch, setSourceEpoch] = useState(0);
@@ -78,7 +87,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   const [createRecovery,setCreateRecovery]=useState<{candidateId?:string}|null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => () => { parsing.current.sequence++; parsing.current.controller?.abort(); }, []);
+  useEffect(() => () => { parsing.current.sequence++; parsing.current.controller?.abort(); savingSource.current?.abort(); }, []);
 
   const validateCvFile = (file: File): boolean => {
     if (!ACCEPTED_CV_TYPES.includes(file.type)) {
@@ -95,10 +104,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   };
 
   const handleCvChange = async (file: File | null) => {
+    if(saving||intakeAttempt)return;
     // A rejected selection does not replace the current source or its approval.
     if (file && !validateCvFile(file)) return;
     if (!file && !cvFile) return;
-    setProcessingApproval(undefined);setConfirmReview(false);
+    setProcessingApproval(undefined);setConfirmReview(false);setIntakeSource(undefined);
     setDocumentError('');
     setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
@@ -117,13 +127,28 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     const controller = new AbortController(); parsing.current.controller = controller;
 
     try {
-      const parsed = await parseCandidateCv(file, controller.signal);
+      let parsed;
+      if(durable){
+        if(intakeCommand.current?.file!==file)intakeCommand.current={file,command:crypto.randomUUID()};
+        let current=await enqueueCvIntake(file,intakeCommand.current.command,controller.signal);
+        for(let attempt=0;attempt<30;attempt++){
+          if(sequence!==parsing.current.sequence||controller.signal.aborted)return;
+          setIntakeSource(current);
+          if(!['queued','running','retry'].includes(current.state))break;
+          await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'));};const timer=setTimeout(()=>{controller.signal.removeEventListener('abort',abort);resolve();},1000);controller.signal.addEventListener('abort',abort,{once:true});if(controller.signal.aborted)abort();});
+          current=await getCvIntake(current.id,controller.signal);
+        }
+        if(sequence!==parsing.current.sequence||controller.signal.aborted)return;
+        setIntakeSource(current);
+        if(current.state!=='ready'||!current.result){setDocumentError(current.code==='OCR_REQUIRED'?'cvReview.unsupported_ocr':'hrIntake.notReady');return;}
+        parsed={...current.result.parsed,extraction:current.result.review};
+      }else parsed=await parseCandidateCv(file,controller.signal);
       if (sequence !== parsing.current.sequence || controller.signal.aborted) return;
 
       if (parsed.name) setName(parsed.name);
       if (parsed.role) setRole(parsed.role);
       if (parsed.email) setEmail(parsed.email);
-      if (parsed.phoneRaw || parsed.phone) setPhone(parsed.phoneRaw || parsed.phone);
+      if (parsed.phoneRaw || parsed.phone) setPhone(parsed.phoneRaw || parsed.phone || "");
       if (parsed.education) setEducation(parsed.education);
       setExperience(parsed.experience == null ? null : Number(parsed.experience));
       setEmploymentHistory(parsed.employmentHistory ?? []); setEducationHistory(parsed.educationHistory ?? []); setCertificationHistory(parsed.certificationHistory ?? []);
@@ -148,10 +173,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (saving) return;
-    if(processingApproval&&!confirmReview){setError(t("hrApproval.confirmRequired"));return;}
+    if (saving||intakeAttempt) return;
+    if(durable&&(cvFile||intakeSource)&&(!intakeSource?.result||intakeSource.state!=="ready")){setDocumentError("hrIntake.notReady");return;}
+    if((processingApproval||durable&&intakeSource)&&!confirmReview){setError(t("hrApproval.confirmRequired"));return;}
     if (aiGenerating || saving || createRecovery) return;
-    if (job && !cvFile) { setError(t("hrStates.cvRequired")); return; }
+    if (job && !cvFile && !intakeSource) { setError(t("hrStates.cvRequired")); return; }
     if (!name.trim()) {
       setError(t("recruitment.candidateForm.nameRequired"));
       return;
@@ -181,6 +207,10 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         jobId: job?.id,
       };
 
+      if(durable&&intakeSource){
+        const input:CvIntakeApproval={confirmed:true,expectedHash:intakeSource.original.sha256,expectedUpdatedAt:intakeSource.updatedAt,profile:{name:payload.name,role:role.trim(),email:payload.email,phone,education,experience,skills,languages,certificates,employmentHistory,educationHistory,certificationHistory},...(job?{jobId:job.id}:{})};
+        await confirmIntake(input);return;
+      }
       if (isEdit && id) {
         // Edit zamanı mövcud ATS statusunu qoruyuruq.
         await updateCandidate(id, payload);
@@ -213,12 +243,20 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     }
   };
 
+  async function confirmIntake(input:CvIntakeApproval|'reserved'){
+    if(!intakeSource)return;
+    savingSource.current?.abort();const controller=new AbortController();savingSource.current=controller;setSaving(true);setDocumentError('');
+    try{const result=input==='reserved'?await reconcileCvIntake(intakeSource.id,controller.signal):await approveCvIntake(intakeSource.id,input,controller.signal);if(controller.signal.aborted||!mounted.current)return;navigate('/app/recruitment/candidates/'+result.candidateId);}
+    catch(failure){if(controller.signal.aborted||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404){setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');return;}if(status===400||status===422){setDocumentError('hrDocuments.invalid');return;}setIntakeAttempt(input);setDocumentError(status===409?'hrProcessing.error.changed':'hrIntake.uncertain');}
+    finally{if(mounted.current&&!controller.signal.aborted)setSaving(false);}
+  }
+  async function intakeDownload(){if(!intakeSource)return;const controller=new AbortController();savingSource.current?.abort();savingSource.current=controller;try{await downloadCvIntake(intakeSource,controller.signal);}catch(failure){if(controller.signal.aborted||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404)setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');else setDocumentError(hrDocumentErrorKey(failure));}}
 
   if (accessDenied) return <HRResourceState status={accessDenied} />;
   const eligibleAiReview = id && initial?.cvOriginal?.sha256 && ((initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based") || (initial.cvReview?.version === "ocr-rules-1" && initial.cvReview.provider === "tesseract-rules" && ["confirmed","corrected"].includes(initial.cvReview.reviewStatus??'') && initial.cvReview.processingApproval?.sourceHash===initial.cvOriginal.sha256)) && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
   return (
     <div className="candidate-form-page">
-      {job && <p>{job.position}</p>}
+      {job && !intakeAttempt && <p>{job.position}</p>}
       <PageHeader
         title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}
         subtitle={t("recruitment.candidateForm.subtitle")}
@@ -236,6 +274,9 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         </div>
       )}
 
+        {durable&&intakeSource&&<section data-cv-intake aria-busy={aiGenerating}><p>{t(intakeSource.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p><p role='status'>{t('hrIntake.state')}: {t('hrIntake.states.'+intakeSource.state)}</p><a href={'?'+new URLSearchParams({intakeId:intakeSource.id,...(job?{jobId:job.id}:{})}).toString()}>{t('hrIntake.resume')}</a>{intakeSource.state==='ready'&&<button type="button" disabled={saving} onClick={()=>void intakeDownload()}>{t('hrIntake.original')}</button>}</section>}
+        {durable&&cvFile&&!intakeSource&&!aiGenerating&&!intakeAttempt&&documentError&&<button data-retry-intake-upload type='button' disabled={saving} onClick={()=>void handleCvChange(cvFile)}>{t('hrIntake.retryUpload')}</button>}
+        {intakeAttempt&&<section role="alert" data-intake-recovery><p>{t('hrIntake.uncertain')}</p><button type="button" disabled={saving} onClick={()=>void confirmIntake(intakeAttempt)}>{t('hrIntake.retryApproval')}</button></section>}
         <form onSubmit={handleSubmit}>
           {initial&&processingJobId&&!sourceChanged&&!cvFile&&<CvProcessingApprovalReview candidate={initial} jobId={processingJobId} disabled={saving||aiGenerating} onApply={applyProcessing} onAccessDenied={setAccessDenied}/>}
           {/* CV Upload */}
@@ -279,7 +320,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
                   <button
                     type="button"
                     className="btn-secondary candidate-cv-upload__remove"
-                    disabled={saving}
+                    disabled={saving||Boolean(intakeAttempt)}
                     onClick={() => void handleCvChange(null)}
                     aria-label={t("recruitment.candidateForm.removeCv")}
                   >
@@ -326,7 +367,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
                     accept=".pdf,.docx"
                     className="hr-private-file-input"
                     aria-label={t("recruitment.candidateForm.chooseCv")}
-                    disabled={saving}
+                    disabled={saving||Boolean(intakeAttempt)}
                     onChange={(e) =>
                       handleCvChange(e.target.files?.[0] || null)
                     }
@@ -380,7 +421,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
                 }
                 setConfirmReview(false);
               }} /> : <p role="note">{t("hrCvAi.saveFirst")}</p>}
-            <fieldset className="candidate-fields" disabled={aiGenerating || saving}>
+            <fieldset className="candidate-fields" disabled={aiGenerating || saving || Boolean(intakeAttempt)}>
               <div className="form-group">
                 <label className="candidate-field-label">
                   {t("recruitment.candidateForm.fullName")} <span className="candidate-field-required">*</span>
@@ -464,7 +505,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               <CvHistoryEditor label={t("cvReview.employmentHistory")} entries={employmentHistory} onChange={setEmploymentHistory} />
               <CvHistoryEditor label={t("cvReview.educationHistory")} entries={educationHistory} onChange={setEducationHistory} />
               <CvHistoryEditor label={t("cvReview.certificates")} entries={certificationHistory} onChange={setCertificationHistory} />
-              {isEdit && review?.version && !cvFile && <label><input name="confirmReview" type="checkbox" checked={confirmReview} onChange={e => setConfirmReview(e.target.checked)} />{t("cvReview.confirm")}</label>}
+              {((isEdit && review?.version && !cvFile)||(durable&&intakeSource?.result)) && <label><input name="confirmReview" type="checkbox" checked={confirmReview} onChange={e => setConfirmReview(e.target.checked)} />{t("cvReview.confirm")}</label>}
             </fieldset>
           </section>
 
@@ -481,7 +522,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
             <button
               type="submit"
               className="btn-primary"
-              disabled={saving || aiGenerating || Boolean(createRecovery)}
+              disabled={saving || aiGenerating || Boolean(createRecovery) || Boolean(intakeAttempt) || (durable&&Boolean(cvFile||intakeSource)&&intakeSource?.state!=="ready")}
             >
               {saving ? <Loader2 size={16} className="spin" /> : null}
               {isEdit
@@ -500,13 +541,20 @@ const CandidateForm: React.FC = () => {
   const { id } = useParams(); const { user } = useAuth();
   const [search] = useSearchParams(); const jobId = id ? undefined : search.get("jobId") ?? undefined;
   const job = useAuditResource(jobId, "recruitment", getJobById, { refreshOnFocus: false });
+  const intakeId=!id&&import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'?search.get('intakeId')??undefined:undefined;
+  const intake=useAuditResource(intakeId,'candidate',getCvIntake,{refreshOnFocus:false});
   const result = useAuditResource(id, "candidate", getCandidateById, { refreshOnFocus: false });
   const processingJobId=id ? search.get("processingJobId") ?? undefined : undefined;
-  const key = JSON.stringify([id, jobId, processingJobId, result.data?.revision, result.data?.updatedAt, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  const key = JSON.stringify([id, jobId, intakeId, intake.data?.id, processingJobId, result.data?.revision, result.data?.updatedAt, user?.id, user?.role, user?.departmentId, user?.permissions]);
   if (!hasPermission(user, "candidate", id ? "update" : "create")) return <HRResourceState status="forbidden" />;
   if (jobId && !hasPermission(user, "application", "create")) return <HRResourceState status="forbidden" />;
   if (jobId && job.status !== "ready") return <HRResourceState status={job.status} retry={job.reload} />;
   if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
-  return <CandidateFormFields key={key} initial={result.data ?? undefined} job={job.data ?? undefined} processingJobId={processingJobId} />;
+  if(intakeId&&intake.status!=='ready')return <HRResourceState status={intake.status} retry={intake.reload}/>;
+  if(intakeId&&intake.data?.approvalState==='completed'&&intake.data.candidateId)return <IntakeCompleted id={intake.data.candidateId}/>;
+  if(intakeId&&intake.data?.state!=='ready')return <IntakePending source={intake.data!} reload={intake.reload}/>;
+  return <CandidateFormFields key={key} source={intake.data} initial={result.data ?? undefined} job={job.data ?? undefined} processingJobId={processingJobId} />;
 };
+function IntakeCompleted({id}:{id:string}){const {t}=useTranslation(),navigate=useNavigate();return <section data-intake-completed><p>{t('hrIntake.completed')}</p><button type='button' onClick={()=>navigate('/app/recruitment/candidates/'+id)}>{t('hrDocuments.reviewCreated')}</button></section>;}
+function IntakePending({source,reload}:{source:CvIntakeSource;reload:()=>void}){const {t}=useTranslation();return <section data-intake-resume><p>{t('hrIntake.states.'+source.state)}</p><p>{t('hrIntake.notReady')}</p><button type='button' onClick={reload}>{t('hrIntake.check')}</button></section>;}
 export default CandidateForm;

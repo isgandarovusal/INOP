@@ -1457,5 +1457,29 @@
       "languages": "Languages",
       "certificates": "Certificates"
     }
+  },
+  "hrIntake": {
+    "retryUpload": "Retry the same upload command",
+    "notice": "One private original is processed in the background. Review all facts and explicitly confirm before creating records.",
+    "test": "MOCK TEST storage/scanner — not verified for real CVs.",
+    "state": "Source state",
+    "states": {
+      "reserved": "Upload unconfirmed",
+      "queued": "Queued",
+      "running": "Processing",
+      "retry": "Waiting to retry",
+      "ready": "HR review required",
+      "blocked": "Processing blocked",
+      "quarantined": "Quarantined",
+      "failed": "Processing failed",
+      "cancelled": "Cancelled"
+    },
+    "notReady": "The private original is retained; this source is not ready for approval. Check its status or resolve processing first.",
+    "resume": "Resume this source without uploading again",
+    "original": "Download private original",
+    "uncertain": "Approval was not fully confirmed. The approved draft and original are retained. Retry only this same stored command; do not create again.",
+    "retryApproval": "Reconcile the previous approval",
+    "check": "Check processing status",
+    "completed": "This source has already created records. Open the existing Candidate; do not create again."
   }
 }

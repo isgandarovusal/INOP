@@ -1481,5 +1481,29 @@
       "languages": "Dillər",
       "certificates": "Sertifikatlar"
     }
+  },
+  "hrIntake": {
+    "retryUpload": "Eyni upload command-ını təkrar yoxla",
+    "notice": "Bir private original arxa planda emal olunur. Qeyd yaratmazdan əvvəl bütün faktları yoxlayın və açıq şəkildə təsdiqləyin.",
+    "test": "MOCK TEST storage/scanner — real CV-lər üçün təsdiqlənməyib.",
+    "state": "Mənbənin vəziyyəti",
+    "states": {
+      "reserved": "Upload təsdiqlənməyib",
+      "queued": "Növbədə",
+      "running": "Emal olunur",
+      "retry": "Təkrar emalı gözləyir",
+      "ready": "HR yoxlaması tələb olunur",
+      "blocked": "Emal bloklanıb",
+      "quarantined": "Karantində",
+      "failed": "Emal uğursuzdur",
+      "cancelled": "Ləğv edilib"
+    },
+    "notReady": "Private original saxlanılır; bu mənbə təsdiqə hazır deyil. Vəziyyətini yoxlayın və ya emal problemini həll edin.",
+    "resume": "Yenidən upload etmədən bu mənbədən davam et",
+    "original": "Private originalı yüklə",
+    "uncertain": "Təsdiq tam başa çatmayıb. Təsdiqlənmiş draft və original saxlanılıb. Yalnız əvvəlki command-ı bərpa edin; yenidən qeyd yaratmayın.",
+    "retryApproval": "Əvvəlki təsdiqi bərpa et",
+    "check": "Emal vəziyyətini yoxla",
+    "completed": "Bu mənbədən qeydlər artıq yaradılıb. Mövcud namizədə keçin; yenidən qeyd yaratmayın."
   }
 }
