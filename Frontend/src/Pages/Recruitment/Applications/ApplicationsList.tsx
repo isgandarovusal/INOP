@@ -159,7 +159,7 @@ const ApplicationsList: React.FC = () => {
     <div className="hr-workspace recruitment-list-page">
       <PageHeader
         title={t("recruitment.applications.title")}
-        subtitle={t("recruitment.applications.totalShown", { total: result.data?.total ?? 0, shown: rows.length })}
+        subtitle={result.status === "ready" && result.data ? t("recruitment.applications.totalShown", { total: result.data.total, shown: rows.length }) : undefined}
       />
 
       {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}

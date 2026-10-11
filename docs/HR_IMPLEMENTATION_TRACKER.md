@@ -1609,3 +1609,12 @@ Actual inspected Azerbaijani Chromium screenshots exposed Intl medium-date fallb
 | AUD-145 | Azerbaijani Intl medium-date fallback prints M10 month marker in real workspace screenshots | TESTED | Actual prior screenshot evidence; numeric local formatting and all-three-locale regression above; no fake timestamp or date-filter/API change. |
 
 17C final score-source proof:30/30 cold production cases,13/13 transition/recovery scenarios and10/10 alternating traces passed. Application DOM1038→948 relative to the intermediate rich UI; visible30rows/score contracts unchanged. Endpoint/JSON count remains one/bounded; cold metrics vary, no universal or hosted speedup claimed. Only this subsequent analytics timestamp expression/test changes; final source will be frozen afresh before full regression and release.
+
+###17E — unresolved totals are not zero
+
+| ID | Acceptance/finding | Status | Evidence |
+|---|---|---|---|
+| P17-011 | Jobs/Application table/board counts appear only after a successful scoped read; distinguish loading/failure from actual zero and preserve manual retry | TESTED | Three actual-route held-response baseline failures (plus failing parent) reproduce false zero. Final hrHeaderCounts4/4 covers loading, actual zero,500server-error and retry;105/105 combined daily/dense/14-page visual/loading targets. hr17e TSapp/node/buildPASS, lint0/9, smoke13, authorization632. |
+| AUD-146 | Jobs and Application header substitutes0 for unresolved API totals, including board and failed-read states | TESTED | Actual held primary response and canonical server-error reproduction; count caption requires ready+data. Genuine zero and existing scoped total/visible count remain unchanged;105targets/gates above. |
+
+The first diagnostic accidentally checked outer route Suspense rather than the mounted page and used generic error instead of canonical server-error; that failed diagnostic is retained. Corrected baseline waits for the actual page header, then reproduces all three false-zero states before patching. No failed diagnostic is counted as product PASS. Only two caption expressions plus the targeted test changed; no request/service/API/permission/timing policy changed. Final source-bound frontend regression and serialized production repeats follow; Backend inputs remain byte-identical to the1858/1858 run.

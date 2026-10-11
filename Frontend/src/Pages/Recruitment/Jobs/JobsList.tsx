@@ -91,10 +91,10 @@ const JobsList: React.FC = () => {
     <div className="hr-workspace recruitment-list-page">
       <PageHeader
         title={t("recruitment.jobs.title")}
-        subtitle={t("recruitment.jobs.totalShown", {
-          total: result.data?.total ?? 0,
+        subtitle={result.status === "ready" && result.data ? t("recruitment.jobs.totalShown", {
+          total: result.data.total,
           shown: filtered.length,
-        })}
+        }) : undefined}
         actions={
           canCreate && (
             <button className="btn-add recruitment-action--create" onClick={() => navigate("/app/recruitment/jobs/new")}>
