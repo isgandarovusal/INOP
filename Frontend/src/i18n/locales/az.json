@@ -1023,6 +1023,11 @@
     }
   },
   "hrWorkspace": {
+    "filters": "Əlavə filtrlər",
+    "activeFilters": "{{count}} aktiv",
+    "analyticsViews": "Analitika görünüşləri",
+    "overview": "Ümumi baxış",
+    "operations": "Əməliyyatlar",
     "recruitment": "İşə qəbul",
     "navigation": "HR naviqasiyası",
     "cohort": "Hesablama və görünən məlumatlar",

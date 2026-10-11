@@ -1,3 +1,4 @@
+import HRFilterPanel from './HRFilterPanel';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/useAuth';
@@ -12,8 +13,9 @@ export default function HRScopeFilters({ jobs, brand, branch, job, onBrand, onBr
   jobs: Job[]; brand: string; branch: string; job?: string; onBrand: (value: string) => void; onBranch: (value: string) => void; onJob?: (value: string) => void;
 }) {
   const { t } = useTranslation(), { user } = useAuth();
+  const [filterOpen, setFilterOpen] = useState(false);
   const [expanded, setExpanded] = useState(false), [brandSearch, setBrandSearch] = useState(''), [branchSearch, setBranchSearch] = useState(''), [jobSearch, setJobSearch] = useState('');
-  const enabled = expanded && hasPermission(user, 'recruitment', 'read');
+  const enabled = filterOpen && expanded && hasPermission(user, 'recruitment', 'read');
   const brands = useHRPage('recruitment', { q: useDebouncedSearch(brandSearch), sort: 'name' }, getBrandPage, { enabled });
   const branches = useHRPage('recruitment', { q: useDebouncedSearch(branchSearch), sort: 'name', brandId: brand === 'all' ? undefined : brand }, getBranchPage, { enabled });
   const jobOptions = useHRPage('recruitment', { q: useDebouncedSearch(jobSearch), brandId: brand === 'all' ? undefined : brand, branchId: branch === 'all' ? undefined : branch }, getJobPage, { enabled: enabled && !!onJob });
@@ -25,7 +27,7 @@ export default function HRScopeFilters({ jobs, brand, branch, job, onBrand, onBr
   if (branch !== 'all' && !branchOptions.has(branch)) branchOptions.set(branch, t('hrCatalog.unavailable'));
   const vacancies = new Map([...jobs, ...(jobOptions.data?.items || [])].map(j => [j.id, j.position]));
   if (job && job !== 'all' && !vacancies.has(job)) vacancies.set(job, t('hrCatalog.unavailable'));
-  return <>
+  return <HRFilterPanel activeCount={[brand, branch, ...(onJob ? [job] : [])].filter(value => value && value !== "all").length} onOpenChange={open => { setFilterOpen(open); if (!open) setExpanded(false); }}>
     <select aria-label={t('hrCatalog.brand')} value={brand} disabled={!hasPermission(user, 'recruitment', 'read')} onChange={e => onBrand(e.target.value)}>
       <option value="all">{t('hrCatalog.allBrands')}</option><option value="unset">{t('hrCatalog.unset')}</option>
       {brandIds.map(id => <option key={id} value={id}>{brands.data?.items.find(b => b.id === id)?.name || jobs.find(j => j.brandId === id)?.brandName || brandLabel(id)}</option>)}
@@ -36,7 +38,7 @@ export default function HRScopeFilters({ jobs, brand, branch, job, onBrand, onBr
     {onJob && <select aria-label={t('hrPage.jobFilter')} value={job} disabled={!hasPermission(user, 'recruitment', 'read')} onChange={e => onJob(e.target.value)}>
       <option value="all">{t('recruitment.applications.allJobs')}</option>{[...vacancies].map(([id, name]) => <option key={id} value={id}>{name}</option>)}
     </select>}
-    {hasPermission(user, 'recruitment', 'read') && <details onToggle={e => setExpanded(e.currentTarget.open)} className="hr-filter-lookups">
+    {hasPermission(user, 'recruitment', 'read') && <details open={expanded} onToggle={e => setExpanded(e.currentTarget.open)} className="hr-filter-lookups">
       <summary>{t('hrPage.lookup')}</summary>
       {expanded && <div>{[
         { key: 'brand', value: brandSearch, set: setBrandSearch, result: brands },
@@ -48,5 +50,5 @@ export default function HRScopeFilters({ jobs, brand, branch, job, onBrand, onBr
         <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== 'ready'} />
       </section>)}</div>}
     </details>}
-  </>;
+  </HRFilterPanel>;
 }

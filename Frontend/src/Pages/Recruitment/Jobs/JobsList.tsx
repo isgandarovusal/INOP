@@ -106,9 +106,8 @@ const JobsList: React.FC = () => {
       />
 
       {error && <p role="alert">{t(error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
-      <div className="filter-bar">
+      <div className="filter-bar hr-primary-controls">
         <select className="input-field" aria-label={t("hrJobArchive.visibility")} value={archived} onChange={e=>setArchived(e.target.value)}><option value="false">{t("hrJobArchive.active")}</option><option value="true">{t("hrArchive.archiveList")}</option></select>
-        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} />
         <SearchInput
           value={query}
           onChange={setQuery}
@@ -126,6 +125,8 @@ const JobsList: React.FC = () => {
           <option value="closed">{t("recruitment.jobs.closed")}</option>
           <option value="draft">{t("recruitment.jobs.draft")}</option>
         </select>
+
+        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} />
 
         {filtersActive && (
           <button

@@ -225,8 +225,7 @@ const CandidateDetail: React.FC = () => {
           <strong>
             {t("recruitment.candidateDetail.experience")}:
           </strong>{" "}
-          {candidate.experience ?? t("cvReview.unknown")}{" "}
-          {t("recruitment.candidateDetail.years")}
+          {candidate.experience == null ? t("cvReview.unknown") : `${candidate.experience} ${t("recruitment.candidateDetail.years")}`}
         </p>
 
         <p>

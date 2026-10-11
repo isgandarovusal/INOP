@@ -36,12 +36,12 @@ export default function ApplicationKanban({ applications, reload, canChangeStatu
   return <DragDropContext onDragEnd={result => { void dropped(result); }}><div className="hr-application-board" data-application-kanban role="region" aria-label={t('hrMatch.board')} tabIndex={0}>
     {stages.map(stage => <Droppable key={stage} droppableId={stage} isDropDisabled={stage === 'processing' || !canChangeStatus}>
       {provided => <section ref={provided.innerRef} {...provided.droppableProps} data-board-lane={stage} aria-busy={laneState[stage]?.loading || undefined} aria-label={t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)}>
-        <h3>{t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)} ({pages[stage]?.total ?? columns[stage].length})</h3>
+        <h3><span>{t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)}</span><span className="hr-lane-count">{pages[stage]?.total ?? columns[stage].length}</span></h3>
         {laneState[stage]?.error && <p role="alert">{t('hrBoard.changed')} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
         {!columns[stage].length && <p>{t('hrBoard.empty')}</p>}
         {columns[stage].map((a, index) => <Draggable key={a.id} draggableId={a.id} index={index} isDragDisabled={!canChangeStatus || !!pendingIds.length || !!laneState[stage]?.loading || !(manualOrder && stage !== 'processing') && !applicationTransitions[a.status].length}>
           {drag => <article ref={drag.innerRef} {...drag.draggableProps} style={drag.draggableProps.style} className="recruitment-kanban__card" data-application-card={a.id}>
-            <div {...drag.dragHandleProps} aria-label={`${t('hrWorkflow.move')} ${a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}`}>
+            <div className="hr-board-card-title" {...drag.dragHandleProps} aria-label={`${t('hrWorkflow.move')} ${a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}`}>
               {a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}
             </div>
             <p>{a.jobId && typeof a.jobId === 'object' ? `${a.jobId.position} · ${a.jobId.brandName || brandLabel(a.jobId.brandId)}` : t('hrStates.restricted')}</p>

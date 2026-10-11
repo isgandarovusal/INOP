@@ -10,7 +10,7 @@ test('Application board pages and manual drag are context-bound and persisted', 
   }
   const lane = stage => h.page.locator(`[data-board-lane="${stage}"]`), card = id => h.page.locator(`[data-application-card="${id}"]`);
   const open = () => h.open('admin', '/app/recruitment/applications?view=board');
-  const selectJob = async () => { await h.page.getByLabel('Vakansiya filtri', { exact: true }).selectOption(String(job._id)); await lane('applied').locator('[data-application-card]').first().waitFor(); };
+  const selectJob = async () => { if(!await h.page.locator('[data-hr-filters]').evaluate(el=>el.open))await h.page.locator('[data-hr-filters] > summary').click();await h.page.getByLabel('Vakansiya filtri', { exact: true }).selectOption(String(job._id)); await lane('applied').locator('[data-application-card]').first().waitFor(); };
   const moveDown = async (row, timeout = 10000) => {
     const handle = card(row._id).locator('[data-rfd-drag-handle-draggable-id]'); await handle.focus(); await handle.press('Space'); await handle.press('ArrowDown'); await h.page.waitForTimeout(100);
     const saved = h.page.waitForResponse(r => r.url().endsWith(`/applications/${row._id}/status`) && r.request().method()==='PATCH', { timeout }); await handle.press('Space'); return saved;

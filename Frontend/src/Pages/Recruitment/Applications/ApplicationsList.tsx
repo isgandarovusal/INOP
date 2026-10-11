@@ -49,8 +49,13 @@ const ApplicationsList: React.FC = () => {
   const canDelete = hasPermission(user, "application", "delete");
   const canManage = canDelete;
 
-  const [params] = useSearchParams();
-  const [view, setView] = useState<"table" | "board">(params.get('view') === 'board' ? 'board' : 'table');
+  const [params, setParams] = useSearchParams();
+  const view = params.get('view') === 'board' ? 'board' : 'table';
+  const setView = (value: 'table' | 'board') => setParams(previous => {
+    const next = new URLSearchParams(previous);
+    if (value === 'board') next.set('view', 'board'); else next.delete('view');
+    return next;
+  });
   const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus>; cards?: Application[] }>({ key: '', statuses: {} });
   const [mutation, setMutation] = useState<{ key: string; error: string }>({ key: '', error: '' });
   const [search, setSearch] = useState('');
@@ -158,11 +163,10 @@ const ApplicationsList: React.FC = () => {
       />
 
       {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
-      <div className="filter-bar">
+      <div className="filter-bar hr-primary-controls">
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
         <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrWorkflow.sortNewest' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
         <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
-        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} job={jobFilter} onJob={setJobFilter} />
         <select
           aria-label={t('hrPage.statusFilter')}
           className="input-field"
@@ -180,6 +184,8 @@ const ApplicationsList: React.FC = () => {
           <option value="hired">{t("recruitment.applications.hired")}</option>
           <option value="rejected">{t("recruitment.applications.rejected")}</option>
         </select>
+
+        <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} job={jobFilter} onJob={setJobFilter} />
 
         {filtersActive && (
           <button
@@ -234,17 +240,11 @@ const ApplicationsList: React.FC = () => {
             ) : (
               rows.map(({ app, job, candidate }) => (
                 <tr key={app.id} className={deletingId === app.id ? "row--removing" : ""}>
-                  <td
-                    className="cell-title cell-title--clickable"
-                    onClick={() => candidate && navigate(`/app/recruitment/candidates/${candidate.id}`)}
-                  >
-                    {candidate?.name ?? t("hrStates.restricted")}
+                  <td className="cell-title">
+                    {candidate ? <button type="button" className="hr-row-title" onClick={() => navigate(`/app/recruitment/candidates/${candidate.id}`)}>{candidate.name}</button> : t("hrStates.restricted")}
                   </td>
-                  <td
-                    className="cell-title cell-title--clickable"
-                    onClick={() => job && navigate(`/app/recruitment/jobs/${job.id}`)}
-                  >
-                    {job?.position ?? t("hrStates.restricted")}
+                  <td className="cell-title">
+                    {job ? <button type="button" className="hr-row-title" onClick={() => navigate(`/app/recruitment/jobs/${job.id}`)}>{job.position}</button> : t("hrStates.restricted")}
                     {job?.brandId && <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId)}{job.branchName ? ` · ${job.branchName}` : ""}</small>}
                   </td>
                   <td><MatchScoreBadge application={app} onUpdated={load} /><button type="button" onClick={() => navigate(`/app/recruitment/applications/${app.id}`)}>{t("hrWorkflow.details")}</button></td>

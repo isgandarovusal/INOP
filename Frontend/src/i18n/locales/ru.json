@@ -960,6 +960,11 @@
     }
   },
   "hrWorkspace": {
+    "filters": "Больше фильтров",
+    "activeFilters": "Активных: {{count}}",
+    "analyticsViews": "Виды аналитики",
+    "overview": "Обзор",
+    "operations": "Операции",
     "recruitment": "Подбор персонала",
     "navigation": "Навигация HR",
     "cohort": "Расчёт и доступные данные",

@@ -26,7 +26,7 @@ test('Brand and workplace selectors persist create/edit and filter scoped vacanc
   await t.test('legacy jobs stay unspecified; brand filter shows only matching records', async () => {
     await Job.create({ title: 'Legacy office', department: 'Office', description: 'Legacy', createdBy: h.actors.admin._id });
     await h.open('admin', '/app/recruitment/jobs'); await h.page.getByText('Updated cashier', { exact: true }).waitFor();
-    await h.page.getByRole('combobox', { name: 'Brend', exact: true }).selectOption('pizza-hut');
+    await h.page.locator('[data-hr-filters] > summary').click();await h.page.getByRole('combobox', { name: 'Brend', exact: true }).selectOption('pizza-hut');
     assert.equal(await h.page.getByText('Legacy office', { exact: true }).count(), 0);
     await h.page.getByRole('combobox', { name: 'Brend', exact: true }).selectOption('unset'); await h.page.getByText('Legacy office', { exact: true }).waitFor();
     assert.equal(await h.page.getByText('Updated cashier', { exact: true }).count(), 0);

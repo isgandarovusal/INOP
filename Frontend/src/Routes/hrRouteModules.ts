@@ -10,11 +10,12 @@ const pages = {
 type Manifest = Record<string, { file: string }>;
 let manifest: Promise<Manifest> | undefined;
 const pending = new Map<string, Promise<void>>();
-async function publicFetch(url: string) {
+const completed = new Set<string>();
+async function publicFetch(url: string, cache: RequestCache = 'force-cache') {
   const controller = new AbortController();
   const deadline = setTimeout(() => controller.abort(), 5000);
   try {
-    const response = await fetch(url, { credentials: 'omit', cache: 'force-cache', signal: controller.signal });
+    const response = await fetch(url, { credentials: 'omit', cache, signal: controller.signal });
     if (!response.ok) throw new Error('Public route code unavailable');
     return await response.text();
   } finally { clearTimeout(deadline); }
@@ -26,19 +27,20 @@ export function preloadHRRoute(path: string, user: PublicUser | null) {
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
   if (connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType || '')) return;
   const name = path.split('?')[0].replace('/app/recruitment/', '');
-  if (!(name in pages)) return;
+  if (!Object.hasOwn(pages, name)) return;
   const target = pages[name as keyof typeof pages];
-  if (!hasPermission(user, target.resource, 'read') || pending.has(name)) return;
+  if (!hasPermission(user, target.resource, 'read') || pending.has(name) || completed.has(name)) return;
   const task = (async () => {
     const source = `src/Pages/Recruitment/${target.file}.tsx`;
     let url = '/' + source;
     if (import.meta.env.PROD) {
-      manifest ??= publicFetch(import.meta.env.BASE_URL + 'hr-route-manifest.json').then(text => JSON.parse(text) as Manifest).catch(error => { manifest = undefined; throw error; });
+      manifest ??= publicFetch(import.meta.env.BASE_URL + 'hr-route-manifest.json', 'no-cache').then(text => JSON.parse(text) as Manifest).catch(error => { manifest = undefined; throw error; });
       const file = (await manifest)[source]?.file;
-      if (!file || !/^assets\/[a-zA-Z0-9_.-]+\.js$/.test(file)) return;
+      if (typeof file !== 'string' || !/^assets\/[a-zA-Z0-9_.-]+\.js$/.test(file)) return;
       url = import.meta.env.BASE_URL + file;
     }
     await publicFetch(url);
+    completed.add(name);
   })().catch(() => { /* Navigation performs its own authoritative code/data load. */ })
     .finally(() => pending.delete(name));
   pending.set(name, task);

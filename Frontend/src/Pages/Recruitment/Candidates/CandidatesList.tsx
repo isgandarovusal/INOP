@@ -192,7 +192,7 @@ const CandidatesList: React.FC = () => {
       />
 
       <div
-        className="table-toolbar"
+        className="table-toolbar hr-primary-controls"
         style={{
           marginBottom: "20px",
           display: "flex",
@@ -267,7 +267,7 @@ const CandidatesList: React.FC = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: "64px 24px",
+            padding: "32px 24px",
             textAlign: "center",
             color: "var(--text-secondary)",
           }}

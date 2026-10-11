@@ -999,6 +999,11 @@
     }
   },
   "hrWorkspace": {
+    "filters": "More filters",
+    "activeFilters": "{{count}} active",
+    "analyticsViews": "Analytics views",
+    "overview": "Overview",
+    "operations": "Operations",
     "recruitment": "Recruitment",
     "navigation": "HR navigation",
     "cohort": "Calculation and data visibility",

@@ -17,7 +17,7 @@ export default function HRNavigation() {
   return <div className="hr-product-bar" data-hr-product-bar>
     <span className="hr-product-bar__identity"><span aria-hidden="true">GFC</span><span>{t('hrWorkspace.recruitment')}</span></span>
     <nav aria-label={t('hrWorkspace.navigation')} className="hr-product-nav">{visible.map(({ path, label, Icon }) =>
-      <NavLink key={path} to={'/app/recruitment/' + path} onPointerEnter={event => { if (event.pointerType !== 'touch') preloadHRRoute('/app/recruitment/' + path, user); }} onFocus={() => preloadHRRoute('/app/recruitment/' + path, user)}><Icon size={16} aria-hidden="true" /><span>{t(label)}</span></NavLink>
+      <NavLink key={path} to={'/app/recruitment/' + path} onPointerEnter={event => { if (event.pointerType !== 'touch') preloadHRRoute('/app/recruitment/' + path, user); }} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) preloadHRRoute('/app/recruitment/' + path, user); }}><Icon size={16} aria-hidden="true" /><span>{t(label)}</span></NavLink>
     )}</nav>
   </div>;
 }

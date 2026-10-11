@@ -5,7 +5,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   const path = '/app/recruitment/analytics', kpi = key => h.page.locator(`[data-hr-kpi="${key}"] strong`);
   await t.test('empty state and unknown duration are distinct from genuine zero', async () => {
     await h.open('admin', path); await h.page.locator('[data-hr-analytics-empty]').waitFor(); assert.equal(await kpi('applications').textContent(), '0');
-    assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('Məlumat yoxdur')); assert.ok(!((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')));
+    await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click(); assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('Məlumat yoxdur')); assert.ok(!((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')));
   });
   const candidate = (await h.request('admin', 'POST', '/candidates', { name: 'Analytics_PRIVATE_PROFILE', email: 'analytics@private.invalid', role: 'Cashier', skills: ['Kassa'] })).data;
   const jobs = [];
@@ -19,7 +19,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   await t.test('GFC cohort shows three brands, real funnel/scores and does not render Candidate PII', async () => {
     h.wire.length = 0; await h.open('admin', path); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
     assert.equal(await h.page.locator('[data-hr-stage=Hired] td').textContent(), '1'); assert.equal(await h.page.locator('[data-hr-score-bucket="80"]').textContent(), '80–100%: 3');
-    assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')); assert.equal(h.wire.filter(r => r.path === '/api/hr/analytics').length, 1);
+    const tabReads=h.wire.length;await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();assert.equal(h.wire.length,tabReads);assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')); assert.equal(h.wire.filter(r => r.path === '/api/hr/analytics').length, 1);
     assert.equal(h.wire.filter(r => ['/api/candidates', '/api/jobs', '/api/applications'].includes(r.path)).length, 0);
     const body = await h.page.locator('body').textContent(); assert.ok(!body.includes('Analytics_PRIVATE_PROFILE')); assert.ok(!body.includes('analytics@private.invalid'));
     assert.ok(body.includes('İnteqrasiya edilməyib')); assert.ok(body.includes('davamlı storage təsdiqlənməyib'));
@@ -30,7 +30,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
       assert.equal(await h.page.getByRole('button', { name: brand, exact: true }).getAttribute('aria-pressed'), 'true');
     }
     await h.page.getByRole('button', { name: 'KFC', exact: true }).click(); await kpi('applications').waitFor();
-    await h.page.getByLabel('Filial / iş yeri', { exact: true }).selectOption(String(jobs[0].branchId)); await kpi('applications').waitFor();
+    await h.page.locator('[data-hr-filters] > summary').click();await h.page.getByLabel('Filial / iş yeri', { exact: true }).selectOption(String(jobs[0].branchId)); await kpi('applications').waitFor();
     await h.page.getByLabel('Vakansiya', { exact: true }).selectOption(jobs[0]._id); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '1');
   });
   await t.test('date/source/status filters update metrics and invalid range remains editable', async () => {

@@ -68,7 +68,7 @@ test('HR pages use bounded scoped server pages and cancellable filters', async t
     await Brand.create({_id:'future-brand',name:'Future brand'});
     await h.page.setViewportSize({width:1200,height:900});await h.open('admin','/app/recruitment/applications');await h.page.getByText('Applicant 34',{exact:true}).waitFor();
     assert.equal(await h.page.getByLabel('Vakansiya filtri',{exact:true}).locator('option[value="'+jobs[0]._id+'"]').count(),0);
-    h.wire.length=0;await h.page.locator('summary').filter({hasText:'Bütün icazəli filtr seçimlərində axtar'}).click();
+    await h.page.locator('[data-hr-filters] > summary').click();h.wire.length=0;await h.page.locator('summary').filter({hasText:'Bütün icazəli filtr seçimlərində axtar'}).click();
     await h.page.getByRole('textbox',{name:'Vakansiya axtar',exact:true}).fill('Vacancy 00');await h.page.getByLabel('Vakansiya filtri',{exact:true}).locator('option[value="'+jobs[0]._id+'"]').waitFor({state:'attached'});
     const found = h.page.waitForResponse(r=>r.url().includes('/hr/v2/branches?')&&new URL(r.url()).searchParams.get('q')==='Off-page');await h.page.getByRole('textbox',{name:'Filial axtar',exact:true}).fill('Off-page');const result=await found;assert.equal(result.status(),200);assert.equal((await result.json()).items[0]._id,String(branch._id));await h.page.getByRole('combobox',{name:'Filial / iş yeri',exact:true}).locator('option[value="'+branch._id+'"]').waitFor({state:'attached'});
     await h.page.getByRole('textbox',{name:'Brend axtar',exact:true}).fill('Future');await h.page.getByLabel('Brend',{exact:true}).locator('option[value="future-brand"]').waitFor({state:'attached'});

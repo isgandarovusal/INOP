@@ -344,7 +344,7 @@ const Sidebar: React.FC = () => {
 
             <nav className="admin-sidebar__nav">
               {group.items.map(({ to, labelKey, icon: Icon, end }) => (
-                <NavLink key={to} to={to} end={end} onPointerEnter={event => { if (event.pointerType !== "touch") preloadHRRoute(to, user); }} onFocus={() => preloadHRRoute(to, user)}>
+                <NavLink key={to} to={to} end={end} onPointerEnter={event => { if (event.pointerType !== "touch") preloadHRRoute(to, user); }} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) preloadHRRoute(to, user); }}>
                   <Icon size={17} className="admin-sidebar__icon" />
                   {t(labelKey)}
                 </NavLink>
