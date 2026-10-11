@@ -8,6 +8,7 @@ const messages: Record<Exclude<AuditLoadStatus, "ready">, string> = {
   forbidden: "You do not have permission to view this audit data.",
   "server-error": "The server could not load this audit data. Please retry.",
   error: "Audit data could not be loaded. Please retry.",
+  timeout: "The request timed out. Please retry.",
 };
 
 export default function AuditResourceState({ status, retry }: { status: AuditLoadStatus; retry?: () => void }) {

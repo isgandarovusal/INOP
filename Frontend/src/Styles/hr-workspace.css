@@ -179,3 +179,13 @@
 .hr-workspace [data-candidate-matches] > article > p { margin: 0 0 8px; font-weight: 550; }
 .hr-workspace a { color: #253b61; text-underline-offset: 3px; }
 .hr-workspace button:disabled { opacity: 1; color: #667384; background: #f4f6f9; border-color: #e2e6eb; }
+
+/* Compact request feedback, shared by primary and auxiliary HR resources. */
+.hr-workspace.hr-resource-state { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 14px 18px; margin: 12px 0; background: #f8fafc; }
+.hr-resource-state > svg { flex: 0 0 auto; color: #627185; }
+.hr-resource-state__copy { flex: 1; min-width: 0; }
+.hr-resource-state__copy p { margin: 0; font-size: 13px; font-weight: 500; }
+.hr-resource-state__copy small { display: block; margin-top: 4px; color: #667384; line-height: 1.5; }
+.hr-resource-state > button { flex: 0 0 auto; }
+@media (prefers-reduced-motion: reduce) { .hr-resource-state .spin { animation: none; } }
+@media (max-width: 420px) { .hr-workspace.hr-resource-state { flex-wrap: wrap; } .hr-resource-state > button { margin-left: 30px; } }

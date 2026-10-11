@@ -1023,6 +1023,7 @@
     }
   },
   "hrStates": {
+    "timeout": "Sorğunun vaxtı bitdi. Yenidən cəhd edin.",    "slow": "Sorğu gözləniləndən uzun çəkir. Yenidən cəhd edə bilərsiniz.",
     "cvRequired": "Bu vakansiya axını üçün CV seçin.",
     "cvForJob": "Vakansiya üçün CV-dən namizəd yarat",
     "loading": "HR məlumatları yüklənir…",

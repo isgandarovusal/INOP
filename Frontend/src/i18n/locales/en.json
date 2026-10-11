@@ -999,6 +999,7 @@
     }
   },
   "hrStates": {
+    "timeout": "The request timed out. Please retry.",    "slow": "This is taking longer than expected. You can retry.",
     "cvRequired": "Choose a CV for this vacancy workflow.",
     "cvForJob": "Create candidate from CV for this vacancy",
     "loading": "Loading HR data…",

@@ -38,7 +38,7 @@ const JobDetail: React.FC = () => {
   const job = result.data;
   const [candidateSearch, setCandidateSearch] = useState('');
   const search = useDebouncedSearch(candidateSearch);
-  const apps = useHRRankingPage(job?.id, !!job && canReadApps);
+  const apps = useHRRankingPage(id, !!id && canReadApps);
   const people = useHRPage('candidate', { excludeJobId: job?.id, q: search }, getCandidatePage, { enabled: !!job && canLink && !job.archivedAt && job.status === 'open' });
   const applications = useMemo(() => apps.data?.items ?? [], [apps.data]);
   const candidates = useMemo(() => people.data?.items ?? [], [people.data]);
