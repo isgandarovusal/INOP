@@ -358,7 +358,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-009 | OCR jobs | TESTED | 10C9–10C11 real local scanned PDF/task/HTTP/UI/explicit approval and bounded repair retry; 1915 full. Default off, hosted Native prerequisites EXT-OCR-001 BLOCKED_EXTERNAL |
 | P10-010 | AI jobs | TESTED | 10C8/10C12 source-bound durable task, opt-in HTTP/worker/UI/review and repair retry; 169 targets / 1931 full; actual adapter with synthetic transport only, real provider P09-023 BLOCKED_EXTERNAL |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
-| P10-012 | Ingestion jobs | OPEN | — |
+| P10-012 | Ingestion jobs | IN_PROGRESS | 10D2 disabled immutable source queue/actual parser/scan and current scope tested locally (24 checks); optional HTTP/UI/source attachment and real provider gates remain unfinished |
 | P10-013 | Idempotency | IN_PROGRESS | Email and source-bound parse/OCR/AI UUID replay, current actor/source CAS, exact kind/version and bounded retry are locally tested through 10C12; source drafts/ingestion idempotency and real provider evidence remain unfinished. |
 | P10-014 | Job state | IN_PROGRESS | Email plus persisted parse/OCR/AI state, lease/restart, authority/source cancellation and current review UI tested through 10C12. Source drafts/ingestion and hosted operational state remain unfinished. |
 | P10-015 | Retry/failure monitoring | IN_PROGRESS | Email, parse/OCR/AI repair retry and sanitized diagnostics are locally tested through 10C12; three lifetime attempts remain bounded. Ingestion monitoring and actual hosted/provider operational evidence remain unfinished. |
@@ -1087,3 +1087,18 @@ Final 10D1 gates: full frozen-source `/workspace/inop-hr10d1-regression.log` **1
 | ID | Package | Finding | Status | Evidence |
 |---|---|---|---|---|
 | AUD-119 | 10D1 | Create can continue with revoked request-time grants after asynchronous upload/parsing, including child Application writes | TESTED | Actual owned upload/Role-race baseline creates instead of 403; `hrCvCreateRecovery` now refuses before write or child, retains original, and redacts recovery IDs; full 1961/1961 |
+
+10D1 commit: `d4ade8350317fda2ef2e5603f098a72d86d02e44`, 13 files; 1961 full, 127 backend / 37 UI targets; TypeScript/build PASS, lint 0/9, smoke 13/13, authorization 632/632; clean tree, no push.
+
+## 10D2 — disabled immutable source-command / bounded ingestion foundation
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-057 | Server-owned immutable original/source command, independent scopes, explicit DDL and uncertain-ack replay | TESTED | `hrCvIntake`: actual owned Mongo/JWT + synthetic store/scan, 24 local checks; combined final targets 87/87 |
+| P10-058 | Clean-scan gate then bounded actual rules parsing, private pending HR review and no Candidate/Application auto-write | TESTED | Five scopes, infected/unknown scan, no raw text/keys, zero/unknown and current-role races; 87/87 combined targets |
+| P10-059 | Immutable byte/metadata snapshot, quotas/timeout/ignored cancellation, bounded retries and stale/exhausted lease recovery | TESTED | `hrCvIntake` late worker and producer mutation, two occupied slots, 3 attempts and capacity without source deletion; 87/87 combined targets |
+| P10-060 | Current private original scan/scope/hash guards and withheld obsolete task facts with original compatibility | TESTED | Actual private reader, foreign/unclean/revoked/old-version negatives; 87/87 combined targets |
+
+`HR_CV_INTAKE_FOUNDATION.md` records model/index/compatibility and external gates. Initial target 15/15, expanded snapshot baseline initially had a patch-harness indentation assertion before adding cases (not product proof); corrected baseline reproduces metadata/provider-buffer mutation. Corrected final `/workspace/inop-hr10d2-target-final4.log` **87/87**, zero failures/skips/cancellations, includes 24 intake checks plus inherited source recovery, processing and private storage boundaries. `/workspace/inop-hr-gates/inop-packagehr10d2-validation.json`: TypeScript/build PASS, lint 0/9, smoke 13/13, authorization 632/632. Frontend and mounted backend code are unchanged by 10D2; last full 1961 belongs to 10D1, not falsely claimed as a 1985 full run. New core is deliberately unwired/default-disabled; no redundant full browser cycle is necessary for the three isolated new backend files. `git diff --check` PASS; five package paths only.
+
+P10-003/006/012/013/014/015 remain IN_PROGRESS in wider source/HTTP/UI/attachment/reconciliation/real-provider scope. Actual ingestion API/one-upload UI/source attachment is next; AUD-067/073 are retained. Real storage/scan/recovery/retention activation is not certified by synthetic dependencies; no production DDL/DB/env/secret/hosting/resource/push/deploy. Continue independently after local commit without per-package approval.
