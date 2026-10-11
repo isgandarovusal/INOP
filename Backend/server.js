@@ -52,10 +52,10 @@ app.use(globalErrorHandler);
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || process.env.CS;
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
   .then(() => {
     console.log('db connected');
-    if (process.env.HR_NOTIFICATION_WORKER_ENABLED !== 'false') {
+    if (process.env.HR_NOTIFICATION_WORKER_ENABLED === 'true') {
       require('./services/applicationNotificationWorker.service').createNotificationWorker().start();
     }
     if (process.env.HR_CV_PROCESSING_ENABLED === 'true') {

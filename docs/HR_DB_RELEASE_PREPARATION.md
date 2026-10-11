@@ -49,11 +49,7 @@ checks. Production index compatibility/persistence is not asserted by these test
    exact frontend/backend URL and storage/scanner/OCR/AI/outbox health checks.
    Public relay/Graph/manual Source flags are independent and default disabled.
 
-Existing legacy schemas, including Application, retain their previous Mongoose
-auto-index defaults; new Source/task/manifest/Graph/external schemas explicitly
-disable autoCreate/autoIndex. Thus this helper does not mean **all** application
-startup DDL is disabled. Verify hosting index privileges/startup logs and schedule
-legacy unique Application constraints; no new automatic startup migration is added.
+Since15C, Native server connection explicitly disables autoCreate/autoIndex for startup, including legacy schemas. Source/task/manifest/Graph/external schemas keep their explicit fail-closed settings. Startup does not prepare hosted indexes, seed or backfill data. Owned Native child health/401 plus marker-only collection inventory verifies this locally. Existing indexes are preserved; unique constraints and snapshot indexes still require separately approved hosted inventory/DDL before real activation. The notification worker now requires explicit HR_NOTIFICATION_WORKER_ENABLED=true; default startup does not initiate unverified SMTP delivery. No hosting env or secret is changed by this code.
 
 ## Legacy HR account repair is separate
 
