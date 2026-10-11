@@ -1555,3 +1555,26 @@ Normal push8134e354864d7ead2972d85ae83c9bd76a6f40bf→2b89bb67b8883b098a4cc6acfc
 All393 acceptance IDs:373TESTED/19BLOCKED_EXTERNAL/1OPEN(P13-020 lawful retention).140 findings:132TESTED/7BLOCKED_EXTERNAL/1OPEN(AUD-051). Original520 IDs retained. Full509frontend/1858backend and all532 frozen source inputs remain unchanged. Core UI/local functionality GO; realCV/storage/scanner/recovery/external provider operational activation NO-GO. This report-only confirmation will also be normal-pushed to existing main; its final future SHA is reported by Git after commit/push, not invented here.
 
 **Exact continuation:** obtain actual served-SHA/health/deploy evidence from the existing Render/Vercel panels; compare the current main frontend/API pair and perform authorized HR/Admin live navigation/private-download smoke. Do not activate unverified ingestion/provider flags or live migration. Remaining legal/external IDs stay open/blocked, not silently markedPASS.
+
+##17 — Premium refinement and measured navigation
+
+User confirms hosted loading completes after a few seconds: do not diagnose a hang. Existing main/work76503c3 is clean; no new branch, provider activation or permission-policy changes. Prior findings/IDs/evidence are retained. Hosting transport is checked afresh; inaccessible hosted timings are not invented.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P17-001 | Separate reachable live evidence from controlled API/chunk/render/navigation measurements | OPEN | Supplied live frontend currently proxy CONNECT403/HTTP000; baseline actual production transition/profile measurement pending. |
+| P17-002 | Intent-load only public authorized route code; coalesce duplicate HR visibility/focus refreshes without PII cache | OPEN | Measure before/after and current-permission/failed-import/connection/cancellation behavior; no speculative data GET or new scope. |
+| P17-003 | Compact primary search/status controls and deliberate secondary filter access with visible active state | OPEN | Brand/branch/Job/archive/date/source filtering, clear and keyboard/mobile scenarios pending. |
+| P17-004 | Concise analytics overview and genuine operational detail, no fake statistics/trends | OPEN | Real scoped KPI/funnel/source/score response, zero/missing/error and no-refetch tabs pending. |
+| P17-005 | Coherent tables, profiles, forms and board; keyboard links, long text and URL view state | OPEN | All HR screens remain current-permission guarded; dense/zero/long/mobile/desktop tests pending. |
+| P17-006 | Preserve CRUD/workflow/archive/history/private-file lifecycle and Admin/HR restrictions | OPEN | Target/full regression, canonical dep_hr vs Audit department negative cases pending. |
+| P17-007 | Measure final production network/API/render/navigation; typecheck/build/lint/smoke/security gates | OPEN | No claim that smaller spinner fixes hosted latency; source-bound repeated measurements/full tests pending. |
+| P17-008 | Normal existing-main push, remote parity and honest deployment evidence | OPEN | Existing remote76503c3 confirmed; recheck before push, no force/new branch. Hosted success remains unverified. |
+
+###17A navigation safety evidence
+
+Actual focus/visibility baseline:2 GETs; immediate HR-only250ms coalescing:1 GET, later focus still revalidates.26/26 target tests preserve Audit focus behavior, StrictMode, current permission/token, timeout/retry and stale cancellation. A speculative dynamic-import prototype FAILED its network-failure regression and was discarded before commit. Final HTTP-only public code prefetch passed failed-fetch→real-navigation, Save-Data/2g, current Audit-department exclusion, no speculative dataGET, keyboard intent and genuine Application navigation. Successful public bytes may use HTTP cache; private settled responses remain uncached. Vite emits public hr-route-manifest.json; no runtime env/API/backend contract change. hr17asafe TSapp/node/buildPASS, lint0errors/9existingwarnings, smoke13/13, auth632/632. Production navigation comparison remains pending; no hosted speedup claim.
+
+| AUD-141 | Sequential HR focus/visibility events produce two identical fresh resource reads | TESTED | Real browser baseline2→final1, later refresh and current-department revocation preserved;26/26 lifecycle targets plus complete gates. |
+
+Failed exploratory harness/selector logs are retained outside repo. They are not latency evidence. The measured transition fixture will use real HTTP cache (Playwright request interception disables cache) and identical controlled120ms public-chunk transit for both commits.

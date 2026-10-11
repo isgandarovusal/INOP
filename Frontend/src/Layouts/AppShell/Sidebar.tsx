@@ -1,3 +1,4 @@
+import { preloadHRRoute } from '../../Routes/hrRouteModules';
 import React, { useEffect, useState } from "react";
 import azFlag from "../../assets/flags/az.svg";
 import gbFlag from "../../assets/flags/gb.svg";
@@ -343,7 +344,7 @@ const Sidebar: React.FC = () => {
 
             <nav className="admin-sidebar__nav">
               {group.items.map(({ to, labelKey, icon: Icon, end }) => (
-                <NavLink key={to} to={to} end={end}>
+                <NavLink key={to} to={to} end={end} onPointerEnter={event => { if (event.pointerType !== "touch") preloadHRRoute(to, user); }} onFocus={() => preloadHRRoute(to, user)}>
                   <Icon size={17} className="admin-sidebar__icon" />
                   {t(labelKey)}
                 </NavLink>

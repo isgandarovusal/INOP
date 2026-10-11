@@ -14,7 +14,7 @@ exports.productionHRBuild = async (sha, customHarness) => {
   await fs.writeFile(path.join(root, 'benchmark.jsx'), customHarness || harness, { flag: 'wx' });
   // Keep Vite's build worker pools out of the measuring API/browser process.
   // Exit this dedicated build child only after build() has completed its writes.
-  const code = `const {build}=await import(${JSON.stringify(path.join(frontend, 'node_modules/vite/dist/node/index.js'))});const react=(await import(${JSON.stringify(path.join(frontend, 'node_modules/@vitejs/plugin-react/dist/index.js'))})).default;await build({root:${JSON.stringify(root)},configFile:false,envDir:${JSON.stringify(root)},mode:'production',logLevel:'error',plugins:[react()],define:{'import.meta.env.VITE_API_BASE_URL':'"/api"','import.meta.env.VITE_ENABLE_SPEED_INSIGHTS':'false'},build:{outDir:${JSON.stringify(path.join(root, 'dist'))},emptyOutDir:false}});process.exit(0);`;
+  const code = `const {build}=await import(${JSON.stringify(path.join(frontend, 'node_modules/vite/dist/node/index.js'))});const react=(await import(${JSON.stringify(path.join(frontend, 'node_modules/@vitejs/plugin-react/dist/index.js'))})).default;await build({root:${JSON.stringify(root)},configFile:false,envDir:${JSON.stringify(root)},mode:'production',logLevel:'error',plugins:[react()],define:{'import.meta.env.VITE_API_BASE_URL':'"/api"','import.meta.env.VITE_ENABLE_SPEED_INSIGHTS':'false'},build:{manifest:"hr-route-manifest.json",outDir:${JSON.stringify(path.join(root, 'dist'))},emptyOutDir:false}});process.exit(0);`;
   execFileSync(process.execPath, ['--input-type=module', '-e', code], { cwd: root, timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] });
   return { sha, root, dist: path.join(root, 'dist'), mode: 'production' };
 };

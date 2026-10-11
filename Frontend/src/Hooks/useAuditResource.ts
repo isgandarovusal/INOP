@@ -44,11 +44,21 @@ export function useAuditResource<T>(id: string | undefined, resource: string, lo
 
   useEffect(() => {
     if (options.refreshOnFocus === false) return;
-    const visible = () => { if (document.visibilityState === "visible") reload(); };
-    window.addEventListener("focus", reload);
+    let lastRefresh = -Infinity;
+    const refresh = () => {
+      if (['candidate', 'application', 'recruitment'].includes(resource)) {
+        if (document.visibilityState !== 'visible') return;
+        const now = performance.now();
+        if (now - lastRefresh < 250) return;
+        lastRefresh = now;
+      }
+      reload();
+    };
+    const visible = () => { if (document.visibilityState === "visible") refresh(); };
+    window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", visible);
-    return () => { window.removeEventListener("focus", reload); document.removeEventListener("visibilitychange", visible); };
-  }, [reload, options.refreshOnFocus]);
+    return () => { window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", visible); };
+  }, [reload, options.refreshOnFocus, resource]);
 
   // Never render data belonging to a previous audit or permission context,
   // including the render before an effect's cleanup has run.
