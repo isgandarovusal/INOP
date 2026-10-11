@@ -13,7 +13,8 @@ function endpoint(action){return async(req,res,next)=>{
   const refresh=async()=>{await verifyToken(req,res,()=>{});if(res.headersSent||res.destroyed)return false;req.authRole={permissions:await getRolePermissions(req.user.role)};if(authority(req)!==snapshot)throw fail('PROCESSING_AUTH_CHANGED',403);return true;};
   if(!await Candidate.exists(query()).maxTimeMS(1000))throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
   if((action==='get'||action==='retry')&&!await Jobs.exists({_id:req.params.jobId,candidateId:req.params.id}).maxTimeMS(1000))throw fail('PROCESSING_JOB_UNAVAILABLE',404);
-  const child=(action==='get'||action==='retry')?await Jobs.findOne({_id:req.params.jobId,candidateId:req.params.id}).select('kind').maxTimeMS(1000).lean():null;
+  const child=(action==='get'||action==='retry')?await Jobs.findOne({_id:req.params.jobId,candidateId:req.params.id}).select('kind taskVersion').maxTimeMS(1000).lean():null;
+  if(child&&child.kind!=='parse'&&child.taskVersion!==({ocr:'ocr-rules-1','ai-review':'ai-professional-1'})[child.kind])throw fail('PROCESSING_JOB_UNAVAILABLE',404);
   const kind=child?.kind??(action==='start'?req.body?.kind:req.query.kind??'parse');
   const queue=require('../services/hrCvTaskProfiles.service').profile(kind);
   const result=action==='start'?await queue.enqueue(req,req.params.id,req.body):action==='retry'?await queue.retry(req,req.params.jobId,req.body):action==='get'?await queue.get(req,req.params.jobId):await queue.list(req,req.params.id);

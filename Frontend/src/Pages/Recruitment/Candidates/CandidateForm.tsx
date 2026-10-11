@@ -56,7 +56,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     for(const [field,setter] of [["name",setName],["role",setRole],["email",setEmail],["education",setEducation]] as const)if(typeof p[field]==="string"&&p[field])setter(p[field] as string);
     if(typeof p.phoneRaw==="string"&&p.phoneRaw)setPhone(p.phoneRaw);else if(typeof p.phone==="string"&&p.phone)setPhone(p.phone);
     if(typeof p.experience==="number")setExperience(p.experience);
-    for(const [field,setter] of [["skills",setSkills],["languages",setLanguages],["certificates",setCertificates]] as const)if(Array.isArray(p[field])&&p[field].length)setter(p[field] as string[]);
+    for(const [field,setter] of [["skills",setSkills],["languages",setLanguages],["certificates",setCertificates]] as const)if(Array.isArray(p[field])&&p[field].length)setter(old=>job.kind==='ai-review'?[...new Set([...old,...p[field] as string[]])]:p[field] as string[]);
     for(const [field,setter] of [["employmentHistory",setEmploymentHistory],["educationHistory",setEducationHistory],["certificationHistory",setCertificationHistory]] as const)if(Array.isArray(p[field])&&p[field].length)setter(p[field] as CvHistoryEntry[]);
     setReview(job.result!.review);setConfirmReview(false);
     setProcessingApproval({jobId:job.id,contextHash:job.source.contextHash,expectedJobUpdatedAt:job.updatedAt});
@@ -210,7 +210,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
 
 
   if (accessDenied) return <HRResourceState status={accessDenied} />;
-  const eligibleAiReview = id && initial?.cvOriginal?.sha256 && initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based" && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
+  const eligibleAiReview = id && initial?.cvOriginal?.sha256 && ((initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based") || (initial.cvReview?.version === "ocr-rules-1" && initial.cvReview.provider === "tesseract-rules" && ["confirmed","corrected"].includes(initial.cvReview.reviewStatus??'') && initial.cvReview.processingApproval?.sourceHash===initial.cvOriginal.sha256)) && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
   return (
     <div className="candidate-form-page">
       {job && <p>{job.position}</p>}

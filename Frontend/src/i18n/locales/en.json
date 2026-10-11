@@ -1025,6 +1025,8 @@
     "heading": "CV HR review",
     "ocrBased": "OCR + rule-based extraction; not AI",
     "ocrConfidenceExplanation": "OCR accuracy is uncalibrated. Verify every fact against the original document.",
+    "aiBased": "AI professional evidence proposal; HR makes the final decision",
+    "aiConfidenceExplanation": "Model confidence is not statistical accuracy. HR must verify every proposal.",
     "ruleBased": "Rule-based extraction; no AI",
     "unknown": "Unknown",
     "pending": "Review pending",
@@ -1361,6 +1363,12 @@
       "receipt": "Server-recorded HR approval"
   },
   "hrProcessing": {
+    "aiProfile": "Professional AI fact review",
+    "startAi": "Queue AI review",
+    "aiNotice": "Only professional evidence is sent to a separately approved AI provider; HR approval is required.",
+    "aiManual": "Verify AI proposals against original professional evidence; unknown facts remain unknown.",
+    "retryAi": "Retry only after fixing AI configuration",
+    "aiRunning": "AI review is processing.",
     "retryOcr": "Retry only after fixing OCR runtime, language or file availability",
     "startOcr": "Start OCR",
     "ocrNotice": "Scanned PDFs use OCR. Facts are saved only after explicit HR approval.",
@@ -1401,6 +1409,9 @@
       "unavailable": "Processing is unavailable; the primary profile is retained."
     },
     "code": {
+      "AI_NOT_CONFIGURED": "AI is not configured",
+      "AI_REVIEW_CONTEXT_REQUIRED": "Insufficient professional evidence",
+      "AI_REVIEW_REQUIRED": "AI proposals await HR review",
       "OCR_REVIEW_REQUIRED": "OCR facts await HR review",
       "OCR_NOT_CONFIGURED": "OCR is not configured",
       "OCR_RUNTIME_REQUIRED": "OCR runtime is unavailable",

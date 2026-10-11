@@ -111,6 +111,7 @@ export interface CvHistoryEntry {
 }
 export interface CvProcessingApproval { jobId: string; contextHash: string; expectedJobUpdatedAt: string }
 export interface CvReview {
+  provenance?: {provider:string;model:string;mode:'live'|'mock_test_only';contextHash:string};
   processingApproval?: {jobId:string; parserVersion:string; sourceHash:string; sourceContextHash:string; sourceRevision:number; resultHash:string; approvedFields:string[]; profileHash:string; approvedBy:string; approvedAt:string};
   version?: string; provider?: string; confidenceKind?: string;
   processingStatus?: "extracted" | "unsupported_ocr" | "failed";

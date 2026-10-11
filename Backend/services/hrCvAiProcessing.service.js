@@ -10,14 +10,22 @@ function checked(value,context){
   !/^[a-zA-Z0-9_.:-]{1,120}$/.test(value.provenance.model||'')||!['live','mock_test_only'].includes(value.provenance.mode)||
   value.provenance.contextHash!==crypto.createHash('sha256').update(JSON.stringify(context)).digest('hex'))throw fail();
  let result;try{result=evidence.validate({status:value.status,proposals:value.proposals,uncertainty:value.uncertainty},context);}catch{throw fail();}
- return {parserVersion:version,requiresApproval:true,proposal:{version:value.version,...result,requiresApproval:true,provenance:{...value.provenance}},evidence:context.facts,reviewScope:'professional_evidence_only'};
+ const parsed={},fields={};
+ for(const row of result.proposals){
+  if(['skills','languages','certificates'].includes(row.field))(parsed[row.field]??=[]).push(row.value);
+  else parsed[row.field]=row.field==='experience'?Number(row.value):row.value;
+  const field=fields[row.field]??={source:'ai-professional-evidence',confidence:null,evidence:[]};
+  for(const id of row.evidenceIds){const quote=context.facts.find(f=>f.id===id).quote;if(!field.evidence.includes(quote))field.evidence.push(quote);}
+ }
+ const review={version,provider:'openai-professional-evidence',confidenceKind:'uncalibrated_ai',processingStatus:'extracted',reviewStatus:'pending',fields,warnings:['ai_human_review_required'],provenance:{...value.provenance}};
+ return {parsed,review,parserVersion:version,requiresApproval:true,proposal:{version:value.version,...result,requiresApproval:true,provenance:{...value.provenance}},evidence:context.facts,reviewScope:'professional_evidence_only'};
 }
-// Internal and disabled by default. No HTTP/worker/AI feature activation or new
-// external permission is implied by creating this server-owned task profile.
+// Trusted profile, disabled by default. Optional HTTP/worker wiring does not
+// imply external-review consent, provider credentials or live E2E verification.
 function createAiProcessing({enabled=false,provider=ai,...queue}={}){
  return createProcessing({...queue,enabled,kind:'ai-review',taskVersion:version,task:async({candidate,actorId,signal})=>{
   let context;try{context=evidence.buildContext(candidate);}catch(error){if(error.code==='AI_NO_REVIEW_CONTEXT')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};throw fail();}
-  try{const proposal=await provider.suggestCv(context,{actorId,signal});return{state:'succeeded',code:'AI_REVIEW_REQUIRED',result:checked(proposal,context)};}
+  try{const proposal=await provider.suggestCv(context,{actorId,signal});const result=checked(proposal,context);if(proposal.status==='insufficient_context')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};return{state:'succeeded',code:'AI_REVIEW_REQUIRED',result};}
   catch(error){
    if(['AI_UNAVAILABLE','AI_CONFIGURATION_REQUIRED'].includes(error.code))return{state:'blocked',code:'AI_NOT_CONFIGURED'};
    if(error.code==='AI_INVALID_OUTPUT')throw fail();

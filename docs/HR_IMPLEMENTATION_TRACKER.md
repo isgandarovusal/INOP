@@ -352,7 +352,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | TESTED | 10C2–10C3 actual queue/parser/HTTP/UI: unique bounded slots, lease/retry, private source checks; 104 targets / 1766 full. Parse only, disabled by default, exact DDL required; OCR/AI/ingestion separately OPEN. |
 | P10-009 | OCR jobs | TESTED | 10C9–10C11 real local scanned PDF/task/HTTP/UI/explicit approval and bounded repair retry; 1915 full. Default off, hosted Native prerequisites EXT-OCR-001 BLOCKED_EXTERNAL |
-| P10-010 | AI jobs | IN_PROGRESS | 10C8 disabled internal durable professional AI profile on existing queue, exact kind/version, current-source guards and schema/provenance; HTTP/UI integration and real provider remain pending |
+| P10-010 | AI jobs | TESTED | 10C8/10C12 source-bound durable task, opt-in HTTP/worker/UI/review and repair retry; 169 targets / 1931 full; actual adapter with synthetic transport only, real provider P09-023 BLOCKED_EXTERNAL |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
 | P10-013 | Idempotency | IN_PROGRESS | 10C1 email command/CAS; 10C3–10C4 parse context/UUID command replay and atomic reservation tested (73 final targets). OCR/AI/ingestion job integrations remain OPEN; no real provider proof. |
@@ -957,4 +957,23 @@ Final 10C11 gates: full frozen-source serial `/tmp/inop-hr10c11-regression-final
 
 | ID | Package | New finding | Status | Evidence |
 |---|---|---|---|---|
-| AUD-117 | 10C12 | HTTP child with obsolete non-parse task version may be classified as parent-unavailable, hiding a still-readable primary Candidate | OPEN | Queue version filter correctly refuses old result; inspect/reproduce the HTTP error classification in the next task-profile lifecycle increment |
+| AUD-117 | 10C12 | HTTP child with obsolete non-parse task version may be classified as parent-unavailable, hiding a still-readable primary Candidate | TESTED | Child baseline reproduces wrong parent code; `hrCvTaskLifecycle` + actual obsolete-job UI retain authorized primary draft; full 1931/1931 |
+
+
+10C11 commit: `3653430831434ac4f9b286ddce5c2eeb33974849`, 18 files, 1915 full including all 118 final target cases, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization; clean tree, no push.
+
+## 10C12 — optional durable AI HTTP/worker and explicit professional HR review
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-049 | Authenticated separate opt-in AI task profile/status/start/worker; default parse/OCR compatibility | TESTED | `hrCvAiHttp` + inherited task-profile/parse/OCR/approval suites; 169 combined targets / 1931 final full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| P10-050 | Bounded source-derived professional proposals/reasons, truthful provider/test provenance and explicit apply/edit/confirm/save | TESTED | Five scope positives, actual `hrCvAiProcessingUI`; real adapter with synthetic transport only; 169 combined targets / 1931 final full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| P10-051 | Only HR-confirmed source-bound OCR facts eligible; unknown/protected/recursive/insufficient facts fail closed | TESTED | `hrAiCvReview` approved OCR positive and pending/changed-hash/parser/recursive negatives; actual adapter validations; 169 combined targets / 1931 final full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| P10-052 | AI configuration-repair retry stays current-source/actor/idempotent/lifetime bounded, without automatic decision | TESTED | `hrCvAiHttp` actual retry and no Candidate mutation; existing outage/timeout budgets; 169 combined targets / 1931 final full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+
+AUD-117 baseline `/tmp/inop-hr10c12-child-baseline.log` reproduces obsolete child PROCESSING_PARENT_UNAVAILABLE instead of JOB_UNAVAILABLE. Corrected metadata/version classification keeps old facts closed; `hrCvTaskLifecycle` and actual bookmarked obsolete-job UI preserve authorized primary draft. Default AI routing baseline `/tmp/inop-hr10c12-baseline.log` fails expected profile availability (400 before optional wiring); no failed run is PASS.
+
+First combined targets passed backend/old flows but the new UI asserted mixed-case Mock before the asynchronous result rendered; it now waits for the result and asserts the actual existing MOCK TEST label. Corrected standalone UI 4/4, including malformed proposals/current route/permission and obsolete child handling. The external helper initially rejected a new package label before any validation; its allowed labels were extended and actual checks rerun. These are not claimed successful runs. `HR_CV_AI_HTTP_REVIEW.md` documents contracts, defaults and live external gates. P09-023 real AI stays BLOCKED_EXTERNAL; P10 source draft/ingestion/deletion/retention and P11–13 are retained and continue independently. No production operation or push/deploy.
+
+
+Final 10C12: `/tmp/inop-hr10c12-target-final.log` **169/169**, zero failures/skips/cancellations. `/tmp/inop-packagehr10c12-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full frozen-source serial `/tmp/inop-hr10c12-regression-final.log` **1931/1931**, no failures/skips/cancellations. `git diff --check` PASS. 24 package files only; local SHA recorded next tracker update. All prior commits preserved. Real AI/storage/recovery/hosting/SMTP/Graph/website access and pending deletion decision remain unverified; no program-completion/live intake claim. Continue remaining independent P10 source/error/draft/ingestion work then P11–13, no per-package approval wait/push/deploy.

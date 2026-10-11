@@ -92,7 +92,7 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
   const commandHash=hash(JSON.stringify([req.user.id,input.commandId])),replay=row=>({...dto(row),replayed:true});
   if(job.retryCommandHash===commandHash)return replay(job);
   const count=job.manualRetries??0;
-  if(job.state!=='blocked'||!['SOURCE_MISSING','STORAGE_NOT_CONFIGURED',...(kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:[])].includes(job.code)||!Number.isInteger(job.attempts)||job.attempts<1||job.attempts>=3||!Number.isInteger(count)||count<0||count>=2||job.updatedAt?.toISOString()!==input.expectedUpdatedAt)throw fail('PROCESSING_RETRY_CONFLICT',409);
+  if(job.state!=='blocked'||!['SOURCE_MISSING','STORAGE_NOT_CONFIGURED',...(kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)||!Number.isInteger(job.attempts)||job.attempts<1||job.attempts>=3||!Number.isInteger(count)||count<0||count>=2||job.updatedAt?.toISOString()!==input.expectedUpdatedAt)throw fail('PROCESSING_RETRY_CONFLICT',409);
   for(let i=0;i<8;i++) {
    const queueSlot=slot();if(!Number.isInteger(queueSlot)||queueSlot<0||queueSlot>63)throw fail('PROCESSING_INVALID_CONFIG',400);
    try {

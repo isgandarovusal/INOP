@@ -12,13 +12,14 @@ const protectedText = /(?<![\p{L}\p{N}_])(?:age|gender|nationality|ethnicity|rel
 const sensitive = /@|https?:|www\.|-----BEGIN|(?:api[ _-]?key|password|secret|token)\s*[:=]|[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|[<>\p{Cc}\p{Cf}]|(?<!\p{Nd})\+?\p{Nd}(?:[ ()-]*\p{Nd}){6,}(?!\p{Nd})/iu;
 function safe(text) { return typeof text === 'string' && text.length > 0 && text.length <= 500 && text.trim() && !sensitive.test(text.normalize('NFKC')) && !protectedText.test(text.normalize('NFKC')); }
 exports.buildContext = candidate => {
-  if (!candidate?.cvReview || candidate.cvReview.processingStatus !== 'extracted' || candidate.cvReview.version !== 'rules-2' || candidate.cvReview.provider !== 'rule-based' || !/^[a-f0-9]{64}$/.test(candidate.cvOriginal?.sha256 || '')) throw fail('AI_NO_REVIEW_CONTEXT', 'Professional extraction evidence is unavailable. Review the original CV manually.', 422);
+  const ocr=candidate?.cvReview?.version==='ocr-rules-1'&&candidate.cvReview.provider==='tesseract-rules'&&['confirmed','corrected'].includes(candidate.cvReview.reviewStatus)&&candidate.cvReview.processingApproval?.sourceHash===candidate.cvOriginal?.sha256&&candidate.cvReview.processingApproval?.parserVersion==='ocr-rules-1';
+  if (!candidate?.cvReview || candidate.cvReview.processingStatus !== 'extracted' || (!ocr&&(candidate.cvReview.version !== 'rules-2' || candidate.cvReview.provider !== 'rule-based')) || !/^[a-f0-9]{64}$/.test(candidate.cvOriginal?.sha256 || '')) throw fail('AI_NO_REVIEW_CONTEXT', 'Professional extraction evidence is unavailable. Review the original CV manually.', 422);
   const fields = candidate.cvReview.fields, facts = [];
   const names = [candidate.name, ...(Array.isArray(fields?.name?.evidence) ? fields.name.evidence.slice(0, 20) : [])].filter(n => typeof n === 'string' && n.length <= 500).map(n => canonical(n.replace(/^(?:name|full name|ad|ad soyad|adı|имя|фио)\s*[:：]\s*/iu, ''))).filter(Boolean);
   if (fields && typeof fields === 'object' && !Array.isArray(fields)) {
     for (const field of allowed) {
       const evidence = fields[field];
-      if (evidence?.source !== 'cv-text' || !Array.isArray(evidence.evidence)) continue;
+      if (evidence?.source !== (ocr?'ocr-text':'cv-text') || !Array.isArray(evidence.evidence)) continue;
       for (const text of evidence.evidence.slice(0, 20)) {
         if (facts.length >= 24) break;
         if (!safe(text) || names.some(person => canonical(text).includes(person)) || facts.some(f => f.field === field && canonical(f.quote) === canonical(text))) continue;

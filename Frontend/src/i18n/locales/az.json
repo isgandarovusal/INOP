@@ -1049,6 +1049,8 @@
     "heading": "CV HR yoxlaması",
     "ocrBased": "OCR + qayda əsaslı extraction; AI deyil",
     "ocrConfidenceExplanation": "OCR nəticəsində statistik dəqiqlik təsdiqlənməyib. Bütün faktları original sənədlə yoxlayın.",
+    "aiBased": "Peşəkar sübuta bağlı AI təklifi; yekun qərar HR-ə aiddir",
+    "aiConfidenceExplanation": "Model confidence-i statistik dəqiqlik deyil. Hər təklif HR tərəfindən yoxlanmalıdır.",
     "ruleBased": "Qayda əsaslı extraction; AI deyil",
     "unknown": "Məlum deyil",
     "pending": "Yoxlama gözləyir",
@@ -1385,6 +1387,12 @@
       "receipt": "Serverdə qeydə alınmış HR təsdiqi"
   },
   "hrProcessing": {
+    "aiProfile": "Peşəkar faktların AI yoxlaması",
+    "startAi": "AI yoxlamasını növbəyə al",
+    "aiNotice": "Yalnız peşəkar sübutlar ayrıca icazəli AI provider-ə göndərilir; nəticələr HR təsdiqi tələb edir.",
+    "aiManual": "AI təklifləri original peşəkar sübutla yoxlanmalıdır; naməlum faktlar tamamlanmır.",
+    "retryAi": "Yalnız AI konfiqurasiyası düzəldilibsə yenidən cəhd et",
+    "aiRunning": "AI yoxlaması işləyir.",
     "retryOcr": "Yalnız OCR runtime/dil/fayl problemi düzəldilibsə yenidən cəhd et",
     "startOcr": "OCR başlat",
     "ocrNotice": "Skan edilmiş PDF OCR ilə emal olunur. Faktlar yalnız HR təsdiqi ilə saxlanılır.",
@@ -1425,6 +1433,9 @@
       "unavailable": "Emal xidməti hazırda əlçatan deyil; əsas profil saxlanılır."
     },
     "code": {
+      "AI_NOT_CONFIGURED": "AI konfiqurasiya edilməyib",
+      "AI_REVIEW_CONTEXT_REQUIRED": "Uyğun peşəkar sübut kifayət deyil",
+      "AI_REVIEW_REQUIRED": "AI təklifləri HR təsdiqi gözləyir",
       "OCR_REVIEW_REQUIRED": "OCR faktları HR təsdiqi gözləyir",
       "OCR_NOT_CONFIGURED": "OCR konfiqurasiya edilməyib",
       "OCR_RUNTIME_REQUIRED": "OCR proqramı mövcud deyil",

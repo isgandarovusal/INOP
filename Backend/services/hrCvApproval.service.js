@@ -20,11 +20,12 @@ async function prepare(req,res,current,update) {
  const snapshot=authority(req),plain=current.toObject(),contextHash=processing.fingerprint(plain);
  if(contextHash!==input.contextHash)throw fail('PROCESSING_SOURCE_CHANGED',409);
  if(!await Jobs.exists({_id:input.jobId,candidateId:current._id}).maxTimeMS(1000))throw fail('PROCESSING_JOB_UNAVAILABLE',404);
- const row=await Jobs.findOne({_id:input.jobId,candidateId:current._id}).select('kind').maxTimeMS(1000).lean();
+ const row=await Jobs.findOne({_id:input.jobId,candidateId:current._id}).select('kind taskVersion').maxTimeMS(1000).lean();
+ if(!row||(row.kind!=='parse'&&row.taskVersion!==({ocr:'ocr-rules-1','ai-review':'ai-professional-1'})[row.kind]))throw fail('PROCESSING_JOB_UNAVAILABLE',404);
  const job=await require('./hrCvTaskProfiles.service').profile(row?.kind).get(req,input.jobId);
  if(!job.currentSource||job.source.contextHash!==contextHash||job.source.revision!==(plain.__v||0)||job.source.sha256!==plain.cvOriginal?.sha256||new Date(job.updatedAt).toISOString()!==input.expectedJobUpdatedAt)throw fail('PROCESSING_SOURCE_CHANGED',409);
  const result=job.result;
- const contract=job.kind==='parse'?['rules-2','rule-based']:job.kind==='ocr'?['ocr-rules-1','tesseract-rules']:null;
+ const contract=job.kind==='parse'?['rules-2','rule-based']:job.kind==='ocr'?['ocr-rules-1','tesseract-rules']:job.kind==='ai-review'?['ai-professional-1','openai-professional-evidence']:null;
  if(!contract||job.state!=='succeeded'||result?.requiresApproval!==true||result.parserVersion!==contract[0]||result.review?.version!==contract[0]||result.review?.provider!==contract[1]||!result.parsed)throw fail('PROCESSING_APPROVAL_UNAVAILABLE',409);
  await verifyToken(req,res,()=>{});if(res.headersSent||res.destroyed)return null;
  req.authRole={permissions:await getRolePermissions(req.user.role)};

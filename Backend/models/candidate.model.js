@@ -68,6 +68,7 @@ const candidateSchema = new mongoose.Schema(
       version: String, provider: String, confidenceKind: String,
       processingStatus: { type: String, enum: ['extracted', 'unsupported_ocr', 'failed'] },
       reviewStatus: { type: String, enum: ['pending', 'confirmed', 'corrected'] },
+      provenance: new mongoose.Schema({provider:String,model:String,mode:{type:String,enum:['live','mock_test_only']},contextHash:String},{_id:false}),
       fields: mongoose.Schema.Types.Mixed, warnings: [String], correctedFields: [String],
       reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, reviewedAt: Date,
       processingApproval: new mongoose.Schema({
