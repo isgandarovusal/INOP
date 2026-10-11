@@ -9,13 +9,13 @@ for (const names of [
   ['haccp', 'hazard analysis and critical control points'], ['javascript', 'js'], ['typescript', 'ts'], ['node.js', 'nodejs'],
   ['secondary school', 'tam orta təhsil', 'среднее образование'], ['vocational education', 'peşə təhsili', 'профессиональное образование'],
 ]) for (const name of names) aliases.set(normalize(name), names[0]);
-const canonical = value => aliases.get(normalize(value)) || normalize(value);
+const canonical = value => { const valueNormalized = normalize(value); return aliases.get(valueNormalized) || valueNormalized; };
 const list = values => [...new Set((Array.isArray(values) ? values : []).map(canonical).filter(Boolean))];
 // Conservative lexical guard for explicit personal-trait criteria, not a universal fairness classifier.
 const protectedCriterion = value => /(?:^|[^\p{L}\p{N}])(?:age|gender|sex|males?|females?|men|man|women|woman|young|elderly|nationality|ethnicity|race|religion|pregnan(?:t|cy)|disability|disabled|marital|under\s*\d+|over\s*\d+|yaş|yaşlı|gənc|cins|kişi(?:lər)?|qadın(?:lar)?|milliyyət|возраст|пол|мужчин(?:а|ы)?|женщин(?:а|ы)?|молод(?:ой|ая|ые)|пожил(?:ой|ая|ые)|национальность|раса|религия)(?:$|[^\p{L}\p{N}])/iu.test(normalize(value));
 const roleAliases = new Map();
 for (const names of [['cashier', 'kassir', 'кассир'], ['restaurant manager', 'restoran müdiri', 'менеджер ресторана'], ['cook', 'aşpaz', 'повар'], ['shift manager', 'növbə müdiri', 'менеджер смены']]) for (const name of names) roleAliases.set(normalize(name), names[0]);
-const role = value => roleAliases.get(normalize(value)) || normalize(value);
+const role = value => { const valueNormalized = normalize(value); return roleAliases.get(valueNormalized) || valueNormalized; };
 const hash = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 function candidateFacts(c) {
   return { role: role(c?.role), skills: list(c?.skills), experience: c?.experience ?? null,
@@ -28,7 +28,9 @@ function jobFacts(j) {
   return { role: role(j?.title), requiredSkills: list(j?.requiredSkills), preferredSkills: list(j?.preferredSkills),
     experienceYears: j?.experienceYears || 0, education: list(j?.requiredEducation), certificates: list(j?.requiredCertificates), weights: j?.criterionWeights || {} };
 }
-function fingerprints(j, c) { return { jobHash: hash(jobFacts(j)), candidateHash: hash(candidateFacts(c)) }; }
+const jobFingerprint = j => hash(jobFacts(j));
+const candidateFingerprint = c => hash(candidateFacts(c));
+function fingerprints(j, c) { return { jobHash: jobFingerprint(j), candidateHash: candidateFingerprint(c) }; }
 function relevantExperience(j, c, application, hashes) {
   const review = application?.matchingReview;
   if (review && review.jobHash === hashes.jobHash && review.candidateHash === hashes.candidateHash && Number.isFinite(review.relevantExperienceYears) && review.relevantExperienceYears >= 0)
@@ -77,4 +79,4 @@ function calculateApplicationMatch(job, candidate, { application } = {}) {
   if (result.criteria.some(c => c.weight > 0 && !c.known)) return { ...result, scoreStatus: 'incomplete', reason: 'facts_missing' };
   return { ...result, score: Math.max(0, Math.min(100, Math.round(result.criteria.reduce((n, c) => n + c.weight * (c.ratio || 0), 0) * 100))), scoreStatus: 'calculated', reason: null };
 }
-module.exports = { VERSION, canonical, fingerprints, calculateApplicationMatch, protectedCriterion };
+module.exports = { VERSION, canonical, jobFingerprint, candidateFingerprint, fingerprints, calculateApplicationMatch, protectedCriterion };
