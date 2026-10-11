@@ -44,7 +44,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   });
   await t.test('language change reuses data without new requests, and all three locale keys resolve', async () => {
     const before = h.wire.length;
-    for (const language of ['en', 'ru', 'az']) { await h.page.evaluate(l => window.changeLanguage(l), language); assert.ok(!((await h.page.locator('body').textContent()).includes('hrAnalytics.'))); }
+    for (const language of ['en', 'ru', 'az']) { await h.page.evaluate(l => window.changeLanguage(l), language); assert.ok(!((await h.page.locator('body').textContent()).includes('hrAnalytics.')));assert.doesNotMatch(await h.page.locator('time').textContent(),/M\d{2}/);assert.ok(await h.page.locator('time').getAttribute('dateTime')); }
     assert.equal(h.wire.length, before); assert.equal(await kpi('applications').textContent(), '3');
   });
   await t.test('Candidate-restricted aggregate counts show limited coverage without fake zero score', async () => {

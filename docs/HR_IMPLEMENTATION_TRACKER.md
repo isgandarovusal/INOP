@@ -1600,3 +1600,12 @@ Three old/final cold-profile repeats each30/30 exposed a noisy Application respo
 Only score-body construction is deferred; existing wanted/read lifecycle, matching model/API, weights, missing-vs-zero, backend scopes and recalculation stay intact. Public prefetch remains HTTP-only. Production failed-prefetch test successfully opened the Application page with one privateGET; the first measurement assertion incorrectly expected failed fetches in ResourceTiming. Fixed fixture asserts the server's forced503 directly;13/13 production scenarios now pass. Failed exploratory logs retained, no product failure hidden. CDP trace tool10/10 and node syntax check passed. No backend/env/migration/real provider change.
 
 This local commit follows successful targeted gates. Full suites and repeated profiles will bind the final source snapshot; previous537-file freeze is preserved as an earlier checkpoint, not reused across this actual Badge change.
+
+###17D — numeric locale-safe update timestamp
+
+Actual inspected Azerbaijani Chromium screenshots exposed Intl medium-date fallback text “2026 M10 11”. Numeric localized year/month/day plus24-hour time keeps Asia/Baku and the original ISO datetime while avoiding unresolved month names.
+
+| P17-010 | Readable actual update time in all three locales, unchanged timezone/ISO/source and no language refetch | TESTED |74/74 analytics/14-page viewport tests; three locales reject Mxx placeholders, retain datetime and unchanged GET count. hr17d TSapp/node/buildPASS, lint0/9, smoke13/13, authorization632/632. |
+| AUD-145 | Azerbaijani Intl medium-date fallback prints M10 month marker in real workspace screenshots | TESTED | Actual prior screenshot evidence; numeric local formatting and all-three-locale regression above; no fake timestamp or date-filter/API change. |
+
+17C final score-source proof:30/30 cold production cases,13/13 transition/recovery scenarios and10/10 alternating traces passed. Application DOM1038→948 relative to the intermediate rich UI; visible30rows/score contracts unchanged. Endpoint/JSON count remains one/bounded; cold metrics vary, no universal or hosted speedup claimed. Only this subsequent analytics timestamp expression/test changes; final source will be frozen afresh before full regression and release.

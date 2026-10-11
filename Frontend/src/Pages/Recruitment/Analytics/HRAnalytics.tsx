@@ -17,7 +17,7 @@ export default function HRAnalyticsPage() {
     ...(key === 'brandId' ? { branchId: '', jobId: '' } : key === 'branchId' ? { jobId: '' } : {}) }));
   const brands = data?.options.brands || [{ id: 'kfc', name: 'KFC', active: true }, { id: 'pizza-hut', name: 'Pizza Hut', active: true }, { id: 'simit-sarayi', name: 'Simit Sarayı', active: true }];
   const days = (value: number | null) => value === null ? t('hrAnalytics.unknown') : t('hrAnalytics.days', { count: value });
-  const formatter = useMemo(() => new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Baku' }), [i18n.language]);
+  const formatter = useMemo(() => new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Baku' }), [i18n.language]);
   const kpiIcons = { activeVacancies: BriefcaseBusiness, applications: UsersRound, newApplications: Inbox, processing: Clock3 };
   const scoreRows = useMemo(() => data?.scores?.buckets.map(b => ({ label: `${b.min}–${b.max}%`, count: b.count })) || [], [data?.scores]);
   const statuses = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
