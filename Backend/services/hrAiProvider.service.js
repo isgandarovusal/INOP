@@ -83,6 +83,8 @@ exports.createProvider = ({ env = process.env, testTransport, budget = defaultBu
 };
 // One shared capacity limit for all HTTP consumers; no runtime mock switch.
 const provider = exports.createProvider();
+// Configuration metadata only; never performs an external health request.
+exports.health = () => provider.health();
 exports.suggestJob = (input, options) => provider.suggestJob(input, options);
 
 exports.suggestCv = (input, options) => provider.suggestCv(input, options);

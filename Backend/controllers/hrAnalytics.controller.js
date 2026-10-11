@@ -139,7 +139,7 @@ exports.get = async (req, res, next) => {
       timeToHire: { samples: number(metrics.hireTimes, 'count'), averageDays: dailyAverage(number(metrics.hireTimes, 'sumMs'), number(metrics.hireTimes, 'count')) },
       scores: scores.checked === total ? { states: scores.states, buckets: scores.buckets } : null,
       deliveryQueue: metrics.deliveries.map(r => ({ state: r._id, count: r.count })),
-      integrations: { ai: 'not_integrated', outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
+      integrations: { ai: require('../services/hrAiProvider.service').health().state, outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
       options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
     });
   } catch (e) { if (res.destroyed) return; if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }

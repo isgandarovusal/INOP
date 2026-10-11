@@ -1218,6 +1218,7 @@
       "smtp": "Email"
     },
     "healthState": {
+      "configuration_required": "Требуется настройка; подключение не проверено",
       "not_integrated": "Не интегрировано",
       "not_connected": "Не подключено",
       "local_file_system": "Локальные файлы; сохранность не подтверждена",

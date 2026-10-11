@@ -1281,6 +1281,7 @@
       "smtp": "Email"
     },
     "healthState": {
+      "configuration_required": "Konfiqurasiya tamamlanmalıdır; canlı bağlantı yoxlanılmayıb",
       "not_integrated": "İnteqrasiya edilməyib",
       "not_connected": "Qoşulmayıb",
       "local_file_system": "Lokal fayl sistemi; davamlı storage təsdiqlənməyib",

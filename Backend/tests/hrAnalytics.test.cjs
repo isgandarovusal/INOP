@@ -7,7 +7,7 @@ test('HR analytics uses independent scoped cohorts, bounded DTOs and trusted sco
   const get = (actor, query = '') => h.request(actor, 'GET', '/hr/analytics' + query);
   await t.test('empty cohort has zero counts, null durations and explicit disconnected health', async () => {
     const r = await get('admin'); assert.equal(r.status, 200); assert.equal(r.data.totals.applications, 0); assert.equal(r.data.timeToHire.averageDays, null);
-    assert.ok(r.data.timeInStage.every(s => s.averageDays === null)); assert.equal(r.data.integrations.ai, 'not_integrated'); assert.equal(r.data.integrations.smtp, 'not_configured');
+    assert.ok(r.data.timeInStage.every(s => s.averageDays === null)); assert.equal(r.data.integrations.ai, 'not_configured'); assert.equal(r.data.integrations.smtp, 'not_configured');
   });
   const owned = actor => ({ createdBy: h.actors[actor]._id, assignedTo: h.actors[actor]._id, departmentId: h.actors[actor].departmentId });
   const branch = await Branch.create({ code: 'analytics-branch', name: 'Readable branch', brandId: 'kfc', kind: 'restaurant', ...owned('own') });

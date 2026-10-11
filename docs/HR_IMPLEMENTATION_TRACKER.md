@@ -1340,3 +1340,17 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-038 | Preserve focus/role/route private preview disposal, deny fresh403 and suppress late authorized reply after permission loss | TESTED | Current real local HTTP/Mongo/Chromium, no raw error/download URL on denial; prior four-suite61/61 |
 
 `HR_SOURCE_DOWNLOAD_RACE.md` documents causal evidence and its historical limitation. Initial independent-download test cleanup compared creation order to revocation order; now tests require exact complete URL multisets (no leaked/repeated URL), preserving actual download failure/byte assertions. Initial downstream strict-selector failures depended on early cleanup assertion and are retained in logs. Final concurrent28/28,0fail/skip/cancel; validationhr13hfinal TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. No StrictMode/auth/API/backend/production/provider/resource/push/deploy change. Final full matrix remains separate.
+
+13H commit `5ec3314` (full SHA in ledger), seven paths; concurrent final28 + prior61, all gatesPASS.
+
+## 13I — truthful AI configuration metadata in analytics
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-130 | 07/13 | Analytics always reports AI not_integrated even when its real adapter is configured | TESTED | hrIntegrationHealth actual HTTP default/incomplete/unsupported/complete synthetic config, zero external calls and no secret/model response |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-039 | Integration metadata distinguishes missing/configuration-required/configured-not-verified without fake provider PASS | TESTED | `/workspace/inop-hr13i-health-current.log`78/78; existing analytics UI13/13, AZ/EN/RU configuration-required copy |
+
+`HR_INTEGRATION_HEALTH.md`: no live network health check or reservation/write; malformed configuration does not break analytics. Baseline fixed-string failures retained. Validationhr13i TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Full frozen backend/frontend2 regression has started against all current source/test files (506 SHA-256 manifest paths, excludes credential filenames); its outcome is still pending and not PASS. No source changes during that run. Actual provider/privacy/hosted operational states remain external; no production/secret/resource/push/deploy.

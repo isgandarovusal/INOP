@@ -1257,6 +1257,7 @@
       "smtp": "Email"
     },
     "healthState": {
+      "configuration_required": "Configuration required; live connection unverified",
       "not_integrated": "Not integrated",
       "not_connected": "Not connected",
       "local_file_system": "Local filesystem; durability unverified",
