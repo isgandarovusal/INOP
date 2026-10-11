@@ -36,21 +36,23 @@ function Badge({ application, onUpdated }: { application: Application; onUpdated
   return <div data-application-score={application.id} data-score-status={resolved?.scoreStatus ?? (requested ? 'pending' : application.scoreStatus)} onClick={e => e.stopPropagation()}>
     <strong>{valid ? `${resolved.score}%` : t(`hrMatch.${resolved?.scoreStatus ?? (requested ? 'pending' : application.scoreStatus)}`)}</strong>
     {application.matching && <details onToggle={open}><summary>{t('hrMatch.explanation')}</summary>
-      {requested && detail.status !== 'ready' ? <HRResourceState status={detail.status} retry={detail.reload} /> : matching && <>
+      {wanted && (requested && detail.status !== 'ready' ? <HRResourceState status={detail.status} retry={detail.reload} /> : matching && <>
         <p>{t('hrMatch.coverage')}: {Math.round(matching.dataCoverage * 100)}% · {matching.version}</p>
         <p>{t('hrMatch.calculatedAt')}: {matching.calculatedAt}</p>
         {matching.criteria.map(c => <p key={c.key}>{t(`hrMatch.${c.key}`)} · {Math.round(c.weight * 100)}% · {c.known ? c.value ?? c.matched?.join(', ') ?? '' : t('cvReview.unknown')}
           {c.missing?.length ? ` · ${t('hrMatch.missing')}: ${c.missing.join(', ')}` : ''} · {c.source}</p>)}
         {matching.reason && <p>{t(`hrMatch.reason.${matching.reason}`)}</p>}
-      </>}
+      </>)}
     </details>}
     {canRecalculate && onUpdated && <details onToggle={open}><summary>{t('hrMatch.recalculate')}</summary>
+      {wanted && <>
       {requested && detail.status !== 'ready' && <HRResourceState status={detail.status} retry={detail.reload} />}
       {matching?.criteria.some(c => c.key === 'experience' && !c.known) && <>
         <label>{t('hrMatch.reviewedExperience')}<input aria-label={t('hrMatch.reviewedExperience')} type="number" min="0" max="80" value={experience} onChange={e => setExperience(e.target.value)} /></label>
         <label>{t('hrMatch.reviewReason')}<input aria-label={t('hrMatch.reviewReason')} maxLength={500} value={reason} onChange={e => setReason(e.target.value)} /></label>
       </>}
       <button type="button" disabled={busy || requested && detail.status !== 'ready' || (experience !== '' && !reason.trim())} onClick={() => void recalculate()}>{t(busy ? 'hrMatch.recalculating' : 'hrMatch.recalculate')}</button>
+      </>}
     </details>}
     {error && <span role="alert">{error}</span>}
   </div>;

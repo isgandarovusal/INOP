@@ -1589,3 +1589,14 @@ HTTP-prefetch follow-up: successful public asset fetched once per loaded app; ma
 | AUD-143 | Application populated parent title cells require pointer-only clicks | TESTED | Authorized parents now real buttons; actual keyboard activation, canonical Audit department revocation and restricted-parent regression preserve independent backend scope. |
 
 Final frozen-source full regression and serialized production measurements follow this local source commit. Current remote main remains76503c32d7fd8c8ad8decbf39895aa19c56f82bf; no push yet. Failed dynamic-import prototype/harness logs retained; only final successful evidence is used.
+
+###17C — trace investigation and deferred score body
+
+Three old/final cold-profile repeats each30/30 exposed a noisy Application response→paint increase (122.6→193.4ms median; final third sample115.4ms). Alternating Chromium trace5before/5after with the same real5000-row loopback fixture separated work: window153.3→159.1ms, renderer JS37.98→50.31ms and paint8.04→15.05ms. Trace subsystem unions overlap and are not isolated React duration. Do not present all cold pages as faster.
+
+| P17-009 | Defer closed score evidence/recalculation bodies, keep truthful summary, scoped on-demand evidence, retry/review/permission lifecycle | TESTED | Real browser baseline3 hidden body nodes→0 before explicit intent; one authenticated detailGET on first keyboard open, no repeat on close/reopen, genuine100% unchanged, Audit-department revocation removes content.59/59 matching/ranking/board/accessibility/disclosure tests, hr17c TSapp/node/buildPASS lint0/9 smoke13 auth632. Final performance comparison pending. |
+| AUD-144 | Every collapsed score widget mounts hidden explanation/form DOM before explicit intent, multiplying work across30/80 items | TESTED | Baseline actual3 body nodes per summary; same visible score/summary now0 with59/59 functional tests. Final measured impact to follow without inventing a speedup. |
+
+Only score-body construction is deferred; existing wanted/read lifecycle, matching model/API, weights, missing-vs-zero, backend scopes and recalculation stay intact. Public prefetch remains HTTP-only. Production failed-prefetch test successfully opened the Application page with one privateGET; the first measurement assertion incorrectly expected failed fetches in ResourceTiming. Fixed fixture asserts the server's forced503 directly;13/13 production scenarios now pass. Failed exploratory logs retained, no product failure hidden. CDP trace tool10/10 and node syntax check passed. No backend/env/migration/real provider change.
+
+This local commit follows successful targeted gates. Full suites and repeated profiles will bind the final source snapshot; previous537-file freeze is preserved as an earlier checkpoint, not reused across this actual Badge change.
