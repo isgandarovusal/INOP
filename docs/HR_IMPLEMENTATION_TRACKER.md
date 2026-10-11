@@ -1482,3 +1482,10 @@ User explicitly approved Job archive/restore with linked Applications/history re
 | P15-006 | Delete development only after successful integration/remote SHA and retained ancestry | OPEN | Authorized condition; pending main update |
 
 Retained failed investigative artifacts: first browser used Candidate edit label instead of actual Job label; fixed to canonical localization (no assertion removed). First profile helper referred to fixture h.models.Application, which is not exported; corrected diagnostic uses actual model. The projected foreign lookup trial regressed to8.9s and was reverted rather than accepted as an optimization. Benchmark overlapped with early build is exploratory only; final comparison will be serialized. All initial logs retained.
+
+###15D — OCR language measurement synchronization
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P15-007 | Measure language-only OCR requests after the independent initial duplicate read is ready; keep zero-refetch assertion | TESTED | First full frontend441/443, exit1, actual wire2 versus expected1. Initial Source POST exposed phone before duplicate effectGET; wait for actual duplicate-ready UI and assert exactly one initial read before measuring. Target cvIntakeOcrUI4/4; all AZ/EN/RU zero additional calls/provenance/no person write/explicit confirmation retained. Production code unchanged; existing15final TS/build/lint0/9 smoke13 authorization632 remain byte-identical; corrected full matrix follows. |
+| AUD-136 | OCR language-only test can count the legitimate initial duplicate read as language refetch | TESTED | P15-007 actual ready-state synchronization, no arbitrary sleep/count allowance/assertion deletion;4/4 real browser/HTTP/OCR target. First failed full log retained at /workspace/inop-hr15-full-frontend.log. |
