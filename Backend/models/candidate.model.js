@@ -57,6 +57,10 @@ const candidateSchema = new mongoose.Schema(
       select: false,
       validate: value => { try { require('../services/hrPrivateObjectStorage.service').reference(value.toObject ? value.toObject() : value); return true; } catch { return false; } },
     },
+    privateCvArchive: {
+      type: new mongoose.Schema({manifestId:mongoose.Schema.Types.ObjectId,attachedBy:mongoose.Schema.Types.ObjectId,attachedAt:Date},{_id:false}),
+      select:false,
+    },
     cvOriginal: {
       originalName: String, mimeType: String, size: Number, sha256: String,
     },
@@ -146,7 +150,7 @@ const candidateSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { transform: (_doc, value) => { delete value.privateCvBlob; return value; } },
+    toJSON: { transform: (_doc, value) => { delete value.privateCvBlob; delete value.privateCvArchive; return value; } },
   }
 );
 

@@ -911,3 +911,26 @@ First targets caught unknown email as the existing raw parser's empty string (ne
 Final 10C9 evidence: `/tmp/inop-hr10c9-target-final2.log` **85/85**, including **20/20** new OCR checks (real AZ/EN/RU scanned PDFs separated from synthetic security shims). `/tmp/inop-packagehr10c9-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c9-regression-final.log`: full serial **1885/1885**, zero failures/skips/cancellations on frozen source. `git diff --check` PASS. Eight package files only; exact local SHA recorded next update.
 
 User decision requested asynchronously for AUD-030/051 deletion lifecycle (archive/restore versus rejecting deletion with dependencies); dependent deletion behavior stays unchanged until an answer. Other independent P10 source retention/attachment, queue UI/ingestion and P11–13 continue without per-package confirmation. All production/env/resource/secret/push restrictions remain.
+
+
+10C9 commit: `04e73a11af33151fd460eb61db80d3b921cce4d6`, eight files, 85 combined targets / 1885 full, TypeScript/build PASS, lint 0/9, smoke 13 / authorization 632. Predecessors preserved, no push.
+
+## 10C10 — exact-source attachment and original/provider authorization boundaries
+
+| ID | Package | New finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-115 | 10C10 | Explicit synchronous AI review submits professional evidence after first original read loses JWT/role/assignment/source, although the final response is denied | TESTED | `/tmp/inop-hr10c10-security-baseline.log`: provider counter 1 instead of 0; fresh pre-provider guards added; 229 combined targets / 1902 full; TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| AUD-116 | 10C10 | A newly attached archive pointer remains downloadable after its manifest is blocked/missing/foreign or quarantined during IO | TESTED | Same baseline returns 200 instead of required 409; current owning manifest guards added; 229 combined targets / 1902 full; TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-043 | Disabled exact per-record migration attachment, trusted server approval and one source-only CAS | TESTED | `hrCvOriginalAttachment`, real owned DB/HTTP and synthetic storage/scanner/operator gates; 229 combined targets / 1902 full; TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| P10-044 | Independent current read/update, exact source/manifest, bounded cancellation and uncertain acknowledgement reconciliation | TESTED | Five scopes, mixed/foreign/raced cases, ignored-cancellation slots and idempotent receipt; 229 combined targets / 1902 full; TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+| P10-045 | Private current-manifest read guard, legacy fingerprint/reader compatibility and replacement retains every old original | TESTED | Download/quarantine and replacement tests plus inherited processing/approval/storage suites; 229 combined targets / 1902 full; TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization |
+
+`HR_CV_ORIGINAL_ATTACHMENT.md` documents internal disabled preparation and external backup/scanner/provider/retention gates. Receipt is optional/hidden, no default, backfill/index or startup migration. No Candidate facts/decisions/Application scores are changed. Existing receipt-free processing identity stays compatible. New server receipt is part of source identity/CAS. Real provider/durability/recovery are not represented by synthetic evidence. P10-003/006 remain IN_PROGRESS, 018/019 BLOCKED_EXTERNAL. Other remaining P10 and P11–13 IDs are preserved.
+
+Separate owned-loopback deletion baseline `/tmp/inop-hr10d-delete-baseline.json` confirms Candidate DELETE 200 leaves linked Application and original bytes but canonical download becomes 404. AUD-030/051 decision remains pending asynchronously (archive/restore versus dependency-blocked deletion); no policy is applied without the answer. Independent work continues.
+
+
+Final 10C10 evidence: `/tmp/inop-hr10c10-target-final.log` **229/229**, including **17/17** new attachment/reader/provider-boundary checks. `/tmp/inop-packagehr10c10-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full frozen-source serial `/tmp/inop-hr10c10-regression-final.log`: **1902/1902**, zero failures/skips/cancellations. Security baseline failures are retained, not counted as PASS. `git diff --check` PASS; 13 package files only, local SHA recorded next update. Resume with optional OCR HTTP/UI/explicit HR approval, then AI/drafts/ingestion/P11–13 without per-package approval. No push/deploy.

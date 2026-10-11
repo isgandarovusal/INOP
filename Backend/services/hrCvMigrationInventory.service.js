@@ -6,7 +6,7 @@ const {resourceFilter} = require('./hrResourceScope.service');
 const {fingerprint} = require('./hrCvProcessing.service');
 const storage = require('./hrPrivateObjectStorage.service');
 const fail=(code,status)=>Object.assign(new Error('CV migration inventory is unavailable.'),{code,status});
-const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob';
+const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive';
 const signature=req=>JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
 async function actor(id){
  const user=await User.findOne({_id:id,isActive:true}).select('_id role departmentId').maxTimeMS(1000).lean();
