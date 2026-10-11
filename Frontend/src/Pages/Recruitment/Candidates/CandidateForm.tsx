@@ -91,6 +91,9 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   };
 
   const handleCvChange = async (file: File | null) => {
+    // A rejected selection does not replace the current source or its approval.
+    if (file && !validateCvFile(file)) return;
+    if (!file && !cvFile) return;
     setProcessingApproval(undefined);setConfirmReview(false);
     setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
@@ -98,10 +101,6 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     setAiGenerating(false);
     if (!file) {
       setCvFile(null);
-      return;
-    }
-
-    if (!validateCvFile(file)) {
       return;
     }
 

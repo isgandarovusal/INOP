@@ -27,10 +27,12 @@ export default function CvProcessingApprovalReview({candidate,jobId,onApply,onAc
 }
 function validReview(job:CvProcessingJob){
  const review=job.result?.review,parsed=job.result?.parsed;
- if(!review||review.version!=='rules-2'||review.provider!=='rule-based'||!parsed)return false;
- if(Object.values(review.fields??{}).some(v=>!v||!Array.isArray(v.evidence)||v.evidence.length>50||v.evidence.some(q=>typeof q!=='string'||q.length>2000)||(v.confidence!==null&&(typeof v.confidence!=='number'||v.confidence<0||v.confidence>1))))return false;
+ if(!review||review.version!=='rules-2'||review.provider!=='rule-based'||review.processingStatus!=='extracted'||!parsed)return false;
+ if(review.fields!=null&&(typeof review.fields!=="object"||Array.isArray(review.fields)||Object.keys(review.fields).length>30))return false;
+ for(const value of [review.warnings,review.correctedFields])if(value!=null&&(!Array.isArray(value)||value.length>50||value.some(v=>typeof v!=="string"||v.length>80)))return false;
+ if(Object.values(review.fields??{}).some(v=>!v||typeof v.source!=="string"||v.source.length>128||!Array.isArray(v.evidence)||v.evidence.length>50||v.evidence.some(q=>typeof q!=='string'||q.length>2000)||(v.confidence!==null&&(typeof v.confidence!=='number'||!Number.isFinite(v.confidence)||v.confidence<0||v.confidence>1))))return false;
  for(const key of ['name','role','email','phone','phoneRaw','education'])if(parsed[key]!=null&&(typeof parsed[key]!=='string'||(parsed[key] as string).length>2000))return false;
- for(const key of ['skills','languages','certificates'])if(parsed[key]!=null&&(!Array.isArray(parsed[key])||(parsed[key] as unknown[]).some(v=>typeof v!=='string'||v.length>200)))return false;
+ for(const key of ['skills','languages','certificates'])if(parsed[key]!=null&&(!Array.isArray(parsed[key])||(parsed[key] as unknown[]).length>100||(parsed[key] as unknown[]).some(v=>typeof v!=='string'||v.length>200)))return false;
  for(const key of ['employmentHistory','educationHistory','certificationHistory'])if(parsed[key]!=null&&(!Array.isArray(parsed[key])||(parsed[key] as unknown[]).length>50||(parsed[key] as unknown[]).some(v=>!validHistory(v))))return false;
  return parsed.experience==null||(typeof parsed.experience==='number'&&Number.isFinite(parsed.experience)&&parsed.experience>=0);
 }

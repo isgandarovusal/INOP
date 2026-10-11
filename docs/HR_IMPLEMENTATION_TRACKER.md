@@ -812,3 +812,25 @@ Final `/tmp/inop-hr10c5-validation-final.log` and `/tmp/inop-packagehr10c5-valid
 P10 remains partial. P10-003 original retention/durable manifests, P10-006 actual migration preparation, P10-009 OCR jobs, P10-010 AI jobs, P10-012 ingestion jobs and P10-020 pre-real-intake comprehensive access/security checks are not silently closed. P10-013/014/015 cover tested parse and email only; future kinds remain pending. AUD-030/047/048/050/051/067/073 and AUD-090 remain open in their original scope. P10-018/019 and real AI/SMTP/Graph/source access remain BLOCKED_EXTERNAL. No real CV intake readiness, no automatic retention policy, no credentials/.env/DDL/production DB/push.
 
 Resume: finish safe local durable-original manifest/write/draft/quarantine preparation and migration inventory before external activation; retain OCR/AI/ingestion adapters and packages 11–13 in order. Any real-provider durability/recovery/scan/retention activation needs approved external access/policy and must not be represented as tested locally.
+
+
+10C5 commit: `62cb10a201e313af1382beb69ea4db5a3ed5b2ce`, 18 files, 110 combined targets / 1812 full, TypeScript/build PASS, lint 0 errors / 9 warnings, 13 smoke / 632 authorization; working tree was clean, no push.
+
+## 10C5B — approval draft boundary corrections
+
+| ID | Package | New finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-111 | 10C5B | Rejected non-CV selection clears the job approval proof before validation and silently permits an ordinary save without confirmation | TESTED | Actual browser baseline on `62cb10a` issues one PUT instead of zero; `hrCvApprovalDraftUI` final invalid-file test blocks PUT and retains proof/primary facts |
+| AUD-112 | 10C5B | Malformed processing review warnings pass the partial DTO guard and crash Candidate editor | TESTED | Actual browser injected malformed warnings produces a page error on `62cb10a`; final bounded metadata guard returns auxiliary error while retaining editable primary facts |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-026 | Validate a new file before changing draft/source/proof; rejected selection cannot bypass confirmation | TESTED | `hrCvApprovalDraftUI` invalid-file regression, actual editor/request count/owned DB |
+| P10-027 | Valid replacement cancels old evidence, omits old proof and starts pending review for the new original | TESTED | Actual browser new DOCX extraction/save, late old response, multipart body, new SHA/pending/no receipt; original bytes retained. `hrCvApproval` old-proof + replacement 400 only cleans rejected new file |
+| P10-028 | Bounded result metadata guard prevents malformed evidence/warnings/list/history render or apply | TESTED | `hrCvApprovalDraftUI` malformed warnings returns auxiliary error without page crash or primary draft loss; existing current result/source/UI regressions pass |
+
+No new policy/provider/env/production operation. Metadata validation covers warnings/correction arrays, evidence source/quotes/confidence, known scalar/list/history fields before applying. Invalid selections preserve current source and approval proof; real replacements invalidate old proof and cancel old evidence. Legacy synchronous editing still passes. The reproduction/fix is retained rather than hiding it behind the earlier passing suite.
+
+`/tmp/inop-hr10c5b-baseline.log`: both targeted negative tests fail on prior source (expected, not PASS). Final `/tmp/inop-hr10c5b-target-final.log`: **61/61** on the corrected app source (before two added replacement tests); final `/tmp/inop-hr10c5b-new-target.log`: **20/20**, including both replacement regressions. `/tmp/inop-hr10c5b-validation-final.log` and `/tmp/inop-packagehr10c5b-validation.json`: TypeScript/build PASS, lint 0 errors / 9 warnings, 13 smoke / 632 authorization. Final serial `/tmp/inop-hr10c5b-regression-final.log`: **1817/1817**, no failures/skips/cancellations on this source. `git diff --check` PASS; commit created only after successful checks. Exact commit SHA is recorded next update.
+
+Resume next at P10-006 scoped, bounded **dry-run metadata inventory**; no original bytes will be moved, deleted or represented as verified by metadata alone. Durable manifest/writer/source draft/quarantine, legal retention and real recovery remain pending; all earlier OPEN/BLOCKED_EXTERNAL IDs are retained.
