@@ -13,6 +13,13 @@ export type Section =
   | "roles"
   | "activityLog";
 
+export function hasHRAccess(user: PublicUser | null): boolean {
+  if (!user) return false;
+  // Server metadata is authoritative for the UI. Legacy canonical membership
+  // keeps a coordinated frontend/backend upgrade compatible; API still checks DB.
+  return user.role === 'admin' || (user.departmentId === 'dep_hr' && user.hrAccess !== false);
+}
+
 function permissionMatches(
   permission: Permission,
   resource: string,
@@ -50,6 +57,8 @@ export function getPermissionScope(
   if (!user) {
     return null;
   }
+
+  if (['recruitment', 'candidate', 'application'].includes(resource) && !hasHRAccess(user)) return null;
 
   const permission = (user.permissions || []).find((item) =>
     permissionMatches(item, resource, action),

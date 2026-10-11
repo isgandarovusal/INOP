@@ -2,7 +2,11 @@
 
 Baseline: `c74c49f41bb3a8a54566324c8902576a48a88e8f`, branch `work`. Local implementation and commits only; no production push/deployment. Existing data, secrets and user files must be preserved.
 
-Latest active continuation: **13K final local matrix/report gate**, following13J `0903b744127165448781d1605f9424b24610b07a`. All independent local implementations completed so far are preserved. Read the final13K section before using historical next/stop notes; external and deletion-policy gates are not inferred from earlier release authorization.
+Latest active continuation: **14A HR department boundary / premium UI extension**
+
+User now authorizes push only to `inop-hr-development`; `inop-main`, production, roles, secrets and DB migrations remain untouched. Canonical HR department is exactly `dep_hr`, Admin exempt, no name/role inference. User chose Candidate archive/restore with preserved Applications/history and permanent deletion disabled until retention approval. Original13K completion remains historical below.
+
+Previous continuation: **13K final local matrix/report gate**, following13J `0903b744127165448781d1605f9424b24610b07a`. All independent local implementations completed so far are preserved. Read the final13K section before using historical next/stop notes; external and deletion-policy gates are not inferred from earlier release authorization.
 
 Latest safe-stop checkpoint: [2026-10-11 checkpoint](#safe-stop-checkpoint-2026-10-11). Read that section before resuming; it supersedes older “next” notes without removing their history.
 
@@ -1393,3 +1397,26 @@ Final artifacts: `HR_IMPLEMENTATION_COMPLETION.md` package summary/current test 
 **Genuine pending decision:** AUD-030/051 linked Candidate deletion must choose dependency409 versus archive/restore and lawful retention duration/basis/authority. Prior owned DELETE200 orphan reproduction retained; silence is not a policy approval. No mass deletion/migration/seed/index drop/role rewrite is performed. Legacy HR repair, hosted snapshot/index/backups and any migration require separate explicit approval/access; owned DDL rehearsal is not production verification.
 
 **Resume point:** obtain the external evidence/setup and explicit deletion/retention answer; implement/test only the newly unblocked item and update this tracker. Do not repeat completed local packages, infer expired stop instructions, enable new real intake, create infrastructure or push/deploy without separate authorization. All ignored/local/.env files and prior artifacts/caches/models are preserved. `/tmp` remains nearly full ENV-HR-001; tests use the owned workspace TMPDIR and remove only their own fresh caches/fixtures. Roll-forward/disable gated providers preserves current scoped private reads and security fixes; no automatic insecure rollback.
+
+
+## 14 — renewed audit, HR department boundary and premium product UI
+
+Initial development push: all prior66 local commits retained, remote `inop-hr-development`=`f735acb47d27e4a93f0eeb3336af79d4209fbdd2`; main remains`c74c49f41bb3a8a54566324c8902576a48a88e8f`. No merge/deploy/migration. All13 package acceptance sections,368 existing stable acceptance IDs and131 finding rows retained and reviewed against final disposition/matrix/completion reports.122TESTED/7BLOCKED_EXTERNAL/2OPEN is the original13K checkpoint count, not a claim of new verification. External provider/scanner/storage readiness still blocked. Archive/restore is now explicitly authorized; lawful duration/permanent erasure remains undecided.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P14-001 | Push full history to development only and verify both remote SHAs | TESTED | Successful non-force explicit HEAD:refs/heads/inop-hr-development, ls-remote exact SHA; main unchanged |
+| P14-002 | Reconcile original13 packages/131 findings/368 acceptance IDs without dropping external/open work | TESTED | Original final artifacts retained; this extension explicitly tracks newly approved archive policy and new department constraint |
+| P14-003 | Canonical HR membership independently required for CRUD, summaries, analytics, export, CV/legacy files and approved background contexts | TESTED | hrDepartmentAccess canonical real local HTTP/DB policy tests plus independent scope/privateFiles/background targets138/138 |
+| P14-004 | HR menu/routes/actions/cancelled data fail closed on department or membership loss; Audit access and Admin preserved | TESTED | hrDepartmentAccessUI + hrLifecycle28/28 Chromium; zero new requests/hidden stale data, unrelated audit permission stays true |
+| P14-005 | Generic activity logs cannot expose HR data outside current HR/parent scope | OPEN | Newly discovered separate lookup gap; next security subpackage |
+| P14-006 | Archive/restore retains Candidate/Application/CV/history, scoped recovery and no permanent deletion | OPEN | User policy explicitly selected; no retention duration or permanent erase approval |
+| P14-007 | Consistent quiet HR design system for lists/forms/details/analytics/Kanban/modals/mobile | OPEN | Next scoped frontend package; avoid changing unrelated modules |
+| P14-008 | Final current source E2E/authorization/full regression/build/lint and responsive evidence | OPEN | Final matrix after implementation; prior13K runs are baseline only |
+
+| ID | Finding | Status | Evidence |
+|---|---|---|---|
+| AUD-132 | Resource grants/wildcards previously allowed non-HR departments to read HR data | TESTED | Corrected baseline7 failures; canonical policy now enforced independent of role/JWT/body, bytes rechecked after IO; target138/browser28, TS/buildPASS lint0/9 smoke13 authorization632 |
+| AUD-133 | Generic activity-log API can reveal HR record descriptions independently of HR department/parent authorization | OPEN | Current query applies only activity_log scope; separate reproduction/patch pending |
+
+14A validation `/workspace/inop-hr-gates/inop-packagehr14a-validation.json`,138backend/28browser, TSapp/node/buildPASS lint0errors/9baselinewarnings,13smoke/632authorization, diff-checkPASS. First baseline had invalid synthetic Job setup; corrected baseline reproduces the real bypass, retained separately. No roles or department IDs changed outside owned local fixtures. Existing mathematical scope fixtures explicitly simulate HR membership in two synthetic departments ONLY in their owned loopback DB; strict canonical policy suite opts out and tests unmodified production predicate/real routes. Browser fixture maps those synthetic HR memberships to canonical UI metadata, while backend scope ownership remains independently tested. This simulation does not assert that dep_A/dep_B/dep_HR are eligible in production.

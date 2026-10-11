@@ -9,6 +9,7 @@ async function current(req){
  const fresh={headers:req.headers};let status=200,verified=false;
  await verifyToken(fresh,{status(value){status=value;return this;},json(){return this;}},()=>{verified=true;});
  if(!verified)throw fail(status);
+ if(!require('./hrDepartmentAccess.service').isHRMember(fresh.user))throw fail(403);
  fresh.authRole={permissions:await getRolePermissions(fresh.user.role)};
  return fresh;
 }

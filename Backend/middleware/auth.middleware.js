@@ -103,6 +103,15 @@ exports.verifyToken = async (req, res, next) => {
   }
 };
 
+function hrDenied(req, res, resource) {
+  const access = require('../services/hrDepartmentAccess.service');
+  if (access.isHRResource(resource) && !access.isHRMember(req.user)) {
+    res.status(403).json({ message: 'HR department access is required.', code: 'HR_DEPARTMENT_REQUIRED' });
+    return true;
+  }
+  return false;
+}
+
 async function getRole(roleKey) {
   return Role.findOne({
     key: String(roleKey || "").toLowerCase(),
@@ -137,6 +146,8 @@ exports.requirePermission = (resource, action) => {
         message: "Authentication tələb olunur.",
       });
     }
+
+    if (hrDenied(req, res, resource)) return;
 
     try {
       let role = req.authRole;
@@ -241,6 +252,7 @@ exports.requireAnyPermission = (permissions) => {
           action
         );
 
+        if (scope && require('../services/hrDepartmentAccess.service').isHRResource(resource) && !require('../services/hrDepartmentAccess.service').isHRMember(req.user)) continue;
         if (scope) {
           req.permission = {
             resource,

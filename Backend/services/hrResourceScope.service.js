@@ -3,6 +3,8 @@ const { getDataScope } = require('../middleware/dataScope.middleware');
 // authorize() keeps a legacy req.dataScope for the route's primary resource.
 // Parent resources must use their own grant from the server-loaded role instead.
 function resourceFilter(req, resource, action = 'read') {
+  const access = require('./hrDepartmentAccess.service');
+  if (access.isHRResource(resource) && !access.isHRMember(req.user)) return { _id: { $in: [] } };
   const permission = req.authRole?.permissions?.find(p =>
     (p.resource === resource || p.resource === '*') &&
     (p.action === action || p.action === '*'));

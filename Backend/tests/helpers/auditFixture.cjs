@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 mongoose.set('autoCreate', false);
 mongoose.set('autoIndex', false);
 
-exports.withAuditFixture = async (callback) => {
+exports.withAuditFixture = async (callback, options = {}) => {
   process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
   process.env.SMTP_HOST = '';
   const models = {
@@ -22,6 +22,13 @@ exports.withAuditFixture = async (callback) => {
   };
   const database = `inop_audit_test_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
   let owned = false, server;
+  const membership = require('../../services/hrDepartmentAccess.service');
+  const canonicalMembership = membership.isHRMember;
+  // Existing mathematical own/department/assigned scope fixtures model two HR
+  // departments. Isolate that collaborator ONLY to this owned loopback DB.
+  // Canonical policy tests opt out and exercise the production predicate itself.
+  if (!options.canonicalHR) membership.isHRMember = user => canonicalMembership(user) ||
+    (owned && mongoose.connection.name === database && mongoose.connection.host === '127.0.0.1' && ['dep_A', 'dep_B', 'dep_HR'].includes(user?.departmentId));
   try {
     await mongoose.connect(`mongodb://127.0.0.1:27017/${database}`);
     if (mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) throw Error('Unexpected database');
@@ -75,6 +82,7 @@ exports.withAuditFixture = async (callback) => {
       async assign(actor, audit, status = 'accepted') { return models.Assignment.create({ auditId: audit._id, auditor: actors[actor]._id, status }); },
     });
   } finally {
+    membership.isHRMember = canonicalMembership;
     if (server) await new Promise(resolve => server.close(resolve));
     if (owned) {
       if (!/^inop_audit_test_\d+_[a-f0-9]{12}$/.test(database) || mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) throw Error('Refusing cleanup');

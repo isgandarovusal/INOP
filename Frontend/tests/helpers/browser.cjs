@@ -60,7 +60,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     const profile = async actor => {
       const user = await h.models.User.findById(h.actors[actor]._id).lean();
       const role = await h.models.Role.findOne({ key: user.role }).lean();
-      return { id: String(user._id), name: user.name, email: user.email, role: user.role, departmentId: user.departmentId, isActive: true, permissions: role.permissions };
+      return { id: String(user._id), name: user.name, email: user.email, role: user.role, departmentId: require('../../../Backend/services/hrDepartmentAccess.service').isHRMember(user) && user.role !== 'admin' ? 'dep_hr' : user.departmentId, isActive: true, permissions: role.permissions, hrAccess: require('../../../Backend/services/hrDepartmentAccess.service').isHRMember(user) };
     };
     async function open(actor, route) {
       initial = { user: await profile(actor), token: h.tokens[actor] };

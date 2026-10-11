@@ -33,6 +33,7 @@ export interface User {
   isActive: boolean;
   createdAt: string;
   permissions: Permission[];
+  hrAccess?: boolean;
 }
 
 export type PublicUser = Omit<User, "password">;

@@ -69,6 +69,7 @@ const readAuthority = (req,scope) => JSON.stringify([req.user.id,req.user.role,r
 async function currentCandidate(req, res, candidate, initialAuthority) {
   const fresh = async () => {
     await verifyToken(req,res,()=>{}); if (res.headersSent || res.destroyed) return null;
+    if (!require('../services/hrDepartmentAccess.service').isHRMember(req.user)) { res.status(403).json({code:'HR_DEPARTMENT_REQUIRED',message:'HR department access is required.'});return null; }
     const scope = await getPermissionScope(req.user.role,'candidate','read');
     const filter = getDataScope({user:req.user,permission:{scope}});
     if (filter === null) { res.status(403).json({message:'Fayla giriş icazəsi yoxdur.'});return null; }
@@ -156,6 +157,7 @@ exports.legacy = async (req, res) => {
   // Existing /uploads paths remain usable with Bearer auth; orphan files stay closed.
   const source = await Source.findOne({ fileName: filename }).lean();
   const resource = source ? 'audit.source_document' : 'candidate';
+  if (!source && !require('../services/hrDepartmentAccess.service').isHRMember(req.user)) return res.status(403).json({code:'HR_DEPARTMENT_REQUIRED',message:'HR department access is required.'});
   const scope = await getPermissionScope(req.user.role, resource, 'read');
   if (!scope || scope === 'none' || (source && scope !== 'all')) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
   if (source) return sendPrivateFile(req, res, filename, source.originalName);

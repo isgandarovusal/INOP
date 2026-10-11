@@ -53,7 +53,7 @@ test('HR parent resources keep independent read scopes', async t => withAuditFix
     await h.models.User.updateOne({ _id: owner }, { departmentId: '' });
     try {
       const r = await h.request('own', 'GET', `/applications/${app._id}`);
-      assert.equal(r.status, 200); assert.equal(r.data.candidateId, null); assert.equal(r.data.jobId, null);
+      assert.equal(r.status, 403); assert.equal(r.data.code, 'HR_DEPARTMENT_REQUIRED');
     } finally { await h.models.User.updateOne({ _id: owner }, { departmentId: 'dep_A' }); }
   });
   for (const scope of ['own', 'department', 'assigned']) await t.test(`${scope} parents are visible when their own relationship matches`, async () => {

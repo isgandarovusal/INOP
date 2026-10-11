@@ -26,6 +26,7 @@ function publicUser(user, permissions = []) {
     isActive: user.isActive,
     createdAt: user.createdAt,
     permissions,
+    hrAccess: require("../services/hrDepartmentAccess.service").isHRMember(user),
   };
 }
 
