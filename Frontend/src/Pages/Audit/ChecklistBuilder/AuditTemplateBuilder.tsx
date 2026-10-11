@@ -29,11 +29,12 @@ import type {
 import { useTranslation } from "react-i18next";
 
 import { useAuth } from "../../../Context/useAuth";
-import { useAuditResource } from "../../../Hooks/useAuditResource";
+import { useAuditResource, auditErrorStatus } from "../../../Hooks/useAuditResource";
 import { useAuditAction } from "../../../Hooks/useAuditAction";
 import { usePrivateFile, privateFileErrorMessage } from "../../../Hooks/usePrivateFile";
 import { getPermissionScope } from "../../../Utils/permissions";
 import AuditResourceState from "../../../Components/AuditResourceState";
+import { downloadBlob } from "../../../Utils/downloadFile";
 import PrivateFilePreview from "../../../Components/PrivateFilePreview";
 
 const loadDocuments = (id: string, signal?: AbortSignal, scopeKey?: string) => getAuditSourceDocuments(id === "__new__" ? undefined : id, signal, scopeKey);
@@ -111,6 +112,8 @@ function AuditTemplateEditor() {
   const removal = useAuditAction(id || "__new__", "audit.source_document", "delete");
   const preview = usePrivateFile(JSON.stringify([id, user?.id, user?.role, user?.permissions, source.status]));
   const [previewName, setPreviewName] = useState("");
+  const [previewDocumentId, setPreviewDocumentId] = useState("");
+  const download = useAuditAction(id || "__new__", "audit.source_document", "read");
   const documents = source.data || [];
   const saving = save.busy;
   const uploading = upload.busy;
@@ -519,7 +522,19 @@ function AuditTemplateEditor() {
           {removal.status !== "ready" && removal.status !== "loading" && <div data-source-mutation={removal.status}><AuditResourceState status={removal.status} /></div>}
           {preview.loading && <p role="status">{t("audit.checklist.builder.loading")}</p>}
           {preview.error && <p role="alert" data-file-error={preview.error}>{privateFileErrorMessage(preview.error)}</p>}
-          {preview.url && <PrivateFilePreview url={preview.url} type={preview.type} name={previewName} onClose={preview.close} />}
+          {download.status !== "ready" && download.status !== "loading" && <div data-source-download={download.status}><AuditResourceState status={download.status} /></div>}
+          {preview.url && <PrivateFilePreview url={preview.url} type={preview.type} name={previewName} onClose={preview.close} downloading={download.busy} onDownload={() => {
+            const documentId = previewDocumentId, name = previewName;
+            void download.run(async signal => {
+              try {
+                const blob = await getAuditSourceDocumentFile(documentId, signal);
+                if (!signal.aborted) downloadBlob(blob, name);
+              } catch (error) {
+                if (!signal.aborted && ["unauthenticated", "forbidden", "not-found"].includes(auditErrorStatus(error))) preview.close();
+                throw error;
+              }
+            });
+          }} />}
           <div className="audit-builder-list">
             {documents.map((document) => (
               <label
@@ -539,7 +554,7 @@ function AuditTemplateEditor() {
                 />
                 <span>{document.originalName || document.name}</span>
                 <button type="button" disabled={preview.loading} onClick={event => {
-                  event.preventDefault(); setPreviewName(document.originalName || document.name);
+                  event.preventDefault(); setPreviewName(document.originalName || document.name); setPreviewDocumentId(document.id);
                   void preview.open(signal => getAuditSourceDocumentFile(document.id, signal));
                 }}>Aç / Endir</button>
 

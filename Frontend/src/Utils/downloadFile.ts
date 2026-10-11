@@ -11,5 +11,6 @@ export function downloadBlob(
   anchor.click();
   anchor.remove();
 
-  window.URL.revokeObjectURL(url);
+  // Let the browser consume the explicit download before releasing its own URL.
+  setTimeout(() => window.URL.revokeObjectURL(url), 0);
 }
