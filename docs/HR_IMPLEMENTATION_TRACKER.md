@@ -96,9 +96,9 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | TESTED | `hrAccessibility` with full App CSS: four viewports, table/board keyboard regions, forms/detail, CV chooser and three-language names; documented workflow coverage, not WCAG certification |
 | AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | TESTED | 11A–11D approved default-disabled Graph/delta/durable Source/current actor/worker/review local tests; real consent/mailbox/provider/hosting P11-020 blocked |
-| AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
-| AUD-082 | 12 | External website capabilities and administrator access unknown | OPEN | — |
-| AUD-083 | 12 | Signed identity/privacy/anti-malware required before external real CV ingestion | OPEN | — |
+| AUD-081 | 12 | No approved external API/public application adapter | TESTED | 12A default-off approved signed registry/relay interface + actual local Source/Mongo/HTTP,51targets/full1743; real vendor adapter schema P12 external |
+| AUD-082 | 12 | External website capabilities and administrator access unknown | BLOCKED_EXTERNAL | All public GET attempts proxy403; vendor API/form/email/export/admin capabilities UNKNOWN, per-source company access checklist |
+| AUD-083 | 12 | Signed identity/privacy/anti-malware required before external real CV ingestion | IN_PROGRESS | 12A local signed identity/consent/unknown/infected/currentScope/abuse gates tested; actual malware scanner/private storage/privacy/retention/activation still external |
 
 ## Package 01: P0 authorization
 
@@ -374,7 +374,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 |---|---|---|---|
 | P11-001 | Approved GFC mailbox adapter | TESTED | 11A–11C local approved default-disabled Graph transport+MongoSource sink+explicit review UI, real mailbox P11-020 blocked |
 | P11-002 | OAuth/application permission choice | TESTED | 11A application client-credentials/.default contract + setup; actual tenant consent P11-020 blocked |
-| P11-003 | Least privilege mailbox scope | IN_PROGRESS | 11A code mailbox allowlist/config fail-closed tested; actual Exchange/Entra least-privilege evidence P11-020 blocked |
+| P11-003 | Least privilege mailbox scope | BLOCKED_EXTERNAL | Actual Exchange/Entra least privilege/mailbox restriction evidence unavailable; local approved allowlist is TESTED28 but not tenant policy proof |
 | P11-004 | Token lifecycle | TESTED | 11A synthetic transport token cache/skew/single-flight/401 refresh;28/28, real provider blocked |
 | P11-005 | Polling/delta or webhook | TESTED | 11B persistent single delta page/cursor+CAS lease/restart;98targets/fullbackend1704, synthetic Graph |
 | P11-006 | Pagination | TESTED | 11A bounded delta and attachment metadata next links;28/28 synthetic transport |
@@ -397,25 +397,25 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P12-001 | Public kfc.az research | OPEN | — |
-| P12-002 | Public pizzahut.az research | OPEN | — |
-| P12-003 | Public JobSearch research | OPEN | — |
-| P12-004 | First-party API/webhook evidence | OPEN | — |
-| P12-005 | Actual form destination evidence | OPEN | — |
-| P12-006 | Email notification evidence | OPEN | — |
-| P12-007 | CSV/admin export evidence | OPEN | — |
-| P12-008 | Official partner API evidence | OPEN | — |
-| P12-009 | Approved adapter interfaces | OPEN | — |
-| P12-010 | Actual email/Google Forms channels only | OPEN | — |
-| P12-011 | No unauthorized private scraping/login bypass | OPEN | — |
-| P12-012 | BLOCKED_EXTERNAL_ACCESS with required access | OPEN | — |
-| P12-013 | Approved alternative integration path | OPEN | — |
-| P12-014 | Public form abuse/rate limit | OPEN | — |
-| P12-015 | Upload validation | OPEN | — |
-| P12-016 | Anti-malware gate | OPEN | — |
-| P12-017 | Signed source identity | OPEN | — |
-| P12-018 | Idempotency | OPEN | — |
-| P12-019 | Privacy controls | OPEN | — |
+| P12-001 | Public kfc.az research | BLOCKED_EXTERNAL | Public read attempted: proxy403; live site/form content not verified, retained research + per-site access checklist |
+| P12-002 | Public pizzahut.az research | BLOCKED_EXTERNAL | Public read attempted: proxy403; live site/form content not verified, retained research + per-site access checklist |
+| P12-003 | Public JobSearch research | BLOCKED_EXTERNAL | Public read attempted: proxy403; live vacancy form/email/GoogleForms channel not verified |
+| P12-004 | First-party API/webhook evidence | BLOCKED_EXTERNAL | Unknown first-party capability; company/partner schema/approval required, no invented working API |
+| P12-005 | Actual form destination evidence | BLOCKED_EXTERNAL | Actual form destinations unknown; approved owner/admin metadata required |
+| P12-006 | Email notification evidence | BLOCKED_EXTERNAL | Actual destination mailbox/email notification unknown; approved company mailbox mapping needed |
+| P12-007 | CSV/admin export evidence | BLOCKED_EXTERNAL | Actual CSV/admin export schema/owner permission unavailable; no personal data collection |
+| P12-008 | Official partner API evidence | BLOCKED_EXTERNAL | Official partner API not verified; company/partner contact required |
+| P12-009 | Approved adapter interfaces | TESTED | 12A approved default-off signed Source registry + real local HTTP/Mongo sink; targets51/fullbackend1743; vendor schema external |
+| P12-010 | Actual email/Google Forms channels only | BLOCKED_EXTERNAL | JobSearch email/GoogleForms actual channels unverified; no fictitious channel; approved mailbox/owner export path documented |
+| P12-011 | No unauthorized private scraping/login bypass | TESTED | Only retained public read attempts, server fixed approved Graph transport/signed relay; no website scrape/login/private CV acquisition |
+| P12-012 | BLOCKED_EXTERNAL_ACCESS with required access | TESTED | HR_EXTERNAL_SOURCE_CAPABILITIES per-site BLOCKED_EXTERNAL_ACCESS, required access and no secret collection |
+| P12-013 | Approved alternative integration path | TESTED | Documented approved first-party signed relay/mailbox/authorized export alternatives, conditional on real owner/schema |
+| P12-014 | Public form abuse/rate limit | TESTED | 12A raw body2/7.1MB/30s,IP/source shared Mongo20/5 budgets/currentActor/timeout slots; actual HTTP/rate tests51 |
+| P12-015 | Upload validation | TESTED | 12A byte/ZIP worker +5MB/MIME/extension/filename/base64 negatives before write;51targets/full1743 |
+| P12-016 | Anti-malware gate | TESTED | 12A clean hash-bound scan before object write + Source worker rescan, infected/unknown/late cancellation tests; actual scanner external |
+| P12-017 | Signed source identity | TESTED | 12A exact raw signed version/source/epoch/UUID/SHA,constant-time validation, no forwardedIP spoof;51targets |
+| P12-018 | Idempotency | TESTED | 12A private unique receipt/body conflict/immutable commands/lost ack/new timestamp replay, actual Source no second PUT;51targets |
+| P12-019 | Privacy controls | TESTED | 12A consent/version/approved ownership/private ack/no PII/public ID,source-secret HMAC rate keys/metadata-only TTL; actual lawful retention approval external |
 | P12-020 | Real external integration E2E requires approved access | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 
 ## Package 13: E2E security and readiness
@@ -1219,3 +1219,17 @@ Final11B `/workspace/inop-hr11b-final.log`98/98 (0 fail/skip/cancel), complete f
 `HR_BACKGROUND_IDENTITY.md` explains internal WeakMap-only identity, approved fixed actor, no persisted employee JWT/no remote-forged context, existing permission policies/current scope preserved. Current source/Job hint and duplicate review are retained. First141/141 targets; metadata result now reports running=false after tick finally cleanup, final tests/complete backend pending. Authority helper addition affects no public verifyToken/role schema or grants; full current backend required because shared HR helper changed. No production auth policy/hosting/provider/env/secret change or worker start. New code is preparation, actual approved actor/bindings/real external integrations remain blocked.
 
 Final11D `/workspace/inop-hr11d-target-final.log`141/141, complete frozen current backend `/workspace/inop-hr11d-backend-full.log`1725/1725 exit0, 0fail/skip/cancel; validationhr11d TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Six explicit paths only. All previous Source/role/JWT/user-privilege/audit/upload suites pass with the private context branch; public verifyToken unchanged. No worker starts and no approval of production actor/tenant is implied. SHA follows next increment.
+
+11D commit `a57b2d7bb8de539cf0659c43fe0e08c51b92dd86`,six reviewedpaths; complete current backend1725/1725, targets141; TS/build PASS lint0/9 smoke13 authorization632, clean work/no push.
+
+## 12A — approved signed career relay / external capability gates
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P12-021 | Default-off signed registry/raw-body interface with current approved server actor, fresh signature and exact immutable command/body identity | TESTED | Final targets51/fullbackend1743; actual private HTTP/Source/Mongo, synthetic relay/store/scan only |
+| P12-022 | Public disabled-before-parser route, bounded raw/processing/IP/source budgets, safe files/hash-bound clean scan before object write | TESTED | Final targets51/fullbackend1743; actual private HTTP/Source/Mongo, synthetic relay/store/scan only |
+| P12-023 | Source/consent/provenance/durable receipt, independent Job mapping/HR ambiguity review; no automatic people/decisions/PII reply | TESTED | Final targets51/fullbackend1743; actual private HTTP/Source/Mongo, synthetic relay/store/scan only |
+
+Public read-only website attempts are retained as proxy403, capability UNKNOWN not fake API. `HR_EXTERNAL_SOURCE_CAPABILITIES.md` details per-site access and approved mailbox/signed relay/export alternatives, unknown actual Google Forms/email destinations, no private scraping and privacy/runtime/DDL/scan/durability requirements. The user will obtain administrator access later; preparation continues independently. Real first-party channels/provider/admin/privacy/runtime remainBLOCKED_EXTERNAL. New endpoint is additive and default-disabled before parsing; all other HR paths still globalJWT. No secrets in browser/env/repo, no activated real intake/provider/production operation.
+
+Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current backend `/workspace/inop-hr12a-backend-full.log`1743/1743 exit0,0fail/skip/cancel; validationhr12afinal TS/build PASS lint0/9 smoke13 authorization632. Source immutability/processing slots/reference scalar checks and source-wide budget were tightened before final tests; all assertions preserved. Ten explicit paths only; default profile no source registry/actor/store/AV/credential activation. API addition remains unavailable before accepted octet-stream parsing; global JSON parser still its original100KiB limit. No provider/website/hosting/DDL/production/push/deploy change. Actual vendor schemas/tenant consent/AV runtime/durability/lawful retention remain external/pending; continue native scan preparation/final invariants/matrix, not fake DONE.

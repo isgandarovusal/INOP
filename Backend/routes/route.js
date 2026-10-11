@@ -47,9 +47,12 @@ const auditClosureRoutes = require('./auditClosure.routes');
 const auditExportRoutes = require('./auditExport.routes');
 const candidateExportRoutes = require("./candidateExport.routes");
 
+// Signed career relay has its own default-disabled authentication contract.
+// No other HR API bypasses the existing global JWT middleware.
+router.use('/hr/career-intake',require('./hrCareerIntake.routes'));
 router.use('/auth', authRoutes);
 
-// All non-auth API routes require a valid JWT.
+// All remaining non-auth API routes require a valid JWT.
 // Authentication is therefore secure by default.
 router.use(verifyToken);
 
