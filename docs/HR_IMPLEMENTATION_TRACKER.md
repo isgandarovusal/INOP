@@ -24,8 +24,8 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-006 | 02 | UI broad canManageRecruitment enables unrelated resource actions | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-007 | 02 | Recruitment-only route guard blocks other legitimate HR resources | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-008 | 02 | Frontend truthy none scope does not fail closed | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
-| AUD-009 | 13 | Live JWT and role.update escalation protection must remain intact | OPEN | — |
-| AUD-010 | 13 | Legacy hr role migration is not automatic and hosted state unknown | OPEN | — |
+| AUD-009 | 13 | Live JWT and role.update escalation protection must remain intact | TESTED | 13F userPrivileges + authorization632: current DB role/old JWT/self-promotion/credential/admin positive and negative checks |
+| AUD-010 | 13 | Legacy hr role migration is not automatic and hosted state unknown | BLOCKED_EXTERNAL | 13F hrSeed current canonical/idempotent tests; separate approved per-account hosted inventory/repair plan, no automatic mass role rewrite |
 | AUD-011 | 06 | Assigned creator field lacks explicit reassignment workflow | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-012 | 02 | Nested populated _id objects are not normalized to id | TESTED | `Frontend/tests/hrContracts.test.cjs`: 8/8; summary contract 36/36 |
 | AUD-013 | 02 | JobDetail compares populated jobId object with string and loses applications | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
@@ -76,14 +76,14 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-058 | 05 | Breakdown/version/hash/coverage not persisted | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-059 | 05 | Default zero conflates uncalculated and real zero | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-060 | 05 | Cross-vacancy global ranking is not meaningful | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
-| AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | OPEN | — |
+| AUD-061 | 13 | Protected traits excluded and no automatic decision must remain invariant | TESTED | 13B ats-v2 fairness/metadata fingerprints + 13F actual Source/HR/Application score/status/interview/explicitdecision E2E; semantic guard limits documented |
 | AUD-062 | 06 | Candidate-global statuses conflict with Application stages | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-063 | 06 | No processing state, revision CAS or transition validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-064 | 06/08 | DnD order not persisted and status requests can race | TESTED | `applicationOrdering`, `hrBoard`, `hrBoardUI`, existing lifecycle UI: scoped atomic status/order, target/neighbor conflict, actual keyboard drag and refresh persistence, page-two anchors, rollback and stale permission response |
 | AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
 | AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | IN_PROGRESS | 10D1 lost-ack compensation/source retention and UI retry guard tested locally; durable source commands/ingestion and real retention/recovery remain incomplete |
-| AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
+| AUD-068 | 13 | HR user.create does not override privileged role.update account administration | TESTED | 13F userPrivileges current server role.update/all denies HR self/foreign privilege or credential promotion; legitimate admin positive |
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 | AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
 | AUD-071 | 11 | No ingestion source identity or person-level deduplication | TESTED | 11B immutable source receipts/one command replay;11C scoped possible duplicate hints/no auto person merge, real providers blocked |
@@ -1301,3 +1301,15 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-033 | HR Job/Candidate/Application CRUD/action validation/status states localized AZ/EN/RU and stable keys retranslate without refetch | TESTED | hrCrudErrorsUI + existing lifecycle/contracts/document tests,73initial/51final |
 
 `HR_CRUD_ERROR_PRESENTATION.md` explains HR-only toast suppression, sanitized presentation and unchanged backendAPI. `/workspace/inop-hr13e-crud-baseline.log`1pass/9fail reproduces actual old code, not PASS. Initial target73/73; after storing error keys across lists/linking/workflow `/workspace/inop-hr13e-ui-current.log`51/51,0fail/skip/cancel. Current validationhr13ecurrent TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Shared axios behavior is limited to HR relative paths, previous nonHR default unchanged; final complete frontend matrix pending. No production/provider/DDL/push/deploy. Retention and real storage/scanner gates remain separate; Source parallel55 pass does not close AUD-090.
+
+13E commit `8ec6ae1` (full SHA in ledger),16paths; final51/unchangedextra22 UI, all gatesPASS.
+
+## 13F — joined recruitment E2E / owned local DB release rehearsal
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-034 | Joined immutable approved mock Graph → actual Source/parser/HR/Candidate/Application/ATSv2/board/interview/explicitdecision/scoped analytics | TESTED | hrRecruitmentE2E8/8; actual local Mongo/HTTP/PDF/DOCX/AZ-EN-RU, synthetic Graph/store/AV only |
+| P13-035 | Three brands/branches, same Candidate separate Jobs, actual0/100, revision409 and SMTP outage leaves status valid | TESTED | Joined E2E8/8, no real email/provider call; independently restricted CV downloads verified |
+| P13-036 | Schema-only inventory, no-write dry run, additive idempotent owned local DDL and conflicting-index refusal without data/legacy snapshot backfill | TESTED | hrReleaseIndexes6/6; no production apply capability or startup import |
+
+`HR_DB_RELEASE_PREPARATION.md` documents exact schema-derived inventory, production approval/backup/uniqueness/window/rollback and separate HR account repair; existing legacy schema auto-index defaults explicitly retained, not claimed disabled. Initial local comparison treated Mongo's omitted default simple collation as a conflict; fixed equivalence without relaxing uniqueness/partial/TTL. Final `/workspace/inop-hr13f-final.log`103/103,0fail/skip/cancel, includes E2E/DDL/hrSeed/userPrivileges. Previous99run did not include misspelled hrSeed filename and is not mislabeled; final correctly includes actual hrSeed4. Validationhr13f TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. No actual Atlas DDL/account repair/backup/provider/runtime activation, production/push/deploy. AUD-090 retained OPEN pending causal investigation; final frontend/backend full matrix/disposition next.
