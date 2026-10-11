@@ -6,4 +6,4 @@ Backend permission middleware, independent parent resource filters, fresh JWT au
 
 Evidence: hrDepartmentAccess strict production predicate + owned HTTP/Mongo coverage, all/own/department/assigned/none grants, wildcard non-HR actor, unrelated Audit route200, Admin200, anonymous401, current department with old JWT, legacy alias and withheld CV bytes when department changes during simulated storage IO. Real storage/scanner remain unverified; the delayed provider test is synthetic. Existing scope fixtures separately simulate known test HR memberships without modifying production policy.
 
-Remaining: generic activity descriptions must be independently parent-scoped; Candidate archive/restore is approved; retention duration/permanent erasure and real provider activation remain blocked. No migration, secret change, production push or deployment.
+Generic activity descriptions are independently parent-scoped (14B), and approved Candidate archive/restore is implemented/tested (14C). Remaining: lawful retention duration/permanent erasure and real provider activation. No migration, secret change, production push or deployment.

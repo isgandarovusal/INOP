@@ -1,4 +1,6 @@
-# Final ATS-v2 local API benchmark
+# ATS-v2 local API benchmarks
+
+## Historical13K sample
 
 Bound source `0903b744127165448781d1605f9424b24610b07a`, Node24.19.0. New owned loopback Mongo fixture per size; synthetic data, actual GET routes. Run after full frontend/backend runners finished, without overlapping validation. No .env/provider/production/hosting access, no seed/reset/migration on existing data. Artifact `/workspace/inop-hr13-final-atsv2-benchmark.json`; command `node --expose-gc Backend/scripts/benchmarkHr.cjs /tmp/inop-hr13-final-atsv2.json`, successful exit. Original report and log retained; only each runner-owned temporary database was dropped.
 
@@ -33,3 +35,41 @@ At50k, legacy Applications returns162,222,693bytes/50,000rows at8,267.8ms versus
 API latency includes local route/Mongo/client serialization; Server-Timing covers server handling. Same Node process contains measurement client and API: RSS/heap deltas are neither isolated server peak nor memory guarantees. Raw data retains negative GC deltas. No browser/hosted SLA follows from this benchmark.
 
 Production-build browser comparison was already completed in08D2 and is not rerun or relabeled as current-HEAD isolated React CPU: see HR_PERFORMANCE_MEASUREMENTS. At5k historical baseline table rendered5000rows/16.2MB,6,809ms paint/2,516ms long task versus current paged30rows/23.7KB,368ms navigation→two-frame paint/54ms longest task;50k historical baseline FAILED_OR_TIMEOUT, not fabricated OOM/latency. Its archived source/single local sample limitations remain explicit. Current corrected full frontend408/408 separately verifies actual lifecycle/contracts/parallel download correctness.
+
+
+## Current14F sample
+
+Bound source `fcceff65fdeb908a4eb41d92853b5e8e82356a7f`, same unchanged production code as14E;504frozen source/test/config hashes rechecked. Node24.19.0, owned loopback fixture per0/5,000/50,000, actual GET/Mongo after full runners completed, exit0. Artifact `/workspace/inop-hr14f-final-atsv2-benchmark.json`, log `/workspace/inop-hr14f-final-benchmark.log`. No .env/hosting/provider/production DB access or migration.
+
+| Records | Endpoint | ms | JSON bytes | Rows | Backend timing ms |
+|---:|---|---:|---:|---:|---:|
+| 0 | `/applications` | 53.9 | 2 | 0 | 15.26 |
+| 0 | `/candidates` | 10.8 | 2 | 0 | 6.50 |
+| 0 | `/hr/v2/applications` | 16.4 | 102 | 0 | 12.41 |
+| 0 | `/hr/v2/candidates` | 8.7 | 102 | 0 | 5.25 |
+| 0 | `/hr/v2/application-board` | 18.4 | 1013 | 0 | 14.85 |
+| 0 | `/hr/v2/application-board (selected Job)` | 19.2 | 1012 | aggregate / selected Job | 15.89 |
+| 0 | `/hr/v2/application-ranking (selected Job)` | 21.4 | 102 | aggregate / selected Job | 17.16 |
+| 0 | `/hr/analytics` | 19.4 | 2751 | aggregate / selected Job | 15.98 |
+| 5000 | `/applications` | 853.3 | 16217265 | 5000 | 693.12 |
+| 5000 | `/candidates` | 112.0 | 3564891 | 5000 | 90.09 |
+| 5000 | `/hr/v2/applications` | 20.5 | 23749 | 30 | 17.42 |
+| 5000 | `/hr/v2/candidates` | 12.6 | 14178 | 30 | 10.86 |
+| 5000 | `/hr/v2/application-board` | 58.8 | 66687 | 80 | 55.40 |
+| 5000 | `/hr/v2/application-board (selected Job)` | 37.6 | 65849 | aggregate / selected Job | 35.37 |
+| 5000 | `/hr/v2/application-ranking (selected Job)` | 138.5 | 23677 | aggregate / selected Job | 136.63 |
+| 5000 | `/hr/analytics` | 563.5 | 2847 | aggregate / selected Job | 560.35 |
+| 50000 | `/applications` | 8156.3 | 162222693 | 50000 | 6772.82 |
+| 50000 | `/candidates` | 1221.2 | 35698891 | 50000 | 951.37 |
+| 50000 | `/hr/v2/applications` | 43.4 | 23744 | 30 | 39.82 |
+| 50000 | `/hr/v2/candidates` | 59.5 | 14209 | 30 | 56.43 |
+| 50000 | `/hr/v2/application-board` | 260.7 | 66689 | 80 | 256.96 |
+| 50000 | `/hr/v2/application-board (selected Job)` | 129.4 | 65858 | aggregate / selected Job | 126.31 |
+| 50000 | `/hr/v2/application-ranking (selected Job)` | 1149.6 | 23672 | aggregate / selected Job | 1146.26 |
+| 50000 | `/hr/analytics` | 4771.9 | 2871 | aggregate / selected Job | 4768.22 |
+
+All24endpoint calls200; all15scope totals equal expected counts. Separate scope-math fixtures explicitly simulate eligible HR departments in the owned DB; strict canonical dep_hr suite independently tests unmodified production membership. This benchmark does not admit extra production department IDs. At5k/50k the four sampled unhinted newest31row plans examine31keys/documents; they are not proof for every actual aggregate or archive filter plan.
+
+At50k: legacy Applications8156.3ms/162222693bytes/50000rows versus paged43.4ms/23744bytes/30rows; legacy Candidates1221.2ms/35698891bytes versus paged59.5ms/14209bytes/30rows. Board260.7ms/66689bytes/80cards, ranking1149.6ms/23672bytes, analytics4771.9ms/2871bytes/213Mongoose method observations. Full body sizes include JSON serialization; candidate page adds archive metadata. Single samples are not controlled before/after latency regression proof or hosted p95. Analytics/ranking still scan scoped cohorts and are the main remaining measured performance risk. Archive-heavy workloads were not part of these all-active samples; their index selectivity/latency is unmeasured.
+
+Query counters omit wire getMore; sampled explain plans apply only to their named queries. Client and API share one Node process: raw RSS/heap/GC deltas are not isolated server peak memory. Existing production-build UI baseline remains archived-source evidence, not a fake current CPU rerun. Current439frontend tests instead verify real bounded rendering/lifecycle, parallel authorized download and actual-shell mobile containment. No hosted, real storage or scanner PASS inferred.

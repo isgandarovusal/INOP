@@ -1,6 +1,6 @@
 # HR audit finding disposition
 
-All original AUD-001–083 findings and later AUD-084–131 are retained with stable IDs. TESTED refers to the documented local implementation/regression; it never certifies a real provider, hosted runtime, legal policy or production deployment. Historical evidence references remain tied to their named runs. Current full-suite result and source binding belong to HR_IMPLEMENTATION_COMPLETION. No finding is silently deleted or marked DONE.
+All original AUD-001–083 findings and later AUD-084–131 are retained with stable IDs. TESTED refers to the documented local implementation/regression; it never certifies a real provider, hosted runtime, legal policy or production deployment. Historical evidence references remain tied to their named runs. Current renewed full-suite evidence belongs to HR_DEVELOPMENT_FINAL_REPORT; HR_IMPLEMENTATION_COMPLETION retains the13K baseline. No finding is silently deleted or marked DONE.
 
 | ID | Package | Original finding | Disposition | Evidence / remaining limit |
 |---|---|---|---|---|
@@ -33,7 +33,7 @@ All original AUD-001–083 findings and later AUD-084–131 are retained with st
 | AUD-027 | 02 | Error/notFound states are conflated or leave forms editable | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-028 | 06 | Activity log lacks scope fields for own/department visibility | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-029 | 06 | Best-effort generic activity log is not Application event history | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
-| AUD-030 | 10 | Hard deletion leaves orphan Applications/CV files | OPEN | Owned deletion reproduction `/tmp/inop-hr10d-delete-baseline.json`: DELETE200 leaves Application/original but canonical file404. Explicit dependency409 versus archive/restore policy decision pending; no destructive cleanup or inferred policy. |
+| AUD-030 | 10/14C | Hard deletion leaves orphan Applications/CV files | TESTED | Explicitly approved archive/restore: legacy DELETE reversible, retained Candidate/CV/Application/history, active exclusion, scoped restore/CAS409; hrCandidateArchive7/7 and actual UI42/42. No permanent erasure or migration. Prior orphan reproduction retained as historical baseline. |
 | AUD-031 | 06 | Closed/draft Job accepts applications without lifecycle validation | TESTED | `applicationLifecycle.test.cjs`, `applicationScoreState.test.cjs`, `hrContracts.test.cjs`; backend workflow/history/CAS contract; UI integration remains 06B |
 | AUD-032 | 02 | Canonical Candidate/CV pipeline unused by frontend job context | TESTED | `Frontend/tests/hrLifecycle.test.cjs`: 21/21; `hrContracts.test.cjs`: 9/9; full 1051/1051 |
 | AUD-033 | 03 | PDF/DOCX extraction is real but scanned OCR unavailable | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
@@ -54,7 +54,7 @@ All original AUD-001–083 findings and later AUD-084–131 are retained with st
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | BLOCKED_EXTERNAL | 13C native adapter14/14 and hash-bound Source/relay quarantine tests; actual scanner/definitions/EICAR absent, legacy upload activation not certified |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | BLOCKED_EXTERNAL | Local private storage/read/manifest/Source/recovery contracts tested; actual approved durable provider/redeploy persistence/restore not available. Native legacy filesystem remains ephemeral; no real CV readiness. |
-| AUD-051 | 10 | Privacy retention/deletion lifecycle is absent | OPEN | Retention/deletion policy, durations, lawful basis and authorized archive/restore versus dependency409 decision pending. No automatic delete/TTL/backfill on originals/results/history. |
+| AUD-051 | 10/14C | Privacy retention/deletion lifecycle is absent | OPEN | Archive/restore is approved and implemented. Lawful retention duration/basis and permanent-erasure authority remain undecided; permanent deletion disabled. No original/history TTL, automatic cleanup/backfill or policy inference. |
 | AUD-052 | 09 | Job AI suggestion is hardcoded timeout and three/four fixed skills | TESTED | `hrAiUI` / existing `cvReviewUI`: unavailable/manual/rule-based labels and no manufactured skills; provider test-only mode explicit; real AI E2E remains blocked |
 | AUD-053 | 05 | Standalone aiMatchService and MatchScoreBadge unused | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
 | AUD-054 | 05 | Historical global match UI removed; restore only Application context | TESTED | `applicationMatching`, `applicationScoreState`, `applicationMatchingUI`; 31 new passing checks; authoritative Application context |
@@ -136,4 +136,18 @@ All original AUD-001–083 findings and later AUD-084–131 are retained with st
 | AUD-130 | 07/13 | Analytics always reports AI not_integrated even when its real adapter is configured | TESTED | hrIntegrationHealth actual HTTP default/incomplete/unsupported/complete synthetic config, zero external calls and no secret/model response |
 | AUD-131 | 02/13 | CandidateForm shared error branch renders stored translation keys literally for explicit confirmation/409 | TESTED | Actual complete frontend399/408 reproduction; one JSX translation correction, unchanged approval/AI/OCR/manual/source assertions and extra three-language zero-refetch checks, targets45/45 |
 
-Remaining decision: AUD-030/051 Candidate deletion/retention requires dependency409 versus archive/restore plus lawful retention durations/basis. Existing destructive cleanup is not authorized. External blockers: hosted HR account inventory, real scanner, private durable storage/recovery/activation, retirement of legacy upload path, approved website/tenant/provider/privacy gates. See HR_RELEASE_E2E_MATRIX and provider setup documents.
+Remaining decision: AUD-051 lawful retention durations/basis and permanent-erasure authority. AUD-030 archive/restore is explicitly approved, implemented and tested; existing destructive cleanup remains unauthorized. External blockers: hosted HR account inventory, real scanner, private durable storage/recovery/activation, retirement of legacy upload path, approved website/tenant/provider/privacy gates. See HR_RELEASE_E2E_MATRIX and provider setup documents.
+
+## Renewed HR boundary/product findings
+
+| ID | Package | Original finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-132 | 14A | Resource grants/wildcards allow non-HR departments to access HR data | TESTED | Canonical dep_hr server-loaded membership independent of grants; strict current JWT/bytes/background tests138 and browser28; Admin and unrelated Audit preserved. Synthetic multi-department scope fixtures are explicitly separate from production predicate. |
+| AUD-133 | 14B | Generic activity descriptions reveal HR parents outside current membership/read scope | TESTED | Owned baseline4failures, current privacy/membership/scopes104/104; bounded independent parent aggregate before cap, no sensitive lookup projection. |
+| AUD-134 | 14D | Actual shell analytics table overflows mobile and legacy styles defeat readable headings | TESTED | Actual-shell baseline4failures,20/20 real HTTP/DB responsive/menu/KPI tests at390/1280 plus62 existing accessibility/responsive tests. |
+
+All original131 findings retained; current135 dispositions:126 TESTED locally,7 BLOCKED_EXTERNAL,2 OPEN. Provider deployment/storage/scanner/legal evidence is never inferred from these test results.
+
+| ID | Package | Original finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-135 | 14F | Authorized deletion of a linked Job orphans the retained Application job context | OPEN | Owned actual HTTP/Mongo DELETE200, Job absent/Application retained/detail200 jobId=null. Separate explicit dependency409/Closed versus Job archive policy question; no inferred migration or destructive cleanup. |

@@ -1,6 +1,6 @@
 # HR local commit ledger
 
-Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 65 existing HR/checkpoint implementation commits preserved. This document inventories actual Git objects and their changed paths; it does not imply push, hosted deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
+Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 72 HR/checkpoint commits through `fcceff65fdeb908a4eb41d92853b5e8e82356a7f` preserved; original65 baseline entries retained. This document inventories actual Git objects and their changed paths; development push is separately verified by ls-remote; this inventory never implies production deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
 
 ## `a832bd76f918d6a142e3086c1a5be108935a0000`
 
@@ -1208,3 +1208,132 @@ fix(hr): translate explicit review validation messages
 - `A docs/HR_FINAL_REGRESSION_CORRECTIONS.md`
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
 
+
+## `f735acb47d27e4a93f0eeb3336af79d4209fbdd2`
+
+docs(hr): finalize verified E2E matrix and external release gates
+
+6 changed paths:
+
+- `A docs/HR_AUDIT_FINDING_DISPOSITION.md`
+- `A docs/HR_FINAL_API_BENCHMARK.md`
+- `A docs/HR_IMPLEMENTATION_COMPLETION.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `A docs/HR_LOCAL_COMMIT_LEDGER.md`
+- `A docs/HR_RELEASE_E2E_MATRIX.md`
+
+## `65e64daba6dcb112fb384efcd69650d4d8aad73e`
+
+fix(hr): enforce canonical department access independently of grants
+
+21 changed paths:
+
+- `M Backend/controllers/auth.controller.js`
+- `M Backend/controllers/privateFiles.controller.js`
+- `M Backend/middleware/auth.middleware.js`
+- `M Backend/services/hrBackgroundActor.service.js`
+- `M Backend/services/hrCreateRecovery.service.js`
+- `A Backend/services/hrDepartmentAccess.service.js`
+- `M Backend/services/hrResourceScope.service.js`
+- `M Backend/tests/helpers/auditFixture.cjs`
+- `M Backend/tests/hrBackgroundActor.test.cjs`
+- `A Backend/tests/hrDepartmentAccess.test.cjs`
+- `M Backend/tests/hrResourceScopes.test.cjs`
+- `M Frontend/src/Hooks/useAuditAction.ts`
+- `M Frontend/src/Hooks/useAuditResource.ts`
+- `M Frontend/src/Hooks/useHRActionContext.ts`
+- `M Frontend/src/Routes/HRRoute.tsx`
+- `M Frontend/src/Types/auth.ts`
+- `M Frontend/src/Utils/permissions.ts`
+- `M Frontend/tests/helpers/browser.cjs`
+- `A Frontend/tests/hrDepartmentAccessUI.test.cjs`
+- `A docs/HR_DEPARTMENT_ACCESS.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `feacace3f59bda485addc8f17f124236b47575b8`
+
+fix(hr): scope recruitment activity descriptions to readable parents
+
+4 changed paths:
+
+- `M Backend/controllers/activityLog.controller.js`
+- `A Backend/services/hrActivityVisibility.service.js`
+- `A Backend/tests/hrActivityPrivacy.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `7110d2e63c58b1e23c00d2be7783e30ed477c9be`
+
+feat(hr): archive and restore candidates without erasing history
+
+26 changed paths:
+
+- `M Backend/controllers/applications.controller.js`
+- `A Backend/controllers/candidateArchive.controller.js`
+- `M Backend/controllers/candidateExport.controller.js`
+- `M Backend/controllers/candidates.controller.js`
+- `M Backend/controllers/dashboardSummary.controller.js`
+- `M Backend/controllers/hrPaged.controller.js`
+- `M Backend/models/candidate.model.js`
+- `M Backend/routes/route.js`
+- `M Backend/services/hrCvApproval.service.js`
+- `M Backend/services/hrCvIntakeScope.service.js`
+- `M Backend/services/hrCvProcessing.service.js`
+- `A Backend/tests/hrCandidateArchive.test.cjs`
+- `A Frontend/src/Components/CandidateArchiveHistory.tsx`
+- `A Frontend/src/Components/HRConfirmDialog.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx`
+- `M Frontend/src/Services/candidatesService.ts`
+- `M Frontend/src/Services/hrPageService.ts`
+- `M Frontend/src/Types/recruitment.ts`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `A Frontend/tests/hrCandidateArchiveUI.test.cjs`
+- `A docs/HR_CANDIDATE_ARCHIVE.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `02fdfa3dd3ae0cc3b89814aa5f7941926a48997f`
+
+feat(hr): unify responsive recruitment workspace design
+
+19 changed paths:
+
+- `M Frontend/src/App.css`
+- `M Frontend/src/Components/HRResourceState.tsx`
+- `M Frontend/src/Layouts/AppShell/AppShell.tsx`
+- `M Frontend/src/Pages/Dashboard/Dashboard.tsx`
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CvIntakeDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CvIntakeQueue.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx`
+- `A Frontend/src/Styles/hr-workspace.css`
+- `A Frontend/tests/hrWorkspaceUI.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `A docs/HR_WORKSPACE_DESIGN.md`
+
+## `ebaf0859898efa3e177ff79de3342a10233817e0`
+
+test(hr): align action race coverage with candidate archival
+
+2 changed paths:
+
+- `M Frontend/tests/candidateActions.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `fcceff65fdeb908a4eb41d92853b5e8e82356a7f`
+
+test(hr): require readable parents in activity lifecycle fixtures
+
+2 changed paths:
+
+- `M Backend/tests/applicationLifecycle.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
