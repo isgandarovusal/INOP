@@ -66,6 +66,12 @@ const candidateSchema = new mongoose.Schema(
       reviewStatus: { type: String, enum: ['pending', 'confirmed', 'corrected'] },
       fields: mongoose.Schema.Types.Mixed, warnings: [String], correctedFields: [String],
       reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, reviewedAt: Date,
+      processingApproval: new mongoose.Schema({
+        jobId: mongoose.Schema.Types.ObjectId, parserVersion: String,
+        sourceHash: String, sourceContextHash: String, sourceRevision: Number,
+        resultHash: String, approvedFields: [String], profileHash: String,
+        approvedBy: {type:mongoose.Schema.Types.ObjectId,ref:"User"}, approvedAt: Date,
+      }, { _id: false }),
     },
     employmentHistory: { type: [mongoose.Schema.Types.Mixed], default: [] },
     educationHistory: { type: [mongoose.Schema.Types.Mixed], default: [] },

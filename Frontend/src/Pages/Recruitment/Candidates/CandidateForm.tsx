@@ -1,3 +1,6 @@
+import {isAxiosError} from 'axios';
+import CvProcessingApprovalReview from '../../../Components/CvProcessingApprovalReview';
+import type {CvProcessingJob} from '../../../Services/cvProcessingService';
 import CvReviewAssistant from "../../../Components/CvReviewAssistant";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import CvHistoryEditor from "../../../Components/CvHistoryEditor";
@@ -19,7 +22,7 @@ import {
   parseCandidateCv,
   updateCandidate,
 } from "../../../Services/candidatesService";
-import type { Candidate, CandidateStatus, Job, CvHistoryEntry, CvReview } from "../../../Types/recruitment";
+import type { Candidate, CandidateStatus, Job, CvHistoryEntry, CvReview, CvProcessingApproval } from "../../../Types/recruitment";
 import { useTranslation } from "react-i18next";
 
 const ACCEPTED_CV_TYPES = [
@@ -29,7 +32,7 @@ const ACCEPTED_CV_TYPES = [
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ initial, job }) => {
+const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processingJobId?: string }> = ({ initial, job, processingJobId }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const isEdit = Boolean(id);
@@ -47,6 +50,17 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   const [certificationHistory, setCertificationHistory] = useState<CvHistoryEntry[]>(initial?.certificationHistory ?? []);
   const [review, setReview] = useState<CvReview | undefined>(initial?.cvReview);
   const [confirmReview, setConfirmReview] = useState(false);
+  const [processingApproval,setProcessingApproval]=useState<CvProcessingApproval|undefined>();
+  function applyProcessing(job:CvProcessingJob){
+    const p=job.result!.parsed;
+    for(const [field,setter] of [["name",setName],["role",setRole],["email",setEmail],["education",setEducation]] as const)if(typeof p[field]==="string"&&p[field])setter(p[field] as string);
+    if(typeof p.phoneRaw==="string"&&p.phoneRaw)setPhone(p.phoneRaw);else if(typeof p.phone==="string"&&p.phone)setPhone(p.phone);
+    if(typeof p.experience==="number")setExperience(p.experience);
+    for(const [field,setter] of [["skills",setSkills],["languages",setLanguages],["certificates",setCertificates]] as const)if(Array.isArray(p[field])&&p[field].length)setter(p[field] as string[]);
+    for(const [field,setter] of [["employmentHistory",setEmploymentHistory],["educationHistory",setEducationHistory],["certificationHistory",setCertificationHistory]] as const)if(Array.isArray(p[field])&&p[field].length)setter(p[field] as CvHistoryEntry[]);
+    setReview(job.result!.review);setConfirmReview(false);
+    setProcessingApproval({jobId:job.id,contextHash:job.source.contextHash,expectedJobUpdatedAt:job.updatedAt});
+  }
   const [skills, setSkills] = useState<string[]>(initial?.skills ?? []);
   const [languages, setLanguages] = useState<string[]>(initial?.languages ?? []);
   const [certificates, setCertificates] = useState<string[]>(initial?.certificates ?? []);
@@ -77,6 +91,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   };
 
   const handleCvChange = async (file: File | null) => {
+    setProcessingApproval(undefined);setConfirmReview(false);
     setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
     const sequence = ++parsing.current.sequence;
@@ -135,6 +150,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (saving) return;
+    if(processingApproval&&!confirmReview){setError(t("hrApproval.confirmRequired"));return;}
     if (aiGenerating || saving) return;
     if (job && !cvFile) { setError(t("hrStates.cvRequired")); return; }
     if (!name.trim()) {
@@ -160,6 +176,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
         employmentHistory, educationHistory, certificationHistory,
         reviewStatus: confirmReview ? "confirmed" as const : undefined,
         expectedRevision: initial?.revision,
+        processingApproval,
         cvFile,
         jobId: job?.id,
       };
@@ -183,6 +200,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
       navigate("/app/recruitment/candidates");
     } catch (err: unknown) {
       if (!mounted.current) return;
+      if(isAxiosError(err)){const status=err.response?.status;if(status===401||status===403||(status===404&&err.response?.data?.code!=="PROCESSING_JOB_UNAVAILABLE")){setAccessDenied(status===401?"unauthenticated":status===403?"forbidden":"not-found");return;}if(status===409||status===404){setConfirmReview(false);setError(t("hrProcessing.error.changed"));return;}}
       setError(
         getErrorMessage(err, t("recruitment.candidateForm.genericError")),
       );
@@ -210,6 +228,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job }> = ({ ini
       )}
 
         <form onSubmit={handleSubmit}>
+          {initial&&processingJobId&&!sourceChanged&&!cvFile&&<CvProcessingApprovalReview candidate={initial} jobId={processingJobId} disabled={saving||aiGenerating} onApply={applyProcessing} onAccessDenied={setAccessDenied}/>}
           {/* CV Upload */}
           <section className="candidate-form-section">
             <div className="candidate-form-section__header">
@@ -473,11 +492,12 @@ const CandidateForm: React.FC = () => {
   const [search] = useSearchParams(); const jobId = id ? undefined : search.get("jobId") ?? undefined;
   const job = useAuditResource(jobId, "recruitment", getJobById, { refreshOnFocus: false });
   const result = useAuditResource(id, "candidate", getCandidateById, { refreshOnFocus: false });
-  const key = JSON.stringify([id, jobId, user?.id, user?.role, user?.departmentId, user?.permissions]);
+  const processingJobId=id ? search.get("processingJobId") ?? undefined : undefined;
+  const key = JSON.stringify([id, jobId, processingJobId, result.data?.revision, result.data?.updatedAt, user?.id, user?.role, user?.departmentId, user?.permissions]);
   if (!hasPermission(user, "candidate", id ? "update" : "create")) return <HRResourceState status="forbidden" />;
   if (jobId && !hasPermission(user, "application", "create")) return <HRResourceState status="forbidden" />;
   if (jobId && job.status !== "ready") return <HRResourceState status={job.status} retry={job.reload} />;
   if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
-  return <CandidateFormFields key={key} initial={result.data ?? undefined} job={job.data ?? undefined} />;
+  return <CandidateFormFields key={key} initial={result.data ?? undefined} job={job.data ?? undefined} processingJobId={processingJobId} />;
 };
 export default CandidateForm;

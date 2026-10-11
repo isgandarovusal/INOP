@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom';
 import {useEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {isAxiosError} from 'axios';
@@ -49,7 +50,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
     <button type="button" disabled={busy} onClick={()=>void run('get',job.id)}>{t('hrProcessing.inspect')}</button>
     {canStart&&retryable(job)&&<button type="button" disabled={busy} onClick={()=>void run('retry',job.id)}>{t('hrProcessing.retry')}</button>}
    </li>)}</ul>
-   {selected?.result&&selected.currentSource&&<div data-processing-result><h4>{t('hrProcessing.review')}</h4><p>{t('hrProcessing.manual')}</p><dl>{fields.map(field=>{const value=facts(selected.result!.parsed[field]);return value?<div key={field}><dt>{t(`hrProcessing.field.${field}`)}</dt><dd>{value}</dd></div>:null;})}</dl></div>}
+   {selected?.result&&selected.currentSource&&<div data-processing-result><h4>{t('hrProcessing.review')}</h4><p>{t('hrProcessing.manual')}</p><dl>{fields.map(field=>{const value=facts(selected.result!.parsed[field]);return value?<div key={field}><dt>{t(`hrProcessing.field.${field}`)}</dt><dd>{value}</dd></div>:null;})}</dl>{canStart&&<Link to={`/app/recruitment/candidates/${candidate.id}/edit?processingJobId=${selected.id}`}>{t("hrApproval.open")}</Link>}</div>}
   </>}
  </section>;
 }

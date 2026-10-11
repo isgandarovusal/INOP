@@ -1349,6 +1349,15 @@
       "failed": "Notification retry could not be queued. Check and retry."
     }
   },
+  "hrApproval": {
+      "open": "Edit for HR approval",
+      "title": "Review parsing result",
+      "notice": "Loading facts does not change the profile. Apply to the draft, review its fields and explicitly confirm before saving. Empty facts do not erase existing data; history fields can also be edited.",
+      "load": "Load current-source facts",
+      "apply": "Apply facts to draft",
+      "confirmRequired": "Confirm the profile facts before saving.",
+      "receipt": "Server-recorded HR approval"
+  },
   "hrProcessing": {
     "readOnly": "Current permission is read-only; processing cannot be started or retried.",
     "retry": "Retry only after repairing the file/storage issue",

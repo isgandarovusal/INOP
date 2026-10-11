@@ -1373,6 +1373,15 @@
       "failed": "Təkrar göndəriş növbəyə əlavə edilə bilmədi. Yenidən yoxlayın."
     }
   },
+  "hrApproval": {
+      "open": "HR təsdiqi üçün redaktə et",
+      "title": "Parsing nəticəsini nəzərdən keçir",
+      "notice": "Faktları yükləmək profili dəyişmir. Draft-a tətbiq etdikdən sonra sahələri yoxlayın və ayrıca təsdiqləyərək yadda saxlayın. Boş faktlar mövcud məlumatı silmir; tarixçə sahələri də redaktə edilə bilər.",
+      "load": "Cari mənbə faktlarını yüklə",
+      "apply": "Faktları draft-a tətbiq et",
+      "confirmRequired": "Profil faktlarını təsdiqləyin; sonra yadda saxlayın.",
+      "receipt": "Serverdə qeydə alınmış HR təsdiqi"
+  },
   "hrProcessing": {
     "readOnly": "Cari icazə yalnız oxumağa imkan verir; emalı başlatmaq və ya retry etmək olmaz.",
     "retry": "Yalnız fayl/storage problemi düzəldilibsə yenidən növbəyə al",

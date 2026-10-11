@@ -246,7 +246,10 @@ exports.updateCandidate = async (req, res) => {
 
     const update = {};
     if (req.file) update.cvUrl = `/uploads/${req.file.filename}`;
-    const current = await Candidate.findOne(buildScopedQuery(req, { _id: id }));
+    const approval = req.body.processingApproval !== undefined;
+    if(approval)res.set("Cache-Control","private, no-store");
+    if (approval && req.file) return res.status(400).json({code:"PROCESSING_APPROVAL_INPUT",message:"Replacement requires a new review."});
+    const current = await Candidate.findOne(approval ? require('../services/hrCvApproval.service').query(req,id) : buildScopedQuery(req, { _id: id })).select(approval ? '+privateCvBlob' : '');
     if (!current) return res.status(404).json({ message: "Namizəd tapılmadı və ya giriş icazəniz yoxdur." });
     const expected = req.body.expectedRevision;
     if (expected !== undefined && (!Number.isInteger(Number(expected)) || Number(expected) < 0)) return res.status(400).json({ message: 'Revision düzgün deyil.' });
@@ -346,7 +349,7 @@ exports.updateCandidate = async (req, res) => {
       update.employmentHistory ??= extracted.parsed?.employmentHistory || [];
       update.educationHistory ??= extracted.parsed?.educationHistory || [];
       update.certificationHistory ??= extracted.parsed?.certificationHistory || [];
-    } else {
+    } else if (!approval) {
       const review = manualReview(req, current, update);
       if (review === null) return res.status(400).json({ message: 'CV review status düzgün deyil.' });
       if (review !== undefined) update.cvReview = review;
@@ -361,8 +364,10 @@ exports.updateCandidate = async (req, res) => {
      * assignedTo
      */
     update.reviewedFields = [...new Set([...(req.file ? [] : current.reviewedFields || []), ...["role", "skills", "experience", "education", "certificates", "employmentHistory"].filter(key => req.body[key] !== undefined)])];
+    const approvalQuery = approval ? await require('../services/hrCvApproval.service').prepare(req,res,current,update) : undefined;
+    if (approval && !approvalQuery) return;
     const updated = await Candidate.findOneAndUpdate(
-      buildScopedQuery(req, {
+      approvalQuery || buildScopedQuery(req, {
         _id: id,
         __v: current.__v === undefined ? { $exists: false } : current.__v,
       }),
@@ -374,6 +379,10 @@ exports.updateCandidate = async (req, res) => {
     );
 
     if (!updated) {
+      if (approval) {
+        if(!await Candidate.exists(require('../services/hrCvApproval.service').query(req,id))) return res.status(404).json({code:'PROCESSING_PARENT_UNAVAILABLE',message:'Candidate is unavailable.'});
+        return res.status(409).json({code:'PROCESSING_SOURCE_CHANGED',message:'CV approval context changed.'});
+      }
       if (await Candidate.exists(buildScopedQuery(req, { _id: id }))) return res.status(409).json({ message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.', code: 'REVISION_CONFLICT' });
       return res.status(404).json({
         message:
@@ -397,6 +406,8 @@ exports.updateCandidate = async (req, res) => {
     return res.status(200).json(updated);
   } catch (error) {
     logFailure(error);
+
+    if (error.code?.startsWith('PROCESSING_') && error.status) return res.status(error.status).json({code:error.code,message:'CV approval is unavailable.'});
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({

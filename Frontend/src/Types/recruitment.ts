@@ -109,7 +109,9 @@ export interface CvHistoryEntry {
   end: { year: number; month: number | null } | null;
   ongoing: boolean;
 }
+export interface CvProcessingApproval { jobId: string; contextHash: string; expectedJobUpdatedAt: string }
 export interface CvReview {
+  processingApproval?: {jobId:string; parserVersion:string; sourceHash:string; sourceContextHash:string; sourceRevision:number; resultHash:string; approvedFields:string[]; profileHash:string; approvedBy:string; approvedAt:string};
   version?: string; provider?: string; confidenceKind?: string;
   processingStatus?: "extracted" | "unsupported_ocr" | "failed";
   reviewStatus?: "pending" | "confirmed" | "corrected";

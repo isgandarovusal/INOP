@@ -4,7 +4,7 @@ import { readJson } from "../api/readRequest";
 import type {
   Candidate,
   CandidateStatus,
-  CvHistoryEntry, CvReview,
+  CvHistoryEntry, CvReview, CvProcessingApproval,
 } from "../Types/recruitment";
 
 export interface CandidateInput {
@@ -25,6 +25,7 @@ export interface CandidateInput {
   certificationHistory?: CvHistoryEntry[];
   reviewStatus?: "pending" | "confirmed" | "corrected";
   expectedRevision?: number;
+  processingApproval?: CvProcessingApproval;
 
   languages?: string[];
   certificates?: string[];
@@ -328,7 +329,7 @@ export async function updateCandidate(
   if (input.certificates !== undefined) {
     payload.certificates = input.certificates;
   }
-  for (const field of ["employmentHistory", "educationHistory", "certificationHistory", "reviewStatus", "expectedRevision"] as const) {
+  for (const field of ["employmentHistory", "educationHistory", "certificationHistory", "reviewStatus", "expectedRevision", "processingApproval"] as const) {
     if (input[field] !== undefined) payload[field] = input[field];
   }
 
@@ -336,7 +337,7 @@ export async function updateCandidate(
   if (input.cvFile) {
     const form = new FormData();
     for (const [key, value] of Object.entries(payload)) {
-      if (key === "employmentHistory" || key === "educationHistory" || key === "certificationHistory") form.append(key, JSON.stringify(value));
+      if (key === "processingApproval" || key === "employmentHistory" || key === "educationHistory" || key === "certificationHistory") form.append(key, JSON.stringify(value));
       else if (Array.isArray(value)) {
         if (!value.length) form.append(key, "");
         else value.forEach(item => form.append(key, String(item)));
