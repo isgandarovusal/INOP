@@ -8,6 +8,7 @@ const Candidate = require("../models/candidate.model");
 const Job = require("../models/job.model");
 const Application = require("../models/application.model");
 const { resourceFilter } = require('../services/hrResourceScope.service');
+const recovery = require('../services/hrCreateRecovery.service');
 
 const { reviewForFile, contactPhone, historyInput } = require('../services/cvReview.service');
 
@@ -93,7 +94,7 @@ function normalizeCandidateStatus(value) {
 }
 
 async function cleanupFile(file) {
-  if (!file?.path) {
+  if (!file?.path || file.preserveOnError) {
     return;
   }
 
@@ -109,6 +110,7 @@ async function cleanupFile(file) {
 exports.createCandidateFromCv = async (req, res) => {
   let savedCandidate = null;
   let savedApplication = null;
+  let attempt;
 
   try {
     if (!req.file) {
@@ -218,7 +220,15 @@ exports.createCandidateFromCv = async (req, res) => {
         }
       }
     }
-    savedCandidate = await Candidate.create({
+    const authority = await recovery.creation(req, true);
+    // Job scope/status are checked again after parsing, using current grants.
+    if(jobId){job=await Job.findOne({$and:[{_id:jobId},resourceFilter(req,'recruitment')]}).lean();
+      if(!job)throw Object.assign(new Error('Job is unavailable.'),{status:404,code:'JOB_UNAVAILABLE'});
+      if(job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
+    }
+    const candidateId = new mongoose.Types.ObjectId();
+    const candidatePayload = {
+      _id: candidateId,
       name,
       role,
       status,
@@ -264,11 +274,20 @@ exports.createCandidateFromCv = async (req, res) => {
 
       assignedTo:
         req.user?.id || null,
-    });
+    };
+    await new Candidate(candidatePayload).validate();
+    attempt={candidateId,candidateSaved:false};
+    recovery.preserve(req.file);
+    savedCandidate = await Candidate.create(candidatePayload);
+    attempt.candidateSaved=true;
 
     let match = null;
 
     if (job) {
+      if(await recovery.creation(req,true)!==authority)throw Object.assign(new Error('Authorization changed.'),{status:403,code:'HR_PERMISSION_CHANGED'});
+      job=await Job.findOne({$and:[{_id:jobId},resourceFilter(req,'recruitment')]}).lean();
+      if(!job)throw Object.assign(new Error('Job is unavailable.'),{status:404,code:'JOB_UNAVAILABLE'});
+      if(job.status!=='Open')throw Object.assign(new Error('Job is not open.'),{status:409,code:'JOB_NOT_OPEN'});
       match = calculateApplicationMatch(
         job,
         savedCandidate,
@@ -348,27 +367,14 @@ exports.createCandidateFromCv = async (req, res) => {
   } catch (error) {
     logFailure(error);
 
-    if (savedApplication?._id) {
-      try {
-        await Application.deleteOne({
-          _id: savedApplication._id,
-        });
-      } catch (cleanupError) {
-        logFailure(cleanupError);
-      }
-    }
-
-    if (savedCandidate?._id) {
-      try {
-        await Candidate.deleteOne({
-          _id: savedCandidate._id,
-        });
-      } catch (cleanupError) {
-        logFailure(cleanupError);
-      }
-    }
+    // A failed acknowledgement cannot prove that the write did not commit.
+    // Preserve valid/possibly linked parents and their original, rather than
+    // deleting records which another operation may already reference.
+    if(attempt)return res.status(error.status||500).json({message:'CV creation requires review before retrying.',...await recovery.failure(req,attempt)});
 
     await cleanupFile(req.file);
+
+    if(error.status)return res.status(error.status).json({code:error.code,message:'Current resource or authorization is unavailable.'});
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({

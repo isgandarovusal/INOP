@@ -1,0 +1,11 @@
+# CV creation recovery boundary
+
+A database error after starting a write cannot prove it did not commit. Candidate and CV pipeline creation validate before writing, use server-created IDs/ownership, and retain the current original once a write is attempted. The pipeline never deletes a possibly linked Candidate/Application to compensate a failed acknowledgement. Rejected pre-write uploads still use their exact owned-file cleanup; client body fields cannot change retention.
+
+Current JWT/revocation/user/role is revalidated using existing auth middleware after async parsing/upload and before creation. Job read scope/status is checked again independently before each parent/child write. A permission/department change between Candidate and Application stops the child while preserving the parent. Recovery identifiers require fresh independent Candidate.read scope and a matching final authority; create-only/changed roles see no IDs or private paths.
+
+Failed writes remain errors (not fake success): CV_CREATE_UNCERTAIN or CV_PIPELINE_PARTIAL, recoveryRequired=true, retrySafe=false. The UI preserves the draft, translates this state in AZ/EN/RU without refetch, blocks another POST from that draft and only offers a validated, authorized Candidate link. No automatic delete/retry/seed/migration occurs. Existing successful API envelopes/statuses are retained.
+
+This fixes destructive compensation and source loss, but does not claim exactly-once creation: refreshing/reopening the legacy form, transport loss before an error DTO or separate requests may still duplicate records. Durable source-command idempotency/ingestion is the next increment (AUD-067/073 remain in progress). Conservatively retained uncertain uploads require approved reconciliation/retention policy; no automatic garbage collection is enabled. Candidate DELETE policy remains a separate pending decision (AUD-030/051). Storage remains ephemeral unless a verified private provider is configured; real recovery/scanning are not proven by isolated tests.
+
+Evidence: hrCvCreateRecovery actual owned-loopback Mongo/HTTP/DOCX lost-ack/failure/permission/five-scope tests; hrCvCreateRecoveryUI actual StrictMode editor with synthetic error DTOs. Baseline failures and final gates are recorded in the tracker. No production operations/push/deploy.

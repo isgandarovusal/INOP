@@ -276,7 +276,7 @@ export async function createCandidate(
 
   const response = await API.post(
     input.jobId ? "/candidates/from-cv" : "/candidates",
-    formData
+    formData, { suppressErrorToast: true }
   );
 
   return normalizeCandidate(input.jobId ? response.data.candidate : response.data);

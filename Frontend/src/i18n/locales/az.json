@@ -1387,6 +1387,8 @@
       "receipt": "Serverdə qeydə alınmış HR təsdiqi"
   },
   "hrDocuments": {
+      "createUncertain": "Yazının nəticəsi tam təsdiqlənmədi. Təkrar yaratmayın: namizədlər siyahısında əvvəlki nəticəni yoxlayın; draft saxlanılır.",
+      "reviewCreated": "Yaradılan namizədi yoxla",
       "network": "CV emal xidməti ilə əlaqə qurulmadı. Yenidən cəhd edin.",
       "unavailable": "CV emalı hazırda əlçatan deyil. Draft saxlanılır; originalı əl ilə yoxlayın.",
       "timeout": "CV emalının vaxtı bitdi. Draft saxlanılır; sonra yenidən cəhd edin.",

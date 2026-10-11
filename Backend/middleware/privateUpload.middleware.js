@@ -29,7 +29,9 @@ function privateUpload(field, extensions, persist = true) {
         req.file.path = path.join(uploadsDir, req.file.filename);
         await fs.writeFile(req.file.path, req.file.buffer, { flag: 'wx', mode: 0o600 });
         const ownedPath = req.file.path;
-        res.once('finish', () => { if (res.statusCode >= 400) void fs.unlink(ownedPath).catch(() => {}); });
+        // Only server code may set this after starting an uncertain DB write.
+        // Request-body fields never control the lifetime of an uploaded original.
+        res.once('finish', () => { if (res.statusCode >= 400 && !req.file.preserveOnError) void fs.unlink(ownedPath).catch(() => {}); });
       }
       next();
     } catch (failure) { next(failure); }

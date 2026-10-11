@@ -2,6 +2,8 @@
 
 Baseline: `c74c49f41bb3a8a54566324c8902576a48a88e8f`, branch `work`. Local implementation and commits only; no production push/deployment. Existing data, secrets and user files must be preserved.
 
+Latest active continuation: [10D1 onward](#active-continuation-2026-10-11--10d1-creation-recovery). The user has resumed continuous work; the historical stop instruction below is superseded.
+
 Latest safe-stop checkpoint: [2026-10-11 checkpoint](#safe-stop-checkpoint-2026-10-11). Read that section before resuming; it supersedes older “next” notes without removing their history.
 
 ## Resume protocol
@@ -80,7 +82,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-064 | 06/08 | DnD order not persisted and status requests can race | TESTED | `applicationOrdering`, `hrBoard`, `hrBoardUI`, existing lifecycle UI: scoped atomic status/order, target/neighbor conflict, actual keyboard drag and refresh persistence, page-two anchors, rollback and stale permission response |
 | AUD-065 | 06 | No interview schedule/timezone/interviewer/results/next action | TESTED | `applicationLifecycleUI.test.cjs`, `applicationInterviewers.test.cjs`: 24/24; full 1196/1196; 06A server contracts retained |
 | AUD-066 | 06 | SMTP awaited per request with no durable retry/idempotency/visible delivery | TESTED | `applicationNotifications.test.cjs` and `applicationLifecycleUI.test.cjs`: 35/35; full 1212/1212; mock/missing SMTP only, no real receipt claim |
-| AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | OPEN | — |
+| AUD-067 | 10 | CV pipeline manual rollback can leave file/record orphans | IN_PROGRESS | 10D1 lost-ack compensation/source retention and UI retry guard tested locally; durable source commands/ingestion and real retention/recovery remain incomplete |
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 | AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
@@ -1066,3 +1068,22 @@ Checkpoint integrity check: all **435** prior stable AUD/P acceptance IDs remain
 After this implementation commit `git status --short` is empty on `work`; previous `42c1a4a65e1a5bfd2dcc7df1fa49c887a76ee0f1` and all ancestors are preserved. This final documentation-only checkpoint commit records the actual implementation SHA and stop state; its own SHA is obtained with `git rev-parse HEAD` and reported to the user (not embedded recursively). No additional source change or redundant regression is required for these ledger notes; the same eight source/test/contract fingerprints still match the tested implementation.
 
 **Stop requested and honored after checkpoint.** No next package, external access/provider operation, production DB/migration/secret/hosting change, push or deployment is started. Owned final regression runner completed with exit 0. Existing logs/caches/models, ignored/local files and `.env` are retained. On resume read this checkpoint, verify `work`/clean status/current HEAD, then continue **P10-003/006** source draft/retention/migration preparation and **P10-012 / AUD-067/073** ingestion/orphan/double-upload work. Preserve pending **AUD-030/051** user decision and all OPEN/BLOCKED_EXTERNAL requirements listed above; complete independent work before P11/P12/P13, without replaying already TESTED packages.
+
+## Active continuation 2026-10-11 — 10D1 creation recovery
+
+User resumed from `d65d5e312cf8764402e9da6081d0d775231ffaf3` and authorized continuous independent implementation/local commits; the earlier checkpoint stop applies only to that completed turn. Branch work/clean HEAD matched before edits; all prior commits preserved. Continue without per-package approval, no push/deploy. Setup workflow reuses the existing Node/Mongo/Chromium/OCR environment; no configuration, secret or infrastructure is changed.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-055 | Preserve possibly committed Candidate/Application/original after lost acknowledgement; no destructive compensation or false success | TESTED | `hrCvCreateRecovery`: actual lost-ack/child-failure/plain-create baseline fails; patched combined backend targets 127/127; full gates pending |
+| P10-056 | Current independent authorization after async IO and scoped recovery IDs; translated UI blocks unsafe duplicate POST | TESTED | Current grant revocation/five-scope/create-only tests and actual `hrCvCreateRecoveryUI`; UI combined 37/37; full gates pending |
+
+Baseline `/workspace/inop-hr10d1-baseline.log`: 5 passed / 9 failed including parent. Committed DB rows lose source or are deleted, stale upload grants still create data. `/workspace/inop-hr10d1-ui-baseline.log` reproduces missing recovery boundary. Patched `/workspace/inop-hr10d1-target.log` 127/127; `/workspace/inop-hr10d1-ui-target.log` 37/37. `HR_CV_CREATE_RECOVERY.md` documents backward-compatible error additions and remaining exactly-once/storage/privacy limitations. AUD-067 is IN_PROGRESS, not fully closed until durable source commands/ingestion remove retry/orphan gaps; AUD-073 still OPEN. No Candidate DELETE policy applied.
+
+New gate artifacts live under `/workspace/inop-hr-gates`, preserving the full /tmp and old artifacts. Temporary preload removes only unique browser scratch caches created by the current process; it never cleans preexisting caches/user files. No test assertions or provider integrity are weakened. Full frozen-source regression underway; final count/commit follows. Real storage/AV/privacy/AI/SMTP/Graph/website gates remain unverified; independent work proceeds after commit.
+
+Final 10D1 gates: full frozen-source `/workspace/inop-hr10d1-regression.log` **1961/1961**, zero failures/skips/cancellations. Backend targets **127/127**, UI targets **37/37**, `/workspace/inop-hr-gates/inop-packagehr10d1-validation.json` TypeScript/build PASS, lint **0/9**, smoke **13/13**, authorization **632/632**. `git diff --check` PASS. 13 explicit package paths only; local SHA recorded next update. Continue remaining P10 ingestion/source preparation, then P11/P12/P13.
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-119 | 10D1 | Create can continue with revoked request-time grants after asynchronous upload/parsing, including child Application writes | TESTED | Actual owned upload/Role-race baseline creates instead of 403; `hrCvCreateRecovery` now refuses before write or child, retains original, and redacts recovery IDs; full 1961/1961 |

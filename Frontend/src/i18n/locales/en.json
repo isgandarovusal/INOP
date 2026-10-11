@@ -1363,6 +1363,8 @@
       "receipt": "Server-recorded HR approval"
   },
   "hrDocuments": {
+      "createUncertain": "Creation was not fully confirmed. Do not create again: check the existing result in Candidates; your draft is preserved.",
+      "reviewCreated": "Review created Candidate",
       "network": "Could not connect to CV processing. Try again.",
       "unavailable": "CV processing is unavailable. Your draft is preserved; review the original manually.",
       "timeout": "CV processing timed out. Your draft is preserved; try again later.",

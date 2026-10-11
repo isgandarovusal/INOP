@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { invalidateScores } = require("../services/applicationScoreState.service");
 const { recordActivity } = require("../services/activityLog.service");
 const Candidate = require("../models/candidate.model");
+const recovery = require('../services/hrCreateRecovery.service');
 const { reviewForFile, contactPhone, manualReview, historyInput } = require('../services/cvReview.service');
 
 const candidateStatusValues =
@@ -123,6 +124,7 @@ exports.getCandidateById = async (req, res) => {
 };
 
 exports.createCandidate = async (req, res) => {
+  let attempt;
   try {
     const name = normalizeString(req.body.name);
     const role = normalizeString(req.body.role);
@@ -175,6 +177,7 @@ exports.createCandidate = async (req, res) => {
         if (histories[field] === null) return res.status(400).json({ message: 'CV history düzgün deyil.' });
       }
     }
+    await recovery.creation(req);
     const candidate = new Candidate({
       name,
       role,
@@ -204,6 +207,9 @@ exports.createCandidate = async (req, res) => {
       assignedTo: req.user.id,
     });
 
+    await candidate.validate();
+    attempt={candidateId:candidate._id,candidateSaved:false};
+    recovery.preserve(req.file);
     const saved = await candidate.save();
 
     try {
@@ -221,6 +227,9 @@ exports.createCandidate = async (req, res) => {
     return res.status(201).json(saved);
   } catch (error) {
     logFailure(error);
+
+    if(attempt)return res.status(error.status||500).json({message:'Candidate creation requires review before retrying.',...await recovery.failure(req,attempt)});
+    if(error.status)return res.status(error.status).json({code:error.code,message:'Current authorization is unavailable.'});
 
     if (error?.name === "ValidationError") {
       return res.status(400).json({

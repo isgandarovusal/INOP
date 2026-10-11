@@ -35,6 +35,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processingJobId?: string }> = ({ initial, job, processingJobId }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   const [saving, setSaving] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [documentError,setDocumentError]=useState('');
+  const [createRecovery,setCreateRecovery]=useState<{candidateId?:string}|null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => () => { parsing.current.sequence++; parsing.current.controller?.abort(); }, []);
@@ -148,7 +150,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     e.preventDefault();
     if (saving) return;
     if(processingApproval&&!confirmReview){setError(t("hrApproval.confirmRequired"));return;}
-    if (aiGenerating || saving) return;
+    if (aiGenerating || saving || createRecovery) return;
     if (job && !cvFile) { setError(t("hrStates.cvRequired")); return; }
     if (!name.trim()) {
       setError(t("recruitment.candidateForm.nameRequired"));
@@ -198,6 +200,10 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
       navigate("/app/recruitment/candidates");
     } catch (err: unknown) {
       if (!mounted.current) return;
+      if(isAxiosError(err)&&err.response?.data?.retrySafe===false&&['CV_PIPELINE_PARTIAL','CV_CREATE_UNCERTAIN'].includes(err.response.data.code)&&!isEdit){
+        const candidateId=err.response.data.recovery?.candidateId;
+        if(![401,403].includes(err.response.status)){setError(null);setCreateRecovery({candidateId:typeof candidateId==='string'&&/^[a-f0-9]{24}$/.test(candidateId)?candidateId:undefined});return;}
+      }
       if(isAxiosError(err)){const status=err.response?.status;if(status===401||status===403||(status===404&&err.response?.data?.code!=="PROCESSING_JOB_UNAVAILABLE")){setAccessDenied(status===401?"unauthenticated":status===403?"forbidden":"not-found");return;}if(status===409||status===404){setConfirmReview(false);setError(t("hrProcessing.error.changed"));return;}}
       setError(
         getErrorMessage(err, t("recruitment.candidateForm.genericError")),
@@ -217,6 +223,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}
         subtitle={t("recruitment.candidateForm.subtitle")}
       />
+
+      {createRecovery&&<div role="alert" data-cv-create-recovery>
+        <p>{t('hrDocuments.createUncertain')}</p>
+        {createRecovery.candidateId&&hasPermission(user,'candidate','read')&&<button type="button" onClick={()=>navigate('/app/recruitment/candidates/'+createRecovery.candidateId)}>{t('hrDocuments.reviewCreated')}</button>}
+      </div>}
 
       {(error||documentError) && (
         <div className="alert alert--danger" role="alert">
@@ -470,7 +481,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
             <button
               type="submit"
               className="btn-primary"
-              disabled={saving || aiGenerating}
+              disabled={saving || aiGenerating || Boolean(createRecovery)}
             >
               {saving ? <Loader2 size={16} className="spin" /> : null}
               {isEdit
