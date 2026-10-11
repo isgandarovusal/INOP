@@ -95,7 +95,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | TESTED | 08D counts Mongoose methods and unhinted plans: no per-row network N+1 claim; correlated internal parent lookup cost reproduced as AUD-100, replaced with indexed joins/batches |
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | TESTED | `hrAccessibility` with full App CSS: four viewports, table/board keyboard regions, forms/detail, CV chooser and three-language names; documented workflow coverage, not WCAG certification |
 | AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
-| AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | IN_PROGRESS | 11A–11C local Graph/delta/durable sink/source review tested; server background actor/binding/activation and real tenant evidence remain |
+| AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | TESTED | 11A–11D approved default-disabled Graph/delta/durable Source/current actor/worker/review local tests; real consent/mailbox/provider/hosting P11-020 blocked |
 | AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
 | AUD-082 | 12 | External website capabilities and administrator access unknown | OPEN | — |
 | AUD-083 | 12 | Signed identity/privacy/anti-malware required before external real CV ingestion | OPEN | — |
@@ -1206,3 +1206,16 @@ Final11B `/workspace/inop-hr11b-final.log`98/98 (0 fail/skip/cancel), complete f
 | AUD-123 | 13 | Explicit Source approval with corrected fields stores corrected status but ATS-v1 requires confirmed; trusted score remains pending | OPEN | Code/source approval scope test already requires corrected; calculateApplicationMatch treats corrected as pending by design. Targeted reproduction/fix pending; no weaker acceptance or global automatic confirmation. |
 
 `HR_CV_SOURCE_REVIEW.md` documents opaque source hints, independently scoped Job IDs, explicit linking and possible-duplicate review (not person dedup certainty/automatic merge). First fixture was invalid Job missing required description; corrected fixture, no model change. `/workspace/inop-hr11c-backend-second.log`82/82; `/workspace/inop-hr11c-ui-first.log`30/30; validationhr11c TS/build PASS lint0/9 smoke13 authorization632. Existing Source/private current-role tests preserved. Full backend1704 belongs11B and is not mislabeled current full; current finalP13 complete run still pending. All newly observed issue IDs are retained; no secret/production/DDL/provider/push/deploy.
+
+11C commit `263501b84c9d33f236dafc16b1da9842344286fc`,13paths; backend82/UI30, TS/build PASS lint0/9 smoke13 authorization632; cleanwork/no push.
+
+## 11D — approved server-only actor / bounded native worker preparation
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P11-029 | Tokenless private server context for an approved existing actor, current DB grants/department/inactivity on every boundary; public JWT contract unchanged | TESTED | Final targets141/141, complete current backend1725/1725 and authorization632 |
+| P11-030 | Default-off native worker, serialized per-mailbox bounded polling, independent Source parse on Graph outage and sanitized health/graceful stop | TESTED | Actual local current User/Role/Source plus injected worker adapters;141target/fullbackend1725; no live activation |
+
+`HR_BACKGROUND_IDENTITY.md` explains internal WeakMap-only identity, approved fixed actor, no persisted employee JWT/no remote-forged context, existing permission policies/current scope preserved. Current source/Job hint and duplicate review are retained. First141/141 targets; metadata result now reports running=false after tick finally cleanup, final tests/complete backend pending. Authority helper addition affects no public verifyToken/role schema or grants; full current backend required because shared HR helper changed. No production auth policy/hosting/provider/env/secret change or worker start. New code is preparation, actual approved actor/bindings/real external integrations remain blocked.
+
+Final11D `/workspace/inop-hr11d-target-final.log`141/141, complete frozen current backend `/workspace/inop-hr11d-backend-full.log`1725/1725 exit0, 0fail/skip/cancel; validationhr11d TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Six explicit paths only. All previous Source/role/JWT/user-privilege/audit/upload suites pass with the private context branch; public verifyToken unchanged. No worker starts and no approval of production actor/tenant is implied. SHA follows next increment.

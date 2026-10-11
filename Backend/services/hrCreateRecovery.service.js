@@ -5,6 +5,7 @@ const fail=(status)=>Object.assign(new Error('Current authorization is unavailab
 const identity=req=>JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
 // Reuse the existing JWT/revocation/current-user contract after asynchronous IO.
 async function current(req){
+ const background=await require('./hrBackgroundActor.service').resolve(req);if(background)return background;
  const fresh={headers:req.headers};let status=200,verified=false;
  await verifyToken(fresh,{status(value){status=value;return this;},json(){return this;}},()=>{verified=true;});
  if(!verified)throw fail(status);
