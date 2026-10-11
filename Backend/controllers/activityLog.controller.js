@@ -16,10 +16,13 @@ exports.getActivityLogs = async (req, res) => {
       Object.assign(query, req.dataScope);
     }
 
-    const logs = await ActivityLog.find(query)
-      .sort({ createdAt: -1 })
-      .limit(500)
-      .lean();
+    // Aggregate casting is explicit; filter HR parent visibility BEFORE the cap.
+    for (const field of ['createdBy', 'assignedTo']) if (query[field]) query[field] = new mongoose.Types.ObjectId(query[field]);
+    const logs = await ActivityLog.aggregate([
+      { $match: query },
+      ...require('../services/hrActivityVisibility.service').stages(req),
+      { $sort: { createdAt: -1, _id: -1 } }, { $limit: 500 },
+    ]).option({ maxTimeMS: 5000 });
 
     return res.status(200).json({
       activityLogs: logs.map((log) => ({
