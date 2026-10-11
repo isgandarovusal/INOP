@@ -1,0 +1,11 @@
+# Private Source operator retry and read-only review
+
+The private Source profile remains disabled by default. No hosted provider, scanner, storage or worker is activated by this change.
+
+`POST /api/hr/cv-intake/:id/retry` requires current independent candidate.read and candidate.create scopes, current linked Candidate authority, and the original creator's active server-side permissions. Supply exactly `expectedHash`, canonical ISO `expectedUpdatedAt` and UUIDv4 `commandId`. A retry cannot change bytes, original identity, creator, task version, assignment, approval or extracted facts. Its private command digest is never returned. Lost acknowledgements replay the same command, including after worker completion; they do not upload another original or reset lifetime attempts.
+
+Only explicitly repairable blocked/failed states can requeue. Quarantine, ready/approved, revoked authority, changed identity/revision and exhausted three lifetime processing attempts are refused. At most two manual retries are allowed. Existing bounded actor/global queue slots are reacquired; every worker attempt re-reads the immutable original and scans again. No implicit Candidate/Application creation or hiring decision occurs.
+
+CandidateForm can resume blocked/failed drafts to request a technical retry. Submit remains disabled until a ready result and explicit human confirmation. A successful retry does not overwrite manual HR fields and resets confirmation; an uncertain acknowledgement keeps the frozen command for replay. Queued/running sources still use the pending view. Read-only scoped users can inspect Source metadata, evidence and clean authorized original at `/app/recruitment/cv-intake/:id` without a create/resume action. Focus/server revocation and client permission changes remove private controls. All original downloads use fresh Bearer authorization, SHA-256 verification and Blob URL revocation.
+
+Local evidence: Backend Source/retry/approval/OCR/list69/69; browser repair/read-only/queue/original intake26/26; TS/build, lint0 errors/9 existing warnings, smoke13 and authorization632. Synthetic scanner/object map tests are not real scanner/storage durability evidence. A pending-view guard prevented the initial retry control; its regression is included. No production DB/migration/secret/resource/push/deploy.

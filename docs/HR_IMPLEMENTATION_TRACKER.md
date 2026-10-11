@@ -1313,3 +1313,18 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-036 | Schema-only inventory, no-write dry run, additive idempotent owned local DDL and conflicting-index refusal without data/legacy snapshot backfill | TESTED | hrReleaseIndexes6/6; no production apply capability or startup import |
 
 `HR_DB_RELEASE_PREPARATION.md` documents exact schema-derived inventory, production approval/backup/uniqueness/window/rollback and separate HR account repair; existing legacy schema auto-index defaults explicitly retained, not claimed disabled. Initial local comparison treated Mongo's omitted default simple collation as a conflict; fixed equivalence without relaxing uniqueness/partial/TTL. Final `/workspace/inop-hr13f-final.log`103/103,0fail/skip/cancel, includes E2E/DDL/hrSeed/userPrivileges. Previous99run did not include misspelled hrSeed filename and is not mislabeled; final correctly includes actual hrSeed4. Validationhr13f TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. No actual Atlas DDL/account repair/backup/provider/runtime activation, production/push/deploy. AUD-090 retained OPEN pending causal investigation; final frontend/backend full matrix/disposition next.
+
+13F commit `087f19a5ab483a6aee7ad08ca49fabfc43fca765`, six paths; final103/103 and all gatesPASS.
+
+## 13G — bounded Source operator repair / read-only evidence review
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-129 | 10/13 | Repairable blocked private Source has no safe operator retry/read-only detail; pending guard prevents retry form | TESTED | hrCvSourceRetry6/6 and browser lost-ack/manual-draft/read-only/revocation assertions; no lifetime reset or reupload |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-074 | Current independent scopes/original creator, immutable retry command and bounded quota/lifetime attempts | TESTED | `/workspace/inop-hr13g-backend-final.log`69/69 includes command privacy, quarantine, revision/hash, creator revocation, own/department/assigned/foreign |
+| P10-075 | Read-only Source evidence/original, fail-closed focus/permission lifecycle and lost-ack retry without clobbering manual fields | TESTED | `/workspace/inop-hr13g-ui-current.log`26/26, strict current HTTP/Mongo/browser, synthetic scanner/store only |
+
+`HR_SOURCE_RETRY_AND_READ_ONLY_REVIEW.md` documents additive default-off repair API and UI. First UI failures were harness syntax/ambiguous queue selector and then the real pending guard; corrected without weakening assertions. Backend69/69/browser26/26,0fail/skip/cancel. Validationhr13gfinal TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. No existing Source bytes/approval/permissions changed, no runtime activation or production/push/deploy. AUD-090 still being causally investigated in separate work; genuine scanner/storage/Graph/provider/recovery gates remain BLOCKED_EXTERNAL.

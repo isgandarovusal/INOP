@@ -1,5 +1,5 @@
 import CvIntakeSourceReview from '../../../Components/CvIntakeSourceReview';
-import {enqueueCvIntake,getCvIntake,approveCvIntake,downloadCvIntake,reconcileCvIntake} from '../../../Services/cvIntakeService';
+import {enqueueCvIntake,getCvIntake,approveCvIntake,downloadCvIntake,reconcileCvIntake,retryCvIntake} from '../../../Services/cvIntakeService';
 import type {CvIntakeSource,CvIntakeApproval} from '../../../Services/cvIntakeService';
 import {isAxiosError} from 'axios';
 import {hrDocumentErrorKey} from '../../../Utils/hrDocumentError';
@@ -47,6 +47,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   const draft = source?.approvedProfile ?? source?.result?.parsed;
   const [intakeSource,setIntakeSource]=useState<CvIntakeSource|undefined>(source);
   const [intakeAttempt,setIntakeAttempt]=useState<CvIntakeApproval|'reserved'|null>(source?.approvalState?'reserved':null);
+  const retrySourceCommand=useRef<{source:CvIntakeSource;command:string}|null>(null);
   const intakeCommand=useRef<{file:File;command:string}|null>(null);
   const savingSource=useRef<AbortController|null>(null);
 
@@ -110,7 +111,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     if (file && !validateCvFile(file)) return;
     if (!file && !cvFile) return;
     setProcessingApproval(undefined);setConfirmReview(false);setIntakeSource(undefined);
-    setDocumentError('');
+    setDocumentError('');retrySourceCommand.current=null;
     setSourceEpoch(value => value + 1);
     parsing.current.controller?.abort();
     const sequence = ++parsing.current.sequence;
@@ -249,6 +250,24 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     catch(failure){if(controller.signal.aborted||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404){setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');return;}if(status===400||status===422){setDocumentError('hrDocuments.invalid');return;}setIntakeAttempt(input);setDocumentError(status===409?'hrProcessing.error.changed':'hrIntake.uncertain');}
     finally{if(mounted.current&&!controller.signal.aborted)setSaving(false);}
   }
+  async function retryIntakeSource(){
+    if(!intakeSource||saving||aiGenerating||intakeAttempt)return;
+    if(retrySourceCommand.current?.source.id!==intakeSource.id)retrySourceCommand.current={source:intakeSource,command:crypto.randomUUID()};
+    const command=retrySourceCommand.current,controller=new AbortController(),sequence=++parsing.current.sequence;parsing.current.controller?.abort();parsing.current.controller=controller;setAiGenerating(true);setDocumentError('');setConfirmReview(false);
+    try{
+      let source=await retryCvIntake(command.source,command.command,controller.signal);
+      for(let attempt=0;attempt<30;attempt++){
+        if(controller.signal.aborted||sequence!==parsing.current.sequence||!mounted.current)return;setIntakeSource(source);
+        if(!['queued','running','retry'].includes(source.state))break;
+        await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'));};const timer=setTimeout(()=>{controller.signal.removeEventListener('abort',abort);resolve();},1000);controller.signal.addEventListener('abort',abort,{once:true});if(controller.signal.aborted)abort();});source=await getCvIntake(source.id,controller.signal);
+      }
+      if(controller.signal.aborted||sequence!==parsing.current.sequence||!mounted.current)return;setIntakeSource(source);
+      if(source.result){setReview(source.result.review);setDocumentError('');}else setDocumentError(source.code==='OCR_REQUIRED'?'cvReview.unsupported_ocr':'hrIntake.notReady');
+      // Never overwrite HR's manual fields with a reprocessing result.
+      retrySourceCommand.current=null;
+    }catch(failure){if(controller.signal.aborted||sequence!==parsing.current.sequence||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404)setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');else setDocumentError(status===409?'hrProcessing.error.changed':'hrIntake.retryUncertain');}
+    finally{if(mounted.current&&!controller.signal.aborted&&sequence===parsing.current.sequence)setAiGenerating(false);}
+  }
   async function intakeDownload(){if(!intakeSource)return;const controller=new AbortController();savingSource.current?.abort();savingSource.current=controller;try{await downloadCvIntake(intakeSource,controller.signal);}catch(failure){if(controller.signal.aborted||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404)setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');else setDocumentError(hrDocumentErrorKey(failure));}}
 
   if (accessDenied) return <HRResourceState status={accessDenied} />;
@@ -273,7 +292,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         </div>
       )}
 
-        {durable&&intakeSource&&<section data-cv-intake aria-busy={aiGenerating}><p>{t(intakeSource.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p><p role='status'>{t('hrIntake.state')}: {t('hrIntake.states.'+intakeSource.state)}</p><a href={'?'+new URLSearchParams({intakeId:intakeSource.id,...(job?{jobId:job.id}:{})}).toString()}>{t('hrIntake.resume')}</a>{intakeSource.state==='ready'&&<button type="button" disabled={saving} onClick={()=>void intakeDownload()}>{t('hrIntake.original')}</button>}</section>}
+        {durable&&intakeSource&&<section data-cv-intake aria-busy={aiGenerating}><p>{t(intakeSource.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p><p role='status'>{t('hrIntake.state')}: {t('hrIntake.states.'+intakeSource.state)}</p><a href={'?'+new URLSearchParams({intakeId:intakeSource.id,...(job?{jobId:job.id}:{})}).toString()}>{t('hrIntake.resume')}</a>{['blocked','failed'].includes(intakeSource.state)&&!intakeSource.approvalState&&typeof intakeSource.attempts==='number'&&intakeSource.attempts<3&&(!intakeSource.manualRetries||intakeSource.manualRetries<2)&&['OCR_REQUIRED','INTAKE_SCAN_REQUIRED','INTAKE_RESULT','INTAKE_READBACK','INTAKE_PROVIDER_UNAVAILABLE','INTAKE_TIMEOUT'].includes(intakeSource.code)&&<button data-retry-intake-source type='button' disabled={saving||aiGenerating} onClick={()=>void retryIntakeSource()}>{t('hrIntake.retryProcessing')}</button>}{(intakeSource.state==='ready'||intakeSource.state==='blocked'&&intakeSource.code==='OCR_REQUIRED')&&<button type="button" disabled={saving} onClick={()=>void intakeDownload()}>{t('hrIntake.original')}</button>}</section>}
         {durable&&intakeSource&&<CvIntakeSourceReview source={intakeSource} linkedJob={Boolean(job)} recovering={Boolean(intakeAttempt)}/> }
         {durable&&cvFile&&!intakeSource&&!aiGenerating&&!intakeAttempt&&documentError&&<button data-retry-intake-upload type='button' disabled={saving} onClick={()=>void handleCvChange(cvFile)}>{t('hrIntake.retryUpload')}</button>}
         {intakeAttempt&&<section role="alert" data-intake-recovery><p>{t('hrIntake.uncertain')}</p><button type="button" disabled={saving} onClick={()=>void confirmIntake(intakeAttempt)}>{t('hrIntake.retryApproval')}</button></section>}
@@ -552,7 +571,7 @@ const CandidateForm: React.FC = () => {
   if (id && result.status !== "ready") return <HRResourceState status={result.status} retry={result.reload} />;
   if(intakeId&&intake.status!=='ready')return <HRResourceState status={intake.status} retry={intake.reload}/>;
   if(intakeId&&intake.data?.approvalState==='completed'&&intake.data.candidateId)return <IntakeCompleted id={intake.data.candidateId}/>;
-  if(intakeId&&intake.data?.state!=='ready')return <IntakePending source={intake.data!} reload={intake.reload}/>;
+  if(intakeId&&!['ready','blocked','failed'].includes(intake.data?.state??''))return <IntakePending source={intake.data!} reload={intake.reload}/>;
   return <CandidateFormFields key={key} source={intake.data} initial={result.data ?? undefined} job={job.data ?? undefined} processingJobId={processingJobId} />;
 };
 function IntakeCompleted({id}:{id:string}){const {t}=useTranslation(),navigate=useNavigate();return <section data-intake-completed><p>{t('hrIntake.completed')}</p><button type='button' onClick={()=>navigate('/app/recruitment/candidates/'+id)}>{t('hrDocuments.reviewCreated')}</button></section>;}

@@ -1483,6 +1483,10 @@
     }
   },
   "hrIntake": {
+    "view": "Mənbəyə bax",
+    "retryProcessing": "Emalı yenidən başlat",
+    "retryUncertain": "Yenidən başlatma nəticəsi təsdiqlənmədi. Eyni əmri təhlükəsiz təkrar edin; CV-ni yenidən yükləməyin.",
+
     "queue": "Private CV mənbə növbəsi",
     "queueNotice": "Vakansiyaya bağlanmamış mənbələr funnel-dan ayrıdır. Saylar cari namizəd/mənbə scope-u və bağlı qeydə giriş əsasında hesablanır.",
     "allStates": "Bütün vəziyyətlər",

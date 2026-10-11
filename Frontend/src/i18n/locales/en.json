@@ -1459,6 +1459,10 @@
     }
   },
   "hrIntake": {
+    "view": "View source",
+    "retryProcessing": "Retry processing",
+    "retryUncertain": "Retry outcome is unconfirmed. Repeat the same command safely; do not reupload the CV.",
+
     "queue": "Private CV source queue",
     "queueNotice": "Unassigned sources are separate from vacancy funnels. Counts use current Candidate/source scope and current linked parent access.",
     "allStates": "All states",
