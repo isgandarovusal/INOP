@@ -1378,23 +1378,23 @@
     }
   },
   "hrApproval": {
-      "open": "HR təsdiqi üçün redaktə et",
-      "title": "Parsing nəticəsini nəzərdən keçir",
-      "notice": "Faktları yükləmək profili dəyişmir. Draft-a tətbiq etdikdən sonra sahələri yoxlayın və ayrıca təsdiqləyərək yadda saxlayın. Boş faktlar mövcud məlumatı silmir; tarixçə sahələri də redaktə edilə bilər.",
-      "load": "Cari mənbə faktlarını yüklə",
-      "apply": "Faktları draft-a tətbiq et",
-      "confirmRequired": "Profil faktlarını təsdiqləyin; sonra yadda saxlayın.",
-      "receipt": "Serverdə qeydə alınmış HR təsdiqi"
+    "open": "HR təsdiqi üçün redaktə et",
+    "title": "Parsing nəticəsini nəzərdən keçir",
+    "notice": "Faktları yükləmək profili dəyişmir. Draft-a tətbiq etdikdən sonra sahələri yoxlayın və ayrıca təsdiqləyərək yadda saxlayın. Boş faktlar mövcud məlumatı silmir; tarixçə sahələri də redaktə edilə bilər.",
+    "load": "Cari mənbə faktlarını yüklə",
+    "apply": "Faktları draft-a tətbiq et",
+    "confirmRequired": "Profil faktlarını təsdiqləyin; sonra yadda saxlayın.",
+    "receipt": "Serverdə qeydə alınmış HR təsdiqi"
   },
   "hrDocuments": {
-      "createUncertain": "Yazının nəticəsi tam təsdiqlənmədi. Təkrar yaratmayın: namizədlər siyahısında əvvəlki nəticəni yoxlayın; draft saxlanılır.",
-      "reviewCreated": "Yaradılan namizədi yoxla",
-      "network": "CV emal xidməti ilə əlaqə qurulmadı. Yenidən cəhd edin.",
-      "unavailable": "CV emalı hazırda əlçatan deyil. Draft saxlanılır; originalı əl ilə yoxlayın.",
-      "timeout": "CV emalının vaxtı bitdi. Draft saxlanılır; sonra yenidən cəhd edin.",
-      "busy": "CV emal limiti doludur. Sonra yenidən cəhd edin.",
-      "missing": "CV emal endpoint-i mövcud deyil. Draft saxlanılır.",
-      "invalid": "CV sorğusu düzgün deyil. Faylı və sahələri yoxlayın."
+    "createUncertain": "Yazının nəticəsi tam təsdiqlənmədi. Təkrar yaratmayın: namizədlər siyahısında əvvəlki nəticəni yoxlayın; draft saxlanılır.",
+    "reviewCreated": "Yaradılan namizədi yoxla",
+    "network": "CV emal xidməti ilə əlaqə qurulmadı. Yenidən cəhd edin.",
+    "unavailable": "CV emalı hazırda əlçatan deyil. Draft saxlanılır; originalı əl ilə yoxlayın.",
+    "timeout": "CV emalının vaxtı bitdi. Draft saxlanılır; sonra yenidən cəhd edin.",
+    "busy": "CV emal limiti doludur. Sonra yenidən cəhd edin.",
+    "missing": "CV emal endpoint-i mövcud deyil. Draft saxlanılır.",
+    "invalid": "CV sorğusu düzgün deyil. Faylı və sahələri yoxlayın."
   },
   "hrProcessing": {
     "aiProfile": "Peşəkar faktların AI yoxlaması",
@@ -1489,7 +1489,6 @@
     "pendingReview": "HR yoxlamasını gözləyir",
     "recoveryPending": "Command bərpasını gözləyir",
     "empty": "Cari scope/filtr üzrə mənbə yoxdur.",
-
     "retryUpload": "Eyni upload command-ını təkrar yoxla",
     "notice": "Bir private original arxa planda emal olunur. Qeyd yaratmazdan əvvəl bütün faktları yoxlayın və açıq şəkildə təsdiqləyin.",
     "test": "MOCK TEST storage/scanner — real CV-lər üçün təsdiqlənməyib.",
@@ -1511,6 +1510,23 @@
     "uncertain": "Təsdiq tam başa çatmayıb. Təsdiqlənmiş draft və original saxlanılıb. Yalnız əvvəlki command-ı bərpa edin; yenidən qeyd yaratmayın.",
     "retryApproval": "Əvvəlki təsdiqi bərpa et",
     "check": "Emal vəziyyətini yoxla",
-    "completed": "Bu mənbədən qeydlər artıq yaradılıb. Mövcud namizədə keçin; yenidən qeyd yaratmayın."
+    "completed": "Bu mənbədən qeydlər artıq yaradılıb. Mövcud namizədə keçin; yenidən qeyd yaratmayın.",
+    "source": "Müraciət mənbəyi",
+    "matches": {
+      "exact_approved_mapping": "Təsdiqlənmiş vakansiya təklifi; əlaqələndirməzdən əvvəl yoxlayın.",
+      "ambiguous": "Bir neçə vakansiya istinadı var: HR seçim etməlidir.",
+      "unmatched": "Təsdiqlənmiş vakansiya istinadı yoxdur: HR seçim etməlidir.",
+      "unavailable": "Vakansiya bağlıdır və ya icazələrinizə görə əlçatan deyil."
+    },
+    "chooseSuggestedJob": "Draftı redaktə etməzdən əvvəl təklif edilən vakansiyanı yoxla",
+    "duplicates": "Mümkün mövcud namizədlər",
+    "noAutomaticMerge": "Yalnız görünən mümkün uyğunluqlar göstərilir. HR şəxsiyyəti yoxlamalıdır; avtomatik birləşdirmə və imtina yoxdur.",
+    "reviewExisting": "Namizədi yoxla",
+    "noVisibleDuplicate": "Görünən mümkün uyğunluq tapılmadı; bu, şəxsin unikal olduğunu təsdiqləmir.",
+    "duplicateReasons": {
+      "same_original": "Eyni original fayl",
+      "same_email": "Eyni email",
+      "same_phone": "Eyni telefon"
+    }
   }
 }

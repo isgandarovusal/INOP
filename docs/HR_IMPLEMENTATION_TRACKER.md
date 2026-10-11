@@ -86,7 +86,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-068 | 13 | HR user.create does not override privileged role.update account administration | OPEN | — |
 | AUD-069 | 04 | No HR Brand catalog or Brand/Branch relationships | TESTED | `recruitmentCatalog.test.cjs`, `recruitmentCatalogUI.test.cjs`; 23 new checks; analytics field/filter contract only, implementation tracked in P07 |
 | AUD-070 | 07 | No dedicated scoped HR funnel/source/brand analytics | TESTED | `hrAnalytics.test.cjs`, `hrAnalyticsUI.test.cjs`, CV source assertion in `hrContracts.test.cjs`: target 40/40 (30 new); full 1242/1242 |
-| AUD-071 | 11 | No ingestion source identity or person-level deduplication | OPEN | — |
+| AUD-071 | 11 | No ingestion source identity or person-level deduplication | TESTED | 11B immutable source receipts/one command replay;11C scoped possible duplicate hints/no auto person merge, real providers blocked |
 | AUD-072 | 08 | HR lists unbounded with full populated documents | TESTED | 08B consumers use bounded independent projected pages; legacy array routes deliberately preserved for API compatibility |
 | AUD-073 | 08 | CV parse then create double uploads file synchronously | IN_PROGRESS | 10D4 gated source path proves one upload/no parse or Candidate multipart, explicit review and idempotent recovery; default legacy path remains until real storage/scanner/activation gates permit retirement |
 | AUD-074 | 08 | HR service requests lack signal/dedup despite safe main Dashboard implementation | TESTED | `hrPaginationUI`: StrictMode one list request, canceled stale filters, zero language refetch; shared readJson auth fingerprint |
@@ -95,7 +95,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-077 | 08 | N+1 was not confirmed; measure query behavior instead of asserting it | TESTED | 08D counts Mongoose methods and unhinted plans: no per-row network N+1 claim; correlated internal parent lookup cost reproduced as AUD-100, replaced with indexed joins/batches |
 | AUD-078 | 08 | Mobile accessibility not verified despite responsive CSS | TESTED | `hrAccessibility` with full App CSS: four viewports, table/board keyboard regions, forms/detail, CV chooser and three-language names; documented workflow coverage, not WCAG certification |
 | AUD-079 | 03 | DOCX has download but no native preview | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
-| AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | OPEN | — |
+| AUD-080 | 11 | No Graph/OAuth/poll/delta/webhook renewal integration | IN_PROGRESS | 11A–11C local Graph/delta/durable sink/source review tested; server background actor/binding/activation and real tenant evidence remain |
 | AUD-081 | 12 | No approved external API/public application adapter | OPEN | — |
 | AUD-082 | 12 | External website capabilities and administrator access unknown | OPEN | — |
 | AUD-083 | 12 | Signed identity/privacy/anti-malware required before external real CV ingestion | OPEN | — |
@@ -372,7 +372,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P11-001 | Approved GFC mailbox adapter | IN_PROGRESS | 11A/11B approved defaultoff Graph+durable sink locally tested; origin/hint/review UI and activation/provider metadata remain |
+| P11-001 | Approved GFC mailbox adapter | TESTED | 11A–11C local approved default-disabled Graph transport+MongoSource sink+explicit review UI, real mailbox P11-020 blocked |
 | P11-002 | OAuth/application permission choice | TESTED | 11A application client-credentials/.default contract + setup; actual tenant consent P11-020 blocked |
 | P11-003 | Least privilege mailbox scope | IN_PROGRESS | 11A code mailbox allowlist/config fail-closed tested; actual Exchange/Entra least-privilege evidence P11-020 blocked |
 | P11-004 | Token lifecycle | TESTED | 11A synthetic transport token cache/skew/single-flight/401 refresh;28/28, real provider blocked |
@@ -380,12 +380,12 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P11-006 | Pagination | TESTED | 11A bounded delta and attachment metadata next links;28/28 synthetic transport |
 | P11-007 | Subscription renewal if used | TESTED | 11A chooses delta polling; no subscription/webhook endpoint; renewal not applicable to this mode |
 | P11-008 | Attachment ingestion | TESTED | 11B actual private Source/Mongo/DOCX parsing + explicit HR Candidate/Application only; synthetic Graph/store/scan, real external blocked |
-| P11-009 | Deduplication | IN_PROGRESS | 11B immutable provider attachment identity/Sourcecommand replay tested; person duplicate review hints next11C |
+| P11-009 | Deduplication | TESTED | 11B immutable attachment/Source dedup;11C scoped five possible SHA/email/phone person matches, explicit HR identity review/no auto merge |
 | P11-010 | Retries | TESTED | 11A network/429/5xx bounded retry/exhaustion sanitized;28/28 |
 | P11-011 | Rate limits | TESTED | 11A two shared slots,2s max Retry-After,timeout/late transport retain capacity;28/28 |
 | P11-012 | Sync health | TESTED | 11B sanitized server-only health/current actor and no raw cursor/subject/facts;98targets/full1704; hosted binding external |
-| P11-013 | Subject/recipient/vacancy matching | IN_PROGRESS | 11B exact approved reference/recipient + independent Open Job current scope; safe UI hint review next11C |
-| P11-014 | Ambiguous matching HR review | IN_PROGRESS | 11B ambiguous/unmatched/unavailable source remains private review, no auto-Application; explicit UI review next11C |
+| P11-013 | Subject/recipient/vacancy matching | TESTED | 11B exact approved source reference/recipient/current Job mapping;11C safe current hint and explicit HR linking/UI30/backend82 |
+| P11-014 | Ambiguous matching HR review | TESTED | 11C ambiguous/unmatched/unavailable private Source review; no guessed Application/current scope/human confirmation |
 | P11-015 | No token/CV logging | TESTED | 11A sanitized errors/no logger/private body GET; transport28/28, no real provider data |
 | P11-016 | Tenant setup checklist | TESTED | HR_OUTLOOK_ADAPTER company single-tenant UUID setup/negative config test; actual access blocked |
 | P11-017 | Mailbox setup checklist | TESTED | HR_OUTLOOK_ADAPTER approved mailbox object UUID allowlist + Exchange restriction validation checklist |
@@ -1190,3 +1190,19 @@ Final11A `/workspace/inop-hr11a-repo-target.log`28/28 (0 fail/skip/cancel), vali
 `HR_OUTLOOK_SYNC.md` documents additive explicit MongoDDL, server-only Source origin/command bridge and disabled sync. Initial fixture failures exposed direct DTO Date versus HTTP ISO input and intentional Source quotas; fixture now serializes the same ISO as real HTTP, runs actual bounded Source worker between batches rather than weakening capacity assertions. No success/complete count inferred from failed run. Fresh combined targets/current gates appended before commit. Original P11-001/003/005/008/009/012/013/014 unfinished until backend/UI/provider requirements evidenced. Actual approval policy unchanged; retention choice pending, independent work continues.
 
 Final11B `/workspace/inop-hr11b-final.log`98/98 (0 fail/skip/cancel), complete frozen-source backend `/workspace/inop-hr11b-backend-full.log`1704/1704 exit0, frontend Source targets22/22. `hr11b` TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Initial second failure: server-only origin validation threw synchronously; approved enqueue now consistently async/rejects, assertion preserved. All old Source/role/JWT/audit/private-upload tasks included in full backend. Ten explicit paths, no mounted Graph endpoint/worker, no productionDDL/provider binding; SHA next increment. Continue source hints/person-level review/security then approved website adapter prep/P13 without dropping P10 blockers.
+
+11B commit `bbfcbad9f0b9c0cbdae711d5dab70af353e69882`,ten reviewedpaths; full frozenbackend1704/1704, targets98/SourceUI22; TS/build PASS lint0/9 smoke13 authorization632; cleanwork/no push.
+
+## 11C — explicit Job suggestion / scoped human duplicate review
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P11-026 | Scoped current source origin/Job hint with no provider identity/PII and no guessed binding | TESTED | Backend82/82, Job IO reassignment negative + source/current role/HTTP; private additive detail DTO |
+| P11-027 | Up to five current-scope SHA/email/phone review candidates, no foreign counts/facts, no auto merge/reject | TESTED | Actual owned Mongo five scopes, late Candidate reassignment, bounded no-global-count;82targets |
+| P11-028 | Explicit suggestion click then HR confirmation, AZ/EN/RU source/duplicate notices and primary/auxiliary failure separation | TESTED | Browser30/30 with actual HTTP/DB/source/approval; no autoApplication/zero language refetch |
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-123 | 13 | Explicit Source approval with corrected fields stores corrected status but ATS-v1 requires confirmed; trusted score remains pending | OPEN | Code/source approval scope test already requires corrected; calculateApplicationMatch treats corrected as pending by design. Targeted reproduction/fix pending; no weaker acceptance or global automatic confirmation. |
+
+`HR_CV_SOURCE_REVIEW.md` documents opaque source hints, independently scoped Job IDs, explicit linking and possible-duplicate review (not person dedup certainty/automatic merge). First fixture was invalid Job missing required description; corrected fixture, no model change. `/workspace/inop-hr11c-backend-second.log`82/82; `/workspace/inop-hr11c-ui-first.log`30/30; validationhr11c TS/build PASS lint0/9 smoke13 authorization632. Existing Source/private current-role tests preserved. Full backend1704 belongs11B and is not mislabeled current full; current finalP13 complete run still pending. All newly observed issue IDs are retained; no secret/production/DDL/provider/push/deploy.

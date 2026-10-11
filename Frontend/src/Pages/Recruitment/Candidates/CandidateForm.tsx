@@ -1,3 +1,4 @@
+import CvIntakeSourceReview from '../../../Components/CvIntakeSourceReview';
 import {enqueueCvIntake,getCvIntake,approveCvIntake,downloadCvIntake,reconcileCvIntake} from '../../../Services/cvIntakeService';
 import type {CvIntakeSource,CvIntakeApproval} from '../../../Services/cvIntakeService';
 import {isAxiosError} from 'axios';
@@ -275,6 +276,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
       )}
 
         {durable&&intakeSource&&<section data-cv-intake aria-busy={aiGenerating}><p>{t(intakeSource.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p><p role='status'>{t('hrIntake.state')}: {t('hrIntake.states.'+intakeSource.state)}</p><a href={'?'+new URLSearchParams({intakeId:intakeSource.id,...(job?{jobId:job.id}:{})}).toString()}>{t('hrIntake.resume')}</a>{intakeSource.state==='ready'&&<button type="button" disabled={saving} onClick={()=>void intakeDownload()}>{t('hrIntake.original')}</button>}</section>}
+        {durable&&intakeSource&&<CvIntakeSourceReview source={intakeSource} linkedJob={Boolean(job)} recovering={Boolean(intakeAttempt)}/> }
         {durable&&cvFile&&!intakeSource&&!aiGenerating&&!intakeAttempt&&documentError&&<button data-retry-intake-upload type='button' disabled={saving} onClick={()=>void handleCvChange(cvFile)}>{t('hrIntake.retryUpload')}</button>}
         {intakeAttempt&&<section role="alert" data-intake-recovery><p>{t('hrIntake.uncertain')}</p><button type="button" disabled={saving} onClick={()=>void confirmIntake(intakeAttempt)}>{t('hrIntake.retryApproval')}</button></section>}
         <form onSubmit={handleSubmit}>

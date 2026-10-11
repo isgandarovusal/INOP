@@ -1354,23 +1354,23 @@
     }
   },
   "hrApproval": {
-      "open": "Edit for HR approval",
-      "title": "Review parsing result",
-      "notice": "Loading facts does not change the profile. Apply to the draft, review its fields and explicitly confirm before saving. Empty facts do not erase existing data; history fields can also be edited.",
-      "load": "Load current-source facts",
-      "apply": "Apply facts to draft",
-      "confirmRequired": "Confirm the profile facts before saving.",
-      "receipt": "Server-recorded HR approval"
+    "open": "Edit for HR approval",
+    "title": "Review parsing result",
+    "notice": "Loading facts does not change the profile. Apply to the draft, review its fields and explicitly confirm before saving. Empty facts do not erase existing data; history fields can also be edited.",
+    "load": "Load current-source facts",
+    "apply": "Apply facts to draft",
+    "confirmRequired": "Confirm the profile facts before saving.",
+    "receipt": "Server-recorded HR approval"
   },
   "hrDocuments": {
-      "createUncertain": "Creation was not fully confirmed. Do not create again: check the existing result in Candidates; your draft is preserved.",
-      "reviewCreated": "Review created Candidate",
-      "network": "Could not connect to CV processing. Try again.",
-      "unavailable": "CV processing is unavailable. Your draft is preserved; review the original manually.",
-      "timeout": "CV processing timed out. Your draft is preserved; try again later.",
-      "busy": "CV processing capacity is full. Try again later.",
-      "missing": "The CV processing endpoint is unavailable. Your draft is preserved.",
-      "invalid": "The CV request is invalid. Check the file and fields."
+    "createUncertain": "Creation was not fully confirmed. Do not create again: check the existing result in Candidates; your draft is preserved.",
+    "reviewCreated": "Review created Candidate",
+    "network": "Could not connect to CV processing. Try again.",
+    "unavailable": "CV processing is unavailable. Your draft is preserved; review the original manually.",
+    "timeout": "CV processing timed out. Your draft is preserved; try again later.",
+    "busy": "CV processing capacity is full. Try again later.",
+    "missing": "The CV processing endpoint is unavailable. Your draft is preserved.",
+    "invalid": "The CV request is invalid. Check the file and fields."
   },
   "hrProcessing": {
     "aiProfile": "Professional AI fact review",
@@ -1465,7 +1465,6 @@
     "pendingReview": "Pending HR review",
     "recoveryPending": "Pending command recovery",
     "empty": "No sources in the current scope/filter.",
-
     "retryUpload": "Retry the same upload command",
     "notice": "One private original is processed in the background. Review all facts and explicitly confirm before creating records.",
     "test": "MOCK TEST storage/scanner — not verified for real CVs.",
@@ -1487,6 +1486,23 @@
     "uncertain": "Approval was not fully confirmed. The approved draft and original are retained. Retry only this same stored command; do not create again.",
     "retryApproval": "Reconcile the previous approval",
     "check": "Check processing status",
-    "completed": "This source has already created records. Open the existing Candidate; do not create again."
+    "completed": "This source has already created records. Open the existing Candidate; do not create again.",
+    "source": "Application source",
+    "matches": {
+      "exact_approved_mapping": "Approved vacancy suggestion; review before linking.",
+      "ambiguous": "Multiple vacancy references: HR must choose.",
+      "unmatched": "No approved vacancy reference: HR must choose.",
+      "unavailable": "Vacancy is closed or unavailable under your permissions."
+    },
+    "chooseSuggestedJob": "Review suggested vacancy before editing this draft",
+    "duplicates": "Possible existing candidates",
+    "noAutomaticMerge": "Only visible possible matches are shown. HR must verify identity; no automatic merge or rejection.",
+    "reviewExisting": "Review candidate",
+    "noVisibleDuplicate": "No visible potential match found; this does not guarantee a unique person.",
+    "duplicateReasons": {
+      "same_original": "Same original file",
+      "same_email": "Same email",
+      "same_phone": "Same phone"
+    }
   }
 }
