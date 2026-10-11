@@ -1,6 +1,6 @@
 # HR local commit ledger
 
-Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 72 HR/checkpoint commits through `fcceff65fdeb908a4eb41d92853b5e8e82356a7f` preserved; original65 baseline entries retained. This document inventories actual Git objects and their changed paths; development push is separately verified by ls-remote; this inventory never implies production deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
+Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 77 HR/checkpoint commits through `7309cb72ca5f1f9d160a23bc3af66c30d4f500e5` preserved; original65 baseline entries retained. This document inventories actual Git objects and their changed paths; development push is separately verified by ls-remote; this inventory never implies production deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
 
 ## `a832bd76f918d6a142e3086c1a5be108935a0000`
 
@@ -1336,4 +1336,85 @@ test(hr): require readable parents in activity lifecycle fixtures
 2 changed paths:
 
 - `M Backend/tests/applicationLifecycle.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `fadd19e0ea25272722c291deac2575989ec14171`
+
+docs(hr): record development verification and remaining release gates
+
+8 changed paths:
+
+- `M docs/HR_AUDIT_FINDING_DISPOSITION.md`
+- `M docs/HR_DEPARTMENT_ACCESS.md`
+- `A docs/HR_DEVELOPMENT_FINAL_REPORT.md`
+- `M docs/HR_FINAL_API_BENCHMARK.md`
+- `M docs/HR_IMPLEMENTATION_COMPLETION.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `M docs/HR_LOCAL_COMMIT_LEDGER.md`
+- `M docs/HR_RELEASE_E2E_MATRIX.md`
+
+## `a95401ad22d364804dea8dfbaed5b8a2fca91bea`
+
+fix(hr): archive jobs without deleting applications or history
+
+28 changed paths:
+
+- `M Backend/controllers/applications.controller.js`
+- `M Backend/controllers/candidatePipeline.controller.js`
+- `M Backend/controllers/dashboardSummary.controller.js`
+- `M Backend/controllers/hrAi.controller.js`
+- `M Backend/controllers/hrAnalytics.controller.js`
+- `M Backend/controllers/hrPaged.controller.js`
+- `A Backend/controllers/jobArchive.controller.js`
+- `M Backend/controllers/jobs.controller.js`
+- `M Backend/models/job.model.js`
+- `M Backend/routes/route.js`
+- `M Backend/services/hrCvIntakeApproval.service.js`
+- `M Backend/services/hrCvSourceReview.service.js`
+- `M Backend/services/hrGraphSync.service.js`
+- `M Backend/services/hrSignedSource.service.js`
+- `M Backend/tests/hrCandidateArchive.test.cjs`
+- `A Backend/tests/hrJobArchive.test.cjs`
+- `A Frontend/src/Components/JobArchiveHistory.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx`
+- `M Frontend/src/Services/jobsService.ts`
+- `M Frontend/src/Types/recruitment.ts`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `A Frontend/tests/hrJobArchiveUI.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `A docs/HR_JOB_ARCHIVE.md`
+
+## `a4d008cf02f6c3498fe8ed5d83884abbd26aa4a1`
+
+perf(hr): bound analytics parent work and score hashing
+
+4 changed paths:
+
+- `M Backend/controllers/hrAnalytics.controller.js`
+- `M Backend/services/applicationMatch.service.js`
+- `A Backend/tests/hrAnalyticsOptimization.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `777a88f86df189f9cefdf4c2c5983e9eaebe71b5`
+
+fix(release): disable automatic schema creation and worker activation
+
+4 changed paths:
+
+- `M Backend/server.js`
+- `A Backend/tests/hrNativeReleaseGate.test.cjs`
+- `M docs/HR_DB_RELEASE_PREPARATION.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `7309cb72ca5f1f9d160a23bc3af66c30d4f500e5`
+
+test(hr): wait for source duplicate readiness before language measurement
+
+2 changed paths:
+
+- `M Frontend/tests/cvIntakeOcrUI.test.cjs`
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`

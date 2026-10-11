@@ -70,7 +70,4 @@ public uploads/foreign parent access/old privileged role-write holes. Restore a
 backup only with explicit approval into an isolated target first and reconciled
 new writes. No automated DB rollback/deletion or old insecure code deployment.
 
-Candidate deletion/retention policy still awaits a genuine user decision
-(dependency409 versus archive/restore). Existing linked deletion behavior is not
-silently changed. Actual Atlas DDL/backup/HR repair/provider activation/storage
-recovery require separate approval/access; none was performed by this program.
+Candidate and Job archive/restore are now explicitly approved and locally tested. Linked Applications, originals and history are retained; permanent deletion stays disabled. Lawful retention duration/basis and permanent-erasure authority remain undecided (AUD-051). Actual Atlas DDL/backup/HR repair/provider activation/storage recovery require separate approval/access; none was performed by this program.

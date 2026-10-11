@@ -1,6 +1,6 @@
 # GFC Recruitment & ATS —13K local baseline report
 
-> Historical13K baseline: the renewed department authorization, archive/restore and premium UI continuation is in [HR_DEVELOPMENT_FINAL_REPORT](HR_DEVELOPMENT_FINAL_REPORT.md), with current tests/commits and development push evidence. AUD-030 archive/restore is now approved/tested; only AUD-051 lawful retention/permanent erasure remains OPEN. Production branch/deployment remains untouched. The counts and pre-archive behavior below describe the earlier named baseline, not current behavior.
+> Historical13K baseline: the renewed department authorization, archive/restore and premium UI continuation is in [HR_DEVELOPMENT_FINAL_REPORT](HR_DEVELOPMENT_FINAL_REPORT.md), with current tests/commits and development push evidence. AUD-030 archive/restore is now approved/tested; only AUD-051 lawful retention/permanent erasure remains OPEN. See HR_MAIN_RELEASE_REPORT for the subsequent explicitly authorized existing-main integration; real CV/provider activation remains NO-GO. The counts and pre-archive behavior below describe the earlier named baseline, not current behavior.
 
 ## Result and scope
 

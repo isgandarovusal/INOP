@@ -73,3 +73,17 @@ All24endpoint calls200; all15scope totals equal expected counts. Separate scope-
 At50k: legacy Applications8156.3ms/162222693bytes/50000rows versus paged43.4ms/23744bytes/30rows; legacy Candidates1221.2ms/35698891bytes versus paged59.5ms/14209bytes/30rows. Board260.7ms/66689bytes/80cards, ranking1149.6ms/23672bytes, analytics4771.9ms/2871bytes/213Mongoose method observations. Full body sizes include JSON serialization; candidate page adds archive metadata. Single samples are not controlled before/after latency regression proof or hosted p95. Analytics/ranking still scan scoped cohorts and are the main remaining measured performance risk. Archive-heavy workloads were not part of these all-active samples; their index selectivity/latency is unmeasured.
 
 Query counters omit wire getMore; sampled explain plans apply only to their named queries. Client and API share one Node process: raw RSS/heap/GC deltas are not isolated server peak memory. Existing production-build UI baseline remains archived-source evidence, not a fake current CPU rerun. Current439frontend tests instead verify real bounded rendering/lifecycle, parallel authorized download and actual-shell mobile containment. No hosted, real storage or scanner PASS inferred.
+
+## Current15 serialized comparison
+
+Tested source7309cb72ca5f1f9d160a23bc3af66c30d4f500e5;527 input hashes rechecked. Complete frontend443/443 and backend1858/1858 finished before the benchmark; no overlapping build/test runner. Node24.19.0, newly owned loopback DB for each size, no .env/hosting/provider/production access. Artifact /workspace/inop-hr15-final-main-benchmark.json, exit0, all24 endpoint calls200/all15 scoped totals match. Original14F sample is retained for comparison.
+
+| Records | Analytics ms | Backend timing | JSON bytes | Mongoose method observations |
+|---:|---:|---|---:|---:|
+| 0 | 22.2 | app;dur=19.63 | 2751 | 17 |
+| 5000 | 308.5 | app;dur=305.48 | 2847 | 23 |
+| 50000 | 2928.1 | app;dur=2925.98 | 2871 | 68 |
+
+At50k:4771.9ms→2928.1ms (~38.6% lower),2871bytes unchanged,213→68 Mongoose-method observations (~68.1% fewer).5k563.5ms→308.5ms. Diagnosis: repeated heavy Job equality joins and200 Candidate score-batch reads; bounded500 scoped Job identity/brand prefetch eliminates repeated Job joins for this cohort, batches1000 reduce Candidate score reads to50 and individual unchanged ATS-v2 hashes avoid redundant work. Foreign projection-pipeline trial was slower(~8.9s) and reverted; investigations remain recorded. Golden ATS-v2 hashes, empty cohorts, current assignment/grant races, mixed scopes and >500Job no-truncation fallback are tested.
+
+These are local single samples, not hosted p95 or isolated before/after confidence intervals. Different resource noise/GC remains possible; the cause and operation-count reduction are separately tested. Query observations omit wire getMore. Client and API share a Node process:50k analytics raw RSSdelta524288B/heapdelta90782472B/event-loop maximum47.3ms are not isolated server peaks or guarantees. Candidate join/scoring still scans the scoped cohort; more than500Jobs uses indexed fallback and is not claimed to achieve the same latency. Archive-heavy production workloads and current isolated React CPU remain unmeasured. No response contract, score version, PII projection, deadline, grant cache or hosted index/migration changed.

@@ -1,5 +1,7 @@
 # HR development continuation — final verification
 
+> Historical14F report. Section15 in HR_IMPLEMENTATION_TRACKER and HR_MAIN_RELEASE_REPORT record the subsequent explicitly authorized Job archive/analytics/startup hardening and existing-main integration. Earlier development-only restrictions, counts and pending Job policy below describe that named historical run; they do not override the later user decision. Real CV/provider readiness remains NO-GO.
+
 ## Scope and release boundary
 
 Original release `c74c49f41bb3a8a54566324c8902576a48a88e8f` and all prior66 HR commits through `f735acb47d27e4a93f0eeb3336af79d4209fbdd2` are preserved. Work is committed on `work` and pushed exclusively with `HEAD:refs/heads/inop-hr-development`, without force. No production branch push/merge/deploy, real DB migration, seed/reset, user-role rewrite, secret change or hosting resource creation. Real CV intake and production activation remain **NO-GO**.

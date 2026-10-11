@@ -146,8 +146,10 @@ Remaining decision: AUD-051 lawful retention durations/basis and permanent-erasu
 | AUD-133 | 14B | Generic activity descriptions reveal HR parents outside current membership/read scope | TESTED | Owned baseline4failures, current privacy/membership/scopes104/104; bounded independent parent aggregate before cap, no sensitive lookup projection. |
 | AUD-134 | 14D | Actual shell analytics table overflows mobile and legacy styles defeat readable headings | TESTED | Actual-shell baseline4failures,20/20 real HTTP/DB responsive/menu/KPI tests at390/1280 plus62 existing accessibility/responsive tests. |
 
-All original131 findings retained; current135 dispositions:126 TESTED locally,7 BLOCKED_EXTERNAL,2 OPEN. Provider deployment/storage/scanner/legal evidence is never inferred from these test results.
+All original131 findings retained; current136 dispositions:128 TESTED locally,7 BLOCKED_EXTERNAL,1 OPEN. Provider deployment/storage/scanner/legal evidence is never inferred from these test results.
 
 | ID | Package | Original finding | Disposition | Evidence / remaining limit |
 |---|---|---|---|---|
-| AUD-135 | 14F | Authorized deletion of a linked Job orphans the retained Application job context | OPEN | Owned actual HTTP/Mongo DELETE200, Job absent/Application retained/detail200 jobId=null. Separate explicit dependency409/Closed versus Job archive policy question; no inferred migration or destructive cleanup. |
+| AUD-135 | 14F/15A | Authorized deletion of a linked Job orphans the retained Application job context | TESTED | Explicit approved archive/restore in a95401a; actual Job archive7/7 backend + UI4/4, target120 backend/55 browser. Parent/Application/history retained, active lists/count/options exclude archive, current grant/CAS409/restore positive and negative tests. Prior orphan reproduction retained; no permanent delete or migration. |
+
+| AUD-136 | 15D | OCR language-only regression starts counting before the independent initial duplicate read | TESTED |7309cb7 waits for actual duplicate-ready UI and asserts exactly one initial duplicate read before AZ/EN/RU zero-refetch assertions. Real browser/HTTP/OCR4/4, production code unchanged; initial failed full441/443 is retained, not relabeled PASS. |
