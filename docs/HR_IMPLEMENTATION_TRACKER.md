@@ -1271,3 +1271,18 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | EXT-AV-001 | Real deployed ClamAV/signature/EICAR/quarantine/recovery evidence | BLOCKED_EXTERNAL | clamscan/clamdscan unavailable; approved runtime preparation + real harmless fixture test required |
 
 `HR_NATIVE_MALWARE_SCANNER.md` has activation/outage/recovery checklist. `/workspace/inop-hr13c-av-final.log`14/14; complete frozen backend `/workspace/inop-hr13c-backend-full.log`1789/1789,0fail/skip/cancel; validationhr13c TS/build PASS lint0/9 smoke13 authorization632. Source OCR test was added after full-run file list capture and is explicitly NOT included in1789; initial synthetic store missing-error fixture corrected and new baseline retained separately. Parallel Source/lifecycle/intake frontend `/workspace/inop-hr13-source-concurrent.log`55/55 passes, but does NOT establish AUD-090 root cause; retained OPEN. No real scanner/storage/provider/production/env/DDL/push/deploy. Four explicit scanner/docs/tracker paths; OCR files belong next separate increment.
+
+13C commit `ff450ae` (full SHA in ledger), four paths; fullbackend1789/scanner14/all gatesPASS.
+
+## 13D — private Source real local OCR / strict frontend compatibility
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-126 | 10/13 | Clean scanned private Sources cannot reach explicit approval even when existing local OCR engine is ready | TESTED | Corrected synthetic store baseline yields blocked versus requiredready; optional existing real Tesseract bridge, no default activation |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-073 | Private clean scanned Source → actual bounded OCR → pending evidence → explicit corrected HR confirmation | TESTED | hrCvSourceOcr5/5, English actual image-only PDF/Tesseract, exact bytes retained; actual scanner/store separately external |
+| P13-032 | Source OCR frontend strict version/provider/null confidence and AZ/EN/RU zero language refetch | TESTED | Source OCR/intake UI15/15 + existing Candidate OCR UI4/4 |
+
+`HR_PRIVATE_SOURCE_OCR.md` documents optional existing native engine; no new resource/env/boot/activation. Original backend78/78, current shared parser24/24 and extra late-role5/5. Initial UI normalized-phone assertion incorrectly expected raw editable phone to equal normalized storage value; corrected to validate actual digits (keeps final stored normalized assertion), final15/15. Existing Candidate OCR UI4/4. Validationhr13d TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Broader E2E eight checks pass after fixture delta added required evidenceMode; belongs next separate package, not this commit. Original scanner/storage/recovery gates remain BLOCKED_EXTERNAL, retention choice pending and AUD-090 still OPEN despite current parallel55 pass. No production/push/deploy.
