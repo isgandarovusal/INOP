@@ -69,6 +69,8 @@ export function normalizeCandidate(raw: unknown): Candidate {
           ? data._id
           : "",
     _id: typeof data._id === "string" ? data._id : undefined,
+    archivedAt: typeof data.archivedAt === 'string' ? data.archivedAt : null,
+    archivedBy: typeof data.archivedBy === 'string' ? data.archivedBy : null,
     revision: typeof data.__v === "number" ? data.__v : 0,
 
     name: typeof data.name === "string" ? data.name : "",
@@ -365,9 +367,9 @@ export async function updateCandidateStatus(
 }
 
 export async function deleteCandidate(
-  id: string, signal?: AbortSignal
+  id: string, signal?: AbortSignal, expectedRevision?: number
 ): Promise<void> {
-  await API.delete(`/candidates/${id}`, { signal });
+  await API.delete(`/candidates/${id}`, { signal, data: expectedRevision === undefined ? undefined : { expectedRevision } });
 }
 
 export async function exportCandidatesExcel(): Promise<Blob> {
@@ -404,3 +406,9 @@ export async function getCandidateCvPreview(id: string, expectedHash: string, ex
   if (typeof data?.rawText !== 'string' || data.rawText.length > 100000 || data.sha256 !== expectedHash || !Array.isArray(data.warnings) || data.warnings.some(code => !['text_limit', 'page_limit'].includes(code))) throw new Error('Invalid CV preview response.');
   return data;
 }
+
+export async function restoreCandidate(id: string, expectedRevision: number, signal?: AbortSignal): Promise<void> {
+  await API.post(`/candidates/${id}/restore`, { expectedRevision }, { signal });
+}
+export interface CandidateArchiveEvent { action: 'archive' | 'restore'; actor: string; at: string; reason: string; revision: number }
+export const getCandidateArchiveHistory = (id: string, signal?: AbortSignal, scopeKey?: string) => readJson<{items:CandidateArchiveEvent[];limit:number}>(`/candidates/${id}/archive-history`, {signal,scopeKey});

@@ -314,6 +314,11 @@ router.post(
   cvController.parseCv
 );
 
+const candidateArchive=require('../controllers/candidateArchive.controller');
+router.post('/candidates/:id/archive', ...authorize('candidate','delete'), candidateArchive.archive);
+router.post('/candidates/:id/restore', ...authorize('candidate','update'), candidateArchive.restore);
+router.get('/candidates/:id/archive-history', ...authorize('candidate','read'), candidateArchive.history);
+
 // Candidates Endpoints
 router.get(
   '/candidates',

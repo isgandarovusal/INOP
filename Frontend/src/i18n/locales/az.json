@@ -1540,5 +1540,18 @@
     "network": "Bağlantı kəsildi. Əməliyyatın nəticəsini yoxlayın, sonra yenidən cəhd edin.",
     "timeout": "Sorğunun vaxtı bitdi. Təkrar göndərməzdən əvvəl nəticəni yoxlayın.",
     "unavailable": "Əməliyyat hazırda əlçatan deyil. Məlumatlarınızı qoruyub yenidən cəhd edin."
+  },
+  "hrArchive": {
+    "archive": "Arxivlə",
+    "restore": "Bərpa et",
+    "archived": "Namizəd arxivləndi",
+    "restored": "Namizəd bərpa edildi",
+    "active": "Aktiv namizədlər",
+    "archiveList": "Arxiv",
+    "visibility": "Namizəd siyahısı",
+    "confirm": "{{name}} arxivlənsin? Müraciətlər, CV və tarixçə qorunacaq.",
+    "readOnly": "Bu namizəd arxivdədir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir.",
+    "history": "Arxiv tarixçəsi",
+    "historyLimit": "Son 50 əməliyyat göstərilir. Tam tarixçə saxlanılır."
   }
 }

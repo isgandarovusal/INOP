@@ -65,6 +65,8 @@ export interface CandidateFile {
 }
 
 export interface Candidate {
+  archivedAt?: string | null;
+  archivedBy?: string | null;
   id: string;
   _id?: string;
   revision?: number;

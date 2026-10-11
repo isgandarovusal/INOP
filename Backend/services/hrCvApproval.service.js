@@ -8,7 +8,7 @@ const { verifyToken, getRolePermissions } = require('../middleware/auth.middlewa
 const fields = ['name','role','email','phone','phoneRaw','education','experience','skills','languages','certificates','employmentHistory','educationHistory','certificationHistory'];
 const fail = (code,status) => Object.assign(new Error('CV approval is unavailable.'),{code,status});
 const authority = req => JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
-const query = (req,id,extra={}) => ({$and:[{_id:id,...extra},resourceFilter(req,'candidate'),resourceFilter(req,'candidate','update')]});
+const query = (req,id,extra={}) => ({$and:[{_id:id,archivedAt:null,...extra},resourceFilter(req,'candidate'),resourceFilter(req,'candidate','update')]});
 
 // Only the existing Candidate save writes an approval receipt: one atomic write,
 // no cross-collection partial approval or automatic application of extracted facts.

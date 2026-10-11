@@ -1,0 +1,9 @@
+# Candidate archive / restore
+
+User explicitly chose reversible archive, confirmed canonical HR ID dep_hr, no permanent erase until retention approval. No existing rows are migrated or mass-updated.
+
+POST /candidates/:id/archive requires candidate.delete AND independently candidate.read; POST /restore requires candidate.update AND independently candidate.read. Both require current canonical HR department (Admin exception), expectedRevision nonnegative integer, optional reason <=500 characters, no client actor/privilege fields. Atomic Candidate compare-and-set persists archivedAt/archivedBy, revision increment and hidden archiveHistory together. No Application/event/original removal. Legacy DELETE uses the same reversible action, idempotent without a stale explicit revision. Concurrent/stale requests return409, foreign parent404, non-HR403, anonymous401. Permanent deletion fields rejected400; no permanent erase endpoint/TTL.
+
+GET candidates and default v2 page, searchable lookup, active Excel export and Candidate dashboard counts exclude archivedAt (null or missing legacy field). v2/candidates?archived=true returns independently scoped archives; other resource or malformed archive filters400. Detail/PDF/original/linked Application remain readable under current grants. Archived facts/status/new Application/processing/approval cannot be edited until restore. GET /candidates/:id/archive-history returns only last50 events; full stored history is retained, no destructive cap. UI shows archive selector, reversible confirmation, authorized restore and readonly editor explanation with AZ/EN/RU copy, cancel/Tab/Escape/focus return.
+
+Test evidence uses only owned loopback Mongo databases, synthetic CV/records and local Chromium. Retention durations, legal basis and permanent-erasure authority remain AUD-051 OPEN. Real storage/scanner recovery remains BLOCKED_EXTERNAL. No migration/production push/deploy/secret/user-role change.

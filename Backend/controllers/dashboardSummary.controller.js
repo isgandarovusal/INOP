@@ -23,7 +23,7 @@ exports.jobs = wrap(async req => ({ total: await Job.countDocuments(filter(Job, 
 exports.applications = wrap(async req => ({ total: await Application.countDocuments(filter(Application, req)) }));
 exports.candidates = wrap(async req => {
   const [data] = await Candidate.aggregate([
-    { $match: filter(Candidate, req) },
+    { $match: { $and: [filter(Candidate, req), { archivedAt: null }] } },
     { $facet: {
       total: [{ $count: 'value' }],
       statuses: [

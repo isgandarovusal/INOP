@@ -1,3 +1,4 @@
+import HRConfirmDialog from '../../../Components/HRConfirmDialog';
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +9,13 @@ import {
   Loader2,
   Plus,
   Search,
-  Trash2,
+  Archive, RotateCcw,
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
-  deleteCandidate,
+  deleteCandidate, restoreCandidate,
   exportCandidatesExcel,
 } from "../../../Services/candidatesService";
 import { hasPermission } from "../../../Utils/permissions";
@@ -59,9 +60,11 @@ const CandidatesList: React.FC = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const search = useDebouncedSearch(searchQuery);
-  const result = useHRPage("candidate", { q: search }, getCandidatePage);
+  const [archived, setArchived] = useState(false);
+  const result = useHRPage("candidate", { q: search, archived: String(archived) }, getCandidatePage);
+  const [confirmation, setConfirmation] = useState<{key:string;candidate:Candidate}|null>(null);
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
-  const context = useHRActionContext(JSON.stringify([search, result.page]));
+  const context = useHRActionContext(JSON.stringify([search, archived, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
   const candidates = useMemo(() => result.data?.items ?? [], [result.data]);
@@ -73,6 +76,7 @@ const CandidatesList: React.FC = () => {
   const setExporting = (busy: boolean) => setExportBusy({ key: context.key, busy });
 
   const canCreate = hasPermission(user, "candidate", "create");
+  const canRestore = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
 
   const fetchCandidates = result.reload;
@@ -109,22 +113,22 @@ const CandidatesList: React.FC = () => {
 
     if (!canDelete || deletingId) return;
 
-    const confirmed = window.confirm(
-      `${candidate.name} — ${t("recruitment.candidates.deleteConfirm")}`,
-    );
-
-    if (!confirmed) return;
+    setConfirmation({key:context.key,candidate});
+  };
+  const confirmArchive = async () => {
+    if (!confirmation || confirmation.key!==context.key || !canDelete) return;
+    const candidate=confirmation.candidate;
     const key = context.key;
 
     try {
       setDeletingId(candidate.id);
 
-      await deleteCandidate(candidate.id);
+      await deleteCandidate(candidate.id, undefined, candidate.revision);
 
       if (context.current.current !== key) return;
-      fetchCandidates();
+      setConfirmation(null);fetchCandidates();
 
-      toast.success(t("recruitment.candidates.deleted"));
+      toast.success(t("hrArchive.archived"));
     } catch (err: unknown) {
       if (context.current.current !== key) return;
       setMutation({ key, error: hrCrudErrorKey(err) });
@@ -136,12 +140,19 @@ const CandidatesList: React.FC = () => {
     }
   };
 
+  const handleRestore = async (event: React.MouseEvent<HTMLButtonElement>, candidate: Candidate) => {
+    event.stopPropagation();if(!canRestore||deletingId)return;const key=context.key;setDeletingId(candidate.id);
+    try{await restoreCandidate(candidate.id,candidate.revision??0);if(context.current.current===key){fetchCandidates();toast.success(t('hrArchive.restored'));}}
+    catch(failure){if(context.current.current===key)setMutation({key,error:hrCrudErrorKey(failure)});}
+    finally{if(context.current.current===key)setDeletingId(null);}
+  };
   const filteredCandidates = candidates;
 
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
     <div className="page-container hr-candidates-page">
+      {confirmation?.key===context.key&&<HRConfirmDialog title={t("hrArchive.archive")} message={t("hrArchive.confirm",{name:confirmation.candidate.name})} confirmLabel={t("hrArchive.archive")} loading={Boolean(deletingId)} onConfirm={()=>{void confirmArchive();}} onCancel={()=>setConfirmation(null)}/>}
       <PageHeader
         title={t("recruitment.candidates.title")}
         subtitle={t("recruitment.candidates.subtitle")}
@@ -189,6 +200,7 @@ const CandidatesList: React.FC = () => {
         }}
       >
         <>{import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}{hasPermission(user, "application", "read") && <button type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}</>
+        <select className="input-field" aria-label={t("hrArchive.visibility")} value={String(archived)} onChange={e=>setArchived(e.target.value==='true')}><option value="false">{t("hrArchive.active")}</option><option value="true">{t("hrArchive.archiveList")}</option></select>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
@@ -302,7 +314,7 @@ const CandidatesList: React.FC = () => {
                 <th>{t("recruitment.candidates.experience")}</th>
                 <th>{t("recruitment.candidates.skills")}</th>
                 <th>{t("recruitment.candidates.status")}</th>
-                {canDelete && (
+                {(archived ? canRestore : canDelete) && (
                   <th>{t("recruitment.candidates.actions")}</th>
                 )}
               </tr>
@@ -368,17 +380,17 @@ const CandidatesList: React.FC = () => {
                       </span>
                     </td>
 
-                    {canDelete && (
+                    {(archived ? canRestore : canDelete) && (
                       <td>
                         <button
                           type="button"
                           className="icon-btn icon-btn--danger"
                           title={t(
-                            "recruitment.candidates.delete",
+                            archived ? "hrArchive.restore" : "hrArchive.archive",
                           )}
                           disabled={deletingId === candidate.id}
                           onClick={(event) =>
-                            void handleDelete(event, candidate)
+                            void (archived ? handleRestore(event, candidate) : handleDelete(event, candidate))
                           }
                         >
                           {deletingId === candidate.id ? (
@@ -387,7 +399,7 @@ const CandidatesList: React.FC = () => {
                               className="spin"
                             />
                           ) : (
-                            <Trash2 size={16} />
+                            archived ? <RotateCcw size={16} /> : <Archive size={16} />
                           )}
                         </button>
                       </td>

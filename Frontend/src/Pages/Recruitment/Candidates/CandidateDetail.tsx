@@ -1,3 +1,5 @@
+import HRConfirmDialog from '../../../Components/HRConfirmDialog';
+import CandidateArchiveHistory from '../../../Components/CandidateArchiveHistory';
 import CvProcessingPanel from '../../../Components/CvProcessingPanel';
 import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import CandidateApplicationMatches from "../../../Components/CandidateApplicationMatches";
@@ -18,7 +20,7 @@ import toast from "react-hot-toast";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import {
-  deleteCandidate,
+  deleteCandidate, restoreCandidate,
   exportCandidatePdf,
   getCandidateById,
   getCandidateCv,
@@ -40,6 +42,7 @@ const CandidateDetail: React.FC = () => {
 
   const result = useAuditResource(id, "candidate", getCandidateById);
   const candidate = result.data;
+  const [archiveConfirm, setArchiveConfirm]=useState<string|null>(null);
   const fileContext = JSON.stringify([id, candidate?.cvUrl, candidate?.cvOriginal?.sha256, user?.id, user?.role, user?.departmentId, user?.permissions]);
   const cv = usePrivateFile(fileContext);
   const context = useHRActionContext(JSON.stringify([id, candidate?.revision, candidate?.cvUrl, candidate?.cvOriginal?.sha256]));
@@ -91,20 +94,15 @@ const CandidateDetail: React.FC = () => {
   const handleDelete = async () => {
     if (!candidate || !canDelete) return;
 
-    const confirmed = window.confirm(
-      `${candidate.name} ${t("recruitment.candidateDetail.deleteConfirm")}`,
-    );
-
-    if (!confirmed) return;
     const key = context.key, controller = new AbortController(); controllers.current.set(controller, key);
     setActionError({ key, status: 'ready' });
 
     try {
       setDeleting(true);
-      await deleteCandidate(candidate.id, controller.signal);
+      await deleteCandidate(candidate.id, controller.signal, candidate.revision);
       if (context.current.current !== key || controller.signal.aborted) return;
 
-      toast.success(t("recruitment.candidateDetail.deleted"));
+      toast.success(t("hrArchive.archived"));
       navigate("/app/recruitment/candidates");
     } catch (err: unknown) {
       if (context.current.current !== key || controller.signal.aborted) return;
@@ -118,15 +116,24 @@ const CandidateDetail: React.FC = () => {
     }
   };
 
+  const handleRestore=async()=>{
+    if(!candidate||!canUpdate||deleting)return;const key=context.key,controller=new AbortController();controllers.current.set(controller,key);setDeleting(true);
+    try{await restoreCandidate(candidate.id,candidate.revision??0,controller.signal);if(context.current.current===key&&!controller.signal.aborted){toast.success(t('hrArchive.restored'));result.reload();}}
+    catch(failure){if(context.current.current===key&&!controller.signal.aborted)setActionError({key,status:auditErrorStatus(failure)});}
+    finally{controllers.current.delete(controller);if(context.current.current===key)setDeleting(false);}
+  };
   if (result.status !== "ready" || !candidate) return <HRResourceState status={result.status} retry={result.reload} />;
 
   const cvUrl = candidate.cvUrl || "";
 
   return (
     <div className="candidate-detail-page">
+      {archiveConfirm===context.key&&<HRConfirmDialog title={t('hrArchive.archive')} message={t('hrArchive.confirm',{name:candidate.name})} confirmLabel={t('hrArchive.archive')} loading={deleting} onConfirm={()=>{void handleDelete();}} onCancel={()=>setArchiveConfirm(null)}/>}
+      {candidate.archivedAt&&<p className="hr-notice" role="status">{t('hrArchive.readOnly')}</p>}
       {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
       <CvReviewEvidence review={candidate.cvReview} />
-      <CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />
+      {!candidate.archivedAt&&<CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />}
+      <CandidateArchiveHistory key={JSON.stringify([id,candidate.revision])} id={candidate.id} revision={candidate.revision}/>
       <CandidateApplicationMatches candidateId={candidate.id} />
       {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
       {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
@@ -156,7 +163,7 @@ const CandidateDetail: React.FC = () => {
               </button>
             )}
 
-            {canUpdate && (
+            {canUpdate && !candidate.archivedAt && (
               <button
                 type="button"
                 className="btn-primary candidate-detail-action candidate-detail-action--edit"
@@ -170,11 +177,12 @@ const CandidateDetail: React.FC = () => {
               </button>
             )}
 
-            {canDelete && (
+            {candidate.archivedAt&&canUpdate&&<button type="button" className="btn-secondary" onClick={()=>{void handleRestore();}} disabled={deleting}>{t('hrArchive.restore')}</button>}
+            {canDelete && !candidate.archivedAt && (
               <button
                 type="button"
                 className="btn-secondary candidate-detail-action candidate-detail-action--delete"
-                onClick={handleDelete}
+                onClick={()=>setArchiveConfirm(context.key)}
                 disabled={deleting}
               >
                 {deleting ? (
@@ -182,7 +190,7 @@ const CandidateDetail: React.FC = () => {
                 ) : (
                   <Trash2 size={16} />
                 )}
-                {t("recruitment.candidateDetail.delete")}
+                {t("hrArchive.archive")}
               </button>
             )}
 

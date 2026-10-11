@@ -271,6 +271,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   async function intakeDownload(){if(!intakeSource)return;const controller=new AbortController();savingSource.current?.abort();savingSource.current=controller;try{await downloadCvIntake(intakeSource,controller.signal);}catch(failure){if(controller.signal.aborted||!mounted.current)return;const status=isAxiosError(failure)?failure.response?.status:undefined;if(status===401||status===403||status===404)setAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');else setDocumentError(hrDocumentErrorKey(failure));}}
 
   if (accessDenied) return <HRResourceState status={accessDenied} />;
+  if(initial?.archivedAt)return <section className="hr-workspace" role="status"><p>{t("hrArchive.readOnly")}</p><button type="button" onClick={()=>navigate(`/app/recruitment/candidates/${initial.id}`)}>{t("hrIntake.view")}</button></section>;
   const eligibleAiReview = id && initial?.cvOriginal?.sha256 && ((initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based") || (initial.cvReview?.version === "ocr-rules-1" && initial.cvReview.provider === "tesseract-rules" && ["confirmed","corrected"].includes(initial.cvReview.reviewStatus??'') && initial.cvReview.processingApproval?.sourceHash===initial.cvOriginal.sha256)) && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
   return (
     <div className="candidate-form-page">

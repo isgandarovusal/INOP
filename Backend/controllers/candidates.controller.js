@@ -75,7 +75,7 @@ function parseExperience(value) {
 exports.getCandidates = async (req, res) => {
   try {
     const candidates = await Candidate.find(
-      buildScopedQuery(req)
+      buildScopedQuery(req, { archivedAt: null })
     )
       .select('-cvReview.fields -employmentHistory -educationHistory -certificationHistory')
       .sort({ createdAt: -1 })
@@ -260,6 +260,7 @@ exports.updateCandidate = async (req, res) => {
     if (approval && req.file) return res.status(400).json({code:"PROCESSING_APPROVAL_INPUT",message:"Replacement requires a new review."});
     const current = await Candidate.findOne(approval ? require('../services/hrCvApproval.service').query(req,id) : buildScopedQuery(req, { _id: id })).select(approval ? '+privateCvBlob +privateCvArchive +privateCvIntake' : '');
     if (!current) return res.status(404).json({ message: "Namizəd tapılmadı və ya giriş icazəniz yoxdur." });
+    if (current.archivedAt) return res.status(409).json({code:'CANDIDATE_ARCHIVED',message:'Restore the archived Candidate before editing.'});
     const expected = req.body.expectedRevision;
     if (expected !== undefined && (!Number.isInteger(Number(expected)) || Number(expected) < 0)) return res.status(400).json({ message: 'Revision düzgün deyil.' });
     if (expected !== undefined && Number(expected) !== (current.__v ?? 0)) return res.status(409).json({ message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.', code: 'REVISION_CONFLICT' });
@@ -377,7 +378,7 @@ exports.updateCandidate = async (req, res) => {
     if (approval && !approvalQuery) return;
     const updated = await Candidate.findOneAndUpdate(
       approvalQuery || buildScopedQuery(req, {
-        _id: id,
+        _id: id, archivedAt: null,
         __v: current.__v === undefined ? { $exists: false } : current.__v,
       }),
       { $set: update, $inc: { __v: 1 }, ...(req.file ? { $unset: { privateCvBlob: 1, privateCvArchive: 1, privateCvIntake: 1 } } : {}) },
@@ -462,9 +463,10 @@ exports.updateCandidateStatus = async (req, res) => {
       });
     }
 
+    if (existing.archivedAt) return res.status(409).json({code:'CANDIDATE_ARCHIVED',message:'Restore the archived Candidate before editing.'});
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
-        _id: id,
+        _id: id, archivedAt: null,
       }),
       { status },
       {
@@ -510,50 +512,5 @@ exports.updateCandidateStatus = async (req, res) => {
   }
 };
 
-exports.deleteCandidate = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!isValidObjectId(id)) {
-      return res.status(400).json({
-        message: "Namizəd ID-si düzgün deyil.",
-      });
-    }
-
-    const deleted = await Candidate.findOneAndDelete(
-      buildScopedQuery(req, {
-        _id: id,
-      })
-    );
-
-    if (!deleted) {
-      return res.status(404).json({
-        message:
-          "Namizəd tapılmadı və ya bu namizədi silmək üçün icazəniz yoxdur.",
-      });
-    }
-
-    try {
-      await recordActivity({
-        req,
-        action: "delete",
-        entityType: "candidate",
-        entityId: deleted._id,
-        description: `Namizəd silindi: ${deleted.name} (${deleted.role})`,
-      });
-    } catch (activityError) {
-      logFailure(activityError);
-    }
-
-    return res.status(200).json({
-      message: "Namizəd silindi.",
-    });
-  } catch (error) {
-    logFailure(error);
-
-    return res.status(500).json({
-      message:
-        "Namizəd silinərkən server xətası baş verdi.",
-    });
-  }
-};
+// Legacy DELETE now performs reversible archival. No permanent erase route.
+exports.deleteCandidate = require('./candidateArchive.controller').archive;

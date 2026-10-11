@@ -1516,5 +1516,18 @@
     "network": "Connection lost. Check the operation result before trying again.",
     "timeout": "The request timed out. Check the result before resubmitting.",
     "unavailable": "The operation is currently unavailable. Keep your draft and try again."
+  },
+  "hrArchive": {
+    "archive": "Archive",
+    "restore": "Restore",
+    "archived": "Candidate archived",
+    "restored": "Candidate restored",
+    "active": "Active candidates",
+    "archiveList": "Archive",
+    "visibility": "Candidate visibility",
+    "confirm": "Archive {{name}}? Applications, CV and history will be retained.",
+    "readOnly": "This candidate is archived. An authorized HR/Admin must restore it before editing.",
+    "history": "Archive history",
+    "historyLimit": "Latest 50 actions shown. Full history is retained."
   }
 }

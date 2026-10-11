@@ -8,6 +8,6 @@ async function checkLinked(req,row,write=false){
  if(!row.approval)return;
  const id=row.approval.candidateId;
  if(!await Candidate.exists({_id:id}).maxTimeMS(1000)){if(row.approval.completedAt)throw fail();return;}
- if(!await Candidate.exists({$and:[{_id:id},resourceFilter(req,'candidate'),...(write?[resourceFilter(req,'candidate','create')]:[])]}).maxTimeMS(1000))throw fail();
+ if(!await Candidate.exists({$and:[{_id:id},resourceFilter(req,'candidate'),...(write?[{archivedAt:null},resourceFilter(req,'candidate','create')]:[])]}).maxTimeMS(1000))throw fail();
 }
 module.exports={checkLinked};

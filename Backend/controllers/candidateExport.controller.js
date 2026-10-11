@@ -38,7 +38,7 @@ function getScopeFilter(req) {
 
 exports.exportCandidatesExcel = async (req, res) => {
   try {
-    const candidates = await Candidate.find(getScopeFilter(req))
+    const candidates = await Candidate.find({ $and: [getScopeFilter(req), { archivedAt: null }] })
       .sort({ createdAt: -1 })
       .lean();
 
