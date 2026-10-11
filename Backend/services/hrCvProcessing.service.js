@@ -9,6 +9,7 @@ const fingerprint = candidate => {
  const parts=[String(candidate._id),candidate.cvUrl,candidate.privateCvBlob,candidate.cvOriginal,candidate.cvReview?.version,candidate.__v||0,candidate.updatedAt];
  // Existing jobs retain their source identity when no archive receipt exists.
  if(candidate.privateCvArchive)parts.push(candidate.privateCvArchive);
+ if(candidate.privateCvIntake)parts.push(String(candidate.privateCvIntake));
  return hash(JSON.stringify(parts));
 };
 const identity = req => JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
@@ -19,7 +20,7 @@ async function actor(id) {
  return {user:{id:String(user._id),role:user.role,departmentId:user.departmentId||''},authRole:role};
 }
 async function candidate(req,id,update=true,reviewFields='cvReview.version') {
- return Candidate.findOne({$and:[{_id:id},resourceFilter(req,'candidate'),...(update?[resourceFilter(req,'candidate','update')]:[])]}).select('cvUrl cvOriginal '+reviewFields+' __v updatedAt +privateCvBlob +privateCvArchive').maxTimeMS(1000).lean();
+ return Candidate.findOne({$and:[{_id:id},resourceFilter(req,'candidate'),...(update?[resourceFilter(req,'candidate','update')]:[])]}).select('cvUrl cvOriginal '+reviewFields+' __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
 }
 function dto(row,result) { return {id:String(row._id),candidateId:String(row.candidateId),kind:row.kind,...(row.kind!=='parse'?{taskVersion:row.taskVersion}:{}),state:row.state,attempts:row.attempts,manualRetries:row.manualRetries??0,code:row.code,source:{sha256:row.sourceHash,revision:row.sourceRevision,contextHash:row.sourceFingerprint},createdAt:row.createdAt,updatedAt:row.updatedAt,nextAttemptAt:row.nextAttemptAt||null,events:(row.events||[]).map(({state,code,at,attempt})=>({state,code,at,attempt})),...(result?{result}:{} )}; }
 async function indexes() {

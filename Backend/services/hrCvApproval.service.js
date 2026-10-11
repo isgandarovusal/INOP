@@ -30,7 +30,7 @@ async function prepare(req,res,current,update) {
  await verifyToken(req,res,()=>{});if(res.headersSent||res.destroyed)return null;
  req.authRole={permissions:await getRolePermissions(req.user.role)};
  if(authority(req)!==snapshot)throw fail('PROCESSING_AUTH_CHANGED',403);
- const fresh=await Candidate.findOne(query(req,current._id)).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive').maxTimeMS(1000).lean();
+ const fresh=await Candidate.findOne(query(req,current._id)).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
  if(!fresh)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
  if(processing.fingerprint(fresh)!==contextHash)throw fail('PROCESSING_SOURCE_CHANGED',409);
  const approvedFields=fields.filter(field=>Object.hasOwn(update,field));
@@ -39,7 +39,7 @@ async function prepare(req,res,current,update) {
  update.cvReview={...result.review,processingStatus:'extracted',reviewStatus:correctedFields.length?'corrected':'confirmed',correctedFields,reviewedBy:req.user.id,reviewedAt:new Date(),
   processingApproval:{jobId:job.id,parserVersion:result.parserVersion,sourceHash:job.source.sha256,sourceContextHash:contextHash,sourceRevision:job.source.revision,approvedBy:req.user.id,approvedAt:new Date(),profileHash:crypto.createHash("sha256").update(JSON.stringify(Object.fromEntries(approvedFields.map(field=>[field,update[field]])))).digest("hex"),resultHash:crypto.createHash('sha256').update(JSON.stringify(result)).digest('hex'),approvedFields}};
  // Exact source fields protect even edits/replacements that did not increment __v.
- const exact={updatedAt:plain.updatedAt,cvUrl:plain.cvUrl,cvOriginal:plain.cvOriginal,privateCvBlob:plain.privateCvBlob??{$exists:false},privateCvArchive:plain.privateCvArchive??{$exists:false},'cvReview.version':plain.cvReview?.version??{$exists:false}};
+ const exact={updatedAt:plain.updatedAt,cvUrl:plain.cvUrl,cvOriginal:plain.cvOriginal,privateCvBlob:plain.privateCvBlob??{$exists:false},privateCvArchive:plain.privateCvArchive??{$exists:false},privateCvIntake:plain.privateCvIntake??{$exists:false},'cvReview.version':plain.cvReview?.version??{$exists:false}};
  return query(req,current._id,{__v:plain.__v===undefined?{$exists:false}:plain.__v,...exact});
 }
 module.exports={prepare,query};

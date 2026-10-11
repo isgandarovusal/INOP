@@ -258,7 +258,7 @@ exports.updateCandidate = async (req, res) => {
     const approval = req.body.processingApproval !== undefined;
     if(approval)res.set("Cache-Control","private, no-store");
     if (approval && req.file) return res.status(400).json({code:"PROCESSING_APPROVAL_INPUT",message:"Replacement requires a new review."});
-    const current = await Candidate.findOne(approval ? require('../services/hrCvApproval.service').query(req,id) : buildScopedQuery(req, { _id: id })).select(approval ? '+privateCvBlob +privateCvArchive' : '');
+    const current = await Candidate.findOne(approval ? require('../services/hrCvApproval.service').query(req,id) : buildScopedQuery(req, { _id: id })).select(approval ? '+privateCvBlob +privateCvArchive +privateCvIntake' : '');
     if (!current) return res.status(404).json({ message: "Namizəd tapılmadı və ya giriş icazəniz yoxdur." });
     const expected = req.body.expectedRevision;
     if (expected !== undefined && (!Number.isInteger(Number(expected)) || Number(expected) < 0)) return res.status(400).json({ message: 'Revision düzgün deyil.' });
@@ -380,7 +380,7 @@ exports.updateCandidate = async (req, res) => {
         _id: id,
         __v: current.__v === undefined ? { $exists: false } : current.__v,
       }),
-      { $set: update, $inc: { __v: 1 }, ...(req.file ? { $unset: { privateCvBlob: 1, privateCvArchive: 1 } } : {}) },
+      { $set: update, $inc: { __v: 1 }, ...(req.file ? { $unset: { privateCvBlob: 1, privateCvArchive: 1, privateCvIntake: 1 } } : {}) },
       {
         new: true,
         runValidators: true,

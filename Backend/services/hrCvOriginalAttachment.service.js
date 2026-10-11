@@ -5,7 +5,7 @@ const {resourceFilter}=require('./hrResourceScope.service'),{fingerprint}=requir
 const storage=require('./hrPrivateObjectStorage.service');
 const fail=(code,status=503)=>Object.assign(new Error('CV original attachment is unavailable.'),{code,status});
 const signature=req=>JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
-const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive';
+const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake';
 async function actor(id){
  const user=await User.findOne({_id:id,isActive:true}).select('_id role departmentId').maxTimeMS(1000).lean();
  const role=user&&await Role.findOne({key:String(user.role).toLowerCase(),isActive:true}).select('permissions').maxTimeMS(1000).lean();

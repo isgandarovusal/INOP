@@ -19,7 +19,7 @@ function endpoint(action){return async(req,res,next)=>{
   const queue=require('../services/hrCvTaskProfiles.service').profile(kind);
   const result=action==='start'?await queue.enqueue(req,req.params.id,req.body):action==='retry'?await queue.retry(req,req.params.jobId,req.body):action==='get'?await queue.get(req,req.params.jobId):await queue.list(req,req.params.id);
   if(!await refresh())return;
-  const parent=await Candidate.findOne(query()).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive').maxTimeMS(1000).lean();
+  const parent=await Candidate.findOne(query()).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
   if(!parent)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
   const guard=item=>{if(item.candidateId!==String(new mongoose.Types.ObjectId(req.params.id)))throw fail('PROCESSING_JOB_UNAVAILABLE',404);const currentSource=processing.fingerprint(parent)===item.source.contextHash;return{...item,...(!currentSource?{result:undefined}:{}),currentSource,parentUpdatedAt:parent.updatedAt?.toISOString()};};
   const output=action==='list'?{...result,items:result.items.map(guard)}:guard(result);

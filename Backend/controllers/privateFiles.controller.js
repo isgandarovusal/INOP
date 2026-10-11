@@ -43,6 +43,11 @@ async function archiveProof(candidate, blob) {
   }).select('+blob').maxTimeMS(1000).lean();
   if (!manifest || JSON.stringify(manifest.blob) !== JSON.stringify(blob)) throw changed();
 }
+async function intakeProof(candidate,blob){
+ if(!candidate.privateCvIntake)return;
+ const source=await require('../models/hrCvIntake.model').findOne({_id:candidate.privateCvIntake,state:'ready','approval.candidateId':candidate._id,'original.sha256':blob.sha256,'scan.sha256':blob.sha256}).select('+blob').maxTimeMS(1000).lean();
+ if(!source||JSON.stringify(source.blob)!==JSON.stringify(blob))throw Object.assign(new Error('Source identity changed.'),{code:'STORAGE_IDENTITY_MISMATCH',status:409});
+}
 async function readCandidateOriginal(candidate, options = {}) {
   if (candidate.privateCvBlob) {
     const store = require('../services/hrPrivateObjectStorage.service');
@@ -50,14 +55,16 @@ async function readCandidateOriginal(candidate, options = {}) {
     if ((candidate.cvOriginal?.sha256 && candidate.cvOriginal.sha256 !== blob.sha256) || (candidate.cvOriginal?.size !== undefined && candidate.cvOriginal.size !== blob.size)) throw Object.assign(new Error('Source identity changed.'), { code: 'STORAGE_IDENTITY_MISMATCH', status: 409 });
     // Presence of a blob forbids filesystem fallback, even when unavailable.
     await archiveProof(candidate, blob);
+    await intakeProof(candidate, blob);
     const bytes = await store.fromEnvironment().get(blob, options);
     await archiveProof(candidate, blob);
+    await intakeProof(candidate, blob);
     return bytes;
   }
   if (!candidate.cvUrl?.startsWith('/uploads/')) return null;
   return readBoundedPrivateFile(candidate.cvUrl.slice('/uploads/'.length));
 }
-const candidateIdentity = row => JSON.stringify([String(row._id),row.cvUrl,row.privateCvBlob,row.privateCvArchive,row.__v || 0,row.updatedAt]);
+const candidateIdentity = row => JSON.stringify([String(row._id),row.cvUrl,row.privateCvBlob,row.privateCvArchive,row.privateCvIntake,row.__v || 0,row.updatedAt]);
 const readAuthority = (req,scope) => JSON.stringify([req.user.id,req.user.role,req.user.departmentId,scope]);
 async function currentCandidate(req, res, candidate, initialAuthority) {
   const fresh = async () => {
@@ -68,7 +75,7 @@ async function currentCandidate(req, res, candidate, initialAuthority) {
     return {filter,authority:readAuthority(req,scope)};
   };
   const context = await fresh();if (!context) return false;
-  const current = await Candidate.findOne({_id:candidate._id,...context.filter}).select('+privateCvBlob +privateCvArchive').lean();
+  const current = await Candidate.findOne({_id:candidate._id,...context.filter}).select('+privateCvBlob +privateCvArchive +privateCvIntake').lean();
   if (!current) { missing(res);return false; }
   if (candidateIdentity(current) !== candidateIdentity(candidate)) { res.status(409).json({message:'CV changed. Reload the Candidate.',code:'CV_CHANGED'});return false; }
   const final = await fresh();if (!final) return false;
@@ -134,7 +141,7 @@ exports.readBoundedPrivateFile = readBoundedPrivateFile;
 exports.readCandidateOriginal = readCandidateOriginal;
 exports.candidate = async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Namizəd ID-si düzgün deyil.' });
-  const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob +privateCvArchive').lean();
+  const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob +privateCvArchive +privateCvIntake').lean();
   if (!candidate || !candidate.cvUrl?.startsWith('/uploads/')) return missing(res);
   return sendCandidateFile(req,res,candidate,req.permission.scope);
 };
@@ -154,7 +161,7 @@ exports.legacy = async (req, res) => {
   if (source) return sendPrivateFile(req, res, filename, source.originalName);
   const filter = getDataScope({ user: req.user, permission: { scope } });
   if (filter === null) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
-  const candidate = await Candidate.findOne({ cvUrl: '/uploads/' + filename, ...filter }).select('+privateCvBlob +privateCvArchive').lean();
+  const candidate = await Candidate.findOne({ cvUrl: '/uploads/' + filename, ...filter }).select('+privateCvBlob +privateCvArchive +privateCvIntake').lean();
   return candidate ? sendCandidateFile(req,res,candidate,scope) : missing(res);
 };
 
@@ -165,7 +172,7 @@ exports.candidatePreview = async (req, res) => {
   const disconnected = () => { if (!res.writableEnded) controller.abort(); };
   res.once('close', disconnected);
   try {
-    const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob +privateCvArchive').lean();
+    const candidate = await Candidate.findOne({ _id: req.params.id, ...req.dataScope }).select('+privateCvBlob +privateCvArchive +privateCvIntake').lean();
     if (!candidate || !candidate.cvUrl?.startsWith('/uploads/')) return missing(res);
     const { expectedHash, expectedRevision } = req.query;
     if ((expectedHash !== undefined && (typeof expectedHash !== 'string' || !/^[a-f0-9]{64}$/.test(expectedHash))) ||

@@ -4,7 +4,7 @@ const { resourceFilter } = require('../services/hrResourceScope.service');
 const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
 const evidence = require('../services/hrAiCvReview.service'), ai = require('../services/hrAiProvider.service');
 const { readCandidateOriginal } = require('./privateFiles.controller');
-const query = (req, id) => Candidate.findOne({ $and: [{ _id: id }, resourceFilter(req, 'candidate', 'read'), resourceFilter(req, 'candidate', 'update')] }).select('name cvUrl cvOriginal.sha256 cvOriginal.size cvReview __v updatedAt +privateCvBlob +privateCvArchive').maxTimeMS(1000).lean();
+const query = (req, id) => Candidate.findOne({ $and: [{ _id: id }, resourceFilter(req, 'candidate', 'read'), resourceFilter(req, 'candidate', 'update')] }).select('name cvUrl cvOriginal.sha256 cvOriginal.size cvReview __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
 const authority = req => JSON.stringify([req.user.id, req.user.role, req.user.departmentId, req.authRole.permissions]);
 const fail = (code, message, status) => Object.assign(new Error(message), { code, status });
 async function original(candidate, hash, signal) {

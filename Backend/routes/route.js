@@ -53,6 +53,7 @@ router.use('/auth', authRoutes);
 // Authentication is therefore secure by default.
 router.use(verifyToken);
 
+router.use('/hr/cv-intake',require('./hrCvIntake.routes'));
 router.use('/users', userRoutes);
 router.use('/departments', departmentRoutes);
 router.use("/activity-logs", activityLogRoutes);

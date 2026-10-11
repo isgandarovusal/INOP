@@ -7,7 +7,7 @@ const storage = require('./hrPrivateObjectStorage.service');
 const {readCandidateOriginal} = require('../controllers/privateFiles.controller');
 const fail=(code,status=503)=>Object.assign(new Error('Original CV archive is unavailable.'),{code,status});
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
-const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive';
+const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake';
 const signature=req=>JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
 async function actor(id){
  const user=await User.findOne({_id:id,isActive:true}).select('_id role departmentId').maxTimeMS(1000).lean();
