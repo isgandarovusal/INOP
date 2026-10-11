@@ -373,24 +373,24 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
 | P11-001 | Approved GFC mailbox adapter | OPEN | — |
-| P11-002 | OAuth/application permission choice | OPEN | — |
-| P11-003 | Least privilege mailbox scope | OPEN | — |
-| P11-004 | Token lifecycle | OPEN | — |
-| P11-005 | Polling/delta or webhook | OPEN | — |
-| P11-006 | Pagination | OPEN | — |
-| P11-007 | Subscription renewal if used | OPEN | — |
+| P11-002 | OAuth/application permission choice | TESTED | 11A application client-credentials/.default contract + setup; actual tenant consent P11-020 blocked |
+| P11-003 | Least privilege mailbox scope | IN_PROGRESS | 11A code mailbox allowlist/config fail-closed tested; actual Exchange/Entra least-privilege evidence P11-020 blocked |
+| P11-004 | Token lifecycle | TESTED | 11A synthetic transport token cache/skew/single-flight/401 refresh;28/28, real provider blocked |
+| P11-005 | Polling/delta or webhook | IN_PROGRESS | 11A delta/pagination transport tested; durable cursor/sink next11B |
+| P11-006 | Pagination | TESTED | 11A bounded delta and attachment metadata next links;28/28 synthetic transport |
+| P11-007 | Subscription renewal if used | TESTED | 11A chooses delta polling; no subscription/webhook endpoint; renewal not applicable to this mode |
 | P11-008 | Attachment ingestion | OPEN | — |
 | P11-009 | Deduplication | OPEN | — |
-| P11-010 | Retries | OPEN | — |
-| P11-011 | Rate limits | OPEN | — |
+| P11-010 | Retries | TESTED | 11A network/429/5xx bounded retry/exhaustion sanitized;28/28 |
+| P11-011 | Rate limits | TESTED | 11A two shared slots,2s max Retry-After,timeout/late transport retain capacity;28/28 |
 | P11-012 | Sync health | OPEN | — |
 | P11-013 | Subject/recipient/vacancy matching | OPEN | — |
 | P11-014 | Ambiguous matching HR review | OPEN | — |
-| P11-015 | No token/CV logging | OPEN | — |
-| P11-016 | Tenant setup checklist | OPEN | — |
-| P11-017 | Mailbox setup checklist | OPEN | — |
-| P11-018 | Admin consent checklist | OPEN | — |
-| P11-019 | Credential setup checklist | OPEN | — |
+| P11-015 | No token/CV logging | TESTED | 11A sanitized errors/no logger/private body GET; transport28/28, no real provider data |
+| P11-016 | Tenant setup checklist | TESTED | HR_OUTLOOK_ADAPTER company single-tenant UUID setup/negative config test; actual access blocked |
+| P11-017 | Mailbox setup checklist | TESTED | HR_OUTLOOK_ADAPTER approved mailbox object UUID allowlist + Exchange restriction validation checklist |
+| P11-018 | Admin consent checklist | TESTED | HR_OUTLOOK_ADAPTER Mail.Read-only admin consent/revocation/foreign mailbox test checklist; consent not performed |
+| P11-019 | Credential setup checklist | TESTED | HR_OUTLOOK_ADAPTER server-only secure credential/expiry/rotation checklist; no env/secret change |
 | P11-020 | Real mailbox E2E requires access | BLOCKED_EXTERNAL | Approved credentials/configuration unavailable; local adapter work remains independent |
 
 ## Package 12: External career sources
@@ -1161,3 +1161,18 @@ Initial backend57/57; frontend build found pagination prop/metadata TS errors an
 P10 wider original legacy migration/retention/actual scanner/storage/worker activation remain IN_PROGRESS/BLOCKED_EXTERNAL. Review queue is a tested opt-in local path, not real durability/monitoring-provider certification. Pending Candidate DELETE decision untouched. Continue independent Graph adapter prep, approved source interfaces/security and final evidence without package-stop/push/deploy.
 
 Final10D5 `/workspace/inop-hr10d5-backend-current.log`58/58, zero failures/skips/cancellations; UI22/22; optimized source benchmark all nine runs return bounded metadata; TS/build PASS lint0/9 smoke13 authorization632. `git diff --check` PASS; 15 explicit package files reviewed. Full inherited backend/frontend runs from10D3/D4 are preserved and not mislabeled as a new full cycle; P13 current full matrix remains pending. No real provider activation. Local SHA recorded in next increment.
+
+10D5 commit `c1e63c6078df109e87034360dc5abef043664d5b`,15paths, backend58/UI22, TS/build PASS lint0/9 smoke13 authorization632; clean tree. No push/deploy.
+
+## 11A — approved default-disabled Graph transport / setup
+
+Proceeding on independent P11 transport preparation while actual storage/scan/Graph/admin access remain blocked and Candidate retention decision remains pending. No missing P10 criteria are silently deleted or closed.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P11-021 | Fixed approved tenant/mailbox server-only transport, private bounded metadata/attachment DTO and immutable source identity | TESTED | Repository28/28, default disabled; synthetic transport only |
+| P11-022 | Bounded retries/timeouts/stream cleanup/current caller abort/shared capacity/token lifecycle | TESTED | Repository28/28, real consent/token/cursor provider E2E not PASS |
+
+`HR_OUTLOOK_ADAPTER.md` covers chosen application+delta polling, no webhook/subscription, least-privilege company consent/mailbox restrictions and setup. Planned variable names are documentation only; no binding/env/secret/provider/resource is changed. Source sink/persistent delta health/vacancy review integration remains11B; original P11-001..019 retained until their actual local tests/required external metadata is present. P11-020 staysBLOCKED_EXTERNAL.
+
+Final11A `/workspace/inop-hr11a-repo-target.log`28/28 (0 fail/skip/cancel), validationhr11a TS/build PASS lint0/9 smoke13 authorization632. Four explicit paths only, diff-checkPASS; no mounted routes/model/DB/source UI changes. Local SHA next increment. Source sink/health/matching unfinished original IDs preserved.
