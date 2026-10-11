@@ -1243,3 +1243,19 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-029 | Actual Source explicit corrected approval preserves evidence and exposes legitimate100/real0; draft/legacy/unknown remains untrusted | TESTED | `/workspace/inop-hr13a-score-target.log`78/78; UI28/28; baseline failed corrected approval score before patch |
 
 `HR_SOURCE_SCORE_CONFIRMATION.md` distinguishes correction from explicit approval. Only Source approval's already mandatory explicit confirmed act becomes confirmed review status; no weakening of existing legacy review, current scopes or automatic migration. Targets78/78, UI `/workspace/inop-hr13a-ui.log`28/28, zero failures/skips/cancellations. Validationhr13a TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Current full P13 run remains pending and earlier full1743 belongs12A. Separate protected plural/unknown-field scoring reproduction is next; no problem is silently ignored, external gates and deletion policy question remain pending. No production/provider/env/DDL/push/deploy.
+
+13A commit `209c925` (full SHA in Git ledger), five paths, targets78/UI28/all gatesPASS.
+
+## 13B — versioned protected-criterion and unknown-fact guards
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-124 | 13 | Obvious protected plural/synonym criteria bypass Job/matching/AI guards | TESTED | Actual HTTP women/qadınlar/женщины create/update baseline400 assertion failed; shared AZ/EN/RU guard, purpose32/32 + matching/AI/analytics/ranking137/137 |
+| AUD-125 | 13 | Global confirmed status treats omitted/unreviewed facts as real0 | TESTED | Baseline direct confirmed unknown skills/education/certificates failed; actual partial Source approval and per-field reviewed presence tests pass |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-030 | Protected metadata excluded, explicit protected plural criteria denied and no automated hiring decision | TESTED | hrMatchingFairness + existing matching/lifecycle; no universal semantic fairness claim |
+| P13-031 | ats-v2 hides stored v1 percentages as legacy, explicit recalculation/current parent checks retained | TESTED | applicationScoreState, hrRanking/hrAnalytics, frontend Matching/analytics22/22; no bulk migration |
+
+`HR_ATS_V2_COMPATIBILITY.md` documents required version change and per-field known semantics. `/workspace/inop-hr13b-target.log`137/137; after added actual partial Source regression `/workspace/inop-hr13b-final-added.log`32/32; UI22/22,0fail/skip/cancel. Validationhr13b TS/build PASS lint0/9 smoke13 authorization632. Candidate partial confirmation no longer invents zero. Legacy v1 remains stored, status-aware clients hide until authorized explicit recalc. Native scanner files are a separate next increment and are not staged into13B. Current final complete matrix remains pending; no real provider/production/env/DDL/push/deploy.

@@ -30,7 +30,7 @@ test('pending CV review never becomes a trusted percentage', () => {
 });
 test('protected traits, contact details and unrelated metadata do not change score/fingerprint', () => {
   const a = match(), b = match(job, { ...candidate, age: 60, gender: 'female', nationality: 'changed', name: 'other', email: 'other@example.invalid', phone: '+994501234567' });
-  assert.equal(a.score, b.score); assert.equal(a.candidateHash, b.candidateHash); assert.equal(a.version, 'ats-v1');
+  assert.equal(a.score, b.score); assert.equal(a.candidateHash, b.candidateHash); assert.equal(a.version, 'ats-v2');
 });
 test('missing relevant experience produces null, explicit zero is a scored fact with evidence', () => {
   const j = { ...job, requiredSkills: [], experienceYears: 2 };

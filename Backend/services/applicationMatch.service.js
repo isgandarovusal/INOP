@@ -1,5 +1,5 @@
 const crypto = require('node:crypto');
-const VERSION = 'ats-v1';
+const VERSION = 'ats-v2';
 const normalize = value => String(value || '').normalize('NFKC').toLowerCase().replace(/\u0307/g, '').replace(/\s+/g, ' ').trim();
 const aliases = new Map();
 for (const names of [
@@ -11,7 +11,8 @@ for (const names of [
 ]) for (const name of names) aliases.set(normalize(name), names[0]);
 const canonical = value => aliases.get(normalize(value)) || normalize(value);
 const list = values => [...new Set((Array.isArray(values) ? values : []).map(canonical).filter(Boolean))];
-const protectedCriterion = value => /(?:^|[^\p{L}\p{N}])(?:age|gender|sex|male|female|nationality|ethnicity|race|religion|pregnant|yaş|cins|kişi|qadın|milliyyət|возраст|пол|мужчина|женщина|национальность|раса|религия)(?:$|[^\p{L}\p{N}])/iu.test(String(value));
+// Conservative lexical guard for explicit personal-trait criteria, not a universal fairness classifier.
+const protectedCriterion = value => /(?:^|[^\p{L}\p{N}])(?:age|gender|sex|males?|females?|men|man|women|woman|young|elderly|nationality|ethnicity|race|religion|pregnan(?:t|cy)|disability|disabled|marital|under\s*\d+|over\s*\d+|yaş|yaşlı|gənc|cins|kişi(?:lər)?|qadın(?:lar)?|milliyyət|возраст|пол|мужчин(?:а|ы)?|женщин(?:а|ы)?|молод(?:ой|ая|ые)|пожил(?:ой|ая|ые)|национальность|раса|религия)(?:$|[^\p{L}\p{N}])/iu.test(normalize(value));
 const roleAliases = new Map();
 for (const names of [['cashier', 'kassir', 'кассир'], ['restaurant manager', 'restoran müdiri', 'менеджер ресторана'], ['cook', 'aşpaz', 'повар'], ['shift manager', 'növbə müdiri', 'менеджер смены']]) for (const name of names) roleAliases.set(normalize(name), names[0]);
 const role = value => roleAliases.get(normalize(value)) || normalize(value);
@@ -50,7 +51,7 @@ function calculateApplicationMatch(job, candidate, { application } = {}) {
   const result = { version: VERSION, ...hashes, score: null, scoreStatus: 'pending', calculatedAt: new Date(), dataCoverage: 0, criteria: [], reason: 'requirements_missing' };
   if (!job?._id || !candidate?._id || !application || String(application.jobId) !== String(job?._id) || String(application.candidateId) !== String(candidate?._id)) return { ...result, reason: 'application_context_required' };
   if ([...facts.requiredSkills, ...facts.preferredSkills, ...facts.education, ...facts.certificates].some(protectedCriterion)) return { ...result, reason: 'protected_criteria_forbidden' };
-  const known = (key, values) => values?.length > 0 || candidate.reviewedFields?.includes(key) || candidate.cvReview?.reviewStatus === 'confirmed';
+  const known = (key, values) => values?.length > 0 || candidate.reviewedFields?.includes(key);
   const defaultWeights = { skills: .6, preferred: .15, experience: .25, education: .1, certificates: .1 };
   const addSkills = (key, needed, values, field) => {
     if (!needed.length) return; const have = list(values), matched = needed.filter(s => have.includes(s)), missing = needed.filter(s => !have.includes(s));

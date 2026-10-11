@@ -11,7 +11,7 @@ test('Application matching is versioned, scoped, invalidated and explicitly reca
   };
   let row;
   await t.test('create persists version, criterion evidence, zero and nonzero scores', async () => {
-    row = await create('admin', 'Cashier', ['Cash handling'], ['Kassa']); assert.equal(row.app.score, 100); assert.equal(row.app.matching.version, 'ats-v1');
+    row = await create('admin', 'Cashier', ['Cash handling'], ['Kassa']); assert.equal(row.app.score, 100); assert.equal(row.app.matching.version, 'ats-v2');
     assert.equal(row.app.scoreStatus, 'calculated'); assert.equal(row.app.matching.dataCoverage, 1); assert.ok(row.app.matching.calculatedAt);
     assert.deepEqual(row.app.matching.criteria[0].matched, ['cash handling']);
     const zero = await create('admin', 'Cook', ['Food safety'], []); assert.equal(zero.app.score, 0); assert.equal(zero.app.scoreStatus, 'calculated');
