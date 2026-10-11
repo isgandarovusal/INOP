@@ -445,7 +445,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P13-017 | Stale requests/concurrent updates | TESTED | Current browser/HTTP stale route/permission/source/async cancellation; CAS409/reorder/lostack; SourceDownloadRace focus/URL revocation and late-role suppression. |
 | P13-018 | Large datasets | TESTED | HR_PERFORMANCE_MEASUREMENTS owned0/5k/50k backend and actual production-build browser baseline/current; committed scale/query tests. Local named historical samples not hosted/currentHEAD latency claims. |
 | P13-019 | Frontend/backend compatibility | TESTED | hrContracts/scoped current HTTP/DTO normalization, current ATSv2 legacy compatibility, durable Source validation, full corrected frontend408/408 plus current build/TS. |
-| P13-020 | Security/privacy/retention | OPEN | Local security/access/privacy projection/prompt guards tested; legal deletion/retention AUD-030/051 decision and true scanner/storage/recovery gates remain unresolved. Real CV acceptance NO-GO. |
+| P13-020 | Security/privacy/retention | OPEN | Local security/access/privacy projection/prompt guards tested; AUD-030 archive/restore is approved/tested. AUD-051 lawful duration/permanent-erasure authority and true scanner/storage/recovery gates remain unresolved. Real CV acceptance NO-GO. |
 | P13-021 | Separate local mock and real external evidence | TESTED | HR_RELEASE_E2E_MATRIX separates actual local Mongo/HTTP/parser/Tesseract/browser from synthetic Graph/AI/storage/AV/SMTP and all genuine external gates. |
 | P13-022 | All package commit SHAs | TESTED | HR_LOCAL_COMMIT_LEDGER inventories65 actual full SHA objects since c74 release and changed paths; final report-only commit SHA delivered after creation. |
 | P13-023 | Full finding disposition | TESTED | HR_AUDIT_FINDING_DISPOSITION has all131 stable IDs with current status/evidence/limits; all prior titles/history retained. |
@@ -1379,6 +1379,8 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 
 ## 13K — final local completion / exhaustive disposition and release gate
 
+Historical13K checkpoint below: pre-archive policy/counts/resume instruction are retained as history. Current continuation and newly approved archive policy are in14A–14F; use the latest resume point, not this historical one.
+
 | ID | Acceptance | Status | Evidence |
 |---|---|---|---|
 | P13-041 | All current regression files execute without skipped/cancelled tests, bound to frozen source and preserved commits | TESTED | Backend1819/1819 after frontend408/408 concurrency2, both exit0;506 SHA-256 paths unchanged at0903b744127165448781d1605f9424b24610b07a; final report-only changes do not alter code |
@@ -1442,3 +1444,16 @@ Evidence `/workspace/inop-hr14d-product-verified.log`20/20 includes8surfaces at3
 ## 14E — full-suite archive action harness correction
 
 ENV-HR-003: the first renewed full frontend runner reached the previous Candidate native-confirm test and waited indefinitely for DELETE after the product intentionally changed to an accessible application dialog. The owned runner was stopped; that run is incomplete, never PASS. Existing stale-export/mutation assertions remain, but the action test now confirms the real archive dialog, bounds intercepted request-start waits to15seconds, and proves the actual Bearer PDF plus retained archived record/history instead of permanent deletion. This is a test-only contract update; no production source or privacy policy weakened. Target `candidateActions` + `hrCandidateArchiveUI`13/13; fresh `hr14e` TSapp/node/buildPASS, lint0/9, smoke13/13 and authorization632/632. Complete renewed current-source suites follow. Prior runner evidence `/workspace/inop-hr14-final-frontend.log` retained.
+
+
+## 14F — activity lifecycle regression fixture and newly reproduced Job dependency
+
+ENV-HR-004: frozen14E full backend1843/1845 (exit1) exposed one obsolete activity fixture plus its failing parent test: it submitted an Application activity without entityId and expected visibility.14B deliberately denies unknown/missing/foreign HR parents. No authorization source was relaxed. Fixture now links an actually readable own Application, retains server-only snapshot anti-spoof checks, and additionally rejects parentless and foreign-parent activity even with an own snapshot. `applicationLifecycle` + `hrActivityPrivacy` + strict `hrDepartmentAccess`35/35. Fresh `hr14f` TSapp/node/buildPASS, lint0/9, smoke13/13, authorization632/632. Complete backend rerun follows; frontend439/439 input code is unchanged except this backend-only test, which frontend does not load. Initial failed backend log retained.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P14-009 | Preserve Applications when an authorized user deletes a linked Job, using an explicitly agreed dependency/archive policy | OPEN | New owned real HTTP/Mongo reproduction; policy question pending, no inferred Job archive model/migration |
+
+| ID | Finding | Status | Evidence |
+|---|---|---|---|
+| AUD-135 | Authorized linked Job deletion returns200, removes the Job but retains Application with jobId=null | OPEN | `/workspace/inop-hr14-linked-job-delete-baseline.json`: owned fixture only, DELETE200/Job absent/Application retained/detail200 null parent. User asked dependency409 with Closed workflow versus explicit Job archive/restore. No production data touched or new policy inferred. |

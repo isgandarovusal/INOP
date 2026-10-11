@@ -87,12 +87,16 @@ test('Application lifecycle keeps scope, revisions, history and interviews indep
   await t.test('activity snapshots make new own/department logs visible without opening legacy/foreign logs', async () => {
     const Activity = require('../models/activityLog.model');
     for (const scope of ['own', 'department']) await h.models.Role.updateOne({ key: `test_${scope}` }, { $push: { permissions: { resource: 'activity_log', action: '*', scope } } });
-    await h.request('own', 'POST', '/activity-logs', { action: 'create', entityType: 'application', description: 'OWN_ACTIVITY', departmentId: 'dep_B', createdBy: h.actors.foreign._id });
-    await h.request('foreign', 'PATCH', `/applications/${(await create('foreign'))._id}/status`, { status: 'Screening' });
+    const owned = await create('own'), foreign = await create('foreign');
+    assert.equal((await h.request('own', 'POST', '/activity-logs', { action: 'create', entityType: 'application', entityId: owned._id, description: 'OWN_ACTIVITY', departmentId: 'dep_B', createdBy: h.actors.foreign._id })).status, 201);
+    await h.request('foreign', 'PATCH', `/applications/${foreign._id}/status`, { status: 'Screening' });
+    await h.request('own', 'POST', '/activity-logs', { action: 'create', entityType: 'application', description: 'WITHOUT_PARENT' });
+    await h.request('own', 'POST', '/activity-logs', { action: 'create', entityType: 'application', entityId: foreign._id, description: 'FOREIGN_PARENT_OWN_SNAPSHOT' });
     await Activity.create({ userId: h.actors.own._id, action: 'create', entityType: 'application', description: 'LEGACY_WITHOUT_SNAPSHOT' });
     for (const actor of ['own', 'department']) {
       const r = await h.request(actor, 'GET', '/activity-logs'); assert.equal(r.status, 200); assert.ok(r.data.activityLogs.some(l => l.description === 'OWN_ACTIVITY'));
       assert.ok(!r.data.activityLogs.some(l => l.description === 'LEGACY_WITHOUT_SNAPSHOT'));
+      assert.ok(!r.data.activityLogs.some(l => ['WITHOUT_PARENT', 'FOREIGN_PARENT_OWN_SNAPSHOT'].includes(l.description)));
       const rows = await Activity.find({ _id: { $in: r.data.activityLogs.map(l => l.id) } }); assert.ok(rows.every(l => l.departmentId === 'dep_A'));
     }
   });
