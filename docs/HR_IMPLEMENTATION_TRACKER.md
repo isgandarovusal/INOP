@@ -1530,3 +1530,12 @@ User authorizes small local commits and existing-main pushes, no new branch, no 
 Actual desktop analytics/Job and mobile profile/board were inspected. First expanded matrix93 total failed13 including parent: bare disabled-source pages8 and legacy Job-card gradients4, plus aggregate parent failure. The initial source/Job fix then failed3 early-width Job cases plus parent, exposing the separate first-column selector. Final104/104 target passed after all card fixes. Final search-icon/ranking polish adds explicit icon padding and first-rank gradient checks:60/60 (14 pages ×4 widths plus genuine empty/filter/keyboard/permission cases and parent). No assertion or failing investigative log is discarded. Source intake stays disabled and makes zero requests; full independent mock source queue11/11 remains valid.
 
 **16B gate:** hr16bcomplete TSapp/node and production buildPASS, lint0errors/9existingwarnings, smoke13/13, authorization632/632; no source changes follow before this package commit.
+
+###16C — actual CSS cascade and deferred candidate painting
+
+| ID | Acceptance/finding | Status | Evidence |
+|---|---|---|---|
+| P16-009 | Preserve actual analytics grid against global important rules; defer offscreen candidate card paint without changing paging/permissions/keyboard access | TESTED |81/81 actual-shell tests,14pages×4widths; computed grid/paint assertions, deferred-card keyboard navigation and current-department removal. hr16c gates recorded below. |
+| AUD-140 | Legacy admin important flex overrides new analytics grid; 30 rich candidate cards incur offscreen layout/paint | TESTED | Real cascade diagnostic identified admin important rule; scoped grid and content-visibility with81/81 regression. Final production measurements remain pending rather than claiming an unmeasured speedup. |
+
+**16C gate:** TSapp/node/buildPASS, lint0/9, smoke13, authorization632. Exact source/test inputs will be frozen after this commit; final before/after and full suite follow without overlapping their measurements.

@@ -312,3 +312,7 @@
 /* Preserve space for SearchInput's leading icon and trailing clear control. */
 .hr-workspace .search-field input:not([type=checkbox]):not([type=radio]):not([type=file]) { padding-left: 36px; padding-right: 36px; }
 .hr-workspace .search-field .search-field__clear { min-height: 32px; width: 32px; padding: 0; background: transparent; border: 0; }
+/* Legacy admin.css forces every .filter-bar to flex; only HR analytics is a grid. */
+.hr-workspace.hr-analytics-page .hr-analytics-filter-grid { display: grid !important; align-items: end !important; }
+/* Keep bounded-page card data and keyboard navigation, defer offscreen paint/layout. */
+.hr-workspace .hr-candidate-grid > article { content-visibility: auto; contain-intrinsic-size: auto 240px; }
