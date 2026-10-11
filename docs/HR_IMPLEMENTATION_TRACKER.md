@@ -345,7 +345,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 |---|---|---|---|
 | P10-001 | Private object storage adapter | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-002 | Authorized file access | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
-| P10-003 | Original CV retention | OPEN | — |
+| P10-003 | Original CV retention | IN_PROGRESS | 10C7 disabled manifest/archive preparation, source-bound immutable reservation/scan/readback, no deletion or Candidate attachment; actual provider/retention/recovery activation remains gated |
 | P10-004 | Parsing metadata | TESTED | 10C5 explicit source-bound HR approval and historical server receipt tested by `hrCvApproval`/`hrCvApprovalUI` (110 combined targets);  10C3 `hrCvProcessing`/`hrCvProcessingHttp`/`hrCvProcessingUI`: rules-2 source SHA/revision/full-context identity, private evidence metadata, current-result guard; 104 targets / 1766 full. HR facts remain read-only here; explicit correction uses existing Candidate edit. |
 | P10-005 | Source identity | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-006 | Existing file migration plan | IN_PROGRESS | 10C6 internal scoped metadata-only dry-run inventory: 14/14 owned-loopback tests, current read/update, strict bounds/keyset, legacy review and no writes/provider/files; `HR_CV_MIGRATION_PREPARATION.md`. Actual manifest/writer/apply/backup/provider recovery still pending; no migration activated |
@@ -853,3 +853,19 @@ The internal module is unwired (no route/CLI/worker invocation) and does not aut
 Final `/tmp/inop-hr10c6-target-final.log`: **14/14**, zero failures/skips/cancellations, owned loopback metadata only. Final `/tmp/inop-hr10c6-validation-final.log` and `/tmp/inop-packagehr10c6-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Final serial `/tmp/inop-hr10c6-regression-final.log`: **1831/1831**, zero failures/skips/cancellations on this source. `git diff --check` PASS; commit only after these checks. Exact commit SHA is recorded in the next tracker update.
 
 Resume at P10-003/006: implement disabled, server-owned original manifest/write/source-draft/quarantine preparation with approved scanner/storage interfaces; actual provider/backup/retention activation remains gated. P10-009/010/012 OCR/AI/ingestion jobs, P10-020 comprehensive pre-intake security and AUD-030/047/048/050/051/067/073/090 remain OPEN/IN_PROGRESS in their original scope. P10-018/019 and actual AI/SMTP/Graph/website access stay BLOCKED_EXTERNAL. Do not skip or silently close these IDs; packages 11–13 are preserved. Production push/deploy is not authorized by this implementation task.
+
+
+10C6 commit: `a932580b5da3b670aca592361c5519166b94de63`, four files, 14 target / 1831 full, TypeScript/build PASS, lint 0/9, smoke 13 / authorization 632. Predecessors preserved.
+
+## 10C7 — source-bound original manifest/archive preparation
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-032 | Disabled internal original manifest with exact separately approved unique DDL; no automatic migration/TTL | TESTED | `hrCvOriginalArchive` 19/19 owned-loopback checks |
+| P10-033 | Server key saved before immutable PUT, exact scan/hash readback and same-key uncertain-write recovery | TESTED | `hrCvOriginalArchive` 19/19, synthetic scanner/storage only |
+| P10-034 | Current independent read/update and original actor/source/lease guards; bounded attempts/capacity/deadline | TESTED | `hrCvOriginalArchive` 19/19 owned-loopback checks |
+| P10-035 | Retain original/obsolete object and manifest; hide keys/PII/errors; no Candidate attachment or fake recovery | TESTED | `hrCvOriginalArchive` 19/19 owned-loopback checks |
+
+P10 remains partial. The technical archive is disabled/unwired and never applies the migration inventory. No production DDL, provider config, scanner activation, Candidate pointer, file/object deletion or TTL. `docs/HR_CV_ORIGINAL_MANIFEST.md` records exact DDL and activation/recovery/retention gates. Original IDs and external blockers are retained, including draft/attachment, orphan/deletion lifecycle, actual OCR/AI/ingestion and P11–13. Continue independent work after this local commit; no per-package user confirmation or push/deploy.
+
+Final 10C7 evidence: `/tmp/inop-hr10c7-target-final.log` **64/64** (new original archive 19, inventory 14, private object adapter 31); `/tmp/inop-packagehr10c7-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c7-regression-final.log` full serial **1850/1850**, no failures/skips/cancellations, frozen source. `git diff --check` PASS. Five package files only; SHA recorded after commit next update. P10-003/006 remain IN_PROGRESS: technical synthetic archive is tested, actual migration/attachment/storage/scan/backup/recovery/retention is not. No user confirmation wait; next independent P10 increment is durable professional AI review/task preparation using the existing queue, preserving parse-only HTTP/UI.

@@ -1,0 +1,29 @@
+# P10C7 — original manifest and conditional archive preparation
+
+This is an **internal, disabled, unwired preparation**. There is no route, startup worker, environment activation, Candidate pointer attachment, migration apply, delete, or new hosting resource. Existing Candidate upload/parse/read behavior is unchanged. Real CV intake remains gated on approved storage, actual scan/recovery tests and privacy/retention decisions. The original filesystem remains ephemeral.
+
+`createArchive().archive(req,candidateId,{expectedRevision,sourceHash,contextHash})` is disabled by default. A future authenticated server caller supplies only its actor ID; current active User/Role and independent Candidate read/update are resolved from the DB. Input cannot supply actor, storage key, grant or attachment. The exact source fingerprint includes original metadata, native/private locator, parser version, revision and timestamp. Current actor and parent are checked after awaited work, including the original initiating actor on resumed contexts. Losing role, department/assignment or source makes the manifest obsolete and refuses the operation.
+
+The optional `HrCvOriginalManifest` has `autoCreate=false`, `autoIndex=false`, no TTL/backfill/startup DDL. Collection and exact indexes must be separately prepared/approved:
+
+- `hr_original_context_unique`: unique `{contextKey:1}`, not sparse/partial.
+- `hr_original_active_slot`: unique `{slot:1}`, partial `{slot:{$type:'number'}}`, not sparse.
+- `hr_original_candidate`: `{candidateId:1,createdAt:-1}` for later bounded parent history.
+
+The service verifies the first two before original IO and fails `ARCHIVE_DDL_REQUIRED` without creating them. Tests create these indexes only in the fixture's newly owned loopback DB. Context is derived from parent/source/evidence mode, shared across authorized actors. Concurrent equal requests cannot create two reservations. Eight unique active slots bound admitted work across instances; each context has a 60s lease, 30s maximum deadline and three lifetime attempts. A busy attempt does not consume a slot or processing attempt. No count-then-write quota is used. Internal reserved/historical rows are retained; this is not a public intake rate limiter or retention policy.
+
+The reader provides exact current original bytes; SHA/size/known PDF or DOCX MIME must match original metadata. The caller must use existing structural validation for any new intake; the archive is not a document format parser. A trusted server scanner must return clean evidence bound to the exact SHA, with bounded engine/version identity. Missing/unknown/infected/mismatched scan blocks before object writing. The scanner sees a byte copy and cannot mutate the retained original. There is no default mock scanner, no client-supplied scan result, no claim that MIME implies malware safety, and no real scanner integration in this increment.
+
+Before any PUT, the server-generated opaque object reference is durably saved in the manifest. Conditional immutable PUT and exact hash/size readback use the existing private storage adapter; an initial GET reconciles interrupted/uncertain writes using that **same key**. A conditional conflict is accepted only if readback verifies the intended bytes. Failure/uncertain acknowledgement stays retry/failed with fixed safe codes; raw provider messages/bodies, paths, file names, contact details and credentials are never copied into state or DTO. No object/native original is removed on failure, revision change, replacement, retry or obsolescence. Old lease owners cannot publish after lease replacement; ignored late adapters cannot resume write after deadline.
+
+Successful `verified` means a particular archive attempt read back exact bytes. It does **not** mean provider backup, long-term durability, restore, malware readiness, Candidate attachment or permission to activate intake. DTO explicitly includes `candidateAttached:false` and `recoveryVerified:false`. A replay reports the historical `verifiedAt`, not a newly executed recovery. Internal test adapters use `evidenceMode:test`; this mode is part of the context so test proof cannot be adopted by a provider context. There is no runtime environment-selectable mock. Private blob/key/scan/context/lease fields are hidden from model JSON and never returned by this helper.
+
+## Remaining gates and safe migration
+
+1. Approve existing private storage and a real scanner, least-privilege access, processing/residency terms and recovery tests. No resource is created by this code.
+2. Verify backup and exact restored hashes, alongside metadata/manifest. No delete, TTL or legal period is inferred. HR role migration remains a separate reviewed operation.
+3. Separately authorize DDL and per-record/bulk migration apply. The inventory remains read-only; an archive is not migration approval.
+4. Implement explicit source-draft/attachment CAS with current parent authority and verified provider-mode scan/storage evidence. Preserve old bytes and manifest. This service intentionally does not write Candidate pointers.
+5. Add approved retention/deletion and orphan reconciliation without weakening old private read authorization. Disable new intake during rollback; preserve private authorized reads and manifests, never restore public files or old scope holes.
+
+`hrCvOriginalArchive.test.cjs` uses an owned loopback DB and synthetic in-memory originals/object store/scanner, **not** a hosted provider/malware E2E. It verifies five authorized scopes, denied/mixed scopes, forged grants/input, missing DDL/default disablement, source/hash/MIME/scan gates, reserved key before PUT, uncertain acknowledgement/recreation, attempt/lease/capacity bounds, source/permission races, unchanged Candidate/no deletion and private metadata. Native reader/SigV4 transport remain separately covered by their existing tests. No production DB/backup/migration/env/secret or deployment is touched.
