@@ -9,7 +9,7 @@ import CvReviewAssistant from "../../../Components/CvReviewAssistant";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import CvHistoryEditor from "../../../Components/CvHistoryEditor";
 import { useMounted } from "../../../Hooks/useMounted";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import HRResourceState from "../../../Components/HRResourceState";
@@ -176,11 +176,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     e.preventDefault();
     if (saving||intakeAttempt) return;
     if(durable&&(cvFile||intakeSource)&&(!intakeSource?.result||intakeSource.state!=="ready")){setDocumentError("hrIntake.notReady");return;}
-    if((processingApproval||durable&&intakeSource)&&!confirmReview){setError(t("hrApproval.confirmRequired"));return;}
+    if((processingApproval||durable&&intakeSource)&&!confirmReview){setError("hrApproval.confirmRequired");return;}
     if (aiGenerating || saving || createRecovery) return;
-    if (job && !cvFile && !intakeSource) { setError(t("hrStates.cvRequired")); return; }
+    if (job && !cvFile && !intakeSource) { setError("hrStates.cvRequired"); return; }
     if (!name.trim()) {
-      setError(t("recruitment.candidateForm.nameRequired"));
+      setError("recruitment.candidateForm.nameRequired");
       return;
     }
 
@@ -235,10 +235,8 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
         const candidateId=err.response.data.recovery?.candidateId;
         if(![401,403].includes(err.response.status)){setError(null);setCreateRecovery({candidateId:typeof candidateId==='string'&&/^[a-f0-9]{24}$/.test(candidateId)?candidateId:undefined});return;}
       }
-      if(isAxiosError(err)){const status=err.response?.status;if(status===401||status===403||(status===404&&err.response?.data?.code!=="PROCESSING_JOB_UNAVAILABLE")){setAccessDenied(status===401?"unauthenticated":status===403?"forbidden":"not-found");return;}if(status===409||status===404){setConfirmReview(false);setError(t("hrProcessing.error.changed"));return;}}
-      setError(
-        getErrorMessage(err, t("recruitment.candidateForm.genericError")),
-      );
+      if(isAxiosError(err)){const status=err.response?.status;if(status===401||status===403||(status===404&&err.response?.data?.code!=="PROCESSING_JOB_UNAVAILABLE")){setAccessDenied(status===401?"unauthenticated":status===403?"forbidden":"not-found");return;}if(status===409||status===404){setConfirmReview(false);setError("hrProcessing.error.changed");return;}}
+      setError(hrCrudErrorKey(err));
     } finally {
       if (mounted.current) setSaving(false);
     }

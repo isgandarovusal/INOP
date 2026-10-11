@@ -4,7 +4,7 @@ import CandidateApplicationMatches from "../../../Components/CandidateApplicatio
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
 import HRResourceState from "../../../Components/HRResourceState";
 import { auditErrorStatus, useAuditResource } from "../../../Hooks/useAuditResource";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -80,10 +80,7 @@ const CandidateDetail: React.FC = () => {
       if (context.current.current !== key || controller.signal.aborted) return;
       setActionError({ key, status: auditErrorStatus(err) });
       toast.error(
-        getErrorMessage(
-          err,
-          t("recruitment.candidates.exportError"),
-        ),
+        t(hrCrudErrorKey(err)),
       );
     } finally {
       controllers.current.delete(controller);
@@ -113,7 +110,7 @@ const CandidateDetail: React.FC = () => {
       if (context.current.current !== key || controller.signal.aborted) return;
       setActionError({ key, status: auditErrorStatus(err) });
       toast.error(
-        getErrorMessage(err, t("recruitment.candidateDetail.deleteError")),
+        t(hrCrudErrorKey(err)),
       );
     } finally {
       controllers.current.delete(controller);

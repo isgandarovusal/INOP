@@ -1504,5 +1504,12 @@
       "same_email": "Same email",
       "same_phone": "Same phone"
     }
+  },
+  "hrErrors": {
+    "invalid": "Check required fields, professional criteria and resource links.",
+    "busy": "The request limit was reached. Try again shortly.",
+    "network": "Connection lost. Check the operation result before trying again.",
+    "timeout": "The request timed out. Check the result before resubmitting.",
+    "unavailable": "The operation is currently unavailable. Keep your draft and try again."
   }
 }

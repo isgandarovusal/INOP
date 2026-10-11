@@ -4,7 +4,7 @@ import ApplicationKanban from "../../../Components/ApplicationKanban";
 import { applicationTransitions } from "../../../Utils/applicationWorkflow";
 import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import { isAxiosError } from "axios";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -116,7 +116,7 @@ const ApplicationsList: React.FC = () => {
       await deleteApplication(deleteTarget.id);
       if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (deleteError) {
-      if (context.current.current === key) setMutation({ key, error: getErrorMessage(deleteError, t("somethingWentWrong")) });
+      if (context.current.current === key) setMutation({ key, error: hrCrudErrorKey(deleteError) });
     } finally {
       if (context.current.current === key) setDeletingId(null);
     }
@@ -139,7 +139,7 @@ const ApplicationsList: React.FC = () => {
       if (!controller.signal.aborted && context.current.current === key) load();
     } catch (err) {
       if (!controller.signal.aborted && context.current.current === key) {
-        setMutation({ key, error: isAxiosError(err) && err.response?.status === 409 ? t('hrWorkflow.conflict') : getErrorMessage(err, t('somethingWentWrong')) });
+        setMutation({ key, error: isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err) });
         if (isAxiosError(err) && [401, 403, 404, 409].includes(err.response?.status || 0)) load();
       }
     } finally {
@@ -157,7 +157,7 @@ const ApplicationsList: React.FC = () => {
         subtitle={t("recruitment.applications.totalShown", { total: result.data?.total ?? 0, shown: rows.length })}
       />
 
-      {mutation.key === context.key && mutation.error && <p role="alert">{mutation.error} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
+      {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
         <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrWorkflow.sortNewest' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>

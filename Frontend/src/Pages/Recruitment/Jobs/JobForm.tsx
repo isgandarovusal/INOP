@@ -1,7 +1,8 @@
 import JobSkillsAssistant from "../../../Components/JobSkillsAssistant";
 import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFields";
 import { useMounted } from "../../../Hooks/useMounted";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
+import {isAxiosError} from "axios";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import HRResourceState from "../../../Components/HRResourceState";
@@ -46,7 +47,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
     if (saving) return;
 
     if (!position.trim()) {
-      setError(t("recruitment.jobForm.positionRequired"));
+      setError("recruitment.jobForm.positionRequired");
       return;
     }
 
@@ -77,10 +78,8 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       navigate("/app/recruitment/jobs");
     } catch (err: unknown) {
       if (!mounted.current) return;
-      console.error("Failed to save job:", err);
-      setError(
-        getErrorMessage(err, t("recruitment.jobForm.genericError")),
-      );
+      if(isAxiosError(err)&&[401,403,404].includes(err.response?.status??0)){setAccessDenied(err.response!.status===401?'unauthenticated':err.response!.status===403?'forbidden':'not-found');return;}
+      setError(hrCrudErrorKey(err));
     } finally {
       if (mounted.current) setSaving(false);
     }
@@ -102,7 +101,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       {error && (
         <div className="alert alert--danger">
           <AlertCircle size={18} />
-          <span>{error}</span>
+          <span>{t(error)}</span>
         </div>
       )}
 

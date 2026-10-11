@@ -1,7 +1,7 @@
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { useHRRankingPage } from "../../../Hooks/useHRRankingPage";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Plus, UserSquare2 } from "lucide-react";
@@ -83,7 +83,7 @@ const JobDetail: React.FC = () => {
 
       if (context.current.current === key) { setSelectedCandidate(""); loadJobDetail(); }
     } catch (err: unknown) {
-      if (context.current.current === key) setAction(previous => ({ ...previous, key, error: getErrorMessage(err, t("recruitment.jobDetail.linkError")) }));
+      if (context.current.current === key) setAction(previous => ({ ...previous, key, error: hrCrudErrorKey(err) }));
     } finally {
       if (context.current.current === key) setAction(previous => ({ ...previous, busy: false }));
     }
@@ -93,7 +93,7 @@ const JobDetail: React.FC = () => {
 
   return (
     <div className="job-detail-page">
-      {error && <div role="alert">{error}</div>}
+      {error && <div role="alert">{t(error)}</div>}
 
       {job.branchName && <p>{t("hrCatalog.branch")}: {job.branchName}</p>}
       <PageHeader

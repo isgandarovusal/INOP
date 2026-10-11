@@ -62,7 +62,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | AUD-044 | 03 | Parser/source/hash/original-file metadata not persisted | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | AUD-045 | 09 | Rule parser and static suggestions are presented as AI | TESTED | 09B removes static Job suggestions; 09C2 `hrAiCvUI` reproduces and corrects active AZ/EN/RU Candidate copy, distinguishes rules/manual/optional evidence AI and keeps mock identity visible. Earlier narrow evidence tests did not cover outer copy; correction is preserved below. |
 | AUD-046 | 03 | UI advertises DOC despite PDF/DOCX-only upload contract | TESTED | 09C2 `hrAiCvUI` has separate AZ/EN/RU negative DOC-copy assertions; current visible format/error text is PDF/DOCX only, matching server validation. Earlier evidence/type tests did not cover the active outer copy. |
-| AUD-047 | 02 | Upload/processing/error strings have incomplete localization | IN_PROGRESS | 10C11–10C13 profile/OCR/AI/document errors in AZ/EN/RU; broader HR CRUD/backend validation/action strings remain open |
+| AUD-047 | 02 | Upload/processing/error strings have incomplete localization | TESTED | 13E status-based safe AZ/EN/RU Job/Candidate/Application CRUD/action errors + previous document/OCR/AI/source errors; target73 then final51; raw arbitrary backend strings never rendered |
 | AUD-048 | 10 | No malware quarantine/scan for untrusted uploaded documents | BLOCKED_EXTERNAL | 13C native adapter14/14 and hash-bound Source/relay quarantine tests; actual scanner/definitions/EICAR absent, legacy upload activation not certified |
 | AUD-049 | 08 | Synchronous decompression/extraction may block requests | TESTED | `documentProcessing`: CPU heartbeat, queue/timeout/cancel/recovery; ZIP validation, PDF/DOCX extraction and structured parsing run off the HTTP thread |
 | AUD-050 | 10 | Native Render CV storage is ephemeral without durability/recovery | OPEN | — |
@@ -1286,3 +1286,18 @@ Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current 
 | P13-032 | Source OCR frontend strict version/provider/null confidence and AZ/EN/RU zero language refetch | TESTED | Source OCR/intake UI15/15 + existing Candidate OCR UI4/4 |
 
 `HR_PRIVATE_SOURCE_OCR.md` documents optional existing native engine; no new resource/env/boot/activation. Original backend78/78, current shared parser24/24 and extra late-role5/5. Initial UI normalized-phone assertion incorrectly expected raw editable phone to equal normalized storage value; corrected to validate actual digits (keeps final stored normalized assertion), final15/15. Existing Candidate OCR UI4/4. Validationhr13d TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Broader E2E eight checks pass after fixture delta added required evidenceMode; belongs next separate package, not this commit. Original scanner/storage/recovery gates remain BLOCKED_EXTERNAL, retention choice pending and AUD-090 still OPEN despite current parallel55 pass. No production/push/deploy.
+
+13D commit `7f4f5068028482fc2c4601ebd133a6a46f50ca18`, seven paths; actual local OCR78/current24/late-role5, frontend Source15 + Candidate OCR4, all gatesPASS.
+
+## 13E — localized mutation lifecycle and safe diagnostics
+
+| ID | Package | Finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-127 | 02/13 | Job submit401/403/404 leaves an editable form despite lost server authority | TESTED | Archived browser baseline missing fail-closed states; current JobForm primary access state/no submit controls |
+| AUD-128 | 02/13 | HR raw server/axios errors appear in CRUD toasts/DOM/JobForm console | TESTED | Archived pre-patch 9failed/10; current no raw diagnostic/toast/log, status localization keeps drafts |
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-033 | HR Job/Candidate/Application CRUD/action validation/status states localized AZ/EN/RU and stable keys retranslate without refetch | TESTED | hrCrudErrorsUI + existing lifecycle/contracts/document tests,73initial/51final |
+
+`HR_CRUD_ERROR_PRESENTATION.md` explains HR-only toast suppression, sanitized presentation and unchanged backendAPI. `/workspace/inop-hr13e-crud-baseline.log`1pass/9fail reproduces actual old code, not PASS. Initial target73/73; after storing error keys across lists/linking/workflow `/workspace/inop-hr13e-ui-current.log`51/51,0fail/skip/cancel. Current validationhr13ecurrent TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Shared axios behavior is limited to HR relative paths, previous nonHR default unchanged; final complete frontend matrix pending. No production/provider/DDL/push/deploy. Retention and real storage/scanner gates remain separate; Source parallel55 pass does not close AUD-090.

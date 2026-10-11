@@ -1528,5 +1528,12 @@
       "same_email": "Eyni email",
       "same_phone": "Eyni telefon"
     }
+  },
+  "hrErrors": {
+    "invalid": "Məlumatları yoxlayın: tələb olunan sahələr, peşə meyarları və əlaqələr düzgün olmalıdır.",
+    "busy": "Sorğu limiti dolub. Bir qədər sonra yenidən cəhd edin.",
+    "network": "Bağlantı kəsildi. Əməliyyatın nəticəsini yoxlayın, sonra yenidən cəhd edin.",
+    "timeout": "Sorğunun vaxtı bitdi. Təkrar göndərməzdən əvvəl nəticəni yoxlayın.",
+    "unavailable": "Əməliyyat hazırda əlçatan deyil. Məlumatlarınızı qoruyub yenidən cəhd edin."
   }
 }

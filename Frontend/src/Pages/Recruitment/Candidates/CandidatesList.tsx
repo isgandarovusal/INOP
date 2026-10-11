@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -92,12 +92,9 @@ const CandidatesList: React.FC = () => {
       toast.success(t("recruitment.candidates.exportSuccess"));
     } catch (err: unknown) {
       if (context.current.current !== key) return;
-      setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
+      setMutation({ key, error: hrCrudErrorKey(err) });
       toast.error(
-        getErrorMessage(
-          err,
-          t("recruitment.candidates.exportError"),
-        ),
+        t(hrCrudErrorKey(err)),
       );
     } finally {
       if (context.current.current === key) setExporting(false);
@@ -130,9 +127,9 @@ const CandidatesList: React.FC = () => {
       toast.success(t("recruitment.candidates.deleted"));
     } catch (err: unknown) {
       if (context.current.current !== key) return;
-      setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
+      setMutation({ key, error: hrCrudErrorKey(err) });
       toast.error(
-        getErrorMessage(err, t("recruitment.candidates.deleteError")),
+        t(hrCrudErrorKey(err)),
       );
     } finally {
       if (context.current.current === key) setDeletingId(null);
@@ -239,7 +236,7 @@ const CandidatesList: React.FC = () => {
         </div>
       </div>
 
-      {error && <p role="alert">{error} <button type="button" onClick={fetchCandidates}>{t("hrStates.retry")}</button></p>}
+      {error && <p role="alert">{t(error)} <button type="button" onClick={fetchCandidates}>{t("hrStates.retry")}</button></p>}
       {result.status !== "ready" ? <HRResourceState status={result.status} retry={fetchCandidates} /> : loading ? (
         <div
           style={{

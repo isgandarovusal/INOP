@@ -1,6 +1,6 @@
 import HRScopeFilters from "../../../Components/HRScopeFilters";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
-import { getErrorMessage } from "../../../Utils/getErrorMessage";
+import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
@@ -76,7 +76,7 @@ const JobsList: React.FC = () => {
       await deleteJob(id);
       if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (err: unknown) {
-      if (context.current.current === key) setMutation({ key, error: getErrorMessage(err, t("somethingWentWrong")) });
+      if (context.current.current === key) setMutation({ key, error: hrCrudErrorKey(err) });
     } finally {
       if (context.current.current === key) setDeletingId(null);
     }
@@ -102,7 +102,7 @@ const JobsList: React.FC = () => {
         }
       />
 
-      {error && <p role="alert">{error} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
+      {error && <p role="alert">{t(error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar">
         <HRScopeFilters jobs={jobs} brand={brandFilter} branch={branchFilter} onBrand={value => { setBrandFilter(value); setBranchFilter('all'); }} onBranch={setBranchFilter} />
         <SearchInput

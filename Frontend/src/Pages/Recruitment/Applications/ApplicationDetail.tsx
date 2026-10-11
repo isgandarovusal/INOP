@@ -8,7 +8,7 @@ import { useAuditResource } from '../../../Hooks/useAuditResource';
 import { useHRActionContext } from '../../../Hooks/useHRActionContext';
 import { hasPermission, getPermissionScope } from '../../../Utils/permissions';
 import { applicationTransitions, applicationSubstatuses, localDateTime } from '../../../Utils/applicationWorkflow';
-import { getErrorMessage } from '../../../Utils/getErrorMessage';
+import { hrCrudErrorKey } from '../../../Utils/hrCrudError';
 import { getApplicationById, getApplicationHistory, getApplicationInterviewers, updateApplicationWorkflow } from '../../../Services/applicationsService';
 import type { Application, ApplicationStatus, ApplicationInterview, ApplicationNextAction } from '../../../Types/recruitment';
 import PageHeader from '../../../Components/PageHeader';
@@ -58,10 +58,10 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
         ...(status === 'interview' && start ? { interview: { localStart: start, timezone, durationMinutes: duration, interviewerId: interviewer, result: interviewResult } } : {}),
         nextAction: { kind: action, ...(due ? { localDueAt: due } : {}), timezone, notes: actionNotes } });
       if (context.current.current === key) reload();
-    } catch (err) { if (context.current.current === key) { setError(isAxiosError(err) && err.response?.status === 409 ? t('hrWorkflow.conflict') : getErrorMessage(err, t('somethingWentWrong'))); } }
+    } catch (err) { if (context.current.current === key) { setError(isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err)); } }
     finally { if (context.current.current === key) setBusy(false); }
   }}>
-    {error && <p role="alert" className="form-group--full">{error} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
+    {error && <p role="alert" className="form-group--full">{t(error)} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
     <fieldset disabled={busy} className="form-group--full">
       {canReopen && <label><input type="checkbox" checked={reopen} onChange={e => { setReopen(e.target.checked); setStatus(e.target.checked ? 'screening' : app.status); setSubstatus(''); }} />{t('hrWorkflow.reopen')}</label>}
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={status} onChange={e => { setStatus(e.target.value as ApplicationStatus); setSubstatus(''); }}>{choices.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s}`)}</option>)}</select></label>

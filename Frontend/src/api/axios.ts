@@ -39,7 +39,9 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.config?.suppressErrorToast) return Promise.reject(error);
+    // HR pages classify errors locally in the active language; do not duplicate
+    // their state with raw server/request messages. Other modules keep defaults.
+    if (error.config?.suppressErrorToast || /^\/(?:jobs|candidates|applications|hr)(?:[/?]|$)/.test(error.config?.url || '')) return Promise.reject(error);
 
     if (error.code === "ECONNABORTED") {
       toast.error("Server cavab vermədi. Yenidən cəhd edin.");
