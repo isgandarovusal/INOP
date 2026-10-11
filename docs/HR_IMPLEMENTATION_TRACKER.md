@@ -352,7 +352,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | TESTED | 10C2–10C3 actual queue/parser/HTTP/UI: unique bounded slots, lease/retry, private source checks; 104 targets / 1766 full. Parse only, disabled by default, exact DDL required; OCR/AI/ingestion separately OPEN. |
 | P10-009 | OCR jobs | OPEN | — |
-| P10-010 | AI jobs | OPEN | — |
+| P10-010 | AI jobs | IN_PROGRESS | 10C8 disabled internal durable professional AI profile on existing queue, exact kind/version, current-source guards and schema/provenance; HTTP/UI integration and real provider remain pending |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
 | P10-013 | Idempotency | IN_PROGRESS | 10C1 email command/CAS; 10C3–10C4 parse context/UUID command replay and atomic reservation tested (73 final targets). OCR/AI/ingestion job integrations remain OPEN; no real provider proof. |
@@ -869,3 +869,20 @@ Resume at P10-003/006: implement disabled, server-owned original manifest/write/
 P10 remains partial. The technical archive is disabled/unwired and never applies the migration inventory. No production DDL, provider config, scanner activation, Candidate pointer, file/object deletion or TTL. `docs/HR_CV_ORIGINAL_MANIFEST.md` records exact DDL and activation/recovery/retention gates. Original IDs and external blockers are retained, including draft/attachment, orphan/deletion lifecycle, actual OCR/AI/ingestion and P11–13. Continue independent work after this local commit; no per-package user confirmation or push/deploy.
 
 Final 10C7 evidence: `/tmp/inop-hr10c7-target-final.log` **64/64** (new original archive 19, inventory 14, private object adapter 31); `/tmp/inop-packagehr10c7-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c7-regression-final.log` full serial **1850/1850**, no failures/skips/cancellations, frozen source. `git diff --check` PASS. Five package files only; SHA recorded after commit next update. P10-003/006 remain IN_PROGRESS: technical synthetic archive is tested, actual migration/attachment/storage/scan/backup/recovery/retention is not. No user confirmation wait; next independent P10 increment is durable professional AI review/task preparation using the existing queue, preserving parse-only HTTP/UI.
+
+
+10C7 commit: `4f487005c8fb630a33cf6778c81a439e74ce23e8`, five files, 64 targets / 1850 full, TypeScript/build PASS, lint 0/9, smoke 13 / authorization 632; working tree clean, no push.
+
+## 10C8 — durable professional AI task preparation
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-036 | Exact immutable task kind/version and shared durable queue bounds without breaking parse HTTP/UI | TESTED | `hrCvAiProcessing` 15/15; 84 combined targets / 1865 full; `hrCvAiProcessing` 15/15 local targets |
+| P10-037 | Current authorized original/source before and after professional-only provider operation | TESTED | `hrCvAiProcessing` 15/15; 84 combined targets / 1865 full; revocation during original IO sends zero provider requests |
+| P10-038 | Private validated evidence/provenance, explicit blocked/unavailable, no static AI or automatic decision | TESTED | `hrCvAiProcessing` 15/15; 84 combined targets / 1865 full; actual P09 adapter with synthetic transport only |
+
+The original first target run failed because the new fixture used invalid model status `ocr-required`; it now uses the canonical `unsupported_ocr`. An existing HTTP race test then waited on a `findById` hook bypassed by the new query. The production query retains `findById` plus the exact kind/version filter; the test assertion was not weakened. The interrupted run is not PASS. `/tmp/inop-hr10c8-abort-cleanup.json` records removal of only that run's uniquely owned loopback fixture and four exact generated DOCX files, verified by time/content/hash/parent metadata; existing files/data were untouched. Final combined targets `/tmp/inop-hr10c8-target-final.log`: **84/84**, no failures/skips/cancellations. Full regression/build gates pending.
+
+P10-010 stays IN_PROGRESS: the adapter/queue is internal and disabled, HTTP/UI integration and real AI are not claimed complete. No P10 storage/OCR/ingestion/privacy gate is silently closed. Original audit/acceptance IDs and P11–13 remain preserved; external access remains BLOCKED_EXTERNAL, and independent work continues after local commit. No provider/environment activation, DDL/migration/resource/secret/production/push.
+
+Final 10C8 evidence: `/tmp/inop-hr10c8-target-final.log` **84/84** AI/parse/HTTP/retry/approval, `/tmp/inop-packagehr10c8-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `/tmp/inop-hr10c8-regression-final.log` serial full **1865/1865**, zero failures/skips/cancellations, frozen source. `git diff --check` PASS. Six package files only; local SHA recorded next tracker update. P10 stays partial; next independent increment is bounded optional OCR profile with real local scanned-PDF tests and explicit missing runtime/language status, then authenticated task diagnostics/review, ingestion/drafts/orphans and P11–13. No push/deploy.
