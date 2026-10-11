@@ -1372,5 +1372,63 @@
       "conflict": "Bildiriş və ya müraciət dəyişib. Son məlumatı yenidən yükləyin.",
       "failed": "Təkrar göndəriş növbəyə əlavə edilə bilmədi. Yenidən yoxlayın."
     }
+  },
+  "hrProcessing": {
+    "title": "CV background emalı",
+    "notice": "Mövcud original qayda parseri ilə emal olunur. Profil yalnız HR tərəfindən redaktə və yadda saxlananda dəyişir.",
+    "show": "Emal tarixçəsini göstər",
+    "refresh": "Emal statusunu yenilə",
+    "start": "Background parsing başlat",
+    "identityRequired": "Başlamaq üçün original hash və profil revision-u tələb olunur.",
+    "empty": "Emal işi yoxdur.",
+    "obsolete": "Bu iş əvvəlki mənbəyə aiddir; faktlar tətbiq edilmir.",
+    "inspect": "Status və faktları göstər",
+    "review": "Çıxarılmış faktların HR yoxlaması",
+    "manual": "Qayda əsaslı nəticədir, AI deyil. Lazım olan düzəlişləri profilin redaktə formasında əl ilə yoxlayın və yadda saxlayın. Naməlum məlumat göstərilmir; uzun siyahılar qısaldılır.",
+    "state": {
+      "queued": "Növbədə",
+      "running": "Emal olunur",
+      "retry": "Avtomatik təkrar cəhd gözlənilir",
+      "succeeded": "HR yoxlamasını gözləyir",
+      "failed": "Uğursuz",
+      "blocked": "Bloklanıb",
+      "cancelled": "Ləğv edilib"
+    },
+    "error": {
+      "disabled": "Background emal aktiv deyil; manual profil işləyir.",
+      "setup": "Emal DB/index hazırlığı tamamlanmayıb.",
+      "changed": "Mənbə və ya profil dəyişib. Son məlumatı yeniləyin.",
+      "busy": "Emal növbəsi doludur. Sonra yenidən yoxlayın.",
+      "missing": "Emal işi tapılmadı.",
+      "unavailable": "Emal xidməti hazırda əlçatan deyil; əsas profil saxlanılır."
+    },
+    "code": {
+      "QUEUED": "Emal növbədədir.",
+      "PROCESSING": "Qayda parseri işləyir.",
+      "REVIEW_REQUIRED": "HR yoxlaması tələb olunur.",
+      "OCR_REQUIRED": "Skan sənədi OCR tələb edir; OCR hazır deyil.",
+      "AUTH_REVOKED": "Cari giriş icazəsi ləğv edilib.",
+      "SOURCE_CHANGED": "Mənbə və ya profil dəyişib.",
+      "SOURCE_MISSING": "Original fayl mövcud deyil.",
+      "RESULT_LIMIT": "Nəticə dəstəklənən ölçünü keçir.",
+      "INPUT_LIMIT": "Original dəstəklənən ölçünü keçir.",
+      "STORAGE_NOT_CONFIGURED": "Private storage konfiqurasiya edilməyib.",
+      "PROCESSING_TIMEOUT": "Emal vaxtı bitdi.",
+      "PROCESSING_FAILED": "Emal tamamlanmadı.",
+      "ATTEMPTS_EXHAUSTED": "Avtomatik cəhd limiti bitib.",
+      "UNKNOWN": "Əlavə yoxlama tələb olunur."
+    },
+    "field": {
+      "name": "Ad",
+      "email": "Email",
+      "phone": "Telefon",
+      "phoneRaw": "Telefon (original)",
+      "role": "Vəzifə",
+      "education": "Təhsil",
+      "skills": "Bacarıqlar",
+      "experience": "Təcrübə (il)",
+      "languages": "Dillər",
+      "certificates": "Sertifikatlar"
+    }
   }
 }

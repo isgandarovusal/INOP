@@ -1,3 +1,4 @@
+import CvProcessingPanel from '../../../Components/CvProcessingPanel';
 import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import CandidateApplicationMatches from "../../../Components/CandidateApplicationMatches";
 import CvReviewEvidence from "../../../Components/CvReviewEvidence";
@@ -128,6 +129,7 @@ const CandidateDetail: React.FC = () => {
     <div className="candidate-detail-page">
       {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
       <CvReviewEvidence review={candidate.cvReview} />
+      <CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />
       <CandidateApplicationMatches candidateId={candidate.id} />
       {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
       {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}

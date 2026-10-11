@@ -240,6 +240,9 @@ router.delete(
   auditTemplatesController.deleteTemplate
 );
 
+router.get('/candidates/:id/processing', ...authorize('candidate', 'read'), require('../controllers/hrCvProcessing.controller').list);
+router.get('/candidates/:id/processing/:jobId', ...authorize('candidate', 'read'), require('../controllers/hrCvProcessing.controller').get);
+router.post('/candidates/:id/processing', ...authorize('candidate', 'update'), require('../controllers/hrCvProcessing.controller').start);
 router.get('/candidates/:id/cv-preview', ...authorize('candidate', 'read'), privateFiles.candidatePreview);
 router.get('/candidates/:id/cv', ...authorize('candidate', 'read'), privateFiles.candidate);
 router.get('/audit-source-documents/:id/file', ...authorize('audit.source_document', 'read'), requireGlobalSourceDocumentAccess, privateFiles.source);

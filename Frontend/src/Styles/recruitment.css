@@ -4310,3 +4310,8 @@
 
 [data-cv-ai-assistant] { min-width: 0; overflow-wrap: anywhere; }
 [data-cv-ai-assistant] button { max-width: 100%; white-space: normal; }
+
+[data-cv-processing] { overflow-wrap: anywhere; margin: 16px 0; }
+[data-cv-processing] button { max-width: 100%; white-space: normal; }
+[data-processing-result] dl { display: grid; gap: 8px; }
+[data-processing-result] dd { margin: 0; }

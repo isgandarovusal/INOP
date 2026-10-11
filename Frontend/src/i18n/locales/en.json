@@ -1348,5 +1348,63 @@
       "conflict": "Notification or application changed. Reload the latest information.",
       "failed": "Notification retry could not be queued. Check and retry."
     }
+  },
+  "hrProcessing": {
+    "title": "Background CV processing",
+    "notice": "The existing original uses a rule-based parser. The profile changes only when HR edits and saves it.",
+    "show": "Show processing history",
+    "refresh": "Refresh processing status",
+    "start": "Start background parsing",
+    "identityRequired": "Original hash and profile revision are required to start.",
+    "empty": "No processing jobs.",
+    "obsolete": "This job belongs to an older source; its facts are not applied.",
+    "inspect": "Show status and facts",
+    "review": "HR review of extracted facts",
+    "manual": "Rule-based output, not AI. Review and save needed corrections manually in the profile edit form. Unknown information is omitted; long lists are abbreviated.",
+    "state": {
+      "queued": "Queued",
+      "running": "Processing",
+      "retry": "Waiting for automatic retry",
+      "succeeded": "Awaiting HR review",
+      "failed": "Failed",
+      "blocked": "Blocked",
+      "cancelled": "Cancelled"
+    },
+    "error": {
+      "disabled": "Background processing is disabled; manual profile remains available.",
+      "setup": "Processing DB/index preparation is incomplete.",
+      "changed": "Source or profile changed. Reload current information.",
+      "busy": "Processing queue is full. Check again later.",
+      "missing": "Processing job was not found.",
+      "unavailable": "Processing is unavailable; the primary profile is retained."
+    },
+    "code": {
+      "QUEUED": "Processing queued.",
+      "PROCESSING": "Rule parser is running.",
+      "REVIEW_REQUIRED": "HR review is required.",
+      "OCR_REQUIRED": "Scanned document requires OCR; OCR is unavailable.",
+      "AUTH_REVOKED": "Current access was revoked.",
+      "SOURCE_CHANGED": "Source or profile changed.",
+      "SOURCE_MISSING": "Original file is missing.",
+      "RESULT_LIMIT": "Result exceeds the supported limit.",
+      "INPUT_LIMIT": "Original exceeds the supported limit.",
+      "STORAGE_NOT_CONFIGURED": "Private storage is not configured.",
+      "PROCESSING_TIMEOUT": "Processing timed out.",
+      "PROCESSING_FAILED": "Processing did not complete.",
+      "ATTEMPTS_EXHAUSTED": "Automatic attempt limit reached.",
+      "UNKNOWN": "Further review is required."
+    },
+    "field": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "phoneRaw": "Phone (original)",
+      "role": "Role",
+      "education": "Education",
+      "skills": "Skills",
+      "experience": "Experience (years)",
+      "languages": "Languages",
+      "certificates": "Certificates"
+    }
   }
 }

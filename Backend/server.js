@@ -58,6 +58,9 @@ mongoose.connect(MONGO_URI)
     if (process.env.HR_NOTIFICATION_WORKER_ENABLED !== 'false') {
       require('./services/applicationNotificationWorker.service').createNotificationWorker().start();
     }
+    if (process.env.HR_CV_PROCESSING_ENABLED === 'true') {
+      require('./services/hrCvProcessing.service').createProcessing().start();
+    }
     app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
   })
   .catch((err) => console.error('Failed to connect to MongoDB:', err));

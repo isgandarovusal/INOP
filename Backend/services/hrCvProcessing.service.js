@@ -16,7 +16,7 @@ async function actor(id) {
 async function candidate(req,id,update=true) {
  return Candidate.findOne({$and:[{_id:id},resourceFilter(req,'candidate'),...(update?[resourceFilter(req,'candidate','update')]:[])]}).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob').maxTimeMS(1000).lean();
 }
-function dto(row,result) { return {id:String(row._id),kind:row.kind,state:row.state,attempts:row.attempts,code:row.code,source:{sha256:row.sourceHash,revision:row.sourceRevision},createdAt:row.createdAt,updatedAt:row.updatedAt,nextAttemptAt:row.nextAttemptAt||null,events:row.events,...(result?{result}:{} )}; }
+function dto(row,result) { return {id:String(row._id),candidateId:String(row.candidateId),kind:row.kind,state:row.state,attempts:row.attempts,code:row.code,source:{sha256:row.sourceHash,revision:row.sourceRevision,contextHash:row.sourceFingerprint},createdAt:row.createdAt,updatedAt:row.updatedAt,nextAttemptAt:row.nextAttemptAt||null,events:row.events,...(result?{result}:{} )}; }
 async function indexes() {
  let values;try{values=await Jobs.collection.indexes();}catch{throw fail('PROCESSING_QUEUE_NOT_READY');}
  const required=[['hr_processing_context_unique',{contextKey:1},null],['hr_processing_queue_slot',{queueSlot:1},{queueSlot:{$type:'number'}}],['hr_processing_actor_slot',{actorId:1,actorSlot:1},{actorSlot:{$type:'number'}}]];
@@ -55,6 +55,14 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
   if(!row)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
   const currentSource=fingerprint(row)===job.sourceFingerprint;
   return {...dto(job,currentSource?job.result:undefined),currentSource};
+ }
+ async function list(req,id) {
+  available();if(!require('mongoose').isObjectIdOrHexString(id))throw fail('PROCESSING_INVALID_INPUT',400);
+  const current=await actor(req.user.id),auth=identity(current),row=await candidate(current,id,false);
+  if(!row)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);await indexes();
+  const jobs=await Jobs.find({candidateId:id}).sort({createdAt:-1,_id:-1}).limit(20).maxTimeMS(1000).lean();
+  const fresh=await actor(req.user.id),latest=await candidate(fresh,id,false);if(identity(fresh)!==auth)throw fail('PROCESSING_AUTH_CHANGED',403);if(!latest)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
+  return {items:jobs.map(job=>({...dto(job),currentSource:fingerprint(latest)===job.sourceFingerprint})),limit:20};
  }
  let busy=false,timer;
  async function finish(job,token,state,code,result) {
@@ -106,6 +114,6 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
  }
  function start(){available();if(timer)return;timer=setInterval(()=>void runOnce().catch(()=>console.error('CV processing temporarily unavailable.')),5000);timer.unref();}
  function stop(){clearInterval(timer);timer=undefined;}
- return{enqueue,get,runOnce,start,stop};
+ return{enqueue,get,list,runOnce,start,stop};
 }
 module.exports={createProcessing,fingerprint};
