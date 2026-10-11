@@ -1203,7 +1203,7 @@ Final11B `/workspace/inop-hr11b-final.log`98/98 (0 fail/skip/cancel), complete f
 
 | ID | Package | Finding | Status | Evidence |
 |---|---|---|---|---|
-| AUD-123 | 13 | Explicit Source approval with corrected fields stores corrected status but ATS-v1 requires confirmed; trusted score remains pending | OPEN | Code/source approval scope test already requires corrected; calculateApplicationMatch treats corrected as pending by design. Targeted reproduction/fix pending; no weaker acceptance or global automatic confirmation. |
+| AUD-123 | 13 | Explicit Source approval with corrected fields stores corrected status but ATS-v1 requires confirmed; trusted score remains pending | TESTED | 13A actual Source/HR approval/Candidate/Application/HTTP score regression; explicit confirmation only, correction evidence retained, no legacy migration. |
 
 `HR_CV_SOURCE_REVIEW.md` documents opaque source hints, independently scoped Job IDs, explicit linking and possible-duplicate review (not person dedup certainty/automatic merge). First fixture was invalid Job missing required description; corrected fixture, no model change. `/workspace/inop-hr11c-backend-second.log`82/82; `/workspace/inop-hr11c-ui-first.log`30/30; validationhr11c TS/build PASS lint0/9 smoke13 authorization632. Existing Source/private current-role tests preserved. Full backend1704 belongs11B and is not mislabeled current full; current finalP13 complete run still pending. All newly observed issue IDs are retained; no secret/production/DDL/provider/push/deploy.
 
@@ -1233,3 +1233,13 @@ Final11D `/workspace/inop-hr11d-target-final.log`141/141, complete frozen curren
 Public read-only website attempts are retained as proxy403, capability UNKNOWN not fake API. `HR_EXTERNAL_SOURCE_CAPABILITIES.md` details per-site access and approved mailbox/signed relay/export alternatives, unknown actual Google Forms/email destinations, no private scraping and privacy/runtime/DDL/scan/durability requirements. The user will obtain administrator access later; preparation continues independently. Real first-party channels/provider/admin/privacy/runtime remainBLOCKED_EXTERNAL. New endpoint is additive and default-disabled before parsing; all other HR paths still globalJWT. No secrets in browser/env/repo, no activated real intake/provider/production operation.
 
 Final12A `/workspace/inop-hr12a-target-final.log`51/51, complete frozen current backend `/workspace/inop-hr12a-backend-full.log`1743/1743 exit0,0fail/skip/cancel; validationhr12afinal TS/build PASS lint0/9 smoke13 authorization632. Source immutability/processing slots/reference scalar checks and source-wide budget were tightened before final tests; all assertions preserved. Ten explicit paths only; default profile no source registry/actor/store/AV/credential activation. API addition remains unavailable before accepted octet-stream parsing; global JSON parser still its original100KiB limit. No provider/website/hosting/DDL/production/push/deploy change. Actual vendor schemas/tenant consent/AV runtime/durability/lawful retention remain external/pending; continue native scan preparation/final invariants/matrix, not fake DONE.
+
+12A commit `2edc863b31dd7491e2886dc5042ce28967fb877a`, ten paths; targeted51/fullbackend1743, all gatesPASS. No push/deploy.
+
+## 13A — explicit corrected Source facts and contextual score
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P13-029 | Actual Source explicit corrected approval preserves evidence and exposes legitimate100/real0; draft/legacy/unknown remains untrusted | TESTED | `/workspace/inop-hr13a-score-target.log`78/78; UI28/28; baseline failed corrected approval score before patch |
+
+`HR_SOURCE_SCORE_CONFIRMATION.md` distinguishes correction from explicit approval. Only Source approval's already mandatory explicit confirmed act becomes confirmed review status; no weakening of existing legacy review, current scopes or automatic migration. Targets78/78, UI `/workspace/inop-hr13a-ui.log`28/28, zero failures/skips/cancellations. Validationhr13a TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Current full P13 run remains pending and earlier full1743 belongs12A. Separate protected plural/unknown-field scoring reproduction is next; no problem is silently ignored, external gates and deletion policy question remain pending. No production/provider/env/DDL/push/deploy.
