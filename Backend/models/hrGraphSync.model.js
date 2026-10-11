@@ -1,0 +1,4 @@
+const mongoose=require('mongoose');
+const schema=new mongoose.Schema({mailboxKey:{type:String,required:true,select:false},createdBy:{type:mongoose.Schema.Types.ObjectId,required:true},assignedTo:{type:mongoose.Schema.Types.ObjectId,required:true},departmentId:{type:String,default:''},state:{type:String,enum:['idle','running','retry','blocked'],required:true},code:String,attempts:{type:Number,default:0,min:0,max:3},cursor:{type:String,select:false},leaseToken:{type:String,select:false},leaseUntil:Date,nextAttemptAt:Date,lastSuccessAt:Date,lastFailureAt:Date,processed:{type:Number,default:0},skipped:{type:Number,default:0}},{timestamps:true,autoCreate:false,autoIndex:false});
+schema.index({mailboxKey:1},{unique:true,name:'hr_graph_mailbox_unique'});
+module.exports=mongoose.models.HrGraphSync||mongoose.model('HrGraphSync',schema);

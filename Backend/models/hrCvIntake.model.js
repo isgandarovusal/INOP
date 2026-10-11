@@ -1,6 +1,7 @@
 const mongoose=require('mongoose');
 const schema=new mongoose.Schema({
  createdBy:{type:mongoose.Schema.Types.ObjectId,required:true},assignedTo:{type:mongoose.Schema.Types.ObjectId,required:true},departmentId:{type:String,default:''},
+ origin:{type:new mongoose.Schema({key:{type:String,enum:['outlook','kfc','pizzahut','jobsearch','external_form']},identityHash:String,receivedAt:Date,jobId:mongoose.Schema.Types.ObjectId,matchReason:String},{_id:false}),select:false},
  taskVersion:{type:String,required:true,immutable:true},commandKey:{type:String,required:true,select:false},original:{originalName:String,mimeType:String,size:Number,sha256:String},
  blob:{type:mongoose.Schema.Types.Mixed,required:true,select:false},evidenceMode:{type:String,enum:['provider','test'],required:true},
  state:{type:String,enum:['reserved','queued','running','retry','ready','blocked','quarantined','failed','cancelled'],required:true},code:String,
@@ -9,7 +10,7 @@ const schema=new mongoose.Schema({
  approval:{type:new mongoose.Schema({actor:mongoose.Schema.Types.ObjectId,departmentId:String,profile:{type:mongoose.Schema.Types.Mixed},notes:String,profileHash:String,contextHash:String,sourceUpdatedAt:Date,candidateId:mongoose.Schema.Types.ObjectId,applicationId:mongoose.Schema.Types.ObjectId,jobId:mongoose.Schema.Types.ObjectId,at:Date,completedAt:Date},{_id:false}),select:false},
  scan:{engine:String,version:String,sha256:String,at:Date},result:{type:mongoose.Schema.Types.Mixed,select:false},
  events:{type:[new mongoose.Schema({state:String,code:String,at:Date,attempt:Number},{_id:false})],default:[]},
-},{timestamps:true,autoCreate:false,autoIndex:false,toJSON:{transform:(_doc,row)=>{for(const k of ['blob','commandKey','leaseToken','result','queueSlot','actorSlot','approval'])delete row[k];return row;}}});
+},{timestamps:true,autoCreate:false,autoIndex:false,toJSON:{transform:(_doc,row)=>{for(const k of ['blob','commandKey','leaseToken','result','queueSlot','actorSlot','approval','origin'])delete row[k];return row;}}});
 schema.index({commandKey:1},{unique:true,name:'hr_intake_command_unique'});
 schema.index({queueSlot:1},{unique:true,name:'hr_intake_queue_slot',partialFilterExpression:{queueSlot:{$type:'number'}}});
 schema.index({createdBy:1,actorSlot:1},{unique:true,name:'hr_intake_actor_slot',partialFilterExpression:{actorSlot:{$type:'number'}}});

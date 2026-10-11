@@ -4,7 +4,7 @@ const authority=require('./hrCreateRecovery.service'),{resourceFilter}=require('
 const {calculateApplicationMatch}=require('./applicationMatch.service'),{creationEvent}=require('./applicationLifecycle.service');
 const fields=['name','role','email','phone','education','experience','skills','languages','certificates','employmentHistory','educationHistory','certificationHistory'];
 const fail=(code,status=409)=>Object.assign(new Error('CV intake approval is unavailable.'),{code,status});
-const sourceContext=row=>({blob:row.blob,original:row.original,scan:row.scan,result:row.result,taskVersion:row.taskVersion});
+const sourceContext=row=>({blob:row.blob,original:row.original,scan:row.scan,result:row.result,origin:row.origin,taskVersion:row.taskVersion});
 const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'&&!(value instanceof Date)?Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])])):value;
 const hash=value=>crypto.createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
 function profile(input){
@@ -28,7 +28,7 @@ function createApproval({original,available}){
   const guard=async()=>{
    const fresh=await authority.current(req);if(authority.identity(fresh)!==auth)throw fail('INTAKE_AUTH_REVOKED',403);
    for(const [resource,action]of [['candidate','read'],['candidate','create'],...(jobId?[['application','create'],['recruitment','read']]:[])])if(resourceFilter(fresh,resource,action)._id?.$in?.length===0)throw fail('INTAKE_AUTH_REVOKED',403);
-   const row=await Source.findOne({$and:[{_id:id},resourceFilter(fresh,'candidate'),resourceFilter(fresh,'candidate','create')]}).select('+blob +result +approval').maxTimeMS(1000).lean();
+   const row=await Source.findOne({$and:[{_id:id},resourceFilter(fresh,'candidate'),resourceFilter(fresh,'candidate','create')]}).select('+blob +result +approval +origin').maxTimeMS(1000).lean();
    if(!row)throw fail('INTAKE_SOURCE_UNAVAILABLE',404);
    await require('./hrCvIntakeScope.service').checkLinked(fresh,row,true);
    if(row.state!=='ready'||row.taskVersion!=='intake-rules-1'||row.result?.requiresApproval!==true||row.scan?.sha256!==row.original.sha256||row.original.sha256!==input.expectedHash)throw fail('INTAKE_SOURCE_CHANGED');
@@ -55,7 +55,7 @@ function createApproval({original,available}){
   const parent=async()=>{const checked=await guard();const current=await Candidate.findOne({$and:[{_id:candidate._id,privateCvIntake:id},resourceFilter(checked.fresh,'candidate'),resourceFilter(checked.fresh,'candidate','create')]}).lean();if(!current)throw fail('INTAKE_SOURCE_UNAVAILABLE',404);candidate=current;return checked;};
   let application;
   if(jobId){context=await parent();application=await Application.findOne({$and:[{_id:receipt.applicationId,candidateId:candidate._id,jobId},resourceFilter(context.fresh,'application','create')]}).lean();
-   if(!application){if(receipt.completedAt)throw fail('INTAKE_COMPLETED_RESOURCE_UNAVAILABLE');const match=calculateApplicationMatch(context.job,candidate,{application:{jobId,candidateId:candidate._id}});const payload={_id:receipt.applicationId,jobId,candidateId:candidate._id,...ownership,status:'Applied',score:match.score,matching:match,scoreStatus:match.scoreStatus,notes,source:{key:'cv_upload',receivedAt:context.row.createdAt},events:[creationEvent(context.fresh)]};
+   if(!application){if(receipt.completedAt)throw fail('INTAKE_COMPLETED_RESOURCE_UNAVAILABLE');const match=calculateApplicationMatch(context.job,candidate,{application:{jobId,candidateId:candidate._id}});const payload={_id:receipt.applicationId,jobId,candidateId:candidate._id,...ownership,status:'Applied',score:match.score,matching:match,scoreStatus:match.scoreStatus,notes,source:{key:context.row.origin?.key||'cv_upload',receivedAt:context.row.origin?.receivedAt||context.row.createdAt},events:[creationEvent(context.fresh)]};
     await new Application(payload).validate();context=await parent();try{await Application.create(payload);}catch{/* Same reserved identity only; no destructive rollback. */}
     application=await Application.findOne({$and:[{_id:receipt.applicationId,candidateId:candidate._id,jobId},resourceFilter(context.fresh,'application','create')]}).lean();if(!application){await guard();if(await Application.exists({_id:receipt.applicationId}))throw fail('INTAKE_SOURCE_UNAVAILABLE',404);throw fail('INTAKE_APPROVAL_UNCERTAIN',503);}
    }

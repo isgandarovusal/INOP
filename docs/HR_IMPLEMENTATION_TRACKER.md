@@ -372,20 +372,20 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 
 | ID | Acceptance criterion | Status | Evidence |
 |---|---|---|---|
-| P11-001 | Approved GFC mailbox adapter | OPEN | — |
+| P11-001 | Approved GFC mailbox adapter | IN_PROGRESS | 11A/11B approved defaultoff Graph+durable sink locally tested; origin/hint/review UI and activation/provider metadata remain |
 | P11-002 | OAuth/application permission choice | TESTED | 11A application client-credentials/.default contract + setup; actual tenant consent P11-020 blocked |
 | P11-003 | Least privilege mailbox scope | IN_PROGRESS | 11A code mailbox allowlist/config fail-closed tested; actual Exchange/Entra least-privilege evidence P11-020 blocked |
 | P11-004 | Token lifecycle | TESTED | 11A synthetic transport token cache/skew/single-flight/401 refresh;28/28, real provider blocked |
-| P11-005 | Polling/delta or webhook | IN_PROGRESS | 11A delta/pagination transport tested; durable cursor/sink next11B |
+| P11-005 | Polling/delta or webhook | TESTED | 11B persistent single delta page/cursor+CAS lease/restart;98targets/fullbackend1704, synthetic Graph |
 | P11-006 | Pagination | TESTED | 11A bounded delta and attachment metadata next links;28/28 synthetic transport |
 | P11-007 | Subscription renewal if used | TESTED | 11A chooses delta polling; no subscription/webhook endpoint; renewal not applicable to this mode |
-| P11-008 | Attachment ingestion | OPEN | — |
-| P11-009 | Deduplication | OPEN | — |
+| P11-008 | Attachment ingestion | TESTED | 11B actual private Source/Mongo/DOCX parsing + explicit HR Candidate/Application only; synthetic Graph/store/scan, real external blocked |
+| P11-009 | Deduplication | IN_PROGRESS | 11B immutable provider attachment identity/Sourcecommand replay tested; person duplicate review hints next11C |
 | P11-010 | Retries | TESTED | 11A network/429/5xx bounded retry/exhaustion sanitized;28/28 |
 | P11-011 | Rate limits | TESTED | 11A two shared slots,2s max Retry-After,timeout/late transport retain capacity;28/28 |
-| P11-012 | Sync health | OPEN | — |
-| P11-013 | Subject/recipient/vacancy matching | OPEN | — |
-| P11-014 | Ambiguous matching HR review | OPEN | — |
+| P11-012 | Sync health | TESTED | 11B sanitized server-only health/current actor and no raw cursor/subject/facts;98targets/full1704; hosted binding external |
+| P11-013 | Subject/recipient/vacancy matching | IN_PROGRESS | 11B exact approved reference/recipient + independent Open Job current scope; safe UI hint review next11C |
+| P11-014 | Ambiguous matching HR review | IN_PROGRESS | 11B ambiguous/unmatched/unavailable source remains private review, no auto-Application; explicit UI review next11C |
 | P11-015 | No token/CV logging | TESTED | 11A sanitized errors/no logger/private body GET; transport28/28, no real provider data |
 | P11-016 | Tenant setup checklist | TESTED | HR_OUTLOOK_ADAPTER company single-tenant UUID setup/negative config test; actual access blocked |
 | P11-017 | Mailbox setup checklist | TESTED | HR_OUTLOOK_ADAPTER approved mailbox object UUID allowlist + Exchange restriction validation checklist |
@@ -1176,3 +1176,17 @@ Proceeding on independent P11 transport preparation while actual storage/scan/Gr
 `HR_OUTLOOK_ADAPTER.md` covers chosen application+delta polling, no webhook/subscription, least-privilege company consent/mailbox restrictions and setup. Planned variable names are documentation only; no binding/env/secret/provider/resource is changed. Source sink/persistent delta health/vacancy review integration remains11B; original P11-001..019 retained until their actual local tests/required external metadata is present. P11-020 staysBLOCKED_EXTERNAL.
 
 Final11A `/workspace/inop-hr11a-repo-target.log`28/28 (0 fail/skip/cancel), validationhr11a TS/build PASS lint0/9 smoke13 authorization632. Four explicit paths only, diff-checkPASS; no mounted routes/model/DB/source UI changes. Local SHA next increment. Source sink/health/matching unfinished original IDs preserved.
+
+11A commit `204167a4236a3c7eca82018883955f7d37f7ac82`,4paths; transport28/28, TS/build PASS lint0/9 smoke13 authorization632; cleanwork/no push.
+
+## 11B — persistent mailbox checkpoint / immutable Source provenance
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P11-023 | Owned Mongo checkpoint/receipt and Source sink before cursor advance; lost-ack replay no duplicate PUT/person writes | TESTED | Local Mongo/actual Source/parser, synthetic Graph/store/scan, targets98/fullbackend1704 |
+| P11-024 | Exact approved reference/recipient mapping with independent current Job scope; ambiguity/private source review and source enum propagation | TESTED | Current scope/unknown/ambiguous/closed/foreign mappings, explicit HR Application source persistence;98targets/1704backend |
+| P11-025 | Current actor/JWT/department/role, bounded lease/retry and sanitized health; no startup DDL or deleted-mail cascade | TESTED | Targets98/fullbackend1704, actual lost-ack/restart/lease/currentRole; no live provider |
+
+`HR_OUTLOOK_SYNC.md` documents additive explicit MongoDDL, server-only Source origin/command bridge and disabled sync. Initial fixture failures exposed direct DTO Date versus HTTP ISO input and intentional Source quotas; fixture now serializes the same ISO as real HTTP, runs actual bounded Source worker between batches rather than weakening capacity assertions. No success/complete count inferred from failed run. Fresh combined targets/current gates appended before commit. Original P11-001/003/005/008/009/012/013/014 unfinished until backend/UI/provider requirements evidenced. Actual approval policy unchanged; retention choice pending, independent work continues.
+
+Final11B `/workspace/inop-hr11b-final.log`98/98 (0 fail/skip/cancel), complete frozen-source backend `/workspace/inop-hr11b-backend-full.log`1704/1704 exit0, frontend Source targets22/22. `hr11b` TS/build PASS lint0/9 smoke13 authorization632; diff-checkPASS. Initial second failure: server-only origin validation threw synchronously; approved enqueue now consistently async/rejects, assertion preserved. All old Source/role/JWT/audit/private-upload tasks included in full backend. Ten explicit paths, no mounted Graph endpoint/worker, no productionDDL/provider binding; SHA next increment. Continue source hints/person-level review/security then approved website adapter prep/P13 without dropping P10 blockers.
