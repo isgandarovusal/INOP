@@ -1,6 +1,6 @@
 # HR local commit ledger
 
-Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 77 HR/checkpoint commits through `7309cb72ca5f1f9d160a23bc3af66c30d4f500e5` preserved; original65 baseline entries retained. This document inventories actual Git objects and their changed paths; development push is separately verified by ls-remote; this inventory never implies production deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
+Release baseline `c74c49f41bb3a8a54566324c8902576a48a88e8f`. Branch `work`. All 78 HR/checkpoint commits through `02890cac3b364060bd53c67b58b4d0000ff4d2e4` preserved; original65 baseline entries retained. This document inventories actual Git objects and their changed paths; development push is separately verified by ls-remote; this inventory never implies production deployment or external provider verification. Per-increment test evidence/limitations are retained in HR_IMPLEMENTATION_TRACKER. The final report-only commit is identified by its actual SHA in the final user report/Git log; a document cannot contain its own future SHA.
 
 ## `a832bd76f918d6a142e3086c1a5be108935a0000`
 
@@ -1418,3 +1418,20 @@ test(hr): wait for source duplicate readiness before language measurement
 
 - `M Frontend/tests/cvIntakeOcrUI.test.cjs`
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `02890cac3b364060bd53c67b58b4d0000ff4d2e4`
+
+docs(hr): record archive analytics and main release verification
+
+8 changed paths:
+
+- `M docs/HR_AUDIT_FINDING_DISPOSITION.md`
+- `M docs/HR_DB_RELEASE_PREPARATION.md`
+- `M docs/HR_DEVELOPMENT_FINAL_REPORT.md`
+- `M docs/HR_FINAL_API_BENCHMARK.md`
+- `M docs/HR_IMPLEMENTATION_COMPLETION.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `M docs/HR_LOCAL_COMMIT_LEDGER.md`
+- `A docs/HR_MAIN_RELEASE_REPORT.md`
+
+Main fast-forward and remote development deletion are verified in HR_MAIN_RELEASE_REPORT. The subsequent report-only confirmation is identified by its actual SHA in Git/final output; it cannot embed its own future SHA. No prior Git object is removed.
