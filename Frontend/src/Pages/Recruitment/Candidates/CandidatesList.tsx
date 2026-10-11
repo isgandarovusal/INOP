@@ -151,7 +151,7 @@ const CandidatesList: React.FC = () => {
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
-    <div className="page-container hr-candidates-page">
+    <div className="hr-workspace page-container hr-candidates-page">
       {confirmation?.key===context.key&&<HRConfirmDialog title={t("hrArchive.archive")} message={t("hrArchive.confirm",{name:confirmation.candidate.name})} confirmLabel={t("hrArchive.archive")} loading={Boolean(deletingId)} onConfirm={()=>{void confirmArchive();}} onCancel={()=>setConfirmation(null)}/>}
       <PageHeader
         title={t("recruitment.candidates.title")}

@@ -88,7 +88,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   if (accessDenied) return <HRResourceState status={accessDenied} />;
   const aiContext = { title: position, description, brandId, branchId, workplace: location, experienceYears: experience, requiredSkills, preferredSkills };
   return (
-    <div className="job-form-page">
+    <div className="hr-workspace job-form-page">
       <PageHeader
         title={
           isEdit

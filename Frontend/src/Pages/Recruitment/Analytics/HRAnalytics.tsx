@@ -14,7 +14,7 @@ export default function HRAnalyticsPage() {
   const brands = data?.options.brands || [{ id: 'kfc', name: 'KFC', active: true }, { id: 'pizza-hut', name: 'Pizza Hut', active: true }, { id: 'simit-sarayi', name: 'Simit Sarayı', active: true }];
   const days = (value: number | null) => value === null ? t('hrAnalytics.unknown') : t('hrAnalytics.days', { count: value });
   const statuses = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
-  return <div className="hr-analytics-page">
+  return <div className="hr-workspace hr-analytics-page">
     <PageHeader title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} />
     <Link to="/app/recruitment/applications">{t('navigation.applications')}</Link>
     <div className="filter-bar" aria-label={t('hrAnalytics.brands')}>
@@ -48,7 +48,7 @@ export default function HRAnalyticsPage() {
       {data.coverage.restrictedCandidateApplications > 0 && <p role="status">{t('hrAnalytics.partial', { count: data.coverage.restrictedCandidateApplications })}</p>}
       <div className="hr-analytics-kpis">{Object.entries(data.totals).map(([key, value]) => <article key={key} data-hr-kpi={key}><h3>{t(`hrAnalytics.kpi.${key}`)}</h3><strong>{value}</strong></article>)}</div>
       <div className="hr-analytics-sections">
-        <section><h2>{t('hrAnalytics.funnel')}</h2><table><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row">{t(`recruitment.applications.${r.status.toLowerCase()}`)}</th><td>{r.count}</td></tr>)}</tbody></table></section>
+        <section><h2>{t('hrAnalytics.funnel')}</h2><table><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row">{t(`recruitment.applications.${r.status.toLowerCase()}`)}</th><td><span className="hr-analytic-number">{r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></td></tr>)}</tbody></table></section>
         <section><h2>{t('hrAnalytics.source')}</h2><ul>{data.sources.map(r => <li key={r.key} data-hr-source={r.key}>{t(`hrAnalytics.sources.${r.key}`)}: {r.count}</li>)}</ul></section>
         <section><h2>{t('hrAnalytics.brands')}</h2><table><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{data.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications}</td><td>{r.activeVacancies}</td></tr>)}</tbody></table>{data.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>
         <section><h2>{t('hrAnalytics.review')}</h2><p>{t('hrAnalytics.linkedReview')}</p>{data.coverage.candidateReadable ? <ul>{Object.entries(data.review).map(([key, value]) => <li key={key}>{t(`hrAnalytics.reviewState.${key}`)}: {value}</li>)}<li>{t('hrAnalytics.duplicates')}: {data.duplicateAlerts.extraProfiles}</li></ul> : <p>{t('hrStates.restricted')}</p>}</section>

@@ -151,7 +151,7 @@ const ApplicationsList: React.FC = () => {
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={load} />;
 
   return (
-    <div className="recruitment-list-page">
+    <div className="hr-workspace recruitment-list-page">
       <PageHeader
         title={t("recruitment.applications.title")}
         subtitle={t("recruitment.applications.totalShown", { total: result.data?.total ?? 0, shown: rows.length })}

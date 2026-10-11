@@ -1,0 +1,40 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs/promises');
+const {withBrowserFixture}=require('./helpers/browser.cjs');
+const Candidate=require('../../Backend/models/candidate.model'),Job=require('../../Backend/models/job.model'),Application=require('../../Backend/models/application.model');
+const harness=`import React from 'react';import {createRoot} from 'react-dom/client';import {BrowserRouter,Routes,Route,useNavigate} from 'react-router-dom';import {AuthContext} from '/src/Context/AuthContext.ts';import i18n from '/src/i18n/index.ts';import '/src/App.css';import Shell from '/src/Layouts/AppShell/AppShell.tsx';import Jobs from '/src/Pages/Recruitment/Jobs/JobsList.tsx';import JobForm from '/src/Pages/Recruitment/Jobs/JobForm.tsx';import Candidates from '/src/Pages/Recruitment/Candidates/CandidatesList.tsx';import Candidate from '/src/Pages/Recruitment/Candidates/CandidateDetail.tsx';import CandidateForm from '/src/Pages/Recruitment/Candidates/CandidateForm.tsx';import Applications from '/src/Pages/Recruitment/Applications/ApplicationsList.tsx';import Analytics from '/src/Pages/Recruitment/Analytics/HRAnalytics.tsx';import Dashboard from '/src/Pages/Dashboard/Dashboard.tsx';import api from '/src/api/axios.ts';api.defaults.baseURL='/api';window.changeLanguage=l=>i18n.changeLanguage(l);function App(){const [user,setUser]=React.useState(window.testUser);window.setTestUser=setUser;window.navigateTest=useNavigate();return React.createElement(AuthContext.Provider,{value:{user,isLoading:false,logout:async()=>{}}},React.createElement(Routes,null,React.createElement(Route,{element:React.createElement(Shell)},React.createElement(Route,{path:'/app/dashboard',element:React.createElement(Dashboard)}),React.createElement(Route,{path:'/app/recruitment/jobs',element:React.createElement(Jobs)}),React.createElement(Route,{path:'/app/recruitment/jobs/new',element:React.createElement(JobForm)}),React.createElement(Route,{path:'/app/recruitment/candidates',element:React.createElement(Candidates)}),React.createElement(Route,{path:'/app/recruitment/candidates/new',element:React.createElement(CandidateForm)}),React.createElement(Route,{path:'/app/recruitment/candidates/:id',element:React.createElement(Candidate)}),React.createElement(Route,{path:'/app/recruitment/applications',element:React.createElement(Applications)}),React.createElement(Route,{path:'/app/recruitment/analytics',element:React.createElement(Analytics)}))));}createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(BrowserRouter,null,React.createElement(App))));`;
+test('Full HR shell uses real scoped data and a consistent responsive keyboard-accessible workspace',async t=>withBrowserFixture(harness,async h=>{
+ const output='/workspace/inop-hr14d-visual';await fs.mkdir(output,{recursive:true});
+ const c=await Candidate.create({name:'Aysel Test',role:'Restoran meneceri',phone:'+994501234567',email:'synthetic@example.invalid',skills:['Food safety','Shift management'],experience:3});
+ const jobs=[];for(const [brandId,title] of [['kfc','Restoran meneceri'],['pizza-hut','Kassir'],['simit-sarayi','Növbə rəhbəri']]){const j=await Job.create({title,brandId,department:'Operations',description:'Synthetic restaurant operations vacancy',requiredSkills:['Food safety'],preferredSkills:['Customer service'],status:'Open'});jobs.push(j);await Application.create({candidateId:c._id,jobId:j._id});}
+ const cases=[['jobs','/app/recruitment/jobs','.admin-table-container'],['candidates','/app/recruitment/candidates','.hr-candidate-grid'],['profile','/app/recruitment/candidates/'+c._id,'.candidate-detail-page .page-header'],['job-form','/app/recruitment/jobs/new','form'],['candidate-form','/app/recruitment/candidates/new','form'],['applications','/app/recruitment/applications','.admin-table-container'],['board','/app/recruitment/applications?view=board','[data-application-kanban]'],['analytics','/app/recruitment/analytics','[data-hr-kpi=applications]']];
+ for(const width of [390,1280])for(const [name,url,selector] of cases)await t.test(`${name} real shell at${width}px`,async()=>{
+  await h.page.setViewportSize({width,height:900});await h.open('admin',url);await h.page.locator(selector).waitFor();
+  await h.page.screenshot({path:`${output}/${name}-${width}-layout.png`,fullPage:true});
+  const layout=await h.page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:innerWidth,overflow:Array.from(document.querySelectorAll('.hr-workspace *')).filter(el=>el.getBoundingClientRect().right>innerWidth+1&&el.getBoundingClientRect().width>0).slice(0,8).map(el=>({tag:el.tagName,cls:el.className,width:el.getBoundingClientRect().width,min:getComputedStyle(el).minWidth}))}));assert.ok(layout.scroll<=layout.width+1,JSON.stringify(layout));
+  const title=h.page.locator('.hr-workspace .page-header__title').first();await title.waitFor();assert.ok(await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=24));
+  const card=h.page.locator('.hr-workspace').first();assert.equal(await card.evaluate(el=>getComputedStyle(el).getPropertyValue('--text-primary').trim()),'#1b2432');
+  const toolbar=h.page.locator('.hr-workspace .filter-bar').first();if(await toolbar.count())assert.equal(await toolbar.evaluate(el=>getComputedStyle(el).backgroundImage),'none');
+  const primary=h.page.locator('.hr-workspace .page-header .btn-primary').first();if(await primary.count())assert.equal(await primary.evaluate(el=>getComputedStyle(el).backgroundImage),'none');
+  await h.page.screenshot({path:`${output}/${name}-${width}.png`,fullPage:true});
+ });
+ await t.test('Live API analytics totals and board context match actual records; brand filter keeps data real',async()=>{
+  await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'3');
+  await h.page.locator('.filter-bar').first().getByRole('button',{name:'KFC',exact:true}).click();await h.page.waitForFunction(()=>document.querySelector('[data-hr-kpi=applications] strong')?.textContent==='1');
+  assert.equal(await h.page.getByText(c.email,{exact:true}).count(),0);
+ });
+ await t.test('Dashboard HR summary remains real and language changes send no extra data requests',async()=>{
+  await h.open('admin','/app/dashboard');await h.page.locator('.hr-dashboard-summary .kpi-card').first().waitFor();
+  await h.page.waitForFunction(()=>Array.from(document.querySelectorAll('.hr-dashboard-summary .kpi-card__value')).map(el=>el.textContent.trim()).join(',')==='3,1,3,0');
+  const count=h.wire.length;await h.page.evaluate(()=>window.changeLanguage('en'));
+  await h.page.locator('.hr-dashboard-summary').getByRole('heading',{name:'Recruitment',exact:true}).waitFor();assert.equal(h.wire.length,count);
+  await h.page.evaluate(()=>window.changeLanguage('az'));assert.equal(h.wire.length,count);
+ });
+ await t.test('Actual sidebar removes all HR links when department changes, without dropping Audit links',async()=>{
+  await h.page.setViewportSize({width:1280,height:900});await h.open('admin','/app/recruitment/jobs');await h.page.locator('.admin-table-container').waitFor();
+  assert.ok(await h.page.locator('.admin-layout a[href^="/app/recruitment/"]').count()>=3);
+  const profile=await h.profile('admin');profile.role='auditor';profile.departmentId='dep_audit';profile.hrAccess=true;
+  await h.page.evaluate(p=>window.setTestUser(p),profile);await h.page.locator('[data-hr-state=forbidden]').waitFor();
+  assert.equal(await h.page.locator('.admin-layout a[href^="/app/recruitment/"]').count(),0);assert.ok(await h.page.locator('a[href^="/app/audit"]').count()>0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));

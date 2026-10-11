@@ -1,10 +1,11 @@
 import { Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const AppShell: React.FC = () => {
+  const hr = useLocation().pathname.startsWith("/app/recruitment/");
   return (
-    <div className="admin-layout">
+    <div className={hr ? "admin-layout hr-shell" : "admin-layout"}>
       <Sidebar />
       <main className="admin-main">
         <Suspense

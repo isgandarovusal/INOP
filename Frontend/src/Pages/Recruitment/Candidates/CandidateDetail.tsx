@@ -127,16 +127,7 @@ const CandidateDetail: React.FC = () => {
   const cvUrl = candidate.cvUrl || "";
 
   return (
-    <div className="candidate-detail-page">
-      {archiveConfirm===context.key&&<HRConfirmDialog title={t('hrArchive.archive')} message={t('hrArchive.confirm',{name:candidate.name})} confirmLabel={t('hrArchive.archive')} loading={deleting} onConfirm={()=>{void handleDelete();}} onCancel={()=>setArchiveConfirm(null)}/>}
-      {candidate.archivedAt&&<p className="hr-notice" role="status">{t('hrArchive.readOnly')}</p>}
-      {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
-      <CvReviewEvidence review={candidate.cvReview} />
-      {!candidate.archivedAt&&<CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />}
-      <CandidateArchiveHistory key={JSON.stringify([id,candidate.revision])} id={candidate.id} revision={candidate.revision}/>
-      <CandidateApplicationMatches candidateId={candidate.id} />
-      {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
-      {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
+    <div className="hr-workspace candidate-detail-page">
       <PageHeader
         title={candidate.name}
         subtitle={
@@ -205,16 +196,10 @@ const CandidateDetail: React.FC = () => {
           </>
         }
       />
-
-      <div
-        style={{
-          background: "var(--bg-card)",
-          padding: "20px",
-          borderRadius: "8px",
-          border: "1px solid var(--border-color)",
-          marginBottom: "20px",
-        }}
-      >
+      {archiveConfirm===context.key&&<HRConfirmDialog title={t('hrArchive.archive')} message={t('hrArchive.confirm',{name:candidate.name})} confirmLabel={t('hrArchive.archive')} loading={deleting} onConfirm={()=>{void handleDelete();}} onCancel={()=>setArchiveConfirm(null)}/>}
+      {candidate.archivedAt&&<p className="hr-notice" role="status">{t('hrArchive.readOnly')}</p>}
+      {actionError.key === context.key && actionError.status !== "ready" && <section data-candidate-action-error><HRResourceState status={actionError.status} retry={result.reload} /></section>}
+      <div className="detail-card">
         <h4>{t("recruitment.candidateDetail.mainInformation")}</h4>
 
         <p>
@@ -295,15 +280,7 @@ const CandidateDetail: React.FC = () => {
 
       {cv.url && <PrivateFilePreview url={cv.url} type={cv.type} text={cv.text} name={candidate.cvOriginal?.originalName || cvUrl.split("/").pop() || "cv"} onClose={cv.close} />}
 
-      <div
-        style={{
-          background: "var(--bg-card)",
-          padding: "20px",
-          borderRadius: "8px",
-          border: "1px solid var(--border-color)",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="detail-card">
         <h4>{t("recruitment.candidateDetail.skills")}</h4>
 
         {candidate.skills.length > 0 ? (
@@ -327,14 +304,7 @@ const CandidateDetail: React.FC = () => {
         )}
       </div>
 
-      <div
-        style={{
-          background: "var(--bg-card)",
-          padding: "20px",
-          borderRadius: "8px",
-          border: "1px solid var(--border-color)",
-        }}
-      >
+      <div className="detail-card">
         <h4>{t("recruitment.candidateDetail.additionalInformation")}</h4>
 
         <p>
@@ -355,6 +325,14 @@ const CandidateDetail: React.FC = () => {
             : t("recruitment.candidateDetail.notProvided")}
         </p>
       </div>
+      <CvReviewEvidence review={candidate.cvReview} />
+      {!candidate.archivedAt&&<CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />}
+      <CandidateArchiveHistory key={JSON.stringify([id,candidate.revision])} id={candidate.id} revision={candidate.revision}/>
+      <CandidateApplicationMatches candidateId={candidate.id} />
+      {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
+      {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
+
+
     </div>
   );
 };

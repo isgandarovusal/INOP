@@ -7,7 +7,7 @@ import { Briefcase, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
-import ConfirmDialog from "../../../Components/ConfirmDialog";
+import ConfirmDialog from "../../../Components/HRConfirmDialog";
 import Badge, { type BadgeTone } from "../../../Components/Badge";
 import { deleteJob } from "../../../Services/jobsService";
 import type { Job, JobStatus } from "../../../Types/recruitment";
@@ -85,7 +85,7 @@ const JobsList: React.FC = () => {
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={load} />;
 
   return (
-    <div className="recruitment-list-page">
+    <div className="hr-workspace recruitment-list-page">
       <PageHeader
         title={t("recruitment.jobs.title")}
         subtitle={t("recruitment.jobs.totalShown", {

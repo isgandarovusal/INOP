@@ -252,7 +252,7 @@ const Dashboard: React.FC = () => {
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
           {showRecruitment && (
-            <>
+            <div className="hr-workspace hr-dashboard-summary">
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
 
               {recruitmentError !== null && (
@@ -361,7 +361,7 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {showAudit && (

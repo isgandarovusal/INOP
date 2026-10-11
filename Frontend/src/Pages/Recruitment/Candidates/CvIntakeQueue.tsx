@@ -17,7 +17,7 @@ export default function CvIntakeQueue(){
  const summary=(result.data as CvIntakePage|undefined)?.summary;
  if(!hasPermission(user,'candidate','read'))return <HRResourceState status='forbidden'/>;
  if(!enabled)return <p role='alert'>{t('hrDocuments.unavailable')}</p>;
- return <main className='hr-page' data-cv-intake-queue><PageHeader title={t('hrIntake.queue')} subtitle={t('hrIntake.queueNotice')}/>
+ return <main className='hr-workspace hr-page' data-cv-intake-queue><PageHeader title={t('hrIntake.queue')} subtitle={t('hrIntake.queueNotice')}/>
   <div className='hr-list-controls'><label>{t('common.actions.search')}<input type='search' value={search} maxLength={80} onChange={e=>setSearch(e.target.value)}/></label><label>{t('hrIntake.state')}<select value={status} onChange={e=>setStatus(e.target.value)}><option value=''>{t('hrIntake.allStates')}</option>{['reserved','queued','running','retry','ready','blocked','quarantined','failed','cancelled'].map(state=><option key={state} value={state}>{t('hrIntake.states.'+state)}</option>)}</select></label><button type='button' onClick={result.reload}>{t('hrIntake.check')}</button></div>
   {result.status!=='ready'?<HRResourceState status={result.status} retry={result.reload}/>:<>
    <p data-source-summary>{t('hrIntake.pendingReview')}: {summary?.pendingReview??0} · {t('hrIntake.recoveryPending')}: {summary?.recoveryPending??0}</p>

@@ -274,7 +274,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   if(initial?.archivedAt)return <section className="hr-workspace" role="status"><p>{t("hrArchive.readOnly")}</p><button type="button" onClick={()=>navigate(`/app/recruitment/candidates/${initial.id}`)}>{t("hrIntake.view")}</button></section>;
   const eligibleAiReview = id && initial?.cvOriginal?.sha256 && ((initial.cvReview?.version === "rules-2" && initial.cvReview.provider === "rule-based") || (initial.cvReview?.version === "ocr-rules-1" && initial.cvReview.provider === "tesseract-rules" && ["confirmed","corrected"].includes(initial.cvReview.reviewStatus??'') && initial.cvReview.processingApproval?.sourceHash===initial.cvOriginal.sha256)) && initial.cvReview.processingStatus === "extracted" && !sourceChanged && !cvFile && !aiGenerating && !saving;
   return (
-    <div className="candidate-form-page">
+    <div className="hr-workspace candidate-form-page">
       {job && !intakeAttempt && <p>{job.position}</p>}
       <PageHeader
         title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}

@@ -26,7 +26,7 @@ export default function CvIntakeDetail(){
  if(!enabled)return <p role='alert'>{t('hrDocuments.unavailable')}</p>;
  if(result.status!=='ready'||!result.data)return <HRResourceState status={result.status} retry={result.reload}/>;
  const source=result.data,readable=source.state==='ready'||source.state==='blocked'&&source.code==='OCR_REQUIRED';
- return <main className='hr-page' data-source-detail><PageHeader title={source.original.originalName} subtitle={t('hrIntake.queueNotice')}/>
+ return <main className='hr-workspace hr-page' data-source-detail><PageHeader title={source.original.originalName} subtitle={t('hrIntake.queueNotice')}/>
   <p>{t('hrIntake.states.'+source.state)} · {t(source.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p>
   <button type='button' onClick={result.reload}>{t('hrIntake.check')}</button>
   {readable&&<button data-source-download type='button' disabled={action.key===context.key&&action.busy} onClick={()=>void download()}>{t('hrIntake.original')}</button>}

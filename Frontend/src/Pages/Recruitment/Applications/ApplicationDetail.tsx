@@ -89,7 +89,7 @@ export default function ApplicationDetail() {
   const resource = useAuditResource(id, 'application', getApplicationById);
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
-  return <div className="hr-application-detail">
+  return <div className="hr-workspace hr-application-detail">
     <PageHeader title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} />
     <Link to="/app/recruitment/applications">{t('common.actions.back')}</Link>
     {app.candidateId && typeof app.candidateId === 'object' && <><Link to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user, 'candidate', 'update') && <Link to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}

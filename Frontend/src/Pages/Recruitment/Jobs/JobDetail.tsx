@@ -92,7 +92,7 @@ const JobDetail: React.FC = () => {
   if (result.status !== "ready" || !job) return <HRResourceState status={result.status} retry={result.reload} />;
 
   return (
-    <div className="job-detail-page">
+    <div className="hr-workspace job-detail-page">
       {error && <div role="alert">{t(error)}</div>}
 
       {job.branchName && <p>{t("hrCatalog.branch")}: {job.branchName}</p>}

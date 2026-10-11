@@ -1,0 +1,9 @@
+# HR workspace design and verification
+
+Scoped product layer: hr-workspace.css, HR page roots/resource states, HR-route AppShell marker and HR-only Dashboard summary. Neutral white/slate, system typography24–30px primary headings/14px body, understated navy actions, predictable40px controls/44px mobile icon targets, bordered cards, quiet KPIs, real-data funnel proportion bars, bounded table/board scrolling and readable form labels. No neon/AI look, no decorative card/row entrance motion; reduced-motion honored. Existing hardcoded important gradients are overridden inside HR only; Audit/Execution/core design is not rewritten.
+
+Candidate primary information precedes secondary processing/matching/history. Archive dialog supports Tab/Escape/initial safe cancel focus/restore and pending action guard. Shared Job confirmation uses the same HR-only dialog without changing other modules' dialogs. AZ/EN/RU labels and existing lifecycle/data contracts remain.
+
+Actual full shell screenshots: jobs, candidates, profile, Job/Candidate forms, Applications table/board, analytics at390/1280. Real local HTTP/Mongo data, three brands, no provider-manufactured scores. Twenty hrWorkspaceUI checks also cover live3→1 KFC totals, HR menu revocation/Audit preservation, actual Dashboard3/1/3/0 summaries and zero language refetch. Existing responsive/accessibility tests cover320/390/768/1280 lists/forms/details, overflow/keyboard containment, named controls, reduced motion and real focus behavior. Mobile analytics initially inherited520px global minimum table width; final scoped wrapping fixes the real overflow. Screenshots are local evidence, not hosted execution or formal WCAG certification.
+
+Real CV/hosted production remains NO-GO until approved durable storage/scanner/recovery and external provider/privacy/retention gates are verified.
