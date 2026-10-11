@@ -1505,3 +1505,88 @@ docs(hr): record premium UI regression and production-build measurements
 - `M docs/HR_PREMIUM_WORKSPACE_REPORT.md`
 
 Normal fast-forward existing-main push and exact remote parity verified. Post-push hosting remains proxy-blocked; final report-only confirmation is identified by its actual Git SHA after commit. All532 tested source inputs remain unchanged.
+
+##17 — Premium daily workflows and measured navigation
+
+### 55753e864fb5cb80dbd98869a031c0fbe52eb1e1
+
+perf(hr): preload public route code and coalesce focus refreshes
+
+9 changed paths:
+
+- `A Frontend/scripts/profileHRTransitions.cjs`
+- `M Frontend/src/Components/HRNavigation.tsx`
+- `M Frontend/src/Hooks/useAuditResource.ts`
+- `M Frontend/src/Layouts/AppShell/Sidebar.tsx`
+- `A Frontend/src/Routes/hrRouteModules.ts`
+- `M Frontend/tests/helpers/productionBrowser.cjs`
+- `A Frontend/tests/hrNavigationPerformance.test.cjs`
+- `M Frontend/vite.config.ts`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 59bb4d6a4a946d72534e0fa5bad2556985b7ea92
+
+feat(hr): refine daily workspace filters analytics and keyboard flows
+
+25 changed paths:
+
+- `M Frontend/scripts/profileHRTransitions.cjs`
+- `M Frontend/src/Components/ApplicationKanban.tsx`
+- `A Frontend/src/Components/HRFilterPanel.tsx`
+- `M Frontend/src/Components/HRHistogram.tsx`
+- `M Frontend/src/Components/HRNavigation.tsx`
+- `M Frontend/src/Components/HRScopeFilters.tsx`
+- `M Frontend/src/Layouts/AppShell/Sidebar.tsx`
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx`
+- `M Frontend/src/Routes/hrRouteModules.ts`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `M Frontend/tests/hrAnalyticsUI.test.cjs`
+- `M Frontend/tests/hrBoardUI.test.cjs`
+- `A Frontend/tests/hrDailyWorkspace.test.cjs`
+- `M Frontend/tests/hrNavigationPerformance.test.cjs`
+- `M Frontend/tests/hrPaginationUI.test.cjs`
+- `M Frontend/tests/hrPremiumWorkspace.test.cjs`
+- `M Frontend/tests/recruitmentCatalogUI.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 70a345e74b8cddf8a8137436b64be2f52438ecc1
+
+perf(hr): defer closed score evidence and review controls
+
+5 changed paths:
+
+- `A Frontend/scripts/profileHRRender.cjs`
+- `M Frontend/scripts/profileHRTransitions.cjs`
+- `M Frontend/src/Components/MatchScoreBadge.tsx`
+- `A Frontend/tests/hrScoreDisclosure.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### dedd4497af276a43c5ae816be608d58ca411e236
+
+fix(hr): display locale-safe analytics update timestamps
+
+3 changed paths:
+
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/tests/hrAnalyticsUI.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 997844757731b92cd093200682540fab0ff30319
+
+fix(hr): distinguish unresolved list totals from zero
+
+4 changed paths:
+
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx`
+- `A Frontend/tests/hrHeaderCounts.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+Every source package passed its targeted tests and TSapp/node, production build, lint0errors/9existingwarnings, smoke13 and authorization632 gates. Source packages introduce no backend/env/model/permission/seed/migration/provider activation changes. Final source-bound full regression/measurement and exact existing-main remote proof are recorded in HR_PREMIUM_REFINEMENT_REPORT.md and the final execution response; a report-only commit cannot truthfully record its own future SHA.

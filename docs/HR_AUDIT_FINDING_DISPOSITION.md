@@ -164,3 +164,16 @@ All original131 findings retained; current136 dispositions:128 TESTED locally,7 
 | AUD-140 | 16C | Global important flex overrides analytics grid; rich candidate page incurs offscreen layout/paint | TESTED | Browser cascade identified real overriding rule; only HR grid corrected, candidate content-visibility with deferred-card keyboard/current-permission tests. Three-run local5k paint medians120.4→67.5ms; board increase/remaining long tasks retained in report. Hosted performance unverified. |
 
 All prior findings and external/legal limits remain unchanged. No real storage/scanner/OCR/provider/mailbox or hosted deployment is certified through these local tests.
+
+##17 — Premium daily-workspace and measured-navigation findings
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-141 |17A |Immediate focus/visibility pair produces two identical HR resource reads | TESTED |Actual browser2→1 reads; later focus/current permission/stale/manual retry retained.26 lifecycle/navigation targets and all gates. No private settled cache. |
+| AUD-142 |17B |Application table/board view is lost on refresh/back | TESTED |URL-derived view retains unrelated parameters; actual refresh/back, independent bounded table/board queries and existing workflow/CAS409 targets. |
+| AUD-143 |17B |Authorized populated Application parent title requires pointer-only navigation | TESTED |Real keyboard buttons for readable parents, restricted parents remain text; keyboard/current Audit-department revocation and independent backend-parent regressions retained. |
+| AUD-144 |17C |Collapsed score cards eagerly mount hidden evidence/recalculation controls | TESTED |Actual3 hidden nodes→0 before intent; one on-demand scopedGET, repeat-close/reopen noGET, truthful100% and current-department removal.59 matching/ranking/accessibility targets; intermediate1038→948 actual Application DOM. Remaining paint costs explicitly reported. |
+| AUD-145 |17D |Azerbaijani Chromium medium-date locale displays unresolved M10 month marker | TESTED |Actual screenshot reproduction; numeric localized date retains ISO/Asia-Baku and avoids Mxx in all three locales with no extraGET.74 charts/viewport targets and all gates. |
+| AUD-146 |17E |Jobs/Application/board caption displays zero before the scoped total is known | TESTED |Actual held-page baseline fails on all three routes. Ready+data caption distinguishes unknown/loading/server-error from verified zero;4 target cases plus105 responsive/dense/lifecycle checks and all gates. |
+
+All original131 findings are preserved. Current146 dispositions:138 TESTED locally,7 BLOCKED_EXTERNAL,1 OPEN (AUD-051 lawful retention). Unreachable hosted deployment and external operational checks remain unverified regardless of successful local tests or Git push. Complete source-bound regression and honest cold/intent/renderer comparisons are in [the phase-17 report](HR_PREMIUM_REFINEMENT_REPORT.md).

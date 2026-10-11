@@ -1,5 +1,7 @@
 # HR premium workspace and opening lifecycle — package 16
 
+Latest follow-up: [phase17 premium refinement, measured navigation and final regression](HR_PREMIUM_REFINEMENT_REPORT.md). The phase16 history and evidence below are preserved.
+
 2026-10-11. Existing `work` checkout, baseline `8134e354864d7ead2972d85ae83c9bd76a6f40bf`, existing `inop-main` release target. No branch creation, role rewrite, API/schema change, database migration, seed overwrite or external-provider activation. Prior commits, all original tracker IDs and external blockers are retained.
 
 ## What changed
