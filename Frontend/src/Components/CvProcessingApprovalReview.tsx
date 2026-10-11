@@ -27,7 +27,8 @@ export default function CvProcessingApprovalReview({candidate,jobId,onApply,onAc
 }
 function validReview(job:CvProcessingJob){
  const review=job.result?.review,parsed=job.result?.parsed;
- if(!review||review.version!=='rules-2'||review.provider!=='rule-based'||review.processingStatus!=='extracted'||!parsed)return false;
+ const contract=job.kind==='ocr'?['ocr-rules-1','tesseract-rules']:['rules-2','rule-based'];
+ if(!review||review.version!==contract[0]||review.provider!==contract[1]||review.processingStatus!=='extracted'||!parsed)return false;
  if(review.fields!=null&&(typeof review.fields!=="object"||Array.isArray(review.fields)||Object.keys(review.fields).length>30))return false;
  for(const value of [review.warnings,review.correctedFields])if(value!=null&&(!Array.isArray(value)||value.length>50||value.some(v=>typeof v!=="string"||v.length>80)))return false;
  if(Object.values(review.fields??{}).some(v=>!v||typeof v.source!=="string"||v.source.length>128||!Array.isArray(v.evidence)||v.evidence.length>50||v.evidence.some(q=>typeof q!=='string'||q.length>2000)||(v.confidence!==null&&(typeof v.confidence!=='number'||!Number.isFinite(v.confidence)||v.confidence<0||v.confidence>1))))return false;

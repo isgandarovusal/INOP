@@ -166,7 +166,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P03-025 | HR edits all extracted fields | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | P03-026 | CV replacement parsing races | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
 | P03-027 | Scanned CV processing/unsupported state | TESTED | `cvExtraction`, `cvReview`, `cvConcurrency`, `cvReviewUI`: 50 new passing checks; full 1101/1101 |
-| P03-028 | Real OCR E2E only with tested implementation | OPEN | Deferred to background/OCR package 10; scanned originals retained as unsupported_ocr, not claimed extracted |
+| P03-028 | Real OCR E2E only with tested implementation | TESTED | 10C9–10C11 actual image-only AZ/EN/RU local OCR; actual private scan -> persisted job -> explicit HR UI save; full 1915/1915. Hosted runtime remains EXT-OCR-001 BLOCKED_EXTERNAL |
 
 ## Package 04: GFC brands and branches
 
@@ -351,7 +351,7 @@ Prior audit findings below are retained as the baseline backlog, not declared in
 | P10-006 | Existing file migration plan | IN_PROGRESS | 10C6 internal scoped metadata-only dry-run inventory: 14/14 owned-loopback tests, current read/update, strict bounds/keyset, legacy review and no writes/provider/files; `HR_CV_MIGRATION_PREPARATION.md`. Actual manifest/writer/apply/backup/provider recovery still pending; no migration activated |
 | P10-007 | Existing file fallback | TESTED | 10B2 adapter/current Candidate scope/source/no-fallback targets 177/177 and full 1682/1682; mock object transport, real provider/durability/recovery blocked; no object writer/migration activated |
 | P10-008 | Bounded parsing jobs | TESTED | 10C2–10C3 actual queue/parser/HTTP/UI: unique bounded slots, lease/retry, private source checks; 104 targets / 1766 full. Parse only, disabled by default, exact DDL required; OCR/AI/ingestion separately OPEN. |
-| P10-009 | OCR jobs | IN_PROGRESS | 10C9 disabled OCR task profile; real local image-only AZ/EN/RU extraction and five-scope queue tests; HTTP/UI and hosted Native runtime remain pending |
+| P10-009 | OCR jobs | TESTED | 10C9–10C11 real local scanned PDF/task/HTTP/UI/explicit approval and bounded repair retry; 1915 full. Default off, hosted Native prerequisites EXT-OCR-001 BLOCKED_EXTERNAL |
 | P10-010 | AI jobs | IN_PROGRESS | 10C8 disabled internal durable professional AI profile on existing queue, exact kind/version, current-source guards and schema/provenance; HTTP/UI integration and real provider remain pending |
 | P10-011 | Email jobs | TESTED | 10C1 existing Mongo Application event outbox, current scope/retry actor, bounded automatic/manual retry/diagnostics; 67 targets and 1714 full tests; actual SMTP receipt blocked |
 | P10-012 | Ingestion jobs | OPEN | — |
@@ -934,3 +934,27 @@ Separate owned-loopback deletion baseline `/tmp/inop-hr10d-delete-baseline.json`
 
 
 Final 10C10 evidence: `/tmp/inop-hr10c10-target-final.log` **229/229**, including **17/17** new attachment/reader/provider-boundary checks. `/tmp/inop-packagehr10c10-validation.json`: TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. Full frozen-source serial `/tmp/inop-hr10c10-regression-final.log`: **1902/1902**, zero failures/skips/cancellations. Security baseline failures are retained, not counted as PASS. `git diff --check` PASS; 13 package files only, local SHA recorded next update. Resume with optional OCR HTTP/UI/explicit HR approval, then AI/drafts/ingestion/P11–13 without per-package approval. No push/deploy.
+
+
+10C10 commit: `e93ab040bb949099d9c0a81ae478901144043f5f`, 13 files, 229 targets / 1902 full, TypeScript/build PASS, lint 0/9, 13 smoke / 632 authorization; clean tree, no push.
+
+## 10C11 — optional OCR status/start/worker and explicit HR approval UI
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P10-046 | Separate opt-in trusted OCR profile on existing authenticated routes and Mongo worker, default parse compatibility | TESTED | `hrCvOcrHttp` actual owned Mongo/HTTP/real OCR; pre-patch baseline fails because OCR is not routed; local targets passed; final frozen-source 1915/1915 full |
+| P10-047 | Current-source, independent scope, truthful OCR provenance and explicit human apply/confirm/save | TESTED | Five role positives and mixed/foreign negatives, actual `hrCvOcrUI` scanned source -> private job -> editor -> server receipt; local targets passed; final frozen-source 1915/1915 full |
+| P10-048 | Bounded idempotent OCR repair retry with original/current actor guard, remaining lifetime attempts and source CAS | TESTED | `hrCvOcrHttp` / `hrCvOcrUI` runtime repair, no automatic profile writes; local targets passed; final frozen-source 1915/1915 full |
+| EXT-OCR-001 | Hosted Native executable/model availability and resource limits | BLOCKED_EXTERNAL | Actual local Tesseract/model tests do not prove Render runtime provisioning; opt-in stays off |
+
+`HR_CV_OCR_HTTP_REVIEW.md` documents flags/metadata-only requirements, contracts and release gates. No new provider/dependency, automatic model download, source deletion, startup DDL/seed/migration, production env/DB/push/deploy. Shared default parse behavior is retained; persisted child kind chooses its trusted profile. Source draft/storage/retention/ingestion, AI task UI and P11–13 remain unfinished; independent work continues after successful local commit.
+
+
+10C11 targeted evidence: `/tmp/inop-hr10c11-target-first.log` 95/95 before added retry cases; final combined target caught a fixture using `wire.url` although the shared browser harness records `wire.path` (116 pass / 2 fail including parent). The fixture is corrected, assertions are unchanged; `/tmp/inop-hr10c11-ui-final.log` **4/4** including actual retry, zero failures/skips/cancellations. Remaining combined cases passed; full final frozen-source run now underway. `/tmp/inop-packagehr10c11-validation.json` TypeScript/build PASS, lint 0 errors / 9 warnings, 13 smoke / 632 authorization. No failed log is reported as PASS. Final full gates pending; no commit before completion.
+
+
+Final 10C11 gates: full frozen-source serial `/tmp/inop-hr10c11-regression-final.log` **1915/1915**, zero failures/skips/cancellations, includes all 118 target cases after the fixture correction. `/tmp/inop-packagehr10c11-validation.json` TypeScript/build PASS, lint **0 errors / 9 warnings**, smoke **13/13**, authorization **632/632**. `git diff --check` PASS; 18 package files only. Local commit after these checks; SHA recorded next update. Next independent work: durable AI task status/start/worker/review, then source draft/ingestion and P11–13. No push/deploy. P10 overall stays partial with real provider/storage/recovery/hosting gates and deletion policy pending.
+
+| ID | Package | New finding | Status | Evidence |
+|---|---|---|---|---|
+| AUD-117 | 10C12 | HTTP child with obsolete non-parse task version may be classified as parent-unavailable, hiding a still-readable primary Candidate | OPEN | Queue version filter correctly refuses old result; inspect/reproduce the HTTP error classification in the next task-profile lifecycle increment |

@@ -1023,6 +1023,8 @@
     "download": "Download",
     "textPreview": "Extracted text preview; original layout may differ.",
     "heading": "CV HR review",
+    "ocrBased": "OCR + rule-based extraction; not AI",
+    "ocrConfidenceExplanation": "OCR accuracy is uncalibrated. Verify every fact against the original document.",
     "ruleBased": "Rule-based extraction; no AI",
     "unknown": "Unknown",
     "pending": "Review pending",
@@ -1359,6 +1361,14 @@
       "receipt": "Server-recorded HR approval"
   },
   "hrProcessing": {
+    "retryOcr": "Retry only after fixing OCR runtime, language or file availability",
+    "startOcr": "Start OCR",
+    "ocrNotice": "Scanned PDFs use OCR. Facts are saved only after explicit HR approval.",
+    "ocrManual": "OCR facts require human review; unknown fields remain unknown.",
+    "ocrRunning": "OCR is processing.",
+    "profile": "Processing profile",
+    "parseProfile": "Text extraction",
+    "ocrProfile": "Scanned PDF — OCR",
     "readOnly": "Current permission is read-only; processing cannot be started or retried.",
     "retry": "Retry only after repairing the file/storage issue",
     "retries": "Manual retries",
@@ -1391,6 +1401,14 @@
       "unavailable": "Processing is unavailable; the primary profile is retained."
     },
     "code": {
+      "OCR_REVIEW_REQUIRED": "OCR facts await HR review",
+      "OCR_NOT_CONFIGURED": "OCR is not configured",
+      "OCR_RUNTIME_REQUIRED": "OCR runtime is unavailable",
+      "OCR_LANGUAGE_REQUIRED": "OCR language model is unavailable",
+      "OCR_PDF_REQUIRED": "OCR requires PDF",
+      "OCR_NO_TEXT": "OCR found no text",
+      "OCR_INPUT_LIMIT": "OCR document limit exceeded",
+      "OCR_INVALID_DOCUMENT": "PDF could not be read",
       "QUEUED": "Processing queued.",
       "PROCESSING": "Rule parser is running.",
       "REVIEW_REQUIRED": "HR review is required.",

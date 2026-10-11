@@ -1047,6 +1047,8 @@
     "download": "Endir",
     "textPreview": "Çıxarılmış mətn; orijinal sənədin görünüşü fərqli ola bilər.",
     "heading": "CV HR yoxlaması",
+    "ocrBased": "OCR + qayda əsaslı extraction; AI deyil",
+    "ocrConfidenceExplanation": "OCR nəticəsində statistik dəqiqlik təsdiqlənməyib. Bütün faktları original sənədlə yoxlayın.",
     "ruleBased": "Qayda əsaslı extraction; AI deyil",
     "unknown": "Məlum deyil",
     "pending": "Yoxlama gözləyir",
@@ -1383,6 +1385,14 @@
       "receipt": "Serverdə qeydə alınmış HR təsdiqi"
   },
   "hrProcessing": {
+    "retryOcr": "Yalnız OCR runtime/dil/fayl problemi düzəldilibsə yenidən cəhd et",
+    "startOcr": "OCR başlat",
+    "ocrNotice": "Skan edilmiş PDF OCR ilə emal olunur. Faktlar yalnız HR təsdiqi ilə saxlanılır.",
+    "ocrManual": "OCR nəticəsi HR yoxlaması tələb edir; naməlum sahələr tamamlanmır.",
+    "ocrRunning": "OCR işləyir.",
+    "profile": "Emal növü",
+    "parseProfile": "Mətn extraction",
+    "ocrProfile": "Skan edilmiş PDF — OCR",
     "readOnly": "Cari icazə yalnız oxumağa imkan verir; emalı başlatmaq və ya retry etmək olmaz.",
     "retry": "Yalnız fayl/storage problemi düzəldilibsə yenidən növbəyə al",
     "retries": "Manual retry sayı",
@@ -1415,6 +1425,14 @@
       "unavailable": "Emal xidməti hazırda əlçatan deyil; əsas profil saxlanılır."
     },
     "code": {
+      "OCR_REVIEW_REQUIRED": "OCR faktları HR təsdiqi gözləyir",
+      "OCR_NOT_CONFIGURED": "OCR konfiqurasiya edilməyib",
+      "OCR_RUNTIME_REQUIRED": "OCR proqramı mövcud deyil",
+      "OCR_LANGUAGE_REQUIRED": "OCR dil modeli mövcud deyil",
+      "OCR_PDF_REQUIRED": "OCR üçün PDF tələb olunur",
+      "OCR_NO_TEXT": "OCR mətn tapa bilmədi",
+      "OCR_INPUT_LIMIT": "OCR sənəd limiti keçilib",
+      "OCR_INVALID_DOCUMENT": "PDF oxunmadı",
       "QUEUED": "Emal növbədədir.",
       "PROCESSING": "Qayda parseri işləyir.",
       "REVIEW_REQUIRED": "HR yoxlaması tələb olunur.",

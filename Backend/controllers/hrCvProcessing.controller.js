@@ -13,7 +13,9 @@ function endpoint(action){return async(req,res,next)=>{
   const refresh=async()=>{await verifyToken(req,res,()=>{});if(res.headersSent||res.destroyed)return false;req.authRole={permissions:await getRolePermissions(req.user.role)};if(authority(req)!==snapshot)throw fail('PROCESSING_AUTH_CHANGED',403);return true;};
   if(!await Candidate.exists(query()).maxTimeMS(1000))throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
   if((action==='get'||action==='retry')&&!await Jobs.exists({_id:req.params.jobId,candidateId:req.params.id}).maxTimeMS(1000))throw fail('PROCESSING_JOB_UNAVAILABLE',404);
-  const queue=processing.createProcessing();
+  const child=(action==='get'||action==='retry')?await Jobs.findOne({_id:req.params.jobId,candidateId:req.params.id}).select('kind').maxTimeMS(1000).lean():null;
+  const kind=child?.kind??(action==='start'?req.body?.kind:req.query.kind??'parse');
+  const queue=require('../services/hrCvTaskProfiles.service').profile(kind);
   const result=action==='start'?await queue.enqueue(req,req.params.id,req.body):action==='retry'?await queue.retry(req,req.params.jobId,req.body):action==='get'?await queue.get(req,req.params.jobId):await queue.list(req,req.params.id);
   if(!await refresh())return;
   const parent=await Candidate.findOne(query()).select('cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive').maxTimeMS(1000).lean();

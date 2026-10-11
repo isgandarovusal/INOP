@@ -61,6 +61,9 @@ mongoose.connect(MONGO_URI)
     if (process.env.HR_CV_PROCESSING_ENABLED === 'true') {
       require('./services/hrCvProcessing.service').createProcessing().start();
     }
+    if (process.env.HR_CV_OCR_ENABLED === 'true') {
+      require('./services/hrCvTaskProfiles.service').profile('ocr').start();
+    }
     app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
   })
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
