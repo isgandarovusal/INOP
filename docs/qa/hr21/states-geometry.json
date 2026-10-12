@@ -1,0 +1,5821 @@
+[
+  {
+    "name": "candidates-empty-390",
+    "viewport": [
+      390,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Excel-ə ixrac et",
+        "x": 18,
+        "y": 308.78125,
+        "width": 173,
+        "height": 44
+      },
+      {
+        "name": "Yeni Namizəd",
+        "x": 199,
+        "y": 310.78125,
+        "width": 173,
+        "height": 40
+      },
+      {
+        "name": "Axtarış (ad, vəzifə, bacarıq)…",
+        "x": 31,
+        "y": 389.78125,
+        "width": 328,
+        "height": 42.140625
+      },
+      {
+        "name": "Namizəd siyahısı",
+        "x": 31,
+        "y": 441.921875,
+        "width": 159,
+        "height": 42
+      },
+      {
+        "name": "Status filtri",
+        "x": 200,
+        "y": 441.921875,
+        "width": 159,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 31,
+        "y": 500.921875,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Namizəd kartları",
+        "x": 177.28125,
+        "y": 498.921875,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Siyahı Rejimi",
+        "x": 215.28125,
+        "y": 498.921875,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Yenilə",
+        "x": 135.578125,
+        "y": 797.796875,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 232.265625,
+        "y": 798.796875,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 305.3125,
+        "y": 798.796875,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidates-empty-768",
+    "viewport": [
+      768,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Excel-ə ixrac et",
+        "x": 449.5,
+        "y": 155,
+        "width": 148.6875,
+        "height": 40.140625
+      },
+      {
+        "name": "Yeni Namizəd",
+        "x": 606.1875,
+        "y": 155.0625,
+        "width": 143.8125,
+        "height": 40
+      },
+      {
+        "name": "Axtarış (ad, vəzifə, bacarıq)…",
+        "x": 31,
+        "y": 247.140625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Namizəd siyahısı",
+        "x": 377,
+        "y": 247.203125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Status filtri",
+        "x": 562,
+        "y": 247.203125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 31,
+        "y": 306.28125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Namizəd kartları",
+        "x": 177.28125,
+        "y": 304.28125,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Siyahı Rejimi",
+        "x": 215.28125,
+        "y": 304.28125,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Yenilə",
+        "x": 513.578125,
+        "y": 576.5625,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 610.265625,
+        "y": 577.5625,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 683.3125,
+        "y": 577.5625,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidates-empty-1910",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Excel-ə ixrac et",
+        "x": 1575.5,
+        "y": 30,
+        "width": 148.6875,
+        "height": 40.140625
+      },
+      {
+        "name": "Yeni Namizəd",
+        "x": 1732.1875,
+        "y": 30.0625,
+        "width": 143.8125,
+        "height": 40
+      },
+      {
+        "name": "Axtarış (ad, vəzifə, bacarıq)…",
+        "x": 307,
+        "y": 133.5625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Namizəd siyahısı",
+        "x": 737,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Status filtri",
+        "x": 922,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 1107,
+        "y": 136.640625,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Namizəd kartları",
+        "x": 1253.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Siyahı Rejimi",
+        "x": 1291.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 406.921875,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 407.921875,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 407.921875,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-empty-390",
+    "viewport": [
+      390,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 31,
+        "y": 309.640625,
+        "width": 328,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 31,
+        "y": 361.78125,
+        "width": 186.71875,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 227.71875,
+        "y": 364.78125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 31,
+        "y": 413.78125,
+        "width": 177.578125,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 218.578125,
+        "y": 481.78125,
+        "width": 140.421875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 218.578125,
+        "y": 535.78125,
+        "width": 140.421875,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 218.578125,
+        "y": 589.78125,
+        "width": 140.421875,
+        "height": 42
+      },
+      {
+        "name": "Yenilə",
+        "x": 135.578125,
+        "y": 794.984375,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 232.265625,
+        "y": 795.984375,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 305.3125,
+        "y": 795.984375,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-empty-768",
+    "viewport": [
+      768,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 31,
+        "y": 247.140625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 420.71875,
+        "y": 247.203125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 605.71875,
+        "y": 250.203125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 31,
+        "y": 299.28125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 216,
+        "y": 367.28125,
+        "width": 38.796875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 266.796875,
+        "y": 367.28125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 317.609375,
+        "y": 367.28125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Yenilə",
+        "x": 513.578125,
+        "y": 615.15625,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 610.265625,
+        "y": 616.15625,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 683.3125,
+        "y": 616.15625,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-empty-1910",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 307,
+        "y": 129.640625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 737,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 922,
+        "y": 132.703125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 1063.28125,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 1248.28125,
+        "y": 197.703125,
+        "width": 38.796875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1299.078125,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 1349.890625,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 445.65625,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 446.65625,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 446.65625,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "job-create-390",
+    "viewport": [
+      390,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 37,
+        "y": 369.265625,
+        "width": 316,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 37,
+        "y": 457.09375,
+        "width": 316,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 37,
+        "y": 544.921875,
+        "width": 316,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 37,
+        "y": 631.0625,
+        "width": 316,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 37,
+        "y": 748.4375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 37,
+        "y": 813.8125,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 37,
+        "y": 879.1875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 37,
+        "y": 921.1875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 163,
+        "y": 748.4375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 163,
+        "y": 813.8125,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 163,
+        "y": 857.5,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 37,
+        "y": 770.890625,
+        "width": 316,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 37,
+        "y": 858.71875,
+        "width": 316,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 37,
+        "y": 946.546875,
+        "width": 316,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 37,
+        "y": 1032.6875,
+        "width": 316,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 37,
+        "y": 1118.828125,
+        "width": 316,
+        "height": 112
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 50,
+        "y": 1288.703125,
+        "width": 290,
+        "height": 43.6875
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 50,
+        "y": 1392.578125,
+        "width": 290,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 50,
+        "y": 1496.453125,
+        "width": 290,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 50,
+        "y": 1600.328125,
+        "width": 290,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 54,
+        "y": 1748.296875,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 54,
+        "y": 1891.1875,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 37,
+        "y": 2083.46875,
+        "width": 316,
+        "height": 40.140625
+      },
+      {
+        "name": "Draft saxla",
+        "x": 37,
+        "y": 2033.328125,
+        "width": 316,
+        "height": 40.140625
+      },
+      {
+        "name": "Vakansiyanı dərc et",
+        "x": 37,
+        "y": 1981.328125,
+        "width": 316,
+        "height": 42
+      }
+    ],
+    "jobGrid": {
+      "columns": "316px",
+      "gap": "16px",
+      "x": 18,
+      "y": 322.125,
+      "width": 354,
+      "height": 1820.484375
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 37,
+        "y": 516.78125,
+        "width": 316,
+        "height": 209.96875
+      },
+      {
+        "span": "1 / -1",
+        "x": 37,
+        "y": 1090.6875,
+        "width": 316,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 37,
+        "y": 1253.515625,
+        "width": 316,
+        "height": 191.75
+      },
+      {
+        "span": "1 / -1",
+        "x": 37,
+        "y": 1461.265625,
+        "width": 316,
+        "height": 191.75
+      },
+      {
+        "span": "1 / -1",
+        "x": 37,
+        "y": 1669.015625,
+        "width": 316,
+        "height": 279.3125
+      },
+      {
+        "span": "1 / -1",
+        "x": 54,
+        "y": 1804.4375,
+        "width": 282,
+        "height": 126.890625
+      }
+    ]
+  },
+  {
+    "name": "job-create-768",
+    "viewport": [
+      768,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 43,
+        "y": 312.765625,
+        "width": 329,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 396,
+        "y": 312.765625,
+        "width": 329,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 43,
+        "y": 400.59375,
+        "width": 329,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 396,
+        "y": 400.59375,
+        "width": 329,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 43,
+        "y": 517.96875,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 43,
+        "y": 583.34375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 43,
+        "y": 648.71875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 43,
+        "y": 690.71875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 169,
+        "y": 517.96875,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 169,
+        "y": 583.34375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 169,
+        "y": 627.03125,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 43,
+        "y": 540.421875,
+        "width": 329,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 396,
+        "y": 540.421875,
+        "width": 329,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 43,
+        "y": 628.25,
+        "width": 329,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 396,
+        "y": 628.25,
+        "width": 329,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 43,
+        "y": 714.390625,
+        "width": 682,
+        "height": 112
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 56,
+        "y": 884.265625,
+        "width": 303,
+        "height": 43.6875
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 409,
+        "y": 884.265625,
+        "width": 303,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 56,
+        "y": 988.140625,
+        "width": 303,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 409,
+        "y": 988.140625,
+        "width": 303,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 60,
+        "y": 1115.96875,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 60,
+        "y": 1215.484375,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 43,
+        "y": 1314.046875,
+        "width": 172,
+        "height": 40.140625
+      },
+      {
+        "name": "Draft saxla",
+        "x": 225,
+        "y": 1314.046875,
+        "width": 172,
+        "height": 40.140625
+      },
+      {
+        "name": "Vakansiyanı dərc et",
+        "x": 407,
+        "y": 1314.125,
+        "width": 318,
+        "height": 40
+      }
+    ],
+    "jobGrid": {
+      "columns": "329px 329px",
+      "gap": "16px",
+      "x": 18,
+      "y": 259.625,
+      "width": 732,
+      "height": 1128
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 43,
+        "y": 372.453125,
+        "width": 682,
+        "height": 123.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 43,
+        "y": 686.25,
+        "width": 682,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 43,
+        "y": 849.078125,
+        "width": 682,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 43,
+        "y": 952.953125,
+        "width": 682,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 43,
+        "y": 1056.828125,
+        "width": 682,
+        "height": 215.796875
+      },
+      {
+        "span": "1 / -1",
+        "x": 60,
+        "y": 1172.109375,
+        "width": 648,
+        "height": 83.515625
+      }
+    ]
+  },
+  {
+    "name": "job-create-1711",
+    "viewport": [
+      1711,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 450.5,
+        "y": 196.515625,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 997.5,
+        "y": 196.515625,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 450.5,
+        "y": 284.34375,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 997.5,
+        "y": 284.34375,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 450.5,
+        "y": 401.71875,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 450.5,
+        "y": 467.09375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 450.5,
+        "y": 532.46875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 450.5,
+        "y": 574.46875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 576.5,
+        "y": 401.71875,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 576.5,
+        "y": 467.09375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 576.5,
+        "y": 510.78125,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 450.5,
+        "y": 424.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 997.5,
+        "y": 424.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 450.5,
+        "y": 512,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 997.5,
+        "y": 512,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 450.5,
+        "y": 598.140625,
+        "width": 1070,
+        "height": 112
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 463.5,
+        "y": 768.015625,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 1010.5,
+        "y": 768.015625,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 463.5,
+        "y": 871.890625,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 1010.5,
+        "y": 871.890625,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 467.5,
+        "y": 999.71875,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 467.5,
+        "y": 1099.234375,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 450.5,
+        "y": 1197.796875,
+        "width": 269,
+        "height": 40.140625
+      },
+      {
+        "name": "Draft saxla",
+        "x": 729.5,
+        "y": 1197.796875,
+        "width": 269,
+        "height": 40.140625
+      },
+      {
+        "name": "Vakansiyanı dərc et",
+        "x": 1008.5,
+        "y": 1197.875,
+        "width": 512,
+        "height": 40
+      }
+    ],
+    "jobGrid": {
+      "columns": "523px 523px",
+      "gap": "16px",
+      "x": 425.5,
+      "y": 143.375,
+      "width": 1120,
+      "height": 1128
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 256.203125,
+        "width": 1070,
+        "height": 123.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 570,
+        "width": 1070,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 732.828125,
+        "width": 1070,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 836.703125,
+        "width": 1070,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 940.578125,
+        "width": 1070,
+        "height": 215.796875
+      },
+      {
+        "span": "1 / -1",
+        "x": 467.5,
+        "y": 1055.859375,
+        "width": 1036,
+        "height": 83.515625
+      }
+    ]
+  },
+  {
+    "name": "analytics-zero-390",
+    "viewport": [
+      390,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 18,
+        "y": 292.4375,
+        "width": 173,
+        "height": 44
+      },
+      {
+        "name": "GFC",
+        "x": 18,
+        "y": 360.4375,
+        "width": 55.34375,
+        "height": 36.59375
+      },
+      {
+        "name": "KFC",
+        "x": 82.34375,
+        "y": 360.4375,
+        "width": 54,
+        "height": 36.59375
+      },
+      {
+        "name": "Pizza Hut",
+        "x": 145.34375,
+        "y": 360.4375,
+        "width": 81.359375,
+        "height": 36.59375
+      },
+      {
+        "name": "Simit Sarayı",
+        "x": 235.703125,
+        "y": 360.4375,
+        "width": 94.6875,
+        "height": 36.59375
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 18,
+        "y": 406.03125,
+        "width": 113.375,
+        "height": 36.59375
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 35,
+        "y": 548.21875,
+        "width": 106.421875,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya",
+        "x": 35,
+        "y": 626.8125,
+        "width": 106.421875,
+        "height": 42
+      },
+      {
+        "name": "Başlanğıc tarix (UTC)",
+        "x": 35,
+        "y": 724,
+        "width": 106.421875,
+        "height": 42.59375
+      },
+      {
+        "name": "Son tarix (UTC)",
+        "x": 35,
+        "y": 803.1875,
+        "width": 106.421875,
+        "height": 42.59375
+      },
+      {
+        "name": "Müraciət mənbəyi",
+        "x": 35,
+        "y": 882.375,
+        "width": 106.421875,
+        "height": 42
+      },
+      {
+        "name": "Status",
+        "x": 35,
+        "y": 960.96875,
+        "width": 106.421875,
+        "height": 42
+      },
+      {
+        "name": "Təmizlə",
+        "x": 35,
+        "y": 1014.96875,
+        "width": 75.015625,
+        "height": 40
+      },
+      {
+        "name": "Ümumi baxış",
+        "x": 18,
+        "y": 846.59375,
+        "width": 80.921875,
+        "height": 40.140625
+      },
+      {
+        "name": "Əməliyyatlar",
+        "x": 118.921875,
+        "y": 846.59375,
+        "width": 77.375,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "analytics-zero-768",
+    "viewport": [
+      768,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 602.625,
+        "y": 156.0625,
+        "width": 40,
+        "height": 38
+      },
+      {
+        "name": "GFC",
+        "x": 18,
+        "y": 237.9375,
+        "width": 55.34375,
+        "height": 36.59375
+      },
+      {
+        "name": "KFC",
+        "x": 82.34375,
+        "y": 237.9375,
+        "width": 54,
+        "height": 36.59375
+      },
+      {
+        "name": "Pizza Hut",
+        "x": 145.34375,
+        "y": 237.9375,
+        "width": 81.359375,
+        "height": 36.59375
+      },
+      {
+        "name": "Simit Sarayı",
+        "x": 235.703125,
+        "y": 237.9375,
+        "width": 94.6875,
+        "height": 36.59375
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 339.390625,
+        "y": 237.9375,
+        "width": 113.375,
+        "height": 36.59375
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 626.578125,
+        "y": 425.09375,
+        "width": 27.46875,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya",
+        "x": 666.046875,
+        "y": 425.09375,
+        "width": 27.46875,
+        "height": 42
+      },
+      {
+        "name": "Başlanğıc tarix (UTC)",
+        "x": 705.515625,
+        "y": 424.5,
+        "width": 27.484375,
+        "height": 42.59375
+      },
+      {
+        "name": "Son tarix (UTC)",
+        "x": 626.578125,
+        "y": 559.46875,
+        "width": 27.46875,
+        "height": 42.59375
+      },
+      {
+        "name": "Müraciət mənbəyi",
+        "x": 666.046875,
+        "y": 560.0625,
+        "width": 27.46875,
+        "height": 42
+      },
+      {
+        "name": "Status",
+        "x": 705.515625,
+        "y": 560.0625,
+        "width": 27.484375,
+        "height": 42
+      },
+      {
+        "name": "Təmizlə",
+        "x": 626.578125,
+        "y": 614.0625,
+        "width": 37.65625,
+        "height": 126.4375
+      },
+      {
+        "name": "Ümumi baxış",
+        "x": 18,
+        "y": 515.109375,
+        "width": 80.921875,
+        "height": 40.140625
+      },
+      {
+        "name": "Əməliyyatlar",
+        "x": 122.921875,
+        "y": 515.109375,
+        "width": 77.375,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "analytics-zero-1875",
+    "viewport": [
+      1875,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 1693.625,
+        "y": 31.0625,
+        "width": 40,
+        "height": 38
+      },
+      {
+        "name": "GFC",
+        "x": 294,
+        "y": 121.6875,
+        "width": 55.34375,
+        "height": 36.59375
+      },
+      {
+        "name": "KFC",
+        "x": 358.34375,
+        "y": 121.6875,
+        "width": 54,
+        "height": 36.59375
+      },
+      {
+        "name": "Pizza Hut",
+        "x": 421.34375,
+        "y": 121.6875,
+        "width": 81.359375,
+        "height": 36.59375
+      },
+      {
+        "name": "Simit Sarayı",
+        "x": 511.703125,
+        "y": 121.6875,
+        "width": 94.6875,
+        "height": 36.59375
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 615.390625,
+        "y": 121.6875,
+        "width": 113.375,
+        "height": 36.59375
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1717.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya",
+        "x": 1729.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Başlanğıc tarix (UTC)",
+        "x": 1741.578125,
+        "y": 549.96875,
+        "width": 26,
+        "height": 42.59375
+      },
+      {
+        "name": "Son tarix (UTC)",
+        "x": 1753.578125,
+        "y": 549.96875,
+        "width": 70.421875,
+        "height": 42.59375
+      },
+      {
+        "name": "Müraciət mənbəyi",
+        "x": 1717.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Status",
+        "x": 1729.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Təmizlə",
+        "x": 1741.578125,
+        "y": 805.03125,
+        "width": 37.65625,
+        "height": 126.4375
+      },
+      {
+        "name": "Ümumi baxış",
+        "x": 294,
+        "y": 398.859375,
+        "width": 80.921875,
+        "height": 40.140625
+      },
+      {
+        "name": "Əməliyyatlar",
+        "x": 398.921875,
+        "y": 398.859375,
+        "width": 77.375,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidates-filled",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Excel-ə ixrac et",
+        "x": 1575.5,
+        "y": 30,
+        "width": 148.6875,
+        "height": 40.140625
+      },
+      {
+        "name": "Yeni Namizəd",
+        "x": 1732.1875,
+        "y": 30.0625,
+        "width": 143.8125,
+        "height": 40
+      },
+      {
+        "name": "Axtarış (ad, vəzifə, bacarıq)…",
+        "x": 307,
+        "y": 133.5625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Namizəd siyahısı",
+        "x": 737,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Status filtri",
+        "x": 922,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 1107,
+        "y": 136.640625,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Namizəd kartları",
+        "x": 1253.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Siyahı Rejimi",
+        "x": 1291.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Synthetic applicant 34",
+        "x": 361,
+        "y": 228.640625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 33",
+        "x": 681,
+        "y": 228.640625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 32",
+        "x": 1001,
+        "y": 228.640625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 31",
+        "x": 1321,
+        "y": 228.640625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 30",
+        "x": 1641,
+        "y": 228.640625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 29",
+        "x": 361,
+        "y": 507.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 28",
+        "x": 681,
+        "y": 507.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 27",
+        "x": 1001,
+        "y": 507.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 26",
+        "x": 1321,
+        "y": 507.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 25",
+        "x": 1641,
+        "y": 507.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 24",
+        "x": 361,
+        "y": 786.296875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 23",
+        "x": 681,
+        "y": 786.296875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 22",
+        "x": 1001,
+        "y": 786.296875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 21",
+        "x": 1321,
+        "y": 786.296875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 20",
+        "x": 1641,
+        "y": 786.296875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 19",
+        "x": 361,
+        "y": 1065.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 18",
+        "x": 681,
+        "y": 1065.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 17",
+        "x": 1001,
+        "y": 1065.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 16",
+        "x": 1321,
+        "y": 1065.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 15",
+        "x": 1641,
+        "y": 1065.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 14",
+        "x": 361,
+        "y": 1343.953125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 13",
+        "x": 681,
+        "y": 1343.953125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 12",
+        "x": 1001,
+        "y": 1343.953125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 11",
+        "x": 1321,
+        "y": 1343.953125,
+        "width": 147.0625,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 10",
+        "x": 1641,
+        "y": 1343.953125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 09",
+        "x": 361,
+        "y": 1622.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 08",
+        "x": 681,
+        "y": 1622.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 07",
+        "x": 1001,
+        "y": 1622.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 06",
+        "x": 1321,
+        "y": 1622.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic applicant 05",
+        "x": 1641,
+        "y": 1622.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 1897.609375,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 1898.609375,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 1898.609375,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidates-table",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Excel-ə ixrac et",
+        "x": 1575.5,
+        "y": 30,
+        "width": 148.6875,
+        "height": 40.140625
+      },
+      {
+        "name": "Yeni Namizəd",
+        "x": 1732.1875,
+        "y": 30.0625,
+        "width": 143.8125,
+        "height": 40
+      },
+      {
+        "name": "Axtarış (ad, vəzifə, bacarıq)…",
+        "x": 307,
+        "y": 133.5625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Namizəd siyahısı",
+        "x": 737,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Status filtri",
+        "x": 922,
+        "y": 133.640625,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 1107,
+        "y": 136.640625,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Namizəd kartları",
+        "x": 1253.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "Siyahı Rejimi",
+        "x": 1291.28125,
+        "y": 134.640625,
+        "width": 34,
+        "height": 40
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 276.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 340.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 404.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 468.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 532.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 596.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 660.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 724.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 788.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 852.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 916.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 980.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1044.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1108.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1172.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1236.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1300.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1364.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1428.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1492.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1556.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1620.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1684.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1748.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1812.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1876.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 1940.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 2004.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 2068.640625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "",
+        "x": 1825,
+        "y": 2132.890625,
+        "width": 32,
+        "height": 34
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 2214.640625,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 2215.640625,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 2215.640625,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidate-create",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "CV seç",
+        "x": 1084.5,
+        "y": 423.234375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 548,
+        "y": 676.9375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 1097,
+        "y": 676.9375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 548,
+        "y": 768.765625,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 1097,
+        "y": 768.765625,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 548,
+        "y": 860.59375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 561,
+        "y": 959.46875,
+        "width": 1048,
+        "height": 43.6875
+      },
+      {
+        "name": "education",
+        "x": 548,
+        "y": 1060.296875,
+        "width": 525,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 1110,
+        "y": 1067.34375,
+        "width": 499,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 561,
+        "y": 1227.484375,
+        "width": 499,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1336.96875,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1433.765625,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1530.5625,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 1333.59375,
+        "y": 1660.5625,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Namizədi yadda saxla",
+        "x": 1463.59375,
+        "y": 1660.5625,
+        "width": 164.40625,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidate-edit-390",
+    "viewport": [
+      390,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "CV seç",
+        "x": 194.5,
+        "y": 621.484375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 41,
+        "y": 957.5625,
+        "width": 308,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 41,
+        "y": 1049.390625,
+        "width": 308,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 41,
+        "y": 1141.21875,
+        "width": 308,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 41,
+        "y": 1233.046875,
+        "width": 308,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 41,
+        "y": 1324.875,
+        "width": 308,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 104.125,
+        "y": 1427.75,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Sil Food safety",
+        "x": 228.859375,
+        "y": 1427.75,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 280.859375,
+        "y": 1425.90625,
+        "width": 55.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 41,
+        "y": 1528.890625,
+        "width": 308,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 54,
+        "y": 1696.078125,
+        "width": 282,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 54,
+        "y": 1803.953125,
+        "width": 282,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 1913.4375,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 2010.234375,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 2107.03125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 35,
+        "y": 2287.171875,
+        "width": 320,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 35,
+        "y": 2237.03125,
+        "width": 320,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidate-edit-768",
+    "viewport": [
+      768,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "CV seç",
+        "x": 383.5,
+        "y": 539.484375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 41,
+        "y": 814.875,
+        "width": 331,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 396,
+        "y": 814.875,
+        "width": 331,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 41,
+        "y": 906.703125,
+        "width": 331,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 396,
+        "y": 906.703125,
+        "width": 331,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 41,
+        "y": 998.53125,
+        "width": 331,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 104.125,
+        "y": 1101.40625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Sil Food safety",
+        "x": 228.859375,
+        "y": 1101.40625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 280.859375,
+        "y": 1099.5625,
+        "width": 433.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 41,
+        "y": 1202.546875,
+        "width": 331,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 409,
+        "y": 1209.59375,
+        "width": 305,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 54,
+        "y": 1369.734375,
+        "width": 305,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 1479.21875,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 1576.015625,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 41,
+        "y": 1672.8125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 463,
+        "y": 1802.8125,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 593,
+        "y": 1802.8125,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "candidate-edit-1910",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "CV seç",
+        "x": 1084.5,
+        "y": 423.234375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 548,
+        "y": 676.9375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 1097,
+        "y": 676.9375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 548,
+        "y": 768.765625,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 1097,
+        "y": 768.765625,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 548,
+        "y": 860.59375,
+        "width": 525,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 611.125,
+        "y": 963.46875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Sil Food safety",
+        "x": 735.859375,
+        "y": 963.46875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 787.859375,
+        "y": 961.625,
+        "width": 821.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 548,
+        "y": 1064.609375,
+        "width": 525,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 1110,
+        "y": 1071.65625,
+        "width": 499,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 561,
+        "y": 1231.796875,
+        "width": 499,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1341.28125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1438.078125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 548,
+        "y": 1534.875,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 1358,
+        "y": 1664.875,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 1488,
+        "y": 1664.875,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-filled",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 307,
+        "y": 129.640625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 737,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 922,
+        "y": 132.703125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 1063.28125,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 1248.28125,
+        "y": 197.703125,
+        "width": 38.796875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1299.078125,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 1349.890625,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Synthetic applicant 34",
+        "x": 323,
+        "y": 331.96875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 331.96875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 346.65625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 34",
+        "x": 1409.609375,
+        "y": 320.265625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 324.265625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 33",
+        "x": 323,
+        "y": 449.75,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 449.75,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 464.4375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 33",
+        "x": 1409.609375,
+        "y": 438.046875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 442.046875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 32",
+        "x": 323,
+        "y": 567.53125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 567.53125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 582.21875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 32",
+        "x": 1409.609375,
+        "y": 555.828125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 559.828125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 31",
+        "x": 323,
+        "y": 685.3125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 685.3125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 700,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 31",
+        "x": 1409.609375,
+        "y": 673.609375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 677.609375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 30",
+        "x": 323,
+        "y": 803.09375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 803.09375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 817.78125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 30",
+        "x": 1409.609375,
+        "y": 791.390625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 795.390625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 29",
+        "x": 323,
+        "y": 920.875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 920.875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 935.5625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 29",
+        "x": 1409.609375,
+        "y": 909.171875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 913.171875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 28",
+        "x": 323,
+        "y": 1038.65625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 1038.65625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1053.34375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 28",
+        "x": 1409.609375,
+        "y": 1026.953125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1030.953125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 27",
+        "x": 323,
+        "y": 1156.4375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 1156.4375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1171.125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 27",
+        "x": 1409.609375,
+        "y": 1144.734375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1148.734375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 26",
+        "x": 323,
+        "y": 1274.21875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 1274.21875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1288.90625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 26",
+        "x": 1409.609375,
+        "y": 1262.515625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1266.515625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 25",
+        "x": 323,
+        "y": 1392,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 1392,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1406.6875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 25",
+        "x": 1409.609375,
+        "y": 1380.296875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1384.296875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 24",
+        "x": 323,
+        "y": 1509.78125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 1509.78125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1524.46875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 24",
+        "x": 1409.609375,
+        "y": 1498.078125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1502.078125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 23",
+        "x": 323,
+        "y": 1627.5625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 1627.5625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1642.25,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 23",
+        "x": 1409.609375,
+        "y": 1615.859375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1619.859375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 22",
+        "x": 323,
+        "y": 1745.34375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 1745.34375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1760.03125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 22",
+        "x": 1409.609375,
+        "y": 1733.640625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1737.640625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 21",
+        "x": 323,
+        "y": 1863.125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 1863.125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1877.8125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 21",
+        "x": 1409.609375,
+        "y": 1851.421875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1855.421875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 20",
+        "x": 323,
+        "y": 1980.90625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 1980.90625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 1995.59375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 20",
+        "x": 1409.609375,
+        "y": 1969.203125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 1973.203125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 19",
+        "x": 323,
+        "y": 2098.6875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 2098.6875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2113.375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 19",
+        "x": 1409.609375,
+        "y": 2086.984375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2090.984375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 18",
+        "x": 323,
+        "y": 2216.46875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 2216.46875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2231.15625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 18",
+        "x": 1409.609375,
+        "y": 2204.765625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2208.765625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 17",
+        "x": 323,
+        "y": 2334.25,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 2334.25,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2348.9375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 17",
+        "x": 1409.609375,
+        "y": 2322.546875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2326.546875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 16",
+        "x": 323,
+        "y": 2452.03125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 2452.03125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2466.71875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 16",
+        "x": 1409.609375,
+        "y": 2440.328125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2444.328125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 15",
+        "x": 323,
+        "y": 2569.8125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 2569.8125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2584.5,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 15",
+        "x": 1409.609375,
+        "y": 2558.109375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2562.109375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 14",
+        "x": 323,
+        "y": 2687.59375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 2687.59375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2702.28125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 14",
+        "x": 1409.609375,
+        "y": 2675.890625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2679.890625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 13",
+        "x": 323,
+        "y": 2805.375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 2805.375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2820.0625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 13",
+        "x": 1409.609375,
+        "y": 2793.671875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2797.671875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 12",
+        "x": 323,
+        "y": 2923.15625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 2923.15625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 2937.84375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 12",
+        "x": 1409.609375,
+        "y": 2911.453125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 2915.453125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 11",
+        "x": 323,
+        "y": 3040.9375,
+        "width": 147.0625,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 3040.9375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3055.625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 11",
+        "x": 1409.609375,
+        "y": 3029.234375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3033.234375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 10",
+        "x": 323,
+        "y": 3158.71875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 3158.71875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3173.40625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 10",
+        "x": 1409.609375,
+        "y": 3147.015625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3151.015625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 09",
+        "x": 323,
+        "y": 3276.5,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 3276.5,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3291.1875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 09",
+        "x": 1409.609375,
+        "y": 3264.796875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3268.796875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 08",
+        "x": 323,
+        "y": 3394.28125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 3394.28125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3408.96875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 08",
+        "x": 1409.609375,
+        "y": 3382.578125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3386.578125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 07",
+        "x": 323,
+        "y": 3512.0625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 3512.0625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3526.75,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 07",
+        "x": 1409.609375,
+        "y": 3500.359375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3504.359375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 06",
+        "x": 323,
+        "y": 3629.84375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 3629.84375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3644.53125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 06",
+        "x": 1409.609375,
+        "y": 3618.140625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3622.140625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 05",
+        "x": 323,
+        "y": 3747.625,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 3747.625,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 3762.3125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 05",
+        "x": 1409.609375,
+        "y": 3735.921875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 3739.921875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 3848.3125,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 3849.3125,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 3849.3125,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-page-two",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 307,
+        "y": 129.640625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 737,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Application Kanban",
+        "x": 922,
+        "y": 132.703125,
+        "width": 131.28125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 1063.28125,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 1248.28125,
+        "y": 197.703125,
+        "width": 38.796875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1299.078125,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 1349.890625,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Synthetic applicant 04",
+        "x": 323,
+        "y": 331.96875,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 331.96875,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 346.65625,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 04",
+        "x": 1409.609375,
+        "y": 320.265625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 324.265625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 03",
+        "x": 323,
+        "y": 449.75,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 449.75,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 464.4375,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 03",
+        "x": 1409.609375,
+        "y": 438.046875,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 442.046875,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 02",
+        "x": 323,
+        "y": 567.53125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 2",
+        "x": 709.328125,
+        "y": 567.53125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 582.21875,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 02",
+        "x": 1409.609375,
+        "y": 555.828125,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 559.828125,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 01",
+        "x": 323,
+        "y": 685.3125,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 1",
+        "x": 709.328125,
+        "y": 685.3125,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 700,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 01",
+        "x": 1409.609375,
+        "y": 673.609375,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 677.609375,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Synthetic applicant 00",
+        "x": 323,
+        "y": 803.09375,
+        "width": 147.828125,
+        "height": 19.59375
+      },
+      {
+        "name": "Synthetic vacancy 0",
+        "x": 709.328125,
+        "y": 803.09375,
+        "width": 133.859375,
+        "height": 19.59375
+      },
+      {
+        "name": "Müraciəti aç",
+        "x": 1053.71875,
+        "y": 817.78125,
+        "width": 95.375,
+        "height": 40
+      },
+      {
+        "name": "Status Synthetic applicant 00",
+        "x": 1409.609375,
+        "y": 791.390625,
+        "width": 150,
+        "height": 42
+      },
+      {
+        "name": "",
+        "x": 1821,
+        "y": 795.390625,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "name": "Yenilə",
+        "x": 1639.578125,
+        "y": 903.78125,
+        "width": 88.6875,
+        "height": 38.59375
+      },
+      {
+        "name": "Əvvəlki",
+        "x": 1736.265625,
+        "y": 904.78125,
+        "width": 65.046875,
+        "height": 36.59375
+      },
+      {
+        "name": "Növbəti",
+        "x": 1809.3125,
+        "y": 904.78125,
+        "width": 66.6875,
+        "height": 36.59375
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "applications-board",
+    "viewport": [
+      1910,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 1784.421875,
+        "y": 30,
+        "width": 91.578125,
+        "height": 40.140625
+      },
+      {
+        "name": "Namizəd / vakansiya üzrə axtarış",
+        "x": 307,
+        "y": 129.640625,
+        "width": 240,
+        "height": 42.140625
+      },
+      {
+        "name": "Sıralama",
+        "x": 737,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Cədvəl",
+        "x": 922,
+        "y": 132.703125,
+        "width": 64.078125,
+        "height": 36
+      },
+      {
+        "name": "Status filtri",
+        "x": 996.078125,
+        "y": 129.703125,
+        "width": 175,
+        "height": 42
+      },
+      {
+        "name": "Brend",
+        "x": 1181.078125,
+        "y": 197.703125,
+        "width": 38.796875,
+        "height": 42
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1231.875,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya filtri",
+        "x": 1282.6875,
+        "y": 197.703125,
+        "width": 38.8125,
+        "height": 42
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 307,
+        "y": 2535.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 438,
+        "y": 2535.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 601,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 732,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 895,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 1026,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 1189,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 1320,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 1483,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 1614,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 1777,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 1908,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 2071,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 2202,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Əvvəlki kartlar",
+        "x": 2365,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      },
+      {
+        "name": "Növbəti kartlar",
+        "x": 2496,
+        "y": 342.65625,
+        "width": 123,
+        "height": 40
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "job-edit",
+    "viewport": [
+      1711,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 450.5,
+        "y": 196.515625,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 997.5,
+        "y": 196.515625,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 450.5,
+        "y": 284.34375,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 997.5,
+        "y": 284.34375,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 450.5,
+        "y": 401.71875,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 450.5,
+        "y": 467.09375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 450.5,
+        "y": 532.46875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 450.5,
+        "y": 574.46875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 576.5,
+        "y": 401.71875,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 576.5,
+        "y": 467.09375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 576.5,
+        "y": 510.78125,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 450.5,
+        "y": 424.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 997.5,
+        "y": 424.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 450.5,
+        "y": 512,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 997.5,
+        "y": 512,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 450.5,
+        "y": 598.140625,
+        "width": 1070,
+        "height": 112
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 513.625,
+        "y": 772.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 565.625,
+        "y": 770.171875,
+        "width": 394.875,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil Customer service",
+        "x": 1113.828125,
+        "y": 772.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 1165.828125,
+        "y": 770.171875,
+        "width": 341.671875,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 463.5,
+        "y": 876.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 1010.5,
+        "y": 876.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 467.5,
+        "y": 1004.03125,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 467.5,
+        "y": 1081.859375,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 450.5,
+        "y": 1180.421875,
+        "width": 362,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 822.5,
+        "y": 1180.5,
+        "width": 698,
+        "height": 40
+      }
+    ],
+    "jobGrid": {
+      "columns": "523px 523px",
+      "gap": "16px",
+      "x": 425.5,
+      "y": 143.375,
+      "width": 1120,
+      "height": 1110.625
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 256.203125,
+        "width": 1070,
+        "height": 123.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 570,
+        "width": 1070,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 732.828125,
+        "width": 1070,
+        "height": 92.1875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 841.015625,
+        "width": 1070,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 944.890625,
+        "width": 1070,
+        "height": 194.109375
+      },
+      {
+        "span": "1 / -1",
+        "x": 467.5,
+        "y": 1060.171875,
+        "width": 1036,
+        "height": 61.828125
+      }
+    ]
+  },
+  {
+    "name": "job-ai-configuration",
+    "viewport": [
+      1711,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 450.5,
+        "y": -197.484375,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 997.5,
+        "y": -197.484375,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 450.5,
+        "y": -109.65625,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 997.5,
+        "y": -109.65625,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 450.5,
+        "y": 7.71875,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 450.5,
+        "y": 73.09375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 450.5,
+        "y": 138.46875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 450.5,
+        "y": 180.46875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 576.5,
+        "y": 7.71875,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 576.5,
+        "y": 73.09375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 576.5,
+        "y": 116.78125,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 450.5,
+        "y": 30.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 997.5,
+        "y": 30.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 450.5,
+        "y": 118,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 997.5,
+        "y": 118,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 450.5,
+        "y": 204.140625,
+        "width": 1070,
+        "height": 112
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 513.625,
+        "y": 378.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 565.625,
+        "y": 376.171875,
+        "width": 394.875,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil Customer service",
+        "x": 1113.828125,
+        "y": 378.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 1165.828125,
+        "y": 376.171875,
+        "width": 341.671875,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 463.5,
+        "y": 482.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 1010.5,
+        "y": 482.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 467.5,
+        "y": 610.03125,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 467.5,
+        "y": 687.859375,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 450.5,
+        "y": 786.421875,
+        "width": 362,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 822.5,
+        "y": 786.5,
+        "width": 698,
+        "height": 40
+      }
+    ],
+    "jobGrid": {
+      "columns": "523px 523px",
+      "gap": "16px",
+      "x": 425.5,
+      "y": -250.625,
+      "width": 1120,
+      "height": 1110.625
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": -137.796875,
+        "width": 1070,
+        "height": 123.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 176,
+        "width": 1070,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 338.828125,
+        "width": 1070,
+        "height": 92.1875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 447.015625,
+        "width": 1070,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 550.890625,
+        "width": 1070,
+        "height": 194.109375
+      },
+      {
+        "span": "1 / -1",
+        "x": 467.5,
+        "y": 666.171875,
+        "width": 1036,
+        "height": 61.828125
+      }
+    ]
+  },
+  {
+    "name": "job-ai-unconfigured",
+    "viewport": [
+      1711,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Vakansiyanın adı *",
+        "x": 450.5,
+        "y": -197.484375,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Tələb olunan təcrübə (il)",
+        "x": 997.5,
+        "y": -197.484375,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Təyin edilməyibKFCPizza HutSimit Sarayı",
+        "x": 450.5,
+        "y": -109.65625,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 997.5,
+        "y": -109.65625,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Filial kodu",
+        "x": 450.5,
+        "y": 7.71875,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "Filial adı",
+        "x": 450.5,
+        "y": 73.09375,
+        "width": 102,
+        "height": 43.6875
+      },
+      {
+        "name": "İş yeri növü",
+        "x": 450.5,
+        "y": 138.46875,
+        "width": 102,
+        "height": 42
+      },
+      {
+        "name": "Filial əlavə et",
+        "x": 450.5,
+        "y": 180.46875,
+        "width": 102,
+        "height": 61.375
+      },
+      {
+        "name": "Brend kodu",
+        "x": 576.5,
+        "y": 7.71875,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend adı",
+        "x": 576.5,
+        "y": 73.09375,
+        "width": 110.546875,
+        "height": 43.6875
+      },
+      {
+        "name": "Brend əlavə et",
+        "x": 576.5,
+        "y": 116.78125,
+        "width": 110.546875,
+        "height": 61.375
+      },
+      {
+        "name": "",
+        "x": 450.5,
+        "y": 30.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "",
+        "x": 997.5,
+        "y": 30.171875,
+        "width": 523,
+        "height": 43.6875
+      },
+      {
+        "name": "Full-timePart-timeContractInternship",
+        "x": 450.5,
+        "y": 118,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "AçıqBağlıQaralama",
+        "x": 997.5,
+        "y": 118,
+        "width": 523,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya haqqında",
+        "x": 450.5,
+        "y": 204.140625,
+        "width": 1070,
+        "height": 112
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 513.625,
+        "y": 378.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Tələb olunan bacarıqlar",
+        "x": 565.625,
+        "y": 376.171875,
+        "width": 394.875,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil Customer service",
+        "x": 1113.828125,
+        "y": 378.015625,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Arzuolunan bacarıqlar",
+        "x": 1165.828125,
+        "y": 376.171875,
+        "width": 341.671875,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri təhsil (yalnız iş tələb edirsə)",
+        "x": 463.5,
+        "y": 482.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "Zəruri sertifikatlar (yalnız iş tələb edirsə)",
+        "x": 1010.5,
+        "y": 482.203125,
+        "width": 497,
+        "height": 43.6875
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 467.5,
+        "y": 610.03125,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI bacarıq təklifini soruş",
+        "x": 467.5,
+        "y": 687.859375,
+        "width": 203,
+        "height": 40.140625
+      },
+      {
+        "name": "Ləğv et",
+        "x": 450.5,
+        "y": 808.109375,
+        "width": 362,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 822.5,
+        "y": 808.1875,
+        "width": 698,
+        "height": 40
+      }
+    ],
+    "jobGrid": {
+      "columns": "523px 523px",
+      "gap": "16px",
+      "x": 425.5,
+      "y": -250.625,
+      "width": 1120,
+      "height": 1132.3125
+    },
+    "fullRows": [
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": -137.796875,
+        "width": 1070,
+        "height": 123.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 176,
+        "width": 1070,
+        "height": 146.828125
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 338.828125,
+        "width": 1070,
+        "height": 92.1875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 447.015625,
+        "width": 1070,
+        "height": 87.875
+      },
+      {
+        "span": "1 / -1",
+        "x": 450.5,
+        "y": 550.890625,
+        "width": 1070,
+        "height": 215.796875
+      },
+      {
+        "span": "1 / -1",
+        "x": 467.5,
+        "y": 666.171875,
+        "width": 1036,
+        "height": 83.515625
+      }
+    ]
+  },
+  {
+    "name": "analytics-filled",
+    "viewport": [
+      1875,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 1693.625,
+        "y": 31.0625,
+        "width": 40,
+        "height": 38
+      },
+      {
+        "name": "GFC",
+        "x": 294,
+        "y": 121.6875,
+        "width": 55.34375,
+        "height": 36.59375
+      },
+      {
+        "name": "KFC",
+        "x": 358.34375,
+        "y": 121.6875,
+        "width": 54,
+        "height": 36.59375
+      },
+      {
+        "name": "Pizza Hut",
+        "x": 421.34375,
+        "y": 121.6875,
+        "width": 81.359375,
+        "height": 36.59375
+      },
+      {
+        "name": "Simit Sarayı",
+        "x": 511.703125,
+        "y": 121.6875,
+        "width": 94.6875,
+        "height": 36.59375
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 615.390625,
+        "y": 121.6875,
+        "width": 113.375,
+        "height": 36.59375
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1717.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya",
+        "x": 1729.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Başlanğıc tarix (UTC)",
+        "x": 1741.578125,
+        "y": 549.96875,
+        "width": 26,
+        "height": 42.59375
+      },
+      {
+        "name": "Son tarix (UTC)",
+        "x": 1753.578125,
+        "y": 549.96875,
+        "width": 70.421875,
+        "height": 42.59375
+      },
+      {
+        "name": "Müraciət mənbəyi",
+        "x": 1717.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Status",
+        "x": 1729.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Təmizlə",
+        "x": 1741.578125,
+        "y": 805.03125,
+        "width": 37.65625,
+        "height": 126.4375
+      },
+      {
+        "name": "Ümumi baxış",
+        "x": 294,
+        "y": 348.71875,
+        "width": 80.921875,
+        "height": 40.140625
+      },
+      {
+        "name": "Əməliyyatlar",
+        "x": 398.921875,
+        "y": 348.71875,
+        "width": 77.375,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "analytics-operations",
+    "viewport": [
+      1875,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Yenilə",
+        "x": 1693.625,
+        "y": 31.0625,
+        "width": 40,
+        "height": 38
+      },
+      {
+        "name": "GFC",
+        "x": 294,
+        "y": 121.6875,
+        "width": 55.34375,
+        "height": 36.59375
+      },
+      {
+        "name": "KFC",
+        "x": 358.34375,
+        "y": 121.6875,
+        "width": 54,
+        "height": 36.59375
+      },
+      {
+        "name": "Pizza Hut",
+        "x": 421.34375,
+        "y": 121.6875,
+        "width": 81.359375,
+        "height": 36.59375
+      },
+      {
+        "name": "Simit Sarayı",
+        "x": 511.703125,
+        "y": 121.6875,
+        "width": 94.6875,
+        "height": 36.59375
+      },
+      {
+        "name": "Təyin edilməyib",
+        "x": 615.390625,
+        "y": 121.6875,
+        "width": 113.375,
+        "height": 36.59375
+      },
+      {
+        "name": "Filial / iş yeri",
+        "x": 1717.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Vakansiya",
+        "x": 1729.578125,
+        "y": 550.5625,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Başlanğıc tarix (UTC)",
+        "x": 1741.578125,
+        "y": 549.96875,
+        "width": 26,
+        "height": 42.59375
+      },
+      {
+        "name": "Son tarix (UTC)",
+        "x": 1753.578125,
+        "y": 549.96875,
+        "width": 70.421875,
+        "height": 42.59375
+      },
+      {
+        "name": "Müraciət mənbəyi",
+        "x": 1717.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Status",
+        "x": 1729.578125,
+        "y": 889.46875,
+        "width": 26,
+        "height": 42
+      },
+      {
+        "name": "Təmizlə",
+        "x": 1741.578125,
+        "y": 805.03125,
+        "width": 37.65625,
+        "height": 126.4375
+      },
+      {
+        "name": "Ümumi baxış",
+        "x": 294,
+        "y": 348.71875,
+        "width": 80.921875,
+        "height": 40.140625
+      },
+      {
+        "name": "Əməliyyatlar",
+        "x": 398.921875,
+        "y": 348.71875,
+        "width": 77.375,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "cv-ai-unconfigured-az",
+    "viewport": [
+      1440,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "CV seç",
+        "x": 849.5,
+        "y": 314.375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Professional CV üçün AI təklifini soruş",
+        "x": 334,
+        "y": 777.84375,
+        "width": 268.625,
+        "height": 40.140625
+      },
+      {
+        "name": "AI konfiqurasiyasını yoxla",
+        "x": 334,
+        "y": 890.265625,
+        "width": 190.390625,
+        "height": 40.140625
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 317,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 862,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 317,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 862,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 317,
+        "y": 1217.34375,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 380.125,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Sil Food safety",
+        "x": 504.859375,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 556.859375,
+        "y": 1318.375,
+        "width": 813.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 317,
+        "y": 1421.359375,
+        "width": 521,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 875,
+        "y": 1428.40625,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 330,
+        "y": 1588.546875,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1698.03125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1794.828125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1891.625,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "confirmReview",
+        "x": 317,
+        "y": 1952.625,
+        "width": 13,
+        "height": 13
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 1119,
+        "y": 2061.765625,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 1249,
+        "y": 2061.765625,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "cv-ai-unconfigured-en",
+    "viewport": [
+      1440,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Choose CV",
+        "x": 849.5,
+        "y": 314.375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Request professional CV AI proposal",
+        "x": 334,
+        "y": 777.84375,
+        "width": 258.515625,
+        "height": 40.140625
+      },
+      {
+        "name": "Check AI configuration",
+        "x": 334,
+        "y": 890.265625,
+        "width": 171.8125,
+        "height": 40.140625
+      },
+      {
+        "name": "Full Name",
+        "x": 317,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Position",
+        "x": 862,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 317,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Phone",
+        "x": 862,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Experience (Years)",
+        "x": 317,
+        "y": 1217.34375,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Remove HACCP",
+        "x": 380.125,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Remove Food safety",
+        "x": 504.859375,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Skills",
+        "x": 556.859375,
+        "y": 1318.375,
+        "width": 813.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 317,
+        "y": 1421.359375,
+        "width": 521,
+        "height": 112
+      },
+      {
+        "name": "Languages",
+        "x": 875,
+        "y": 1428.40625,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Certificates",
+        "x": 330,
+        "y": 1588.546875,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Add",
+        "x": 317,
+        "y": 1698.03125,
+        "width": 50.921875,
+        "height": 40
+      },
+      {
+        "name": "Add",
+        "x": 317,
+        "y": 1794.828125,
+        "width": 50.921875,
+        "height": 40
+      },
+      {
+        "name": "Add",
+        "x": 317,
+        "y": 1891.625,
+        "width": 50.921875,
+        "height": 40
+      },
+      {
+        "name": "confirmReview",
+        "x": 317,
+        "y": 1952.625,
+        "width": 13,
+        "height": 13
+      },
+      {
+        "name": "Cancel",
+        "x": 1119,
+        "y": 2061.765625,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Update",
+        "x": 1249,
+        "y": 2061.765625,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "cv-ai-unconfigured-ru",
+    "viewport": [
+      1440,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Выбрать CV",
+        "x": 849.5,
+        "y": 314.375,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Запросить AI проверку профессионального CV",
+        "x": 334,
+        "y": 777.84375,
+        "width": 337.1875,
+        "height": 40.140625
+      },
+      {
+        "name": "Проверить конфигурацию AI",
+        "x": 334,
+        "y": 890.265625,
+        "width": 217.015625,
+        "height": 40.140625
+      },
+      {
+        "name": "Имя и фамилия",
+        "x": 317,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Должность",
+        "x": 862,
+        "y": 1033.6875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 317,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Телефон",
+        "x": 862,
+        "y": 1125.515625,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Опыт (лет)",
+        "x": 317,
+        "y": 1217.34375,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Удалить HACCP",
+        "x": 380.125,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Удалить Food safety",
+        "x": 504.859375,
+        "y": 1320.21875,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Навыки",
+        "x": 556.859375,
+        "y": 1318.375,
+        "width": 813.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 317,
+        "y": 1421.359375,
+        "width": 521,
+        "height": 112
+      },
+      {
+        "name": "Языки",
+        "x": 875,
+        "y": 1428.40625,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Сертификаты",
+        "x": 330,
+        "y": 1588.546875,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Добавить",
+        "x": 317,
+        "y": 1698.03125,
+        "width": 87.875,
+        "height": 40
+      },
+      {
+        "name": "Добавить",
+        "x": 317,
+        "y": 1794.828125,
+        "width": 87.875,
+        "height": 40
+      },
+      {
+        "name": "Добавить",
+        "x": 317,
+        "y": 1891.625,
+        "width": 87.875,
+        "height": 40
+      },
+      {
+        "name": "confirmReview",
+        "x": 317,
+        "y": 1952.625,
+        "width": 13,
+        "height": 13
+      },
+      {
+        "name": "Отмена",
+        "x": 1119,
+        "y": 2061.765625,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Обновить",
+        "x": 1249,
+        "y": 2061.765625,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  },
+  {
+    "name": "cv-one-processing-review",
+    "viewport": [
+      1440,
+      900
+    ],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "Cari mənbə faktlarını yüklə",
+        "x": 294,
+        "y": 212.125,
+        "width": 192.53125,
+        "height": 40
+      },
+      {
+        "name": "CV seç",
+        "x": 849.5,
+        "y": 472.125,
+        "width": 1,
+        "height": 1
+      },
+      {
+        "name": "Ad və Soyad",
+        "x": 317,
+        "y": 916.59375,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Vəzifə",
+        "x": 862,
+        "y": 916.59375,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Email",
+        "x": 317,
+        "y": 1008.421875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Telefon",
+        "x": 862,
+        "y": 1008.421875,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Təcrübə (İl)",
+        "x": 317,
+        "y": 1100.25,
+        "width": 521,
+        "height": 43.6875
+      },
+      {
+        "name": "Sil HACCP",
+        "x": 380.125,
+        "y": 1203.125,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Sil Food safety",
+        "x": 504.859375,
+        "y": 1203.125,
+        "width": 37,
+        "height": 40
+      },
+      {
+        "name": "Bacarıqlar",
+        "x": 556.859375,
+        "y": 1201.28125,
+        "width": 813.140625,
+        "height": 43.6875
+      },
+      {
+        "name": "Synthetic unknown dates",
+        "x": 317,
+        "y": 1304.265625,
+        "width": 521,
+        "height": 112
+      },
+      {
+        "name": "Dillər",
+        "x": 875,
+        "y": 1311.3125,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Sertifikatlar",
+        "x": 330,
+        "y": 1471.453125,
+        "width": 495,
+        "height": 43.6875
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1580.9375,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1677.734375,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "Əlavə et",
+        "x": 317,
+        "y": 1774.53125,
+        "width": 77.796875,
+        "height": 40
+      },
+      {
+        "name": "confirmReview",
+        "x": 317,
+        "y": 1835.53125,
+        "width": 13,
+        "height": 13
+      },
+      {
+        "name": "Ləğv Et",
+        "x": 1119,
+        "y": 1944.671875,
+        "width": 120,
+        "height": 40.140625
+      },
+      {
+        "name": "Yenilə",
+        "x": 1249,
+        "y": 1944.671875,
+        "width": 140,
+        "height": 40.140625
+      }
+    ],
+    "jobGrid": null,
+    "fullRows": []
+  }
+]

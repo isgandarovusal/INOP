@@ -19,7 +19,7 @@ test('HR navigation, route and in-flight replies fail closed when canonical depa
   await h.page.evaluate(p=>window.setTestUser(p),profile);await h.page.getByText(job.title,{exact:true}).waitFor();
   let enter,release;const ready=new Promise(r=>enter=r),gate=new Promise(r=>release=r);
   await h.page.route('**/api/hr/v2/jobs?*',async r=>{enter();await gate;await r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({items:[{_id:String(job._id),title:'Stale confidential vacancy',status:'open'}],page:1,pageSize:30,total:1,totalPages:1})});});
-  try {await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await ready;
+  try {await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await ready;
    await h.page.evaluate(p=>window.setTestUser(p),{...profile,departmentId:'dep_audit'});await h.page.locator('[data-hr-state=forbidden]').waitFor();release();
    await h.page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
    assert.equal(await h.page.getByText('Stale confidential vacancy',{exact:true}).count(),0);

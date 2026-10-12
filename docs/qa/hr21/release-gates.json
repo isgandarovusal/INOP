@@ -1,0 +1,21 @@
+{
+  "package": "hr21detail",
+  "typescript": "PASS",
+  "build": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 9
+  },
+  "smoke": 13,
+  "authorization": 632,
+  "isolation": {
+    "database": "inop_smokehr21detail_1791809775971_b3fdbd21cb3e",
+    "host": "127.0.0.1",
+    "productionTouched": false,
+    "smokeSource": "/workspace/inop-cloud/smoke.cjs",
+    "checksPassed": 13,
+    "removedOnlyOwnedTemporaryDatabase": true
+  },
+  "runtimeSource": "93017e7635f76cdc567656a7421e98909f0dd271",
+  "hosting": "UNVERIFIED"
+}

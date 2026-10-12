@@ -13,10 +13,11 @@ exports.withProductionHRFixture = async callback => {
       server = http.createServer(async (req, res) => {
         try {
           const name = new URL(req.url, 'http://127.0.0.1').pathname;
-          const target = path.resolve(build.dist, name.startsWith('/assets/') ? decodeURIComponent(name).slice(1) : 'index.html');
+          if (name === '/__fixture') { res.setHeader('Content-Type','text/html'); return res.end('<!doctype html><html><body></body></html>'); }
+          const target = path.resolve(build.dist, name.startsWith('/assets/') || name === '/hr-route-manifest.json' ? decodeURIComponent(name).slice(1) : 'index.html');
           if (!target.startsWith(build.dist + path.sep)) { res.writeHead(400); return res.end(); }
           const body = await fs.readFile(target);
-          res.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.webp') ? 'image/webp' : 'text/html');
+          res.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.webp') ? 'image/webp' : target.endsWith('.json') ? 'application/json' : 'text/html');
           res.end(body);
         } catch { res.writeHead(404); res.end(); }
       });
@@ -46,7 +47,7 @@ exports.withProductionHRFixture = async callback => {
       });
       async function open(actor, route) {
         token = h.tokens[actor] || '';
-        await page.goto(origin + '/login');
+        await page.goto(origin + '/__fixture');
         await page.evaluate(value => value ? localStorage.setItem('inop_auth_token', value) : localStorage.removeItem('inop_auth_token'), token);
         await page.goto(origin + route, { waitUntil: 'domcontentloaded' });
       }

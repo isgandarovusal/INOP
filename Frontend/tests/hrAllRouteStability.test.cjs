@@ -11,10 +11,10 @@ test('Real production auth + every HR list/board stays stable while idle and aft
     ['applications', '.admin-table-container'], ['applications?view=board', '.hr-application-board'],
     ['analytics', '[data-hr-kpi=applications] strong'],
   ]) await t.test(route, async () => {
-    await h.open('admin', '/app/recruitment/' + route);
+    const first=h.wire.length;await h.open('admin', '/app/recruitment/' + route);
     await h.page.locator(selector).first().waitFor();
     await h.page.waitForLoadState('networkidle');
-    const start = h.wire.length;
+    const readyMs=await h.page.evaluate(async()=>{await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return performance.now()});const initial=h.wire.slice(first);const start = h.wire.length;
     await h.page.evaluate(() => { window.loadingTrace = []; });
     await h.page.waitForTimeout(1000);
     assert.equal(h.wire.length, start, 'No idle polling or render loop');
@@ -23,7 +23,7 @@ test('Real production auth + every HR list/board stays stable while idle and aft
       await h.page.waitForTimeout(400); await h.page.waitForLoadState('networkidle');
     }
     const extra = h.wire.slice(start), dataReads = extra.filter(r => r.path !== '/api/auth/me');
-    measurements.push({ route, dataReads: dataReads.length, sessionReads: extra.filter(r => r.path === '/api/auth/me').length, loadingMutations: await h.page.evaluate(() => window.loadingTrace.length), requests: extra });
+    measurements.push({ route, readyMs, initial, dataReads: dataReads.length, sessionReads: extra.filter(r => r.path === '/api/auth/me').length, loadingMutations: await h.page.evaluate(() => window.loadingTrace.length), requests: extra });
     await h.page.screenshot({ path: path.join(dir, route.replace('?view=', '-') + '.png'), fullPage: true });
     assert.equal(dataReads.length, route === 'analytics' ? 0 : expected, JSON.stringify(measurements.at(-1)));
     assert.equal(extra.filter(r => r.path === '/api/auth/me').length, 3);

@@ -6,7 +6,17 @@ exports.productionHRBuild = async (sha, customHarness) => {
   if (sha !== 'working' && !/^[a-f0-9]{40}$/.test(sha)) throw Error('A complete source commit SHA or explicit working snapshot is required.');
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'inop-hr-prod-benchmark-'));
   // Archive only source; never copy .env, uploads, credentials or user changes.
-  if (sha === 'working') await fs.cp(path.join(frontend, 'src'), path.join(root, 'src'), { recursive: true });
+  if (sha === 'working') {
+    // Read current bytes of Git-tracked source only; never copy unrelated
+    // untracked/ignored workspace files or private environment material.
+    const files = execFileSync('git', ['ls-files', '-z', 'Frontend/src'], { cwd: repo }).toString().split('\0').filter(Boolean);
+    for (const file of files) {
+      if (!file.startsWith('Frontend/src/') || /(?:^|\/)\.env(?:\.|$)|\.(?:pem|key|p12)$/i.test(file)) throw Error('Private material in source snapshot');
+      const target = path.join(root, file.slice('Frontend/'.length));
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.copyFile(path.join(repo, file), target);
+    }
+  }
   else {
     const archive = execFileSync('git', ['archive', sha, 'Frontend/src'], { cwd: repo, maxBuffer: 64 * 1024 * 1024 });
     const extracted = spawnSync('tar', ['-x', '-C', root, '--strip-components=1'], { input: archive });

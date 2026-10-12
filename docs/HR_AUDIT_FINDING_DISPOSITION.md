@@ -213,3 +213,16 @@ Current156findings:148TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051 lawful rete
 | AUD-159 |20C2 |Shared :is control specificity overrides textarea multiline reading height | TESTED |New assertion fails all3widths at65.375px. Canonical input/select height split and textarea.input minimum112px;5final geometry targets within119pass. Earlier width-only coverage limitation retained. |
 
 All original131 and159current findings retained:151TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051 lawfulretention). Final sourceccf24e5 has236Backend/170Frontend workflows/private/download/119responsive+analytic tests,632existing security and13owned smoke checks. Approval review's initial transparent SVG rejection was resolved by fresh explicit user confirmation; original bitmaps retained,5vector and30existing brand/login/Audit tests pass. No actual external storage/scanner/provider/recovery/Graph/site or hosted deployment PASS is inferred. See HR_FINAL_STABILITY_REPORT for source-bound measurements and remaining operational gates.
+
+
+##21 — Full HR lifecycle and screenshot/AI acceptance
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-160 |21 |List/board default focus reload survives analytics-only fix | TESTED |Production3extraGET→0; session3 retained, loading mutations0after; current auth/held refresh tests. |
+| AUD-161 |21 |Duplicate Candidate create CTA and conflicting restaurant/toolbar CSS | TESTED |One CTA, compact canonical toolbar, native export/paging, actual responsive photos and Audit comparisons. |
+| AUD-162 |21 |Job fullspan/catalog layout creates oversized gaps and ambiguous draft submit | TESTED |Grouped form grid and associated labels; explicit draft/primarypublish/nativeEnter regressions and photos. |
+| AUD-163 |21 |Competing source-bound CV review AI actions and unclear configuration failure | TESTED |One generation per function; AZ/EN/RU exact setup statuses and current provider/permission/approval contracts. RealproviderBLOCKED_EXTERNAL. |
+| AUD-164 |21 |Application detail header links crowd and Save stretches beside textarea | TESTED |Existing PageHeader actions/fullspanfieldset/separatefooter; current63tests and desktop/tablet/mobile photos; no permission changes. |
+
+All original131 retained. Current164 dispositions:156TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051). Counts retain existing historical dispositions, not hosted certification. P21 checklist and HR_LIVE_REFINEMENT_REPORT document78screenshots, source-bound tests, corrected infrastructure failures and bounded measurements. Hosted UI/deploymentUNVERIFIED; realCV activationNO-GO.

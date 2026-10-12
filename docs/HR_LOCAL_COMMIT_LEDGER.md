@@ -1823,3 +1823,161 @@ test(hr): verify final workflows and paired analytics stability
 - `M docs/HR_LOCAL_COMMIT_LEDGER.md`
 
 Existingmain release confirmed by normalfast-forward and exactls-remote atffd7de5fa3a574f900d6610a568f76c4d671260a. Final confirmation-onlycommit follows; its SHA is reported by Git/finaluserreport, never guessed. Runtime/frontend source remainsccf24e55baa35265b680ed341d079220fda027c4, Backend unchanged from2243d68. Hosted/external certification is separate.
+
+
+## Phase21 — local ordered packages
+
+### 8b38320612bb01e4a467357ac064be9941dd0fd4
+
+fix(hr): stop list and board focus reloads without weakening auth
+
+```text
+M	Frontend/src/Components/CandidateArchiveHistory.tsx
+M	Frontend/src/Components/HRPageControls.tsx
+M	Frontend/src/Components/JobArchiveHistory.tsx
+M	Frontend/src/Hooks/useHRBoard.ts
+M	Frontend/src/Hooks/useHRPage.ts
+M	Frontend/src/Hooks/useHRRankingPage.ts
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationDetail.tsx
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobDetail.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx
+M	Frontend/tests/helpers/productionBrowser.cjs
+A	Frontend/tests/helpers/productionHRFixture.cjs
+A	Frontend/tests/hrAllRouteStability.test.cjs
+M	Frontend/tests/hrNavigationPerformance.test.cjs
+M	Frontend/tests/hrPaginationUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### d1fcbdd9f4b72de3b0fee353f765004e7c306dd1
+
+fix(hr): unify candidate toolbar and remove duplicate create action
+
+```text
+M	Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx
+M	Frontend/src/Styles/admin.css
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/recruitment.css
+A	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### 1f099e71ecc800536f9850c8fdf78f9a48a365cf
+
+fix(hr): align application controls and clarify scoped sorting
+
+```text
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/i18n/locales/az.json
+M	Frontend/src/i18n/locales/en.json
+M	Frontend/src/i18n/locales/ru.json
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### 4f153e75d0b0d480ff9fb6284ff13abd5b77a1ef
+
+fix(hr): keep empty application content inside mobile viewport
+
+```text
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### 99ede1fd8ec6747446cc6a57fcc874242e418393
+
+fix(hr): compose job forms and preserve explicit draft and publish actions
+
+```text
+M	Frontend/src/Components/JobSkillsAssistant.tsx
+M	Frontend/src/Components/RecruitmentLocationFields.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/recruitment.css
+M	Frontend/src/i18n/locales/az.json
+M	Frontend/src/i18n/locales/en.json
+M	Frontend/src/i18n/locales/ru.json
+M	Frontend/tests/hrAiUI.test.cjs
+M	Frontend/tests/hrLifecycle.test.cjs
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	Frontend/tests/recruitmentCatalogUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### 9c028170c6225d12a411a5ba225f67d6fda8597c
+
+fix(hr): clarify AI setup and prevent competing CV review actions
+
+```text
+M	Frontend/src/Components/AIAvailability.tsx
+M	Frontend/src/Components/CvProcessingPanel.tsx
+M	Frontend/src/Components/CvReviewAssistant.tsx
+M	Frontend/src/Components/JobSkillsAssistant.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx
+M	Frontend/src/i18n/locales/az.json
+M	Frontend/src/i18n/locales/en.json
+M	Frontend/src/i18n/locales/ru.json
+M	Frontend/tests/hrAiAvailability.test.cjs
+M	Frontend/tests/hrAiCvUI.test.cjs
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+A	docs/HR_AI_ACTION_VERIFICATION.md
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### c91604e9426d9ef19f12feb8943b3cc2b7e804cd
+
+style(hr): align analytics and professional review state presentation
+
+```text
+M	Frontend/src/Components/CvReviewAssistant.tsx
+M	Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/recruitment.css
+M	Frontend/src/i18n/locales/az.json
+M	Frontend/src/i18n/locales/en.json
+M	Frontend/src/i18n/locales/ru.json
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+```
+
+### 9cc8e19416943a729ccf17a1e15a75791c0ba6a6
+
+fix(auth): remove business brand text from login and verify shell
+
+```text
+M	Frontend/src/Pages/Auth/Login/Login.tsx
+M	Frontend/src/Styles/auth.css
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+A	docs/qa/hr21/login-1440.jpg
+A	docs/qa/hr21/login-390.jpg
+A	docs/qa/hr21/login-768.jpg
+A	docs/qa/hr21/sidebar-1440.jpg
+A	docs/qa/hr21/sidebar-390.jpg
+A	docs/qa/hr21/sidebar-768.jpg
+```
+
+### 93017e7635f76cdc567656a7421e98909f0dd271
+
+fix(hr): align application detail actions and workflow form
+
+```text
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationDetail.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/i18n/locales/az.json
+M	Frontend/src/i18n/locales/en.json
+M	Frontend/src/i18n/locales/ru.json
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+```
