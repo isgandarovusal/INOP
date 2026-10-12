@@ -681,9 +681,6 @@
   transform: translateY(-1px);
 }
 
-.candidate-fields {
-  gap: 16px;
-}
 
 .candidate-field-label,
 .candidate-form-page .form-group > label {

@@ -443,13 +443,13 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               }} /> : <p role="note">{t("hrCvAi.saveFirst")}</p>}
             <fieldset className="candidate-fields" disabled={aiGenerating || saving || Boolean(intakeAttempt)}>
               <div className="form-group">
-                <label className="candidate-field-label">
+                <label className="candidate-field-label" htmlFor="candidate-name">
                   {t("recruitment.candidateForm.fullName")} <span className="candidate-field-required">*</span>
                 </label>
                 <input
                   type="text"
                   className="input"
-                  name="name"
+                  id="candidate-name" name="name"
                   aria-label={t("recruitment.candidateForm.fullName")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -458,13 +458,13 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">
+                <label className="candidate-field-label" htmlFor="candidate-role">
                   {t("recruitment.candidateForm.position")}
                 </label>
                 <input
                   type="text"
                   className="input"
-                  name="role"
+                  id="candidate-role" name="role"
                   aria-label={t("recruitment.candidateForm.position")}
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
@@ -472,11 +472,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">{t("recruitment.candidateForm.email")}</label>
+                <label className="candidate-field-label" htmlFor="candidate-email">{t("recruitment.candidateForm.email")}</label>
                 <input
                   type="email"
                   className="input"
-                  name="email"
+                  id="candidate-email" name="email"
                   aria-label={t("recruitment.candidateForm.email")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -484,11 +484,11 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">{t("recruitment.candidateForm.phone")}</label>
+                <label className="candidate-field-label" htmlFor="candidate-phone">{t("recruitment.candidateForm.phone")}</label>
                 <input
                   type="text"
                   className="input"
-                  name="phone"
+                  id="candidate-phone" name="phone"
                   aria-label={t("recruitment.candidateForm.phone")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -496,12 +496,12 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               </div>
 
               <div className="form-group">
-                <label className="candidate-field-label">{t("recruitment.candidateForm.experience")}</label>
+                <label className="candidate-field-label" htmlFor="candidate-experience">{t("recruitment.candidateForm.experience")}</label>
                 <input
                   type="number"
                   className="input"
                   min={0}
-                  name="experience"
+                  id="candidate-experience" name="experience"
                   aria-label={t("recruitment.candidateForm.experience")}
                   value={experience ?? ""}
                   onChange={(e) => setExperience(e.target.value === "" ? null : Number(e.target.value))}
@@ -509,9 +509,6 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
               </div>
 
               <div className="form-group form-group--full">
-                <label className="candidate-field-label">
-                  {t("recruitment.candidateForm.skillsEnglish")}
-                </label>
                 <TagInput
                   label={t("recruitment.candidateForm.skills")}
                   values={skills}
@@ -519,7 +516,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
                   placeholder={t("recruitment.candidateForm.skillPlaceholder")}
                 />
               </div>
-              <div className="form-group"><label>{t("cvReview.education")}<textarea name="education" value={education} onChange={e => setEducation(e.target.value)} /></label></div>
+              <div className="form-group"><label htmlFor="candidate-education">{t("cvReview.education")}</label><textarea id="candidate-education" name="education" className="input" value={education} onChange={e => setEducation(e.target.value)} /></div>
               <TagInput label={t("cvReview.languages")} values={languages} onChange={setLanguages} />
               <TagInput label={t("cvReview.certificates")} values={certificates} onChange={setCertificates} />
               <CvHistoryEditor label={t("cvReview.employmentHistory")} entries={employmentHistory} onChange={setEmploymentHistory} />

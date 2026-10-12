@@ -4,7 +4,7 @@ import type { CvHistoryEntry } from '../Types/recruitment';
 export default function CvHistoryEditor({ label, entries, onChange }: { label: string; entries: CvHistoryEntry[]; onChange: (entries: CvHistoryEntry[]) => void }) {
   const { t } = useTranslation();
   const update = (index: number, change: Partial<CvHistoryEntry>) => onChange(entries.map((entry, i) => i === index ? { ...entry, ...change } : entry));
-  return <section><h4>{label}</h4>{entries.map((entry, i) => <fieldset key={i}>
+  return <section className="cv-history-editor"><h4>{label}</h4>{entries.map((entry, i) => <fieldset key={i}>
     <label>{t('cvReview.originalText')}<textarea aria-label={`${label} ${i + 1} ${t('cvReview.originalText')}`} value={entry.raw} onChange={e => update(i, { raw: e.target.value })} maxLength={500} /></label>
     <label>{t('cvReview.organization')}<input value={entry.organization ?? ''} onChange={e => update(i, { organization: e.target.value || null })} maxLength={500} /></label>
     <label>{t('cvReview.title')}<input value={entry.title ?? ''} onChange={e => update(i, { title: e.target.value || null })} maxLength={500} /></label>

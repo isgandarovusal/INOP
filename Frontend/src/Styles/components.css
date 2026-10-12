@@ -1423,11 +1423,20 @@ tbody tr:hover {
 /* Form fields */
 
 .candidate-fields {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  align-items: start;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
+  gap: 20px 24px;
 }
 
+.candidate-fields .form-group > label { display: block; margin-bottom: 8px; }
+.candidate-fields :is(.input, textarea) { display: block; width: 100%; }
+.candidate-fields textarea { min-height: 112px; }
+.candidate-fields > .cv-history-editor { grid-column: 1 / -1; }
 .candidate-fields .form-group {
   margin-bottom: 0;
 }

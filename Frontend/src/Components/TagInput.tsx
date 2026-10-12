@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useId } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -16,6 +16,7 @@ const TagInput: React.FC<TagInputProps> = ({
   placeholder,
 }) => {
   const { t } = useTranslation();
+  const inputId = useId();
   const [draft, setDraft] = useState("");
 
   const commit = () => {
@@ -43,7 +44,7 @@ const TagInput: React.FC<TagInputProps> = ({
 
   return (
     <div className="form-group">
-      <label className="form-label">{label}</label>
+      <label className="form-label" htmlFor={inputId}>{label}</label>
 
       <div className="tag-input" onClick={commit}>
         {values.map((tag, idx) => (
@@ -64,6 +65,7 @@ const TagInput: React.FC<TagInputProps> = ({
         ))}
 
         <input
+          id={inputId}
           type="text"
           aria-label={label}
           value={draft}
