@@ -80,12 +80,12 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
 
   if(group==='allroutes'||group==='all') {
     const application=await Application.findOne().lean();
-    for(const width of [390,768,1910])for(const [name,url,selector] of [
+    for(const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910)])for(const [name,url,selector] of [
       ['jobs','jobs','.admin-table-container'],['job-create','jobs/new','.job-form-page form'],['job-detail','jobs/'+jobs[0]._id,'.job-detail-page'],['job-edit','jobs/'+jobs[0]._id+'/edit','.job-form-page form'],
       ['candidates','candidates','.hr-candidates-page'],['candidate-create','candidates/new','.candidate-fields'],['candidate-detail','candidates/'+people[0]._id,'.candidate-detail-page'],['candidate-edit','candidates/'+people[0]._id+'/edit','.candidate-fields'],
       ['applications','applications','.admin-table-container'],['application-board','applications?view=board','.hr-application-board'],['application-detail','applications/'+application._id,'.hr-application-detail'],['analytics','analytics','[data-hr-kpi=applications] strong'],
       ['intake-disabled','cv-intake','[data-hr-feature-disabled]'],['intake-detail-disabled','cv-intake/'+people[0]._id,'[data-hr-feature-disabled]'],
-    ])await t.test(name+' production '+width,async()=>{await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/'+url);await h.page.locator(selector).first().waitFor();await capture(name+'-route-'+width);if(name==='application-detail'){const save=h.page.getByRole('button',{name:az.common.actions.save,exact:true});assert.ok((await save.boundingBox()).height<=48,'Save action is not stretched by textarea grid row');assert.equal(await save.getAttribute('class'),'btn-primary');assert.ok(await h.page.locator('.page-header__actions').isVisible());}});
+    ].filter(([name])=>!process.env.INOP_HR_ROUTE_NAMES || process.env.INOP_HR_ROUTE_NAMES.split(',').includes(name)))await t.test(name+' production '+width,async()=>{await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/'+url);await h.page.locator(selector).first().waitFor();await capture(name+'-route-'+width);if(name==='application-detail'){const save=h.page.getByRole('button',{name:az.common.actions.save,exact:true});assert.ok((await save.boundingBox()).height<=48,'Save action is not stretched by textarea grid row');assert.equal(await save.getAttribute('class'),'btn-primary');assert.ok(await h.page.locator('.page-header__actions').isVisible());}});
   }
   if(enabled('ai')) await t.test('AI review has explicit real configuration failure and one source-bound workflow',async()=>{
     const crypto=require('node:crypto'),{docx}=require('../../Backend/tests/helpers/cvDocuments.cjs'),{uploadsDir}=require('../../Backend/middleware/privateUpload.middleware');

@@ -30,7 +30,21 @@
   --hr-subtle: #f8fafc;
   --hr-danger: #b42318;
   --hr-danger-hover: #8f1c13;
-  --hr-focus: #253b61;
+  --hr-focus: #1761cf;
+  --hr-blue: #1761cf;
+  --hr-blue-soft: #eaf0ff;
+  --hr-blue-border: #bdcff7;
+  --hr-blue-ink: #204781;
+  --hr-purple: #6842cc;
+  --hr-purple-hover: #5631b4;
+  --hr-purple-soft: #f3eeff;
+  --hr-purple-border: #d7c8fc;
+  --hr-success: #15753d;
+  --hr-success-soft: #e9f8ee;
+  --hr-warning: #945800;
+  --hr-warning-soft: #fff6df;
+  --hr-page: #f3f6fc;
+  --hr-control-hover: #dce7ff;
 
   /* Design system */
   --surface-page: #f5f6fb;

@@ -1872,3 +1872,33 @@ TestfirstQueueenqueueproperly503PROCESSING_QUEUE_NOT_READY withmissingfixtureind
 
 
 21I release transport VERIFIED: normal gitpush HEAD:refs/heads/inop-main b71eee8→d9e81b3952f9dee0e522c1748c6972ec2497c813 succeeded, native ls-remote exactmatch, work clean,8b38320ancestor preserved. P21-025 FIXED for Git transport, all hosted columns remainUNVERIFIED. Final docs-only confirmation follows; source remains93017e7 and gates remain valid. Render/Vercel/frontend/status probes proxyCONNECT403/HTTP000, no observed deploy/runtime result. No risky DB operation/provider activation. Runtime/UI screenshot acceptance is localFIXED, not livePASS; pending external operational gates and retentionOPEN remain.
+
+
+##22 — Reference-led enterprise HR design (12 October2026)
+
+User supplied dashboard PNG in chat; navy/blue/purple/green/amber semantic palette, compact toolbar and table, dark active sidebar guide A–F. Sample names/counts/percentages are NOT copied. Baseline ae4822c clean/work; all existing IDs preserved. No new branch, dependencies, API requests, migration, provider activation or secret changes.
+
+| ID | Package / acceptance | Status | Evidence |
+|---|---|---|---|
+| P22-001 | A inventory existing CSS and replace white secondary source rules, no appended override sheet | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
+| P22-002 | A namespaced navy/blue/purple/success/warning/danger tokens and semantic accessible controls | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
+| P22-003 | A focus/disabled/loading/error states and production screenshot/test/commit | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
+| P22-004 | B compact readable SVG/sidebar subtitle, preserve raster assets | OPEN | Pending |
+| P22-005 | B dark active nav, languages/group/icon/scroll/mobile shell | OPEN | Pending |
+| P22-006 | B before/after1440/tablet/mobile screenshot/tests/commit | OPEN | Pending |
+| P22-007 | C coherent Candidate/Application headers/toolbars/table/status/actions/page controls | OPEN | Pending |
+| P22-008 | C single CTA/no fake KPIs, real data0/few/many and responsive interactions | OPEN | Pending |
+| P22-009 | C before/after screenshot/tests/commit | OPEN | Pending |
+| P22-010 | D Job/create/edit/detail, Candidate/Application detail/review/interview consistent grid | OPEN | Pending |
+| P22-011 | D modal/action hierarchy/validation/current workflow preserved | OPEN | Pending |
+| P22-012 | D before/after screenshot/tests/commit | OPEN | Pending |
+| P22-013 | E distinct real KPI cards/charts/filters/tabs/zero/loading | OPEN | Pending |
+| P22-014 | E Kanban status/columns/cards and purple AI with explicit configuration-required | OPEN | Pending |
+| P22-015 | E before/after screenshot/tests/commit | OPEN | Pending |
+| P22-016 | F1440/768/390 all HR routes screenshots visually inspected, compare baseline | OPEN | Pending |
+| P22-017 | F preserve0extraidle/focus reads/currentauth and bundle/runtime performance | OPEN | Pending |
+| P22-018 | F Admin/dep_hr scope/private/export/archive/CAS and unchanged Audit regressions | OPEN | Pending |
+| P22-019 | F TypeScript/build/lint/smoke/authorization gates and final commit | OPEN | Pending |
+| P22-020 | NormalmainFF/push/exactremoteSHA; actual hosted status separate | OPEN | Pending |
+
+Real provider/storage/scanner/recovery/Graph/sites remain BLOCKED_EXTERNAL; retention AUD051OPEN, realCV activationNO-GO. Local visual acceptance does not certify inaccessible hosted deployment.

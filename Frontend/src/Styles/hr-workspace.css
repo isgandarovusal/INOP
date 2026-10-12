@@ -28,8 +28,10 @@
 }
 .hr-workspace :is(.btn-primary, .btn-add) { background: var(--hr-navy); border: 1px solid var(--hr-navy); color: var(--hr-white); box-shadow: none; }
 .hr-workspace :is(.btn-primary, .btn-add):hover { background: var(--hr-navy-hover); box-shadow: none; transform: none; }
-.hr-workspace :is(.btn-secondary, .btn-cancel) { background: var(--hr-white); color: var(--hr-navy); border: 1px solid #d7dde5; }
-.hr-workspace :is(.btn-secondary, .btn-cancel):hover { background: #f3f5f8; box-shadow: none; transform: none; }
+.hr-workspace .btn-secondary { background: var(--hr-blue-soft); color: var(--hr-blue-ink); border: 1px solid var(--hr-blue-border); }
+.hr-workspace .btn-cancel { width: auto; flex: 0 0 auto; background: var(--hr-white); color: var(--hr-slate); border: 1px solid var(--hr-border); }
+.hr-workspace .btn-secondary:hover:not(:disabled) { background: var(--hr-control-hover); border-color: #9ab7f0; box-shadow: none; transform: none; }
+.hr-workspace .btn-cancel:hover:not(:disabled) { background: var(--hr-subtle); }
 .hr-workspace button:disabled { cursor: not-allowed; }
 .hr-workspace :is(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 3px; }
 .hr-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea) {
@@ -175,14 +177,14 @@
 .hr-workspace :is(.candidate-form-actions, .form-actions) .btn-primary { background: var(--hr-navy) !important; border-color: var(--hr-navy) !important; color: var(--hr-white) !important; box-shadow: none; }
 .hr-workspace .page-header .page-header__actions :is(.btn-primary, .btn-add, .recruitment-action--create):hover,
 .hr-workspace :is(.candidate-form-actions, .form-actions) .btn-primary:hover { background: var(--hr-navy-hover) !important; box-shadow: none; transform: none; }
-.hr-workspace .page-header .page-header__actions :is(.btn-secondary, .candidate-detail-action--export, .candidate-detail-action--back) { background: var(--hr-white) !important; border-color: #d7dde5 !important; color: var(--hr-navy) !important; box-shadow: none; }
-.hr-workspace .page-header .page-header__actions :is(.btn-secondary, .candidate-detail-action--export, .candidate-detail-action--back):hover { background: #f3f5f8 !important; box-shadow: none; transform: none; }
+.hr-workspace .page-header .page-header__actions :is(.btn-secondary, .candidate-detail-action--export, .candidate-detail-action--back) { background: var(--hr-blue-soft) !important; border-color: var(--hr-blue-border) !important; color: var(--hr-blue-ink) !important; box-shadow: none; }
+.hr-workspace .page-header .page-header__actions :is(.btn-secondary, .candidate-detail-action--export, .candidate-detail-action--back):hover { background: var(--hr-control-hover) !important; box-shadow: none; transform: none; }
 .hr-workspace .recruitment-kanban__card { border-color: #e0e5ec !important; }
 .hr-workspace .recruitment-kanban__card:hover { border-color: #b8c5d6 !important; }
 .hr-workspace .search-field input { padding-left: 38px; padding-right: 38px; }
 .hr-workspace .search-field { min-width: 0; }
-.hr-workspace button:not([class]) { padding: 8px 12px; background: var(--hr-white); color: var(--hr-navy); border: 1px solid #d7dde5; }
-.hr-workspace button:not([class]):hover:not(:disabled) { background: #f3f5f8; }
+.hr-workspace button:not([class]) { padding: 8px 12px; background: var(--hr-blue-soft); color: var(--hr-blue-ink); border: 1px solid var(--hr-blue-border); }
+.hr-workspace button:not([class]):hover:not(:disabled) { background: var(--hr-control-hover); }
 .hr-workspace .hr-application-board > section nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 8px; }
 .hr-workspace .hr-application-board > section nav > span { flex-basis: 100%; order: -1; font-size: 12px; color: var(--hr-slate); }
 .hr-workspace .hr-application-board > section nav > button { flex: 1 1 90px; font-size: 12px; }
@@ -331,9 +333,12 @@
 .hr-workspace.job-detail-page .detail-grid > div:nth-child(2) > .detail-card:last-child .btn-primary { background: var(--hr-navy); border-color: var(--hr-navy); box-shadow: none; }
 .hr-workspace.job-detail-page .detail-grid > div:nth-child(2) > .detail-card:last-child .btn-primary:hover:not(:disabled) { background: var(--hr-navy-hover); box-shadow: none; transform: none; }
 .hr-workspace.job-detail-page .detail-grid > div:first-child > .detail-card:first-child { background: var(--hr-white); }
-.hr-workspace .badge--info { color: #345678; background: #edf3f8; }
-.hr-workspace .badge--accent { color: #485b77; background: #eef1f7; }
-.hr-workspace .badge--success { color: #316550; background: #eef5f1; }
+.hr-workspace .badge--info { color: var(--hr-blue-ink); background: var(--hr-blue-soft); border: 1px solid var(--hr-blue-border); }
+.hr-workspace .badge--accent { color: var(--hr-purple-hover); background: var(--hr-purple-soft); border: 1px solid var(--hr-purple-border); }
+.hr-workspace .badge--success { color: var(--hr-success); background: var(--hr-success-soft); border: 1px solid #bce5ca; }
+.hr-workspace .badge--warning { color: var(--hr-warning); background: var(--hr-warning-soft); border: 1px solid #f3d791; }
+.hr-workspace .badge--danger { color: var(--hr-danger); background: #feeeee; border: 1px solid #f7c9c5; }
+.hr-workspace .badge--neutral { color: #475569; background: #eef2f7; border: 1px solid #d5deea; }
 .hr-workspace.job-detail-page .ranking-row:first-child .ranking-row__rank { background: #edf1f6; color: #4b5c74; box-shadow: none; }
 /* Preserve space for SearchInput's leading icon and trailing clear control. */
 .hr-workspace .search-field input:not([type=checkbox]):not([type=radio]):not([type=file]) { padding-left: 36px; padding-right: 36px; }

@@ -121,7 +121,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
           <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
         </section>
         <div className="form-actions recruitment-form-actions">
-          <button type="button" className="btn-secondary" onClick={()=>navigate(-1)}>{t("recruitment.jobForm.cancel")}</button>
+          <button type="button" className="btn-cancel" onClick={()=>navigate(-1)}>{t("recruitment.jobForm.cancel")}</button>
           {!isEdit && <button type="button" className="btn-secondary" disabled={saving} onClick={event=>{if(event.currentTarget.form?.reportValidity())void handleSubmit(true);}}>{t("hrJobArchive.saveDraft")}</button>}
           <button type="submit" className="btn-primary" disabled={saving}>{saving ? <Loader2 size={16} className="spin" /> : null}{isEdit ? t("recruitment.jobForm.update") : t("recruitment.jobForm.publish")}</button>
         </div>
