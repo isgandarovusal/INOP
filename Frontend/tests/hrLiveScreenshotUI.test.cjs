@@ -9,7 +9,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
   if (!dir || !path.isAbsolute(dir)) throw Error('Owned screenshot output required');
   await fs.mkdir(dir, { recursive: true });
   const evidence = [];
-  const enabled = name => group === name || group === 'all' || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
+  const enabled = name => group === name || group === 'all' || group === 'C' && ['candidates','applications'].includes(name) || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
   async function capture(name) {
     await h.page.waitForLoadState('networkidle');
     const measured = await h.page.evaluate(() => {
@@ -50,7 +50,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
   const people=await Candidate.insertMany(Array.from({length:35},(_,i)=>({name:'Synthetic applicant '+String(i).padStart(2,'0'),role:'Synthetic long restaurant position with multiple branches',skills:['HACCP','Food safety'],education:'Synthetic unknown dates',status:'new',...provenance})));
   await Application.insertMany(people.map((c,i)=>({candidateId:c._id,jobId:jobs[i%3]._id,status:'Applied',...provenance})));
   if(enabled('candidates')) await t.test('S3/S6 candidate search, list/grid, create/edit/review functions',async()=>{
-    await h.page.setViewportSize({width:1910,height:900});await h.open('admin','/app/recruitment/candidates');await h.page.locator('.hr-candidate-grid article').first().waitFor();await capture('candidates-filled');
+    await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910),height:900});await h.open('admin','/app/recruitment/candidates');await h.page.locator('tbody tr').first().waitFor();await capture('candidates-filled');await h.page.getByRole('button',{name:az.hrWorkflow.candidateCards,exact:true}).click();await h.page.locator('.hr-candidate-grid article').first().waitFor();
     if(!captureOnly){assert.equal(await h.page.getByRole('button',{name:'Yeni Namizəd',exact:true}).count(),1);
       const count=h.wire.filter(r=>r.path==='/api/hr/v2/candidates').length;
       await h.page.getByRole('button',{name:az.recruitment.candidates.listMode,exact:true}).click();await h.page.locator('tbody tr').first().waitFor();assert.equal(await h.page.locator('tbody tr').count(),30);assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/candidates').length,count);await capture('candidates-table');
@@ -61,7 +61,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     for(const width of [390,768,1910]){await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/candidates/'+people[0]._id+'/edit');await h.page.locator('.candidate-fields textarea').first().waitFor();await capture('candidate-edit-'+width);}
   });
   if(enabled('applications')) await t.test('S1 bounded table, page sort, search, next/previous and board intent',async()=>{
-    await h.page.setViewportSize({width:1910,height:900});await h.open('admin','/app/recruitment/applications');await h.page.locator('tbody tr').first().waitFor();await capture('applications-filled');
+    await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910),height:900});await h.open('admin','/app/recruitment/applications');await h.page.locator('tbody tr').first().waitFor();await capture('applications-filled');
     assert.equal(await h.page.locator('tbody tr').count(),30);await h.page.getByRole('button',{name:'Növbəti',exact:true}).click();await h.page.waitForFunction(()=>document.querySelectorAll('tbody tr').length===5);await capture('applications-page-two');
     await h.page.getByRole('button',{name:'Application Kanban',exact:true}).click();await h.page.locator('.hr-application-board').waitFor();await capture('applications-board');
   });

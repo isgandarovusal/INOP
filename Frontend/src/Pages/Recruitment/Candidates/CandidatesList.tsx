@@ -4,6 +4,7 @@ import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  UsersRound,
   FileSpreadsheet,
   LayoutGrid,
   List,
@@ -30,6 +31,7 @@ const getCandidateStatusBadgeVariant = (
   status: CandidateStatus,
 ): "neutral" | "info" | "success" | "warning" | "danger" | "accent" => {
   switch (status) {
+    case "new":
     case "applied":
     case "screening":
       return "info";
@@ -59,7 +61,7 @@ const CandidatesList: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const search = useDebouncedSearch(searchQuery);
   const [archived, setArchived] = useState(false);
@@ -155,7 +157,7 @@ const CandidatesList: React.FC = () => {
   return (
     <div className="hr-workspace recruitment-list-page hr-candidates-page">
       {confirmation?.key===context.key&&<HRConfirmDialog title={t("hrArchive.archive")} message={t("hrArchive.confirm",{name:confirmation.candidate.name})} confirmLabel={t("hrArchive.archive")} loading={Boolean(deletingId)} onConfirm={()=>{void confirmArchive();}} onCancel={()=>setConfirmation(null)}/>}
-      <PageHeader
+      <PageHeader icon={<UsersRound size={26} />}
         title={t("recruitment.candidates.title")}
         subtitle={t("recruitment.candidates.subtitle")}
         actions={
@@ -266,9 +268,7 @@ const CandidatesList: React.FC = () => {
                     }
                     style={{ cursor: "pointer" }}
                   >
-                    <td style={{ fontWeight: 500 }}>
-                      {candidate.name}
-                    </td>
+                    <td><div className="hr-person-cell"><span className="hr-person-avatar" aria-hidden="true">{candidate.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" onClick={event=>{event.stopPropagation();navigate("/app/recruitment/candidates/"+candidate.id);}}>{candidate.name}</button>{candidate.email && <small>{candidate.email}</small>}</div></div></td>
 
                     <td>
                       {candidate.role ||
@@ -276,8 +276,7 @@ const CandidatesList: React.FC = () => {
                     </td>
 
                     <td>
-                      {candidate.experience ?? t("cvReview.unknown")}{" "}
-                      {t("recruitment.candidates.years")}
+                      {candidate.experience == null ? t("cvReview.unknown") : `${candidate.experience} ${t("recruitment.candidates.years")}`}
                     </td>
 
                     <td>

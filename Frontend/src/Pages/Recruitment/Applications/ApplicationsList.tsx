@@ -1,3 +1,4 @@
+import { Layers3 } from "lucide-react";
 import HRScopeFilters from "../../../Components/HRScopeFilters";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { applicationTransitions } from "../../../Utils/applicationWorkflow";
@@ -174,7 +175,7 @@ const ApplicationsList: React.FC = () => {
 
   return (
     <div className="hr-workspace recruitment-list-page">
-      <PageHeader
+      <PageHeader icon={<Layers3 size={26} />}
         title={t("recruitment.applications.title")}
         actions={view === "board" ? <button type="button" className="btn-secondary" disabled={result.status !== "ready" || result.refreshing} aria-busy={result.refreshing || undefined} onClick={load}><RefreshCw size={16} className={result.refreshing ? "spin" : undefined} />{t("common.actions.refresh")}</button> : undefined}
         subtitle={result.status === "ready" && result.data ? t("recruitment.applications.totalShown", { total: result.data.total, shown: rows.length }) : undefined}

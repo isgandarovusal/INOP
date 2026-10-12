@@ -22,7 +22,7 @@ test('HR pages use bounded scoped server pages and cancellable filters', async t
     await h.page.getByText('Vacancy 34',{exact:true}).waitFor();assert.equal(await h.page.locator('tbody tr').count(),1);
     assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/jobs').length,1);assert.equal(await h.page.getByRole('button',{name:'Əvvəlki',exact:true}).isDisabled(),true);
   });
-  for(const [kind,selector] of [['candidates','.hr-candidate-grid article'],['applications','tbody tr']])await t.test(`${kind} renders bounded pages without legacy arrays`,async()=>{
+  for(const [kind,selector] of [['candidates','tbody tr'],['applications','tbody tr']])await t.test(`${kind} renders bounded pages without legacy arrays`,async()=>{
     h.wire.length=0;await h.open('admin','/app/recruitment/'+kind);await h.page.getByText('Applicant 34',{exact:true}).waitFor();assert.equal(await h.page.locator(selector).count(),30);
     assert.equal(h.wire.filter(r=>r.path==='/api/'+kind).length,0);assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/'+kind).length,1);
     await h.page.getByRole('button',{name:'Növbəti',exact:true}).click();await h.page.getByText('Applicant 04',{exact:true}).waitFor();assert.equal(await h.page.locator(selector).count(),5);
