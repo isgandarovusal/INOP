@@ -23,18 +23,18 @@ test('Shared brand/login: real asset sizes, quiet responsive layout, accessible 
 }));
 test('Existing Audit content keeps its computed design after duplicate-declaration cleanup',async t=>{
  const src=await fs.readFile(path.join(__dirname,'hrNavigationPerformance.test.cjs'),'utf8');
- const previous={};for(const n of['components','recruitment','hr-workspace','layout','admin'])previous[n+'.css']=execFileSync('git',['show','406ac4f:Frontend/src/Styles/'+n+'.css'],{encoding:'utf8'});
+ const latest={};const previous={};for(const n of['components','recruitment','hr-workspace','layout','admin']){previous[n+'.css']=execFileSync('git',['show','406ac4f:Frontend/src/Styles/'+n+'.css'],{encoding:'utf8'});latest[n+'.css']=await fs.readFile(path.join(__dirname,'../src/Styles',n+'.css'),'utf8');}
  await withBrowserFixture(src.match(/const harness=`([\s\S]*?)`;/)[1],async h=>{
   for(const width of[320,1280])for(const url of['/app/audit/audits','/app/audit/restaurants','/app/audit/standard','/app/audit/restaurants/new'])await t.test(url+' '+width,async()=>{
    await h.page.setViewportSize({width,height:900});await h.open('admin',url);await h.page.locator('main.admin-main').waitFor();await h.page.waitForLoadState('networkidle');
-   const value=await h.page.evaluate(previous=>{
+   const value=await h.page.evaluate(({previous,latest})=>{
     const stop=document.createElement('style');stop.textContent='*{animation:none!important;transition:none!important}';document.head.append(stop);
     const read=()=>Array.from(document.querySelectorAll('main.admin-main :is(h1,h2,h3,p,button,input,select,table,th,td,form)')).slice(0,160).map(e=>{const s=getComputedStyle(e);return[e.tagName,...['color','backgroundColor','backgroundImage','fontSize','fontWeight','padding','margin','border','borderRadius','display','width','height'].map(k=>s[k])]});
-    const current=read(),originals=[];
-    for(const e of document.querySelectorAll('style[data-vite-dev-id]')){const name=e.getAttribute('data-vite-dev-id').split('/').at(-1);if(previous[name]){originals.push([e,e.textContent]);e.textContent=previous[name];}}
-    const old=read();for(const[e,text]of originals)e.textContent=text;stop.remove();return{current,old};
-   },previous);
-   assert.ok(value.current.length>0);assert.deepEqual(value.current,value.old);
+    const current=read(),originals=[];let replacements=0;
+    for(const e of document.querySelectorAll('style[data-vite-dev-id]')){const text=e.textContent;for(const name of Object.keys(previous))if(e.textContent.includes(latest[name].trim())){e.textContent=e.textContent.replace(latest[name].trim(),previous[name].trim());replacements++;}if(e.textContent!==text)originals.push([e,text]);}
+    const old=read();for(const[e,text]of originals)e.textContent=text;stop.remove();return{current,old,replacements};
+   },{previous,latest});
+   assert.ok(value.current.length>0);assert.ok(value.replacements>=5,'Every selected stylesheet must actually be replaced, including bundled @imports');assert.deepEqual(value.current,value.old);
   });
   await t.test('One visible desktop HR navigation; mobile shortcuts and inert closed drawer retain keyboard operation',async()=>{
    await h.page.setViewportSize({width:1280,height:900});await h.open('admin','/app/recruitment/jobs');await h.page.locator('.admin-table-container').waitFor();

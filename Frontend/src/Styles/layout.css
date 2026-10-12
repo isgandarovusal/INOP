@@ -453,7 +453,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 10px 24px;
+  justify-content: center;
+  margin: 0 8px 20px;
+  min-width: 0;
   color: #343b46;
   font-size: 21px;
   font-weight: 760;
@@ -587,10 +589,12 @@
 /* One language control for the shell and login; replaces legacy variants. */
 .language-switcher { width: fit-content; display: flex; align-items: center; gap: 2px; padding: 3px; margin: 0 8px 20px; border: 1px solid #e0e5ec; border-radius: 9px; background: #f6f8fa; }
 .language-switcher button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 7px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #556378; font-size: 11px; font-weight: 550; cursor: pointer; box-shadow: none; }
+.admin-sidebar > .language-switcher { width: auto; align-self: stretch; min-width: 0; }
+.admin-sidebar > .language-switcher button { flex: 1; min-width: 0; padding-inline: 6px; }
 .language-switcher button[aria-pressed=true] { background: #fff; border-color: #d6dde7; color: #253b61; }
 .language-switcher button:hover { background: #edf1f5; }
 .language-switcher button:focus-visible { outline: 2px solid #253b61; outline-offset: 2px; }
 .language-switcher img { display: block; object-fit: cover; border-radius: 2px; }
 .inop-logo { display: block; height: auto; max-width: 100%; object-fit: contain; }
-.admin-sidebar__brand .inop-logo { width: 160px; border-radius: 8px; }
+.admin-sidebar__brand .inop-logo { width: 144px; border-radius: 8px; }
 .admin-topbar__brand .inop-logo { width: 112px; border-radius: 6px; }
