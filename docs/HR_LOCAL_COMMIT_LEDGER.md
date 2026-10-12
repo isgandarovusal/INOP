@@ -2077,3 +2077,112 @@ A	docs/qa/hr21/states-geometry.json
 ```
 
 Normalmainpush and remote exactSHA verified. Final documentation confirmation commit follows; runtime93017e7 unchanged, deploymentsUNVERIFIED.
+
+
+## Phase22 A–E enterprise design packages
+
+### 66d84410a1564430ba28492104dca5d2e59311e0
+
+style(hr): establish reference-led semantic controls and palette
+
+```text
+M	Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/variables.css
+A	Frontend/tests/hrEnterpriseDesign.test.cjs
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/qa/hr22/A/before-job-create-1440.jpg
+A	docs/qa/hr22/A/controls-1440.jpg
+A	docs/qa/hr22/A/controls-390.jpg
+A	docs/qa/hr22/A/controls-768.jpg
+A	docs/qa/hr22/A/styles.json
+```
+
+### 6de4a7f160a054bbae570cce066c6a39c7b98aab
+
+style(hr): balance compact branding and dark active navigation
+
+```text
+M	Frontend/src/Components/INOPLogo.tsx
+M	Frontend/src/Layouts/AppShell/Sidebar.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/qa/hr22/B/before-sidebar-1440.jpg
+A	docs/qa/hr22/B/controls-1440.jpg
+A	docs/qa/hr22/B/controls-390.jpg
+A	docs/qa/hr22/B/controls-768.jpg
+```
+
+### 7703069df6fb17efb6c71d2bd8fe19b1e470c24d
+
+style(hr): unify recruitment tables and remove legacy table decorations
+
+```text
+M	Frontend/src/Components/PageHeader.tsx
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/recruitment.css
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	Frontend/tests/hrPaginationUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/qa/hr22/C/applications-empty-390.jpg
+A	docs/qa/hr22/C/applications-filled.jpg
+A	docs/qa/hr22/C/before-applications-1440.jpg
+A	docs/qa/hr22/C/before-candidates-1440.jpg
+A	docs/qa/hr22/C/candidates-empty-390.jpg
+A	docs/qa/hr22/C/candidates-filled.jpg
+A	docs/qa/hr22/C/candidates-table.jpg
+```
+
+### ed437a3e35af065068cc45205a7430a7d55e9e48
+
+style(hr): align professional forms and compact workflow actions
+
+```text
+M	Frontend/src/Pages/Recruitment/Applications/ApplicationDetail.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx
+M	Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobDetail.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx
+M	Frontend/src/Pages/Recruitment/Jobs/JobsList.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/qa/hr22/D/application-detail-1440.jpg
+A	docs/qa/hr22/D/before-application-detail-1440.jpg
+A	docs/qa/hr22/D/before-candidate-create-1440.jpg
+A	docs/qa/hr22/D/before-candidate-detail-1440.jpg
+A	docs/qa/hr22/D/before-candidate-edit-1440.jpg
+A	docs/qa/hr22/D/before-job-edit-1440.jpg
+A	docs/qa/hr22/D/candidate-create-1440.jpg
+A	docs/qa/hr22/D/candidate-detail-1440.jpg
+A	docs/qa/hr22/D/candidate-edit-1440.jpg
+A	docs/qa/hr22/D/job-create-390.jpg
+A	docs/qa/hr22/D/job-edit-1440.jpg
+A	docs/qa/hr22/D/job-edit.jpg
+```
+
+### ccdd4e1dce8acc0337c4e4dc5c0e58c0b6e27aa6
+
+style(hr): distinguish real analytics metrics and human-reviewed AI actions
+
+```text
+M	Frontend/src/Components/CvProcessingPanel.tsx
+M	Frontend/src/Components/CvReviewAssistant.tsx
+M	Frontend/src/Components/HRHistogram.tsx
+M	Frontend/src/Components/JobSkillsAssistant.tsx
+M	Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/tests/hrEnterpriseDesign.test.cjs
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/qa/hr22/E/ai-configuration-required.jpg
+A	docs/qa/hr22/E/analytics-filled.jpg
+A	docs/qa/hr22/E/analytics-operations.jpg
+A	docs/qa/hr22/E/analytics-zero-390.jpg
+A	docs/qa/hr22/E/before-analytics-1440.jpg
+A	docs/qa/hr22/E/cv-ai-unconfigured-az.jpg
+A	docs/qa/hr22/E/cv-one-processing-review.jpg
+```

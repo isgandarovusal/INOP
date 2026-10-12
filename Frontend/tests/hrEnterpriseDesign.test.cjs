@@ -19,5 +19,12 @@ test('Reference-led enterprise controls in actual production shell '+stage,async
   const action=h.page.locator('[data-ai-action=job-skills]');assert.equal(await action.count(),1);const colors=await action.evaluate(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));assert.equal(colors.background,'rgb(104, 66, 204)');assert.ok(contrast(colors.background,colors.color)>=4.5);
   await action.click();await h.page.locator('[data-job-skills-assistant] [role=alert]').waitFor();assert.equal(await h.page.locator('[data-ai-proposal]').count(),0);assert.ok(h.wire.some(r=>r.method==='POST'&&r.status===503));
   await h.page.evaluate(()=>window.scrollTo(0,0));await h.page.screenshot({path:path.join(dir,'ai-configuration-required.jpg'),fullPage:true,type:'jpeg',quality:70});
+ });
+ if(stage==='F')await t.test('Production archive modal is accessible and neutral cancel preserves the profile',async()=>{
+  const Candidate=require('../../Backend/models/candidate.model');const candidate=await Candidate.create({name:'Synthetic modal applicant',role:'Cashier',createdBy:h.actors.admin._id,departmentId:'dep_hr'});
+  for(const width of [1440,390]){await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/candidates/'+candidate._id);await h.page.getByRole('button',{name:'Arxivlə',exact:true}).click();await h.page.getByRole('dialog').waitFor();assert.equal(await h.page.locator('.hr-dialog').evaluate(e=>getComputedStyle(e).position),'fixed','Dialog backdrop must overlay viewport, not become a profile card');assert.equal(await h.page.evaluate(()=>!!document.elementFromPoint(10,10)?.closest('.hr-dialog')),true,'Backdrop must intercept the sidebar/topbar, not sit underneath it');
+   const neutral=await h.page.locator('.hr-dialog .btn-cancel').evaluate(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));assert.equal(neutral.background,'rgb(255, 255, 255)');assert.ok(contrast(neutral.background,neutral.color)>=4.5);
+   await h.page.evaluate(()=>window.scrollTo(0,0));await h.page.screenshot({path:path.join(dir,'archive-modal-'+width+'.jpg'),fullPage:false,type:'jpeg',quality:70});await h.page.keyboard.press('Escape');assert.equal(await h.page.getByRole('dialog').count(),0);assert.equal((await Candidate.findById(candidate._id).lean()).archivedAt,null);
+  }
  });await fs.writeFile(path.join(dir,'styles.json'),JSON.stringify(records,null,2));assert.deepEqual(h.pageErrors,[]);
 }));

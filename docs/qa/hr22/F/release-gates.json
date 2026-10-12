@@ -1,0 +1,19 @@
+{
+  "package": "hr22verified",
+  "typescript": "PASS",
+  "build": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 9
+  },
+  "smoke": 13,
+  "authorization": 632,
+  "isolation": {
+    "database": "inop_smokehr22verified_1791814979804_ff274dbe4b81",
+    "host": "127.0.0.1",
+    "productionTouched": false,
+    "smokeSource": "/workspace/inop-cloud/smoke.cjs",
+    "checksPassed": 13,
+    "removedOnlyOwnedTemporaryDatabase": true
+  }
+}

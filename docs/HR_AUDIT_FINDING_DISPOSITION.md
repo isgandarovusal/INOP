@@ -226,3 +226,12 @@ All original131 and159current findings retained:151TESTED locally/7BLOCKED_EXTER
 | AUD-164 |21 |Application detail header links crowd and Save stretches beside textarea | TESTED |Existing PageHeader actions/fullspanfieldset/separatefooter; current63tests and desktop/tablet/mobile photos; no permission changes. |
 
 All original131 retained. Current164 dispositions:156TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051). Counts retain existing historical dispositions, not hosted certification. P21 checklist and HR_LIVE_REFINEMENT_REPORT document78screenshots, source-bound tests, corrected infrastructure failures and bounded measurements. Hosted UI/deploymentUNVERIFIED; realCV activationNO-GO.
+
+
+##22 — Reference-led design and modal visual regression
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-165 |22F | Legacy Candidate direct-div styles turn archive modal into an in-flow card; generic backdrop also sits below sidebar | TESTED | 17source selectors exclude .hr-dialog withzero-specificity :where; canonicalHRdialogz100>sidebar60. Final actualproduction1440/390 viewport images, fixedposition andsidebar/topbar hit-test interception/Escape/record preservation regression pass. No portal/API/policy change. |
+
+Original131 retained;165current dispositions157TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD051). A–F style acceptance and limited n2performance proof documented in HR_ENTERPRISE_DESIGN_REPORT.md. No real provider/storage/scanner/hosting readiness inferred; realCVactivationNO-GO.

@@ -44,7 +44,6 @@ const getCandidateStatusBadgeVariant = (
       return "success";
     case "rejected":
       return "danger";
-    case "new":
     default:
       return "neutral";
   }
