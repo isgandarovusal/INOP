@@ -191,3 +191,14 @@ All original131 findings are preserved. Current146 dispositions:138 TESTED local
 | AUD-153 |18G |Inactive /me403 retains prior frontend identity/token | TESTED |Owned baseline backend403/old ready/token present; same-token auth401/403 expires, transient500 preserves valid session, resource403 unchanged.6targets/full current authority tests. |
 
 Current153findings:145TESTED locally/7BLOCKED_EXTERNAL/1OPEN (lawful retention). All original findings retained; measured cold Application increase and unknown live5–6s cause are explicit limitations in [HR_SYSTEMATIC_REFINEMENT_REPORT](HR_SYSTEMATIC_REFINEMENT_REPORT.md), not silently declared solved or provider/hosting PASS.
+
+
+##19 — Focused analytics and limited branding
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-154 |19A |First KPI paint waits for Candidate/history aggregate and all score validation | TESTED |Exact scoped summary/scores/intent operations;50k owned first KPI median3869.3→923.1ms, real App/AuthProvider production9/9before+9/9after.60Backend/16current analytic UI, held-secondary/authority/fallback regression, all gates. Actual live cause/deploy unverified. |
+| AUD-155 |19B |Fixed language row overflows sidebar with classic scrollbar gutter | TESTED |Baseline244client/257scroll→244/244, no overflow mask;144px centered unchanged-byte logo,3widths/3languages.30visual/Audit then15final targets and all gates. |
+| AUD-156 |19B |Audit style test misses four @import CSS sources bundled into App.css | TESTED |Actual style IDs and strict5source replacement requirement;4Audit screens×2widths computed content properties unchanged against406ac4f. Historical partial comparison explicitly corrected; no Audit source/function change. |
+
+Current156findings:148TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051 lawful retention). All original131 retained. Current116responsive/workspace+16analytics+30visual/Audit targets and60Backend/gates are focused evidence, not a claimed new full576/1877 suite or hosted PASS. Scores and operations remain separate finite heavy work,0data improvement is not claimed, and realCV/providers/storage/scanner/external activation stays NO-GO. See [focused release report](HR_ANALYTICS_FOCUSED_RELEASE_REPORT.md).

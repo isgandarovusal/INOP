@@ -1706,3 +1706,38 @@ fix(auth): expire rejected inactive sessions safely
 - `M Frontend/src/Services/authService.ts`
 - `M Frontend/tests/authFocusCoalescing.test.cjs`
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+##19 — Focused analytics and limited branding
+
+### 55d22c83b5e65b94ac8437154f842f41142df188
+
+perf(hr): separate analytics summary from expensive detail work
+
+Analytics60Backend/16final UI, hr19arelease gates; real App/session production9before+9after, no hosted proof.
+
+10 changed paths:
+
+- `M Backend/controllers/hrAnalytics.controller.js`
+- `M Backend/routes/route.js`
+- `A Backend/tests/hrAnalyticsViews.test.cjs`
+- `A Frontend/scripts/profileHRAnalytics.cjs`
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/src/Services/hrAnalyticsService.ts`
+- `M Frontend/tests/hrAnalyticsUI.test.cjs`
+- `M Frontend/tests/hrDailyWorkspace.test.cjs`
+- `M Frontend/tests/hrPremiumWorkspace.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 0a7fe62be477f4aedebc2d9ce3ecd51d8b338590
+
+style(hr): refine sidebar branding and navy login contrast
+
+Visual30combined/15final, final116workspace, hr19b gates;8strict actual Audit CSS comparisons; exact remote main parity.
+
+5 changed paths:
+
+- `M Frontend/src/Styles/auth.css`
+- `M Frontend/src/Styles/layout.css`
+- `A Frontend/tests/hrAnalyticsBrandRefinement.test.cjs`
+- `M Frontend/tests/hrUnifiedBrand.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
