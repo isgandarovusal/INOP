@@ -177,3 +177,17 @@ All prior findings and external/legal limits remain unchanged. No real storage/s
 | AUD-146 |17E |Jobs/Application/board caption displays zero before the scoped total is known | TESTED |Actual held-page baseline fails on all three routes. Ready+data caption distinguishes unknown/loading/server-error from verified zero;4 target cases plus105 responsive/dense/lifecycle checks and all gates. |
 
 All original131 findings are preserved. Current146 dispositions:138 TESTED locally,7 BLOCKED_EXTERNAL,1 OPEN (AUD-051 lawful retention). Unreachable hosted deployment and external operational checks remain unverified regardless of successful local tests or Git push. Complete source-bound regression and honest cold/intent/renderer comparisons are in [the phase-17 report](HR_PREMIUM_REFINEMENT_REPORT.md).
+
+##18 — Systematic auth, bundle and actual AI configuration
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-147 |18A |Pending focus/visibility pair restarts the same session read | TESTED |Actual2→1 physical /me reads; subsequent settled/current-token/current-grant reads remain fresh, no settled auth cache. Final576frontend/1877backend and all package gates. |
+| AUD-148 |18B |Table eagerly loads drag-and-drop runtime | TESTED |Actual table0 Kanban loads; board parallel code/query, one scopedGET. Apps100569→about13KB; unused86KB board excluded.6compressed HTTP/30Auth-inclusive final cases; cold speedup is mixed and not claimed universal. |
+| AUD-149 |18C |Legacy login effects and duplicated language markup/CSS add code and inconsistency | TESTED |81 identical declarations/30 obsolete rules removed; route-owned35-rule login, shared accessible language/brand controls.107targets incl. four Audit screens/two-width computed style equality and final full suite. |
+| AUD-150 |18C |Duplicated desktop HR navigation and focusable offscreen mobile drawer | TESTED |One visible desktop primary nav; mobile shortcuts/inert closed drawer/expanded/Escape remain. Actual keyboard/prefetch/current permission/mobile matrix and full576. |
+| AUD-151 |18D |AI prerequisites/setup are unexplained until a failed call | TESTED |Read-only secret-free current server-authorized metadata; explicit job context/CV consent/unchecked/incomplete/configured-unverified/auxiliary failure states, no eager API/provider call.98backend/56frontend targets; real provider stays blocked. |
+| AUD-152 |18F |Held public board code can load indefinitely after primary data succeeds | TESTED |Forced owned15.5s baseline API200/loading/no retry;15s timeout, late-code suppression and full-document reload preserving board URL,16targets/full suite. Not claimed to cause the observed live5–6s. |
+| AUD-153 |18G |Inactive /me403 retains prior frontend identity/token | TESTED |Owned baseline backend403/old ready/token present; same-token auth401/403 expires, transient500 preserves valid session, resource403 unchanged.6targets/full current authority tests. |
+
+Current153findings:145TESTED locally/7BLOCKED_EXTERNAL/1OPEN (lawful retention). All original findings retained; measured cold Application increase and unknown live5–6s cause are explicit limitations in [HR_SYSTEMATIC_REFINEMENT_REPORT](HR_SYSTEMATIC_REFINEMENT_REPORT.md), not silently declared solved or provider/hosting PASS.

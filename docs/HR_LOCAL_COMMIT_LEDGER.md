@@ -1590,3 +1590,119 @@ fix(hr): distinguish unresolved list totals from zero
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
 
 Every source package passed its targeted tests and TSapp/node, production build, lint0errors/9existingwarnings, smoke13 and authorization632 gates. Source packages introduce no backend/env/model/permission/seed/migration/provider activation changes. Final source-bound full regression/measurement and exact existing-main remote proof are recorded in HR_PREMIUM_REFINEMENT_REPORT.md and the final execution response; a report-only commit cannot truthfully record its own future SHA.
+
+##18 — Systematic auth, bundle, cleanup, AI setup and capacity refinement
+
+### eecc311ff58ef9f2d8fe165f21aa84e196ef0610
+
+perf(auth): coalesce paired pending session refreshes
+
+5targets; TS/build/lint0/9/smoke13/auth632
+
+4 changed paths:
+
+- `A Frontend/scripts/profileHRSession.cjs`
+- `M Frontend/src/Context/AuthContextProvider.tsx`
+- `A Frontend/tests/authFocusCoalescing.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 406ac4f6cff0cb7275b0469c3a87bb85ee238b72
+
+perf(hr): load Kanban runtime only for board workflows
+
+50targets; all gates
+
+3 changed paths:
+
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx`
+- `A Frontend/tests/hrBoardCode.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 93bc13fe0628489e9078943eebf2a1ce82a85b9c
+
+refactor(ui): unify INOP branding and remove duplicate shell styles
+
+107targets incl. actual Audit style equality; all gates
+
+18 changed paths:
+
+- `M Frontend/scripts/profileHRTransitions.cjs`
+- `M Frontend/src/App.css`
+- `A Frontend/src/Components/INOPLogo.tsx`
+- `A Frontend/src/Components/LanguageSwitcher.tsx`
+- `M Frontend/src/Layouts/AppShell/Sidebar.tsx`
+- `M Frontend/src/Pages/Auth/Login/Login.tsx`
+- `M Frontend/src/Styles/admin.css`
+- `M Frontend/src/Styles/auth.css`
+- `M Frontend/src/Styles/components.css`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/Styles/layout.css`
+- `M Frontend/src/Styles/recruitment.css`
+- `A Frontend/src/assets/brand/inop-320.webp`
+- `A Frontend/src/assets/brand/inop-640.webp`
+- `M Frontend/tests/hrNavigationPerformance.test.cjs`
+- `A Frontend/tests/hrUnifiedBrand.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `A docs/INOP_BRAND_ASSETS.md`
+
+### 36a465846bdd2d76587a33bc4b93b763c53e12e3
+
+feat(hr): expose honest AI configuration and action prerequisites
+
+98backend/56frontend; all gates, real provider unverified
+
+15 changed paths:
+
+- `M Backend/controllers/hrAi.controller.js`
+- `M Backend/routes/route.js`
+- `A Backend/tests/hrAiStatus.test.cjs`
+- `A Frontend/src/Components/AIAvailability.tsx`
+- `M Frontend/src/Components/CvProcessingPanel.tsx`
+- `M Frontend/src/Components/CvReviewAssistant.tsx`
+- `M Frontend/src/Components/JobSkillsAssistant.tsx`
+- `M Frontend/src/Pages/Recruitment/Jobs/JobForm.tsx`
+- `M Frontend/src/Services/hrAiService.ts`
+- `M Frontend/src/i18n/locales/az.json`
+- `M Frontend/src/i18n/locales/en.json`
+- `M Frontend/src/i18n/locales/ru.json`
+- `A Frontend/tests/hrAiAvailability.test.cjs`
+- `A docs/HR_AI_ACTIONS_AND_CONFIGURATION.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### e661eceab1ce50d0981589aa6d9b614de052303d
+
+test(hr): verify hundred-branch scopes and native startup performance
+
+11targets and all gates
+
+5 changed paths:
+
+- `A Backend/tests/hrHundredBranches.test.cjs`
+- `M Backend/tests/hrNativeReleaseGate.test.cjs`
+- `M Frontend/scripts/profileHRSession.cjs`
+- `M Frontend/scripts/profileHRWorkspace.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### 353042a83191a2b43ebe47b1b7988973a83164f0
+
+fix(hr): bound stalled Kanban code loading and recovery
+
+16targets/late reply/reload; all gates
+
+3 changed paths:
+
+- `M Frontend/src/Pages/Recruitment/Applications/ApplicationsList.tsx`
+- `M Frontend/tests/hrBoardCode.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+### db6b560315ff4ad2a9aa150de0f1c0f0a0fa3195
+
+fix(auth): expire rejected inactive sessions safely
+
+6targets/current permissions/transient500; all gates
+
+3 changed paths:
+
+- `M Frontend/src/Services/authService.ts`
+- `M Frontend/tests/authFocusCoalescing.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`

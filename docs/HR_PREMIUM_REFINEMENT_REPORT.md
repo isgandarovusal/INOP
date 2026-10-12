@@ -1,5 +1,7 @@
 # HR premium refinement — phase 17
 
+Latest follow-up: [phase18 systematic performance/auth, cleanup, branding, actual AI setup and capacity evidence](HR_SYSTEMATIC_REFINEMENT_REPORT.md). Phase17 history below is retained.
+
 This report continues [the phase-16 report](HR_PREMIUM_WORKSPACE_REPORT.md). Hosted loading completes after a few seconds according to the user; it is not diagnosed as a hang. The objective is usable daily workflows and measured navigation speed, with restrained surfaces, genuine data and current server authorization.
 
 ## Product changes
