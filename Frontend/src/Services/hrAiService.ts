@@ -1,4 +1,18 @@
 import API from "../api/axios";
+import { readJson } from "../api/readRequest";
+
+export interface AIStatus {
+  version: "hr-ai-status-v1"; provider: "openai" | null;
+  state: "not_configured" | "configuration_required" | "configured_not_verified";
+  realE2EVerified: false; cvReviewApproved: boolean;
+}
+export async function getAIStatus(signal: AbortSignal, scopeKey: string): Promise<AIStatus> {
+  const value = await readJson<AIStatus>("/hr/ai/status", { signal, scopeKey, suppressErrorToast: true });
+  if (value?.version !== "hr-ai-status-v1" || ![null, "openai"].includes(value.provider) ||
+      !["not_configured", "configuration_required", "configured_not_verified"].includes(value.state) ||
+      value.realE2EVerified !== false || typeof value.cvReviewApproved !== "boolean") throw new Error("Invalid AI status metadata");
+  return value;
+}
 
 export interface JobSkillsContext {
   title: string; description: string; brandId: string | null; branchId: string | null;

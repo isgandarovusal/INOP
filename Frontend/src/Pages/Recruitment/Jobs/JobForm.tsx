@@ -1,3 +1,4 @@
+import AIAvailability from "../../../Components/AIAvailability";
 import JobSkillsAssistant from "../../../Components/JobSkillsAssistant";
 import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFields";
 import { useMounted } from "../../../Hooks/useMounted";
@@ -175,6 +176,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
           />
         </div>
 
+        <div className="form-group form-group--full"><AIAvailability /></div>
         <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
         <div className="form-actions recruitment-form-actions">
           <button

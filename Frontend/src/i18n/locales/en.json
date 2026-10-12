@@ -1008,9 +1008,10 @@
     "navigation": "HR navigation",
     "cohort": "Calculation and data visibility",
     "updated": "Last updated"
-},
+  },
   "hrStates": {
-    "timeout": "The request timed out. Please retry.",    "slow": "This is taking longer than expected. You can retry.",
+    "timeout": "The request timed out. Please retry.",
+    "slow": "This is taking longer than expected. You can retry.",
     "cvRequired": "Choose a CV for this vacancy workflow.",
     "cvForJob": "Create candidate from CV for this vacancy",
     "loading": "Loading HR data…",
@@ -1321,7 +1322,17 @@
     "invalid": "AI response failed validation; skills were not changed.",
     "context": "Check vacancy context and the selected branch.",
     "limited": "AI request limit or budget reached. You can continue manually.",
-    "changed": "Permission, vacancy or branch changed. Reload and review."
+    "changed": "Permission, vacancy or branch changed. Reload and review.",
+    "setupUnknown": "AI connection has not been checked. You can enter skills manually.",
+    "setupError": "AI configuration could not be checked. Retry; manual entry remains available.",
+    "checkSetup": "Check AI configuration",
+    "contextRequired": "Enter the vacancy title and responsibilities to request recommendations.",
+    "cvApprovalRequired": "External AI processing of CV facts has not been approved. Continue local HR review.",
+    "setupState": {
+      "not_configured": "No AI provider is connected. An administrator must configure the provider, model and cost limits. Manual entry is available.",
+      "configuration_required": "AI configuration is incomplete. An administrator must check model, credentials and budget settings.",
+      "configured_not_verified": "The provider is configured; its live connection is not verified. Recommendations require HR review."
+    }
   },
   "hrCvAi": {
     "label": "Professional CV AI review",
@@ -1475,7 +1486,6 @@
     "view": "View source",
     "retryProcessing": "Retry processing",
     "retryUncertain": "Retry outcome is unconfirmed. Repeat the same command safely; do not reupload the CV.",
-
     "queue": "Private CV source queue",
     "queueNotice": "Unassigned sources are separate from vacancy funnels. Counts use current Candidate/source scope and current linked parent access.",
     "allStates": "All states",
@@ -1543,9 +1553,9 @@
     "historyLimit": "Latest 50 actions shown. Full history is retained."
   },
   "hrJobArchive": {
-  "active": "Active vacancies",
-  "visibility": "Vacancy visibility",
-  "confirm": "Archive {{name}}? Applications and history will be retained.",
-  "readOnly": "This vacancy is archived and does not accept new applications. An authorized HR/Admin must restore it before editing."
-}
+    "active": "Active vacancies",
+    "visibility": "Vacancy visibility",
+    "confirm": "Archive {{name}}? Applications and history will be retained.",
+    "readOnly": "This vacancy is archived and does not accept new applications. An authorized HR/Admin must restore it before editing."
+  }
 }

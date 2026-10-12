@@ -8,6 +8,17 @@ const { verifyToken, getRolePermissions } = require('../middleware/auth.middlewa
 const identity = req => JSON.stringify([req.user.id, req.user.role, req.user.departmentId, req.authRole.permissions]);
 const jobQuery = (req, id) => Job.findOne({ $and: [{ _id: id, archivedAt: null }, resourceFilter(req, 'recruitment', 'read'), resourceFilter(req, 'recruitment', 'update')] }).select('title description brandId branchId location experienceYears requiredSkills preferredSkills updatedAt').maxTimeMS(1000).lean();
 const fail = (code, message, status) => Object.assign(new Error(message), { code, status });
+// Read-only configuration metadata. No credential/model diagnostics, provider
+// request, budget reservation or processing activation is performed here.
+exports.status = (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
+  if (Object.keys(req.query).length) return res.status(400).json({ code: 'AI_INVALID_CONTEXT', message: 'No configuration input is accepted.' });
+  const health = ai.health();
+  const states = ['not_configured', 'configuration_required', 'configured_not_verified'];
+  return res.json({ version: 'hr-ai-status-v1', provider: health.provider === 'openai' ? 'openai' : null,
+    state: states.includes(health.state) ? health.state : 'configuration_required', realE2EVerified: false,
+    cvReviewApproved: process.env.HR_AI_CV_REVIEW_APPROVED === 'true' });
+};
 exports.suggest = async (req, res) => {
   res.set('Cache-Control', 'private, no-store');
   const controller = new AbortController();

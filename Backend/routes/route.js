@@ -5,7 +5,7 @@ const departmentRoutes = require("./department.routes");
 const activityLogRoutes = require("./activityLog.routes");
 const rolesRoutes = require("./roles.routes");
 const { verifyToken, requirePermission } = require('../middleware/auth.middleware');
-const { authorize } = require("../middleware/authorization.middleware");
+const { authorize, authorizeAny } = require("../middleware/authorization.middleware");
 const { cvUpload } = require("../middleware/cvUpload.middleware");
 const { cvParseUpload } = require("../middleware/cvParse.middleware");
 const cvController = require("../controllers/cv.controller");
@@ -104,6 +104,7 @@ const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller
 const applicationWorkflow = require('../controllers/applicationWorkflow.controller');
 const hrPaged = require('../controllers/hrPaged.controller');
 const hrAi = require('../controllers/hrAi.controller');
+router.get('/hr/ai/status', ...authorizeAny(['recruitment.create', 'recruitment.update', 'candidate.create', 'candidate.update']), hrAi.status);
 router.post('/hr/ai/job-skills', ...authorize('recruitment', 'create'), hrAi.suggest);
 router.post('/jobs/:id/ai-skills', ...authorize('recruitment', 'update'), requirePermission('recruitment', 'read'), hrAi.suggest);
 router.post('/candidates/:id/ai-review', ...authorize('candidate', 'update'), requirePermission('candidate', 'read'), require('../controllers/hrAiCvReview.controller').get);

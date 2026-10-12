@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { isAxiosError, isCancel } from "axios";
 import { useTranslation } from "react-i18next";
 import { suggestCvReview, type CvFactProposal, type CvReviewProposal } from "../Services/hrAiService";
+import AIAvailability from './AIAvailability';
 
 export default function CvReviewAssistant({ id, hash, revision, onApprove, onAccessDenied }: {
   id: string; hash: string; revision: number; onApprove: (rows: CvFactProposal[]) => void;
@@ -31,6 +32,7 @@ export default function CvReviewAssistant({ id, hash, revision, onApprove, onAcc
   return <section data-cv-ai-assistant aria-label={t("hrCvAi.label")} aria-busy={pending}>
     <p>{t("hrCvAi.scope")}</p>
     <button type="button" className="btn-secondary" disabled={pending} onClick={() => void generate()}>{t("hrCvAi.generate")}</button>
+    <AIAvailability cv />
     {pending && <p role="status">{t("hrAi.processing")}</p>}
     {error && <p role="alert">{t(error)}</p>}
     {proposal && <div data-cv-ai-proposal>

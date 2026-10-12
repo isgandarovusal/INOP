@@ -1032,9 +1032,10 @@
     "navigation": "HR naviqasiyası",
     "cohort": "Hesablama və görünən məlumatlar",
     "updated": "Son yenilənmə"
-},
+  },
   "hrStates": {
-    "timeout": "Sorğunun vaxtı bitdi. Yenidən cəhd edin.",    "slow": "Sorğu gözləniləndən uzun çəkir. Yenidən cəhd edə bilərsiniz.",
+    "timeout": "Sorğunun vaxtı bitdi. Yenidən cəhd edin.",
+    "slow": "Sorğu gözləniləndən uzun çəkir. Yenidən cəhd edə bilərsiniz.",
     "cvRequired": "Bu vakansiya axını üçün CV seçin.",
     "cvForJob": "Vakansiya üçün CV-dən namizəd yarat",
     "loading": "HR məlumatları yüklənir…",
@@ -1345,7 +1346,17 @@
     "invalid": "AI cavabı yoxlamadan keçmədi; bacarıqlar dəyişdirilmədi.",
     "context": "Vakansiya kontekstini və seçilmiş filialı yoxlayın.",
     "limited": "AI sorğu limiti və ya büdcəsi bitib. Əl ilə davam edə bilərsiniz.",
-    "changed": "İcazə, vakansiya və ya filial dəyişib. Məlumatı yenidən açıb yoxlayın."
+    "changed": "İcazə, vakansiya və ya filial dəyişib. Məlumatı yenidən açıb yoxlayın.",
+    "setupUnknown": "AI bağlantısı yoxlanılmayıb. Bacarıqları əl ilə daxil edə bilərsiniz.",
+    "setupError": "AI konfiqurasiyası yoxlanıla bilmədi. Yenidən yoxlayın; əl ilə işləmək mümkündür.",
+    "checkSetup": "AI konfiqurasiyasını yoxla",
+    "contextRequired": "Tövsiyə üçün vakansiyanın adını və öhdəliklərini daxil edin.",
+    "cvApprovalRequired": "CV faktlarının xarici AI ilə işlənməsi təsdiqlənməyib. Lokal HR yoxlamasını davam etdirin.",
+    "setupState": {
+      "not_configured": "AI provider qoşulmayıb. Administrator provider, model və xərc limitlərini konfiqurasiya etməlidir. Əl ilə işləmək mümkündür.",
+      "configuration_required": "AI konfiqurasiyası natamamdır. Administrator model, credential və büdcə parametrlərini yoxlamalıdır.",
+      "configured_not_verified": "Provider konfiqurasiya olunub, real bağlantı hələ təsdiqlənməyib. Tövsiyələr HR yoxlaması tələb edir."
+    }
   },
   "hrCvAi": {
     "label": "Professional CV üçün AI review",
@@ -1499,7 +1510,6 @@
     "view": "Mənbəyə bax",
     "retryProcessing": "Emalı yenidən başlat",
     "retryUncertain": "Yenidən başlatma nəticəsi təsdiqlənmədi. Eyni əmri təhlükəsiz təkrar edin; CV-ni yenidən yükləməyin.",
-
     "queue": "Private CV mənbə növbəsi",
     "queueNotice": "Vakansiyaya bağlanmamış mənbələr funnel-dan ayrıdır. Saylar cari namizəd/mənbə scope-u və bağlı qeydə giriş əsasında hesablanır.",
     "allStates": "Bütün vəziyyətlər",
@@ -1567,9 +1577,9 @@
     "historyLimit": "Son 50 əməliyyat göstərilir. Tam tarixçə saxlanılır."
   },
   "hrJobArchive": {
-  "active": "Aktiv vakansiyalar",
-  "visibility": "Vakansiya siyahısı",
-  "confirm": "{{name}} arxivlənsin? Müraciətlər və tarixçə qorunacaq.",
-  "readOnly": "Bu vakansiya arxivdədir. Yeni müraciət qəbul etmir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir."
-}
+    "active": "Aktiv vakansiyalar",
+    "visibility": "Vakansiya siyahısı",
+    "confirm": "{{name}} arxivlənsin? Müraciətlər və tarixçə qorunacaq.",
+    "readOnly": "Bu vakansiya arxivdədir. Yeni müraciət qəbul etmir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir."
+  }
 }

@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom';
+import AIAvailability from './AIAvailability';
 import {useEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {isAxiosError} from 'axios';
@@ -39,6 +40,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
  function retryable(job:CvProcessingJob){return job.currentSource&&job.state==='blocked'&&['SOURCE_MISSING','STORAGE_NOT_CONFIGURED',...(job.kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:job.kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)&&job.attempts>=1&&job.attempts<3&&job.manualRetries<2&&job.source.sha256===candidate.cvOriginal?.sha256&&job.source.revision===candidate.revision;}
  if(!hasPermission(user,'candidate','read'))return null;
  return <section data-cv-processing><h3>{t('hrProcessing.title')}</h3><p>{t(kind==='ocr'?'hrProcessing.ocrNotice':kind==='ai-review'?'hrProcessing.aiNotice':'hrProcessing.notice')}</p>
+  {open && kind === 'ai-review' && <AIAvailability cv />}
   {!open?<button type="button" onClick={()=>{setOpen(true);void run('list');}}>{t('hrProcessing.show')}</button>:<>
    <label>{t('hrProcessing.profile')}<select data-processing-kind value={kind} disabled={busy} onChange={e=>{const value=e.target.value==='ocr'?'ocr':e.target.value==='ai-review'?'ai-review':'parse';setKind(value);setSelected(null);setJobs([]);void run('list',undefined,value);}}><option value="parse">{t('hrProcessing.parseProfile')}</option><option value="ocr">{t('hrProcessing.ocrProfile')}</option><option value="ai-review">{t('hrProcessing.aiProfile')}</option></select></label>
    <button type="button" disabled={busy} onClick={()=>void run('list')}>{t('hrProcessing.refresh')}</button>

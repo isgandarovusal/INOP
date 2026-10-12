@@ -38,6 +38,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
   }
   return <section aria-label={t("hrAi.label")} aria-busy={pending} className="form-group form-group--full" data-job-skills-assistant>
     <p>{t("hrAi.notice")}</p>
+    {(!context.title.trim() || !context.description.trim()) && <p>{t('hrAi.contextRequired')}</p>}
     <button type="button" className="recruitment-ai-action" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
       {pending ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}{t("hrAi.generate")}
     </button>
