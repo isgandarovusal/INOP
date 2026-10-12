@@ -47,20 +47,25 @@ const ApplicationsList: React.FC = () => {
   const canUpdate = hasPermission(user, "application", "update");
   const canDelete = hasPermission(user, "application", "delete");
   const canManage = canDelete;
-  const [boardCode, setBoardCode] = useState<{ component?: typeof import("../../../Components/ApplicationKanban").default; error?: boolean }>({});
+  const [boardCode, setBoardCode] = useState<{ component?: typeof import("../../../Components/ApplicationKanban").default; error?: "error" | "timeout" }>({});
 
   const [params, setParams] = useSearchParams();
   const view = params.get('view') === 'board' ? 'board' : 'table';
   useEffect(() => {
     if (view !== "board" || !hasPermission(user, "application", "read") || boardCode.component || boardCode.error) return;
     let current = true;
+    const deadline = window.setTimeout(() => {
+      current = false;
+      setBoardCode({ error: "timeout" });
+    }, 15000);
     // Start public board code alongside its scoped data request. A table never
     // downloads the drag-and-drop runtime. A failed module requires a fresh
     // document rather than repeatedly retrying a poisoned browser module map.
     void import("../../../Components/ApplicationKanban").then(module => {
+      window.clearTimeout(deadline);
       if (current) setBoardCode({ component: module.default });
-    }).catch(() => { if (current) setBoardCode({ error: true }); });
-    return () => { current = false; };
+    }).catch(() => { window.clearTimeout(deadline); if (current) setBoardCode({ error: "error" }); });
+    return () => { current = false; window.clearTimeout(deadline); };
   }, [view, user, boardCode.component, boardCode.error]);
   const ApplicationKanban = boardCode.component;
   const setView = (value: 'table' | 'board') => setParams(previous => {
@@ -211,7 +216,7 @@ const ApplicationsList: React.FC = () => {
       </div>
 
       <p role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error ? "error" : "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
         <table>
           <thead>
             <tr>
