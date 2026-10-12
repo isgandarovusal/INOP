@@ -22,3 +22,15 @@ test('Real session coalesces only a pending opposite focus/visibility pair, neve
  }finally{release();await h.page.unroute('**/api/auth/me');}
  assert.deepEqual(h.pageErrors,[]);
 }));
+test('Rejected inactive /me session clears stale identity; transient /me failures preserve it',async()=>withBrowserFixture(harness,async h=>{
+ await h.open('own','/probe');await h.page.locator('[data-session-ready=true]').waitFor();
+ const pattern='**/api/auth/me';await h.page.route(pattern,r=>r.fulfill({status:500,contentType:'application/json',body:JSON.stringify({message:'Synthetic transient session failure'})}));
+ const failure=h.page.waitForResponse(r=>new URL(r.url()).pathname==='/api/auth/me'&&r.status()===500);
+ await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await failure;await h.page.waitForTimeout(50);
+ assert.equal(await h.page.locator('[data-session-ready=true]').count(),1);assert.equal(await h.page.evaluate(()=>Boolean(localStorage.getItem('inop_auth_token'))),true);
+ await h.page.unroute(pattern);await h.models.User.updateOne({_id:h.actors.own._id},{isActive:false});
+ const rejected=h.page.waitForResponse(r=>new URL(r.url()).pathname==='/api/auth/me'&&r.status()===403);
+ await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await rejected;
+ await h.page.waitForFunction(()=>document.querySelector('[data-session-ready=false]')?.textContent==='[]');
+ assert.equal(await h.page.evaluate(()=>localStorage.getItem('inop_auth_token')),null);assert.deepEqual(h.pageErrors,[]);
+}));

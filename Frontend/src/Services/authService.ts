@@ -66,8 +66,12 @@ export async function getCurrentUser(signal?: AbortSignal, scopeKey?: string): P
     const response = await readJson<MeResponse>("/auth/me", { signal, scopeKey });
     return response.user;
   } catch (error: unknown) {
-    if (isAxiosError(error) && error.response?.status === 401 && getAuthToken() === token) {
+    // /me403 is a rejected session (for example an inactive account), not a
+    // resource-level permission denial. Transient failures keep the session;
+    // an old request must never expire a newly signed-in token.
+    if (isAxiosError(error) && [401, 403].includes(error.response?.status || 0) && getAuthToken() === token) {
       clearAuthToken();
+      window.dispatchEvent(new CustomEvent("inop:auth-expired"));
     }
 
     return null;
