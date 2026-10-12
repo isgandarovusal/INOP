@@ -1741,3 +1741,71 @@ Visual30combined/15final, final116workspace, hr19b gates;8strict actual Audit CS
 - `A Frontend/tests/hrAnalyticsBrandRefinement.test.cjs`
 - `M Frontend/tests/hrUnifiedBrand.test.cjs`
 - `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `3b6489ff1f3b8fe485a1fd78047fa14133af4d2f`
+
+fix(hr): stop unsolicited analytics reloads and retain refresh KPIs
+
+5 changed paths:
+
+- `A Frontend/scripts/profileHRStability.cjs`
+- `M Frontend/src/Hooks/useAuditResource.ts`
+- `M Frontend/src/Pages/Recruitment/Analytics/HRAnalytics.tsx`
+- `M Frontend/tests/hrAnalyticsUI.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `ade69dc0dbcbc28e429549659f52ecbfc0abdbaa`
+
+refactor(hr): consolidate scoped styles and semantic action tokens
+
+8 changed paths:
+
+- `A Frontend/scripts/auditHRStyles.cjs`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateDetail.tsx`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/Styles/recruitment.css`
+- `M Frontend/src/Styles/variables.css`
+- `A Frontend/tests/hrDesignSemantics.test.cjs`
+- `A docs/HR_DESIGN_AND_ACTION_INVENTORY.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `c1bf5cd2f9c614cbd197e3c71c3736299353a626`
+
+fix(hr): align candidate fields and responsive review forms
+
+8 changed paths:
+
+- `M Frontend/src/Components/CvHistoryEditor.tsx`
+- `M Frontend/src/Components/TagInput.tsx`
+- `M Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx`
+- `M Frontend/src/Styles/components.css`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/src/Styles/recruitment.css`
+- `A Frontend/tests/hrFormGeometry.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `f5db6ffbaf221918829f863f23fdb5c2622b158c`
+
+fix(hr): preserve multiline textarea reading height
+
+4 changed paths:
+
+- `M Frontend/src/Styles/components.css`
+- `M Frontend/src/Styles/hr-workspace.css`
+- `M Frontend/tests/hrFormGeometry.test.cjs`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+
+## `ccf24e55baa35265b680ed341d079220fda027c4`
+
+feat(brand): use approved transparent INOP vector wordmark
+
+8 changed paths:
+
+- `M Frontend/src/Components/INOPLogo.tsx`
+- `M Frontend/src/Styles/auth.css`
+- `M Frontend/src/Styles/layout.css`
+- `M Frontend/tests/hrUnifiedBrand.test.cjs`
+- `A Frontend/tests/hrVectorBrand.test.cjs`
+- `M docs/HR_DESIGN_AND_ACTION_INVENTORY.md`
+- `M docs/HR_IMPLEMENTATION_TRACKER.md`
+- `M docs/INOP_BRAND_ASSETS.md`

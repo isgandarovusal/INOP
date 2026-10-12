@@ -202,3 +202,14 @@ Current153findings:145TESTED locally/7BLOCKED_EXTERNAL/1OPEN (lawful retention).
 | AUD-156 |19B |Audit style test misses four @import CSS sources bundled into App.css | TESTED |Actual style IDs and strict5source replacement requirement;4Audit screens×2widths computed content properties unchanged against406ac4f. Historical partial comparison explicitly corrected; no Audit source/function change. |
 
 Current156findings:148TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051 lawful retention). All original131 retained. Current116responsive/workspace+16analytics+30visual/Audit targets and60Backend/gates are focused evidence, not a claimed new full576/1877 suite or hosted PASS. Scores and operations remain separate finite heavy work,0data improvement is not claimed, and realCV/providers/storage/scanner/external activation stays NO-GO. See [focused release report](HR_ANALYTICS_FOCUSED_RELEASE_REPORT.md).
+
+
+##20 — Final analytics stability and unified HR design
+
+| ID | Package | Finding | Disposition | Evidence / remaining limit |
+|---|---|---|---|---|
+| AUD-157 |20A |Default focus/visibility analytics refresh causes redundant reads and hides existing KPIs | TESTED |Actual production App/AuthProvider threeeventcycles6extraanalytics→0, session3→3, initial3→3.17target then119final analytic/form/viewport checks incl.held explicitrefresh retains validKPI; filter/authority/failedresponse clear immediately. Actual hosted cause/deployment unverified. |
+| AUD-158 |20C |Candidate Education textarea remains inline/narrow and browser fieldset border crowds controls | TESTED |Before201px inside523px group/2pxborder;3viewport failures. Explicit associated labels/full-width fieldset grid/history grouping; final desktop521px width/border0, mobile/tablet/create-edit/save and119final tests pass. |
+| AUD-159 |20C2 |Shared :is control specificity overrides textarea multiline reading height | TESTED |New assertion fails all3widths at65.375px. Canonical input/select height split and textarea.input minimum112px;5final geometry targets within119pass. Earlier width-only coverage limitation retained. |
+
+All original131 and159current findings retained:151TESTED locally/7BLOCKED_EXTERNAL/1OPEN(AUD-051 lawfulretention). Final sourceccf24e5 has236Backend/170Frontend workflows/private/download/119responsive+analytic tests,632existing security and13owned smoke checks. Approval review's initial transparent SVG rejection was resolved by fresh explicit user confirmation; original bitmaps retained,5vector and30existing brand/login/Audit tests pass. No actual external storage/scanner/provider/recovery/Graph/site or hosted deployment PASS is inferred. See HR_FINAL_STABILITY_REPORT for source-bound measurements and remaining operational gates.
