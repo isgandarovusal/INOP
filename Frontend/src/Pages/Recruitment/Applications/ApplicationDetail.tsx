@@ -23,7 +23,7 @@ function History({ app, reload }: { app: Application; reload: () => void }) {
   const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(e.after.status || '').toLowerCase() === app.status) : undefined;
   return <section><h3>{t('hrWorkflow.history')}</h3>
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
-      <ol>{result.data?.items.map(e => <li key={e.id}><time>{e.at}</time> · {t(`hrWorkflow.event.${e.type}`)} · {t('hrWorkflow.actor')}: {e.actor}
+      {result.data?.items.length === 0 && <p>{t("hrWorkflow.historyEmpty")}</p>}<ol>{result.data?.items.map(e => <li key={e.id}><time>{e.at}</time> · {t(`hrWorkflow.event.${e.type}`)} · {t('hrWorkflow.actor')}: {e.actor}
         <p>{e.before?.status ? t(`recruitment.applications.${String(e.before.status).toLowerCase()}`) : ''}{e.after.status ? ` → ${t(`recruitment.applications.${String(e.after.status).toLowerCase()}`)}` : ''} {e.reason}</p>
         {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
       </li>)}</ol>
@@ -80,7 +80,7 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
       <label>{t('hrWorkflow.actionNotes')}<textarea aria-label={t('hrWorkflow.actionNotes')} maxLength={500} value={actionNotes} onChange={e => setActionNotes(e.target.value)} /></label>
       <label>{t('hrWorkflow.notes')}<textarea aria-label={t('hrWorkflow.notes')} maxLength={5000} value={notes} onChange={e => setNotes(e.target.value)} /></label>
       <label>{t('hrWorkflow.reason')}<textarea aria-label={t('hrWorkflow.reason')} maxLength={500} required={reopen || canAssign && assignee !== (app.assignedTo || '')} value={reason} onChange={e => setReason(e.target.value)} /></label>
-      <button type="submit" disabled={busy}>{t(busy ? 'common.actions.loading' : 'common.actions.save')}</button>
+      <div className="form-actions"><button className="btn-primary" type="submit" disabled={busy}>{t(busy ? 'common.actions.loading' : 'common.actions.save')}</button></div>
     </fieldset>
   </form>;
 }
@@ -90,9 +90,10 @@ export default function ApplicationDetail() {
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
   return <div className="hr-workspace hr-application-detail">
-    <PageHeader title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} />
-    <Link to="/app/recruitment/applications">{t('common.actions.back')}</Link>
-    {app.candidateId && typeof app.candidateId === 'object' && <><Link to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user, 'candidate', 'update') && <Link to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}
+    <PageHeader title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} actions={<>
+      <Link className="btn-secondary" to="/app/recruitment/applications">{t('common.actions.back')}</Link>
+      {app.candidateId && typeof app.candidateId === 'object' && <><Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user,'candidate','update')&&<Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}
+    </>} />
     <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
     <MatchScoreBadge application={app} onUpdated={resource.reload} />
     {hasPermission(user, 'application', 'update') && <WorkflowForm key={context.key + ':' + app.revision} app={app} reload={resource.reload} />}

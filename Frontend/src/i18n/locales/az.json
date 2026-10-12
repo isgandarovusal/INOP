@@ -1151,6 +1151,7 @@
     }
   },
   "hrWorkflow": {
+    "historyEmpty": "Bu müraciət üçün hələ tarixçə yoxdur.",
     "application": "Müraciətin idarə edilməsi",
     "history": "Müraciət tarixçəsi",
     "actor": "Əməliyyat edən",

@@ -1127,6 +1127,7 @@
     }
   },
   "hrWorkflow": {
+    "historyEmpty": "No events for this application yet.",
     "application": "Manage application",
     "history": "Application history",
     "actor": "Actor",

@@ -21,6 +21,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     });
     evidence.push({ name, ...measured });
     await h.page.screenshot({ path:path.join(dir,name+'.png'), fullPage:true });
+    if(process.env.INOP_HR_DELIVERABLES){const exported=process.env.INOP_HR_DELIVERABLES;assert.ok(path.isAbsolute(exported));await fs.mkdir(exported,{recursive:true});await h.page.screenshot({path:path.join(exported,name+'.jpg'),fullPage:true,type:'jpeg',quality:78});}
     if (!captureOnly) assert.equal(measured.overflow,false,name+' horizontal page overflow');
     return measured;
   }
@@ -77,6 +78,15 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     await h.page.setViewportSize({width:1875,height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');await capture('analytics-filled');await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await capture('analytics-operations');
   });
 
+  if(group==='allroutes'||group==='all') {
+    const application=await Application.findOne().lean();
+    for(const width of [390,768,1910])for(const [name,url,selector] of [
+      ['jobs','jobs','.admin-table-container'],['job-create','jobs/new','.job-form-page form'],['job-detail','jobs/'+jobs[0]._id,'.job-detail-page'],['job-edit','jobs/'+jobs[0]._id+'/edit','.job-form-page form'],
+      ['candidates','candidates','.hr-candidates-page'],['candidate-create','candidates/new','.candidate-fields'],['candidate-detail','candidates/'+people[0]._id,'.candidate-detail-page'],['candidate-edit','candidates/'+people[0]._id+'/edit','.candidate-fields'],
+      ['applications','applications','.admin-table-container'],['application-board','applications?view=board','.hr-application-board'],['application-detail','applications/'+application._id,'.hr-application-detail'],['analytics','analytics','[data-hr-kpi=applications] strong'],
+      ['intake-disabled','cv-intake','[data-hr-feature-disabled]'],['intake-detail-disabled','cv-intake/'+people[0]._id,'[data-hr-feature-disabled]'],
+    ])await t.test(name+' production '+width,async()=>{await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/'+url);await h.page.locator(selector).first().waitFor();await capture(name+'-route-'+width);if(name==='application-detail'){const save=h.page.getByRole('button',{name:az.common.actions.save,exact:true});assert.ok((await save.boundingBox()).height<=48,'Save action is not stretched by textarea grid row');assert.equal(await save.getAttribute('class'),'btn-primary');assert.ok(await h.page.locator('.page-header__actions').isVisible());}});
+  }
   if(enabled('ai')) await t.test('AI review has explicit real configuration failure and one source-bound workflow',async()=>{
     const crypto=require('node:crypto'),{docx}=require('../../Backend/tests/helpers/cvDocuments.cjs'),{uploadsDir}=require('../../Backend/middleware/privateUpload.middleware');
     const bytes=docx('Name: Synthetic applicant\nSkills\nFood safety\nExperience\n0 years'),filename=crypto.randomUUID()+'.docx',file=path.join(uploadsDir,filename),hash=crypto.createHash('sha256').update(bytes).digest('hex');await fs.mkdir(uploadsDir,{recursive:true});await fs.writeFile(file,bytes,{flag:'wx',mode:0o600});
