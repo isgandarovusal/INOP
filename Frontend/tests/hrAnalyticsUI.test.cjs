@@ -80,6 +80,15 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await h.page.unroute('**/api/hr/analytics/*');
     assert.ok(h.wire.filter(r=>r.path==='/api/hr/analytics').length>=1);
   });
+  await t.test('idle focus/visibility/reconnect events do not restart analytics and explicit refresh keeps current KPIs',async()=>{
+    await h.open('admin',path);await kpi('applications').waitFor();await h.page.locator('[data-hr-score-bucket="80"]').waitFor();const before=h.wire.length;
+    for(let i=0;i<3;i++){await h.page.evaluate(()=>{window.dispatchEvent(new Event('focus'));document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('online'));});await h.page.waitForTimeout(300);}
+    assert.equal(h.wire.length,before,'no unsolicited analytics refetch');
+    let release,entered;const gate=new Promise(r=>release=r),ready=new Promise(r=>entered=r);
+    await h.page.route('**/api/hr/analytics/overview',async r=>{entered();await gate;await r.continue().catch(()=>{});});
+    await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await ready;assert.equal(await kpi('applications').textContent(),'3');assert.equal(await h.page.locator('[data-hr-refreshing]').count(),1);
+    release();await h.page.unroute('**/api/hr/analytics/overview');await h.page.waitForFunction(()=>!document.querySelector('[data-hr-refreshing]'));
+  });
   await t.test('permission revocation clears old metrics immediately', async () => {
     const profile = await h.profile('admin'); profile.permissions = []; await h.page.evaluate(p => window.setTestUser(p), profile); await h.page.locator('[data-hr-state=forbidden]').waitFor(); assert.equal(await kpi('applications').count(), 0);
   });

@@ -14,15 +14,16 @@ export function auditErrorStatus(error: unknown): AuditLoadStatus {
   return "error";
 }
 
-export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>, options: { refreshOnFocus?: boolean; deadlineMs?: number } = {}) {
+export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>, options: { refreshOnFocus?: boolean; deadlineMs?: number; retainOnReload?: boolean } = {}) {
   const { user, isLoading } = useAuth();
   const [revision, setRevision] = useState(0);
   const reload = useCallback(() => setRevision(value => value + 1), []);
   const authKey = JSON.stringify([user?.id, user?.role, user?.departmentId, user?.hrAccess, user?.permissions]);
   const scope = getPermissionScope(user, resource, "read");
   const blocked: AuditLoadStatus | null = isLoading ? "loading" : !user ? "unauthenticated" : !scope || scope === "none" ? "forbidden" : !id ? "not-found" : null;
+  const contextKey = JSON.stringify([id, authKey]);
   const key = JSON.stringify([id, authKey, revision]);
-  const [result, setResult] = useState<{ key: string; status: AuditLoadStatus; data?: T }>({ key: "", status: "loading" });
+  const [result, setResult] = useState<{ key: string; contextKey: string; status: AuditLoadStatus; data?: T }>({ key: "", contextKey: "", status: "loading" });
 
   const deadlineMs = options.deadlineMs ?? (['candidate', 'application', 'recruitment'].includes(resource) ? 15000 : 0);
   useEffect(() => {
@@ -30,17 +31,17 @@ export function useAuditResource<T>(id: string | undefined, resource: string, lo
     const controller = new AbortController(); let current = true;
     const deadline = deadlineMs > 0 ? setTimeout(() => {
       current = false; controller.abort();
-      setResult({ key, status: 'timeout' });
+      setResult({ key, contextKey, status: 'timeout' });
     }, deadlineMs) : undefined;
     void load(id, controller.signal, key).then(data => {
       clearTimeout(deadline);
-      if (current) setResult({ key, status: data == null ? "not-found" : "ready", data });
+      if (current) setResult({ key, contextKey, status: data == null ? "not-found" : "ready", data });
     }).catch(error => {
       clearTimeout(deadline);
-      if (current && !controller.signal.aborted) setResult({ key, status: auditErrorStatus(error) });
+      if (current && !controller.signal.aborted) setResult({ key, contextKey, status: auditErrorStatus(error) });
     });
     return () => { current = false; clearTimeout(deadline); controller.abort(); };
-  }, [id, key, authKey, blocked, load, deadlineMs]);
+  }, [id, key, contextKey, authKey, blocked, load, deadlineMs]);
 
   useEffect(() => {
     if (options.refreshOnFocus === false) return;
@@ -62,6 +63,10 @@ export function useAuditResource<T>(id: string | undefined, resource: string, lo
 
   // Never render data belonging to a previous audit or permission context,
   // including the render before an effect's cleanup has run.
-  const status = blocked || (result.key === key ? result.status : "loading");
-  return { status, data: status === "ready" ? result.data : undefined, reload };
+  // Opt-in same-context refresh only: changed resource/filter/authority never
+  // inherits old data, including the render before effect cleanup. Audit callers
+  // keep the original default semantics. Rejected/failed responses clear data.
+  const refreshing = !blocked && options.retainOnReload === true && result.contextKey === contextKey && result.key !== key && result.status === 'ready';
+  const status = blocked || (refreshing ? 'ready' : undefined) || (result.key === key ? result.status : "loading");
+  return { status, data: status === "ready" ? result.data : undefined, reload, refreshing };
 }

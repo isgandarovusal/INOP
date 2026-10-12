@@ -13,9 +13,9 @@ export default function HRAnalyticsPage() {
   const { t, i18n } = useTranslation(); const [filters, setFilters] = useState<HRAnalyticsFilters>({});
   const [pane, setPane] = useState<'overview' | 'operations'>('overview'), tabId = useId();
   const key = JSON.stringify(filters);
-  const result = useAuditResource(key, 'application', getHRAnalyticsOverview), data = result.data;
-  const scoreResult = useAuditResource(key, 'application', getHRAnalyticsScores);
-  const operations = useAuditResource(pane === 'operations' ? key : undefined, 'application', getHRAnalyticsOperations);
+  const result = useAuditResource(key, 'application', getHRAnalyticsOverview, {refreshOnFocus: false, retainOnReload: true}), data = result.data;
+  const scoreResult = useAuditResource(key, 'application', getHRAnalyticsScores, {refreshOnFocus: false, retainOnReload: true});
+  const operations = useAuditResource(pane === 'operations' ? key : undefined, 'application', getHRAnalyticsOperations, {refreshOnFocus: false, retainOnReload: true});
   const scoreData = scoreResult.data, operationData = operations.data;
   const denied = [scoreResult.status, operations.status].find(status => status === 'forbidden' || status === 'unauthenticated');
   const restricted = scoreData?.scores?.states.restricted ?? 0;
@@ -57,7 +57,7 @@ export default function HRAnalyticsPage() {
     {denied || result.status !== 'ready' || !data ? <><HRResourceState status={denied || result.status} retry={reload} />{!denied && result.status === 'loading' && <div className="hr-analytics-kpis" aria-hidden="true">{Object.keys(kpiIcons).map(key => <article key={key}><h3>{t(`hrAnalytics.kpi.${key}`)}</h3><strong>—</strong></article>)}</div>}</> : <>
       {data.totals.applications === 0 && <p role="status" data-hr-analytics-empty>{t('hrAnalytics.empty')}</p>}
       {restricted > 0 && <p role="status">{t('hrAnalytics.partial', { count: restricted })}</p>}
-      <p className="hr-analytics-updated"><span>{t('hrWorkspace.updated')}</span> <time dateTime={data.generatedAt}>{formatter.format(new Date(data.generatedAt))}</time></p>
+      <p className="hr-analytics-updated">{result.refreshing && <span data-hr-refreshing role="status">{t('hrStates.loading')} · </span>}<span>{t('hrWorkspace.updated')}</span> <time dateTime={data.generatedAt}>{formatter.format(new Date(data.generatedAt))}</time></p>
       <div className="hr-analytics-kpis">{Object.entries(data.totals).map(([key, value]) => { const Icon = kpiIcons[key as keyof typeof kpiIcons]; return <article key={key} data-hr-kpi={key}><div className="hr-kpi-heading"><h3>{t(`hrAnalytics.kpi.${key}`)}</h3>{Icon && <Icon size={18} aria-hidden="true" />}</div><strong>{value.toLocaleString(i18n.language)}</strong></article>; })}</div>
       <div className="hr-analytics-tabs" role="tablist" aria-label={t('hrWorkspace.analyticsViews')}>
         {(['overview', 'operations'] as const).map(value => <button type="button" role="tab" key={value} id={`${tabId}-${value}`} aria-controls={`${tabId}-panel`} aria-selected={pane === value} tabIndex={pane === value ? 0 : -1} onClick={() => setPane(value)} onKeyDown={event => {
