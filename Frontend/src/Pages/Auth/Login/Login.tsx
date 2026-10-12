@@ -48,7 +48,6 @@ const Login: React.FC = () => {
       <main className="auth-shell">
         <section className="auth-brand-panel" aria-label="INOP">
           <INOPLogo />
-          <p>KFC · Pizza Hut · Simit Sarayı</p>
           <div className="auth-brand-panel__footer">RECRUITMENT · AUDIT · OPERATIONS</div>
         </section>
         <section className="auth-entry-panel">
