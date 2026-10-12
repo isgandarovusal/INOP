@@ -1336,6 +1336,7 @@
     }
   },
   "hrCvAi": {
+    "setupRequired": "Professional CV AI review requires provider configuration and company approval. Check AI configuration; you can edit facts manually.",
     "label": "Professional CV AI review",
     "scope": "Only extracted professional evidence is reviewed. Contacts, name, dates and raw CV are not sent; this is not full CV extraction or matching.",
     "generate": "Request professional CV AI proposal",

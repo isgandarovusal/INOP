@@ -7,7 +7,7 @@ test('AI configuration is explicit, on-demand and never generates output or bloc
   const status=(state='not_configured')=>({version:'hr-ai-status-v1',provider:state==='configured_not_verified'?'openai':null,state,realE2EVerified:false,cvReviewApproved:false});
   await h.open('admin','/app/recruitment/jobs/new');await h.page.locator('[data-ai-availability]').waitFor();
   assert.equal(h.wire.filter(r=>r.path==='/api/hr/ai/status').length,0);
-  assert.equal(await h.page.locator('button.recruitment-ai-action').isDisabled(),true);
+  assert.equal(await h.page.locator('[data-ai-action=job-skills]').isDisabled(),true);
   await h.page.getByText(az.hrAi.contextRequired,{exact:true}).waitFor();
   await t.test('Unconfigured provider explains setup and manual entry, never hardcoded skills',async()=>{
    await h.page.getByRole('button',{name:az.hrAi.checkSetup,exact:true}).click();

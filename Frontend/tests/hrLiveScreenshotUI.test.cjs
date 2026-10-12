@@ -76,6 +76,18 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
   if(enabled('analytics')) await t.test('S4 independent live DTOs, genuine data/filter/tab functions',async()=>{
     await h.page.setViewportSize({width:1875,height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');await capture('analytics-filled');await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await capture('analytics-operations');
   });
+
+  if(enabled('ai')) await t.test('AI review has explicit real configuration failure and one source-bound workflow',async()=>{
+    const crypto=require('node:crypto'),{docx}=require('../../Backend/tests/helpers/cvDocuments.cjs'),{uploadsDir}=require('../../Backend/middleware/privateUpload.middleware');
+    const bytes=docx('Name: Synthetic applicant\nSkills\nFood safety\nExperience\n0 years'),filename=crypto.randomUUID()+'.docx',file=path.join(uploadsDir,filename),hash=crypto.createHash('sha256').update(bytes).digest('hex');await fs.mkdir(uploadsDir,{recursive:true});await fs.writeFile(file,bytes,{flag:'wx',mode:0o600});
+    try{await Candidate.updateOne({_id:people[0]._id},{cvUrl:'/uploads/'+filename,cvOriginal:{originalName:'synthetic.docx',sha256:hash},cvReview:{version:'rules-2',provider:'rule-based',processingStatus:'extracted',fields:{skills:{source:'cv-text',evidence:['Food safety']},experience:{source:'cv-text',evidence:['0 years']}}}});
+      await h.page.setViewportSize({width:1440,height:900});await h.open('admin','/app/recruitment/candidates/'+people[0]._id+'/edit');await h.page.locator('[data-cv-ai-assistant]').waitFor();assert.equal(await h.page.locator('[data-ai-action=cv-professional-review]').count(),1);
+      await h.page.locator('[data-ai-action=configuration-status]').click();await h.page.getByText(az.hrAi.setupState.not_configured,{exact:true}).waitFor();await h.page.locator('[data-ai-action=cv-professional-review]').click();await h.page.getByRole('alert').filter({hasText:az.hrCvAi.setupRequired}).waitFor();assert.equal(await h.page.locator('[data-cv-ai-proposal]').count(),0);
+      for(const language of ['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),language);await capture('cv-ai-unconfigured-'+language);}await h.page.evaluate(()=>window.changeLanguage('az'));
+      await require('../../Backend/models/hrCvProcessingJob.model').createIndexes();const queue=require('../../Backend/services/hrCvProcessing.service'),factory=queue.createProcessing;let response;try{queue.createProcessing=options=>factory({...options,enabled:true});response=await h.request('admin','POST','/candidates/'+people[0]._id+'/processing',{kind:'parse',expectedHash:hash,expectedRevision:0});}finally{queue.createProcessing=factory;}assert.ok([201,202].includes(response.status),JSON.stringify({status:response.status,code:response.data.code}));assert.ok(response.data.id);
+      await h.open('admin','/app/recruitment/candidates/'+people[0]._id+'/edit?processingJobId='+response.data.id);await h.page.locator('[data-processing-approval-review]').waitFor();assert.equal(await h.page.locator('[data-cv-ai-assistant]').count(),0);await capture('cv-one-processing-review');
+    }finally{await fs.unlink(file);}
+  });
   await fs.writeFile(path.join(dir,'geometry.json'),JSON.stringify(evidence,null,2));
   assert.deepEqual(h.pageErrors,[]);
 }));

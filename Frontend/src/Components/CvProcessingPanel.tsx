@@ -44,7 +44,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
   {!open?<button type="button" onClick={()=>{setOpen(true);void run('list');}}>{t('hrProcessing.show')}</button>:<>
    <label>{t('hrProcessing.profile')}<select data-processing-kind value={kind} disabled={busy} onChange={e=>{const value=e.target.value==='ocr'?'ocr':e.target.value==='ai-review'?'ai-review':'parse';setKind(value);setSelected(null);setJobs([]);void run('list',undefined,value);}}><option value="parse">{t('hrProcessing.parseProfile')}</option><option value="ocr">{t('hrProcessing.ocrProfile')}</option><option value="ai-review">{t('hrProcessing.aiProfile')}</option></select></label>
    <button type="button" disabled={busy} onClick={()=>void run('list')}>{t('hrProcessing.refresh')}</button>
-   {canStart?<button type="button" disabled={busy} onClick={()=>void run('start')}>{t(kind==='ocr'?'hrProcessing.startOcr':kind==='ai-review'?'hrProcessing.startAi':'hrProcessing.start')}</button>:<p>{t(hasPermission(user,'candidate','update')?'hrProcessing.identityRequired':'hrProcessing.readOnly')}</p>}
+   {canStart?<button type="button" data-ai-action={kind==='ai-review'?'cv-professional-review':undefined} disabled={busy} onClick={()=>void run('start')}>{t(kind==='ocr'?'hrProcessing.startOcr':kind==='ai-review'?'hrProcessing.startAi':'hrProcessing.start')}</button>:<p>{t(hasPermission(user,'candidate','update')?'hrProcessing.identityRequired':'hrProcessing.readOnly')}</p>}
    {busy&&<p role="status" aria-busy="true">{t('common.actions.loading')}</p>}
    {error&&<p role="alert">{t(`hrProcessing.error.${error}`)}</p>}
    {!busy&&!error&&!jobs.length&&<p>{t('hrProcessing.empty')}</p>}

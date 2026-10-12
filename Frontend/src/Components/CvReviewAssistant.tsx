@@ -26,12 +26,12 @@ export default function CvReviewAssistant({ id, hash, revision, onApprove, onAcc
       const code = isAxiosError(e) ? e.response?.data?.code : e && typeof e === "object" && "code" in e ? e.code : undefined;
       if (code === "AI_AUTHORIZATION_CHANGED") { onAccessDenied("forbidden"); return; }
       if (status === 401 || status === 403 || status === 404 && code !== "AI_SOURCE_UNAVAILABLE") { onAccessDenied(status === 401 ? "unauthenticated" : status === 403 ? "forbidden" : "not-found"); return; }
-      setError(code === "AI_SOURCE_UNAVAILABLE" ? "hrCvAi.sourceUnavailable" : code === "AI_NO_REVIEW_CONTEXT" ? "hrCvAi.noEvidence" : code === "AI_CONTEXT_CHANGED" ? "hrAi.changed" : code === "AI_TIMEOUT" ? "hrAi.timeout" : code === "AI_INVALID_OUTPUT" ? "hrAi.invalid" : status === 429 ? "hrAi.limited" : "hrAi.unavailable");
+      setError(code === "AI_CONFIGURATION_REQUIRED" ? "hrAi.setupState.configuration_required" : code === "AI_UNAVAILABLE" ? "hrCvAi.setupRequired" : code === "AI_SOURCE_UNAVAILABLE" ? "hrCvAi.sourceUnavailable" : code === "AI_NO_REVIEW_CONTEXT" ? "hrCvAi.noEvidence" : code === "AI_CONTEXT_CHANGED" ? "hrAi.changed" : code === "AI_TIMEOUT" ? "hrAi.timeout" : code === "AI_INVALID_OUTPUT" ? "hrAi.invalid" : status === 429 ? "hrAi.limited" : "hrAi.unavailable");
     } finally { if (!controller.signal.aborted && sequence === request.current.sequence) setPending(false); }
   }
   return <section data-cv-ai-assistant aria-label={t("hrCvAi.label")} aria-busy={pending}>
     <p>{t("hrCvAi.scope")}</p>
-    <button type="button" className="btn-secondary" disabled={pending} onClick={() => void generate()}>{t("hrCvAi.generate")}</button>
+    <button type="button" className="btn-secondary" data-ai-action="cv-professional-review" disabled={pending} onClick={() => void generate()}>{t("hrCvAi.generate")}</button>
     <AIAvailability cv />
     {pending && <p role="status">{t("hrAi.processing")}</p>}
     {error && <p role="alert">{t(error)}</p>}

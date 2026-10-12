@@ -1360,6 +1360,7 @@
     }
   },
   "hrCvAi": {
+    "setupRequired": "Professional CV AI təhlili üçün provider konfiqurasiyası və şirkətin CV review təsdiqi tələb olunur. AI konfiqurasiyasını yoxlayın; faktları əl ilə redaktə edə bilərsiniz.",
     "label": "Professional CV üçün AI review",
     "scope": "Yalnız çıxarılmış professional evidence yoxlanılır. Kontaktlar, ad, tarixlər və xam CV ötürülmür; bu, tam CV extraction və ya matching deyil.",
     "generate": "Professional CV üçün AI təklifini soruş",

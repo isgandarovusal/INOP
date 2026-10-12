@@ -25,6 +25,6 @@ export default function AIAvailability({ cv = false }: { cv?: boolean }) {
   return <div data-ai-availability>
     <p role="status">{t(visible?.error ? 'hrAi.setupError' : visible?.data ? `hrAi.setupState.${visible.data.state}` : 'hrAi.setupUnknown')}</p>
     {cv && visible?.data && !visible.data.cvReviewApproved && <p>{t('hrAi.cvApprovalRequired')}</p>}
-    <button type="button" className="btn-secondary" disabled={visible?.pending} onClick={() => void check()}>{t(visible?.pending ? 'common.actions.loading' : 'hrAi.checkSetup')}</button>
+    <button type="button" className="btn-secondary" data-ai-action="configuration-status" disabled={visible?.pending} onClick={() => void check()}>{t(visible?.pending ? 'common.actions.loading' : 'hrAi.checkSetup')}</button>
   </div>;
 }

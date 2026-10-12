@@ -427,7 +427,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
             </div>
 
             <CvReviewEvidence review={review} />
-            {eligibleAiReview && id && initial?.cvOriginal?.sha256 ? <CvReviewAssistant
+            {processingJobId ? null : eligibleAiReview && id && initial?.cvOriginal?.sha256 ? <CvReviewAssistant
               key={JSON.stringify([id, initial.revision, initial.cvOriginal.sha256, sourceEpoch, role, education, experience, skills, languages, certificates])}
               id={id} hash={initial.cvOriginal.sha256} revision={initial.revision ?? 0} onAccessDenied={setAccessDenied}
               onApprove={rows => {

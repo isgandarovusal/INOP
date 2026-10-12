@@ -17,9 +17,14 @@ test('Professional CV AI review respects source, primary draft, human approval a
   });
   for(const language of ['az','en','ru'])await t.test(`${language} only PDF/DOCX are advertised`,async()=>{await open();await h.page.evaluate(l=>window.changeLanguage(l),language);assert.ok(!/\bDOC\b/.test(await h.page.locator('.candidate-cv-upload').textContent()));});
   if(process.env.INOP_CV_COPY_ONLY)return;
+  await t.test('a processing HR review has one review workflow and no parallel duplicate AI generation',async()=>{
+    await h.open('admin',`/app/recruitment/candidates/${candidate._id}/edit?processingJobId=${'1'.repeat(24)}`);await h.page.locator('input[name=name]').waitFor();await h.page.locator('[data-processing-approval-review]').waitFor();assert.equal(await h.page.locator('[data-cv-ai-assistant]').count(),0);assert.equal(await h.page.locator('[data-ai-action=cv-professional-review]').count(),0);
+    await open();assert.equal(await h.page.locator('[data-ai-action=cv-professional-review]').count(),1);
+  });
+
   await h.page.evaluate(()=>window.changeLanguage('az'));
   await t.test('real provider approval/configuration absence is explicit; manual primary fields stay editable',async()=>{
-   await generate();await h.page.getByRole('alert').filter({hasText:'AI konfiqurasiya edilməyib'}).waitFor();assert.equal(await h.page.locator('input[name=name]').isEnabled(),true);assert.equal(await h.page.locator('input[name=experience]').inputValue(),'');assert.equal(await h.page.locator('[data-cv-ai-proposal]').count(),0);
+   await generate();await h.page.getByRole('alert').filter({hasText:require('../src/i18n/locales/az.json').hrCvAi.setupRequired}).waitFor();assert.equal(await h.page.locator('input[name=name]').isEnabled(),true);assert.equal(await h.page.locator('input[name=experience]').inputValue(),'');assert.equal(await h.page.locator('[data-cv-ai-proposal]').count(),0);
   });
   await t.test('only authenticated source hash/revision leave the UI; proposals do not modify current values',async()=>{
    await reply();await generate();await h.page.locator('[data-cv-ai-proposal]').waitFor();assert.equal(last.headers().authorization,'Bearer '+h.tokens.admin);assert.deepEqual(Object.keys(last.postDataJSON()).sort(),['expectedHash','expectedRevision']);assert.equal(last.postDataJSON().expectedHash,hash);assert.equal(last.postDataJSON().expectedRevision,0);assert.equal(await h.page.locator('input[name=experience]').inputValue(),'');assert.equal(await h.page.locator('[data-cv-ai-proposal]').getByText('MOCK TEST — real AI nəticəsi deyil',{exact:true}).count(),1);assert.ok((await h.page.locator('[data-cv-ai-proposal]').textContent()).includes('Naməlum'));assert.ok((await h.page.locator('[data-cv-ai-proposal]').textContent()).includes('0%'));assert.equal(await h.page.locator('[data-cv-ai-proposal] blockquote').count(),2);
