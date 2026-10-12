@@ -1630,3 +1630,29 @@ All533 initial phase17 IDs preserved. Current404 acceptances:384TESTED/19BLOCKED
 Normal source fast-forward76503c32d7fd8c8ad8decbf39895aa19c56f82bf→997844757731b92cd093200682540fab0ff30319 succeeded; exact remote parity queried. Read-only post-push Render/Vercel panels/supplied frontend/GitHub status: CONNECT403/curl56/HTTP000 before TLS. Hosted servedSHA/health/login/HR/Audit/Execution/Bearer download outcomes remain UNVERIFIED/BLOCKED_BY_TRANSPORT; backend public URL is unknown and never guessed. No blind rollback or automatic DB/environment/provider change.
 
 **Exact continuation:** observe servedSHA/health/deployment in existing Vercel/Render, then authorized HR/Admin zero/dense filters and board/profile/archive/private download smoke; Audit department must stay denied. Keep realCV/storage/scanner/recovery/external provider activation NO-GO and lawful-retention/external IDs open/blocked until actual evidence/approved policy. No new branch/resource/secret/seed/migration/reset or old-file cleanup. This final documentation-only commit is also normal-pushed; its own exact SHA/remote parity is reported after creation rather than invented in its contents.
+
+##18 — Auth-inclusive performance, clean design and actual AI availability
+
+User reports live opening3s→5–6s after release36464b6. This is a user observation, not a measured hosted root cause: current frontend probe remains CONNECT403/HTTP000. Keep earlier measurements/history; do not reuse injected-session measurements as evidence of actual auth startup. Existing work/main36464b6 is clean, no new branch. Supplied logo is visible in the conversation; prepare a faithful derived asset and inspect it before shipping. A failed transparent extraction is not accepted as a final asset.
+
+| ID | Acceptance | Status | Evidence |
+|---|---|---|---|
+| P18-001 | Real AuthProvider-inclusive production waterfall: session/API/code/render, paired events and cold/warm distinction | OPEN | Add reproducible owned loopback measurement; hosted cause remains unverified. |
+| P18-002 | Remove reproduced duplicate auth work without settled session cache, stale grants or broken Admin/Audit workflows | TESTED | Actual held focus/visibility baseline2→1 physical /me reads. Only an opposite pending event pair within250ms/same token shares; completed reads/same-source events/changed tokens revalidate. Real role revocation/restoration and old-token Audit tests retained;5/5 targets, hr18a TS/build lint0/9 smoke13/auth632. |
+| P18-003 | Audit and safely remove duplicate CSS rather than adding product override layers | OPEN | Source307826B styles / initial built CSS222KB; exact duplicate pruning within same cascade context plus responsive/Audit equivalence required. |
+| P18-004 | Quiet, accessible login and existing shell language/navigation, preserving Audit content/layout | OPEN | Existing login renders unused ambient/grid/orbit effects and duplicates language controls. Replace in existing styles/components; no new decorative layer. |
+| P18-005 | Faithful small INOP logo assets, intrinsic sizing, no giant startup image | OPEN | Supplied conversation image; original file is not exposed in workspace. Inspect a derived asset, label provenance honestly and preserve source/reference. |
+| P18-006 | Inventory every AI action and expose real provider/prerequisite/configuration status without activation or fake output | OPEN | Job/CV assistants and source processing exist; no dedicated status endpoint currently. Use server-owned nonsecret metadata and existing gates. |
+| P18-007 | Preserve structured AI validation, HR approval, timeout/budget/provider outage and current authority | OPEN | Existing adapters and mock tests retained; real provider credentials/E2E remain blocked. |
+| P18-008 | Verify scoped pagination/integrity/filters/workflows for100 branches and high-volume applications | OPEN | Owned synthetic branch fixture, bounded DTO and scope counts, no production index/migration. |
+| P18-009 | Admin/canonical dep_hr, Audit exclusion, independent parent/private file/export regression | OPEN | Full prior tests preserved; run source-bound security regressions. |
+| P18-010 | Full frontend/backend regression, TS/build/lint/smoke, honest before/after and small local commits | OPEN | No package complete without evidence; preserve external gates and previous IDs. |
+| P18-011 | Normal existing-main push/remote parity, deployment status separate and no risky DB/provider changes | OPEN | Recheck remote before pushing, no force/new branch. |
+
+Real CV/provider/scanner/storage/recovery/SMTP/Graph/website gates remain separately BLOCKED_EXTERNAL; lawful retention remains OPEN. Do not mark real provider working through local transport tests. Logo or hosted access gaps must not block independent work.
+
+###18A — measured session event duplication
+
+| AUD-147 | AuthProvider aborts and restarts the same pending session read for a focus/visibility event pair | TESTED | Owned real AuthProvider baseline fails2vs1; final5/5 including immediately fresh completed permission reads, real Audit revocation/restoration and StrictMode/private-prefetch failure checks. hr18a TSapp/node/buildPASS lint0/9 smoke13/auth632. |
+
+New profileHRSession uses real App/AuthProvider/protected routes, one real /me plus one bounded primary GET; initial owned0/5k10/10 baseline complete at36464b6. It does not inject ready session state. It records actual public chunks/API/backend timing/DOM+two frames; hosted latency/cold start remains unavailable. Complete repeated baseline/final runs follow after bundle/style changes. Settled user/PII responses are not cached; no permission weakening/provider/DB/hosting operation. Source package commits only the session change, targeted regression, reproducible profiler and tracker.

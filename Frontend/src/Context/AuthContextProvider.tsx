@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
     const controllers = new Set<AbortController>();
+    let lastRefresh: { source: string; token: string | null; started: number; pending: boolean } | undefined;
 
     const handleAuthExpired = () => {
       requestRevision.current += 1;
@@ -34,14 +35,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener("inop:auth-expired", handleAuthExpired);
 
-    const refresh = async (initial = false) => {
+    const refresh = async (initial = false, source = "initial") => {
+      const token = getAuthToken();
+      // Focus and visibility often describe the same return to a tab. Share
+      // only that pending event pair: a completed read, changed token or a
+      // subsequent same-source event must still recheck server permissions.
+      if (lastRefresh?.pending && lastRefresh.source !== "initial" && source !== lastRefresh.source &&
+          lastRefresh.token === token && performance.now() - lastRefresh.started < 250) return;
       for (const controller of controllers) controller.abort();
       const revision = ++requestRevision.current;
-      const token = getAuthToken();
+      const refreshState = { source, token, started: performance.now(), pending: true };
+      lastRefresh = refreshState;
       const controller = new AbortController();
       controllers.add(controller);
       const currentUser = await getCurrentUser(controller.signal, JSON.stringify(["session", initial ? "initial" : revision]));
       controllers.delete(controller);
+      refreshState.pending = false;
       if (!mounted || revision !== requestRevision.current || token !== getAuthToken()) return;
       // A transient /me failure must not sign out a still-authenticated user.
       if (currentUser || !getAuthToken()) {
@@ -49,8 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
     };
-    const onFocus = () => { void refresh(); };
-    const visible = () => { if (document.visibilityState === "visible") onFocus(); };
+    const onFocus = () => { if (document.visibilityState === "visible") void refresh(false, "focus"); };
+    const visible = () => { if (document.visibilityState === "visible") void refresh(false, "visibility"); };
     void refresh(true);
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", visible);
