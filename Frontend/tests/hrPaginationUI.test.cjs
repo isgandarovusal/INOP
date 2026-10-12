@@ -58,7 +58,7 @@ test('HR pages use bounded scoped server pages and cancellable filters', async t
     try{const row=h.page.locator('tbody tr').filter({hasText:'Vacancy 34'});await row.locator('.icon-btn--danger').click();await h.page.getByRole('dialog').locator('.btn-danger-solid').click();await started;const profile=await h.profile('admin');profile.permissions=[];await h.page.evaluate(p=>window.setTestUser(p),profile);await h.page.locator('[data-hr-state=forbidden]').waitFor();release();await h.page.waitForLoadState('networkidle');assert.equal(await h.page.getByRole('dialog').count(),0);assert.equal(await h.page.getByText('Old mutation must not appear',{exact:true}).count(),0);}finally{release();await h.page.unroute(url);}
   });
   await t.test('mobile list controls wrap and accessible pagination remains available',async()=>{
-    await h.page.setViewportSize({width:390,height:844});await h.open('admin','/app/recruitment/candidates');await h.page.getByText('Applicant 34',{exact:true}).waitFor();assert.equal(await h.page.locator('[data-hr-pagination] button').count(),2);
+    await h.page.setViewportSize({width:390,height:844});await h.open('admin','/app/recruitment/candidates');await h.page.getByText('Applicant 34',{exact:true}).waitFor();assert.equal(await h.page.locator('[data-hr-pagination]').getByRole('button',{name:/^(Əvvəlki|Növbəti)$/}).count(),2);
     assert.ok(await h.page.evaluate(()=>document.querySelector('[data-hr-pagination]').getBoundingClientRect().right<=innerWidth));
   });
 

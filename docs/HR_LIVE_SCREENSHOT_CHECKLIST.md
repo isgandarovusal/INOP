@@ -1,0 +1,37 @@
+# HR final live screenshot acceptance checklist — phase21
+
+12 October2026 Asia/Baku. Start work/mainb71eee8aa48fdd5705ac58f2aa8db555073eb3c8 clean. All phase01–20 tracker IDs remain; a prior localPASS does not certify current hosted screenshots. Screenshots are requirements, not proof of current deployedSHA. No new branch, backend rewrite, DBmigration, secrets or realCV/provider activation.
+
+Supplied references: S1Applications loading/toolbar/pagination; S2sidebarSVG/languages crop; S3Candidates loading/toolbar/blank viewport; S4Analytics KPI/filter/tabs/charts; S5Job form large gaps/misaligned grid/AI/footer. Earlier references S6Candidate form overlap/education/CVreview; S7login navy/white. Each is explicitly tracked below. Real browser screenshots must be saved and inspected before visualFIXED. Hosted validation remainsUNVERIFIED until observable.
+
+| ID | Reference / independent acceptance | Local status | Hosted status | Evidence |
+|---|---|---|---|---|
+| P21-001 | S1/S3/S4 all HR lifecycle effects/auth/focus/navigation/retry/request audit and baseline reproduction | FIXED | UNVERIFIED | Production baseline5routes:Jobs/Candidates/Apps/board3focusGET+3loadingmutations,analytics0; quiet1second0all. RawRAMhr21-before/requests.json and /workspace/inop-hr21-before.log. |
+| P21-002 | List/board idle no duplicate GET or loading flicker, focus/reconnect no gratuitous data request, current session checks preserved | FIXED | UNVERIFIED | Production after5routes0extra dataGET/0loadingmutations,3currentmechecks each; retained screenshots /workspace/inop-hr21-visual/a-final-*.png inspected. |
+| P21-003 | Manualrefresh/mutation/filter/page/currentpermission changes reload correctly; stale replies isolated, no cross-scope cache | FIXED | UNVERIFIED | Heldmanualrefresh keeps actualtable/compactbusy; serverrole/departmentloss removes it.24finalproduction+pagination targets pass, navigation/board tests pass. |
+| P21-004 | Detail/private file parent/assignment authorization rechecks preserved without whole-page KPI/data disappearance | FIXED | UNVERIFIED | Currentparent/detail/history focuschecks retained, samecontextpendingretention preventsremount.20interview/CAS/notificationtests and16archive/privatecurrent tests pass; initialhistoryfocusdisable regression corrected beforecommit. |
+| P21-005 | S3 zero/data/search Candidate screen has exactly one NewCandidate primary CTA | OPEN | UNVERIFIED | Pending |
+| P21-006 | S3 compact search/archive/status/board/grid/list toolbar, active controls and no stretched boardbutton | OPEN | UNVERIFIED | Pending |
+| P21-007 | S3/S6 Candidate empty/loading/error/page/list/create/edit/CVreview responsive geometry and functions | OPEN | UNVERIFIED | Pending |
+| P21-008 | S1 Application toolbar/search/status/sort/board/filters/pages compact and coherent | OPEN | UNVERIFIED | Pending |
+| P21-009 | S1 page-only name/score sorting vs server all-result newest ordering explicit; no misleading global rank | OPEN | UNVERIFIED | Pending |
+| P21-010 | S1 scoped table/board/empty/heldrefresh/error/pagination interactions preserve workflow/CAS/history | OPEN | UNVERIFIED | Pending |
+| P21-011 | S5 Job create/edit fullwidth sections/two-column bounded grid/no oversized row gaps | OPEN | UNVERIFIED | Pending |
+| P21-012 | S5 labels/control/textarea/skills/education/certificates/location/brand/AIstatus/footer desktop/tablet/mobile | OPEN | UNVERIFIED | Pending |
+| P21-013 | S5 publish primary/save secondary/cancel neutral/archive destructive; validation/edit/AIapproval preserved | OPEN | UNVERIFIED | Pending |
+| P21-014 | S4 zero/few/dense KPI/filter/tab/chart/loading hierarchy; scores cannot block KPI | OPEN | UNVERIFIED | Pending |
+| P21-015 | S2 existing transparent SVG retained, balanced sidebar/languages/nav/active/hover/gutter/mobile | OPEN | UNVERIFIED | Pending |
+| P21-016 | S7 login removes KFC·PizzaHut·SimitSarayi completely; business brand catalog remains elsewhere | OPEN | UNVERIFIED | Pending |
+| P21-017 | Existing shared tokens/primitives only; remove duplicate/conflicting CSS, semantic neutral/success/warning/danger/focus/loading/error | OPEN | UNVERIFIED | Pending |
+| P21-018 | AI all-screen inventory/onClick/service/endpoint/provider/result; exactly one primary CTA per function | OPEN | UNVERIFIED | Pending |
+| P21-019 | AI no fabricated output; AZ/ENG/RUS configuration explanations; no unexplained disabled actions | OPEN | UNVERIFIED | Pending |
+| P21-020 | AI authorized loading/timeout/retry/error/ratelimit/currentcontext/humanapproval, no automatic reject/hire | OPEN | UNVERIFIED | Pending |
+| P21-021 | Actual AI provider E2E if already safely configured; absence/external access separately labeled, notWORKING | BLOCKED_EXTERNAL | UNVERIFIED | No real provider access verified; no secret reading/activation |
+| P21-022 | Every enabled HRroute production-build screenshots and interactions at desktop/tablet/mobile,0/few/dense/longtext | OPEN | UNVERIFIED | Pending; gated ingestion routes separately tested locally notactivated |
+| P21-023 | Current Admin/dep_hr only, Audit exclusion, independent scopes/private/export/page/sort and unchangedAudit regression | OPEN | UNVERIFIED | Pending |
+| P21-024 | Each ordered small package test/build/typecheck/lint/screenshots/localcommit; before/after request/paint evidence | OPEN | UNVERIFIED | Pending |
+| P21-025 | Normal existing-main fastforward/no force/newbranch; remoteSHA and actual deploy separately checked | OPEN | UNVERIFIED | Pending |
+
+Required sequence: P0 lifecycle → Candidates → Applications → Jobs → Analytics → Shell/login/AI inventory → final source-frozen production browser/mixedscopes/gates → normalmainpush. AI functionality is mandatory within related form/review packages; lacking external access blocks only real provider certification. No existing acceptance item is removed.
+
+No screenshot asset for the user's embedded originals is available on disk; refer to their message as S1–S7. Capture matching wide desktop layout plus320/390/768/1440 and fullform screenshots, preserve measurements/waterfalls. Do not call an unobserved hosted fix verified. Prior real scanner/storage/recovery/Graph/site/retention gates remain unchanged.

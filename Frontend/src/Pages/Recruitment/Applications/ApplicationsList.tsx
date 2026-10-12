@@ -308,7 +308,7 @@ const ApplicationsList: React.FC = () => {
         </table>
       </div>}
 
-      {view === 'table' && <HRPageControls data={table.data} page={table.page} onPage={table.setPage} disabled={table.status !== "ready"} />}
+      {view === 'table' && <HRPageControls data={table.data} page={table.page} onPage={table.setPage} onRefresh={table.reload} refreshing={table.refreshing} disabled={table.status !== "ready"} />}
       {deleteTarget && (
         <ConfirmDialog
           title={t("recruitment.applications.removeTitle")}

@@ -40,7 +40,7 @@ const CandidateDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const result = useAuditResource(id, "candidate", getCandidateById);
+  const result = useAuditResource(id, "candidate", getCandidateById, { retainOnReload: true });
   const candidate = result.data;
   const [archiveConfirm, setArchiveConfirm]=useState<string|null>(null);
   const fileContext = JSON.stringify([id, candidate?.cvUrl, candidate?.cvOriginal?.sha256, user?.id, user?.role, user?.departmentId, user?.permissions]);

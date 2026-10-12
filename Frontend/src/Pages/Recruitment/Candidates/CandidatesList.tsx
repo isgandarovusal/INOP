@@ -413,7 +413,7 @@ const CandidatesList: React.FC = () => {
           </table>
         </div>
       )}
-      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} disabled={result.status !== "ready"} />
+      <HRPageControls data={result.data} page={result.page} onPage={result.setPage} onRefresh={result.reload} refreshing={result.refreshing} disabled={result.status !== "ready"} />
     </div>
   );
 };

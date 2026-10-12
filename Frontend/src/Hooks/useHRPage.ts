@@ -14,7 +14,9 @@ export function useHRPage<T>(resource: string, filters: HRPageQuery, get: (query
   const page = position.key === key ? position.page : 1;
   const queryKey = JSON.stringify({ ...filters, page, pageSize: 30 });
   const load = useCallback((id: string, signal?: AbortSignal, scopeKey?: string) => get(JSON.parse(id) as HRPageQuery, signal, scopeKey), [get]);
-  const result = useAuditResource(options.enabled === false ? undefined : queryKey, resource, load);
+  // Current authority still comes from AuthProvider. A focus event alone must
+  // not discard a scoped page; mutations and explicit refresh call reload().
+  const result = useAuditResource(options.enabled === false ? undefined : queryKey, resource, load, { refreshOnFocus: false, retainOnReload: true });
   const setPage = useCallback((value: number) => setPosition({ key, page: Math.max(1, value) }), [key]);
   return { ...result, page, setPage };
 }

@@ -17,7 +17,7 @@ export function useHRRankingPage(jobId: string | undefined, enabled = true) {
       throw error;
     }
   }, [key]);
-  const result = useAuditResource(enabled && jobId ? query : undefined, 'application', load);
+  const result = useAuditResource(enabled && jobId ? query : undefined, 'application', load, { refreshOnFocus: false, retainOnReload: true });
   const setPage = (page: number) => {
     if (result.status !== 'ready') return;
     if (page === current.page + 1 && result.data?.nextCursor) setPosition({ key, page, cursors: [...current.cursors.slice(0, current.page), result.data.nextCursor] });

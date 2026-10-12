@@ -7,7 +7,7 @@ interface State { key: string; base?: HRBoard; lanes: Partial<Record<BoardStage,
 export function useHRBoard(filters: BoardQuery, enabled: boolean) {
   const query = JSON.stringify({ ...filters, pageSize: 10 }), context = useHRActionContext(query), key = context.key;
   const load = useCallback((value: string, signal?: AbortSignal, scopeKey?: string) => getApplicationBoard(JSON.parse(value) as BoardQuery, signal, scopeKey), []);
-  const result = useAuditResource(enabled ? query : undefined, 'application', load);
+  const result = useAuditResource(enabled ? query : undefined, 'application', load, { refreshOnFocus: false, retainOnReload: true });
   const [state, setState] = useState<State>({ key: '', lanes: {} });
   const controllers = useRef(new Map<BoardStage, AbortController>());
   useEffect(() => { const active = controllers.current; return () => { for (const c of active.values()) c.abort(); active.clear(); }; }, [key, result.data]);

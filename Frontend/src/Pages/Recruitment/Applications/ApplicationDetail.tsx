@@ -19,7 +19,7 @@ const historyLoad = (key: string, signal?: AbortSignal, scopeKey?: string) => { 
 function History({ app, reload }: { app: Application; reload: () => void }) {
   const { t } = useTranslation(); const [offset, setOffset] = useState(0);
   const id = app.id, revision = app.revision;
-  const result = useAuditResource(JSON.stringify([id, offset]), 'application', historyLoad);
+  const result = useAuditResource(JSON.stringify([id, offset]), 'application', historyLoad, { retainOnReload: true });
   const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(e.after.status || '').toLowerCase() === app.status) : undefined;
   return <section><h3>{t('hrWorkflow.history')}</h3>
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
@@ -86,7 +86,7 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
 }
 export default function ApplicationDetail() {
   const { id } = useParams(); const { t } = useTranslation(); const { user } = useAuth();
-  const resource = useAuditResource(id, 'application', getApplicationById);
+  const resource = useAuditResource(id, 'application', getApplicationById, { retainOnReload: true });
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
   return <div className="hr-workspace hr-application-detail">

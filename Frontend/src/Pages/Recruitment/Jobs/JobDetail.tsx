@@ -34,7 +34,7 @@ const JobDetail: React.FC = () => {
   const canLink = hasPermission(user, "application", "create") && hasPermission(user, "candidate", "read");
   const canReadApps = hasPermission(user, "application", "read");
 
-  const result = useAuditResource(id, "recruitment", getJobById);
+  const result = useAuditResource(id, "recruitment", getJobById, { retainOnReload: true });
   const job = result.data;
   const [candidateSearch, setCandidateSearch] = useState('');
   const search = useDebouncedSearch(candidateSearch);
