@@ -228,7 +228,7 @@ const Sidebar: React.FC = () => {
     <>
       <div className="admin-topbar">
         <div className="admin-topbar__brand">
-          <INOPLogo />
+          <INOPLogo compact />
         </div>
 
         <button
@@ -258,7 +258,7 @@ const Sidebar: React.FC = () => {
         }`}
       >
         <h2 className="admin-sidebar__brand">
-          <INOPLogo />
+          <INOPLogo compact />
         </h2>
 
         <LanguageSwitcher />

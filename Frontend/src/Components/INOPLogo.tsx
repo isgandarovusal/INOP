@@ -1,5 +1,5 @@
 /** Vector interpretation of the supplied visual reference; original assets retained. */
-export default function INOPLogo() {
+export default function INOPLogo({ compact = false }: { compact?: boolean }) {
   return <svg className="inop-logo" role="img" aria-label="INOP — Internal Operations Platform" width={320} height={128} viewBox="0 0 320 128" xmlns="http://www.w3.org/2000/svg">
     <title>INOP — Internal Operations Platform</title>
     <g fill="currentColor">
@@ -10,6 +10,6 @@ export default function INOPLogo() {
     <path d="M59 13 112 62V82L59 33Z" fill="currentColor" opacity=".72" />
     <circle cx="182" cy="47" r="29" fill="none" stroke="#6753e7" strokeWidth="16" />
     <path d="M155 36A29 29 0 0 1 192 20" fill="none" stroke="#9589f5" strokeWidth="8" />
-    <text x="7" y="111" fill="currentColor" fontFamily="Arial, sans-serif" fontSize="8.5" fontWeight="500" letterSpacing="2.2" textLength="296" lengthAdjust="spacing">INTERNAL OPERATIONS PLATFORM</text>
+    <text x="7" y="111" fill="currentColor" fontFamily="Arial, sans-serif" fontSize={compact ? 21 : 11} fontWeight="600" letterSpacing={compact ? .3 : 1.2} textLength="296" lengthAdjust="spacing">{compact ? "OPERATIONS PLATFORM" : "INTERNAL OPERATIONS PLATFORM"}</text>
   </svg>;
 }

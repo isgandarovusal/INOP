@@ -1883,9 +1883,9 @@ User supplied dashboard PNG in chat; navy/blue/purple/green/amber semantic palet
 | P22-001 | A inventory existing CSS and replace white secondary source rules, no appended override sheet | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
 | P22-002 | A namespaced navy/blue/purple/success/warning/danger tokens and semantic accessible controls | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
 | P22-003 | A focus/disabled/loading/error states and production screenshot/test/commit | FIXED | A production4/4; contrast≥4.5, neutral cancel vs blue draft/navy publish, focus/layout390/768/1440; docs/qa/hr22/A. Visual narrow-draft defect caught and corrected before commit. |
-| P22-004 | B compact readable SVG/sidebar subtitle, preserve raster assets | OPEN | Pending |
-| P22-005 | B dark active nav, languages/group/icon/scroll/mobile shell | OPEN | Pending |
-| P22-006 | B before/after1440/tablet/mobile screenshot/tests/commit | OPEN | Pending |
+| P22-004 | B compact readable SVG/sidebar subtitle, preserve raster assets | FIXED | B production/brand24PASS then finalcompactvector9PASS; darkactive contrast≥4.5, readable9pxsubtitle, originalraster kept; docs/qa/hr22/B before/after390/768/1440. Audit8computed comparisons unchanged. |
+| P22-005 | B dark active nav, languages/group/icon/scroll/mobile shell | FIXED | B production/brand24PASS then finalcompactvector9PASS; darkactive contrast≥4.5, readable9pxsubtitle, originalraster kept; docs/qa/hr22/B before/after390/768/1440. Audit8computed comparisons unchanged. |
+| P22-006 | B before/after1440/tablet/mobile screenshot/tests/commit | FIXED | B production/brand24PASS then finalcompactvector9PASS; darkactive contrast≥4.5, readable9pxsubtitle, originalraster kept; docs/qa/hr22/B before/after390/768/1440. Audit8computed comparisons unchanged. |
 | P22-007 | C coherent Candidate/Application headers/toolbars/table/status/actions/page controls | OPEN | Pending |
 | P22-008 | C single CTA/no fake KPIs, real data0/few/many and responsive interactions | OPEN | Pending |
 | P22-009 | C before/after screenshot/tests/commit | OPEN | Pending |

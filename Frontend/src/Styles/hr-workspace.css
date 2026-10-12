@@ -165,10 +165,15 @@
 .hr-workspace .hr-analytics-sections table { min-width: 0; width: 100%; table-layout: fixed; }
 .hr-workspace .hr-analytics-sections :is(th, td) { white-space: normal; overflow-wrap: anywhere; }
 .hr-workspace .hr-analytics-sections table th:first-child { width: 55%; }
-.hr-shell .admin-sidebar { background: var(--hr-white); box-shadow: none; backdrop-filter: none; }
+.hr-shell .admin-sidebar { background: var(--hr-white); box-shadow: 2px 0 12px rgb(37 59 97 / 4%); backdrop-filter: none; }
+.hr-shell .admin-main { background: var(--hr-page); }
+.hr-shell .admin-sidebar__brand { margin-bottom: 16px; }
+.hr-shell .admin-sidebar__brand .inop-logo { width: 136px; }
+.hr-shell .admin-sidebar__group-title { color: #65748c; letter-spacing: .12em; }
+.hr-shell .admin-sidebar__nav a:hover:not(.active) { background: var(--hr-blue-soft); color: var(--hr-blue-ink); }
 .hr-shell .admin-sidebar__nav a { color: var(--hr-slate); border-radius: 10px; font-weight: 550; }
-.hr-shell .admin-sidebar__nav a.active { background: #edf1f7; color: var(--hr-navy); border-color: #d7e0ed; box-shadow: none; }
-.hr-shell .admin-sidebar__nav a.active::before { background: var(--hr-navy); }
+.hr-shell .admin-sidebar__nav a.active { background: var(--hr-navy); color: var(--hr-white); border-color: var(--hr-navy); box-shadow: 0 2px 5px rgb(37 59 97 / 12%); }
+.hr-shell .admin-sidebar__nav a.active::before { display: none; }
 .hr-shell .admin-sidebar__brand::before { background: var(--hr-navy); box-shadow: none; }
 
 /* The retained legacy layer has important gradient rules. Override ONLY HR. */
@@ -218,7 +223,7 @@
 .hr-product-nav { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
 .hr-product-nav a { display: inline-flex; align-items: center; gap: 7px; padding: 8px 10px; color: var(--hr-slate); border-radius: 7px; text-decoration: none; font-size: 12px; font-weight: 550; }
 .hr-product-nav a:hover { color: #24374f; background: #edf1f5; }
-.hr-product-nav a[aria-current=page] { background: #e8edf4; color: #243b61; }
+.hr-product-nav a[aria-current=page] { background: var(--hr-navy); color: var(--hr-white); }
 .hr-product-nav a:focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 2px; }
 .hr-workspace { --border-color: var(--hr-border); --hr-surface-shadow: 0 1px 3px rgb(15 23 42 / 3%); }
 .hr-workspace .page-header { padding: 0 0 20px; margin-bottom: 4px; }
