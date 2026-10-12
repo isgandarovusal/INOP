@@ -8,11 +8,11 @@ Reusable primitives remain PageHeader, HRFilterPanel, HRHistogram, HRResourceSta
 |---|---|---|
 | Analytics |HRAnalytics.tsx brand/filter/tab/explicit refresh; compact contextual score loading |hrAnalyticsUI, actual production stability profile |
 | Jobs create/edit/detail/list |JobForm/JobDetail/JobsList; AI proposal+configuration notice, draft save, brand/branch filters, applications/ranking |hrLifecycle/hrDailyWorkspace/hrPremiumWorkspace/hrJobArchiveUI |
-| Candidate create/edit/profile/list |CandidateForm/CandidateDetail/CandidatesList; manual fields, CV replacement/review, authenticated export/download, archive/restore |cvReviewUI/hrDocumentsUI/hrArchiveUI/hrFormGeometry |
-| Applications/detail/board |ApplicationsList/ApplicationDetail/ApplicationKanban; independent status per vacancy, DnD/CAS409/order/interview scheduling, history and explicit review |applicationLifecycleUI/hrManualOrder/hrBoardWorkflow/hrBoardCode |
-| Source/CV review |SourceDocuments, SourceDocumentDetail, CvProcessingPanel, CvReviewAssistant and human-approval panels; safe file access and finite processing/recovery |cvIntakeSourceReviewUI/cvApprovalUI/hrDocumentsUI |
+| Candidate create/edit/profile/list |CandidateForm/CandidateDetail/CandidatesList; manual fields, CV replacement/review, authenticated export/download, archive/restore |cvReviewUI/privateFiles/hrCandidateArchiveUI/hrFormGeometry |
+| Applications/detail/board |ApplicationsList/ApplicationDetail/ApplicationKanban; independent status per vacancy, DnD/CAS409/order/interview scheduling, history and explicit review |applicationLifecycleUI/hrBoardUI/hrBoardCode |
+| Source/CV review |SourceDocuments, SourceDocumentDetail, CvProcessingPanel, CvReviewAssistant and human-approval panels; safe file access and finite processing/recovery |cvIntakeSourceReviewUI/hrCvApprovalUI/hrCvDocumentErrorsUI/sourceDocuments/sourceDownloadRace |
 | Dialog/filter/table/mobile |HRConfirmDialog/HRFilterPanel/shared grid; keyboard focus/trap/Escape/retry/empty states and bounds |hrDesignSemantics/hrDailyWorkspace/hrPremiumWorkspace |
-| AI actions |Existing HR_AI_ACTIONS_AND_CONFIGURATION inventory; provider/prerequisites/consent visible, on-demand metadata; no fake result |hrAiStatus/cvReviewAssistant; real E2E BLOCKED_EXTERNAL |
+| AI actions |Existing HR_AI_ACTIONS_AND_CONFIGURATION inventory; provider/prerequisites/consent visible, on-demand metadata; no fake result |hrAiAvailability/hrAiUI/hrAiCvUI; real E2E BLOCKED_EXTERNAL |
 
 UI styling is not authorization. Admin or canonical dep_hr plus each independent resource permission/scope remains required; Audit department wildcard does not grant HR. Archive retains related records, permanent deletion remains off until retention policy. RealCV/scanner/durable storage/recovery/provider/Graph/site activation remains blocked/disabled. Mock transports are not operational evidence.
 

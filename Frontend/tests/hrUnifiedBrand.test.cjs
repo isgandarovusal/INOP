@@ -5,13 +5,13 @@ const loginHarness=`import React from'react';import{createRoot}from'react-dom/cl
 test('Shared brand/login: real asset sizes, quiet responsive layout, accessible languages/password/error and submit',async t=>withBrowserFixture(loginHarness,async h=>{
  for(const width of[320,768,1440])await t.test('Login '+width,async()=>{
   await h.page.setViewportSize({width,height:900});await h.open('admin','/login');await h.page.getByLabel(az.auth.email,{exact:true}).waitFor();
-  await h.page.waitForFunction(()=>document.querySelector('.inop-logo')?.complete&&document.querySelector('.inop-logo').naturalWidth>0);
+  await h.page.waitForFunction(()=>document.querySelector('svg.inop-logo path'));
   assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   assert.equal(await h.page.locator('.auth-page').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
   assert.equal(await h.page.locator('.auth-page__ambient,.auth-orbit,.auth-page__grid-overlay').count(),0);
-  const logo=h.page.getByAltText('INOP — Internal Operations Platform');assert.equal(await logo.getAttribute('width'),'320');assert.equal(await logo.getAttribute('height'),'128');
+  const logo=h.page.getByRole('img',{name:'INOP — Internal Operations Platform',exact:true});assert.equal(await logo.getAttribute('width'),'320');assert.equal(await logo.getAttribute('height'),'128');
   for(const name of['ENG','RUS','AZE']){const b=h.page.getByRole('button',{name,exact:true});await b.click();assert.equal(await b.getAttribute('aria-pressed'),'true');}
-  const img=await logo.getAttribute('src');const result=await h.page.request.get(h.origin+img);assert.ok((await result.body()).length<12000);
+  assert.equal(await logo.evaluate(e=>e.tagName.toLowerCase()),'svg');assert.ok((await logo.evaluate(e=>e.outerHTML)).length<4096);assert.equal(await logo.locator('image,rect,foreignObject,script').count(),0);assert.equal(await logo.getAttribute('src'),null);
   await fs.mkdir('/workspace/inop-hr18-brand-visual',{recursive:true});await h.page.screenshot({path:'/workspace/inop-hr18-brand-visual/login-'+width+'.png',fullPage:true});
  });
  await t.test('Password visibility and explicit error do not lose the form; successful submit navigates',async()=>{
