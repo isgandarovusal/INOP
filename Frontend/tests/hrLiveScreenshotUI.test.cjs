@@ -30,7 +30,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     if(!captureOnly){assert.equal(await h.page.getByRole('button',{name:'Yeni Namizəd',exact:true}).count(),1);const board=h.page.getByRole('button',{name:'Application Kanban',exact:true});assert.ok((await board.boundingBox()).width<230);assert.equal(await board.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');assert.ok(measured.controls.every(c=>c.width<=width));}
   });
   if (enabled('applications')) for (const width of [390,768,1910]) await t.test('S1 empty Applications '+width, async()=>{
-    await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/applications');await h.page.getByText('Hələ müraciət yoxdur',{exact:true}).waitFor();await capture('applications-empty-'+width);
+    await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/applications');await h.page.getByText('Hələ müraciət yoxdur',{exact:true}).waitFor();await capture('applications-empty-'+width);if(!captureOnly){const hint=h.page.getByText(az.recruitment.applications.noApplicationsHint,{exact:true}),box=await hint.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Empty hint stays in viewport rather than wide hidden table');}
   });
   if (enabled('jobs')) for (const width of [390,768,1711]) await t.test('S5 complete Job create grid '+width, async()=>{
     await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/jobs/new');await h.page.locator('[data-recruitment-locations]').waitFor();await h.page.getByRole('button',{name:'Vakansiyanı dərc et',exact:true}).waitFor();const measured=await capture('job-create-'+width);

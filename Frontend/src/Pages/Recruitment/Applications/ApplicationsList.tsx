@@ -218,7 +218,7 @@ const ApplicationsList: React.FC = () => {
 
       <p className="hr-toolbar-note" role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
       {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
-        <table>
+        {rows.length === 0 ? <EmptyState icon={<ClipboardList size={28} />} title={t(filtersActive ? "recruitment.applications.noFilteredApplications" : "recruitment.applications.noApplications")} hint={t(filtersActive ? "recruitment.applications.noFilteredApplicationsHint" : "recruitment.applications.noApplicationsHint")} /> : <table>
           <thead>
             <tr>
               <th>{t("recruitment.applications.candidate")}</th>
@@ -306,7 +306,7 @@ const ApplicationsList: React.FC = () => {
               ))
             )}
           </tbody>
-        </table>
+        </table>}
       </div>}
 
       {view === 'table' && <HRPageControls data={table.data} page={table.page} onPage={table.setPage} onRefresh={table.reload} refreshing={table.refreshing} disabled={table.status !== "ready"} />}
