@@ -18,8 +18,8 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   }
   await t.test('GFC cohort shows three brands, real funnel/scores and does not render Candidate PII', async () => {
     h.wire.length = 0; await h.open('admin', path); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
-    assert.equal(await h.page.locator('[data-hr-stage=Hired] td').textContent(), '1'); assert.equal(await h.page.locator('[data-hr-score-bucket="80"]').textContent(), '80–100%: 3');
-    const tabReads=h.wire.length;await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();assert.equal(h.wire.length,tabReads);assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')); assert.equal(h.wire.filter(r => r.path === '/api/hr/analytics').length, 1);
+    await h.page.locator('[data-hr-score-bucket="80"]').waitFor();assert.equal(await h.page.locator('[data-hr-stage=Hired] td').textContent(), '1'); assert.equal(await h.page.locator('[data-hr-score-bucket="80"]').textContent(), '80–100%: 3');
+    await h.page.locator('[data-hr-score-bucket="80"]').waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/scores').length,1);assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/operations').length,0);const tabReads=h.wire.length;await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/operations').length,1);assert.equal(h.wire.length,tabReads+1);assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')); assert.equal(h.wire.filter(r => r.path === '/api/hr/analytics/overview').length, 1);
     assert.equal(h.wire.filter(r => ['/api/candidates', '/api/jobs', '/api/applications'].includes(r.path)).length, 0);
     const body = await h.page.locator('body').textContent(); assert.ok(!body.includes('Analytics_PRIVATE_PROFILE')); assert.ok(!body.includes('analytics@private.invalid'));
     assert.ok(body.includes('İnteqrasiya edilməyib')); assert.ok(body.includes('davamlı storage təsdiqlənməyib'));
@@ -43,7 +43,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     await h.page.getByRole('button', { name: 'Təmizlə', exact: true }).click(); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
   });
   await t.test('language change reuses data without new requests, and all three locale keys resolve', async () => {
-    const before = h.wire.length;
+    await h.page.locator('[data-hr-hire-time]').waitFor(); await h.page.waitForTimeout(100); const before = h.wire.length;
     for (const language of ['en', 'ru', 'az']) { await h.page.evaluate(l => window.changeLanguage(l), language); assert.ok(!((await h.page.locator('body').textContent()).includes('hrAnalytics.')));assert.doesNotMatch(await h.page.locator('time').textContent(),/M\d{2}/);assert.ok(await h.page.locator('time').getAttribute('dateTime')); }
     assert.equal(h.wire.length, before); assert.equal(await kpi('applications').textContent(), '3');
   });
@@ -51,25 +51,46 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     await h.models.Role.create({ key: 'analytics_ui_limited', name: 'Limited', permissions: ['application', 'recruitment'].map(resource => ({ resource, action: 'read', scope: 'all' })) });
     await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'analytics_ui_limited' } });
     await h.open('peer', path); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
-    await h.page.getByRole('status').filter({ hasText: 'namizəd məlumatı üçün giriş məhduddur' }).waitFor(); assert.equal(await h.page.locator('[data-hr-score=restricted]').textContent(), 'Qiymətləndirməyə giriş yoxdur: 3');
+    await h.page.getByRole('status').filter({ hasText: 'namizəd məlumatı üçün giriş məhduddur' }).waitFor(); await h.page.locator('[data-hr-score=restricted]').waitFor();assert.equal(await h.page.locator('[data-hr-score=restricted]').textContent(), 'Qiymətləndirməyə giriş yoxdur: 3');
   });
   await t.test('old filter response cannot overwrite a newer selected brand', async () => {
-    const old = (await h.request('admin', 'GET', '/hr/analytics')).data; let release, entered; const gate = new Promise(resolve => { release = resolve; }), captured = new Promise(resolve => { entered = resolve; });
-    await h.page.route('**/api/hr/analytics', async r => { entered(); await gate; await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(old) }).catch(() => {}); });
+    const old = (await h.request('admin', 'GET', '/hr/analytics/overview')).data; let release, entered; const gate = new Promise(resolve => { release = resolve; }), captured = new Promise(resolve => { entered = resolve; });
+    await h.page.route('**/api/hr/analytics/overview', async r => { entered(); await gate; await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(old) }).catch(() => {}); });
     await h.open('admin', path); await captured; await h.page.getByRole('button', { name: 'KFC', exact: true }).click(); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '1');
-    release(); await h.page.waitForTimeout(100); assert.equal(await kpi('applications').textContent(), '1'); await h.page.unroute('**/api/hr/analytics');
+    release(); await h.page.waitForTimeout(100); assert.equal(await kpi('applications').textContent(), '1'); await h.page.unroute('**/api/hr/analytics/overview');
+  });
+  await t.test('held score and failed operations do not block true KPI/funnel/source results', async () => {
+    let release; const gate=new Promise(resolve=>release=resolve);
+    await h.page.route('**/api/hr/analytics/scores',async r=>{await gate;await r.continue().catch(()=>{});});
+    await h.open('admin',path);await kpi('applications').waitFor();assert.equal(await kpi('applications').textContent(),'3');assert.equal(await h.page.locator('[data-hr-stage=Applied] td').textContent(),'1');
+    assert.equal(await h.page.locator('.hr-panel--scores [data-hr-state=loading]').count(),1);
+    await h.page.route('**/api/hr/analytics/operations',r=>r.fulfill({status:503,contentType:'application/json',body:'{"message":"Synthetic timeout"}'}));
+    await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-state=server-error]').waitFor();assert.equal(await kpi('applications').textContent(),'3');
+    await h.page.unroute('**/api/hr/analytics/operations');
+    await h.page.getByRole('button',{name:'Yenidən cəhd et',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();release();await h.page.unroute('**/api/hr/analytics/scores');
+  });
+  await t.test('secondary scope denial clears every KPI and explicit retry revalidates both reads',async()=>{
+    await h.page.route('**/api/hr/analytics/scores',r=>r.fulfill({status:403,contentType:'application/json',body:'{"message":"Scope revoked"}'}));
+    await h.open('admin',path);await h.page.locator('[data-hr-state=forbidden]').waitFor();assert.equal(await kpi('applications').count(),0);
+    await h.page.unroute('**/api/hr/analytics/scores');await h.page.getByRole('button',{name:'Yenidən cəhd et',exact:true}).click();await kpi('applications').waitFor();await h.page.locator('[data-hr-score-bucket="80"]').waitFor();assert.equal(await kpi('applications').textContent(),'3');
+  });
+  await t.test('old backend additive-route404 falls back to the authorized full contract',async()=>{
+    await h.page.route('**/api/hr/analytics/*',r=>r.fulfill({status:404,contentType:'application/json',body:'{"message":"Old backend"}'}));
+    await h.open('admin',path);await kpi('applications').waitFor();await h.page.locator('[data-hr-score-bucket="80"]').waitFor();assert.equal(await kpi('applications').textContent(),'3');
+    await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await h.page.unroute('**/api/hr/analytics/*');
+    assert.ok(h.wire.filter(r=>r.path==='/api/hr/analytics').length>=1);
   });
   await t.test('permission revocation clears old metrics immediately', async () => {
     const profile = await h.profile('admin'); profile.permissions = []; await h.page.evaluate(p => window.setTestUser(p), profile); await h.page.locator('[data-hr-state=forbidden]').waitFor(); assert.equal(await kpi('applications').count(), 0);
   });
   await t.test('500 error offers retry while filters remain accessible', async () => {
-    await h.page.route('**/api/hr/analytics', r => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Synthetic outage"}' })); await h.open('admin', path);
-    await h.page.locator('[data-hr-state=server-error]').waitFor(); assert.equal(await h.page.getByLabel('Status', { exact: true }).count(), 1); await h.page.unroute('**/api/hr/analytics');
+    await h.page.route('**/api/hr/analytics/overview', r => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Synthetic outage"}' })); await h.open('admin', path);
+    await h.page.locator('[data-hr-state=server-error]').waitFor(); assert.equal(await h.page.getByLabel('Status', { exact: true }).count(), 1); await h.page.unroute('**/api/hr/analytics/overview');
     await h.page.getByRole('button', { name: 'Yenidən cəhd et', exact: true }).click(); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
   });
   await t.test('missing required DTO fields fail as a handled contract error instead of crashing the page', async () => {
-    await h.page.route('**/api/hr/analytics', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ version: 'hr-analytics-v1', totals: { applications: 10 }, coverage: {}, funnel: [] }) }));
-    await h.open('admin', path); await h.page.locator('[data-hr-state=error]').waitFor(); assert.equal(await kpi('applications').count(), 0); await h.page.unroute('**/api/hr/analytics');
+    await h.page.route('**/api/hr/analytics/overview', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ version: 'hr-analytics-overview-v1', totals: { applications: 10 }, coverage: {}, funnel: [] }) }));
+    await h.open('admin', path); await h.page.locator('[data-hr-state=error]').waitFor(); assert.equal(await kpi('applications').count(), 0); await h.page.unroute('**/api/hr/analytics/overview');
   });
   await t.test('composite Job permission denial remains 403 with the existing bearer token', async () => {
     await h.models.Role.create({ key: 'analytics_ui_app_only', name: 'App only', permissions: [{ resource: 'application', action: 'read', scope: 'all' }] });

@@ -116,6 +116,7 @@ router.get('/hr/v2/application-board', ...authorize('application', 'read'), requ
 router.get('/hr/v2/candidates', ...authorize('candidate', 'read'), hrPaged.list('candidates'));
 router.get('/hr/v2/applications', ...authorize('application', 'read'), hrPaged.list('applications'));
 router.get('/hr/analytics', ...authorize('application', 'read'), requirePermission('recruitment', 'read'), require('../controllers/hrAnalytics.controller').get);
+for (const view of ['overview', 'scores', 'operations']) router.get('/hr/analytics/' + view, ...authorize('application', 'read'), requirePermission('recruitment', 'read'), require('../controllers/hrAnalytics.controller')[view]);
 router.patch('/applications/:id/workflow', ...authorize('application', 'update'), applicationWorkflow.update);
 router.patch('/applications/:id/assignment', ...authorize('application', 'update'), applicationWorkflow.update);
 router.get('/applications/:id/interviewers', ...authorize('application', 'read'), applicationWorkflow.interviewers);

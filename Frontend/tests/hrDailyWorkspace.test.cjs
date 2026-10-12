@@ -17,11 +17,11 @@ test('Daily HR workspace: dense long text, deliberate filters, genuine data, key
   if(name==='profile')assert.ok(!(await h.page.locator('.hr-profile-facts').innerText()).includes('Məlum deyil il'));
   await h.page.screenshot({path:`${dir}/${name}-${width}.png`,fullPage:true});
  });
- await t.test('Analytics keyboard tabs mount supporting details without refetch, retain true numbers across languages',async()=>{
+ await t.test('Analytics keyboard tabs load supporting details once, retain true numbers across languages',async()=>{
   await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi]').first().waitFor();const before=h.wire.length;
   await h.page.getByRole('tab',{name:'Ümumi baxış',exact:true}).focus();await h.page.keyboard.press('ArrowRight');await h.page.locator('[data-hr-hire-time]').waitFor();assert.equal(await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).getAttribute('aria-selected'),'true');assert.equal(await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).evaluate(el=>document.activeElement===el),true);
   await h.page.keyboard.press('Home');await h.page.locator('[data-hr-analytics-pane=overview]').waitFor();assert.equal(await h.page.locator('[data-hr-hire-time]').count(),0);
-  for(const language of['en','ru','az']){await h.page.evaluate(l=>window.changeLanguage(l),language);assert.ok(!(await h.page.locator('.hr-workspace').textContent()).includes('hrWorkspace.'));assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');}assert.equal(h.wire.length,before);
+  for(const language of['en','ru','az']){await h.page.evaluate(l=>window.changeLanguage(l),language);assert.ok(!(await h.page.locator('.hr-workspace').textContent()).includes('hrWorkspace.'));assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');}assert.equal(h.wire.length,before+1);assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/operations').length,1);
  });
  await t.test('Secondary filter is keyboard operable, preserves selected scope when closed, and does no eager lookup',async()=>{
   await h.open('admin','/app/recruitment/jobs');await h.page.locator('tbody tr').first().waitFor();const details=h.page.locator('[data-hr-filters]'),summary=details.locator('summary').first();assert.equal(await details.evaluate(el=>el.open),false);assert.equal(await h.page.getByLabel('Brend',{exact:true}).isVisible(),false);const before=h.wire.length;

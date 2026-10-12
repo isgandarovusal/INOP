@@ -43,7 +43,7 @@ function parentLookup(req, model, localField, resource, projection, extra = {}) 
   return [{ $lookup: { from: model.collection.name, localField, foreignField: '_id', as } },
     { $set: { [as]: { $map: { input: { $filter: { input: '$' + as, as: 'parent', cond: { $and: checks } } }, as: 'parent', in: safe } } } }];
 }
-function base(req, criteria, scoring = false, cohortJobs = null) {
+function base(req, criteria, scoring = false, cohortJobs = null, summary = false) {
   const jobs = scoring ? { title: 1, requiredSkills: 1, preferredSkills: 1, experienceYears: 1, requiredEducation: 1, requiredCertificates: 1, criterionWeights: 1 } : { status: 1, brandId: 1 };
   const candidates = scoring ? { role: 1, skills: 1, experience: 1, education: 1, certificates: 1, reviewedFields: 1, 'cvReview.reviewStatus': 1, 'cvReview.version': 1, employmentHistory: 1 } : { 'cvReview.version': 1, 'cvReview.reviewStatus': 1, 'cvReview.processingStatus': 1, 'cvOriginal.sha256': 1 };
   const groups = new Map();
@@ -52,9 +52,9 @@ function base(req, criteria, scoring = false, cohortJobs = null) {
   // Empty cohorts still need a valid switch expression; the match admits no rows.
   if(cohortJobs && !groups.size)jobStages.splice(0,1,{$set:{job:{brandId:null}}});
   return [{ $match: { $and: [aggregateResourceFilter(req, 'application'), criteria.apps, ...(cohortJobs ? [{jobId:{$in:cohortJobs.map(j=>j._id)}}] : [])] } },
-    { $project: scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
+    { $project: summary ? {jobId:1,status:1,'source.key':1,processingState:1} : scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
     ...jobStages,
-    ...parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }];
+    ...(summary ? [] : [...parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }])];
 }
 const number = (rows, key) => rows?.[0]?.[key] ?? 0;
 const dailyAverage = (sum, count) => count ? Math.round(sum / count / 86400000 * 100) / 100 : null;
@@ -93,7 +93,7 @@ async function scoreDistribution(req, criteria, cohortJobs = null) {
   try { let rows = []; for await (const row of cursor) { rows.push(row); if (rows.length === 1000) { await consume(rows); rows = []; } } if (rows.length) await consume(rows); } finally { await cursor.close(); }
   return { states, buckets, checked };
 }
-exports.get = async (req, res, next) => {
+function handler(mode) { return async (req, res, next) => {
   let criteria; try { criteria = filters(req.query); } catch (e) { return res.status(400).json({ message: e.message }); }
   const jobScope = resourceFilter(req, 'recruitment');
   if (jobScope._id?.$in?.length === 0) return res.status(403).json({ message: 'Scoped vacancy read permission is required.' });
@@ -106,7 +106,7 @@ exports.get = async (req, res, next) => {
     // use the existing equality-join fallback without truncating any count.
     const jobRows=await Job.find({$and:[resourceFilter(req,'recruitment'),criteria.jobs]}).select('_id brandId').limit(501).maxTimeMS(10000).lean();
     const cohortJobs=jobRows.length<=500?jobRows:null;
-    const pipeline = [...base(req, criteria, false, cohortJobs), { $set: {
+    const pipeline = [...base(req, criteria, false, cohortJobs, mode === 'overview' || mode === 'scores'), { $set: {
       sourceKey: { $cond: [{ $in: ['$source.key', SOURCES.slice(0, -1)] }, '$source.key', 'unknown'] },
       hireAt: { $arrayElemAt: [{ $map: { input: { $filter: { input: { $ifNull: ['$events', []] }, as: 'e', cond: { $and: [{ $eq: ['$$e.type', 'status'] }, { $eq: ['$$e.after.status', 'Hired'] }] } } }, as: 'e', in: '$$e.at' } }, -1] },
     } }, { $facet: {
@@ -122,13 +122,20 @@ exports.get = async (req, res, next) => {
       duplicates: [{ $match: { 'candidate.cvOriginal.sha256': { $regex: '^[a-f0-9]{64}$' } } }, { $group: { _id: { hash: '$candidate.cvOriginal.sha256', candidate: '$candidate._id' } } }, { $group: { _id: '$_id.hash', candidates: { $sum: 1 } } }, { $match: { candidates: { $gt: 1 } } }, { $group: { _id: null, groups: { $sum: 1 }, extraProfiles: { $sum: { $subtract: ['$candidates', 1] } } } }],
       deliveries: [{ $unwind: '$events' }, { $match: { 'events.delivery.state': { $in: ['pending', 'blocked', 'running', 'sent', 'failed', 'skipped'] } } }, { $group: { _id: '$events.delivery.state', count: { $sum: 1 } } }],
     } }];
+    if (mode === 'overview' || mode === 'scores') {
+      const facet = pipeline.at(-1).$facet;
+      for (const key of Object.keys(facet)) if (!(mode === 'scores' ? ['totals'] : ['totals','funnel','sources','brands']).includes(key)) delete facet[key];
+      // Summary never looks up Candidate facts or reads Application history.
+      delete facet.totals[0].$group.restrictedCandidates;
+      delete pipeline[base(req, criteria, false, cohortJobs, true).length].$set.hireAt;
+    }
     const [[metrics], scores, active, optionJobs, brands] = await Promise.all([
-      Application.aggregate(pipeline).option({ maxTimeMS: 10000 }), scoreDistribution(req, criteria, cohortJobs),
-      Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open', archivedAt: null }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
-      Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, {archivedAt:null}] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), getBrands(),
+      Application.aggregate(pipeline).option({ maxTimeMS: 10000 }), mode === 'overview' || mode === 'operations' ? null : scoreDistribution(req, criteria, cohortJobs),
+      mode === 'scores' ? [] : Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open', archivedAt: null }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
+      mode === 'scores' ? [] : Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, {archivedAt:null}] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), mode === 'scores' ? [] : getBrands(),
     ]);
     const branchIds = [...new Set(optionJobs.map(j => j.branchId).filter(Boolean).map(String))];
-    const branches = await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();
+    const branches = mode === 'scores' ? [] : await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();
     await verifyToken(req, res, () => {}); if (res.headersSent || res.destroyed) return;
     req.authRole = { permissions: await getRolePermissions(req.user.role) };
     const permits = resource => req.authRole.permissions.find(p => (p.resource === resource || p.resource === '*') && (p.action === 'read' || p.action === '*'));
@@ -140,10 +147,11 @@ exports.get = async (req, res, next) => {
       if(current.length!==initial.size||current.some(j=>!initial.has(String(j._id))||initial.get(String(j._id))!==(j.brandId??null)))return res.status(409).json({code:'ANALYTICS_CHANGED',message:'Vacancy scope changed during analytics. Refresh and retry.'});
     }
     await verifyToken(req,res,()=>{});if(res.headersSent||res.destroyed)return;req.authRole={permissions:await getRolePermissions(req.user.role)};if(authority()!==initialAuthority)return res.status(409).json({code:'ANALYTICS_CHANGED',message:'Permissions changed during analytics. Refresh and retry.'});
-    const activeByBrand = active[0].brands;
     const total = number(metrics.totals, 'applications'), candidateScope = resourceFilter(req, 'candidate');
-    res.json({ version: 'hr-analytics-v1', generatedAt: at, filters: req.query,
-      coverage: { candidateReadable: !(candidateScope._id?.$in?.length === 0), restrictedCandidateApplications: number(metrics.totals, 'restrictedCandidates'), scoreScanConsistent: scores.checked === total },
+    if (mode === 'scores') return res.json({version:'hr-analytics-scores-v1',generatedAt:at,filters:req.query,total,consistent:scores.checked===total,scores:scores.checked===total?{states:scores.states,buckets:scores.buckets}:null});
+    const activeByBrand = active[0].brands;
+    const response = { version: mode === 'overview' ? 'hr-analytics-overview-v1' : 'hr-analytics-v1', generatedAt: at, filters: req.query,
+      coverage: { candidateReadable: !(candidateScope._id?.$in?.length === 0), restrictedCandidateApplications: number(metrics.totals, 'restrictedCandidates'), scoreScanConsistent: scores?.checked === total },
       totals: { activeVacancies: number(active[0].totals, 'count'), applications: total, newApplications: metrics.funnel.find(r => r._id === 'Applied')?.count || 0, processing: number(metrics.totals, 'processing') },
       funnel: STATUSES.map(status => ({ status, count: metrics.funnel.find(r => r._id === status)?.count || 0 })),
       sources: SOURCES.map(key => ({ key, count: metrics.sources.find(r => r._id === key)?.count || 0 })),
@@ -151,15 +159,22 @@ exports.get = async (req, res, next) => {
       byBrandTruncated: new Set([...metrics.brands, ...activeByBrand].map(r => r._id)).size > 50,
       review: { pending: number(metrics.review, 'pending'), failed: number(metrics.review, 'failed'), ocrRequired: number(metrics.review, 'ocrRequired') },
       duplicateAlerts: { groups: number(metrics.duplicates, 'groups'), extraProfiles: number(metrics.duplicates, 'extraProfiles') },
-      interviews: metrics.interviews.map(r => ({ result: r._id, count: r.count })),
-      timeInStage: STATUSES.map(status => { const r = metrics.stageTimes.find(r => r._id === status); return { status, samples: r?.count || 0, averageDays: dailyAverage(r?.sumMs, r?.count) }; }),
+      interviews: (metrics.interviews || []).map(r => ({ result: r._id, count: r.count })),
+      timeInStage: STATUSES.map(status => { const r = (metrics.stageTimes || []).find(r => r._id === status); return { status, samples: r?.count || 0, averageDays: dailyAverage(r?.sumMs, r?.count) }; }),
       timeToHire: { samples: number(metrics.hireTimes, 'count'), averageDays: dailyAverage(number(metrics.hireTimes, 'sumMs'), number(metrics.hireTimes, 'count')) },
-      scores: scores.checked === total ? { states: scores.states, buckets: scores.buckets } : null,
-      deliveryQueue: metrics.deliveries.map(r => ({ state: r._id, count: r.count })),
+      scores: scores?.checked === total ? { states: scores.states, buckets: scores.buckets } : null,
+      deliveryQueue: (metrics.deliveries || []).map(r => ({ state: r._id, count: r.count })),
       integrations: { ai: require('../services/hrAiProvider.service').health().state, outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
       options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
-    });
+    };
+    if(mode==='overview') { delete response.coverage.restrictedCandidateApplications; delete response.coverage.scoreScanConsistent; }
+    if(mode==='overview') for(const key of ['review','duplicateAlerts','interviews','timeInStage','timeToHire','scores','deliveryQueue','integrations']) delete response[key];
+    res.json(response);
   } catch (e) { if (res.destroyed) return; if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }
-};
+}; }
+exports.get = handler('full');
+exports.overview = handler('overview');
+exports.scores = handler('scores');
+exports.operations = handler('operations');
 module.exports.STATUSES = STATUSES;
 module.exports.SOURCES = SOURCES;
