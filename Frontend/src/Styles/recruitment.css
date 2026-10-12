@@ -308,9 +308,6 @@
   padding: 12px;
   border: 1px solid #e2e6ee;
   border-radius: 15px;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.055), transparent 34%),
-    linear-gradient(180deg, #f9faff 0%, #f4f6fa 100%);
   box-shadow:
     0 8px 24px rgba(30, 41, 59, 0.045),
     inset 0 1px 0 rgba(255, 255, 255, 0.85);
@@ -323,16 +320,13 @@
   gap: 10px;
   min-height: 38px;
   margin-bottom: 8px;
-  padding: 0 2px 10px;
   border-bottom: 1px solid #e3e7ef;
 }
 
 .recruitment-kanban__title {
   margin: 0;
   overflow: hidden;
-  color: #343b46;
   font-size: 12px;
-  letter-spacing: 0.055em;
   line-height: 1.25;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -349,7 +343,6 @@
   padding: 0 7px;
   border: 1px solid #dce2ec;
   border-radius: 999px;
-  color: #687386;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 2px 7px rgba(30, 41, 59, 0.055);
@@ -384,9 +377,6 @@
   border: 1px solid #e1e5ed;
   border-radius: 12px;
   background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-  box-shadow:
-    0 4px 12px rgba(30, 41, 59, 0.045),
-    0 1px 2px rgba(30, 41, 59, 0.025);
   cursor: grab;
   transition:
     transform 160ms ease,
@@ -396,11 +386,7 @@
 }
 
 .recruitment-kanban__card:hover {
-  border-color: #d4daea;
   background: #ffffff;
-  box-shadow:
-    0 9px 20px rgba(30, 41, 59, 0.075),
-    0 2px 4px rgba(30, 41, 59, 0.035);
   transform: translateY(-1px);
 }
 
@@ -411,7 +397,6 @@
 .recruitment-kanban__name {
   display: block;
   overflow: hidden;
-  color: #343b46;
   font-size: 13px;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -419,7 +404,6 @@
 }
 
 .recruitment-kanban__meta {
-  color: #7a8495;
   font-size: 11px;
   font-weight: 550;
   line-height: 1.4;
@@ -478,21 +462,11 @@
 /* ── Recruitment list page surfaces ───────────────────────────── */
 
 .recruitment-list-page .filter-bar {
-  min-height: 54px;
   margin: 0 0 16px;
-  padding: 7px;
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
-  box-shadow: 0 8px 24px rgba(30, 41, 59, 0.045);
 }
 
 .recruitment-list-page .filter-bar .input-field {
   margin: 0;
-}
-
-.recruitment-list-page .admin-table-container {
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
 }
 
 .recruitment-list-page .admin-table-container table {
@@ -519,26 +493,12 @@
   height: 58px;
 }
 
-.recruitment-list-page .cell-title--clickable {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.recruitment-list-page .cell-title--clickable:hover {
-  color: var(--accent);
-}
-
 .recruitment-list-page .tag-list {
   font-size: 11px;
 }
 
 .recruitment-list-page .tag-chip {
-  border-radius: 999px;
   border-color: #dfe5ef;
-  background: #f5f7fb;
-  color: #566174;
-  font-size: 11px;
-  font-weight: 600;
 }
 
 .recruitment-list-page .admin-table-container select.input-field {
@@ -549,26 +509,13 @@
   font-size: 12px;
 }
 
-.recruitment-list-page .empty-state {
-  min-height: 180px;
-}
-
 @media (max-width: 760px) {
   .recruitment-list-page .filter-bar {
     flex-wrap: wrap;
-    padding: 8px;
   }
 
   .recruitment-list-page .filter-bar > * {
     min-width: 0;
-  }
-
-  .recruitment-list-page .filter-bar .btn-secondary {
-    margin-left: 0;
-  }
-
-  .recruitment-list-page .admin-table-container {
-    overflow-x: auto;
   }
 }
 
@@ -905,7 +852,6 @@
 /* Action hierarchy */
 
 .candidate-detail-action {
-  border-radius: 10px;
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -920,30 +866,6 @@
 .candidate-detail-action--export,
 .candidate-detail-action--back {
   border-color: rgba(148, 163, 184, 0.28);
-  background: rgba(248, 250, 252, 0.94);
-}
-
-.candidate-detail-action--export:hover:not(:disabled),
-.candidate-detail-action--back:hover:not(:disabled) {
-  border-color: rgba(99, 102, 241, 0.22);
-  background: #ffffff;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
-}
-
-.candidate-detail-action--edit {
-  box-shadow: 0 7px 18px rgba(79, 70, 229, 0.16);
-}
-
-.candidate-detail-action--delete {
-  color: #b42318;
-  border-color: rgba(180, 35, 24, 0.16);
-  background: rgba(254, 242, 242, 0.82);
-}
-
-.candidate-detail-action--delete:hover:not(:disabled) {
-  border-color: rgba(180, 35, 24, 0.28);
-  background: #fff1f1;
-  box-shadow: 0 5px 16px rgba(180, 35, 24, 0.08);
 }
 
 /* Existing information surfaces */
@@ -976,7 +898,6 @@
   color: #202633;
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.01em;
 }
 
 .candidate-detail-page > div[style] p {
@@ -1099,10 +1020,6 @@
   position: relative;
 }
 
-.recruitment-kanban__count {
-  font-weight: 700;
-}
-
 /* New — graphite/slate */
 
 .recruitment-kanban__column--new::before {
@@ -1217,24 +1134,6 @@
 
 /* Keep candidate cards calm; status belongs to the column language. */
 
-.recruitment-kanban__card {
-  border-color: rgba(148, 163, 184, 0.20);
-  box-shadow:
-    0 4px 12px rgba(15, 23, 42, 0.045),
-    0 1px 2px rgba(15, 23, 42, 0.03);
-}
-
-.recruitment-kanban__card:hover {
-  border-color: rgba(99, 102, 241, 0.22);
-  box-shadow:
-    0 9px 20px rgba(15, 23, 42, 0.075),
-    0 2px 5px rgba(15, 23, 42, 0.035);
-}
-
-.recruitment-kanban__name {
-  color: #273142;
-}
-
 /* ── Candidate Detail translation-safe visual labels ─────────────── */
 
 .candidate-detail-page > div[style] h4 {
@@ -1296,7 +1195,6 @@
 
 .candidate-detail-action--delete {
   border: 1px solid rgba(180, 35, 24, 0.17) !important;
-  background: rgba(255, 247, 247, 0.92) !important;
   box-shadow: none;
 }
 
@@ -1351,7 +1249,6 @@
 
 .recruitment-list-page {
   width: 100%;
-  max-width: 1180px;
 }
 
 /* Page header */
@@ -1366,36 +1263,11 @@
 .recruitment-list-page .filter-bar {
   display: flex;
   align-items: center;
-  min-height: 62px;
   margin-bottom: 18px;
-  padding: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 15px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.98),
-      rgba(248, 250, 252, 0.96)
-    );
 }
 
 .recruitment-list-page .filter-bar .input-field {
   height: 42px;
-  min-height: 42px;
-  border-radius: 10px;
-  border-color: rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.94);
-  color: #273142;
-  font-weight: 550;
-}
-
-.recruitment-list-page .filter-bar .input-field:hover {
-  border-color: rgba(99, 102, 241, 0.22);
-}
-
-.recruitment-list-page .filter-bar .input-field:focus {
-  border-color: rgba(79, 70, 229, 0.48);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
 }
 
 /* Clear filter action */
@@ -1405,59 +1277,12 @@
   margin-left: auto;
   padding: 0 14px;
   border-radius: 10px;
-  color: #475467;
-  border-color: rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.94);
-}
-
-.recruitment-list-page .filter-bar .btn-secondary:hover:not(:disabled) {
-  color: #3730a3;
-  border-color: rgba(99, 102, 241, 0.24);
-  background: #ffffff;
 }
 
 /* Applications table */
 
-.recruitment-list-page .admin-table-container {
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 15px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.99),
-      rgba(248, 250, 252, 0.96)
-    );
-  box-shadow:
-    0 12px 30px rgba(15, 23, 42, 0.045),
-    0 2px 8px rgba(15, 23, 42, 0.025);
-}
-
 .recruitment-list-page .admin-table-container .data-table {
   width: 100%;
-}
-
-.recruitment-list-page .admin-table-container .data-table thead th {
-  height: 48px;
-  padding: 0 16px;
-  background: rgba(248, 250, 252, 0.72);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-  letter-spacing: 0.065em;
-}
-
-.recruitment-list-page .admin-table-container .data-table tbody td {
-  height: 58px;
-  padding: 0 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.11);
-}
-
-.recruitment-list-page .admin-table-container .data-table tbody tr {
-  transition:
-    background-color 150ms ease,
-    box-shadow 150ms ease;
-}
-
-.recruitment-list-page .admin-table-container .data-table tbody tr:hover {
-  background: rgba(79, 70, 229, 0.022);
 }
 
 .recruitment-list-page .admin-table-container .data-table tbody tr:last-child td {
@@ -1466,21 +1291,11 @@
 
 /* Candidate / job emphasis */
 
-.recruitment-list-page .admin-table-container .data-table tbody td:first-child {
-  color: #273142;
-  font-weight: 650;
-}
-
 .recruitment-list-page .admin-table-container .data-table tbody td:nth-child(2) {
   color: #667085;
 }
 
 /* Score */
-
-.recruitment-list-page .admin-table-container .data-table tbody td:nth-child(3) {
-  color: #344054;
-  font-weight: 700;
-}
 
 /* Status control inside table */
 
@@ -1491,7 +1306,6 @@
   border-radius: 8px;
   border: 1px solid rgba(148, 163, 184, 0.22);
   font-size: 12px;
-  font-weight: 600;
 }
 
 .recruitment-list-page .admin-table-container .data-table tbody select:focus {
@@ -1506,39 +1320,21 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-}
-
-.recruitment-list-page .row-actions .icon-button {
-  width: 34px;
-  height: 34px;
 }
 
 /* Empty state */
 
 .recruitment-list-page .empty-state {
-  min-height: 250px;
-  padding: 48px 24px;
   border: 0;
-  background: transparent;
-}
-
-.recruitment-list-page .empty-state svg {
-  width: 38px;
-  height: 38px;
-  margin-bottom: 14px;
-  color: #a7b0c0;
 }
 
 .recruitment-list-page .empty-state h3 {
   margin: 0 0 7px;
-  font-weight: 700;
 }
 
 .recruitment-list-page .empty-state p {
   max-width: 420px;
   margin: 0 auto;
-  color: #8a94a6;
   font-size: 13px;
   line-height: 1.55;
 }
@@ -1596,14 +1392,7 @@
 .recruitment-list-page .filter-bar > .btn-secondary {
   min-width: 82px;
   height: 42px;
-  min-height: 42px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.22) !important;
-  color: #475467 !important;
   box-shadow: none !important;
-  font-size: 13px;
-  font-weight: 600;
   transition:
     color 160ms ease,
     border-color 160ms ease,
@@ -1611,11 +1400,7 @@
 }
 
 .recruitment-list-page .filter-bar > .btn-secondary:hover:not(:disabled) {
-  color: #3730a3 !important;
-  border-color: rgba(99, 102, 241, 0.24) !important;
-  background: rgba(249, 250, 255, 0.98) !important;
   box-shadow: none !important;
-  transform: none;
 }
 
 .recruitment-list-page .filter-bar > .btn-secondary:active:not(:disabled) {
@@ -1626,7 +1411,6 @@
   .recruitment-list-page .filter-bar > .btn-secondary {
     width: 100%;
     min-width: 0;
-    margin-left: 0;
   }
 }
 
@@ -1737,77 +1521,26 @@
 
 .recruitment-list-page .filter-bar {
   border-color: rgba(71, 84, 103, 0.18);
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.99),
-      rgba(246, 248, 251, 0.97)
-    );
-  box-shadow:
-    0 10px 28px rgba(15, 23, 42, 0.045),
-    0 2px 7px rgba(15, 23, 42, 0.025);
 }
 
 .recruitment-list-page .filter-bar .input-field {
-  color: #202633;
-  font-weight: 600;
   border-color: rgba(71, 84, 103, 0.22);
-  background: #ffffff;
-}
-
-.recruitment-list-page .filter-bar .input-field:hover {
-  border-color: rgba(71, 84, 103, 0.32);
-}
-
-.recruitment-list-page .filter-bar .input-field:focus {
-  border-color: rgba(79, 70, 229, 0.52);
 }
 
 /* Clear/filter reset stays secondary and business-like */
 
 .recruitment-list-page .filter-bar .btn-secondary {
-  color: #344054;
   border-color: rgba(71, 84, 103, 0.22);
-  background: #ffffff;
-  font-weight: 650;
-}
-
-.recruitment-list-page .filter-bar .btn-secondary:hover:not(:disabled) {
-  color: #202633;
-  border-color: rgba(71, 84, 103, 0.34);
-  background: #f8fafc;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
 }
 
 /* Jobs / Applications tables */
 
-.recruitment-list-page .admin-table-container {
-  border-color: rgba(71, 84, 103, 0.17);
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.99),
-      rgba(248, 250, 252, 0.97)
-    );
-}
-
 .recruitment-list-page .admin-table-container .data-table thead th {
-  color: #475467;
-  background: #f4f6f8;
   border-bottom-color: rgba(71, 84, 103, 0.16);
 }
 
 .recruitment-list-page .admin-table-container .data-table tbody td {
   border-bottom-color: rgba(71, 84, 103, 0.10);
-}
-
-.recruitment-list-page .admin-table-container .data-table tbody td:first-child {
-  color: #202633;
-  font-weight: 700;
-}
-
-.recruitment-list-page .admin-table-container .data-table tbody tr:hover {
-  background: rgba(31, 41, 55, 0.025);
 }
 
 /* Application score gets a stronger business-data treatment */
@@ -1832,35 +1565,10 @@
 
 /* Action icons */
 
-.recruitment-list-page .row-actions .icon-button {
-  color: #475467;
-  border-color: rgba(71, 84, 103, 0.16);
-}
-
-.recruitment-list-page .row-actions .icon-button:hover:not(:disabled) {
-  color: #202633;
-  border-color: rgba(79, 70, 229, 0.25);
-  background: #f8f9ff;
-}
-
 /* Kanban — stronger operational typography */
 
 .recruitment-kanban__title {
-  color: #344054;
-  font-weight: 750;
   letter-spacing: 0.035em;
-}
-
-.recruitment-kanban__count {
-  color: #344054;
-  border-color: rgba(71, 84, 103, 0.18);
-  background: #ffffff;
-  font-weight: 750;
-}
-
-.recruitment-kanban__name {
-  color: #202633;
-  font-weight: 700;
 }
 
 .recruitment-kanban__meta {
@@ -1932,40 +1640,13 @@
    JOBS + APPLICATIONS — FILTER BAR
    ================================================================ */
 
-.recruitment-list-page .filter-bar {
-  background: #202633 !important;
-  border: 1px solid #202633 !important;
-  box-shadow:
-    0 12px 28px rgba(15, 23, 42, 0.12),
-    0 2px 7px rgba(15, 23, 42, 0.08);
-}
-
-.recruitment-list-page .filter-bar .input-field {
-  border: 1px solid rgba(148, 163, 184, 0.30) !important;
-  color: #202633 !important;
-}
-
-.recruitment-list-page .filter-bar .input-field:hover {
-  border-color: rgba(99, 102, 241, 0.42) !important;
-}
-
-.recruitment-list-page .filter-bar .input-field:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14) !important;
-}
-
 /* Clear becomes a deliberate light control on the graphite bar. */
 
 .recruitment-list-page .filter-bar .btn-secondary {
-  color: #202633 !important;
-  border: 1px solid rgba(255, 255, 255, 0.50) !important;
   font-weight: 700 !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
 }
 
 .recruitment-list-page .filter-bar .btn-secondary:hover:not(:disabled) {
-  color: #111827 !important;
-  background: #f8fafc !important;
-  border-color: #ffffff !important;
   box-shadow: 0 5px 13px rgba(0, 0, 0, 0.14);
 }
 
@@ -1975,16 +1656,12 @@
 
 .recruitment-list-page .admin-table-container {
   border-color: rgba(32, 38, 51, 0.20) !important;
-  box-shadow:
-    0 12px 30px rgba(15, 23, 42, 0.055),
-    0 2px 8px rgba(15, 23, 42, 0.035);
 }
 
 .recruitment-list-page .admin-table-container .data-table thead th {
   color: #ffffff !important;
   background: #202633 !important;
   border-bottom: 1px solid #202633 !important;
-  font-weight: 750;
 }
 
 .recruitment-list-page .admin-table-container .data-table thead th:first-child {
@@ -2049,8 +1726,6 @@
 }
 
 .recruitment-kanban__count {
-  color: #202633 !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
   font-weight: 750 !important;
 }
 
@@ -2062,10 +1737,6 @@
 .recruitment-kanban__column--hired .recruitment-kanban__header,
 .recruitment-kanban__column--rejected .recruitment-kanban__header {
   background: #202633 !important;
-}
-
-.recruitment-kanban__card {
-  border-color: rgba(32, 38, 51, 0.12) !important;
 }
 
 .recruitment-kanban__name {
@@ -2183,16 +1854,12 @@
       #fafaff 100%
     ) !important;
   border: 1px solid rgba(79, 70, 229, 0.16) !important;
-  box-shadow:
-    0 10px 28px rgba(79, 70, 229, 0.075),
-    0 2px 7px rgba(15, 23, 42, 0.035);
 }
 
 .recruitment-list-page .filter-bar .input-field {
   color: #273142 !important;
   background: #ffffff !important;
   border: 1px solid rgba(79, 70, 229, 0.18) !important;
-  box-shadow: 0 2px 5px rgba(79, 70, 229, 0.025);
 }
 
 .recruitment-list-page .filter-bar .input-field:hover {
@@ -2350,13 +2017,6 @@
 
 .recruitment-list-page .row-actions .icon-button {
   border-color: rgba(79, 70, 229, 0.14);
-  background: #ffffff;
-}
-
-.recruitment-list-page .row-actions .icon-button:hover:not(:disabled) {
-  color: #4338a8;
-  border-color: rgba(79, 70, 229, 0.28);
-  background: #f5f3ff;
 }
 
 /* ================================================================
@@ -2373,15 +2033,6 @@
 /* ── INOP Jobs — business-grade visual finish ───────────────────── */
 
 /* Stronger page identity */
-
-.recruitment-list-page > .page-header h1,
-.recruitment-list-page > .page-header .page-header__title {
-  color: #202938;
-}
-
-.recruitment-list-page > .page-header .page-header__subtitle {
-  color: #667085;
-}
 
 /* Dark command/filter surface */
 
@@ -2701,7 +2352,6 @@
   content: "";
   position: absolute;
   top: -34px;
-  right: -80px;
   width: 360px;
   height: 220px;
   border-radius: 50%;
@@ -2734,10 +2384,6 @@
 .job-detail-page .page-header p {
   color: #64748b;
   font-size: 13px;
-}
-
-.job-detail-page .page-header__actions {
-  gap: 8px;
 }
 
 .job-detail-page .detail-card {
@@ -3194,18 +2840,12 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
   padding: 0 13px;
-  border: 1px solid #cfd4f8;
   border-radius: 9px;
-  background: #f7f7ff;
-  color: #4338ca;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition:
     background 160ms ease,
     border-color 160ms ease,
@@ -3218,24 +2858,12 @@
   flex: 0 0 auto;
 }
 
-.job-form-page .recruitment-ai-action:hover:not(:disabled) {
-  border-color: #a5acf0;
-  background: #eef0ff;
-  color: #3730a3;
-  box-shadow:
-    0 4px 12px rgba(79, 70, 229, 0.11);
-}
-
 .job-form-page .recruitment-ai-action:focus-visible {
   outline: none;
-  border-color: #6366f1;
-  box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.13);
 }
 
 .job-form-page .recruitment-ai-action:disabled {
   cursor: not-allowed;
-  opacity: 0.58;
   transform: none;
 }
 
@@ -3273,19 +2901,6 @@
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-}
-
-.job-form-page .recruitment-form-actions .btn-secondary {
-  border: 1px solid #d4dae3;
-  background: #ffffff;
-  color: #475569;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
-}
-
-.job-form-page .recruitment-form-actions .btn-secondary:hover:not(:disabled) {
-  border-color: #b9c1ce;
-  background: #f8fafc;
-  color: #1f2937;
 }
 
 .job-form-page .recruitment-form-actions .btn-primary {
@@ -3368,19 +2983,6 @@
   white-space: nowrap;
 }
 
-.job-detail-page .page-header__actions .btn-secondary {
-  border: 1px solid #d4dae3;
-  background: #ffffff;
-  color: #475569;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
-}
-
-.job-detail-page .page-header__actions .btn-secondary:hover:not(:disabled) {
-  border-color: #b8c0cc;
-  background: #f8fafc;
-  color: #1f2937;
-}
-
 .job-detail-page .page-header__actions .btn-add {
   border: 1px solid #4f46e5;
   background: linear-gradient(135deg, #5b5ce2, #4845c7);
@@ -3431,17 +3033,6 @@
 .job-form-page .recruitment-ai-action {
   position: relative;
   overflow: hidden;
-  border: 1px solid #b9a7f7;
-  background: linear-gradient(
-    135deg,
-    #6d5ce7 0%,
-    #8b5cf6 52%,
-    #c04fd8 100%
-  );
-  color: #ffffff;
-  box-shadow:
-    0 5px 14px rgba(124, 58, 237, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .job-form-page .recruitment-ai-action::before {
@@ -3468,10 +3059,6 @@
     #b83fcf 100%
   );
   color: #ffffff;
-  box-shadow:
-    0 8px 20px rgba(124, 58, 237, 0.27),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
 }
 
 .job-form-page .recruitment-ai-action:hover:not(:disabled)::before {
@@ -3497,18 +3084,6 @@
 }
 
 /* JOB FORM — CANCEL */
-
-.job-form-page .recruitment-form-actions .btn-secondary {
-  border: 1px solid #b9414d;
-  background: linear-gradient(
-    135deg,
-    #b93845 0%,
-    #9f2937 100%
-  );
-  color: #ffffff;
-  box-shadow:
-    0 4px 11px rgba(159, 41, 55, 0.16);
-}
 
 .job-form-page .recruitment-form-actions .btn-secondary:hover:not(:disabled) {
   border-color: #a52f3d;
@@ -3595,7 +3170,6 @@
 
 .recruitment-list-page {
   position: relative;
-  max-width: 1220px;
   margin: 0 auto;
 }
 
@@ -3650,13 +3224,9 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  min-height: 68px;
   margin-bottom: 16px;
-  padding: 13px;
   border: 1px solid #d9dee7;
   border-radius: 14px;
-  background:
-    linear-gradient(145deg, #f1f4f8 0%, #e8edf3 100%);
   box-shadow:
     0 5px 18px rgba(15, 23, 42, 0.055);
 }
@@ -3824,9 +3394,7 @@
 /* Experience */
 
 .recruitment-list-page > .admin-table-container tbody td:nth-child(3) {
-  color: #334155;
   font-size: 12px;
-  font-weight: 650;
   white-space: nowrap;
 }
 
@@ -3888,10 +3456,6 @@
   min-height: 220px;
   border: 0;
   background: transparent;
-}
-
-.recruitment-list-page > .admin-table-container .empty-state svg {
-  color: #9aa6b8;
 }
 
 .recruitment-list-page > .admin-table-container .empty-state__title,

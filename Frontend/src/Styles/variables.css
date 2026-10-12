@@ -20,6 +20,18 @@
 
   --admin-sidebar-width: 260px;
 
+  /* HR palette: namespaced tokens do not change Audit/core variables. */
+  --hr-navy: #253b61;
+  --hr-navy-hover: #172a48;
+  --hr-ink: #1b2432;
+  --hr-slate: #5c6878;
+  --hr-border: #e1e6ed;
+  --hr-white: #fff;
+  --hr-subtle: #f8fafc;
+  --hr-danger: #b42318;
+  --hr-danger-hover: #8f1c13;
+  --hr-focus: #253b61;
+
   /* Design system */
   --surface-page: #f5f6fb;
   --surface: #ffffff;

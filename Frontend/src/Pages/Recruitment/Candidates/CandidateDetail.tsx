@@ -172,7 +172,7 @@ const CandidateDetail: React.FC = () => {
             {canDelete && !candidate.archivedAt && (
               <button
                 type="button"
-                className="btn-secondary candidate-detail-action candidate-detail-action--delete"
+                className="btn-danger candidate-detail-action candidate-detail-action--delete"
                 onClick={()=>setArchiveConfirm(context.key)}
                 disabled={deleting}
               >
