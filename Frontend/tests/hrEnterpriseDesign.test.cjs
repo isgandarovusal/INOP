@@ -13,5 +13,11 @@ test('Reference-led enterprise controls in actual production shell '+stage,async
   if(stage!=='A'){assert.equal(state.active.color,'rgb(255, 255, 255)');assert.ok(contrast(state.active.background,state.active.color)>=4.5);}
   const primary=h.page.locator('.form-actions .btn-primary');await primary.focus();assert.equal(await primary.evaluate(e=>getComputedStyle(e).outlineStyle),'solid');
   records.push({width,...state});await h.page.evaluate(()=>window.scrollTo(0,0));await h.page.screenshot({path:path.join(dir,'controls-'+width+'.jpg'),fullPage:true,type:'jpeg',quality:70});
+ });
+ if(['E','F'].includes(stage)) await t.test('Purple AI action has real configuration failure, one CTA and no fabricated proposal',async()=>{
+  await h.page.setViewportSize({width:1440,height:900});await h.open('admin','/app/recruitment/jobs/new');await h.page.locator('#job-position').fill('Synthetic restaurant manager');await h.page.locator('#job-description').fill('Synthetic shift management responsibilities');
+  const action=h.page.locator('[data-ai-action=job-skills]');assert.equal(await action.count(),1);const colors=await action.evaluate(e=>({background:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color}));assert.equal(colors.background,'rgb(104, 66, 204)');assert.ok(contrast(colors.background,colors.color)>=4.5);
+  await action.click();await h.page.locator('[data-job-skills-assistant] [role=alert]').waitFor();assert.equal(await h.page.locator('[data-ai-proposal]').count(),0);assert.ok(h.wire.some(r=>r.method==='POST'&&r.status===503));
+  await h.page.evaluate(()=>window.scrollTo(0,0));await h.page.screenshot({path:path.join(dir,'ai-configuration-required.jpg'),fullPage:true,type:'jpeg',quality:70});
  });await fs.writeFile(path.join(dir,'styles.json'),JSON.stringify(records,null,2));assert.deepEqual(h.pageErrors,[]);
 }));

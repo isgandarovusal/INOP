@@ -9,9 +9,9 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
   if (!dir || !path.isAbsolute(dir)) throw Error('Owned screenshot output required');
   await fs.mkdir(dir, { recursive: true });
   const evidence = [];
-  const enabled = name => group === name || group === 'all' || group === 'C' && ['candidates','applications'].includes(name) || group === 'D' && ['jobs'].includes(name) || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
+  const enabled = name => group === name || group === 'all' || group === 'C' && ['candidates','applications'].includes(name) || group === 'D' && ['jobs'].includes(name) || group === 'E' && ['analytics','ai'].includes(name) || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
   async function capture(name) {
-    await h.page.waitForLoadState('networkidle');
+    await h.page.waitForLoadState('networkidle');await h.page.evaluate(()=>window.scrollTo(0,0));
     const measured = await h.page.evaluate(() => {
       const rect = e => { const r = e.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; };
       return { viewport: [innerWidth,innerHeight], overflow: document.documentElement.scrollWidth > innerWidth + 1,
@@ -25,19 +25,19 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     if (!captureOnly) assert.equal(measured.overflow,false,name+' horizontal page overflow');
     return measured;
   }
-  if (enabled('candidates')) for (const width of [390,768,1910]) await t.test('S3 empty Candidate '+width, async()=>{
+  if (enabled('candidates')) for (const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910)]) await t.test('S3 empty Candidate '+width, async()=>{
     await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/candidates');await h.page.getByText('Namizəd yoxdur',{exact:true}).waitFor();
     const measured=await capture('candidates-empty-'+width);
     if(!captureOnly){assert.equal(await h.page.getByRole('button',{name:'Yeni Namizəd',exact:true}).count(),1);const board=h.page.getByRole('button',{name:'Application Kanban',exact:true});assert.ok((await board.boundingBox()).width<230);assert.equal(await board.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');assert.ok(measured.controls.every(c=>c.width<=width));}
   });
-  if (enabled('applications')) for (const width of [390,768,1910]) await t.test('S1 empty Applications '+width, async()=>{
+  if (enabled('applications')) for (const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910)]) await t.test('S1 empty Applications '+width, async()=>{
     await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/applications');await h.page.getByText('Hələ müraciət yoxdur',{exact:true}).waitFor();await capture('applications-empty-'+width);if(!captureOnly){const hint=h.page.getByText(az.recruitment.applications.noApplicationsHint,{exact:true}),box=await hint.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Empty hint stays in viewport rather than wide hidden table');}
   });
-  if (enabled('jobs')) for (const width of [390,768,1711]) await t.test('S5 complete Job create grid '+width, async()=>{
+  if (enabled('jobs')) for (const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1711)]) await t.test('S5 complete Job create grid '+width, async()=>{
     await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/jobs/new');await h.page.locator('[data-recruitment-locations]').waitFor();await h.page.getByRole('button',{name:'Vakansiyanı dərc et',exact:true}).waitFor();const measured=await capture('job-create-'+width);
     if(!captureOnly){assert.ok(parseFloat(measured.jobGrid.gap)>=16&&parseFloat(measured.jobGrid.gap)<=24);assert.ok(measured.fullRows.every(r=>r.span==='1 / -1'));assert.ok(measured.jobGrid.height<1850,'Bounded form height rather than scattered large rows');assert.equal(await h.page.locator('[data-job-skills-assistant]').getByRole('button',{name:'AI bacarıq təklifini soruş',exact:true}).count(),1);}
   });
-  if (enabled('analytics')) for (const width of [390,768,1875]) await t.test('S4 real zero Analytics '+width, async()=>{
+  if (enabled('analytics')) for (const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1875)]) await t.test('S4 real zero Analytics '+width, async()=>{
     await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();await h.page.locator('[data-hr-score-bucket="80"]').waitFor();await capture('analytics-zero-'+width);assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'0');
   });
   if(enabled('shell')) for(const width of [390,768,1440]) await t.test('S2/S7 login and sidebar '+width,async()=>{
@@ -58,7 +58,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
       await h.page.getByRole('combobox',{name:az.hrPage.statusFilter,exact:true}).selectOption('all');await h.page.locator('tbody tr').first().waitFor();
       const downloadPromise=h.page.waitForEvent('download');await h.page.getByRole('button',{name:az.recruitment.candidates.exportExcel,exact:true}).click();const download=await downloadPromise;assert.equal(await download.failure(),null);assert.ok((await fs.readFile(await download.path())).length>100);}
     await h.page.getByRole('button',{name:'Yeni Namizəd',exact:true}).first().click();await h.page.locator('.candidate-fields').waitFor();await capture('candidate-create');
-    for(const width of [390,768,1910]){await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/candidates/'+people[0]._id+'/edit');await h.page.locator('.candidate-fields textarea').first().waitFor();await capture('candidate-edit-'+width);}
+    for(const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910)]){await h.page.setViewportSize({width,height:900});await h.open('admin','/app/recruitment/candidates/'+people[0]._id+'/edit');await h.page.locator('.candidate-fields textarea').first().waitFor();await capture('candidate-edit-'+width);}
   });
   if(enabled('applications')) await t.test('S1 bounded table, page sort, search, next/previous and board intent',async()=>{
     await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910),height:900});await h.open('admin','/app/recruitment/applications');await h.page.locator('tbody tr').first().waitFor();await capture('applications-filled');
@@ -75,7 +75,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
 
   });
   if(enabled('analytics')) await t.test('S4 independent live DTOs, genuine data/filter/tab functions',async()=>{
-    await h.page.setViewportSize({width:1875,height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');await capture('analytics-filled');await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await capture('analytics-operations');
+    await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH || 1875),height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');await capture('analytics-filled');await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await capture('analytics-operations');
   });
 
   if(group==='allroutes'||group==='all') {

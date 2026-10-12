@@ -39,7 +39,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
   return <section aria-label={t("hrAi.label")} aria-busy={pending} className="form-group form-group--full" data-job-skills-assistant>
     <p>{t("hrAi.notice")}</p>
     {(!context.title.trim() || !context.description.trim()) && <p>{t('hrAi.contextRequired')}</p>}
-    <button type="button" className="btn-secondary" data-ai-action="job-skills" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
+    <button type="button" className="btn-ai" data-ai-action="job-skills" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
       {pending ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}{t("hrAi.generate")}
     </button>
     {pending && <p role="status">{t("hrAi.processing")}</p>}
@@ -51,7 +51,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
         {[...proposal.requiredSkills, ...proposal.preferredSkills].map(row => <p key={row.name}><strong>{row.name}</strong> — {row.reason} · {t("hrAi.confidence")}: {row.confidence === null ? t("hrAi.unknown") : `${Math.round(row.confidence * 100)}%`}</p>)}
         <TagInput label={t("hrAi.required")} values={required} onChange={setRequired} />
         <TagInput label={t("hrAi.preferred")} values={preferred} onChange={setPreferred} />
-        <button type="button" className="btn-secondary" onClick={() => { setProposal(null); onApprove(required, preferred); }}>{t("hrAi.approve")}</button>
+        <button type="button" className="btn-success" onClick={() => { setProposal(null); onApprove(required, preferred); }}>{t("hrAi.approve")}</button>
       </>}
       {proposal.uncertainty.map((note, index) => <p key={index}>{note}</p>)}
       <button type="button" onClick={() => setProposal(null)}>{t("hrAi.dismiss")}</button>

@@ -1,6 +1,6 @@
 import HRFilterPanel from '../../../Components/HRFilterPanel';
 import { useId, useMemo, useState } from 'react';
-import { BriefcaseBusiness, UsersRound, Inbox, Clock3, RefreshCw } from 'lucide-react';
+import { BarChart3, BriefcaseBusiness, UsersRound, Inbox, Clock3, RefreshCw } from 'lucide-react';
 import HRHistogram from '../../../Components/HRHistogram';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,7 @@ export default function HRAnalyticsPage() {
   const scoreRows = useMemo(() => scoreData?.scores?.buckets.map(b => ({ label: `${b.min}–${b.max}%`, count: b.count })) || [], [scoreData?.scores]);
   const statuses = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
   return <div className="hr-workspace hr-analytics-page">
-    <PageHeader title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} actions={<><button type="button" className="btn-secondary hr-icon-action" aria-label={t('common.actions.refresh')} title={t('common.actions.refresh')} onClick={reload}><RefreshCw size={16}/></button><Link className="btn-secondary hr-header-link" to="/app/recruitment/applications">{t('navigation.applications')}</Link></>} />
+    <PageHeader icon={<BarChart3 size={26} />} title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} actions={<><button type="button" className="btn-secondary hr-icon-action" aria-label={t('common.actions.refresh')} title={t('common.actions.refresh')} onClick={reload}><RefreshCw size={16}/></button><Link className="btn-secondary hr-header-link" to="/app/recruitment/applications">{t('navigation.applications')}</Link></>} />
     <div className="hr-analytics-toolbar"><div className="filter-bar hr-brand-segments" aria-label={t('hrAnalytics.brands')}>
       <button type="button" aria-pressed={!filters.brandId} onClick={() => update('brandId', '')}>GFC</button>
       {brands.map(b => <button type="button" key={b.id} aria-pressed={filters.brandId === b.id} onClick={() => update('brandId', b.id)}>{b.name}</button>)}

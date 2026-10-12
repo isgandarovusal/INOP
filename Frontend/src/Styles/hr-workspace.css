@@ -35,6 +35,11 @@
 .hr-workspace .btn-cancel { width: auto; flex: 0 0 auto; background: var(--hr-white); color: var(--hr-slate); border: 1px solid var(--hr-border); }
 .hr-workspace .btn-secondary:hover:not(:disabled) { background: var(--hr-control-hover); border-color: #9ab7f0; box-shadow: none; transform: none; }
 .hr-workspace .btn-cancel:hover:not(:disabled) { background: var(--hr-subtle); }
+.hr-workspace .btn-ai { background: var(--hr-purple); color: var(--hr-white); border: 1px solid var(--hr-purple); }
+.hr-workspace .btn-ai:hover:not(:disabled) { background: var(--hr-purple-hover); }
+.hr-workspace .btn-ai:disabled { background: var(--hr-purple-soft); color: var(--hr-purple-hover); border-color: var(--hr-purple-border); }
+.hr-workspace .btn-success { background: var(--hr-success); color: var(--hr-white); border: 1px solid var(--hr-success); }
+.hr-workspace .btn-success:hover:not(:disabled) { background: #105d30; }
 .hr-workspace button:disabled { cursor: not-allowed; }
 .hr-workspace :is(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 3px; }
 .hr-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea) {
@@ -77,7 +82,7 @@
 .hr-workspace.job-form-page [data-recruitment-locations] > :is(p,.job-location-actions) { grid-column: 1 / -1; }
 .hr-workspace.job-form-page .job-location-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; }
 .hr-workspace.job-form-page .job-location-actions > details[open] { flex: 1 0 100%; }
-.hr-workspace .hr-ai-panel { padding: 16px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-subtle); }
+.hr-workspace .hr-ai-panel { padding: 16px; border: 1px solid var(--hr-purple-border); border-radius: 10px; background: #faf7ff; }
 .hr-workspace .hr-ai-panel > p, .hr-workspace .hr-ai-panel [data-ai-availability] > p { margin: 0 0 10px; font-size: 13px; }
 .hr-workspace.job-form-page [data-job-skills-assistant] { margin-top: 16px; }
 .hr-workspace [data-cv-ai-assistant].hr-ai-panel { margin: 16px 0; }
@@ -96,7 +101,11 @@
 .hr-workspace .ranking-row__name { font-size: 14px; font-weight: 600; }
 .hr-workspace .ranking-row__meta { font-size: 13px; color: var(--text-secondary); }
 .hr-workspace .hr-application-board { scrollbar-width: thin; scroll-snap-type: x proximity; }
-.hr-workspace .hr-application-board > section { flex: 1 0 280px; min-width: 280px; border: 1px solid #e2e6eb; scroll-snap-align: start; }
+.hr-workspace .hr-application-board > section { --hr-lane-accent: var(--hr-blue); flex: 1 0 280px; min-width: 280px; border: 1px solid #dae3f1; border-top: 3px solid var(--hr-lane-accent); scroll-snap-align: start; }
+.hr-workspace .hr-application-board [data-board-lane=processing] { --hr-lane-accent: var(--hr-purple); }
+.hr-workspace .hr-application-board :is([data-board-lane=interview],[data-board-lane=offered]) { --hr-lane-accent: var(--hr-warning); }
+.hr-workspace .hr-application-board [data-board-lane=hired] { --hr-lane-accent: var(--hr-success); }
+.hr-workspace .hr-application-board [data-board-lane=rejected] { --hr-lane-accent: var(--hr-danger); }
 .hr-workspace .hr-application-board > section > h3 { font-weight: 600; color: #465469; margin-bottom: 16px; }
 .hr-workspace .recruitment-kanban__card { background: var(--hr-white); border: 1px solid #e0e5ec; box-shadow: 0 1px 2px rgb(15 23 42 / 3%); }
 .hr-workspace .recruitment-kanban__card:hover { box-shadow: 0 2px 6px rgb(15 23 42 / 5%); transform: none; }
@@ -206,7 +215,7 @@
 .hr-workspace .icon-btn--danger { color: var(--hr-danger); }
 .hr-workspace .icon-btn--danger:hover:not(:disabled) { background: #fff1ef !important; color: var(--hr-danger-hover); }
 .hr-workspace :is(.btn-danger, .btn-danger-solid, .candidate-detail-action--delete):disabled { background: #f4f6f9 !important; color: #667384 !important; border-color: #e2e6eb !important; }
-.hr-workspace button:disabled { opacity: 1; color: #667384; background: #f4f6f9; border-color: #e2e6eb; }
+.hr-workspace button:disabled:not(.btn-ai) { opacity: 1; color: #667384; background: #f4f6f9; border-color: #e2e6eb; }
 
 /* Compact request feedback, shared by primary and auxiliary HR resources. */
 .hr-workspace.hr-resource-state { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 14px 18px; margin: 12px 0; background: var(--hr-subtle); }
@@ -233,7 +242,7 @@
 .hr-workspace .page-header { padding: 0 0 20px; margin-bottom: 4px; }
 .hr-workspace .page-header__title { font-size: clamp(25px, 2.4vw, 32px); font-weight: 650; }
 .hr-workspace .page-header__subtitle { max-width: 72ch; margin-top: 6px; }
-.hr-workspace :is(.btn-primary, .btn-add, .btn-secondary, .btn-cancel, .btn-danger, .hr-header-link) { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 9px 14px; min-height: 38px; border-radius: 8px; font-size: 13px; font-weight: 550; text-decoration: none; }
+.hr-workspace :is(.btn-primary, .btn-add, .btn-secondary, .btn-cancel, .btn-danger, .btn-ai, .btn-success, .hr-header-link) { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 9px 14px; min-height: 38px; border-radius: 8px; font-size: 13px; font-weight: 550; text-decoration: none; }
 .hr-workspace .btn-primary, .hr-workspace .btn-add { box-shadow: 0 1px 2px rgb(15 23 42 / 12%); }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) { padding: 12px; margin-bottom: 16px; border-radius: 10px; gap: 10px; }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) :is(input, select) { font-size: 13px; min-height: 38px; padding-top: 8px; padding-bottom: 8px; }
@@ -301,7 +310,7 @@
 .hr-workspace .hr-brand-segments { display: flex; gap: 4px; border: 0; padding: 0; background: none; margin-bottom: 18px; }
 .hr-workspace .hr-brand-segments button { min-height: 34px; padding: 7px 12px; font-size: 12px; border: 1px solid transparent; background: none; color: var(--hr-slate); border-radius: 7px; }
 .hr-workspace .hr-brand-segments button:hover { background: #edf1f6; }
-.hr-workspace .hr-brand-segments button[aria-pressed=true] { background: #e8edf5; color: var(--hr-navy); border-color: #d7e0ec; outline: none; }
+.hr-workspace .hr-brand-segments button[aria-pressed=true] { background: var(--hr-navy); color: var(--hr-white); border-color: var(--hr-navy); outline: none; }
 .hr-workspace .hr-analytics-filter-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)) auto; align-items: end; }
 .hr-workspace .hr-analytics-filter-grid label { min-width: 0; }
 .hr-workspace .hr-analytics-filter-grid label :is(select,input) { width: 100%; }
@@ -310,10 +319,13 @@
 .hr-workspace .hr-data-note p { max-width: 90ch; margin: 8px 0; }
 .hr-workspace .hr-analytics-updated { color: #667384; font-size: 11px; text-align: right; margin: 0; }
 .hr-workspace .hr-analytics-kpis { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; margin: 12px 0 24px; }
-.hr-workspace .hr-analytics-kpis article { border-radius: 12px; box-shadow: var(--hr-surface-shadow); }
+.hr-workspace .hr-analytics-kpis article { --hr-metric-accent: var(--hr-blue); --hr-metric-bg: #edf3ff; border-radius: 12px; box-shadow: var(--hr-surface-shadow); background: var(--hr-metric-bg); border-color: #d4def4; border-top: 3px solid var(--hr-metric-accent); }
+.hr-workspace .hr-analytics-kpis [data-hr-kpi=activeVacancies] { --hr-metric-accent: var(--hr-success); --hr-metric-bg: #effaf3; }
+.hr-workspace .hr-analytics-kpis [data-hr-kpi=newApplications] { --hr-metric-accent: var(--hr-purple); --hr-metric-bg: #f6f1ff; }
+.hr-workspace .hr-analytics-kpis [data-hr-kpi=processing] { --hr-metric-accent: var(--hr-warning); --hr-metric-bg: #fff8e8; }
 .hr-kpi-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
 .hr-workspace .hr-analytics-kpis h3 { font-size: 12px; margin: 0; }
-.hr-kpi-heading svg { flex: 0 0 auto; color: #607796; }
+.hr-kpi-heading svg { flex: 0 0 auto; width: 36px; height: 36px; padding: 8px; border-radius: 10px; background: var(--hr-white); color: var(--hr-metric-accent); }
 .hr-workspace .hr-analytics-kpis strong { display: block; line-height: 1.1; font-weight: 600; }
 .hr-workspace .hr-analytics-sections { align-items: start; gap: 18px; }
 .hr-workspace .hr-analytics-sections section { padding: 20px; }
@@ -324,7 +336,7 @@
 .hr-workspace .hr-analytics-sections li { margin: 8px 0; font-size: 12px; }
 .hr-workspace .hr-analytics-sections :is(th,td) { padding: 9px 6px; font-size: 12px; background: none; height: auto; text-transform: none; }
 .hr-workspace .hr-metric-track { height: 4px; background: #edf1f6; border-radius: 4px; margin-top: 7px; }
-.hr-workspace .hr-metric-track > span { background: #526e94; border-radius: 4px; }
+.hr-workspace .hr-metric-track > span { background: var(--hr-blue); border-radius: 4px; }
 .hr-workspace .hr-distribution li { padding: 5px 0; }
 .hr-workspace .hr-histogram { margin: 0 0 16px; min-width: 0; }
 .hr-histogram svg { width: 100%; display: block; max-height: 180px; }

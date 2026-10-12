@@ -31,7 +31,7 @@ export default function CvReviewAssistant({ id, hash, revision, onApprove, onAcc
   }
   return <section className="hr-ai-panel" data-cv-ai-assistant aria-label={t("hrCvAi.label")} aria-busy={pending}>
     <p>{t("hrCvAi.scope")}</p>
-    <button type="button" className="btn-secondary" data-ai-action="cv-professional-review" disabled={pending} onClick={() => void generate()}>{t("hrCvAi.generate")}</button>
+    <button type="button" className="btn-ai" data-ai-action="cv-professional-review" disabled={pending} onClick={() => void generate()}>{t("hrCvAi.generate")}</button>
     <AIAvailability cv />
     {pending && <p role="status">{t("hrAi.processing")}</p>}
     {error && <p role="alert">{t(error)}</p>}
@@ -45,7 +45,7 @@ export default function CvReviewAssistant({ id, hash, revision, onApprove, onAcc
         {row.evidenceIds.map(ref => <blockquote key={ref}>{proposal.evidence.find(f => f.id === ref)?.quote}</blockquote>)}
       </div>)}
       {proposal.uncertainty.map((note, index) => <p key={index}>{note}</p>)}
-      {proposal.status === "suggested" && <button type="button" className="btn-secondary" disabled={!selected.length} onClick={() => { setProposal(null); onApprove(proposal.proposals.filter((_, index) => selected.includes(index))); }}>{t("hrCvAi.approve")}</button>}
+      {proposal.status === "suggested" && <button type="button" className="btn-success" disabled={!selected.length} onClick={() => { setProposal(null); onApprove(proposal.proposals.filter((_, index) => selected.includes(index))); }}>{t("hrCvAi.approve")}</button>}
       <button type="button" onClick={() => setProposal(null)}>{t("hrAi.dismiss")}</button>
     </div>}
   </section>;
