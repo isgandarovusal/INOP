@@ -72,9 +72,12 @@
 .hr-workspace.job-form-page [data-recruitment-locations] > :is(p,.job-location-actions) { grid-column: 1 / -1; }
 .hr-workspace.job-form-page .job-location-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; }
 .hr-workspace.job-form-page .job-location-actions > details[open] { flex: 1 0 100%; }
-.hr-workspace.job-form-page [data-job-ai] { padding: 16px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-subtle); }
-.hr-workspace.job-form-page [data-job-ai] p { margin: 0 0 10px; font-size: 13px; }
+.hr-workspace .hr-ai-panel { padding: 16px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-subtle); }
+.hr-workspace .hr-ai-panel > p, .hr-workspace .hr-ai-panel [data-ai-availability] > p { margin: 0 0 10px; font-size: 13px; }
 .hr-workspace.job-form-page [data-job-skills-assistant] { margin-top: 16px; }
+.hr-workspace [data-cv-ai-assistant].hr-ai-panel { margin: 16px 0; }
+.hr-workspace .hr-ai-panel [data-ai-availability] { margin: 12px 0; }
+.hr-workspace .hr-ai-panel > [role=alert] { margin-top: 12px; color: var(--hr-danger); }
 @media (max-width:650px) { .hr-workspace.job-form-page > .form-grid, .hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { grid-template-columns: minmax(0,1fr); } }
 
 .hr-workspace .candidate-form-section { padding: 24px; }

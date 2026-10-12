@@ -116,7 +116,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         <div className="form-group form-group--full"><label htmlFor="job-description">{t("recruitment.jobForm.description")}</label><textarea id="job-description" aria-label={t("recruitment.jobForm.description")} rows={4} className="input" value={description} onChange={e=>setDescription(e.target.value)} /></div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("recruitment.jobForm.tagLabel")} values={requiredSkills} onChange={setRequiredSkills} placeholder={t("recruitment.jobForm.skillPlaceholder")} /><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
-        <section className="form-group form-group--full" data-job-ai>
+        <section className="form-group form-group--full hr-ai-panel" data-job-ai>
           <AIAvailability />
           <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
         </section>

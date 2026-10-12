@@ -1214,6 +1214,7 @@
     }
   },
   "hrAnalytics": {
+    "noTrustedScores": "No reliable matching scores yet. Results appear when complete, reviewed information is available.",
     "title": "GFC HR analytics",
     "subtitle": "Vacancies and application workflow",
     "brands": "Brands",

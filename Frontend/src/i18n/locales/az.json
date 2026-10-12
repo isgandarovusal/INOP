@@ -1238,6 +1238,7 @@
     }
   },
   "hrAnalytics": {
+    "noTrustedScores": "Hələ etibarlı uyğunluq göstəricisi yoxdur. Tam və yoxlanılmış məlumat olduqda nəticələr burada görünəcək.",
     "title": "GFC HR analitikası",
     "subtitle": "Vakansiya və müraciət axını",
     "brands": "Brendlər",
