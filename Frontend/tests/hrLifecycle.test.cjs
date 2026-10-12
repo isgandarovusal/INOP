@@ -49,7 +49,7 @@ test('HR pages isolate data, drafts, errors and permission contexts', async t =>
     await h.open('admin', jobPath(first._id) + '/edit'); await h.page.locator('input[name=position]').waitFor();
     assert.equal(await h.page.locator('input[name=experience]').inputValue(), '0');
     await h.page.locator('input[name=position]').fill('Edited vacancy');
-    await h.page.locator('button[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
+    await h.page.locator('button.btn-primary[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
     const stored = await Job.findById(first._id);
     assert.equal(stored.title, 'Edited vacancy'); assert.equal(stored.department, 'Operations'); assert.equal(stored.location, 'Baku');
     assert.equal(stored.type, 'Part-time'); assert.equal(stored.experienceYears, 0); assert.deepEqual(stored.preferredSkills.toObject(), ['Food safety']);
@@ -113,7 +113,7 @@ test('HR pages isolate data, drafts, errors and permission contexts', async t =>
     try {
       await h.open('admin', '/app/recruitment/candidates/new');
       await h.page.locator('input[type=file]').setInputFiles({ name: 'a.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic A') }); await started;
-      assert.equal(await h.page.locator('button[type=submit]').isDisabled(), true);
+      assert.equal(await h.page.locator('button.btn-primary[type=submit]').isDisabled(), true);
       await h.page.locator('input[type=file]').setInputFiles({ name: 'b.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic B') });
       await h.page.waitForFunction(() => document.querySelector('input[name=name]')?.value === 'Current B'); release(); await h.page.waitForLoadState('networkidle');
       assert.equal(await h.page.locator('input[name=name]').inputValue(), 'Current B');
@@ -127,7 +127,7 @@ test('HR pages isolate data, drafts, errors and permission contexts', async t =>
       await h.page.locator('input[type=file]').setInputFiles({ name: 'cancel.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic') }); await started;
       await h.page.locator('.candidate-cv-upload__remove').click(); release(); await h.page.waitForLoadState('networkidle');
       assert.equal(await h.page.locator('input[name=name]').inputValue(), 'Manual name');
-      assert.equal(await h.page.locator('button[type=submit]').isDisabled(), false);
+      assert.equal(await h.page.locator('button.btn-primary[type=submit]').isDisabled(), false);
     } finally { release(); await h.page.unroute('**/api/candidates/parse-cv'); }
   });
   await t.test('late previous Candidate edit cannot replace a new Candidate edit', async () => {

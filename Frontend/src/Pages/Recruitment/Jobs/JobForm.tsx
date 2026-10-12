@@ -43,8 +43,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (asDraft = false) => {
     if (saving) return;
 
     if (!position.trim()) {
@@ -63,7 +62,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         preferredSkills, requiredEducation, requiredCertificates,
         department, location, type,
         experience,
-        status,
+        status: asDraft ? "draft" : status,
       };
 
       if (isEdit && id) {
@@ -106,97 +105,25 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="form-grid">
+      <form onSubmit={event=>{event.preventDefault();void handleSubmit();}} className="form-grid">
+        <div className="form-group"><label htmlFor="job-position">{t("recruitment.jobForm.position")}</label><input id="job-position" type="text" className="input" name="position" aria-label={t("recruitment.jobForm.position")} value={position} onChange={e=>setPosition(e.target.value)} placeholder={t("recruitment.jobForm.positionPlaceholder")} required /></div>
+        <div className="form-group"><label htmlFor="job-experience">{t("recruitment.jobForm.experience")}</label><input id="job-experience" type="number" className="input" min={0} name="experience" aria-label={t("recruitment.jobForm.experience")} value={experience} onChange={e=>setExperience(Number(e.target.value))} /></div>
         <RecruitmentLocationFields brandId={brandId} branchId={branchId} onChange={(brand, branch) => { setBrandId(brand); setBranchId(branch); }} />
-        <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" value={department} onChange={e => setDepartment(e.target.value)} required /></div>
-        <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" value={location} onChange={e => setLocation(e.target.value)} required /></div>
-        <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
-        <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
-        <div className="form-group form-group--full"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
-        <div className="form-group form-group--full"><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
-        <div className="form-group">
-          <label>{t("recruitment.jobForm.position")}</label>
-          <input
-            type="text"
-            className="input"
-            name="position"
-            aria-label={t("recruitment.jobForm.position")}
-            value={position}
-            onChange={(e) => setPosition(e.target.value)}
-            placeholder={t("recruitment.jobForm.positionPlaceholder")}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>{t("recruitment.jobForm.experience")}</label>
-          <input
-            type="number"
-            className="input"
-            min={0}
-            name="experience"
-            aria-label={t("recruitment.jobForm.experience")}
-            value={experience}
-            onChange={(e) => setExperience(Number(e.target.value))}
-          />
-        </div>
-
-        <div className="form-group form-group--full">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "6px",
-            }}
-          >
-            <label style={{ margin: 0 }}>
-              {t("recruitment.jobForm.requiredSkills")}
-            </label>
-
-
-          </div>
-
-          <TagInput
-            label={t("recruitment.jobForm.tagLabel")}
-            values={requiredSkills}
-            onChange={setRequiredSkills}
-            placeholder={t("recruitment.jobForm.skillPlaceholder")}
-          />
-        </div>
-
-        <div className="form-group form-group--full">
-          <label>{t("recruitment.jobForm.description")}</label>
-          <textarea
-            aria-label={t("recruitment.jobForm.description")}
-            rows={4}
-            className="input"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        <div className="form-group form-group--full"><AIAvailability /></div>
-        <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
+        <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" className="input" value={department} onChange={e => setDepartment(e.target.value)} required /></div>
+        <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" className="input" value={location} onChange={e => setLocation(e.target.value)} required /></div>
+        <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" className="input" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
+        <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" className="input" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
+        <div className="form-group form-group--full"><label htmlFor="job-description">{t("recruitment.jobForm.description")}</label><textarea id="job-description" aria-label={t("recruitment.jobForm.description")} rows={4} className="input" value={description} onChange={e=>setDescription(e.target.value)} /></div>
+        <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("recruitment.jobForm.tagLabel")} values={requiredSkills} onChange={setRequiredSkills} placeholder={t("recruitment.jobForm.skillPlaceholder")} /><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
+        <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
+        <section className="form-group form-group--full" data-job-ai>
+          <AIAvailability />
+          <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
+        </section>
         <div className="form-actions recruitment-form-actions">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => navigate(-1)}
-          >
-            {t("recruitment.jobForm.cancel")}
-          </button>
-
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={saving}
-          >
-            {saving ? <Loader2 size={16} className="spin" /> : null}
-            {isEdit
-              ? t("recruitment.jobForm.update")
-              : t("recruitment.jobForm.publish")}
-          </button>
+          <button type="button" className="btn-secondary" onClick={()=>navigate(-1)}>{t("recruitment.jobForm.cancel")}</button>
+          {!isEdit && <button type="button" className="btn-secondary" disabled={saving} onClick={event=>{if(event.currentTarget.form?.reportValidity())void handleSubmit(true);}}>{t("hrJobArchive.saveDraft")}</button>}
+          <button type="submit" className="btn-primary" disabled={saving}>{saving ? <Loader2 size={16} className="spin" /> : null}{isEdit ? t("recruitment.jobForm.update") : t("recruitment.jobForm.publish")}</button>
         </div>
       </form>
     </div>

@@ -503,7 +503,7 @@
     "jobForm": {
       "editTitle": "Vakansiyanı redaktə et",
       "newTitle": "Yeni vakansiya yaradın",
-      "subtitle": "AI tələb generatoru ilə vakansiya şərtlərini müəyyən edin",
+      "subtitle": "Vakansiya məlumatlarını, iş yerini və seçim meyarlarını müəyyən edin. AI təklifləri HR təsdiqi tələb edir.",
       "position": "Vakansiyanın adı *",
       "positionPlaceholder": "məs: Senior React Developer",
       "experience": "Tələb olunan təcrübə (il)",
@@ -1578,6 +1578,7 @@
     "historyLimit": "Son 50 əməliyyat göstərilir. Tam tarixçə saxlanılır."
   },
   "hrJobArchive": {
+    "saveDraft": "Draft saxla",
     "active": "Aktiv vakansiyalar",
     "visibility": "Vakansiya siyahısı",
     "confirm": "{{name}} arxivlənsin? Müraciətlər və tarixçə qorunacaq.",

@@ -10,17 +10,17 @@ test('Brand and workplace selectors persist create/edit and filter scoped vacanc
     assert.deepEqual(await h.page.locator('#job-brand option').allTextContents(), ['Təyin edilməyib', 'KFC', 'Pizza Hut', 'Simit Sarayı']);
     await h.page.locator('#job-brand').selectOption('kfc'); await h.page.locator('#job-branch').selectOption(branch._id);
     await h.page.locator('input[name=position]').fill('KFC cashier'); await h.page.locator('textarea').fill('Customer service');
-    await h.page.locator('button[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
+    await h.page.locator('button.btn-primary[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
     job = await Job.findOne({ title: 'KFC cashier' }); assert.equal(job.brandId, 'kfc'); assert.equal(String(job.branchId), branch._id);
   });
   await t.test('editing title retains brand and branch; changing brand explicitly clears old branch', async () => {
     await h.open('admin', `/app/recruitment/jobs/${job._id}/edit`); await h.page.locator('#job-branch').waitFor();
     assert.equal(await h.page.locator('#job-brand').inputValue(), 'kfc'); assert.equal(await h.page.locator('#job-branch').inputValue(), branch._id);
-    await h.page.locator('input[name=position]').fill('Updated cashier'); await h.page.locator('button[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
+    await h.page.locator('input[name=position]').fill('Updated cashier'); await h.page.locator('button.btn-primary[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
     assert.equal(String((await Job.findById(job._id)).branchId), branch._id);
     await h.open('admin', `/app/recruitment/jobs/${job._id}/edit`); await h.page.locator('#job-brand option[value="pizza-hut"]').waitFor({ state: 'attached' });
     await h.page.locator('#job-brand').selectOption('pizza-hut'); assert.equal(await h.page.locator('#job-branch').inputValue(), '');
-    await h.page.locator('button[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
+    await h.page.locator('button.btn-primary[type=submit]').click(); await h.page.waitForURL('**/app/recruitment/jobs');
     const current = await Job.findById(job._id); assert.equal(current.brandId, 'pizza-hut'); assert.equal(current.branchId, null);
   });
   await t.test('legacy jobs stay unspecified; brand filter shows only matching records', async () => {

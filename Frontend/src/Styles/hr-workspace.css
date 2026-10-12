@@ -62,6 +62,21 @@
   background: var(--hr-white); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: none;
 }
 .hr-workspace .job-form-page > form, .hr-workspace.job-form-page > form { background: var(--hr-white); border: 1px solid var(--border-color); box-shadow: none; border-radius: 14px; }
+.hr-workspace.job-form-page > .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; align-items: start; }
+.hr-workspace.job-form-page .form-group { margin: 0; min-width: 0; }
+.hr-workspace.job-form-page .form-group--full, .hr-workspace.job-form-page .form-actions { grid-column: 1 / -1; }
+.hr-workspace.job-form-page .form-actions { margin-top: 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--hr-border); border-radius: 0; background: transparent; }
+.hr-workspace.job-form-page .form-group > label { display: block; margin-bottom: 8px; }
+.hr-workspace.job-form-page :is(input,select,textarea) { width: 100%; }
+.hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; }
+.hr-workspace.job-form-page [data-recruitment-locations] > :is(p,.job-location-actions) { grid-column: 1 / -1; }
+.hr-workspace.job-form-page .job-location-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.hr-workspace.job-form-page .job-location-actions > details[open] { flex: 1 0 100%; }
+.hr-workspace.job-form-page [data-job-ai] { padding: 16px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-subtle); }
+.hr-workspace.job-form-page [data-job-ai] p { margin: 0 0 10px; font-size: 13px; }
+.hr-workspace.job-form-page [data-job-skills-assistant] { margin-top: 16px; }
+@media (max-width:650px) { .hr-workspace.job-form-page > .form-grid, .hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { grid-template-columns: minmax(0,1fr); } }
+
 .hr-workspace .candidate-form-section { padding: 24px; }
 .hr-workspace :is(.candidate-form-section__icon, .candidate-cv-upload__icon) { color: #465469; background: #f1f4f8; border-color: #e2e6eb; box-shadow: none; }
 .hr-workspace :is(.candidate-form-section__title, .detail-card h3, .hr-analytics-sections h2) { font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }

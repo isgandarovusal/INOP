@@ -32,14 +32,14 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
       if (status === 401 || status === 403 || status === 404) { onAccessDenied(status === 401 ? "unauthenticated" : status === 403 ? "forbidden" : "not-found"); return; }
       const code = isAxiosError(e) ? e.response?.data?.code : e && typeof e === "object" && "code" in e ? e.code : undefined;
       if (code === "AI_AUTHORIZATION_CHANGED") { onAccessDenied("forbidden"); return; }
-      const message = code === "AI_CONTEXT_CHANGED" ? "changed" : code === "AI_TIMEOUT" ? "timeout" : code === "AI_INVALID_OUTPUT" ? "invalid" : code === "AI_INVALID_CONTEXT" ? "context" : status === 429 ? "limited" : "unavailable";
+      const message = code === "AI_CONFIGURATION_REQUIRED" ? "setupState.configuration_required" : code === "AI_UNAVAILABLE" ? "setupState.not_configured" : code === "AI_CONTEXT_CHANGED" ? "changed" : code === "AI_TIMEOUT" ? "timeout" : code === "AI_INVALID_OUTPUT" ? "invalid" : code === "AI_INVALID_CONTEXT" ? "context" : status === 429 ? "limited" : "unavailable";
       setError(message);
     } finally { if (!controller.signal.aborted && sequence === request.current.sequence) setPending(false); }
   }
   return <section aria-label={t("hrAi.label")} aria-busy={pending} className="form-group form-group--full" data-job-skills-assistant>
     <p>{t("hrAi.notice")}</p>
     {(!context.title.trim() || !context.description.trim()) && <p>{t('hrAi.contextRequired')}</p>}
-    <button type="button" className="recruitment-ai-action" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
+    <button type="button" className="btn-secondary" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
       {pending ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}{t("hrAi.generate")}
     </button>
     {pending && <p role="status">{t("hrAi.processing")}</p>}

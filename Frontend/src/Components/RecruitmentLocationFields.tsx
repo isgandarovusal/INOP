@@ -34,21 +34,22 @@ export default function RecruitmentLocationFields({ brandId, branchId, onChange 
     finally { if (mounted.current) setSaving(false); }
   };
   return <div className="form-group form-group--full" data-recruitment-locations>
-    <label htmlFor="job-brand">{t('hrCatalog.brand')}</label>
+    <div className="form-group"><label htmlFor="job-brand">{t('hrCatalog.brand')}</label>
     <select id="job-brand" value={brandId || ''} onChange={e => onChange(e.target.value || null, null)}>
       <option value="">{t('hrCatalog.unset')}</option>
       {brandId && !brands.some(b => b.id === brandId) && <option value={brandId}>{brandId}</option>}
       {brands.filter(b => b.active || b.id === brandId).map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
     </select>
-    <label htmlFor="job-branch">{t('hrCatalog.branch')}</label>
+    </div><div className="form-group"><label htmlFor="job-branch">{t('hrCatalog.branch')}</label>
     <select id="job-branch" value={branchId || ''} onChange={e => onChange(brandId, e.target.value || null)}>
       <option value="">{t('hrCatalog.unset')}</option>
       {branchId && !branches.some(b => b._id === branchId) && <option value={branchId}>{t('hrCatalog.unavailable')}</option>}
       {branches.filter(b => b.status === 'active' || b._id === branchId).map(b => <option key={b._id} value={b._id}>{b.name} · {t(`hrCatalog.${b.kind}`)}</option>)}
     </select>
+    </div>
     {result.status !== 'ready' && <p role="status">{t(result.status === 'loading' ? 'hrStates.loading' : 'hrCatalog.loadError')} {result.status !== 'loading' && <button type="button" onClick={result.reload}>{t('hrStates.retry')}</button>}</p>}
     {error && <p role="alert">{error}</p>}
-    {canCreate && <details><summary>{t('hrCatalog.addBranch')}</summary>
+    <div className="job-location-actions">{canCreate && <details><summary>{t('hrCatalog.addBranch')}</summary>
       <label>{t('hrCatalog.code')}<input aria-label={t('hrCatalog.branchCode')} value={code} onChange={e => setCode(e.target.value)} /></label>
       <label>{t('hrCatalog.name')}<input aria-label={t('hrCatalog.branchName')} value={name} onChange={e => setName(e.target.value)} /></label>
       <label>{t('hrCatalog.kind')}<select aria-label={t('hrCatalog.kind')} value={kind} onChange={e => setKind(e.target.value as typeof kind)}>{['restaurant', 'office', 'warehouse', 'remote'].map(k => <option key={k} value={k}>{t(`hrCatalog.${k}`)}</option>)}</select></label>
@@ -59,5 +60,6 @@ export default function RecruitmentLocationFields({ brandId, branchId, onChange 
       <label>{t('hrCatalog.name')}<input aria-label={t('hrCatalog.brandName')} value={brandName} onChange={e => setBrandName(e.target.value)} /></label>
       <button type="button" disabled={saving || !brandCode || !brandName} onClick={() => void add('brand')}>{t('hrCatalog.addBrand')}</button>
     </details>}
+    </div>
   </div>;
 }

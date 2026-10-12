@@ -479,7 +479,7 @@
     "jobForm": {
       "editTitle": "Edit job",
       "newTitle": "Create new job",
-      "subtitle": "Define job requirements with the AI requirement generator",
+      "subtitle": "Define the vacancy, workplace and selection criteria. AI suggestions require HR approval.",
       "position": "Position *",
       "positionPlaceholder": "e.g. Senior React Developer",
       "experience": "Required experience (years)",
@@ -1554,6 +1554,7 @@
     "historyLimit": "Latest 50 actions shown. Full history is retained."
   },
   "hrJobArchive": {
+    "saveDraft": "Save draft",
     "active": "Active vacancies",
     "visibility": "Vacancy visibility",
     "confirm": "Archive {{name}}? Applications and history will be retained.",

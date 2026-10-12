@@ -6,13 +6,13 @@ const proposal={version:'job-skills-v1',status:'suggested',requiredSkills:[{name
 test('AI job skills UI is explicit, human-reviewed and bound to immutable route/auth/draft context',async t=>withBrowserFixture(harness,async h=>{
  const pattern='**/api/hr/ai/job-skills',assistant=()=>h.page.locator('[data-job-skills-assistant]');
  const open=async()=>{await h.open('admin','/app/recruitment/jobs/new');await h.page.getByLabel('Vakansiyanın adı *',{exact:true}).fill('Synthetic cashier');await h.page.getByLabel('Vakansiya haqqında',{exact:true}).fill('Cash handling and food safety');};
- const generate=()=>h.page.locator('button.recruitment-ai-action').click();
+ const generate=()=>h.page.getByRole('button',{name:require('../src/i18n/locales/az.json').hrAi.generate,exact:true}).click();
  let proposalCalls=0;
  const reply=(body=proposal,status=200)=>h.page.route(pattern,r=>{proposalCalls++;return r.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});});
  await t.test('missing real provider shows unavailable instead of hardcoded skills; manual form remains usable',async()=>{
   await open();await generate();
   if(process.env.INOP_BASELINE_ONLY){await h.page.waitForTimeout(800);assert.equal(await h.page.locator('.tag-chip').count(),0,'Unconfigured provider must never manufacture skills');return;}
-  await h.page.getByRole('alert').filter({hasText:'AI konfiqurasiya edilməyib'}).waitFor();assert.equal(await h.page.locator('.tag-chip').count(),0);assert.equal(await h.page.locator('[data-ai-proposal]').count(),0);assert.equal(h.wire.filter(r=>r.path==='/api/hr/ai/job-skills').length,1);assert.equal(await h.page.getByRole('button',{name:'Vakansiyanı dərc et',exact:true}).isEnabled(),true);
+  await h.page.getByRole('alert').filter({hasText:require('../src/i18n/locales/az.json').hrAi.setupState.not_configured}).waitFor();assert.equal(await h.page.locator('.tag-chip').count(),0);assert.equal(await h.page.locator('[data-ai-proposal]').count(),0);assert.equal(h.wire.filter(r=>r.path==='/api/hr/ai/job-skills').length,1);assert.equal(await h.page.getByRole('button',{name:'Vakansiyanı dərc et',exact:true}).isEnabled(),true);
  });
  if(process.env.INOP_BASELINE_ONLY)return;
  await t.test('review explains confidence/unknown and mock identity without automatically changing fields',async()=>{
