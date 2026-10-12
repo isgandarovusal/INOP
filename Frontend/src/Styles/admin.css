@@ -647,13 +647,13 @@
    INOP — Restaurant filters: clear action
    ============================================================ */
 
-.filter-bar{
+.filter-bar:where(:not(.hr-primary-controls)){
   display:flex !important;
   align-items:center !important;
   gap:9px !important;
 }
 
-.filter-bar > .btn-secondary{
+.filter-bar:where(:not(.hr-primary-controls)) > .btn-secondary{
   margin-left:auto !important;
   border-color:#fed7aa !important;
   background:linear-gradient(180deg,#fff7ed 0%,#ffedd5 100%) !important;
@@ -661,7 +661,7 @@
   box-shadow:0 4px 11px rgba(234,88,12,.08) !important;
 }
 
-.filter-bar > .btn-secondary:hover{
+.filter-bar:where(:not(.hr-primary-controls)) > .btn-secondary:hover{
   border-color:#fb923c !important;
   background:linear-gradient(180deg,#ffedd5 0%,#fed7aa 100%) !important;
   color:#9a3412 !important;

@@ -47,7 +47,7 @@
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) > :first-child { min-width: 0; }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) :is(input, select) { min-width: 0; }
 .hr-workspace :is(.filter-bar, .hr-list-controls) label { display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; min-width: 0; }
-.hr-workspace .view-switcher { border-radius: 10px; background: #f3f5f8; box-shadow: none; }
+.hr-workspace .view-switcher { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--hr-border); border-radius: 10px; background: #f3f5f8; box-shadow: none; }
 .hr-workspace :is(.view-switcher__button.active, .hr-analytics-page [aria-pressed=true]) { background: #edf1f7; color: var(--hr-navy-hover); border-color: #bbc8da; box-shadow: none; }
 .hr-workspace .admin-table-container { max-width: 100%; overflow-x: auto; border: 1px solid var(--border-color); background: var(--hr-white); }
 .hr-workspace .admin-table-container table { border-collapse: collapse; width: 100%; }
@@ -325,8 +325,8 @@
 .hr-workspace .hr-candidate-grid > article { content-visibility: auto; contain-intrinsic-size: auto 240px; }
 
 /* Daily HR workspace: primary actions first, deliberate secondary controls. */
-.hr-workspace .hr-primary-controls { gap: 10px; padding: 12px; margin-bottom: 18px; align-items: center; }
-.hr-workspace .hr-primary-controls .search-field { flex: 1 1 220px; min-width: 170px; max-width: 540px; }
+.hr-workspace .hr-primary-controls { gap: 10px; padding: 12px; margin-bottom: 18px; align-items: center; justify-content: flex-start; flex-direction: row; }
+.hr-workspace .hr-primary-controls .search-field { flex: 1 1 240px; min-width: 170px; max-width: 420px; margin-right: 0; }
 .hr-workspace .hr-primary-controls > select { flex: 0 1 175px; max-width: 210px; }
 .hr-workspace .hr-primary-controls > button { flex: 0 0 auto; }
 .hr-workspace .hr-filter-panel { margin: 0; min-width: 0; }

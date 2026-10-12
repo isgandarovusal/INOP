@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
+import EmptyState from "../../../Components/EmptyState";
 import type { Candidate, CandidateStatus } from "../../../Types/recruitment";
 import {
   deleteCandidate, restoreCandidate,
@@ -62,14 +63,14 @@ const CandidatesList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const search = useDebouncedSearch(searchQuery);
   const [archived, setArchived] = useState(false);
-  const result = useHRPage("candidate", { q: search, archived: String(archived) }, getCandidatePage);
+  const [statusFilter, setStatusFilter] = useState<CandidateStatus | "all">("all");
+  const result = useHRPage("candidate", { q: search, archived: String(archived), status: statusFilter === "all" ? undefined : statusFilter }, getCandidatePage);
   const [confirmation, setConfirmation] = useState<{key:string;candidate:Candidate}|null>(null);
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
-  const context = useHRActionContext(JSON.stringify([search, archived, result.page]));
+  const context = useHRActionContext(JSON.stringify([search, archived, statusFilter, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
   const candidates = useMemo(() => result.data?.items ?? [], [result.data]);
-  const loading = result.status === "loading";
   const [mutation, setMutation] = useState({ key: "", error: "" });
   const error = mutation.key === context.key ? mutation.error : "";
   const [exportBusy, setExportBusy] = useState<{ key: string; busy: boolean }>({ key: "", busy: false });
@@ -152,7 +153,7 @@ const CandidatesList: React.FC = () => {
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
   return (
-    <div className="hr-workspace page-container hr-candidates-page">
+    <div className="hr-workspace recruitment-list-page hr-candidates-page">
       {confirmation?.key===context.key&&<HRConfirmDialog title={t("hrArchive.archive")} message={t("hrArchive.confirm",{name:confirmation.candidate.name})} confirmLabel={t("hrArchive.archive")} loading={Boolean(deletingId)} onConfirm={()=>{void confirmArchive();}} onCancel={()=>setConfirmation(null)}/>}
       <PageHeader
         title={t("recruitment.candidates.title")}
@@ -191,36 +192,14 @@ const CandidatesList: React.FC = () => {
         }
       />
 
-      <div
-        className="table-toolbar hr-primary-controls"
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          gap: "12px",
-          justifyContent: "space-between",
-        }}
-      >
-        <>{import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}{hasPermission(user, "application", "read") && <button type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}</>
+      <div className="filter-bar hr-primary-controls">
+        <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder={t("recruitment.candidates.searchPlaceholder")} />
         <select className="input-field" aria-label={t("hrArchive.visibility")} value={String(archived)} onChange={e=>setArchived(e.target.value==='true')}><option value="false">{t("hrArchive.active")}</option><option value="true">{t("hrArchive.archiveList")}</option></select>
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder={t(
-            "recruitment.candidates.searchPlaceholder",
-          )}
-        />
+        <select className="input-field" aria-label={t("hrPage.statusFilter")} value={statusFilter} onChange={e=>setStatusFilter(e.target.value as CandidateStatus | "all")}><option value="all">{t("recruitment.applications.allStatuses")}</option>{["new","applied","screening","shortlisted","interview","offer","hired","rejected"].map(value=><option key={value} value={value}>{t(`recruitment.candidateStatus.${value}`)}</option>)}</select>
+        {import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button className="btn-secondary" type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}
+        {hasPermission(user, "application", "read") && <button className="btn-secondary" type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}
 
-        <div
-          className="view-switcher"
-          style={{
-            display: "flex",
-            gap: "4px",
-            background: "var(--bg-card)",
-            padding: "4px",
-            borderRadius: "8px",
-            border: "1px solid var(--border-color)",
-          }}
-        >
+        <div className="view-switcher" role="group" aria-label={t("recruitment.candidates.title")}>
           <button
             className={
               "view-switcher__button " +
@@ -250,56 +229,8 @@ const CandidatesList: React.FC = () => {
       </div>
 
       {error && <p role="alert">{t(error)} <button type="button" onClick={fetchCandidates}>{t("hrStates.retry")}</button></p>}
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={fetchCandidates} /> : loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "48px",
-          }}
-        >
-          <Loader2 size={24} className="spin" />
-        </div>
-      ) : filteredCandidates.length === 0 ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "32px 24px",
-            textAlign: "center",
-            color: "var(--text-secondary)",
-          }}
-        >
-          <Search size={32} />
-          <h3 style={{ margin: "12px 0 6px" }}>
-            {searchQuery
-              ? t("recruitment.candidates.noSearchResults")
-              : t("recruitment.candidates.empty")}
-          </h3>
-
-          <p style={{ margin: 0 }}>
-            {searchQuery
-              ? t("recruitment.candidates.noSearchResultsDescription")
-              : t(
-                  "recruitment.candidates.emptyDescription",
-                )}
-          </p>
-
-          {canCreate && !searchQuery && (
-            <button
-              className="btn-primary"
-              style={{ marginTop: "16px" }}
-              onClick={() =>
-                navigate("/app/recruitment/candidates/new")
-              }
-            >
-              <Plus size={16} />
-              {t("recruitment.candidates.newCandidate")}
-            </button>
-          )}
-        </div>
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={fetchCandidates} /> : filteredCandidates.length === 0 ? (
+        <EmptyState icon={<Search size={28} />} title={t(searchQuery ? "recruitment.candidates.noSearchResults" : "recruitment.candidates.empty")} hint={t(searchQuery ? "recruitment.candidates.noSearchResultsDescription" : "recruitment.candidates.emptyDescription")} />
       ) : viewMode === "grid" ? (
         <div className="hr-candidate-grid">{filteredCandidates.map(c => <article key={c.id} className="recruitment-kanban__card">
           <div className="hr-person-card-heading"><span className="hr-person-avatar" aria-hidden="true">{c.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role || t('cvReview.unknown')}</p></div></div>
