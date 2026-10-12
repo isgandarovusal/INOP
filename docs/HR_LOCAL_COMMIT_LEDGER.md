@@ -2186,3 +2186,91 @@ A	docs/qa/hr22/E/before-analytics-1440.jpg
 A	docs/qa/hr22/E/cv-ai-unconfigured-az.jpg
 A	docs/qa/hr22/E/cv-one-processing-review.jpg
 ```
+
+## 6716105805da2287383726b0f1bbe1edd7b86813
+
+fix(hr): verify enterprise layouts and correct archive modal layering
+
+```text
+M	Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx
+M	Frontend/src/Styles/hr-workspace.css
+M	Frontend/src/Styles/recruitment.css
+M	Frontend/tests/hrAllRouteStability.test.cjs
+M	Frontend/tests/hrEnterpriseDesign.test.cjs
+M	docs/HR_AUDIT_FINDING_DISPOSITION.md
+A	docs/HR_ENTERPRISE_DESIGN_REPORT.md
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+M	docs/HR_LOCAL_COMMIT_LEDGER.md
+A	docs/qa/hr22/F/analytics-route-1440.jpg
+A	docs/qa/hr22/F/analytics-route-390.jpg
+A	docs/qa/hr22/F/analytics-route-768.jpg
+A	docs/qa/hr22/F/application-board-route-1440.jpg
+A	docs/qa/hr22/F/application-board-route-390.jpg
+A	docs/qa/hr22/F/application-board-route-768.jpg
+A	docs/qa/hr22/F/application-detail-route-1440.jpg
+A	docs/qa/hr22/F/application-detail-route-390.jpg
+A	docs/qa/hr22/F/application-detail-route-768.jpg
+A	docs/qa/hr22/F/applications-route-1440.jpg
+A	docs/qa/hr22/F/applications-route-390.jpg
+A	docs/qa/hr22/F/applications-route-768.jpg
+A	docs/qa/hr22/F/archive-modal-1440.jpg
+A	docs/qa/hr22/F/archive-modal-390.jpg
+A	docs/qa/hr22/F/before-analytics-route-1440.jpg
+A	docs/qa/hr22/F/before-application-board-route-1440.jpg
+A	docs/qa/hr22/F/before-application-detail-route-1440.jpg
+A	docs/qa/hr22/F/before-applications-route-1440.jpg
+A	docs/qa/hr22/F/before-candidate-create-route-1440.jpg
+A	docs/qa/hr22/F/before-candidate-detail-route-1440.jpg
+A	docs/qa/hr22/F/before-candidate-edit-route-1440.jpg
+A	docs/qa/hr22/F/before-candidates-route-1440.jpg
+A	docs/qa/hr22/F/before-intake-detail-disabled-route-1440.jpg
+A	docs/qa/hr22/F/before-intake-disabled-route-1440.jpg
+A	docs/qa/hr22/F/before-job-create-route-1440.jpg
+A	docs/qa/hr22/F/before-job-detail-route-1440.jpg
+A	docs/qa/hr22/F/before-job-edit-route-1440.jpg
+A	docs/qa/hr22/F/before-jobs-route-1440.jpg
+A	docs/qa/hr22/F/before-modal-in-flow-1440.jpg
+A	docs/qa/hr22/F/bundle-after-1.json
+A	docs/qa/hr22/F/bundle-after-2.json
+A	docs/qa/hr22/F/bundle-before-1.json
+A	docs/qa/hr22/F/bundle-before-2.json
+A	docs/qa/hr22/F/candidate-create-route-1440.jpg
+A	docs/qa/hr22/F/candidate-create-route-390.jpg
+A	docs/qa/hr22/F/candidate-create-route-768.jpg
+A	docs/qa/hr22/F/candidate-detail-route-1440.jpg
+A	docs/qa/hr22/F/candidate-detail-route-390.jpg
+A	docs/qa/hr22/F/candidate-detail-route-768.jpg
+A	docs/qa/hr22/F/candidate-edit-route-1440.jpg
+A	docs/qa/hr22/F/candidate-edit-route-390.jpg
+A	docs/qa/hr22/F/candidate-edit-route-768.jpg
+A	docs/qa/hr22/F/candidates-route-1440.jpg
+A	docs/qa/hr22/F/candidates-route-390.jpg
+A	docs/qa/hr22/F/candidates-route-768.jpg
+A	docs/qa/hr22/F/geometry.json
+A	docs/qa/hr22/F/intake-detail-disabled-route-1440.jpg
+A	docs/qa/hr22/F/intake-detail-disabled-route-390.jpg
+A	docs/qa/hr22/F/intake-detail-disabled-route-768.jpg
+A	docs/qa/hr22/F/intake-disabled-route-1440.jpg
+A	docs/qa/hr22/F/intake-disabled-route-390.jpg
+A	docs/qa/hr22/F/intake-disabled-route-768.jpg
+A	docs/qa/hr22/F/job-create-route-1440.jpg
+A	docs/qa/hr22/F/job-create-route-390.jpg
+A	docs/qa/hr22/F/job-create-route-768.jpg
+A	docs/qa/hr22/F/job-detail-route-1440.jpg
+A	docs/qa/hr22/F/job-detail-route-390.jpg
+A	docs/qa/hr22/F/job-detail-route-768.jpg
+A	docs/qa/hr22/F/job-edit-route-1440.jpg
+A	docs/qa/hr22/F/job-edit-route-390.jpg
+A	docs/qa/hr22/F/job-edit-route-768.jpg
+A	docs/qa/hr22/F/jobs-route-1440.jpg
+A	docs/qa/hr22/F/jobs-route-390.jpg
+A	docs/qa/hr22/F/jobs-route-768.jpg
+A	docs/qa/hr22/F/release-gates.json
+A	docs/qa/hr22/F/requests-after-1.json
+A	docs/qa/hr22/F/requests-after-2.json
+A	docs/qa/hr22/F/requests-before-1.json
+A	docs/qa/hr22/F/requests-before-2.json
+A	docs/qa/hr22/comparison.html
+```
+
+Normal mainFF and exactremoteSHA verified; finaldocs-onlyconfirmation follows. Runtime/backend gates remain valid, hosteddeployUNVERIFIED.

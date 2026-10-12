@@ -48,3 +48,7 @@ Disk preservation: two inactive generated old build directories byte-verified in
 - `ccdd4e1dce8acc0337c4e4dc5c0e58c0b6e27aa6` style(hr): distinguish real analytics metrics and human-reviewed AI actions
 
 F final runtime/test/evidence commit follows; full SHA and changed paths are recorded in Git/final response, not guessed in this self-containing file. Normalmainfast-forward permitted only after final gates, clean tree and exact remote ancestry. No new branch/force/history rewrite/migration/seed/secret change/provider activation. Render/Vercel/live status UNVERIFIED unless observable; successful Git transport is not deploy success. RealCV/provider/storage/scanner/recovery/Graph/external activation remains NO-GO/BLOCKED_EXTERNAL; AUD051 retention stillOPEN. No existing package acceptance is removed.
+
+## Verified Git transport and external limit
+
+F source/test/evidence commit `6716105805da2287383726b0f1bbe1edd7b86813` normalfast-forward pushed from ae4822c to inop-main; native ls-remote matched exactly. All A–F complete locally, work clean and previous8b38320 preserved. F changed paths in HR_LOCAL_COMMIT_LEDGER. Final docs-only confirmation follows and its exactSHA is in the final response. No runtime change after F. Frontend URL, Render/Vercel panels and GitHub status API all fail proxyCONNECT403/HTTP000/curl56 before TLS; no observed deploy success/failure or live functional PASS. Actual hosted login/HR/health/download verification remainsUNVERIFIED. No automatic rollback to old authorization or external activation.
