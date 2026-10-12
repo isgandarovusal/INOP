@@ -9,7 +9,7 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
   if (!dir || !path.isAbsolute(dir)) throw Error('Owned screenshot output required');
   await fs.mkdir(dir, { recursive: true });
   const evidence = [];
-  const enabled = name => group === name || group === 'all' || group === 'C' && ['candidates','applications'].includes(name) || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
+  const enabled = name => group === name || group === 'all' || group === 'C' && ['candidates','applications'].includes(name) || group === 'D' && ['jobs'].includes(name) || group === 'states' && ['candidates','applications','jobs','analytics','ai'].includes(name);
   async function capture(name) {
     await h.page.waitForLoadState('networkidle');
     const measured = await h.page.evaluate(() => {

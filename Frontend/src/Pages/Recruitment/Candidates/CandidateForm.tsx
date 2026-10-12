@@ -1,3 +1,4 @@
+import { UserRound } from "lucide-react";
 import CvIntakeSourceReview from '../../../Components/CvIntakeSourceReview';
 import {enqueueCvIntake,getCvIntake,approveCvIntake,downloadCvIntake,reconcileCvIntake,retryCvIntake} from '../../../Services/cvIntakeService';
 import type {CvIntakeSource,CvIntakeApproval} from '../../../Services/cvIntakeService';
@@ -276,7 +277,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   return (
     <div className="hr-workspace candidate-form-page">
       {job && !intakeAttempt && <p>{job.position}</p>}
-      <PageHeader
+      <PageHeader icon={<UserRound size={26} />}
         title={isEdit ? t("recruitment.candidateForm.editTitle") : t("recruitment.candidateForm.newTitle")}
         subtitle={t("recruitment.candidateForm.subtitle")}
       />
@@ -530,7 +531,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
           <div className="candidate-form-actions">
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-cancel"
               onClick={() => navigate(-1)}
             >
               {t("recruitment.candidateForm.cancel")}

@@ -1,3 +1,4 @@
+import { UserRound } from "lucide-react";
 import HRConfirmDialog from '../../../Components/HRConfirmDialog';
 import CandidateArchiveHistory from '../../../Components/CandidateArchiveHistory';
 import CvProcessingPanel from '../../../Components/CvProcessingPanel';
@@ -128,7 +129,7 @@ const CandidateDetail: React.FC = () => {
 
   return (
     <div className="hr-workspace candidate-detail-page">
-      <PageHeader
+      <PageHeader icon={<UserRound size={26} />}
         title={candidate.name}
         subtitle={
           candidate.email ||

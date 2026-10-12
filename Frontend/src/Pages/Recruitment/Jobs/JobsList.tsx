@@ -1,3 +1,4 @@
+import { BriefcaseBusiness } from "lucide-react";
 import HRScopeFilters from "../../../Components/HRScopeFilters";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
@@ -89,7 +90,7 @@ const JobsList: React.FC = () => {
 
   return (
     <div className="hr-workspace recruitment-list-page">
-      <PageHeader
+      <PageHeader icon={<BriefcaseBusiness size={26} />}
         title={t("recruitment.jobs.title")}
         subtitle={result.status === "ready" && result.data ? t("recruitment.jobs.totalShown", {
           total: result.data.total,

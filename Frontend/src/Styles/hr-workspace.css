@@ -44,7 +44,7 @@
 .hr-workspace :is(input, textarea)::placeholder { color: #667384; }
 .hr-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select) { min-height: 42px; }
 .hr-workspace textarea { min-height: 112px; resize: vertical; }
-.hr-workspace :is(.form-group > label, fieldset label, .hr-list-controls label) { font-size: 13px; font-weight: 550; color: #465469; }
+.hr-workspace :is(.form-group > label, fieldset label, .hr-list-controls label) { font-size: 13px; font-weight: 600; color: #364b6b; }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) {
   display: flex; flex-wrap: wrap; align-items: center;
   background: var(--hr-white); border: 1px solid var(--border-color); box-shadow: none;
@@ -86,11 +86,11 @@
 @media (max-width:650px) { .hr-workspace.job-form-page > .form-grid, .hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { grid-template-columns: minmax(0,1fr); } }
 
 .hr-workspace .candidate-form-section { padding: 24px; }
-.hr-workspace :is(.candidate-form-section__icon, .candidate-cv-upload__icon) { color: #465469; background: #f1f4f8; border-color: #e2e6eb; box-shadow: none; }
+.hr-workspace :is(.candidate-form-section__icon, .candidate-cv-upload__icon) { color: var(--hr-blue-ink); background: var(--hr-blue-soft); border-color: var(--hr-blue-border); box-shadow: none; }
 .hr-workspace :is(.candidate-form-section__title, .detail-card h3, .hr-analytics-sections h2) { font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }
 .hr-workspace :is(.candidate-form-section__description, .candidate-cv-upload__hint) { font-size: 13px; color: var(--text-secondary); }
-.hr-workspace .candidate-cv-upload { background: var(--hr-subtle); box-shadow: none; border: 1px dashed #c9d2df; border-radius: 12px; }
-.hr-workspace .candidate-cv-upload:hover { background: #f1f5f9; transform: none; box-shadow: none; }
+.hr-workspace .candidate-cv-upload { background: #f5f8ff; box-shadow: none; border: 1px dashed var(--hr-blue-border); border-radius: 12px; padding: 20px; }
+.hr-workspace .candidate-cv-upload:hover { background: var(--hr-blue-soft); transform: none; box-shadow: none; }
 .hr-workspace :is(.candidate-form-actions, .job-form-page .form-actions) { border-color: var(--border-color); background: var(--hr-white); box-shadow: none; }
 .hr-workspace .ranking-row { gap: 14px; }
 .hr-workspace .ranking-row__name { font-size: 14px; font-weight: 600; }
@@ -126,6 +126,7 @@
 .hr-dialog .modal-card__actions .btn-danger-solid { background: var(--hr-danger); border-color: var(--hr-danger); color: var(--hr-white); }
 .hr-dialog .modal-card__actions .btn-danger-solid:hover:not(:disabled) { background: var(--hr-danger-hover); border-color: var(--hr-danger-hover); }
 .hr-dialog .modal-card__actions { gap: 10px; margin-top: 24px; }
+.hr-dialog .modal-card__actions .btn-cancel { width: auto; background: var(--hr-white); color: var(--hr-slate); border: 1px solid var(--hr-border); }
 .hr-dialog .modal-card__actions button { min-height: 44px; border-radius: 10px; }
 .hr-dialog .modal-card__actions button:focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 3px; }
 @media (max-width: 650px) {
@@ -149,7 +150,7 @@
 }
 
 .hr-workspace .detail-card { padding: 24px; margin-bottom: 20px; }
-.hr-workspace .detail-card :is(h3, h4) { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
+.hr-workspace .detail-card :is(h3, h4) { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hr-border); font-size: 16px; font-weight: 650; }
 .hr-workspace .detail-card p { margin: 10px 0; }
 .hr-workspace :is([data-cv-review], [data-cv-processing-panel]) { background: var(--hr-white); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
 .hr-workspace details summary { cursor: pointer; font-weight: 550; padding: 8px 0; }
@@ -253,10 +254,11 @@
 .hr-workspace.job-detail-page .detail-card :is(button, select) { box-shadow: none; }
 .hr-workspace .ranking-row { background: var(--hr-white); border-color: #e9edf2; border-radius: 8px; padding: 12px; }
 .hr-workspace .ranking-row:hover { background: var(--hr-subtle); transform: none; box-shadow: none; }
-.hr-workspace .ranking-row__rank { background: #edf1f6; color: #4b5c74; border-radius: 7px; }
+.hr-workspace .ranking-row__rank { background: var(--hr-blue-soft); color: var(--hr-blue-ink); border-radius: 7px; }
 .hr-workspace .ranking-row__score { background: none; color: #243b61; box-shadow: none; }
 .hr-workspace.job-form-page > form { padding: 24px; gap: 20px; box-shadow: var(--hr-surface-shadow); }
-.hr-workspace :is(.form-actions, .candidate-form-actions) { margin-top: 12px; padding-top: 20px; border-top: 1px solid #e8edf2; }
+.hr-workspace :is(.form-actions, .candidate-form-actions) { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 12px; padding-top: 20px; border-top: 1px solid #e8edf2; }
+.hr-workspace :is(.form-actions, .candidate-form-actions) > button { flex: 0 0 auto; width: auto; min-width: 112px; }
 .hr-workspace .candidate-form-section { margin-bottom: 20px; }
 .hr-workspace .cv-history-editor { min-width: 0; display: grid; gap: 12px; }
 .hr-workspace .cv-history-editor > h4 { margin: 0; }

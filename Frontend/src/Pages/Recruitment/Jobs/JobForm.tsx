@@ -1,3 +1,4 @@
+import { BriefcaseBusiness } from "lucide-react";
 import AIAvailability from "../../../Components/AIAvailability";
 import JobSkillsAssistant from "../../../Components/JobSkillsAssistant";
 import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFields";
@@ -89,7 +90,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const aiContext = { title: position, description, brandId, branchId, workplace: location, experienceYears: experience, requiredSkills, preferredSkills };
   return (
     <div className="hr-workspace job-form-page">
-      <PageHeader
+      <PageHeader icon={<BriefcaseBusiness size={26} />}
         title={
           isEdit
             ? t("recruitment.jobForm.editTitle")

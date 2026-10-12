@@ -1,3 +1,4 @@
+import { BriefcaseBusiness } from "lucide-react";
 import JobArchiveHistory from "../../../Components/JobArchiveHistory";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
 import { useHRRankingPage } from "../../../Hooks/useHRRankingPage";
@@ -99,7 +100,7 @@ const JobDetail: React.FC = () => {
       {error && <div role="alert">{t(error)}</div>}
 
       {job.branchName && <p>{t("hrCatalog.branch")}: {job.branchName}</p>}
-      <PageHeader
+      <PageHeader icon={<BriefcaseBusiness size={26} />}
         title={job.position + (job.brandId ? ` · ${job.brandName || brandLabel(job.brandId)}` : "")}
         subtitle={`${t("recruitment.jobDetail.yearsExperience", {
           years: job.experience,

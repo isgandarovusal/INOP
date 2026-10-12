@@ -1,3 +1,4 @@
+import { ClipboardList } from "lucide-react";
 import ApplicationDelivery from '../../../Components/ApplicationDelivery';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -90,7 +91,7 @@ export default function ApplicationDetail() {
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
   return <div className="hr-workspace hr-application-detail">
-    <PageHeader title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} actions={<>
+    <PageHeader icon={<ClipboardList size={26} />} title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} actions={<>
       <Link className="btn-secondary" to="/app/recruitment/applications">{t('common.actions.back')}</Link>
       {app.candidateId && typeof app.candidateId === 'object' && <><Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user,'candidate','update')&&<Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}
     </>} />
