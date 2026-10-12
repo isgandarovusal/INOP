@@ -1981,3 +1981,99 @@ M	Frontend/src/i18n/locales/ru.json
 M	Frontend/tests/hrLiveScreenshotUI.test.cjs
 M	docs/HR_IMPLEMENTATION_TRACKER.md
 ```
+
+## d9e81b3952f9dee0e522c1748c6972ec2497c813
+
+test(hr): preserve final screenshot and lifecycle release evidence
+
+```text
+M	Frontend/tests/helpers/productionBrowser.cjs
+M	Frontend/tests/helpers/productionHRFixture.cjs
+M	Frontend/tests/hrAllRouteStability.test.cjs
+M	Frontend/tests/hrDepartmentAccessUI.test.cjs
+M	Frontend/tests/hrLiveScreenshotUI.test.cjs
+M	docs/HR_AUDIT_FINDING_DISPOSITION.md
+M	docs/HR_IMPLEMENTATION_TRACKER.md
+A	docs/HR_LIVE_REFINEMENT_REPORT.md
+M	docs/HR_LIVE_SCREENSHOT_CHECKLIST.md
+M	docs/HR_LOCAL_COMMIT_LEDGER.md
+A	docs/qa/hr21/analytics-filled.jpg
+A	docs/qa/hr21/analytics-operations.jpg
+A	docs/qa/hr21/analytics-route-1910.jpg
+A	docs/qa/hr21/analytics-route-390.jpg
+A	docs/qa/hr21/analytics-route-768.jpg
+A	docs/qa/hr21/analytics-zero-1875.jpg
+A	docs/qa/hr21/analytics-zero-390.jpg
+A	docs/qa/hr21/analytics-zero-768.jpg
+A	docs/qa/hr21/application-board-route-1910.jpg
+A	docs/qa/hr21/application-board-route-390.jpg
+A	docs/qa/hr21/application-board-route-768.jpg
+A	docs/qa/hr21/application-detail-route-1910.jpg
+A	docs/qa/hr21/application-detail-route-390.jpg
+A	docs/qa/hr21/application-detail-route-768.jpg
+A	docs/qa/hr21/applications-board.jpg
+A	docs/qa/hr21/applications-empty-1910.jpg
+A	docs/qa/hr21/applications-empty-390.jpg
+A	docs/qa/hr21/applications-empty-768.jpg
+A	docs/qa/hr21/applications-filled.jpg
+A	docs/qa/hr21/applications-page-two.jpg
+A	docs/qa/hr21/applications-route-1910.jpg
+A	docs/qa/hr21/applications-route-390.jpg
+A	docs/qa/hr21/applications-route-768.jpg
+A	docs/qa/hr21/candidate-create-route-1910.jpg
+A	docs/qa/hr21/candidate-create-route-390.jpg
+A	docs/qa/hr21/candidate-create-route-768.jpg
+A	docs/qa/hr21/candidate-create.jpg
+A	docs/qa/hr21/candidate-detail-route-1910.jpg
+A	docs/qa/hr21/candidate-detail-route-390.jpg
+A	docs/qa/hr21/candidate-detail-route-768.jpg
+A	docs/qa/hr21/candidate-edit-1910.jpg
+A	docs/qa/hr21/candidate-edit-390.jpg
+A	docs/qa/hr21/candidate-edit-768.jpg
+A	docs/qa/hr21/candidate-edit-route-1910.jpg
+A	docs/qa/hr21/candidate-edit-route-390.jpg
+A	docs/qa/hr21/candidate-edit-route-768.jpg
+A	docs/qa/hr21/candidates-empty-1910.jpg
+A	docs/qa/hr21/candidates-empty-390.jpg
+A	docs/qa/hr21/candidates-empty-768.jpg
+A	docs/qa/hr21/candidates-filled.jpg
+A	docs/qa/hr21/candidates-route-1910.jpg
+A	docs/qa/hr21/candidates-route-390.jpg
+A	docs/qa/hr21/candidates-route-768.jpg
+A	docs/qa/hr21/candidates-table.jpg
+A	docs/qa/hr21/cv-ai-unconfigured-az.jpg
+A	docs/qa/hr21/cv-ai-unconfigured-en.jpg
+A	docs/qa/hr21/cv-ai-unconfigured-ru.jpg
+A	docs/qa/hr21/cv-one-processing-review.jpg
+A	docs/qa/hr21/gallery.html
+A	docs/qa/hr21/intake-detail-disabled-route-1910.jpg
+A	docs/qa/hr21/intake-detail-disabled-route-390.jpg
+A	docs/qa/hr21/intake-detail-disabled-route-768.jpg
+A	docs/qa/hr21/intake-disabled-route-1910.jpg
+A	docs/qa/hr21/intake-disabled-route-390.jpg
+A	docs/qa/hr21/intake-disabled-route-768.jpg
+A	docs/qa/hr21/job-ai-configuration.jpg
+A	docs/qa/hr21/job-ai-unconfigured.jpg
+A	docs/qa/hr21/job-create-1711.jpg
+A	docs/qa/hr21/job-create-390.jpg
+A	docs/qa/hr21/job-create-768.jpg
+A	docs/qa/hr21/job-create-route-1910.jpg
+A	docs/qa/hr21/job-create-route-390.jpg
+A	docs/qa/hr21/job-create-route-768.jpg
+A	docs/qa/hr21/job-detail-route-1910.jpg
+A	docs/qa/hr21/job-detail-route-390.jpg
+A	docs/qa/hr21/job-detail-route-768.jpg
+A	docs/qa/hr21/job-edit-route-1910.jpg
+A	docs/qa/hr21/job-edit-route-390.jpg
+A	docs/qa/hr21/job-edit-route-768.jpg
+A	docs/qa/hr21/job-edit.jpg
+A	docs/qa/hr21/jobs-route-1910.jpg
+A	docs/qa/hr21/jobs-route-390.jpg
+A	docs/qa/hr21/jobs-route-768.jpg
+A	docs/qa/hr21/release-gates.json
+A	docs/qa/hr21/requests-after.json
+A	docs/qa/hr21/requests-before.json
+A	docs/qa/hr21/states-geometry.json
+```
+
+Normalmainpush and remote exactSHA verified. Final documentation confirmation commit follows; runtime93017e7 unchanged, deploymentsUNVERIFIED.
