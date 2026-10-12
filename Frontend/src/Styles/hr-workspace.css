@@ -19,7 +19,7 @@
 }
 .hr-workspace :is(.anim-in, .anim-pop, .ranking-row, .recruitment-kanban__card) { animation: none; }
 .hr-workspace .page-header { padding: 8px 0 24px; margin-bottom: 8px; align-items: flex-start; gap: 20px; }
-.hr-workspace .page-header__title { font-size: clamp(24px, 2.3vw, 30px); font-weight: 650; line-height: 1.25; letter-spacing: -.035em; color: var(--text-primary); }
+.hr-workspace .page-header__title { font-size: clamp(24px, 2.3vw, 30px); line-height: 1.25; letter-spacing: -.035em; color: var(--text-primary); }
 .hr-workspace .page-header__subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.55; max-width: 65ch; margin-top: 8px; }
 .hr-workspace .page-header__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .hr-workspace :is(button, input, select, textarea) { font: inherit; }
@@ -77,14 +77,14 @@
 .hr-workspace .hr-application-board { gap: 16px; padding: 4px 2px 16px; scrollbar-width: thin; scroll-snap-type: x proximity; }
 .hr-workspace .hr-application-board > section { flex: 1 0 280px; min-width: 280px; padding: 14px; border-radius: 14px; background: #f4f6f9; border: 1px solid #e2e6eb; scroll-snap-align: start; }
 .hr-workspace .hr-application-board > section > h3 { font-size: 14px; font-weight: 600; color: #465469; margin-bottom: 16px; }
-.hr-workspace .recruitment-kanban__card { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgb(15 23 42 / 3%); }
+.hr-workspace .recruitment-kanban__card { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; box-shadow: 0 1px 2px rgb(15 23 42 / 3%); }
 .hr-workspace .recruitment-kanban__card:hover { border-color: #b8c5d6; box-shadow: 0 2px 6px rgb(15 23 42 / 5%); transform: none; }
 .hr-workspace .recruitment-kanban__card::before, .hr-workspace .recruitment-kanban__card::after { display: none; }
 .hr-workspace .hr-candidate-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
 .hr-workspace .hr-analytics-kpis { gap: 16px; margin: 24px 0; }
 .hr-workspace .hr-analytics-kpis article { padding: 22px; }
 .hr-workspace .hr-analytics-kpis h3 { color: var(--text-secondary); font-size: 13px; font-weight: 500; margin: 0 0 12px; }
-.hr-workspace .hr-analytics-kpis strong { color: var(--text-primary); font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.035em; }
+.hr-workspace .hr-analytics-kpis strong { color: var(--text-primary); font-size: 32px; font-variant-numeric: tabular-nums; letter-spacing: -.035em; }
 .hr-workspace .hr-analytics-sections { gap: 20px; }
 .hr-workspace .hr-analytics-sections section { padding: 24px; min-width: 0; }
 .hr-workspace .hr-analytics-sections :is(ul, ol) { padding-left: 20px; line-height: 1.9; }
@@ -137,7 +137,7 @@
 .hr-workspace.hr-analytics-page [aria-pressed=true] { background: #edf1f7; color: #172a48; outline: 0; border: 1px solid #bbc8da; }
 .hr-workspace.hr-analytics-page .filter-bar > button { padding: 8px 14px; border: 1px solid #d7dde5; }
 .hr-workspace .hr-analytic-number { font-variant-numeric: tabular-nums; }
-.hr-workspace .hr-metric-track { display: block; width: 100%; height: 4px; background: #edf1f5; border-radius: 2px; margin-top: 6px; }
+.hr-workspace .hr-metric-track { display: block; width: 100%; background: #edf1f5; border-radius: 2px; margin-top: 6px; }
 .hr-workspace .hr-metric-track > span { display: block; height: 4px; background: #7086a7; border-radius: 2px; }
 .hr-workspace.hr-dashboard-summary :is(.kpi-card, .recent-card, .chart-card) { border: 1px solid var(--border-color); border-radius: 14px; box-shadow: none; background: #fff; }
 .hr-workspace.hr-dashboard-summary .kpi-card__value { font-variant-numeric: tabular-nums; letter-spacing: -.035em; }
@@ -152,9 +152,6 @@
 .hr-shell .admin-sidebar__nav a { color: #5c6878; border-radius: 10px; font-weight: 550; }
 .hr-shell .admin-sidebar__nav a.active { background: #edf1f7; color: #253b61; border-color: #d7e0ed; box-shadow: none; }
 .hr-shell .admin-sidebar__nav a.active::before { background: #253b61; }
-.hr-shell .admin-language-panel { background: #f4f6f9; border-color: #e2e6eb; box-shadow: none; }
-.hr-shell .admin-language-option--active { background: #fff; border-color: #d7dde5; color: #253b61; box-shadow: 0 1px 2px rgb(15 23 42 / 4%); }
-.hr-shell .admin-language-option--active span { color: #253b61; }
 .hr-shell .admin-sidebar__brand::before { background: #253b61; box-shadow: none; }
 
 /* The retained legacy layer has important gradient rules. Override ONLY HR. */
@@ -192,7 +189,8 @@
 
 /* GFC corporate workspace: calm canvas, crisp surfaces and purposeful density. */
 .hr-shell .admin-main { background: #f7f8fa; }
-.hr-product-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 28px; margin: -8px 0 30px; padding-bottom: 16px; border-bottom: 1px solid #e1e6ed; min-width: 0; }
+.hr-product-bar { display: none; align-items: center; flex-wrap: wrap; gap: 16px 28px; margin: -8px 0 30px; padding-bottom: 16px; border-bottom: 1px solid #e1e6ed; min-width: 0; }
+@media (max-width: 900px) { .hr-product-bar { display: flex; } }
 .hr-product-bar__identity { display: flex; align-items: center; gap: 10px; color: #687588; font-size: 12px; white-space: nowrap; }
 .hr-product-bar__identity > :first-child { color: #24374f; font-weight: 750; font-size: 15px; letter-spacing: -.04em; padding-right: 10px; border-right: 1px solid #d9e0e8; }
 .hr-product-nav { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }

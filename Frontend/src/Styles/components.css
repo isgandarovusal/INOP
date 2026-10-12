@@ -39,7 +39,6 @@
 .btn-add:hover:not(:disabled) {
   background: var(--accent-hover);
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.10);
-  transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled),
@@ -230,7 +229,6 @@
 }
 
 .input-field:focus {
-  outline: none;
   border-color: var(--accent);
   background: var(--surface);
   box-shadow: 0 0 0 3px var(--accent-soft);
@@ -437,7 +435,6 @@ select.input-field {
 }
 
 .page-header__title {
-  margin: 0;
   color: var(--text-primary-strong);
   font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);
@@ -454,12 +451,8 @@ select.input-field {
 }
 
 .page-header__actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
   flex: 0 1 auto;
   gap: var(--space-2);
-  flex-wrap: wrap;
 }
 
 @media (max-width: 640px) {
@@ -494,7 +487,6 @@ select.input-field {
   background: var(--surface);
   color: var(--text-primary-strong);
   font: inherit;
-  font-size: 13px;
   outline: none;
   cursor: pointer;
   transition:
@@ -534,7 +526,6 @@ select.input-field {
   background: var(--surface);
   color: var(--text-primary-strong);
   font: inherit;
-  font-size: 13px;
   outline: none;
   transition:
     background-color var(--transition-fast),
@@ -592,7 +583,6 @@ select.input-field {
 /* ── Table ───────────────────────────────────────────── */
 .admin-table-container {
   margin-top: var(--space-2);
-  overflow-x: auto;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -719,13 +709,8 @@ tbody tr:hover {
 
 /* ── Empty state ─────────────────────────────────────── */
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-10) var(--space-4);
   color: var(--text-secondary-strong);
-  text-align: center;
 }
 
 .empty-state svg {
@@ -1887,8 +1872,6 @@ tbody tr:hover {
 /* Keep glass wrappers visually subordinate to the shared table surface. */
 .admin-table-container.glass {
   background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 @media (max-width: 720px) {

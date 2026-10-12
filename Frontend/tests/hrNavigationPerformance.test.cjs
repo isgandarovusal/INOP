@@ -9,17 +9,17 @@ test('HR focus and visibility regain perform one current authorized refresh',asy
 test('HR navigation intent loads public code, never speculative private data, and respects current access/Save-Data',async()=>withBrowserFixture(harness,async h=>{
  const code=[];h.page.on('request',r=>{if(r.url().includes('/Pages/Recruitment/Applications/ApplicationsList.tsx'))code.push(r.url())});
  await h.open('admin','/app/recruitment/jobs');await h.page.locator('.admin-table-container').waitFor();
- const link=h.page.locator('[data-hr-product-bar] a[href="/app/recruitment/applications"]'),reads=h.wire.length;
+ const link=h.page.locator('aside.admin-sidebar a[href="/app/recruitment/applications"]'),reads=h.wire.length;
  await h.page.evaluate(()=>Object.defineProperty(navigator,'connection',{configurable:true,value:{saveData:true}}));await link.hover();await h.page.waitForTimeout(100);assert.equal(code.length,0);assert.equal(h.wire.length,reads);
  await h.page.evaluate(()=>Object.defineProperty(navigator,'connection',{configurable:true,value:{saveData:false,effectiveType:'2g'}}));await link.focus();await h.page.waitForTimeout(100);assert.equal(code.length,0);
  await h.page.evaluate(async()=>{Object.defineProperty(navigator,'connection',{configurable:true,value:{saveData:false,effectiveType:'4g'}});const{preloadHRRoute}=await import('/src/Routes/hrRouteModules.ts');preloadHRRoute('/app/recruitment/applications',{...window.testUser,role:'auditor',departmentId:'dep_audit',hrAccess:true});});await h.page.waitForTimeout(100);assert.equal(code.length,0);assert.equal(h.wire.length,reads);
- await h.page.locator('[data-hr-product-bar] a[href="/app/recruitment/candidates"]').focus();await h.page.keyboard.press('Tab');assert.equal(await link.evaluate(el=>document.activeElement===el),true);await h.page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.includes('/Pages/Recruitment/Applications/ApplicationsList.tsx')));assert.equal(code.length,1);assert.equal(h.wire.length,reads);
+ await h.page.locator('aside.admin-sidebar a[href="/app/recruitment/candidates"]').focus();await h.page.keyboard.press('Tab');assert.equal(await link.evaluate(el=>document.activeElement===el),true);await h.page.waitForFunction(()=>performance.getEntriesByType('resource').some(r=>r.name.includes('/Pages/Recruitment/Applications/ApplicationsList.tsx')));assert.equal(code.length,1);assert.equal(h.wire.length,reads);
  await link.blur();await link.focus();await h.page.waitForTimeout(100);assert.equal(h.wire.length,reads);assert.equal(code.length,1);
  const response=h.page.waitForResponse(r=>r.url().includes('/api/hr/v2/applications'));await link.click();await response;await h.page.getByRole('region',{name:'Müraciətlər',exact:true}).waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/applications').length,1);assert.deepEqual(h.pageErrors,[]);
 }));
 test('A failed speculative public module fetch cannot break later HR navigation',async()=>withBrowserFixture(harness,async h=>{
  await h.open('admin','/app/recruitment/jobs');await h.page.locator('.admin-table-container').waitFor();let failed=0;
  const pattern='**/Pages/Recruitment/Applications/ApplicationsList.tsx';await h.page.route(pattern,r=>{failed++;return r.abort('failed')});
- const link=h.page.locator('[data-hr-product-bar] a[href="/app/recruitment/applications"]');await link.hover();await h.page.waitForFunction(()=>!document.querySelector('[data-hr-state=loading]'));await h.page.waitForTimeout(250);assert.equal(failed,1);assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/applications').length,0);
+ const link=h.page.locator('aside.admin-sidebar a[href="/app/recruitment/applications"]');await link.hover();await h.page.waitForFunction(()=>!document.querySelector('[data-hr-state=loading]'));await h.page.waitForTimeout(250);assert.equal(failed,1);assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/applications').length,0);
  await h.page.unroute(pattern);await link.click();await h.page.getByRole('region',{name:'Müraciətlər',exact:true}).waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/applications').length,1);assert.deepEqual(h.pageErrors,[]);
 }));

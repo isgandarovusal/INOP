@@ -3,10 +3,9 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
-import i18n, { changeLanguage } from "../../../i18n";
-import azFlag from "../../../assets/flags/az.svg";
-import gbFlag from "../../../assets/flags/gb.svg";
-import ruFlag from "../../../assets/flags/ru.svg";
+import INOPLogo from "../../../Components/INOPLogo";
+import LanguageSwitcher from "../../../Components/LanguageSwitcher";
+import "../../../Styles/auth.css";
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -44,106 +43,19 @@ const Login: React.FC = () => {
     }
   };
 
-  const languages = [
-    { code: "az" as const, label: "AZE", flag: azFlag, name: "Azərbaycan" },
-    { code: "en" as const, label: "ENG", flag: gbFlag, name: "English" },
-    { code: "ru" as const, label: "RUS", flag: ruFlag, name: "Русский" },
-  ];
-
   return (
     <div className="auth-page">
-      <div className="auth-page__ambient auth-page__ambient--one" />
-      <div className="auth-page__ambient auth-page__ambient--two" />
-      <div className="auth-page__grid-overlay" />
-
       <main className="auth-shell">
         <section className="auth-brand-panel" aria-label="INOP">
-          <div className="auth-brand-panel__top">
-            <div className="auth-wordmark" aria-label="INOP">
-              <span className="auth-wordmark__letter">I</span>
-              <span className="auth-wordmark__letter">N</span>
-              <span className="auth-wordmark__letter">O</span>
-              <span className="auth-wordmark__letter">P</span>
-            </div>
-
-            <p className="auth-wordmark__descriptor">
-              INTERNAL OPERATIONS PLATFORM
-            </p>
-          </div>
-
-          <div className="auth-brand-panel__statement">
-            <span className="auth-brand-panel__eyebrow">INOP / OPERATIONS</span>
-            <h1>
-              One platform.
-              <br />
-              <span>Every operation.</span>
-            </h1>
-            <p>{t("auth.subtitle")}</p>
-          </div>
-
-          <div className="auth-brand-panel__geometry" aria-hidden="true">
-            <div className="auth-orbit auth-orbit--outer" />
-            <div className="auth-orbit auth-orbit--middle" />
-            <div className="auth-orbit auth-orbit--inner" />
-            <div className="auth-orbit__core" />
-            <span className="auth-orbit__point auth-orbit__point--one" />
-            <span className="auth-orbit__point auth-orbit__point--two" />
-          </div>
-
-          <div className="auth-brand-panel__footer">
-            <span>RECRUITMENT</span>
-            <i />
-            <span>AUDIT</span>
-            <i />
-            <span>OPERATIONS</span>
-          </div>
+          <INOPLogo />
+          <p>KFC · Pizza Hut · Simit Sarayı</p>
+          <div className="auth-brand-panel__footer">RECRUITMENT · AUDIT · OPERATIONS</div>
         </section>
-
         <section className="auth-entry-panel">
-          <div className="auth-entry-panel__topbar">
-            <div className="auth-entry-panel__mobile-brand">
-              <span>INOP</span>
-              <small>INTERNAL OPERATIONS PLATFORM</small>
-            </div>
-
-            <div
-              className="auth-language-switcher"
-              aria-label={t("auth.language")}
-            >
-              {languages.map((language) => (
-                <button
-                  key={language.code}
-                  type="button"
-                  className={`auth-language-switcher__option ${
-                    i18n.language === language.code
-                      ? "auth-language-switcher__option--active"
-                      : ""
-                  }`}
-                  onClick={() => changeLanguage(language.code)}
-                  aria-pressed={i18n.language === language.code}
-                  aria-label={language.name}
-                >
-                  <img
-                    src={language.flag}
-                    alt=""
-                    className="auth-language-switcher__flag"
-                    aria-hidden="true"
-                  />
-                  <span>{language.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
+          <LanguageSwitcher />
           <div className="auth-card">
-            <div className="auth-card__eyebrow">WELCOME BACK</div>
-
-            <h2 className="auth-card__title">{t("auth.signIn")}</h2>
-
-            <p className="auth-card__subtitle">
-              {t("auth.subtitle")}
-            </p>
-
+            <h1 className="auth-card__title">{t("auth.signIn")}</h1>
+            <p className="auth-card__subtitle">{t("auth.subtitle")}</p>
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
                 <label htmlFor="email" className="form-label">
@@ -204,7 +116,7 @@ const Login: React.FC = () => {
               </div>
 
               {error && (
-                <p className="form-error form-error--submit">
+                <p role="alert" className="form-error form-error--submit">
                   <AlertCircle size={12} /> {error}
                 </p>
               )}
@@ -233,16 +145,8 @@ const Login: React.FC = () => {
                 )}
               </button>
             </form>
-
-            <div className="auth-card__security">
-              <span className="auth-card__security-dot" />
-              Secure internal workspace
-            </div>
           </div>
-
-          <p className="auth-entry-panel__footer">
-            INOP · INTERNAL OPERATIONS PLATFORM
-          </p>
+          <p className="auth-entry-panel__footer">INOP · INTERNAL OPERATIONS PLATFORM</p>
         </section>
       </main>
     </div>

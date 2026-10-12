@@ -4,7 +4,6 @@
 }
 
 .admin-sidebar {
-  width: var(--admin-sidebar-width);
   padding: var(--space-6) var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
@@ -21,8 +20,6 @@
 }
 
 .admin-sidebar__brand {
-  display: flex;
-  align-items: center;
   gap: var(--space-2);
   margin: 0 var(--space-2) var(--space-6);
   font-size: 20px;
@@ -42,7 +39,6 @@
   font-size: 11px;
   font-weight: 650;
   line-height: 1.3;
-  text-transform: uppercase;
   letter-spacing: 0.07em;
 }
 
@@ -58,7 +54,6 @@
   gap: var(--space-3);
   min-height: var(--control-height-md);
   padding: 0 var(--space-3);
-  border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--text-secondary-strong);
   text-decoration: none;
@@ -91,19 +86,15 @@
   left: calc(-1 * var(--space-3));
   top: 50%;
   transform: translateY(-50%);
-  width: 3px;
-  height: 20px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--accent);
 }
 
 .admin-sidebar__icon {
   flex-shrink: 0;
-  color: currentColor;
 }
 
 .admin-sidebar__user {
-  margin-top: auto;
   padding: var(--space-4) var(--space-2) 0;
   border-top: 1px solid var(--border-subtle);
   display: flex;
@@ -470,30 +461,6 @@
   letter-spacing: -0.045em;
 }
 
-.admin-brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 19px;
-  height: 19px;
-  border-radius: 50%;
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      #000 0%,
-      #000 34%,
-      #080910 45%,
-      #171728 58%,
-      rgba(79, 70, 229, 0.28) 72%,
-      transparent 100%
-    );
-  color: transparent;
-  box-shadow:
-    0 0 5px rgba(70, 78, 112, 0.14),
-    0 0 11px rgba(79, 67, 145, 0.09);
-  flex: 0 0 auto;
-}
-
 .admin-sidebar__group {
   margin-bottom: 18px;
 }
@@ -607,54 +574,6 @@
   letter-spacing: -0.025em;
 }
 
-.admin-language-panel {
-  width: auto;
-  margin: 0 8px 18px;
-  padding: 3px;
-  gap: 2px;
-  border: 1px solid rgba(23, 54, 93, 0.08);
-  border-radius: 10px;
-  background: #f7f8fb;
-  box-shadow: none;
-}
-
-.admin-language-option {
-  height: 29px;
-  gap: 6px;
-  padding: 0 7px;
-  border-radius: 7px;
-  color: #737c89 !important;
-  font-size: 8.5px;
-  font-weight: 760;
-  letter-spacing: 0.045em;
-}
-
-.admin-language-option span {
-  color: inherit !important;
-}
-
-.admin-language-option:hover {
-  background: rgba(23, 54, 93, 0.045);
-  color: #343b46 !important;
-}
-
-.admin-language-option--active {
-  background: #ffffff;
-  color: #4540a5 !important;
-  box-shadow:
-    0 1px 3px rgba(15, 23, 42, 0.06),
-    0 0 0 1px rgba(79, 70, 229, 0.07);
-}
-
-.admin-language-option--active span {
-  color: #4540a5 !important;
-}
-
-.admin-language-option:focus-visible {
-  box-shadow:
-    0 0 0 2px rgba(79, 70, 229, 0.12);
-}
-
 @media (max-width: 900px) {
   .admin-main {
     padding: 82px 18px 28px;
@@ -664,3 +583,14 @@
     margin-bottom: 20px;
   }
 }
+
+/* One language control for the shell and login; replaces legacy variants. */
+.language-switcher { width: fit-content; display: flex; align-items: center; gap: 2px; padding: 3px; margin: 0 8px 20px; border: 1px solid #e0e5ec; border-radius: 9px; background: #f6f8fa; }
+.language-switcher button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 7px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #556378; font-size: 11px; font-weight: 550; cursor: pointer; box-shadow: none; }
+.language-switcher button[aria-pressed=true] { background: #fff; border-color: #d6dde7; color: #253b61; }
+.language-switcher button:hover { background: #edf1f5; }
+.language-switcher button:focus-visible { outline: 2px solid #253b61; outline-offset: 2px; }
+.language-switcher img { display: block; object-fit: cover; border-radius: 2px; }
+.inop-logo { display: block; height: auto; max-width: 100%; object-fit: contain; }
+.admin-sidebar__brand .inop-logo { width: 160px; border-radius: 8px; }
+.admin-topbar__brand .inop-logo { width: 112px; border-radius: 6px; }

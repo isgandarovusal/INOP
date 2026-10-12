@@ -1,8 +1,5 @@
 import { preloadHRRoute } from '../../Routes/hrRouteModules';
 import React, { useEffect, useState } from "react";
-import azFlag from "../../assets/flags/az.svg";
-import gbFlag from "../../assets/flags/gb.svg";
-import ruFlag from "../../assets/flags/ru.svg";
 
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -29,7 +26,8 @@ import {
   ROLE_LABELS,
   type Section,
 } from "../../Utils/permissions";
-import i18n, { changeLanguage } from "../../i18n";
+import INOPLogo from "../../Components/INOPLogo";
+import LanguageSwitcher from "../../Components/LanguageSwitcher";
 import "../../Styles/admin.css";
 
 interface NavItem {
@@ -193,9 +191,22 @@ const NAV_GROUPS: NavGroup[] = [
 
 const Sidebar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
   const location = useLocation();
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 900px)');
+    const change = () => setMobile(media.matches);
+    media.addEventListener('change', change);
+    return () => media.removeEventListener('change', change);
+  }, []);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
+  }, [menuOpen]);
 
   useEffect(() => {
     // Intentional: close the mobile menu whenever the route changes.
@@ -212,22 +223,20 @@ const Sidebar: React.FC = () => {
     ),
   })).filter((group) => group.items.length > 0);
 
-  const currentLanguage = i18n.language.split("-")[0];
 
   return (
     <>
       <div className="admin-topbar">
         <div className="admin-topbar__brand">
-          <span className="admin-brand-mark" aria-hidden="true">
-            I
-          </span>
-          <span>INOP</span>
+          <INOPLogo />
         </div>
 
         <button
           className="admin-topbar__toggle"
           onClick={() => setMenuOpen((value) => !value)}
           aria-label={t("navigation.toggleMenu")}
+          aria-expanded={menuOpen}
+          aria-controls="inop-navigation"
           title={t("navigation.toggleMenu")}
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -242,99 +251,17 @@ const Sidebar: React.FC = () => {
       )}
 
       <aside
-        className={`admin-sidebar glass ${
+        id="inop-navigation"
+        inert={mobile && !menuOpen}
+        className={`admin-sidebar ${
           menuOpen ? "admin-sidebar--open" : ""
         }`}
       >
         <h2 className="admin-sidebar__brand">
-          <span className="admin-brand-mark" aria-hidden="true">
-            I
-          </span>
-          <span>INOP</span>
+          <INOPLogo />
         </h2>
 
-          <div className="admin-language-panel">
-            <button
-              type="button"
-              className={`admin-language-option ${
-                currentLanguage === "az"
-                  ? "admin-language-option--active"
-                  : ""
-              }`}
-              onClick={() => changeLanguage("az")}
-              aria-pressed={currentLanguage === "az"}
-            >
-              <img
-                src={azFlag}
-                alt=""
-                className="admin-language-flag"
-              />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                AZE
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`admin-language-option ${
-                currentLanguage === "en"
-                  ? "admin-language-option--active"
-                  : ""
-              }`}
-              onClick={() => changeLanguage("en")}
-              aria-pressed={currentLanguage === "en"}
-            >
-              <img
-                src={gbFlag}
-                alt=""
-                className="admin-language-flag"
-              />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                ENG
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`admin-language-option ${
-                currentLanguage === "ru"
-                  ? "admin-language-option--active"
-                  : ""
-              }`}
-              onClick={() => changeLanguage("ru")}
-              aria-pressed={currentLanguage === "ru"}
-            >
-              <img
-                src={ruFlag}
-                alt=""
-                className="admin-language-flag"
-              />
-              <span
-                style={{
-                  color: "#ffffff",
-                  opacity: 1,
-                  visibility: "visible",
-                  fontWeight: 800,
-                }}
-              >
-                RUS
-              </span>
-            </button>
-          </div>
+        <LanguageSwitcher />
 
         {visibleGroups.map((group) => (
           <div className="admin-sidebar__group" key={group.titleKey}>
