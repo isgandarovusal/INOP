@@ -1309,6 +1309,7 @@
     "pageSort": "Bal/ad sıralaması bu səhifəyə aiddir. Qrupu daraltmaq üçün filtrlərdən istifadə edin.",
     "vacancyRanking": "Bu vakansiyanın bütün icazəli müraciətləri üzrə cari uyğunluq sırası. Qiymətləndirmə olmayan müraciətlər sonda göstərilir.",
     "rankingChanged": "Uyğunluq sırası dəyişib. İlk səhifədən yenidən yükləyin.",
+    "sortNewestAll": "Ən yeni (bütün nəticələr)",
     "sortScorePage": "Bal (bu səhifə)",
     "sortNamePage": "Ad (bu səhifə)",
     "lookup": "Bütün icazəli filtr seçimlərində axtar",

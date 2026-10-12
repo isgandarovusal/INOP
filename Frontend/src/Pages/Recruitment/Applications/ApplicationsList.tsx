@@ -8,7 +8,7 @@ import { applicationScoreOrder } from "../../../Services/rankingService";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ClipboardList, Loader2, Trash2 } from "lucide-react";
+import { ClipboardList, Loader2, Trash2, RefreshCw } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
@@ -176,14 +176,15 @@ const ApplicationsList: React.FC = () => {
     <div className="hr-workspace recruitment-list-page">
       <PageHeader
         title={t("recruitment.applications.title")}
+        actions={view === "board" ? <button type="button" className="btn-secondary" disabled={result.status !== "ready" || result.refreshing} aria-busy={result.refreshing || undefined} onClick={load}><RefreshCw size={16} className={result.refreshing ? "spin" : undefined} />{t("common.actions.refresh")}</button> : undefined}
         subtitle={result.status === "ready" && result.data ? t("recruitment.applications.totalShown", { total: result.data.total, shown: rows.length }) : undefined}
       />
 
       {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <div className="filter-bar hr-primary-controls">
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
-        <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrWorkflow.sortNewest' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
-        <button type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
+        <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrPage.sortNewestAll' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
+        <button className="btn-secondary" type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
         <select
           aria-label={t('hrPage.statusFilter')}
           className="input-field"
@@ -215,7 +216,7 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
-      <p role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
+      <p className="hr-toolbar-note" role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
       {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
         <table>
           <thead>

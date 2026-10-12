@@ -1285,6 +1285,7 @@
     "pageSort": "Score/name ordering applies to this page. Use filters to narrow the cohort.",
     "vacancyRanking": "Current match order across all permitted applications for this vacancy. Unscored applications appear last.",
     "rankingChanged": "The ranking changed. Reload from the first page.",
+    "sortNewestAll": "Newest (all results)",
     "sortScorePage": "Score (this page)",
     "sortNamePage": "Name (this page)",
     "lookup": "Search all authorized filter options",
