@@ -129,8 +129,15 @@ function handler(mode) { return async (req, res, next) => {
       delete facet.totals[0].$group.restrictedCandidates;
       delete pipeline[base(req, criteria, false, cohortJobs, true).length].$set.hireAt;
     }
+    // A bounded scoped Job cohort already proves parent eligibility. Scores
+    // need only an independent total for scan consistency, not brand switches
+    // or summary grouping. Larger cohorts retain the equality-join fallback.
+    const metricRead = mode === 'scores' && cohortJobs
+      ? Application.countDocuments({ $and: [resourceFilter(req, 'application'), criteria.apps, { jobId: { $in: cohortJobs.map(job => job._id) } }] })
+        .maxTimeMS(10000).then(applications => [{ totals: [{ applications }] }])
+      : Application.aggregate(pipeline).option({ maxTimeMS: 10000 });
     const [[metrics], scores, active, optionJobs, brands] = await Promise.all([
-      Application.aggregate(pipeline).option({ maxTimeMS: 10000 }), mode === 'overview' || mode === 'operations' ? null : scoreDistribution(req, criteria, cohortJobs),
+      metricRead, mode === 'overview' || mode === 'operations' ? null : scoreDistribution(req, criteria, cohortJobs),
       mode === 'scores' ? [] : Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open', archivedAt: null }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
       mode === 'scores' ? [] : Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, {archivedAt:null}] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), mode === 'scores' ? [] : getBrands(),
     ]);
