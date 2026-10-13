@@ -1,0 +1,253 @@
+{
+  "baseline": "16848763e3bdd6dd0a4b8c335d3130edc2692b68",
+  "runtimeSource": "1ac3b13960a5ce5fedf1c90b3efb55d62aac4c7a",
+  "dataset": "3 Jobs,35 Candidates,35 Applications,localhost isolated DB",
+  "measurement": "Navigation performance.now after initial API networkidle + two requestAnimationFrame; includes idle wait, not pure TTI/live latency. Two samples per side; test-machine load variation prevents attributing ms improvement to visual CSS.",
+  "routes": [
+    {
+      "route": "jobs",
+      "beforeReadyMs": [
+        1093.3,
+        1240.7
+      ],
+      "afterReadyMs": [
+        1106.4,
+        1093.8
+      ],
+      "beforeMeanMs": 1167.0,
+      "afterMeanMs": 1100.1,
+      "initialGETs": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "extraDataGETs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sessionChecks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "loadingMutations": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "domNodes": [
+        171,
+        171,
+        171,
+        171
+      ],
+      "longTaskCounts": [
+        0,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "route": "candidates",
+      "beforeReadyMs": [
+        943.6,
+        1008.9
+      ],
+      "afterReadyMs": [
+        954.3,
+        939.3
+      ],
+      "beforeMeanMs": 976.2,
+      "afterMeanMs": 946.8,
+      "initialGETs": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "extraDataGETs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sessionChecks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "loadingMutations": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "domNodes": [
+        681,
+        681,
+        681,
+        681
+      ],
+      "longTaskCounts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "route": "applications",
+      "beforeReadyMs": [
+        968.5,
+        976
+      ],
+      "afterReadyMs": [
+        972.9,
+        951.8
+      ],
+      "beforeMeanMs": 972.2,
+      "afterMeanMs": 962.3,
+      "initialGETs": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "extraDataGETs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sessionChecks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "loadingMutations": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "domNodes": [
+        955,
+        955,
+        955,
+        955
+      ],
+      "longTaskCounts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "route": "applications?view=board",
+      "beforeReadyMs": [
+        963,
+        984.5
+      ],
+      "afterReadyMs": [
+        971,
+        969.8
+      ],
+      "beforeMeanMs": 973.8,
+      "afterMeanMs": 970.4,
+      "initialGETs": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "extraDataGETs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sessionChecks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "loadingMutations": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "domNodes": [
+        254,
+        254,
+        254,
+        254
+      ],
+      "longTaskCounts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "route": "analytics",
+      "beforeReadyMs": [
+        985.7,
+        1017.6
+      ],
+      "afterReadyMs": [
+        982.6,
+        971.9
+      ],
+      "beforeMeanMs": 1001.7,
+      "afterMeanMs": 977.2,
+      "initialGETs": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "extraDataGETs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sessionChecks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "loadingMutations": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "domNodes": [
+        267,
+        267,
+        250,
+        250
+      ],
+      "longTaskCounts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

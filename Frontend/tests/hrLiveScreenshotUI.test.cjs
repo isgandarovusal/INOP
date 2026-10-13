@@ -78,6 +78,14 @@ test('Screenshot-specific HR acceptance in the real production shell: ' + group,
     await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH || 1875),height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-kpi=applications] strong').waitFor();assert.equal(await h.page.locator('[data-hr-kpi=applications] strong').textContent(),'35');await h.page.locator('[data-hr-empty-scores] .empty-state__hint').waitFor();assert.equal(await h.page.locator('[data-hr-histogram]').count(),0,'Missing scores have no zero histogram');assert.equal(await h.page.locator('[data-hr-score]').evaluateAll(rows=>rows.reduce((n,r)=>n+Number(r.textContent.split(':').at(-1)),0)),35,'All 35 uncalculated records retain their actual backend state counts');await capture('analytics-filled');await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();await capture('analytics-operations');
   });
 
+  if(enabled('analytics')) await t.test('S4 real calculated zero is a histogram, not missing score',async()=>{
+    const person=(await h.request('admin','POST','/candidates',{name:'Synthetic calculated zero',role:'Cashier',skills:['Cash handling']})).data;
+    const job=(await h.request('admin','POST','/jobs',{title:'Synthetic HACCP specialist',department:'HR',description:'HACCP procedures',requiredSkills:['HACCP']})).data;
+    assert.equal((await h.request('admin','POST','/applications',{candidateId:person._id,jobId:job._id})).status,201);
+    await h.page.setViewportSize({width:Number(process.env.INOP_HR_DESKTOP_WIDTH||1440),height:900});await h.open('admin','/app/recruitment/analytics');await h.page.locator('[data-hr-score-bucket="0"]').waitFor();
+    assert.equal(await h.page.locator('[data-hr-score-bucket="0"]').textContent(),'0–19%: 1');assert.equal(await h.page.locator('[data-hr-histogram]').count(),1);assert.equal(await h.page.locator('[data-hr-empty-scores]').count(),0);await capture('analytics-calculated-zero');
+  });
+
   if(group==='allroutes'||group==='all') {
     const application=await Application.findOne().lean();
     for(const width of [390,768,Number(process.env.INOP_HR_DESKTOP_WIDTH || 1910)])for(const [name,url,selector] of [

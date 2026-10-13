@@ -1,0 +1,327 @@
+[
+  {
+    "route": "jobs",
+    "readyMs": 1093.300000011921,
+    "initial": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 2214.4863,
+        "ms": 50.91405799999984,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/v2/jobs",
+        "query": "?archived=false&page=1&pageSize=30",
+        "start": 2602.870575,
+        "ms": 25.132066000000123,
+        "status": 200,
+        "bytes": 1289
+      }
+    ],
+    "domNodes": 171,
+    "longTasks": [],
+    "dataReads": 0,
+    "sessionReads": 3,
+    "loadingMutations": 0,
+    "requests": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 4159.702003,
+        "ms": 8.491363000000092,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 4563.553133,
+        "ms": 7.758310999999594,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 4968.058975,
+        "ms": 8.982756000000336,
+        "status": 200,
+        "bytes": 272
+      }
+    ]
+  },
+  {
+    "route": "candidates",
+    "readyMs": 943.5999999642372,
+    "initial": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 5577.428005,
+        "ms": 8.593800000000556,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/v2/candidates",
+        "query": "?archived=false&page=1&pageSize=30",
+        "start": 5902.822296,
+        "ms": 18.20777999999973,
+        "status": 200,
+        "bytes": 10906
+      }
+    ],
+    "domNodes": 681,
+    "longTasks": [],
+    "dataReads": 0,
+    "sessionReads": 3,
+    "loadingMutations": 0,
+    "requests": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 7441.931371,
+        "ms": 7.821128000000499,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 7846.176649,
+        "ms": 8.336733000000095,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 8250.877883,
+        "ms": 11.138468000001012,
+        "status": 200,
+        "bytes": 272
+      }
+    ]
+  },
+  {
+    "route": "applications",
+    "readyMs": 968.5,
+    "initial": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 8983.904654,
+        "ms": 9.47005800000079,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/v2/applications",
+        "query": "?page=1&pageSize=30",
+        "start": 9312.742843,
+        "ms": 27.920186999999714,
+        "status": 200,
+        "bytes": 18736
+      }
+    ],
+    "domNodes": 955,
+    "longTasks": [],
+    "dataReads": 0,
+    "sessionReads": 3,
+    "loadingMutations": 0,
+    "requests": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 10874.552827,
+        "ms": 9.727139000000534,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 11278.471577,
+        "ms": 6.453509999999369,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 11683.101422,
+        "ms": 7.384651000000304,
+        "status": 200,
+        "bytes": 272
+      }
+    ]
+  },
+  {
+    "route": "applications?view=board",
+    "readyMs": 963,
+    "initial": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 12594.242239,
+        "ms": 8.256742999999915,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/v2/application-board",
+        "query": "?pageSize=10",
+        "start": 12926.97454,
+        "ms": 24.757158000000345,
+        "status": 200,
+        "bytes": 7551
+      }
+    ],
+    "domNodes": 254,
+    "longTasks": [],
+    "dataReads": 0,
+    "sessionReads": 3,
+    "loadingMutations": 0,
+    "requests": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 14475.20443,
+        "ms": 7.687217000000601,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 14880.528235,
+        "ms": 7.879046000000017,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 15290.438422,
+        "ms": 17.53867100000025,
+        "status": 200,
+        "bytes": 272
+      }
+    ]
+  },
+  {
+    "route": "analytics",
+    "readyMs": 985.7000000476837,
+    "initial": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 15960.391706,
+        "ms": 8.903716999999233,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/analytics/overview",
+        "query": "",
+        "start": 16290.028723,
+        "ms": 46.759375000001455,
+        "status": 200,
+        "bytes": 1309
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/hr/analytics/scores",
+        "query": "",
+        "start": 16290.506792,
+        "ms": 51.323803999999654,
+        "status": 200,
+        "bytes": 382
+      }
+    ],
+    "domNodes": 267,
+    "longTasks": [],
+    "dataReads": 0,
+    "sessionReads": 3,
+    "loadingMutations": 0,
+    "requests": [
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 17873.454301,
+        "ms": 10.08403399999952,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 18280.039625,
+        "ms": 7.661689000000479,
+        "status": 200,
+        "bytes": 272
+      },
+      {
+        "actor": "admin",
+        "method": "GET",
+        "path": "/api/auth/me",
+        "query": "",
+        "start": 18683.485245,
+        "ms": 7.805414999998902,
+        "status": 200,
+        "bytes": 272
+      }
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "source": "16848763e3bdd6dd0a4b8c335d3130edc2692b68",
+  "assetTotals": {
+    "js": 1511895,
+    "css": 348046
+  },
+  "note": "All emitted uncompressed JS/CSS assets, not per-route transfer or gzip"
+}
