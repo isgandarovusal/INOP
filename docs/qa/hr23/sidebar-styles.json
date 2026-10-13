@@ -1,0 +1,101 @@
+[
+  {
+    "width": 1440,
+    "primary": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(37, 59, 97)",
+      "height": 40,
+      "width": 154.6875
+    },
+    "secondary": {
+      "background": "rgb(234, 240, 255)",
+      "color": "rgb(32, 71, 129)",
+      "border": "rgb(189, 207, 247)",
+      "height": 40.140625,
+      "width": 112
+    },
+    "neutral": {
+      "background": "rgb(255, 255, 255)",
+      "color": "rgb(92, 104, 120)",
+      "border": "rgb(225, 230, 237)",
+      "height": 40.140625,
+      "width": 112
+    },
+    "overflow": false,
+    "active": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(255, 255, 255)",
+      "height": 0,
+      "width": 0
+    },
+    "logo": 0
+  },
+  {
+    "width": 768,
+    "primary": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(37, 59, 97)",
+      "height": 40,
+      "width": 154.6875
+    },
+    "secondary": {
+      "background": "rgb(234, 240, 255)",
+      "color": "rgb(32, 71, 129)",
+      "border": "rgb(189, 207, 247)",
+      "height": 40.140625,
+      "width": 112
+    },
+    "neutral": {
+      "background": "rgb(255, 255, 255)",
+      "color": "rgb(92, 104, 120)",
+      "border": "rgb(225, 230, 237)",
+      "height": 40.140625,
+      "width": 112
+    },
+    "overflow": false,
+    "active": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(255, 255, 255)",
+      "height": 34,
+      "width": 116.6875
+    },
+    "logo": 112
+  },
+  {
+    "width": 390,
+    "primary": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(37, 59, 97)",
+      "height": 42,
+      "width": 316
+    },
+    "secondary": {
+      "background": "rgb(234, 240, 255)",
+      "color": "rgb(32, 71, 129)",
+      "border": "rgb(189, 207, 247)",
+      "height": 40.140625,
+      "width": 316
+    },
+    "neutral": {
+      "background": "rgb(255, 255, 255)",
+      "color": "rgb(92, 104, 120)",
+      "border": "rgb(225, 230, 237)",
+      "height": 40.140625,
+      "width": 316
+    },
+    "overflow": false,
+    "active": {
+      "background": "rgb(37, 59, 97)",
+      "color": "rgb(255, 255, 255)",
+      "border": "rgb(255, 255, 255)",
+      "height": 34,
+      "width": 116.6875
+    },
+    "logo": 112
+  }
+]

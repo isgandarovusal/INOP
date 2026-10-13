@@ -178,7 +178,9 @@
 .hr-shell .admin-main { background: var(--hr-page); }
 .hr-shell .admin-sidebar__brand { margin-bottom: 16px; }
 .hr-shell .admin-sidebar__brand .inop-logo { width: 136px; }
-.hr-shell .admin-sidebar__group-title { color: #65748c; letter-spacing: .12em; }
+.hr-shell .admin-sidebar__group { margin-bottom: 16px; }
+.hr-shell .admin-sidebar__group + .admin-sidebar__group { border-top: 1px solid var(--hr-border); padding-top: 16px; }
+.hr-shell .admin-sidebar__group-title { color: var(--hr-slate); font-size: 10px; font-weight: 700; letter-spacing: .1em; padding: 6px 12px 8px; }
 .hr-shell .admin-sidebar__nav a:hover:not(.active) { background: var(--hr-blue-soft); color: var(--hr-blue-ink); }
 .hr-shell .admin-sidebar__nav a { color: var(--hr-slate); border-radius: 10px; font-weight: 550; }
 .hr-shell .admin-sidebar__nav a.active { background: var(--hr-navy); color: var(--hr-white); border-color: var(--hr-navy); box-shadow: 0 2px 5px rgb(37 59 97 / 12%); }
