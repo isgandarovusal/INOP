@@ -1,3 +1,4 @@
+import { FormSection, SectionCard } from '../../../Components/HRSection';
 import { BriefcaseBusiness } from "lucide-react";
 import AIAvailability from "../../../Components/AIAvailability";
 import JobSkillsAssistant from "../../../Components/JobSkillsAssistant";
@@ -122,28 +123,28 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       )}
 
       <form onSubmit={event=>{event.preventDefault();void handleSubmit();}} className="form-grid" noValidate aria-busy={saving}>
-        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.basic")}</legend>
+        <FormSection className="job-form-section" title={t("recruitment.jobForm.sections.basic")}>
         <div className="form-group"><label htmlFor="job-position">{t("recruitment.jobForm.position")}</label><input id="job-position" aria-invalid={Boolean(fieldErrors.position)} aria-describedby={fieldErrors.position ? "job-position-error" : undefined} type="text" className="input" name="position" aria-label={t("recruitment.jobForm.position")} value={position} onChange={e=>{setPosition(e.target.value); clearFieldError("position");}} placeholder={t("recruitment.jobForm.positionPlaceholder")} required />{fieldErrors.position && <p className="form-error" id="job-position-error">{t(fieldErrors.position)}</p>}</div>
         <div className="form-group"><label htmlFor="job-experience">{t("recruitment.jobForm.experience")}</label><input id="job-experience" aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "job-experience-error" : undefined} type="number" className="input" min={0} name="experience" aria-label={t("recruitment.jobForm.experience")} value={experience} onChange={e=>{setExperience(Number(e.target.value)); clearFieldError("experience");}} />{fieldErrors.experience && <p className="form-error" id="job-experience-error">{t(fieldErrors.experience)}</p>}</div>
-        </fieldset>
-        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.organization")}</legend>
+        </FormSection>
+        <FormSection className="job-form-section" title={t("recruitment.jobForm.sections.organization")}>
         <RecruitmentLocationFields brandId={brandId} branchId={branchId} onChange={(brand, branch) => { setBrandId(brand); setBranchId(branch); }} />
         <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" aria-invalid={Boolean(fieldErrors.department)} aria-describedby={fieldErrors.department ? "job-department-error" : undefined} className="input" value={department} onChange={e=>{setDepartment(e.target.value); clearFieldError("department");}} required />{fieldErrors.department && <p className="form-error" id="job-department-error">{t(fieldErrors.department)}</p>}</div>
         <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" aria-invalid={Boolean(fieldErrors.location)} aria-describedby={fieldErrors.location ? "job-location-error" : undefined} className="input" value={location} onChange={e=>{setLocation(e.target.value); clearFieldError("location");}} required />{fieldErrors.location && <p className="form-error" id="job-location-error">{t(fieldErrors.location)}</p>}</div>
         <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" className="input" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
         <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" className="input" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
-        </fieldset>
-        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.requirements")}</legend>
+        </FormSection>
+        <FormSection className="job-form-section" title={t("recruitment.jobForm.sections.requirements")}>
         <div className="form-group form-group--full"><label htmlFor="job-description">{t("recruitment.jobForm.description")} *</label><textarea id="job-description" required aria-invalid={Boolean(fieldErrors.description)} aria-describedby={fieldErrors.description ? "job-description-error" : undefined} aria-label={t("recruitment.jobForm.description")} rows={4} className="input" value={description} onChange={e=>{setDescription(e.target.value); clearFieldError("description");}} />{fieldErrors.description && <p className="form-error" id="job-description-error">{t(fieldErrors.description)}</p>}</div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("recruitment.jobForm.tagLabel")} values={requiredSkills} onChange={setRequiredSkills} placeholder={t("recruitment.jobForm.skillPlaceholder")} /><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
-        </fieldset>
-        <section className="form-group form-group--full hr-ai-panel" data-job-ai>
+        </FormSection>
+        <SectionCard className="form-group form-group--full hr-ai-panel" data-job-ai>
           <h3>{t("hrAi.label")}</h3>
           <AIAvailability onStatus={value => setAIAvailable(value.state === "configured_not_verified")} />
           <JobSkillsAssistant available={aiAvailable} key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
-        </section>
-        <div className="form-actions recruitment-form-actions">
+        </SectionCard>
+        <div className="hr-section form-actions recruitment-form-actions">
           <button type="button" className="btn-cancel" disabled={saving} onClick={()=>navigate("/app/recruitment/jobs")}>{t("recruitment.jobForm.cancel")}</button>
           {!isEdit && <button type="button" className="btn-secondary" disabled={saving} onClick={()=>void handleSubmit(true)}>{t("hrJobArchive.saveDraft")}</button>}
           <button type="submit" className="btn-primary" disabled={saving}>{saving ? <Loader2 size={16} className="spin" /> : null}{isEdit ? t("recruitment.jobForm.update") : status === "draft" ? t("hrJobArchive.saveDraft") : status === "closed" ? t("common.actions.save") : t("recruitment.jobForm.publish")}</button>

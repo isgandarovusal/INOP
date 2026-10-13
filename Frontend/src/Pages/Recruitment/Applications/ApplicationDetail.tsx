@@ -1,3 +1,4 @@
+import { FormSection } from '../../../Components/HRSection';
 import { ClipboardList } from "lucide-react";
 import ApplicationDelivery from '../../../Components/ApplicationDelivery';
 import { useMemo, useState } from 'react';
@@ -63,7 +64,7 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
     finally { if (context.current.current === key) setBusy(false); }
   }}>
     {error && <p role="alert" className="form-group--full">{t(error)} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
-    <fieldset disabled={busy} className="form-group--full">
+    <FormSection disabled={busy} className="form-group--full">
       {canReopen && <label><input type="checkbox" checked={reopen} onChange={e => { setReopen(e.target.checked); setStatus(e.target.checked ? 'screening' : app.status); setSubstatus(''); }} />{t('hrWorkflow.reopen')}</label>}
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={status} onChange={e => { setStatus(e.target.value as ApplicationStatus); setSubstatus(''); }}>{choices.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s}`)}</option>)}</select></label>
       <label>{t('hrWorkflow.substatus')}<select aria-label={t('hrWorkflow.substatus')} value={substatus} onChange={e => setSubstatus(e.target.value)}>{applicationSubstatuses[status].map(s => <option key={s} value={s}>{s ? t(`hrWorkflow.sub.${s}`) : t('hrCatalog.unset')}</option>)}</select></label>
@@ -82,7 +83,7 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
       <label>{t('hrWorkflow.notes')}<textarea aria-label={t('hrWorkflow.notes')} maxLength={5000} value={notes} onChange={e => setNotes(e.target.value)} /></label>
       <label>{t('hrWorkflow.reason')}<textarea aria-label={t('hrWorkflow.reason')} maxLength={500} required={reopen || canAssign && assignee !== (app.assignedTo || '')} value={reason} onChange={e => setReason(e.target.value)} /></label>
       <div className="form-actions"><button className="btn-primary" type="submit" disabled={busy}>{t(busy ? 'common.actions.loading' : 'common.actions.save')}</button></div>
-    </fieldset>
+    </FormSection>
   </form>;
 }
 export default function ApplicationDetail() {
