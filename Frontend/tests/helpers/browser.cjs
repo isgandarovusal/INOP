@@ -10,7 +10,8 @@ const { withAuditFixture } = backendRequire('./tests/helpers/auditFixture.cjs');
 exports.withBrowserFixture = async (source, callback, options = {}) => withAuditFixture(async h => {
   const { chromium } = require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
   const { createServer } = await import(path.join(frontend, 'node_modules/vite/dist/node/index.js'));
-  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'inop-browser-cache-'));
+  const cacheDir = process.env.INOP_BROWSER_CACHE_DIR || fs.mkdtempSync(path.join(os.tmpdir(), 'inop-browser-cache-'));
+  fs.mkdirSync(cacheDir, { recursive: true });
   let vite, browser;
   try {
     vite = await createServer({ root: frontend, configLoader: 'runner', cacheDir, logLevel: 'error', define: { 'import.meta.env.VITE_API_BASE_URL': JSON.stringify('/api') },

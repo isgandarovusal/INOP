@@ -155,7 +155,7 @@
     grid-template-columns:1fr;
   }
 
-  .audit-restaurants-page .filter-bar .btn-secondary{
+  .audit-restaurants-page .filter-bar:where(:not(.hr-workspace *)) .btn-secondary{
     width:100%;
   }
 
@@ -554,7 +554,7 @@
 }
 
 /* Secondary: Clear / reset */
-.filter-bar .btn-secondary{
+.filter-bar:where(:not(.hr-workspace *)) .btn-secondary{
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -576,7 +576,7 @@
     box-shadow .16s ease !important;
 }
 
-.filter-bar .btn-secondary:hover{
+.filter-bar:where(:not(.hr-workspace *)) .btn-secondary:hover{
   transform:translateY(-1px) !important;
   border-color:#bfc6d5 !important;
   background:#f6f7fa !important;
@@ -585,8 +585,8 @@
 }
 
 /* Compact row actions */
-.admin-table-container .btn-secondary,
-.admin-table-container .btn-danger{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-secondary,
+.admin-table-container:where(:not(.hr-workspace *)) .btn-danger{
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -605,14 +605,14 @@
     box-shadow .16s ease !important;
 }
 
-.admin-table-container .btn-secondary{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-secondary{
   border:1px solid #d9deea !important;
   background:#fff !important;
   color:#536070 !important;
   box-shadow:0 3px 9px rgba(20,28,45,.05) !important;
 }
 
-.admin-table-container .btn-secondary:hover{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-secondary:hover{
   transform:translateY(-1px) !important;
   border-color:#aeb8ca !important;
   background:#f5f7fa !important;
@@ -620,14 +620,14 @@
   box-shadow:0 6px 14px rgba(20,28,45,.10) !important;
 }
 
-.admin-table-container .btn-danger{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-danger{
   border:1px solid #fecaca !important;
   background:#fff7f7 !important;
   color:#dc2626 !important;
   box-shadow:0 3px 9px rgba(220,38,38,.06) !important;
 }
 
-.admin-table-container .btn-danger:hover{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-danger:hover{
   transform:translateY(-1px) !important;
   border-color:#fca5a5 !important;
   background:#fee2e2 !important;
@@ -635,8 +635,8 @@
   box-shadow:0 6px 14px rgba(220,38,38,.13) !important;
 }
 
-.admin-table-container .btn-secondary svg,
-.admin-table-container .btn-danger svg{
+.admin-table-container:where(:not(.hr-workspace *)) .btn-secondary svg,
+.admin-table-container:where(:not(.hr-workspace *)) .btn-danger svg{
   width:15px !important;
   height:15px !important;
   flex:0 0 15px !important;

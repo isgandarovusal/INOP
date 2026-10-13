@@ -1,53 +1,52 @@
 :root {
-  --bg-color: #f5f6fb;
-  --text-primary: #1a1d2e;
-  --text-secondary: #6b7086;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --success: #16a34a;
-  --success-bg: rgba(22, 163, 74, 0.12);
-  --warning: #d97706;
-  --warning-bg: rgba(217, 119, 6, 0.12);
+  --bg-color: var(--surface-page);
+  --text-primary: #182b49;
+  --text-secondary: #536681;
   --info: #0ea5e9;
   --info-bg: rgba(14, 165, 233, 0.12);
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --danger-bg: rgba(239, 68, 68, 0.1);
   --card-bg: rgba(255, 255, 255, 0.75);
   --border-color: rgba(26, 29, 46, 0.08);
-  --shadow-sm: 0 1px 3px rgba(30, 34, 60, 0.06), 0 1px 2px rgba(30, 34, 60, 0.04);
-  --shadow-lg: 0 20px 40px -12px rgba(30, 34, 60, 0.18), 0 4px 10px -4px rgba(30, 34, 60, 0.08);
 
   --admin-sidebar-width: 260px;
 
   /* HR palette: namespaced tokens do not change Audit/core variables. */
-  --hr-navy: #253b61;
+  --hr-navy: #20365b;
   --hr-navy-hover: #172a48;
-  --hr-ink: #1b2432;
-  --hr-slate: #5c6878;
-  --hr-border: #e1e6ed;
+  --hr-ink: var(--text-primary);
+  --hr-slate: var(--text-secondary);
+  --hr-border: #d7e2f1;
   --hr-white: #fff;
-  --hr-subtle: #f8fafc;
-  --hr-danger: #b42318;
-  --hr-danger-hover: #8f1c13;
-  --hr-focus: #1761cf;
-  --hr-blue: #1761cf;
-  --hr-blue-soft: #eaf0ff;
+  --hr-subtle: #f3f7fd;
+  --hr-danger: var(--danger);
+  --hr-danger-hover: var(--danger-hover);
+  --hr-focus: var(--accent);
+  --hr-blue: var(--accent);
+  --hr-blue-soft: #edf0ff;
   --hr-blue-border: #bdcff7;
-  --hr-blue-ink: #204781;
+  --hr-blue-ink: #3730a3;
   --hr-purple: #6842cc;
   --hr-purple-hover: #5631b4;
   --hr-purple-soft: #f3eeff;
   --hr-purple-border: #d7c8fc;
-  --hr-success: #15753d;
+  --hr-success: var(--success);
   --hr-success-soft: #e9f8ee;
   --hr-warning: #945800;
   --hr-warning-soft: #fff6df;
-  --hr-page: #f3f6fc;
+  --hr-page: var(--surface-page);
   --hr-control-hover: #dce7ff;
 
+  --hr-primary: var(--accent);
+  --hr-primary-hover: var(--accent-hover);
+  --hr-surface-shadow: var(--shadow-card);
+  --hr-nav-surface: #f7f9ff;
+  --hr-success-hover: #065f46;
+  --hr-hero: #132745;
+  --hr-on-navy: #edf3ff;
+  --hr-on-navy-muted: #c4d3eb;
+  --hr-overlay: rgba(19, 39, 69, .4);
+
   /* Design system */
-  --surface-page: #f5f6fb;
+  --surface-page: #edf3fb;
   --surface: #ffffff;
   --surface-subtle: #f8fafc;
   --surface-muted: #f1f5f9;
@@ -61,15 +60,15 @@
   --border-default: #d1d5db;
   --border-strong: #cbd5e1;
 
-  --accent-rgb: 99, 102, 241;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --accent-active: #4338ca;
+  --accent-rgb: 67, 56, 202;
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-active: #312e81;
   --accent-soft: rgba(var(--accent-rgb), 0.08);
   --accent-ring: rgba(var(--accent-rgb), 0.28);
   --on-accent: #ffffff;
-  --success-rgb: 22, 163, 74;
-  --success: #16a34a;
+  --success-rgb: 4, 120, 87;
+  --success: #047857;
   --success-soft: rgba(var(--success-rgb), 0.1);
   --success-bg: rgba(var(--success-rgb), 0.1);
   --warning-rgb: 217, 119, 6;
@@ -77,9 +76,9 @@
   --warning-soft: rgba(var(--warning-rgb), 0.1);
   --warning-bg: rgba(var(--warning-rgb), 0.1);
   --info-soft: rgba(14, 165, 233, 0.1);
-  --danger-rgb: 239, 68, 68;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
+  --danger-rgb: 153, 27, 27;
+  --danger: #991b1b;
+  --danger-hover: #7f1d1d;
   --danger-soft: rgba(var(--danger-rgb), 0.08);
   --danger-bg: rgba(var(--danger-rgb), 0.08);
 
