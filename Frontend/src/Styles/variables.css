@@ -112,6 +112,9 @@
   --space-10: 40px;
   --space-12: 48px;
 
+  --control-disabled-bg: #f4f6f9;
+  --control-disabled-border: #e2e6eb;
+
   --control-height-sm: 34px;
   --control-height-md: 40px;
   --control-height-lg: 44px;
