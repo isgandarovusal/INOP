@@ -1,3 +1,4 @@
+import Badge, { type BadgeTone } from '../../../Components/Badge';
 import HRFilterPanel from '../../../Components/HRFilterPanel';
 import { useId, useMemo, useState } from 'react';
 import { BarChart3, BriefcaseBusiness, UsersRound, Inbox, Clock3, RefreshCw } from 'lucide-react';
@@ -29,9 +30,11 @@ export default function HRAnalyticsPage() {
   const kpiIcons = { activeVacancies: BriefcaseBusiness, applications: UsersRound, newApplications: Inbox, processing: Clock3 };
   const scoreRows = useMemo(() => scoreData?.scores?.buckets.map(b => ({ label: `${b.min}–${b.max}%`, count: b.count })) || [], [scoreData?.scores]);
   const hasTrustedScores = scoreRows.some(row => row.count > 0);
+  const stageTones: Record<string, BadgeTone> = { Applied: 'info', Screening: 'info', Shortlisted: 'accent', Interview: 'warning', Offered: 'warning', Hired: 'success', Rejected: 'danger' };
+  const invalidRange = Boolean(filters.from && filters.to && filters.from > filters.to);
   const statuses = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
   return <div className="hr-workspace hr-analytics-page">
-    <PageHeader icon={<BarChart3 size={26} />} title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} actions={<><button type="button" className="btn-secondary hr-icon-action" aria-label={t('common.actions.refresh')} title={t('common.actions.refresh')} onClick={reload}><RefreshCw size={16}/></button><Link className="btn-secondary hr-header-link" to="/app/recruitment/applications">{t('navigation.applications')}</Link></>} />
+    <div className="hr-analytics-hero"><PageHeader icon={<BarChart3 size={26} />} title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} actions={<><button type="button" className="btn-secondary hr-icon-action" aria-label={t('common.actions.refresh')} title={t('common.actions.refresh')} onClick={reload}><RefreshCw size={16}/></button><Link className="btn-secondary hr-header-link" to="/app/recruitment/applications">{t('navigation.applications')}</Link></>} /></div>
     <div className="hr-analytics-toolbar"><div className="filter-bar hr-brand-segments" aria-label={t('hrAnalytics.brands')}>
       <button type="button" aria-pressed={!filters.brandId} onClick={() => update('brandId', '')}>GFC</button>
       {brands.map(b => <button type="button" key={b.id} aria-pressed={filters.brandId === b.id} onClick={() => update('brandId', b.id)}>{b.name}</button>)}
@@ -46,14 +49,15 @@ export default function HRAnalyticsPage() {
         <option value="">{t('recruitment.applications.allJobs')}</option>{data?.options.jobs.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
         {filters.jobId && !data?.options.jobs.some(j => j.id === filters.jobId) && <option value={filters.jobId}>{t('hrCatalog.unavailable')}</option>}
       </select></label>
-      <label>{t('hrAnalytics.from')}<input type="date" aria-label={t('hrAnalytics.from')} value={filters.from || ''} onChange={e => update('from', e.target.value)} /></label>
-      <label>{t('hrAnalytics.to')}<input type="date" aria-label={t('hrAnalytics.to')} value={filters.to || ''} onChange={e => update('to', e.target.value)} /></label>
+      <label>{t('hrAnalytics.from')}<input type="date" aria-invalid={invalidRange} aria-describedby={invalidRange ? 'hr-analytics-date-error' : undefined} aria-label={t('hrAnalytics.from')} value={filters.from || ''} onChange={e => update('from', e.target.value)} /></label>
+      <label>{t('hrAnalytics.to')}<input type="date" aria-invalid={invalidRange} aria-describedby={invalidRange ? 'hr-analytics-date-error' : undefined} aria-label={t('hrAnalytics.to')} value={filters.to || ''} onChange={e => update('to', e.target.value)} /></label>
       <label>{t('hrAnalytics.source')}<select aria-label={t('hrAnalytics.source')} value={filters.source || ''} onChange={e => update('source', e.target.value)}>
         <option value="">{t('hrAnalytics.allSources')}</option>{['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form', 'unknown'].map(s => <option key={s} value={s}>{t(`hrAnalytics.sources.${s}`)}</option>)}
       </select></label>
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={filters.status || ''} onChange={e => update('status', e.target.value)}>
         <option value="">{t('recruitment.applications.allStatuses')}</option>{statuses.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s.toLowerCase()}`)}</option>)}
       </select></label>
+      {invalidRange && <p id="hr-analytics-date-error" className="hr-date-error" role="alert">{t('hrAnalytics.invalidRange')}</p>}
       <button type="button" className="btn-secondary" onClick={() => setFilters({})}>{t('common.actions.clear')}</button>
     </div></HRFilterPanel></div>
     {denied || result.status !== 'ready' || !data ? <><HRResourceState status={denied || result.status} retry={reload} />{!denied && result.status === 'loading' && <div className="hr-analytics-kpis" aria-hidden="true">{Object.keys(kpiIcons).map(key => <article key={key}><h3>{t(`hrAnalytics.kpi.${key}`)}</h3><strong>—</strong></article>)}</div>}</> : <>
@@ -70,14 +74,15 @@ export default function HRAnalyticsPage() {
       </div>
       <div className="hr-analytics-sections" role="tabpanel" id={`${tabId}-panel`} aria-labelledby={`${tabId}-${pane}`} data-hr-analytics-pane={pane}>
         {pane === 'overview' ? data.totals.applications === 0 ? null : <>
-        <section className="hr-panel hr-panel--funnel"><h2>{t('hrAnalytics.funnel')}</h2><table><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row">{t(`recruitment.applications.${r.status.toLowerCase()}`)}</th><td><span className="hr-analytic-number">{r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></td></tr>)}</tbody></table></section>
-        <section className="hr-panel hr-panel--scores"><h2>{t('hrAnalytics.scores')}</h2>
+        <section className="hr-panel hr-panel--funnel"><h2><UsersRound size={18} aria-hidden="true" />{t('hrAnalytics.funnel')}</h2><table aria-label={t('hrAnalytics.funnel')}><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row"><Badge tone={stageTones[r.status] || 'neutral'}>{t(`recruitment.applications.${r.status.toLowerCase()}`)}</Badge></th><td><span className="hr-analytic-number">{r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></td></tr>)}</tbody></table></section>
+        <section className="hr-panel hr-panel--scores"><h2><BarChart3 size={18} aria-hidden="true" />{t('hrAnalytics.scores')}</h2>
           {scoreResult.status !== 'ready' ? <HRResourceState status={scoreResult.status} retry={scoreResult.reload}/> : scoreData?.consistent && scoreData.total === data.totals.applications && scoreData.scores ? <>
             {hasTrustedScores ? <><HRHistogram title={t('hrAnalytics.scores')} rows={scoreRows}/><ul className="hr-score-legend">{scoreData.scores.buckets.map(b => <li key={b.min} data-hr-score-bucket={b.min}>{b.min}–{b.max}%: {b.count}</li>)}</ul></> : <div data-hr-empty-scores role="status"><EmptyState icon={<BarChart3 size={24} aria-hidden="true" />} title={t('hrAnalytics.unknown')} hint={t('hrAnalytics.noTrustedScores')} /></div>}
             <ul className="hr-score-states">{Object.entries(scoreData.scores.states).filter(([, value]) => value > 0).map(([key, value]) => <li key={key} data-hr-score={key}>{t(`hrMatch.${key}`)}: {value}</li>)}</ul>
           </> : <p role="status">{t('hrAnalytics.changed')}</p>}
         </section>
-        <section className="hr-panel hr-panel--sources"><h2>{t('hrAnalytics.source')}</h2><ul className="hr-distribution">{data.sources.map(r => <li key={r.key} data-hr-source={r.key}><span>{t(`hrAnalytics.sources.${r.key}`)}: {r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></li>)}</ul></section>
+        <section className="hr-panel hr-panel--sources"><h2><Inbox size={18} aria-hidden="true" />{t('hrAnalytics.source')}</h2><ul className="hr-distribution">{data.sources.map(r => <li key={r.key} data-hr-source={r.key}><span>{t(`hrAnalytics.sources.${r.key}`)}: {r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></li>)}</ul></section>
+        <section className="hr-panel hr-panel--brands"><h2><BriefcaseBusiness size={18} aria-hidden="true" />{t('hrAnalytics.brands')}</h2><table aria-label={t('hrAnalytics.brands')}><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{data.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications.toLocaleString(i18n.language)}</td><td>{r.activeVacancies.toLocaleString(i18n.language)}</td></tr>)}</tbody></table>{data.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>
         </> : operations.status !== 'ready' || !operationData ? <HRResourceState status={operations.status} retry={operations.reload}/> : <>
         <section><h2>{t('hrAnalytics.brands')}</h2><table><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{operationData.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications}</td><td>{r.activeVacancies}</td></tr>)}</tbody></table>{operationData.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>
         <section><h2>{t('hrAnalytics.review')}</h2><p>{t('hrAnalytics.linkedReview')}</p>{operationData.coverage.candidateReadable ? <ul>{Object.entries(operationData.review).map(([key, value]) => <li key={key}>{t(`hrAnalytics.reviewState.${key}`)}: {value}</li>)}<li>{t('hrAnalytics.duplicates')}: {operationData.duplicateAlerts.extraProfiles}</li></ul> : <p>{t('hrStates.restricted')}</p>}</section>

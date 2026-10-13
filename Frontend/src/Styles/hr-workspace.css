@@ -94,6 +94,20 @@
 .hr-workspace .hr-analytics-sections section { min-width: 0; padding: 20px; }
 .hr-workspace .hr-analytics-sections :is(ul, ol) { padding-left: 20px; line-height: 1.9; }
 .hr-workspace .hr-analytics-sections :is(th, td) { font-size: 13px; padding: 12px 8px; border-bottom: 1px solid var(--hr-border); white-space: normal; overflow-wrap: anywhere; }
+/* Analytics surfaces use real bounded aggregates, with explicit numeric alignment. */
+.hr-analytics-page .hr-analytics-hero { background: var(--hr-hero); padding: 24px; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); margin-bottom: 22px; }
+.hr-analytics-page .hr-analytics-hero .page-header { padding: 0; margin: 0; }
+.hr-analytics-page .hr-analytics-hero .page-header__title { color: var(--hr-on-navy); }
+.hr-analytics-page .hr-analytics-hero .page-header__subtitle { color: var(--hr-on-navy-muted); }
+.hr-analytics-page .hr-analytics-sections thead { background: var(--hr-subtle); }
+.hr-analytics-page .hr-analytics-sections td { text-align: right; font-weight: 650; color: var(--hr-navy); }
+.hr-analytics-page .hr-analytics-sections thead th:not(:first-child) { text-align: right; }
+.hr-analytics-page .hr-analytics-sections th[scope=row] { text-align: left; font-weight: 550; }
+.hr-analytics-page .hr-analytics-sections tbody tr:hover { background: var(--hr-subtle); }
+.hr-analytics-page .hr-panel--brands { grid-column: 1 / -1; }
+.hr-analytics-page .hr-distribution li { border: 1px solid var(--hr-border); border-radius: var(--radius-md); background: var(--hr-subtle); padding: 12px; }
+.hr-analytics-page .hr-analytics-filter-grid .hr-date-error { grid-column: 1 / -1; color: var(--hr-danger); font-size: 12px; margin: 0; }
+@media(max-width:650px) { .hr-analytics-page .hr-analytics-hero { padding: 18px; } }
 .hr-workspace .hr-analytics-sections td { font-variant-numeric: tabular-nums; }
 .hr-workspace .hr-page-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 0; color: var(--text-secondary); margin: 16px 0; font-size: 12px; }
 .hr-workspace .hr-page-controls > span { flex: 1 1 180px; }
@@ -254,7 +268,7 @@
 .hr-workspace .hr-brand-segments { display: flex; gap: 4px; border: 0; padding: 0; background: none; margin-bottom: 18px; }
 .hr-workspace .hr-brand-segments button { min-height: 36px; padding: 7px 12px; font-size: 13px; font-weight: 550; border: 1px solid var(--hr-border); background: var(--hr-white); color: var(--hr-navy); border-radius: 8px; }
 .hr-workspace .hr-brand-segments button:hover:not([aria-pressed=true]) { background: var(--hr-blue-soft); border-color: var(--hr-blue-border); }
-.hr-workspace .hr-brand-segments button[aria-pressed=true] { background: var(--hr-navy); color: var(--hr-white); border-color: var(--hr-navy); outline: none; }
+.hr-workspace .hr-brand-segments button[aria-pressed=true] { background: var(--hr-primary); color: var(--hr-white); border-color: var(--hr-primary); }
 .hr-workspace .hr-analytics-filter-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)) auto; align-items: end; gap: 12px; }
 .hr-workspace .hr-analytics-filter-grid label { min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--hr-slate); }
 .hr-workspace .hr-analytics-filter-grid label :is(select,input) { width: 100%; }
@@ -263,9 +277,9 @@
 .hr-workspace .hr-data-note p { max-width: 90ch; margin: 8px 0; }
 .hr-workspace .hr-analytics-updated { color: var(--hr-slate); font-size: 11px; text-align: right; margin: 0; }
 .hr-workspace .hr-analytics-kpis { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; margin: 12px 0 24px; }
-.hr-workspace .hr-analytics-kpis article { --hr-metric-accent: var(--hr-blue); --hr-metric-bg: var(--hr-blue-soft); display: grid; grid-template-columns: 44px minmax(0,1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 4px; align-content: center; padding: 20px; min-height: 114px; border-radius: 12px; box-shadow: var(--hr-surface-shadow); background: var(--hr-metric-bg); border: 1px solid var(--hr-border); }
+.hr-workspace .hr-analytics-kpis article { --hr-metric-accent: var(--hr-blue); --hr-metric-bg: var(--hr-blue-soft); display: grid; grid-template-columns: 44px minmax(0,1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 4px; align-content: center; padding: 20px; min-height: 114px; border-radius: 12px; box-shadow: var(--hr-surface-shadow); background: var(--hr-white); border: 1px solid var(--hr-border); border-top: 3px solid var(--hr-metric-accent); }
 .hr-kpi-heading { display: contents; }
-.hr-kpi-heading svg { grid-column: 1; grid-row: 1 / 3; align-self: center; width: 44px; height: 44px; padding: 10px; border-radius: 12px; background: var(--hr-white); color: var(--hr-metric-accent); }
+.hr-kpi-heading svg { grid-column: 1; grid-row: 1 / 3; align-self: center; width: 44px; height: 44px; padding: 10px; border-radius: 12px; background: var(--hr-metric-bg); color: var(--hr-metric-accent); }
 .hr-workspace .hr-analytics-kpis h3 { grid-column: 2; margin: 0; font-size: 13px; line-height: 1.45; font-weight: 550; color: var(--hr-slate); }
 .hr-workspace .hr-analytics-kpis strong { grid-column: 2; display: block; font-size: 30px; line-height: 1.15; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.035em; color: var(--hr-ink); }
 .hr-workspace .hr-analytics-empty { margin-bottom: 20px; }
@@ -277,7 +291,7 @@
 .hr-workspace .hr-analytics-kpis [data-hr-kpi=newApplications] { --hr-metric-accent: var(--hr-purple); --hr-metric-bg: #f6f1ff; }
 .hr-workspace .hr-analytics-kpis [data-hr-kpi=processing] { --hr-metric-accent: var(--hr-warning); --hr-metric-bg: #fff8e8; }
 .hr-workspace .hr-analytics-sections { align-items: start; gap: 18px; }
-.hr-workspace .hr-analytics-sections h2 { font-size: 15px; margin-bottom: 18px; }
+.hr-workspace .hr-analytics-sections h2 { display: flex; align-items: center; gap: 10px; font-size: 15px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--hr-border); color: var(--hr-navy); }
 .hr-workspace .hr-analytics-sections h3 { font-size: 13px; margin: 16px 0 8px; }
 .hr-workspace .hr-analytics-sections p { font-size: 12px; color: var(--hr-slate); line-height: 1.6; }
 .hr-workspace .hr-analytics-sections :is(ul,ol) { padding: 0; list-style: none; line-height: 1.6; }
@@ -331,10 +345,9 @@
 .hr-workspace.hr-analytics-page > .hr-filter-panel .hr-filter-panel__body { display: block; border: 1px solid var(--hr-border); border-radius: 10px; padding: 16px; background: var(--hr-white); }
 .hr-workspace .hr-analytics-filter-grid > button { width: fit-content; }
 .hr-workspace .hr-icon-action { display: inline-flex; align-items: center; justify-content: center; width: 40px; padding: 0; }
-.hr-workspace .hr-analytics-tabs { display: flex; gap: 24px; border-bottom: 1px solid #dfe5ed; margin: 0 0 20px; }
-.hr-workspace .hr-analytics-tabs > button { position: relative; padding: 8px 0 12px; min-height: 40px; border: 0; border-radius: 0; background: transparent; color: var(--hr-slate); font-size: 13px; font-weight: 550; }
-.hr-workspace .hr-analytics-tabs > button[aria-selected=true] { color: var(--hr-navy); }
-.hr-workspace .hr-analytics-tabs > button[aria-selected=true]::after { content: ''; position: absolute; bottom: -1px; height: 2px; width: 100%; left: 0; background: var(--hr-navy); }
+.hr-workspace .hr-analytics-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 5px; border: 1px solid var(--hr-border); border-radius: var(--radius-lg); background: var(--hr-subtle); margin: 0 0 20px; width: fit-content; }
+.hr-workspace .hr-analytics-tabs > button { position: relative; padding: 10px 16px; min-height: 44px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--hr-slate); font-size: 13px; font-weight: 550; }
+.hr-workspace .hr-analytics-tabs > button[aria-selected=true] { color: var(--hr-white); background: var(--hr-primary); border-color: var(--hr-primary); }
 .hr-workspace .hr-analytics-sections[data-hr-analytics-pane=overview] .hr-panel--sources { grid-column: 1 / -1; }
 .hr-workspace .hr-analytics-sections[data-hr-analytics-pane=overview] .hr-panel--funnel th { font-weight: 500; }
 .hr-workspace .hr-lane-count { flex: 0 0 auto; border: 1px solid #dce3eb; border-radius: 6px; padding: 0 6px; background: var(--hr-white); color: var(--hr-slate); font-size: 11px; line-height: 20px; font-variant-numeric: tabular-nums; }
@@ -362,7 +375,7 @@
 .hr-workspace .hr-analytics-toolbar > .hr-filter-panel[open] { flex: 1 0 100%; }
 .hr-workspace .hr-analytics-toolbar .hr-filter-panel__body { display: block; padding: 16px; background: var(--hr-white); border: 1px solid var(--hr-border); border-radius: 10px; }
 .hr-workspace .hr-panel--sources .hr-distribution { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px 24px; }
-.hr-workspace .hr-panel--sources .hr-distribution li { margin: 0; padding: 0; }
+.hr-workspace .hr-panel--sources .hr-distribution li { margin: 0; padding: 12px; }
 @media (max-width: 1100px) { .hr-workspace .hr-panel--sources .hr-distribution { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 650px) { .hr-workspace .hr-panel--sources .hr-distribution { grid-template-columns: 1fr; gap: 12px; } }
 .hr-workspace .hr-profile-facts > .hr-person-avatar { position: absolute; top: 20px; right: 20px; }

@@ -1241,6 +1241,7 @@
     }
   },
   "hrAnalytics": {
+    "invalidRange": "The start date cannot be after the end date.",
     "emptyHint": "The application count is 0. There is no stage or match data for these filters. Active vacancies are counted separately.",
     "noTrustedScores": "No reliable matching scores yet. Results appear when complete, reviewed information is available.",
     "title": "GFC HR analytics",

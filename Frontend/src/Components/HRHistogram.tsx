@@ -6,11 +6,11 @@ const HRHistogram = memo(function HRHistogram({ title, rows }: { title: string; 
   const max = Math.max(1, ...rows.map(r => r.count)), slot = 400 / rows.length;
   return <figure className="hr-histogram" data-hr-histogram><svg viewBox={`0 0 400 ${empty ? 80 : 154}`} role="img" aria-label={title}>
     <title>{title}: {rows.map(r => `${r.label}: ${r.count}`).join(', ')}</title>
-    <line x1="0" y1={baseline} x2="400" y2={baseline} stroke="#e2e8f0" />
+    <line x1="0" y1={baseline} x2="400" y2={baseline} stroke="var(--hr-border)" />
     {rows.map((r, index) => { const height = r.count / max * 90; return <g key={r.label}>
-      <rect data-chart-count={r.count} x={index * slot + slot * .2} y={baseline - height} width={slot * .6} height={height} rx="4" fill="var(--hr-blue, #1761cf)" />
-      {r.count > 0 && <text x={index * slot + slot / 2} y={112 - height} textAnchor="middle" fontSize="12" fill="#334155">{r.count}</text>}
-      <text x={index * slot + slot / 2} y={baseline + 22} textAnchor="middle" fontSize="11" fill="#5c6878">{r.label}</text>
+      <rect data-chart-count={r.count} x={index * slot + slot * .2} y={baseline - height} width={slot * .6} height={height} rx="4" fill="var(--hr-blue)" />
+      {r.count > 0 && <text x={index * slot + slot / 2} y={112 - height} textAnchor="middle" fontSize="12" fill="var(--hr-ink)">{r.count}</text>}
+      <text x={index * slot + slot / 2} y={baseline + 22} textAnchor="middle" fontSize="11" fill="var(--hr-slate)">{r.label}</text>
     </g>; })}
   </svg></figure>;
 });
