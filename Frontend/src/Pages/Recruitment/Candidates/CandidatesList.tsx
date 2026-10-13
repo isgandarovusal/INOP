@@ -11,7 +11,7 @@ import {
   Loader2,
   Plus,
   Search,
-  Archive, RotateCcw,
+  Archive, RotateCcw, Eye,
 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
@@ -78,9 +78,11 @@ const CandidatesList: React.FC = () => {
   const exporting = exportBusy.key === context.key && exportBusy.busy;
   const setExporting = (busy: boolean) => setExportBusy({ key: context.key, busy });
 
+  const canRead = hasPermission(user, "candidate", "read");
   const canCreate = hasPermission(user, "candidate", "create");
   const canRestore = hasPermission(user, "candidate", "update");
   const canDelete = hasPermission(user, "candidate", "delete");
+  const canAct = archived ? canRestore : canDelete;
 
   const fetchCandidates = result.reload;
 
@@ -149,6 +151,18 @@ const CandidatesList: React.FC = () => {
     catch(failure){if(context.current.current===key)setMutation({key,error:hrCrudErrorKey(failure)});}
     finally{if(context.current.current===key)setDeletingId(null);}
   };
+  const candidateActions = (candidate: Candidate) => (
+    <div className="hr-candidate-actions">
+      {canRead && <button type="button" className="icon-btn" aria-label={`${t('common.actions.viewDetails')} ${candidate.name}`} title={t('common.actions.viewDetails')} onClick={event => {
+        event.stopPropagation(); navigate(`/app/recruitment/candidates/${candidate.id}`);
+      }}><Eye size={16} /></button>}
+      {canAct && <button type="button" className="icon-btn" aria-label={`${t(archived ? 'hrArchive.restore' : 'hrArchive.archive')} ${candidate.name}`}
+        title={t(archived ? 'hrArchive.restore' : 'hrArchive.archive')} disabled={deletingId === candidate.id}
+        onClick={event => void (archived ? handleRestore(event, candidate) : handleDelete(event, candidate))}>
+        {deletingId === candidate.id ? <Loader2 size={16} className="spin" /> : archived ? <RotateCcw size={16} /> : <Archive size={16} />}
+      </button>}
+    </div>
+  );
   const filteredCandidates = candidates;
 
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
@@ -234,13 +248,15 @@ const CandidatesList: React.FC = () => {
         <EmptyState icon={<Search size={28} />} title={t(searchQuery ? "recruitment.candidates.noSearchResults" : "recruitment.candidates.empty")} hint={t(searchQuery ? "recruitment.candidates.noSearchResultsDescription" : "recruitment.candidates.emptyDescription")} />
       ) : viewMode === "grid" ? (
         <div className="hr-candidate-grid">{filteredCandidates.map(c => <article key={c.id} className="recruitment-kanban__card">
-          <div className="hr-person-card-heading"><span className="hr-person-avatar" aria-hidden="true">{c.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role || t('cvReview.unknown')}</p></div></div>
+          <div className="hr-person-card-heading"><span className="hr-person-avatar" aria-hidden="true">{c.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" disabled={!canRead} onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role || t('cvReview.unknown')}</p></div></div>
           <div className="hr-person-card-contact">{c.email && <span>{c.email}</span>}{c.phone && <span>{c.phone}</span>}</div><div className="tag-list">{c.skills.slice(0,3).map(s=><Badge key={s} tone="neutral">{s}</Badge>)}</div>
           <p className="hr-person-card-status"><Badge tone={getCandidateStatusBadgeVariant(c.status)}>{t(`recruitment.candidateStatus.${c.status}`)}</Badge></p>
+          {candidateActions(c)}
         </article>)}</div>
       ) : (
         <div className="admin-table-container" role="region" aria-label={t('recruitment.candidates.title')} tabIndex={0}>
-          <table className="data-table">
+          <table className="data-table hr-candidates-table">
+            <colgroup><col className="hr-candidate-col-person" /><col className="hr-candidate-col-role" /><col className="hr-candidate-col-experience" /><col className="hr-candidate-col-skills" /><col className="hr-candidate-col-status" />{(canRead || canAct) && <col className="hr-candidate-col-actions" />}</colgroup>
             <thead>
               <tr>
                 <th>{t("recruitment.candidates.fullName")}</th>
@@ -248,8 +264,8 @@ const CandidatesList: React.FC = () => {
                 <th>{t("recruitment.candidates.experience")}</th>
                 <th>{t("recruitment.candidates.skills")}</th>
                 <th>{t("recruitment.candidates.status")}</th>
-                {(archived ? canRestore : canDelete) && (
-                  <th>{t("recruitment.candidates.actions")}</th>
+                {(canRead || canAct) && (
+                  <th className="hr-candidate-actions-cell">{t("recruitment.candidates.actions")}</th>
                 )}
               </tr>
             </thead>
@@ -260,14 +276,14 @@ const CandidatesList: React.FC = () => {
                   <tr
                     key={candidate.id}
                     onClick={() =>
-                      navigate(
+                      canRead && navigate(
                         "/app/recruitment/candidates/" +
                           candidate.id,
                       )
                     }
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: canRead ? "pointer" : "default" }}
                   >
-                    <td><div className="hr-person-cell"><span className="hr-person-avatar" aria-hidden="true">{candidate.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" onClick={event=>{event.stopPropagation();navigate("/app/recruitment/candidates/"+candidate.id);}}>{candidate.name}</button>{candidate.email && <small>{candidate.email}</small>}</div></div></td>
+                    <td><div className="hr-person-cell"><span className="hr-person-avatar" aria-hidden="true">{candidate.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" disabled={!canRead} onClick={event=>{event.stopPropagation();navigate("/app/recruitment/candidates/"+candidate.id);}}>{candidate.name}</button>{candidate.email && <small>{candidate.email}</small>}</div></div></td>
 
                     <td>
                       {candidate.role ||
@@ -311,29 +327,8 @@ const CandidatesList: React.FC = () => {
                       </span>
                     </td>
 
-                    {(archived ? canRestore : canDelete) && (
-                      <td>
-                        <button
-                          type="button"
-                          className="icon-btn icon-btn--danger"
-                          title={t(
-                            archived ? "hrArchive.restore" : "hrArchive.archive",
-                          )}
-                          disabled={deletingId === candidate.id}
-                          onClick={(event) =>
-                            void (archived ? handleRestore(event, candidate) : handleDelete(event, candidate))
-                          }
-                        >
-                          {deletingId === candidate.id ? (
-                            <Loader2
-                              size={16}
-                              className="spin"
-                            />
-                          ) : (
-                            archived ? <RotateCcw size={16} /> : <Archive size={16} />
-                          )}
-                        </button>
-                      </td>
+                    {(canRead || canAct) && (
+                      <td className="hr-candidate-actions-cell">{candidateActions(candidate)}</td>
                     )}
                   </tr>
                 );

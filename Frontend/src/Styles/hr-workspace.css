@@ -444,3 +444,33 @@
 .hr-workspace .hr-person-cell { display: flex; align-items: center; gap: 12px; min-width: 170px; }
 .hr-workspace .hr-person-cell small { display: block; margin-top: 3px; color: var(--hr-slate); font-size: 12px; }
 .hr-workspace .hr-person-cell .hr-person-avatar { flex-shrink: 0; background: var(--hr-purple-soft); color: var(--hr-purple-hover); border: 1px solid var(--hr-purple-border); }
+
+/* Candidate geometry is independent of long imported text. */
+.hr-candidates-page .hr-candidates-table { table-layout: fixed; min-width: 860px; }
+.hr-candidates-table .hr-candidate-col-person { width: 24%; }
+.hr-candidates-table .hr-candidate-col-role { width: 22%; }
+.hr-candidates-table .hr-candidate-col-experience { width: 12%; }
+.hr-candidates-table .hr-candidate-col-skills { width: 18%; }
+.hr-candidates-table .hr-candidate-col-status { width: 14%; }
+.hr-candidates-table .hr-candidate-col-actions { width: 150px; }
+.hr-candidates-page .hr-candidates-table :is(th,td) { white-space: normal; overflow-wrap: anywhere; }
+.hr-candidates-page .hr-person-cell { min-width: 0; }
+.hr-candidates-page .hr-person-cell > div { min-width: 0; }
+.hr-candidates-page .tag-chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.hr-candidates-page .hr-candidate-actions-cell { position: sticky; right: 0; z-index: 1; background: var(--hr-white); border-left: 1px solid var(--hr-border); }
+.hr-candidates-page thead .hr-candidate-actions-cell { z-index: 2; background: var(--hr-subtle); }
+.hr-candidates-page .hr-candidate-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.hr-candidates-page .hr-candidate-actions :is(button,a) { min-height: 44px; }
+.hr-candidates-page .hr-candidate-actions .icon-btn { width: 44px; flex: 0 0 44px; }
+.hr-candidates-page :is(button,a):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 2px; }
+/* Compact application cards; shared score behavior remains unchanged. */
+.hr-workspace .hr-application-board .recruitment-kanban__card { padding: 12px; gap: 5px; min-width: 0; }
+.hr-workspace .hr-application-board .recruitment-kanban__card > p { margin: 0; overflow-wrap: anywhere; }
+.hr-workspace .hr-application-board .hr-board-card-title { line-height: 1.4; }
+.hr-workspace .hr-application-board .hr-board-card-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 10px; border-top: 1px solid var(--hr-border); padding-top: 8px; margin-top: 3px; }
+.hr-workspace .hr-application-board .hr-board-card-actions > [data-application-score] { flex: 1 1 140px; min-width: 0; }
+.hr-workspace .hr-application-board .hr-board-card-actions > a { margin: 0; min-height: 44px; align-items: center; }
+.hr-workspace .hr-application-board .hr-board-card-actions summary { min-height: 36px; cursor: pointer; padding: 6px 0; }
+.hr-workspace .hr-application-board .hr-board-card-actions :is(input,button) { max-width: 100%; min-height: 44px; }
+.hr-workspace .hr-application-board .hr-board-card-actions label { display: block; }
+.hr-workspace .hr-application-board :is(a,button,summary,input):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 2px; }

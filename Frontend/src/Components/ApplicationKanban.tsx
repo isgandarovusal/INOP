@@ -44,11 +44,13 @@ export default function ApplicationKanban({ applications, reload, canChangeStatu
             <div className="hr-board-card-title" {...drag.dragHandleProps} aria-label={`${t('hrWorkflow.move')} ${a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}`}>
               {a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}
             </div>
-            <p>{a.jobId && typeof a.jobId === 'object' ? `${a.jobId.position} · ${a.jobId.brandName || brandLabel(a.jobId.brandId)}` : t('hrStates.restricted')}</p>
-            {a.processingState !== 'idle' && <p>{t(`hrWorkflow.processingState.${a.processingState}`)}</p>}
-            {a.interview && <p>{localDateTime(a.interview.startsAt, a.interview.timezone).replace('T', ' ') || t('cvReview.unknown')} · {a.interview.timezone}</p>}
-            <MatchScoreBadge application={a} onUpdated={reload} />
-            <Link to={`/app/recruitment/applications/${a.id}`}>{t('hrWorkflow.details')}</Link>
+            <p className="hr-board-card-job">{a.jobId && typeof a.jobId === 'object' ? `${a.jobId.position} · ${a.jobId.brandName || brandLabel(a.jobId.brandId)}` : t('hrStates.restricted')}</p>
+            {a.processingState !== 'idle' && <p className="hr-board-card-state">{t(`hrWorkflow.processingState.${a.processingState}`)}</p>}
+            {a.interview && <p className="hr-board-card-interview">{localDateTime(a.interview.startsAt, a.interview.timezone).replace('T', ' ') || t('cvReview.unknown')} · {a.interview.timezone}</p>}
+            <div className="hr-board-card-actions">
+              <MatchScoreBadge application={a} onUpdated={reload} />
+              <Link to={`/app/recruitment/applications/${a.id}`}>{t('hrWorkflow.details')}</Link>
+            </div>
           </article>}
         </Draggable>)}
         {provided.placeholder}
