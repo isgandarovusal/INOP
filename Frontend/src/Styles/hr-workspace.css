@@ -45,6 +45,14 @@
 .hr-workspace .icon-btn:hover { box-shadow: none; transform: none; border-color: #d9e1eb; background: #f2f5f8; }
 .hr-workspace :is(.candidate-form-section, .detail-card, .audit-card, .ranking-row, .hr-analytics-kpis article, .hr-analytics-sections section) { background: var(--hr-white); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: var(--hr-surface-shadow); }
 .hr-workspace .job-form-page > form, .hr-workspace.job-form-page > form { background: var(--hr-white); border: 1px solid var(--border-color); box-shadow: none; border-radius: 14px; }
+/* Vacancy sections keep inline catalog creation separate from vacancy submit. */
+.hr-workspace.job-form-page .job-form-section { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; border: 0; padding: 0 0 20px; border-bottom: 1px solid var(--hr-border); }
+.hr-workspace.job-form-page .job-form-section > legend { padding: 0 0 14px; color: var(--hr-navy); font-size: 15px; font-weight: 700; }
+.hr-workspace.job-form-page .job-catalog-hint { color: var(--hr-slate); font-size: 12px; margin: 0; }
+.hr-workspace.job-form-page .job-inline-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 16px; border: 1px solid var(--hr-border); border-radius: var(--radius-lg); background: var(--hr-subtle); }
+.hr-workspace.job-form-page .job-inline-form > label { display: grid; gap: 6px; }
+.hr-workspace.job-form-page .job-inline-form > button { align-self: end; }
+.hr-workspace.job-form-page .form-error { color: var(--hr-danger); font-size: 12px; margin-top: 6px; }
 .hr-workspace.job-form-page > .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; align-items: start; }
 .hr-workspace.job-form-page .form-group { margin: 0; min-width: 0; }
 .hr-workspace.job-form-page .form-group--full, .hr-workspace.job-form-page .form-actions { grid-column: 1 / -1; }
@@ -61,7 +69,7 @@
 .hr-workspace [data-cv-ai-assistant].hr-ai-panel { margin: 16px 0; }
 .hr-workspace .hr-ai-panel [data-ai-availability] { margin: 12px 0; }
 .hr-workspace .hr-ai-panel > [role=alert] { margin-top: 12px; color: var(--hr-danger); }
-@media (max-width:650px) { .hr-workspace.job-form-page > .form-grid, .hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { grid-template-columns: minmax(0,1fr); } }
+@media (max-width:650px) { .hr-workspace.job-form-page :is(.job-form-section,.job-inline-form), .hr-workspace.job-form-page > .form-grid, .hr-workspace.job-form-page :is(.job-criteria-grid,[data-recruitment-locations]) { grid-template-columns: minmax(0,1fr); } }
 .hr-workspace .candidate-form-section { padding: 24px; margin-bottom: 20px; }
 .hr-workspace :is(.candidate-form-section__icon, .candidate-cv-upload__icon) { color: var(--hr-blue-ink); background: var(--hr-blue-soft); border-color: var(--hr-blue-border); box-shadow: none; }
 .hr-workspace :is(.candidate-form-section__title, .detail-card h3, .hr-analytics-sections h2) { font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--text-primary); }

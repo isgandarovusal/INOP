@@ -5,7 +5,7 @@ import RecruitmentLocationFields from "../../../Components/RecruitmentLocationFi
 import { useMounted } from "../../../Hooks/useMounted";
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
 import {isAxiosError} from "axios";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import HRResourceState from "../../../Components/HRResourceState";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
@@ -41,27 +41,41 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
   const [location, setLocation] = useState(initial?.location ?? "Remote");
   const [type, setType] = useState<JobType>(initial?.type ?? "Full-time");
   const [saving, setSaving] = useState(false);
+  const submitLock = useRef(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [aiAvailable, setAIAvailable] = useState(true);
   const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (asDraft = false) => {
-    if (saving) return;
+  const clearFieldError = (field: string) => setFieldErrors(previous => {
+    if (!previous[field]) return previous;
+    const next = { ...previous }; delete next[field]; return next;
+  });
 
-    if (!position.trim()) {
-      setError("recruitment.jobForm.positionRequired");
+  const handleSubmit = async (asDraft = false) => {
+    if (submitLock.current) return;
+    const errors: Record<string, string> = {};
+    if (!position.trim()) errors.position = "recruitment.jobForm.positionRequired";
+    if (!description.trim()) errors.description = "recruitment.jobForm.descriptionRequired";
+    if (!department.trim()) errors.department = "recruitment.jobForm.fieldRequired";
+    if (!location.trim()) errors.location = "recruitment.jobForm.fieldRequired";
+    if (!Number.isFinite(experience) || experience < 0) errors.experience = "recruitment.jobForm.experienceInvalid";
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) {
+      document.getElementById(`job-${Object.keys(errors)[0]}`)?.focus();
       return;
     }
-
+    submitLock.current = true;
     setSaving(true);
     setError(null);
 
     try {
       const payload = {
-        position, brandId, branchId,
-        description,
+        position: position.trim(), brandId, branchId,
+        description: description.trim(),
         requiredSkills,
         preferredSkills, requiredEducation, requiredCertificates,
-        department, location, type,
+        department: department.trim(), location: location.trim(), type,
         experience,
         status: asDraft ? "draft" : status,
       };
@@ -82,6 +96,7 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       if(isAxiosError(err)&&[401,403,404].includes(err.response?.status??0)){setAccessDenied(err.response!.status===401?'unauthenticated':err.response!.status===403?'forbidden':'not-found');return;}
       setError(hrCrudErrorKey(err));
     } finally {
+      submitLock.current = false;
       if (mounted.current) setSaving(false);
     }
   };
@@ -100,31 +115,38 @@ const JobFormFields: React.FC<{ initial?: Job }> = ({ initial }) => {
       />
 
       {error && (
-        <div className="alert alert--danger">
+        <div className="alert alert--danger" role="alert">
           <AlertCircle size={18} />
           <span>{t(error)}</span>
         </div>
       )}
 
-      <form onSubmit={event=>{event.preventDefault();void handleSubmit();}} className="form-grid">
-        <div className="form-group"><label htmlFor="job-position">{t("recruitment.jobForm.position")}</label><input id="job-position" type="text" className="input" name="position" aria-label={t("recruitment.jobForm.position")} value={position} onChange={e=>setPosition(e.target.value)} placeholder={t("recruitment.jobForm.positionPlaceholder")} required /></div>
-        <div className="form-group"><label htmlFor="job-experience">{t("recruitment.jobForm.experience")}</label><input id="job-experience" type="number" className="input" min={0} name="experience" aria-label={t("recruitment.jobForm.experience")} value={experience} onChange={e=>setExperience(Number(e.target.value))} /></div>
+      <form onSubmit={event=>{event.preventDefault();void handleSubmit();}} className="form-grid" noValidate aria-busy={saving}>
+        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.basic")}</legend>
+        <div className="form-group"><label htmlFor="job-position">{t("recruitment.jobForm.position")}</label><input id="job-position" aria-invalid={Boolean(fieldErrors.position)} aria-describedby={fieldErrors.position ? "job-position-error" : undefined} type="text" className="input" name="position" aria-label={t("recruitment.jobForm.position")} value={position} onChange={e=>{setPosition(e.target.value); clearFieldError("position");}} placeholder={t("recruitment.jobForm.positionPlaceholder")} required />{fieldErrors.position && <p className="form-error" id="job-position-error">{t(fieldErrors.position)}</p>}</div>
+        <div className="form-group"><label htmlFor="job-experience">{t("recruitment.jobForm.experience")}</label><input id="job-experience" aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "job-experience-error" : undefined} type="number" className="input" min={0} name="experience" aria-label={t("recruitment.jobForm.experience")} value={experience} onChange={e=>{setExperience(Number(e.target.value)); clearFieldError("experience");}} />{fieldErrors.experience && <p className="form-error" id="job-experience-error">{t(fieldErrors.experience)}</p>}</div>
+        </fieldset>
+        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.organization")}</legend>
         <RecruitmentLocationFields brandId={brandId} branchId={branchId} onChange={(brand, branch) => { setBrandId(brand); setBranchId(branch); }} />
-        <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" className="input" value={department} onChange={e => setDepartment(e.target.value)} required /></div>
-        <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" className="input" value={location} onChange={e => setLocation(e.target.value)} required /></div>
+        <div className="form-group"><label htmlFor="job-department">{t("hrStates.department")}</label><input id="job-department" aria-invalid={Boolean(fieldErrors.department)} aria-describedby={fieldErrors.department ? "job-department-error" : undefined} className="input" value={department} onChange={e=>{setDepartment(e.target.value); clearFieldError("department");}} required />{fieldErrors.department && <p className="form-error" id="job-department-error">{t(fieldErrors.department)}</p>}</div>
+        <div className="form-group"><label htmlFor="job-location">{t("hrStates.location")}</label><input id="job-location" aria-invalid={Boolean(fieldErrors.location)} aria-describedby={fieldErrors.location ? "job-location-error" : undefined} className="input" value={location} onChange={e=>{setLocation(e.target.value); clearFieldError("location");}} required />{fieldErrors.location && <p className="form-error" id="job-location-error">{t(fieldErrors.location)}</p>}</div>
         <div className="form-group"><label htmlFor="job-type">{t("hrStates.type")}</label><select id="job-type" className="input" value={type} onChange={e => setType(e.target.value as JobType)}>{["Full-time", "Part-time", "Contract", "Internship"].map(value => <option key={value}>{value}</option>)}</select></div>
         <div className="form-group"><label htmlFor="job-status">{t("recruitment.jobs.status")}</label><select id="job-status" className="input" value={status} onChange={e => setStatus(e.target.value as typeof status)}>{["open", "closed", "draft"].map(value => <option key={value} value={value}>{t(`recruitment.jobStatus.${value}`)}</option>)}</select></div>
-        <div className="form-group form-group--full"><label htmlFor="job-description">{t("recruitment.jobForm.description")}</label><textarea id="job-description" aria-label={t("recruitment.jobForm.description")} rows={4} className="input" value={description} onChange={e=>setDescription(e.target.value)} /></div>
+        </fieldset>
+        <fieldset className="job-form-section"><legend>{t("recruitment.jobForm.sections.requirements")}</legend>
+        <div className="form-group form-group--full"><label htmlFor="job-description">{t("recruitment.jobForm.description")} *</label><textarea id="job-description" required aria-invalid={Boolean(fieldErrors.description)} aria-describedby={fieldErrors.description ? "job-description-error" : undefined} aria-label={t("recruitment.jobForm.description")} rows={4} className="input" value={description} onChange={e=>{setDescription(e.target.value); clearFieldError("description");}} />{fieldErrors.description && <p className="form-error" id="job-description-error">{t(fieldErrors.description)}</p>}</div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("recruitment.jobForm.tagLabel")} values={requiredSkills} onChange={setRequiredSkills} placeholder={t("recruitment.jobForm.skillPlaceholder")} /><TagInput label={t("hrStates.preferredSkills")} values={preferredSkills} onChange={setPreferredSkills} /></div>
         <div className="form-group form-group--full job-criteria-grid"><TagInput label={t("hrMatch.requiredEducation")} values={requiredEducation} onChange={setRequiredEducation} /><TagInput label={t("hrMatch.requiredCertificates")} values={requiredCertificates} onChange={setRequiredCertificates} /></div>
+        </fieldset>
         <section className="form-group form-group--full hr-ai-panel" data-job-ai>
-          <AIAvailability />
-          <JobSkillsAssistant key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
+          <h3>{t("hrAi.label")}</h3>
+          <AIAvailability onStatus={value => setAIAvailable(value.state === "configured_not_verified")} />
+          <JobSkillsAssistant available={aiAvailable} key={JSON.stringify(aiContext)} context={aiContext} jobId={id} onAccessDenied={setAccessDenied} onApprove={(required, preferred) => { setRequiredSkills(prev => [...new Set([...prev, ...required])]); setPreferredSkills(prev => [...new Set([...prev, ...preferred])]); }} />
         </section>
         <div className="form-actions recruitment-form-actions">
-          <button type="button" className="btn-cancel" onClick={()=>navigate(-1)}>{t("recruitment.jobForm.cancel")}</button>
-          {!isEdit && <button type="button" className="btn-secondary" disabled={saving} onClick={event=>{if(event.currentTarget.form?.reportValidity())void handleSubmit(true);}}>{t("hrJobArchive.saveDraft")}</button>}
-          <button type="submit" className="btn-primary" disabled={saving}>{saving ? <Loader2 size={16} className="spin" /> : null}{isEdit ? t("recruitment.jobForm.update") : t("recruitment.jobForm.publish")}</button>
+          <button type="button" className="btn-cancel" disabled={saving} onClick={()=>navigate("/app/recruitment/jobs")}>{t("recruitment.jobForm.cancel")}</button>
+          {!isEdit && <button type="button" className="btn-secondary" disabled={saving} onClick={()=>void handleSubmit(true)}>{t("hrJobArchive.saveDraft")}</button>}
+          <button type="submit" className="btn-primary" disabled={saving}>{saving ? <Loader2 size={16} className="spin" /> : null}{isEdit ? t("recruitment.jobForm.update") : status === "draft" ? t("hrJobArchive.saveDraft") : status === "closed" ? t("common.actions.save") : t("recruitment.jobForm.publish")}</button>
         </div>
       </form>
     </div>

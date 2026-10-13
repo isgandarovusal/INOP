@@ -7,8 +7,8 @@ import { suggestJobSkills, type JobSkillsContext, type JobSkillsProposal } from 
 
 // Parent keys this component by the immutable professional draft and auth/route
 // identity. Late results from a previous draft can never approve new criteria.
-export default function JobSkillsAssistant({ context, jobId, onApprove, onAccessDenied }: {
-  context: JobSkillsContext; jobId?: string;
+export default function JobSkillsAssistant({ context, jobId, onApprove, onAccessDenied, available = true }: {
+  context: JobSkillsContext; jobId?: string; available?: boolean;
   onApprove: (required: string[], preferred: string[]) => void;
   onAccessDenied: (status: "unauthenticated" | "forbidden" | "not-found") => void;
 }) {
@@ -18,7 +18,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
   const [error, setError] = useState(""), [required, setRequired] = useState<string[]>([]), [preferred, setPreferred] = useState<string[]>([]);
   useEffect(() => () => { request.current.sequence++; request.current.controller?.abort(); }, []);
   async function generate() {
-    if (pending || !context.title.trim() || !context.description.trim()) return;
+    if (!available || pending || !context.title.trim() || !context.description.trim()) return;
     request.current.controller?.abort();
     const controller = new AbortController(), sequence = ++request.current.sequence;
     request.current.controller = controller; setPending(true); setError(""); setProposal(null);
@@ -39,7 +39,7 @@ export default function JobSkillsAssistant({ context, jobId, onApprove, onAccess
   return <section aria-label={t("hrAi.label")} aria-busy={pending} className="form-group form-group--full" data-job-skills-assistant>
     <p>{t("hrAi.notice")}</p>
     {(!context.title.trim() || !context.description.trim()) && <p>{t('hrAi.contextRequired')}</p>}
-    <button type="button" className="btn-ai" data-ai-action="job-skills" disabled={pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
+    <button type="button" className="btn-ai" data-ai-action="job-skills" disabled={!available || pending || !context.title.trim() || !context.description.trim()} onClick={() => void generate()}>
       {pending ? <Loader2 size={14} className="spin" /> : <Sparkles size={14} />}{t("hrAi.generate")}
     </button>
     {pending && <p role="status">{t("hrAi.processing")}</p>}

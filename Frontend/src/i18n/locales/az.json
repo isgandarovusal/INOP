@@ -501,6 +501,14 @@
       "draft": "Qaralama"
     },
     "jobForm": {
+        "descriptionRequired": "Vakansiyanın təsviri mütləqdir.",
+        "fieldRequired": "Bu sahə mütləqdir.",
+        "experienceInvalid": "Təcrübə ili 0 və ya daha böyük rəqəm olmalıdır.",
+        "sections": {
+          "basic": "Əsas məlumat",
+          "organization": "Təşkilati məlumat",
+          "requirements": "Tələblər və bacarıqlar"
+        },
       "editTitle": "Vakansiyanı redaktə et",
       "newTitle": "Yeni vakansiya yaradın",
       "subtitle": "Vakansiya məlumatlarını, iş yerini və seçim meyarlarını müəyyən edin. AI təklifləri HR təsdiqi tələb edir.",
@@ -1096,6 +1104,9 @@
     "page_limit": "Yalnız ilk 50 səhifə emal edildi. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın."
   },
   "hrCatalog": {
+      "catalogInvalid": "Kod və ad daxil edin. Kod yalnız kiçik hərf, rəqəm və tire ola bilər.",
+      "catalogDuplicate": "Bu kod artıq mövcuddur. Siyahıdan seçin.",
+      "catalogHint": "Əvvəl mövcud brend və filialı seçin. Yeni qeyd yalnız ehtiyac olduqda yaradılmalıdır.",
     "brand": "Brend",
     "branch": "Filial / iş yeri",
     "unset": "Təyin edilməyib",

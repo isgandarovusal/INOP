@@ -5,7 +5,7 @@ import { getAIStatus, type AIStatus } from '../Services/hrAiService';
 
 // Shared by vacancy proposals and both CV review paths. Setup is checked only
 // on deliberate intent; opening a page never starts another API/provider call.
-export default function AIAvailability({ cv = false }: { cv?: boolean }) {
+export default function AIAvailability({ cv = false, onStatus }: { cv?: boolean; onStatus?: (status: AIStatus) => void }) {
   const { t } = useTranslation(), context = useHRActionContext();
   const [state, setState] = useState<{ key: string; pending?: boolean; error?: boolean; data?: AIStatus }>({ key: '' });
   const active = useRef<AbortController | null>(null);
@@ -17,7 +17,7 @@ export default function AIAvailability({ cv = false }: { cv?: boolean }) {
     active.current = controller; setState({ key, pending: true });
     try {
       const data = await getAIStatus(controller.signal, key);
-      if (!controller.signal.aborted && context.current.current === key) setState({ key, data });
+      if (!controller.signal.aborted && context.current.current === key) { setState({ key, data }); onStatus?.(data); }
     } catch {
       if (!controller.signal.aborted && context.current.current === key) setState({ key, error: true });
     }

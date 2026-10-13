@@ -477,6 +477,14 @@
       "draft": "Draft"
     },
     "jobForm": {
+        "descriptionRequired": "A vacancy description is required.",
+        "fieldRequired": "This field is required.",
+        "experienceInvalid": "Experience must be a number of zero or more.",
+        "sections": {
+          "basic": "Basic information",
+          "organization": "Organization",
+          "requirements": "Requirements and skills"
+        },
       "editTitle": "Edit job",
       "newTitle": "Create new job",
       "subtitle": "Define the vacancy, workplace and selection criteria. AI suggestions require HR approval.",
@@ -1070,6 +1078,9 @@
     "page_limit": "Only the first 50 pages were processed. Review the complete original CV before confirming."
   },
   "hrCatalog": {
+      "catalogInvalid": "Enter a code and name. Use lowercase letters, numbers and hyphens in the code.",
+      "catalogDuplicate": "This code already exists. Select it from the list.",
+      "catalogHint": "Select an existing brand and branch first. Create a new record only when needed.",
     "brand": "Brand",
     "branch": "Branch / workplace",
     "unset": "Unspecified",
