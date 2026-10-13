@@ -9,6 +9,8 @@ test('Enterprise login validates locally and preserves real auth, languages, pas
   for(const locale of ['ENG','RUS','AZE']){const b=h.page.getByRole('button',{name:locale,exact:true});await b.click();assert.equal(await b.getAttribute('aria-pressed'),'true');}
   assert.equal(await h.page.locator('.auth-brand-features, .auth-brand-panel__footer, .auth-entry-panel__footer, .auth-brand-panel__eyebrow').count(),0);
   assert.equal(await h.page.getByRole('link').count(),0);
+  assert.equal(await h.page.getByRole('img',{name:'INOP',exact:true}).count(),1);
+  assert.equal(await h.page.locator('.auth-page').textContent().then(s=>/INTERNAL OPERATIONS|RECRUITMENT · AUDIT/.test(s)),false);
   assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await fs.mkdir('/workspace/work/premium/screens',{recursive:true});await h.page.screenshot({path:`/workspace/work/premium/screens/login-${width}.png`,fullPage:true});
   await h.page.locator('.auth-submit').click();assert.equal(await h.page.locator('#email').getAttribute('aria-invalid'),'true');assert.equal(await h.page.locator('#email').evaluate(e=>e===document.activeElement),true);
  }

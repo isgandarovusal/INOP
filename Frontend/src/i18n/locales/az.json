@@ -168,8 +168,8 @@
     "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
-      "heroTitle": "İnsanlar və əməliyyatlar üçün vahid iş məkanı.",
-      "heroSubtitle": "Namizədlər, vakansiyalar, analitika və audit proseslərini bir yerdən idarə edin.",
+      "heroTitle": "İnsan resursları üçün vahid platforma.",
+      "heroSubtitle": "Namizədlər, vakansiyalar və analitika bir yerdə.",
       "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
       "passwordRequired": "Şifrənizi daxil edin.",
       "features": {
@@ -178,7 +178,7 @@
         "access": "Rol əsaslı giriş"
       },
     "signIn": "Daxil ol",
-    "subtitle": "İşə qəbul və audit proseslərinə daxil olmaq üçün INOP hesabınızdan istifadə edin.",
+    "subtitle": "Hesabınıza daxil olun.",
     "email": "E-poçt",
     "password": "Şifrə",
     "signingIn": "Daxil olunur…",
