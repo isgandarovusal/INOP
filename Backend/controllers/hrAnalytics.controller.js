@@ -136,13 +136,22 @@ function handler(mode) { return async (req, res, next) => {
       ? Application.countDocuments({ $and: [resourceFilter(req, 'application'), criteria.apps, { jobId: { $in: cohortJobs.map(job => job._id) } }] })
         .maxTimeMS(10000).then(applications => [{ totals: [{ applications }] }])
       : Application.aggregate(pipeline).option({ maxTimeMS: 10000 });
-    const [[metrics], scores, active, optionJobs, brands] = await Promise.all([
+    // Filter branches depend only on the bounded vacancy list, not on the
+    // potentially slower Application aggregate or score scan.
+    const catalogRead = mode === 'scores' ? Promise.resolve({ jobs: [], branches: [] }) : (async () => {
+      const jobs = await Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, { archivedAt: null }] })
+        .select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean();
+      const branchIds = [...new Set(jobs.map(job => job.branchId).filter(Boolean).map(String))];
+      const branches = branchIds.length ? await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] })
+        .select('_id name brandId').limit(50).lean() : [];
+      return { jobs, branches };
+    })();
+    const [[metrics], scores, active, catalog, brands] = await Promise.all([
       metricRead, mode === 'overview' || mode === 'operations' ? null : scoreDistribution(req, criteria, cohortJobs),
       mode === 'scores' ? [] : Job.aggregate([{ $match: { $and: [aggregateResourceFilter(req, 'recruitment'), criteria.jobs, { status: 'Open', archivedAt: null }] } }, { $facet: { totals: [{ $count: 'count' }], brands: [{ $group: { _id: { $ifNull: ['$brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }] } }]).option({ maxTimeMS: 10000 }),
-      mode === 'scores' ? [] : Job.find({ $and: [resourceFilter(req, 'recruitment'), criteria.jobs, {archivedAt:null}] }).select('_id title brandId branchId').sort({ title: 1, _id: 1 }).limit(51).lean(), mode === 'scores' ? [] : getBrands(),
+      catalogRead, mode === 'scores' ? [] : getBrands(),
     ]);
-    const branchIds = [...new Set(optionJobs.map(j => j.branchId).filter(Boolean).map(String))];
-    const branches = mode === 'scores' ? [] : await Branch.find({ $and: [resourceFilter(req, 'recruitment'), { _id: { $in: branchIds } }] }).select('_id name brandId').limit(50).lean();
+    const { jobs: optionJobs, branches } = catalog;
     await verifyToken(req, res, () => {}); if (res.headersSent || res.destroyed) return;
     req.authRole = { permissions: await getRolePermissions(req.user.role) };
     const permits = resource => req.authRole.permissions.find(p => (p.resource === resource || p.resource === '*') && (p.action === 'read' || p.action === '*'));
