@@ -1,36 +1,41 @@
-/* Login owns these rules; loaded with the login route, never on an HR opening. */
-.auth-page { min-height: 100dvh; padding: 32px; display: grid; place-items: center; background: #f5f6f8; color: #1b2432; }
-.auth-shell { width: min(100%, 920px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: #fff; border: 1px solid #e1e6ec; border-radius: 20px; overflow: clip; box-shadow: 0 14px 36px rgb(20 32 51 / 6%); }
-.auth-brand-panel { padding: 48px 40px; display: flex; flex-direction: column; justify-content: center; gap: 28px; background: #0b1830; color: #e4eaf3; min-width: 0; }
-.auth-brand-panel .inop-logo { color: #e4eaf3; width: 304px; max-width: 100%; border-radius: 8px; }
-.auth-brand-panel__footer { color: #aab4c8; font-size: 10px; letter-spacing: .07em; line-height: 1.8; }
-.auth-entry-panel { min-width: 0; padding: 32px 40px; background: #fff; }
-.auth-entry-panel > .language-switcher { margin-left: auto; margin-bottom: 28px; }
-.auth-card__title { margin: 0 0 10px; color: #1b2432; font-size: 28px; font-weight: 650; line-height: 1.25; letter-spacing: -.035em; }
-.auth-card__subtitle { margin: 0 0 28px; color: #637084; font-size: 14px; line-height: 1.65; }
-.auth-card .form-group { margin-bottom: 18px; }
-.auth-card .form-label { display: block; margin-bottom: 8px; color: #344255; font-size: 13px; font-weight: 550; }
-.auth-card .input-field { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #cdd6e1; border-radius: 8px; background: #fff; color: #1b2432; box-shadow: none; font-size: 14px; }
-.auth-card .input-field:focus { outline: 2px solid #253b61; outline-offset: 2px; }
-.auth-password-field { position: relative; }
-.auth-card .auth-password-field__input { padding-right: 48px; }
-.auth-password-field__toggle { position: absolute; top: 1px; right: 1px; width: 42px; min-height: 42px; display: grid; place-items: center; border: 0; border-radius: 7px; background: transparent; color: #57667c; cursor: pointer; }
-.auth-password-field__toggle:focus-visible { outline: 2px solid #253b61; outline-offset: 2px; }
-.auth-card .auth-submit { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: #253b61; color: #fff; border: 1px solid #253b61; border-radius: 8px; font-size: 14px; font-weight: 550; box-shadow: none; transform: none; }
-.auth-card .auth-submit:hover { background: #172a48; box-shadow: none; transform: none; }
-.auth-card .auth-submit:disabled { opacity: .6; cursor: wait; }
-.auth-submit__content { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.auth-card .form-error { display: flex; align-items: flex-start; gap: 8px; color: #a32b31; font-size: 13px; line-height: 1.6; padding: 10px 0; }
-.auth-entry-panel__footer { font-size: 10px; line-height: 1.7; color: #748196; margin: 28px 0 0; text-align: center; }
-.auth-page :is(button, input) { font-family: inherit; }
-.auth-page :is(button, input):focus-visible { outline: 2px solid #253b61; outline-offset: 3px; }
-@media (max-width: 680px) {
- .auth-page { padding: 20px; }
- .auth-shell { max-width: 430px; grid-template-columns: minmax(0, 1fr); }
- .auth-brand-panel { padding: 20px 28px; align-items: center; gap: 0; }
- .auth-brand-panel .inop-logo { color: #e4eaf3; width: 192px; }
- .auth-brand-panel__footer { display: none; }
- .auth-entry-panel { padding: 24px; }
- .auth-entry-panel > .language-switcher { margin: 0 auto 24px; }
- .auth-card__title { font-size: 24px; }
+/* Login uses the shared light enterprise tokens; no global auth overrides. */
+.auth-page { min-height:100dvh; display:grid; place-items:center; padding:var(--space-8); background:var(--surface-page); color:var(--text-primary); }
+.auth-shell { width:min(100%,1040px); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); border:1px solid var(--hr-border); border-radius:var(--radius-xl); overflow:clip; box-shadow:var(--shadow-overlay); background:var(--surface); }
+.auth-brand-panel { padding:48px 40px; display:flex; flex-direction:column; gap:32px; justify-content:center; background:var(--hr-hero); color:var(--hr-on-navy); min-width:0; }
+.auth-brand-panel .inop-logo { color:var(--hr-on-navy); width:260px; max-width:100%; }
+.auth-brand-panel__eyebrow { color:var(--hr-on-navy-muted); font-size:10px; letter-spacing:.12em; margin-bottom:18px; }
+.auth-brand-copy h2 { font-size:clamp(24px,2.5vw,32px); line-height:1.25; font-weight:650; letter-spacing:-.025em; max-width:17ch; margin:0 0 16px; }
+.auth-brand-copy > p:last-child { color:var(--hr-on-navy-muted); font-size:14px; line-height:1.8; }
+.auth-brand-features { list-style:none; display:grid; gap:16px; padding:0; }
+.auth-brand-features li { display:flex; align-items:center; gap:12px; color:var(--hr-on-navy); font-size:13px; }
+.auth-brand-features svg { flex-shrink:0; width:38px; height:38px; padding:9px; background:var(--hr-primary); border-radius:var(--radius-md); }
+.auth-brand-panel__footer { color:var(--hr-on-navy-muted); font-size:10px; letter-spacing:.08em; margin-top:auto; }
+.auth-entry-panel { padding:36px 40px; min-width:0; background:var(--surface); display:flex; flex-direction:column; justify-content:center; }
+.auth-entry-panel > .language-switcher { margin-left:auto; margin-bottom:36px; }
+.auth-card__title { font-size:30px; font-weight:700; line-height:1.25; letter-spacing:-.03em; color:var(--hr-navy); margin:0 0 10px; }
+.auth-card__subtitle { color:var(--hr-slate); font-size:14px; line-height:1.7; margin:0 0 28px; }
+.auth-card .form-group { margin-bottom:20px; }
+.auth-card .form-label { display:block; color:var(--hr-navy); font-size:13px; font-weight:600; margin-bottom:8px; }
+.auth-card .input-field { width:100%; min-height:48px; border:1px solid var(--hr-border); border-radius:var(--radius-md); padding:12px 14px; background:var(--hr-subtle); color:var(--hr-ink); font-size:14px; box-shadow:none; }
+.auth-card .input-field:focus { background:var(--surface); border-color:var(--accent); outline:2px solid var(--accent); outline-offset:2px; }
+.auth-card .input-field[aria-invalid=true] { border-color:var(--danger); }
+.auth-password-field { position:relative; }
+.auth-card .auth-password-field__input { padding-right:52px; }
+.auth-password-field__toggle { position:absolute; top:2px; right:2px; width:44px; min-height:44px; display:grid; place-items:center; border:0; border-radius:var(--radius-sm); background:transparent; color:var(--hr-slate); cursor:pointer; }
+.auth-password-field__toggle:hover { background:var(--hr-blue-soft); color:var(--accent); }
+.auth-card .auth-submit { width:100%; min-height:48px; margin-top:8px; }
+.auth-submit__content { display:flex; align-items:center; justify-content:space-between; width:100%; gap:8px; }
+.auth-card .form-error { display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.6; color:var(--danger); margin:8px 0 0; }
+.auth-card .form-error--submit { padding:12px; border:1px solid var(--danger); border-radius:var(--radius-md); background:var(--danger-soft); margin-bottom:12px; }
+.auth-entry-panel__footer { color:var(--hr-slate); font-size:10px; text-align:center; line-height:1.7; margin:28px 0 0; }
+.auth-page :is(button,input) { font-family:inherit; }
+@media(max-width:680px) {
+ .auth-page { padding:16px; }
+ .auth-shell { max-width:460px; grid-template-columns:minmax(0,1fr); }
+ .auth-brand-panel { padding:24px; gap:0; align-items:center; }
+ .auth-brand-panel .inop-logo { width:180px; }
+ .auth-brand-copy,.auth-brand-features,.auth-brand-panel__footer { display:none; }
+ .auth-entry-panel { padding:28px 24px; }
+ .auth-entry-panel > .language-switcher { margin:0 auto 28px; }
+ .auth-card__title { font-size:26px; }
 }

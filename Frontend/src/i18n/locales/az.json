@@ -162,6 +162,15 @@
     "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
+      "heroTitle": "İnsanlar və əməliyyatlar üçün vahid iş məkanı.",
+      "heroSubtitle": "Namizədlər, vakansiyalar, analitika və audit proseslərini bir yerdən idarə edin.",
+      "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
+      "passwordRequired": "Şifrənizi daxil edin.",
+      "features": {
+        "recruitment": "Mərkəzləşdirilmiş işə qəbul",
+        "analytics": "GFC HR analitikası",
+        "access": "Rol əsaslı giriş"
+      },
     "signIn": "Daxil ol",
     "subtitle": "İşə qəbul və audit proseslərinə daxil olmaq üçün INOP hesabınızdan istifadə edin.",
     "email": "E-poçt",

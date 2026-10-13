@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight, BriefcaseBusiness, BarChart3, ShieldCheck } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
 import INOPLogo from "../../../Components/INOPLogo";
@@ -18,6 +18,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const submitLock = useRef(false);
 
   if (!isLoading && user) {
     const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
@@ -26,11 +28,21 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLock.current || isLoading) return;
+    const emailInput = e.currentTarget.querySelector<HTMLInputElement>('#email');
+    const errors: { email?: string; password?: string } = {};
+    if (!email.trim() || !emailInput?.validity.valid) errors.email = 'auth.emailInvalid';
+    if (!password) errors.password = 'auth.passwordRequired';
+    setFieldErrors(errors);
+    if (errors.email || errors.password) {
+      document.getElementById(errors.email ? 'email' : 'password')?.focus(); return;
+    }
+    submitLock.current = true;
     setError(null);
     setSubmitting(true);
 
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       navigate("/app/dashboard", { replace: true });
     } catch (err) {
       setError(
@@ -39,6 +51,7 @@ const Login: React.FC = () => {
           : t("auth.somethingWentWrong"),
       );
     } finally {
+      submitLock.current = false;
       setSubmitting(false);
     }
   };
@@ -48,29 +61,40 @@ const Login: React.FC = () => {
       <main className="auth-shell">
         <section className="auth-brand-panel" aria-label="INOP">
           <INOPLogo />
-          <div className="auth-brand-panel__footer">RECRUITMENT · AUDIT · OPERATIONS</div>
+          <div className="auth-brand-copy">
+            <p className="auth-brand-panel__eyebrow">RECRUITMENT · AUDIT · OPERATIONS</p>
+            <h2>{t('auth.heroTitle')}</h2>
+            <p>{t('auth.heroSubtitle')}</p>
+          </div>
+          <ul className="auth-brand-features">
+            <li><BriefcaseBusiness size={20} aria-hidden="true" /><span>{t('auth.features.recruitment')}</span></li>
+            <li><BarChart3 size={20} aria-hidden="true" /><span>{t('auth.features.analytics')}</span></li>
+            <li><ShieldCheck size={20} aria-hidden="true" /><span>{t('auth.features.access')}</span></li>
+          </ul>
+          <div className="auth-brand-panel__footer">INOP · INTERNAL OPERATIONS PLATFORM</div>
         </section>
         <section className="auth-entry-panel">
           <LanguageSwitcher />
           <div className="auth-card">
             <h1 className="auth-card__title">{t("auth.signIn")}</h1>
             <p className="auth-card__subtitle">{t("auth.subtitle")}</p>
-            <form onSubmit={handleSubmit} noValidate>
+            <form onSubmit={handleSubmit} noValidate aria-busy={submitting}>
               <div className="form-group">
                 <label htmlFor="email" className="form-label">
                   {t("auth.email")}
                 </label>
 
                 <input
-                  id="email"
+                  id="email" aria-invalid={Boolean(fieldErrors.email)} aria-describedby={fieldErrors.email ? "email-error" : undefined}
                   type="email"
                   autoComplete="username"
                   placeholder={t("auth.emailPlaceholder")}
                   className="input-field"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setFieldErrors(previous => ({ ...previous, email: undefined })); }}
                   required
                 />
+                {fieldErrors.email && <p className="form-error" id="email-error">{t(fieldErrors.email)}</p>}
               </div>
 
               <div className="form-group">
@@ -80,19 +104,19 @@ const Login: React.FC = () => {
 
                 <div className="auth-password-field">
                   <input
-                    id="password"
+                    id="password" aria-invalid={Boolean(fieldErrors.password)} aria-describedby={fieldErrors.password ? "password-error" : undefined}
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     placeholder="••••••••"
                     className="input-field auth-password-field__input"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); setFieldErrors(previous => ({ ...previous, password: undefined })); }}
                     required
                   />
 
                   <button
                     type="button"
-                    className="auth-password-field__toggle"
+                    className="auth-password-field__toggle" aria-pressed={showPassword}
                     onClick={() => setShowPassword((current) => !current)}
                     aria-label={
                       showPassword
@@ -114,6 +138,8 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
+              {fieldErrors.password && <p className="form-error" id="password-error">{t(fieldErrors.password)}</p>}
+
               {error && (
                 <p role="alert" className="form-error form-error--submit">
                   <AlertCircle size={12} /> {error}
@@ -122,7 +148,7 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || isLoading}
                 className="btn-primary auth-submit"
               >
                 {submitting ? (

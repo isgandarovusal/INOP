@@ -157,6 +157,15 @@
     "candidate": "candidate"
   },
   "auth": {
+      "heroTitle": "One workspace for people and operations.",
+      "heroSubtitle": "Manage candidates, vacancies, analytics and audits in one place.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Enter your password.",
+      "features": {
+        "recruitment": "Centralized recruitment",
+        "analytics": "GFC HR analytics",
+        "access": "Role-based access"
+      },
     "signIn": "Sign in",
     "subtitle": "Use your INOP account to access recruitment and audit workflows.",
     "email": "Email",
