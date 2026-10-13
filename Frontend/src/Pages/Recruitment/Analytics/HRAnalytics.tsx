@@ -9,6 +9,7 @@ import { getHRAnalyticsOverview, getHRAnalyticsScores, getHRAnalyticsOperations,
 import { brandLabel } from '../../../Services/recruitmentCatalogService';
 import PageHeader from '../../../Components/PageHeader';
 import HRResourceState from '../../../Components/HRResourceState';
+import EmptyState from '../../../Components/EmptyState';
 export default function HRAnalyticsPage() {
   const { t, i18n } = useTranslation(); const [filters, setFilters] = useState<HRAnalyticsFilters>({});
   const [pane, setPane] = useState<'overview' | 'operations'>('overview'), tabId = useId();
@@ -27,6 +28,7 @@ export default function HRAnalyticsPage() {
   const formatter = useMemo(() => new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Baku' }), [i18n.language]);
   const kpiIcons = { activeVacancies: BriefcaseBusiness, applications: UsersRound, newApplications: Inbox, processing: Clock3 };
   const scoreRows = useMemo(() => scoreData?.scores?.buckets.map(b => ({ label: `${b.min}–${b.max}%`, count: b.count })) || [], [scoreData?.scores]);
+  const hasTrustedScores = scoreRows.some(row => row.count > 0);
   const statuses = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
   return <div className="hr-workspace hr-analytics-page">
     <PageHeader icon={<BarChart3 size={26} />} title={t('hrAnalytics.title')} subtitle={t('hrAnalytics.subtitle')} actions={<><button type="button" className="btn-secondary hr-icon-action" aria-label={t('common.actions.refresh')} title={t('common.actions.refresh')} onClick={reload}><RefreshCw size={16}/></button><Link className="btn-secondary hr-header-link" to="/app/recruitment/applications">{t('navigation.applications')}</Link></>} />
@@ -52,13 +54,13 @@ export default function HRAnalyticsPage() {
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={filters.status || ''} onChange={e => update('status', e.target.value)}>
         <option value="">{t('recruitment.applications.allStatuses')}</option>{statuses.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s.toLowerCase()}`)}</option>)}
       </select></label>
-      <button type="button" onClick={() => setFilters({})}>{t('common.actions.clear')}</button>
+      <button type="button" className="btn-secondary" onClick={() => setFilters({})}>{t('common.actions.clear')}</button>
     </div></HRFilterPanel></div>
     {denied || result.status !== 'ready' || !data ? <><HRResourceState status={denied || result.status} retry={reload} />{!denied && result.status === 'loading' && <div className="hr-analytics-kpis" aria-hidden="true">{Object.keys(kpiIcons).map(key => <article key={key}><h3>{t(`hrAnalytics.kpi.${key}`)}</h3><strong>—</strong></article>)}</div>}</> : <>
-      {data.totals.applications === 0 && <p role="status" data-hr-analytics-empty>{t('hrAnalytics.empty')}</p>}
       {restricted > 0 && <p role="status">{t('hrAnalytics.partial', { count: restricted })}</p>}
       <p className="hr-analytics-updated">{result.refreshing && <span data-hr-refreshing role="status">{t('hrStates.loading')} · </span>}<span>{t('hrWorkspace.updated')}</span> <time dateTime={data.generatedAt}>{formatter.format(new Date(data.generatedAt))}</time></p>
-      <div className="hr-analytics-kpis">{Object.entries(data.totals).map(([key, value]) => { const Icon = kpiIcons[key as keyof typeof kpiIcons]; return <article key={key} data-hr-kpi={key}><div className="hr-kpi-heading"><h3>{t(`hrAnalytics.kpi.${key}`)}</h3>{Icon && <Icon size={18} aria-hidden="true" />}</div><strong>{value.toLocaleString(i18n.language)}</strong></article>; })}</div>
+      <div className="hr-analytics-kpis">{Object.entries(data.totals).map(([key, value]) => { const Icon = kpiIcons[key as keyof typeof kpiIcons]; return <article key={key} data-hr-kpi={key}><div className="hr-kpi-heading">{Icon && <Icon size={22} aria-hidden="true" />}<h3>{t(`hrAnalytics.kpi.${key}`)}</h3></div><strong>{value.toLocaleString(i18n.language)}</strong></article>; })}</div>
+      {data.totals.applications === 0 && <div className="hr-analytics-empty" data-hr-analytics-empty role="status"><EmptyState icon={<Inbox size={26} aria-hidden="true" />} title={t('hrAnalytics.empty')} hint={t('hrAnalytics.emptyHint')} /></div>}
       <div className="hr-analytics-tabs" role="tablist" aria-label={t('hrWorkspace.analyticsViews')}>
         {(['overview', 'operations'] as const).map(value => <button type="button" role="tab" key={value} id={`${tabId}-${value}`} aria-controls={`${tabId}-panel`} aria-selected={pane === value} tabIndex={pane === value ? 0 : -1} onClick={() => setPane(value)} onKeyDown={event => {
           if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
@@ -67,9 +69,14 @@ export default function HRAnalyticsPage() {
         }}>{t(`hrWorkspace.${value}`)}</button>)}
       </div>
       <div className="hr-analytics-sections" role="tabpanel" id={`${tabId}-panel`} aria-labelledby={`${tabId}-${pane}`} data-hr-analytics-pane={pane}>
-        {pane === 'overview' ? <>
+        {pane === 'overview' ? data.totals.applications === 0 ? null : <>
         <section className="hr-panel hr-panel--funnel"><h2>{t('hrAnalytics.funnel')}</h2><table><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row">{t(`recruitment.applications.${r.status.toLowerCase()}`)}</th><td><span className="hr-analytic-number">{r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></td></tr>)}</tbody></table></section>
-        <section className={"hr-panel hr-panel--scores" + (data.totals.applications === 0 ? " hr-panel--empty" : "")}><h2>{t('hrAnalytics.scores')}</h2>{scoreResult.status !== 'ready' ? <HRResourceState status={scoreResult.status} retry={scoreResult.reload}/> : scoreData?.consistent && scoreData.total === data.totals.applications && scoreData.scores ? <>{scoreRows.every(row=>row.count===0) && <p className="hr-toolbar-note" data-hr-empty-scores>{t("hrAnalytics.noTrustedScores")}</p>}<HRHistogram title={t('hrAnalytics.scores')} rows={scoreRows}/><ul className="hr-score-states">{Object.entries(scoreData.scores.states).filter(([, value]) => value > 0).map(([key, value]) => <li key={key} data-hr-score={key}>{t(`hrMatch.${key}`)}: {value}</li>)}</ul><ul className="hr-score-legend">{scoreData.scores.buckets.map(b => <li key={b.min} data-hr-score-bucket={b.min}>{b.min}–{b.max}%: {b.count}</li>)}</ul></> : <p role="status">{t('hrAnalytics.changed')}</p>}</section>
+        <section className="hr-panel hr-panel--scores"><h2>{t('hrAnalytics.scores')}</h2>
+          {scoreResult.status !== 'ready' ? <HRResourceState status={scoreResult.status} retry={scoreResult.reload}/> : scoreData?.consistent && scoreData.total === data.totals.applications && scoreData.scores ? <>
+            {hasTrustedScores ? <><HRHistogram title={t('hrAnalytics.scores')} rows={scoreRows}/><ul className="hr-score-legend">{scoreData.scores.buckets.map(b => <li key={b.min} data-hr-score-bucket={b.min}>{b.min}–{b.max}%: {b.count}</li>)}</ul></> : <div data-hr-empty-scores role="status"><EmptyState icon={<BarChart3 size={24} aria-hidden="true" />} title={t('hrAnalytics.unknown')} hint={t('hrAnalytics.noTrustedScores')} /></div>}
+            <ul className="hr-score-states">{Object.entries(scoreData.scores.states).filter(([, value]) => value > 0).map(([key, value]) => <li key={key} data-hr-score={key}>{t(`hrMatch.${key}`)}: {value}</li>)}</ul>
+          </> : <p role="status">{t('hrAnalytics.changed')}</p>}
+        </section>
         <section className="hr-panel hr-panel--sources"><h2>{t('hrAnalytics.source')}</h2><ul className="hr-distribution">{data.sources.map(r => <li key={r.key} data-hr-source={r.key}><span>{t(`hrAnalytics.sources.${r.key}`)}: {r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></li>)}</ul></section>
         </> : operations.status !== 'ready' || !operationData ? <HRResourceState status={operations.status} retry={operations.reload}/> : <>
         <section><h2>{t('hrAnalytics.brands')}</h2><table><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{operationData.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications}</td><td>{r.activeVacancies}</td></tr>)}</tbody></table>{operationData.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>

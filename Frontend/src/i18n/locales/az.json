@@ -1239,6 +1239,7 @@
     }
   },
   "hrAnalytics": {
+    "emptyHint": "Müraciət sayı həqiqətən 0-dır. Seçilmiş filtrlərdə mərhələ və uyğunluq təhlili üçün məlumat yoxdur. Aktiv vakansiyalar ayrıca hesablanır.",
     "noTrustedScores": "Hələ etibarlı uyğunluq göstəricisi yoxdur. Tam və yoxlanılmış məlumat olduqda nəticələr burada görünəcək.",
     "title": "GFC HR analitikası",
     "subtitle": "Vakansiya və müraciət axını",

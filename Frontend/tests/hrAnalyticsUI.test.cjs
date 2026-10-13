@@ -5,6 +5,8 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   const path = '/app/recruitment/analytics', kpi = key => h.page.locator(`[data-hr-kpi="${key}"] strong`);
   await t.test('empty state and unknown duration are distinct from genuine zero', async () => {
     await h.open('admin', path); await h.page.locator('[data-hr-analytics-empty]').waitFor(); assert.equal(await kpi('applications').textContent(), '0');
+    assert.equal(await h.page.locator('[data-hr-analytics-empty] .empty-state').count(),1);
+    assert.equal(await h.page.locator('[data-hr-histogram], [data-hr-stage], .hr-panel--sources').count(),0);
     await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click(); assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('Məlumat yoxdur')); assert.ok(!((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')));
   });
   const candidate = (await h.request('admin', 'POST', '/candidates', { name: 'Analytics_PRIVATE_PROFILE', email: 'analytics@private.invalid', role: 'Cashier', skills: ['Kassa'] })).data;
@@ -51,7 +53,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     await h.models.Role.create({ key: 'analytics_ui_limited', name: 'Limited', permissions: ['application', 'recruitment'].map(resource => ({ resource, action: 'read', scope: 'all' })) });
     await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'analytics_ui_limited' } });
     await h.open('peer', path); await kpi('applications').waitFor(); assert.equal(await kpi('applications').textContent(), '3');
-    await h.page.getByRole('status').filter({ hasText: 'namizəd məlumatı üçün giriş məhduddur' }).waitFor(); await h.page.locator('[data-hr-score=restricted]').waitFor();assert.equal(await h.page.locator('[data-hr-score=restricted]').textContent(), 'Qiymətləndirməyə giriş yoxdur: 3');
+    await h.page.getByRole('status').filter({ hasText: 'namizəd məlumatı üçün giriş məhduddur' }).waitFor(); await h.page.locator('[data-hr-score=restricted]').waitFor();assert.equal(await h.page.locator('[data-hr-histogram]').count(),0);assert.equal(await h.page.locator('[data-hr-empty-scores] .empty-state').count(),1);assert.equal(await h.page.locator('[data-hr-score=restricted]').textContent(), 'Qiymətləndirməyə giriş yoxdur: 3');
   });
   await t.test('old filter response cannot overwrite a newer selected brand', async () => {
     const old = (await h.request('admin', 'GET', '/hr/analytics/overview')).data; let release, entered; const gate = new Promise(resolve => { release = resolve; }), captured = new Promise(resolve => { entered = resolve; });
@@ -109,6 +111,15 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
   });
   await t.test('mobile presentation is readable without horizontal page overflow', async () => {
     await h.page.setViewportSize({ width: 390, height: 844 }); assert.equal(await h.page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+  });
+  await t.test('A genuine calculated zero match stays in the 0–19% bucket, not missing-data state', async () => {
+    const person = (await h.request('admin', 'POST', '/candidates', {name:'Synthetic zero-match applicant',role:'Cashier',skills:['Cash handling']})).data;
+    const job = (await h.request('admin', 'POST', '/jobs', {title:'Synthetic food safety specialist',department:'HR',description:'HACCP procedures',requiredSkills:['HACCP']})).data;
+    assert.equal((await h.request('admin','POST','/applications',{jobId:job._id,candidateId:person._id})).status,201);
+    await h.open('admin',path);await h.page.locator('[data-hr-score-bucket="0"]').waitFor();
+    assert.equal(await h.page.locator('[data-hr-score-bucket="0"]').textContent(),'0–19%: 1');
+    assert.equal(await h.page.locator('[data-hr-empty-scores]').count(),0);
+    assert.equal(await h.page.locator('[data-hr-histogram]').count(),1);
   });
   assert.deepEqual(h.pageErrors, []);
 }));
