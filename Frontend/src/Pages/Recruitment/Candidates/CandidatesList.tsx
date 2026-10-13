@@ -56,7 +56,7 @@ import HRPageControls from "../../../Components/HRPageControls";
 import { getCandidatePage } from "../../../Services/hrPageService";
 
 const CandidatesList: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -156,7 +156,7 @@ const CandidatesList: React.FC = () => {
       {canRead && <button type="button" className="icon-btn" aria-label={`${t('common.actions.viewDetails')} ${candidate.name}`} title={t('common.actions.viewDetails')} onClick={event => {
         event.stopPropagation(); navigate(`/app/recruitment/candidates/${candidate.id}`);
       }}><Eye size={16} /></button>}
-      {canAct && <button type="button" className="icon-btn" aria-label={`${t(archived ? 'hrArchive.restore' : 'hrArchive.archive')} ${candidate.name}`}
+      {canAct && <button type="button" className={archived ? "icon-btn" : "icon-btn icon-btn--danger"} aria-label={`${t(archived ? 'hrArchive.restore' : 'hrArchive.archive')} ${candidate.name}`}
         title={t(archived ? 'hrArchive.restore' : 'hrArchive.archive')} disabled={deletingId === candidate.id}
         onClick={event => void (archived ? handleRestore(event, candidate) : handleDelete(event, candidate))}>
         {deletingId === candidate.id ? <Loader2 size={16} className="spin" /> : archived ? <RotateCcw size={16} /> : <Archive size={16} />}
@@ -170,7 +170,7 @@ const CandidatesList: React.FC = () => {
   return (
     <div className="hr-workspace recruitment-list-page hr-candidates-page">
       {confirmation?.key===context.key&&<HRConfirmDialog title={t("hrArchive.archive")} message={t("hrArchive.confirm",{name:confirmation.candidate.name})} confirmLabel={t("hrArchive.archive")} loading={Boolean(deletingId)} onConfirm={()=>{void confirmArchive();}} onCancel={()=>setConfirmation(null)}/>}
-      <PageHeader icon={<UsersRound size={26} />}
+      <div className="hr-candidate-hero"><PageHeader icon={<UsersRound size={26} />}
         title={t("recruitment.candidates.title")}
         subtitle={t("recruitment.candidates.subtitle")}
         actions={
@@ -205,7 +205,11 @@ const CandidatesList: React.FC = () => {
             )}
           </>
         }
-      />
+      /></div>
+      <div className="hr-candidate-metrics" aria-label={t('hrCandidateUI.metrics')}>
+        <article><UsersRound size={22} aria-hidden="true" /><div><p>{t('hrCandidateUI.matchingTotal')}</p><strong data-candidate-total>{result.status === 'ready' ? result.data?.total.toLocaleString(i18n.language) : '—'}</strong><small>{t(archived ? 'hrArchive.archiveList' : 'hrArchive.active')}</small></div></article>
+        <article><List size={22} aria-hidden="true" /><div><p>{t('hrCandidateUI.pageShown')}</p><strong data-candidate-shown>{result.status === 'ready' ? candidates.length.toLocaleString(i18n.language) : '—'}</strong><small>{t('hrCandidateUI.page', { page: result.page })}</small></div></article>
+      </div>
 
       <div className="filter-bar hr-primary-controls">
         <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder={t("recruitment.candidates.searchPlaceholder")} />
@@ -214,6 +218,7 @@ const CandidatesList: React.FC = () => {
         {import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button className="btn-secondary" type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}
         {hasPermission(user, "application", "read") && <button className="btn-secondary" type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}
 
+        {(searchQuery || archived || statusFilter !== 'all') && <button type="button" className="btn-secondary" onClick={() => { setSearchQuery(''); setArchived(false); setStatusFilter('all'); }}>{t('common.actions.clear')}</button>}
         <div className="view-switcher" role="group" aria-label={t("recruitment.candidates.title")}>
           <button
             className={
@@ -286,8 +291,7 @@ const CandidatesList: React.FC = () => {
                     <td><div className="hr-person-cell"><span className="hr-person-avatar" aria-hidden="true">{candidate.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" disabled={!canRead} onClick={event=>{event.stopPropagation();navigate("/app/recruitment/candidates/"+candidate.id);}}>{candidate.name}</button>{candidate.email && <small>{candidate.email}</small>}</div></div></td>
 
                     <td>
-                      {candidate.role ||
-                        t("recruitment.candidates.notProvided")}
+                      {candidate.role && candidate.role.length > 80 ? <details className="hr-cell-disclosure" onClick={event => event.stopPropagation()}><summary><span>{candidate.role}</span></summary><p>{candidate.role}</p></details> : candidate.role || t("recruitment.candidates.notProvided")}
                     </td>
 
                     <td>
@@ -316,15 +320,7 @@ const CandidatesList: React.FC = () => {
                     </td>
 
                     <td>
-                      <span
-                        className={`badge badge--${getCandidateStatusBadgeVariant(
-                          candidate.status,
-                        )}`}
-                      >
-                        {t(
-                          `recruitment.candidateStatus.${candidate.status}`,
-                        )}
-                      </span>
+                      <Badge tone={getCandidateStatusBadgeVariant(candidate.status)}>{t(`recruitment.candidateStatus.${candidate.status}`)}</Badge>
                     </td>
 
                     {(canRead || canAct) && (

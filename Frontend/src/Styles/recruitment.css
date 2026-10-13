@@ -1280,7 +1280,7 @@
 }
 
 .recruitment-list-page .page-header__subtitle {
-  color: #667085;
+  color: var(--hr-slate);
 }
 
 /* Filter surface */
@@ -1390,9 +1390,7 @@
   letter-spacing: -0.03em;
 }
 
-.recruitment-list-page .page-header__subtitle {
-  color: #667085 !important;
-}
+
 
 
 /* ── INOP Recruitment — unified indigo business palette ─────────── */

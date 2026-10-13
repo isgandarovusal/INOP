@@ -1,4 +1,10 @@
 {
+  "hrCandidateUI": {
+    "metrics": "Candidate metrics",
+    "matchingTotal": "Matching candidates",
+    "pageShown": "Shown on this page",
+    "page": "Page {{page}}"
+  },
   "common": {
     "actions": {
       "save": "Save",

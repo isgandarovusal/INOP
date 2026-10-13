@@ -370,6 +370,32 @@
 .hr-workspace .hr-person-cell { display: flex; align-items: center; gap: 12px; min-width: 170px; }
 .hr-workspace .hr-person-cell small { display: block; margin-top: 3px; color: var(--hr-slate); font-size: 12px; }
 .hr-workspace .hr-person-cell .hr-person-avatar { flex-shrink: 0; background: var(--hr-purple-soft); color: var(--hr-purple-hover); border: 1px solid var(--hr-purple-border); }
+/* Candidate overview uses only current scoped page counts. */
+.hr-candidates-page .hr-candidate-hero { padding: 24px; margin-bottom: 18px; background: var(--hr-hero); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); }
+.hr-candidates-page .hr-candidate-hero .page-header { padding: 0; margin: 0; }
+.hr-candidates-page .hr-candidate-hero .page-header__title { color: var(--hr-on-navy); }
+.hr-candidates-page .hr-candidate-hero .page-header__subtitle { color: var(--hr-on-navy-muted); }
+.hr-candidates-page .hr-candidate-hero .page-header__icon { background: var(--hr-primary); color: var(--hr-white); border-color: var(--hr-primary); }
+.hr-candidates-page .hr-candidate-metrics { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-bottom: 18px; }
+.hr-candidates-page .hr-candidate-metrics article { display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; border: 1px solid var(--hr-border); border-radius: var(--radius-lg); background: var(--hr-white); box-shadow: var(--shadow-card); }
+.hr-candidates-page .hr-candidate-metrics article > svg { padding: 10px; width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--hr-blue-soft); color: var(--hr-primary); }
+.hr-candidates-page .hr-candidate-metrics p { color: var(--hr-slate); font-size: 12px; margin: 0; }
+.hr-candidates-page .hr-candidate-metrics strong { color: var(--hr-navy); font-size: 28px; font-variant-numeric: tabular-nums; }
+.hr-candidates-page .hr-candidate-metrics small { display: block; color: var(--hr-slate); font-size: 11px; }
+.hr-candidates-page .hr-primary-controls .search-field { max-width: none; flex-grow: 2; }
+.hr-candidates-page .view-switcher { margin-left: auto; }
+.hr-candidates-page .hr-candidates-table .badge { white-space: normal; line-height: 1.4; }
+.hr-candidates-page .hr-cell-disclosure summary { cursor: pointer; padding: 0; }
+.hr-candidates-page .hr-cell-disclosure summary > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.hr-candidates-page .hr-cell-disclosure[open] summary > span { display: inline; }
+.hr-candidates-page .hr-cell-disclosure > p { margin: 8px 0 0; color: var(--hr-slate); }
+@media(max-width:650px) {
+ .hr-candidates-page .hr-candidate-hero { padding: 18px; }
+ .hr-candidates-page .hr-candidate-metrics { gap: 10px; }
+ .hr-candidates-page .hr-candidate-metrics article { padding: 14px; gap: 10px; }
+ .hr-candidates-page .hr-candidate-metrics article > svg { width: 32px; height: 32px; padding: 7px; flex-shrink: 0; }
+ .hr-candidates-page .hr-candidate-metrics strong { font-size: 24px; }
+}
 .hr-candidates-page .hr-candidates-table { table-layout: fixed; min-width: 860px; }
 .hr-candidates-table .hr-candidate-col-person { width: 24%; }
 .hr-candidates-table .hr-candidate-col-role { width: 22%; }
@@ -381,13 +407,13 @@
 .hr-candidates-page .hr-person-cell { min-width: 0; }
 .hr-candidates-page .hr-person-cell > div { min-width: 0; }
 .hr-candidates-page .tag-chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
-.hr-candidates-page .hr-candidate-actions-cell { position: sticky; right: 0; z-index: 1; background: var(--hr-white); border-left: 1px solid var(--hr-border); }
+.hr-candidates-page .hr-candidate-actions-cell { vertical-align: top; position: sticky; right: 0; z-index: 1; background: var(--hr-white); border-left: 1px solid var(--hr-border); }
 .hr-candidates-page thead .hr-candidate-actions-cell { z-index: 2; background: var(--hr-subtle); }
 .hr-candidates-page .hr-candidate-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .hr-candidates-page .hr-candidate-actions :is(button,a) { min-height: 44px; }
 .hr-candidates-page .hr-candidate-actions .icon-btn { width: 44px; flex: 0 0 44px; }
 .hr-candidates-page :is(button,a):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 2px; }
-.hr-workspace .hr-application-board .recruitment-kanban__card { padding: 12px; gap: 5px; min-width: 0; }
+.hr-workspace .hr-application-board .recruitment-kanban__card { box-shadow: var(--shadow-card); padding: 12px; gap: 5px; min-width: 0; }
 .hr-workspace .hr-application-board .recruitment-kanban__card > p { margin: 0; overflow-wrap: anywhere; }
 .hr-workspace .hr-application-board .hr-board-card-title { line-height: 1.4; }
 .hr-workspace .hr-application-board .hr-board-card-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 10px; border-top: 1px solid var(--hr-border); padding-top: 8px; margin-top: 3px; }

@@ -1,4 +1,10 @@
 {
+  "hrCandidateUI": {
+    "metrics": "Namizəd göstəriciləri",
+    "matchingTotal": "Filtrə uyğun namizədlər",
+    "pageShown": "Bu səhifədə göstərilənlər",
+    "page": "Səhifə {{page}}"
+  },
   "common": {
     "actions": {
       "save": "Yadda saxla",

@@ -1,4 +1,10 @@
 {
+  "hrCandidateUI": {
+    "metrics": "Показатели кандидатов",
+    "matchingTotal": "Кандидаты по фильтрам",
+    "pageShown": "Показано на странице",
+    "page": "Страница {{page}}"
+  },
   "common": {
     "actions": {
       "save": "Сохранить",
