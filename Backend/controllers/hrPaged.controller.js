@@ -77,9 +77,10 @@ exports.list = kind => async (req, res, next) => {
     const baseQuery = { $and: [scope, p.extra] }, sort = p.sort === 'name' ? { [kind === 'jobs' ? 'title' : 'name']: 1, _id: 1 } : { createdAt: -1, _id: -1 };
     let items, total;
     if (kind === 'candidates' && req.query.excludeJobId) {
-      // Anti-join only readable links. No unbounded $nin list or hidden-link oracle.
+      // Anti-join only readable links. Concise indexed equality avoids the
+      // per-candidate expression join; no unbounded list or hidden-link oracle.
       const pipeline = [{ $match: { $and: [aggregateResourceFilter(req, 'candidate'), p.extra] } }, { $project: { createdAt: 1, name: 1 } },
-        { $lookup: { from: Application.collection.name, let: { id: '$_id' }, pipeline: [{ $match: { $and: [aggregateResourceFilter(req, 'application'), { jobId: new mongoose.Types.ObjectId(req.query.excludeJobId) }, { $expr: { $eq: ['$candidateId', '$$id'] } }] } }, { $project: { _id: 1 } }, { $limit: 1 }], as: 'linked' } }, { $match: { 'linked.0': { $exists: false } } },
+        { $lookup: { from: Application.collection.name, localField: '_id', foreignField: 'candidateId', pipeline: [{ $match: { $and: [aggregateResourceFilter(req, 'application'), { jobId: new mongoose.Types.ObjectId(req.query.excludeJobId) }] } }, { $project: { _id: 1 } }, { $limit: 1 }], as: 'linked' } }, { $match: { 'linked.0': { $exists: false } } },
         { $facet: { total: [{ $count: 'count' }], items: [...(p.after ? [{ $match: p.after }] : []), { $sort: sort }, { $skip: (p.page - 1) * p.pageSize }, { $limit: p.pageSize + 1 }, { $project: { _id: 1 } }] } }];
       const [data] = await Candidate.aggregate(pipeline).option({ maxTimeMS: 5000 }); total = data.total[0]?.count || 0;
       const ids = data.items.map(r => r._id), rows = await Candidate.find({ $and: [scope, { _id: { $in: ids } }] }).select(fields.candidates).lean();
