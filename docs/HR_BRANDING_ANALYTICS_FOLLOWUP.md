@@ -27,6 +27,10 @@ Same owned localhost database and backend/browser process throughout: 20 vacanci
 
 The dataset has no branch assignments, so its guaranteed improvement is the eliminated empty branch read. The separate concurrency test covers assigned branches. Scores and React code did not change; their timing differences reflect cache/order/runtime noise and cannot be attributed to this optimization. Small development samples do not establish production speedup. An initial baseline run showed KPI median 971.40 ms and render median 319.10 ms, demonstrating development-run variability.
 
+## Separate real local auth/startup trace
+
+A second trace used the actual AuthProvider, localhost `/auth/me`, synthetic JWT and the same 20/200/4,000 dataset. Three full document loads recorded request paths, start times and durations only. Median auth request duration was 24.41 ms; overview and scores started at 991.54 and 991.97 ms from document navigation, confirming parallel startup after auth. Their browser request durations were 131.09 and 253.65 ms. The first React mount cost was 14.50 ms; genuine KPI and score content were observed at 1,614.00 and 1,619.80 ms. These browser timings include Vite development module loading, local routing/fixture overhead and render scheduling. They are separate from the same-process client-navigation comparison above and must not be compared as identical methodologies. Backend token/role revalidation is included in the API query waterfall. No production cold-start measurement exists.
+
 ## Production investigation still required
 
 Capture an authorized production navigation trace without exporting response bodies or PII. Separate route chunk loading, `/auth/me`, overview and scores timing, time to hide each loading region, and redundant requests. Correlate overview/scores request durations with Render startup and server/query timings using the same synthetic permitted tenant dataset. Compare a cold and warm backend. Without that evidence, network latency, auth startup and Render cold-start remain possibilities, not confirmed root causes.

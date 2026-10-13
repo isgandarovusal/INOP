@@ -28,6 +28,7 @@
  .auth-shell { max-width:460px; grid-template-columns:minmax(0,1fr); }
  .auth-brand-panel { padding:24px; gap:0; align-items:center; }
  .auth-brand-panel .inop-logo { width:180px; }
+ .auth-brand-copy { display:none; }
  .auth-entry-panel { padding:28px 24px; }
  .auth-entry-panel > .language-switcher { margin:0 auto 28px; }
  .auth-card__title { font-size:26px; }

@@ -2,17 +2,17 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {withBrowserFixture}=require('./helpers/browser.cjs');
 const az=require('../src/i18n/locales/az.json');
 const loginHarness=`import React from'react';import{createRoot}from'react-dom/client';import{createBrowserRouter,RouterProvider}from'react-router-dom';import{AuthContext}from'/src/Context/AuthContext.ts';import'/src/i18n/index.ts';import'/src/App.css';import Login from'/src/Pages/Auth/Login/Login.tsx';const router=createBrowserRouter([{path:'/login',element:React.createElement(Login)},{path:'/app/dashboard',element:React.createElement('p',{'data-login-destination':true},'Authenticated destination')}]);window.navigateTest=to=>router.navigate(to);function App(){const[user,setUser]=React.useState(null);return React.createElement(AuthContext.Provider,{value:{user,isLoading:false,login:async()=>{if(window.rejectLogin)throw Error('Synthetic login unavailable');setUser(window.testUser)},logout:async()=>setUser(null)}},React.createElement(RouterProvider,{router}))}createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(App)));`;
-test('Shared brand/login: real asset sizes, quiet responsive layout, accessible languages/password/error and submit',async t=>withBrowserFixture(loginHarness,async h=>{
+test('Shared brand/login: shared SVG sizes, quiet responsive layout, accessible languages/password/error and submit',async t=>withBrowserFixture(loginHarness,async h=>{
  for(const width of[320,768,1440])await t.test('Login '+width,async()=>{
   await h.page.setViewportSize({width,height:900});await h.open('admin','/login');await h.page.getByLabel(az.auth.email,{exact:true}).waitFor();
   await h.page.waitForFunction(()=>document.querySelector('svg.inop-logo path'));
   assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   assert.equal(await h.page.locator('.auth-page').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
   assert.equal(await h.page.locator('.auth-page__ambient,.auth-orbit,.auth-page__grid-overlay').count(),0);
-  const logo=h.page.getByRole('img',{name:'INOP — Internal Operations Platform',exact:true});assert.equal(await logo.getAttribute('width'),'320');assert.equal(await logo.getAttribute('height'),'128');
+  const logo=h.page.getByRole('img',{name:'INOP',exact:true});assert.equal(await logo.getAttribute('width'),'224');assert.equal(await logo.getAttribute('height'),'64');
   for(const name of['ENG','RUS','AZE']){const b=h.page.getByRole('button',{name,exact:true});await b.click();assert.equal(await b.getAttribute('aria-pressed'),'true');}
   assert.equal(await logo.evaluate(e=>e.tagName.toLowerCase()),'svg');assert.ok((await logo.evaluate(e=>e.outerHTML)).length<4096);assert.equal(await logo.locator('image,rect,foreignObject,script').count(),0);assert.equal(await logo.getAttribute('src'),null);
-  await fs.mkdir('/workspace/inop-hr18-brand-visual',{recursive:true});await h.page.screenshot({path:'/workspace/inop-hr18-brand-visual/login-'+width+'.png',fullPage:true});
+  await fs.mkdir('/workspace/work/premium/brand-regression-screens',{recursive:true});await h.page.screenshot({path:'/workspace/work/premium/brand-regression-screens/login-'+width+'.png',fullPage:true});
  });
  await t.test('Password visibility and explicit error do not lose the form; successful submit navigates',async()=>{
   await h.page.locator('#email').fill('ui-only@example.invalid');await h.page.locator('#password').fill('synthetic-ui-only');
