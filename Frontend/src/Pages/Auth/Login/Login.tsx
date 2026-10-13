@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight, BriefcaseBusiness, BarChart3, ShieldCheck } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
 import INOPLogo from "../../../Components/INOPLogo";
@@ -62,16 +62,9 @@ const Login: React.FC = () => {
         <section className="auth-brand-panel" aria-label="INOP">
           <INOPLogo />
           <div className="auth-brand-copy">
-            <p className="auth-brand-panel__eyebrow">RECRUITMENT · AUDIT · OPERATIONS</p>
             <h2>{t('auth.heroTitle')}</h2>
             <p>{t('auth.heroSubtitle')}</p>
           </div>
-          <ul className="auth-brand-features">
-            <li><BriefcaseBusiness size={20} aria-hidden="true" /><span>{t('auth.features.recruitment')}</span></li>
-            <li><BarChart3 size={20} aria-hidden="true" /><span>{t('auth.features.analytics')}</span></li>
-            <li><ShieldCheck size={20} aria-hidden="true" /><span>{t('auth.features.access')}</span></li>
-          </ul>
-          <div className="auth-brand-panel__footer">INOP · INTERNAL OPERATIONS PLATFORM</div>
         </section>
         <section className="auth-entry-panel">
           <LanguageSwitcher />
@@ -171,7 +164,6 @@ const Login: React.FC = () => {
               </button>
             </form>
           </div>
-          <p className="auth-entry-panel__footer">INOP · INTERNAL OPERATIONS PLATFORM</p>
         </section>
       </main>
     </div>

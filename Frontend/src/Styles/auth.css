@@ -1,15 +1,10 @@
 /* Login uses the shared light enterprise tokens; no global auth overrides. */
 .auth-page { min-height:100dvh; display:grid; place-items:center; padding:var(--space-8); background:var(--surface-page); color:var(--text-primary); }
 .auth-shell { width:min(100%,1040px); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); border:1px solid var(--hr-border); border-radius:var(--radius-xl); overflow:clip; box-shadow:var(--shadow-overlay); background:var(--surface); }
-.auth-brand-panel { padding:48px 40px; display:flex; flex-direction:column; gap:32px; justify-content:center; background:var(--hr-hero); color:var(--hr-on-navy); min-width:0; }
+.auth-brand-panel { padding:64px 40px; display:flex; flex-direction:column; gap:32px; justify-content:center; background:var(--hr-hero); color:var(--hr-on-navy); min-width:0; }
 .auth-brand-panel .inop-logo { color:var(--hr-on-navy); width:260px; max-width:100%; }
-.auth-brand-panel__eyebrow { color:var(--hr-on-navy-muted); font-size:10px; letter-spacing:.12em; margin-bottom:18px; }
 .auth-brand-copy h2 { font-size:clamp(24px,2.5vw,32px); line-height:1.25; font-weight:650; letter-spacing:-.025em; max-width:17ch; margin:0 0 16px; }
 .auth-brand-copy > p:last-child { color:var(--hr-on-navy-muted); font-size:14px; line-height:1.8; }
-.auth-brand-features { list-style:none; display:grid; gap:16px; padding:0; }
-.auth-brand-features li { display:flex; align-items:center; gap:12px; color:var(--hr-on-navy); font-size:13px; }
-.auth-brand-features svg { flex-shrink:0; width:38px; height:38px; padding:9px; background:var(--hr-primary); border-radius:var(--radius-md); }
-.auth-brand-panel__footer { color:var(--hr-on-navy-muted); font-size:10px; letter-spacing:.08em; margin-top:auto; }
 .auth-entry-panel { padding:36px 40px; min-width:0; background:var(--surface); display:flex; flex-direction:column; justify-content:center; }
 .auth-entry-panel > .language-switcher { margin-left:auto; margin-bottom:36px; }
 .auth-card__title { font-size:30px; font-weight:700; line-height:1.25; letter-spacing:-.03em; color:var(--hr-navy); margin:0 0 10px; }
@@ -27,14 +22,12 @@
 .auth-submit__content { display:flex; align-items:center; justify-content:space-between; width:100%; gap:8px; }
 .auth-card .form-error { display:flex; align-items:flex-start; gap:8px; font-size:12px; line-height:1.6; color:var(--danger); margin:8px 0 0; }
 .auth-card .form-error--submit { padding:12px; border:1px solid var(--danger); border-radius:var(--radius-md); background:var(--danger-soft); margin-bottom:12px; }
-.auth-entry-panel__footer { color:var(--hr-slate); font-size:10px; text-align:center; line-height:1.7; margin:28px 0 0; }
 .auth-page :is(button,input) { font-family:inherit; }
 @media(max-width:680px) {
  .auth-page { padding:16px; }
  .auth-shell { max-width:460px; grid-template-columns:minmax(0,1fr); }
  .auth-brand-panel { padding:24px; gap:0; align-items:center; }
  .auth-brand-panel .inop-logo { width:180px; }
- .auth-brand-copy,.auth-brand-features,.auth-brand-panel__footer { display:none; }
  .auth-entry-panel { padding:28px 24px; }
  .auth-entry-panel > .language-switcher { margin:0 auto 28px; }
  .auth-card__title { font-size:26px; }
