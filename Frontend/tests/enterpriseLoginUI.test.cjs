@@ -7,8 +7,8 @@ test('Enterprise login validates locally and preserves real auth, languages, pas
  for(const width of [1440,768,390]){
   await h.page.setViewportSize({width,height:1000});await h.open('admin','/login');await h.page.locator('#email').waitFor();await h.page.locator('.auth-submit').waitFor();
   for(const locale of ['ENG','RUS','AZE']){const b=h.page.getByRole('button',{name:locale,exact:true});await b.click();assert.equal(await b.getAttribute('aria-pressed'),'true');}
-  assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await h.page.locator('.auth-submit').click();assert.equal(await h.page.locator('#email').getAttribute('aria-invalid'),'true');assert.equal(await h.page.locator('#email').evaluate(e=>e===document.activeElement),true);
-  await fs.mkdir('/workspace/work/premium/screens',{recursive:true});await h.page.screenshot({path:`/workspace/work/premium/screens/login-${width}.png`,fullPage:true});
+  assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await fs.mkdir('/workspace/work/premium/screens',{recursive:true});await h.page.screenshot({path:`/workspace/work/premium/screens/login-${width}.png`,fullPage:true});
+  await h.page.locator('.auth-submit').click();assert.equal(await h.page.locator('#email').getAttribute('aria-invalid'),'true');assert.equal(await h.page.locator('#email').evaluate(e=>e===document.activeElement),true);
  }
  assert.equal(h.wire.filter(r=>r.path==='/api/auth/login').length,0);
  await h.page.locator('#email').fill('auth-enterprise@example.invalid');await h.page.locator('#password').fill('Wrong-synthetic-password');

@@ -164,7 +164,7 @@
 @media (max-width: 650px) { .hr-workspace .detail-card { padding: 18px; } }
 .hr-workspace.recruitment-list-page > .page-header .page-header__title { font-size: clamp(24px, 2.3vw, 30px); font-weight: 650; }
 .hr-workspace .hr-analytics-sections table { min-width: 0; width: 100%; table-layout: fixed; }
-.hr-workspace .hr-analytics-sections table th:first-child { width: 55%; }
+.hr-workspace .hr-panel--funnel table th:first-child { width: 55%; }
 .hr-shell .admin-sidebar { background: var(--hr-nav-surface); box-shadow: 2px 0 12px rgb(37 59 97 / 4%); backdrop-filter: none; }
 .hr-shell .admin-main { background: var(--hr-page); }
 .hr-shell .admin-sidebar__brand { margin-bottom: 16px; }

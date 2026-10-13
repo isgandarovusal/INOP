@@ -547,6 +547,8 @@
       "linkError": "The application could not be created."
     },
     "applicationStatus": {
+      "interview": "Interview",
+      "offered": "Offer sent",
       "applied": "Applied",
       "screening": "Screening",
       "shortlisted": "Shortlisted",

@@ -508,6 +508,8 @@
       "linkError": "Не удалось создать заявку."
     },
     "applicationStatus": {
+      "interview": "Собеседование",
+      "offered": "Предложение отправлено",
       "applied": "Подал заявку",
       "screening": "Первичный отбор",
       "shortlisted": "В коротком списке",
