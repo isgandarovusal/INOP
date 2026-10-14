@@ -5,6 +5,7 @@
 - Reviewer-in daxili scope hesablanması route middleware-dən keçmirdi: deaktiv custom/management profilindən approval yaradılması mümkün idi. `getAuditScopeFilter` artıq profilin aktivliyi, GFC təşkilatı və məlum istiqamətini fail-closed yoxlayır. Naməlum legacy istiqamət route middleware-də də rədd edilir. Aktiv profilli management hesabı hələ də öz istiqaməti ilə məhduddur; rol adı DB permission-i əvəz etmir.
 - Private adapter timeout-u caller-i azad edərkən hələ işləyən provider sorğusunun paralellik slotunu da azad edirdi. Slot faktiki promise/stream bitənədək saxlanır; abort-a əməl etməyən provider iki slotu doldurduqda növbəti əməliyyat təhlükəsiz 503 BUSY alır. Concrete adapter yenə abort müqaviləsini təmin etməlidir.
 - Köhnə generic audit siyahısı `overallPercentage` truthiness/fallback ilə real sıfırı və legacy-unscored nəticəni qarışdırırdı. Mövcud shared `auditScore` oxuma adapterindən istifadə edir: `0` sıfırdır, null `—`, seçilməmiş minimum filtr qiymətləndirilməmiş qeydləri gizlətmir. Hesablama/scoring kontraktı dəyişməyib.
+- Əlavə closure regression yoxlamasında approval yaratma/qərar əməliyyatlarında bağlı audit guard-ının olmadığı aşkarlandı. Hər ikisi eyni transaction/parent lock daxilində 409 qaytarır; bağlanmış auditin approval tarixçəsi dəyişmir. Bu kiçik davam düzəlişi ayrıca lokal commitlə saxlanır.
 
 ## QA
 

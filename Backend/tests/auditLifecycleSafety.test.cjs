@@ -41,6 +41,10 @@ test('Lifecycle uses independent review, complete revision answers, finding clos
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id})).status,409);
  assert.equal((await h.request('admin','PATCH',`/audit-findings/${finding.data.data._id}/status`,{status:'closed'})).status,200);
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id})).status,201);
+ const approvalCount=await h.models.Approval.countDocuments({auditId:id});
+ assert.equal((await h.request('admin','POST','/audit-approval',{auditId:id,reviewer:String(h.actors.peer._id)})).status,409);
+ assert.equal((await h.request('peer','PATCH',`/audit-approval/${approval.data.data._id}`,{status:'rejected'})).status,409);
+ assert.equal(await h.models.Approval.countDocuments({auditId:id}),approvalCount);
  assert.equal((await h.request('admin','POST','/audit-findings',{auditId:id,title:'Too late'})).status,409);
  assert.equal((await h.request('admin','PUT',`/audits/${created.data.id}`,{comments:'Too late'})).status,409);
  assert.equal((await h.request('admin','DELETE',`/audits/${created.data.id}`)).status,200);

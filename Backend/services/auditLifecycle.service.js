@@ -26,6 +26,7 @@ async function createApproval(req) {
   if (req.body.status && req.body.status !== 'pending') throw auditError(400, 'Approval requests must start pending.');
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
+    if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Closed audit is immutable.');
     const User = require('../models/user.model');
     const reviewer = await User.findOne({ _id: req.body.reviewer, isActive: true }).session(session);
     if (!reviewer || String(reviewer._id) === req.user.id) throw auditError(400, 'Select an active independent reviewer.');
@@ -47,6 +48,7 @@ async function createApproval(req) {
 async function resolveApproval(req) {
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
+    if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Closed audit is immutable.');
     const approval = await Approval.findOne({ _id: req.params.id, auditId: audit._id }).session(session);
     if (!approval) throw auditError(404, 'Approval not found.');
     if (String(approval.requestedBy) === req.user.id || (String(approval.reviewer) !== req.user.id && !(['admin','audit_manager'].includes(req.user.role) && req.permission.scope === 'all'))) throw auditError(403, 'Independent designated reviewer or authorized audit manager required.');
