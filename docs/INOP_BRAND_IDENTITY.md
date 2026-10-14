@@ -1,3 +1,5 @@
+> Historical review: superseded by the four-letter-only identity in INOP_WORDMARK.md. The gateway is no longer used.
+
 # INOP identity review
 
 Three source-defined, flat SVG concepts were rendered in existing Chromium and visually inspected on navy login, white sidebar, mobile topbar and 32px icon contexts. The contact sheet is a local QA artifact, not production evidence.

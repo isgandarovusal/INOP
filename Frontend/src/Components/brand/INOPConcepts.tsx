@@ -1,32 +1,26 @@
 export type LogoConcept = 'A' | 'B' | 'C';
-export type LogoProps = { compact?: boolean; iconOnly?: boolean; tone?: 'auto' | 'light' | 'dark'; concept?: LogoConcept };
+export type LogoProps = { compact?: boolean; tone?: 'auto' | 'light' | 'dark'; concept?: LogoConcept };
 
-/** Flat, font-independent artwork keeps every brand surface consistent. */
-export function INOPConcept({ concept = 'B', compact = false, iconOnly = false, tone = 'auto' }: LogoProps) {
+/** Three original letterings; every variant contains only the letters INOP. */
+export function INOPConcept({ concept = 'A', compact = false, tone = 'auto' }: LogoProps) {
   const ink = tone === 'light' ? '#EDF3FF' : tone === 'dark' ? '#132745' : 'currentColor';
-  const accent = tone === 'light' ? '#A5B4FC' : '#4338CA';
-  return <svg className="inop-logo" data-concept={concept} data-variant={iconOnly ? 'icon' : compact ? 'compact' : 'wordmark'} role="img" aria-label="INOP" width={iconOnly ? 64 : 224} height={64} viewBox={iconOnly ? '0 0 64 64' : '0 0 224 64'} xmlns="http://www.w3.org/2000/svg">
+  return <svg className="inop-logo" data-concept={concept} data-variant={compact ? 'compact' : 'wordmark'} role="img" aria-label="INOP" width={224} height={64} viewBox="0 0 224 64" xmlns="http://www.w3.org/2000/svg">
     <title>INOP</title>
-    {concept === 'A' ? <g fill={ink}>
-      {iconOnly ? <path d="M18 10H46V17H36V47H46V54H18V47H28V17H18Z"/> : <g transform="translate(10 4) scale(1.3 1.15)"><Wordmark /></g>}
-    </g> : <>
-      {concept === 'B' ? <g>
-        <path d="M9 14H17V50H9Z" fill={accent}/>
-        <path d="M27 10H43C52 10 57 16 57 25V39C57 48 52 54 43 54H27V46H42C47 46 49 43 49 38V26C49 21 47 18 42 18H27Z" fill={ink}/>
-        <path d="M21 28H34V36H21Z" fill={accent}/>
-      </g> : <g>
-        <path d="M8 12H44V20H16V44H44V52H8Z" fill={ink}/>
-        <path d="M24 27H56V35H24Z" fill={accent}/>
-        <path d="M48 12H56V20H48ZM48 44H56V52H48Z" fill={ink}/>
-      </g>}
-      {!iconOnly && <g fill={ink} transform={concept === 'C' ? 'translate(72 4) skewX(-4)' : 'translate(72 4)'}><Wordmark /></g>}
-    </>}
+    {concept === 'A' ? <g fill="none" stroke={ink} strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round" transform="translate(10 12)">
+      <path data-letter="I" d="M4 0V40" />
+      <path data-letter="N" d="M28 40V0L67 40V0" />
+      <path data-letter="O" d="M108 0H116C127 0 133 6 133 17V23C133 34 127 40 116 40H108C97 40 91 34 91 23V17C91 6 97 0 108 0Z" />
+      <path data-letter="P" d="M158 40V0H182C194 0 200 5 200 14S194 28 182 28H158" />
+    </g> : concept === 'B' ? <g fill={ink} transform="translate(8 12)">
+      <path data-letter="I" d="M0 0H9V40H0Z" />
+      <path data-letter="N" d="M25 40V0H35L64 26V0H73V40H63L34 14V40Z" />
+      <path data-letter="O" fillRule="evenodd" d="M107 0H121Q137 0 137 16V24Q137 40 121 40H107Q91 40 91 24V16Q91 0 107 0ZM109 9Q100 9 100 18V22Q100 31 109 31H119Q128 31 128 22V18Q128 9 119 9Z" />
+      <path data-letter="P" fillRule="evenodd" d="M155 0H185Q207 0 207 15T185 30H164V40H155ZM164 9V21H184Q198 21 198 15T184 9Z" />
+    </g> : <g fill="none" stroke={ink} strokeWidth="6" strokeLinecap="square" strokeLinejoin="miter" transform="translate(10 12)">
+      <path data-letter="I" d="M0 0H16M8 0V40M0 40H16" />
+      <path data-letter="N" d="M35 40V0L73 40V0" />
+      <path data-letter="O" d="M107 0H128L138 10V30L128 40H107L97 30V10Z" />
+      <path data-letter="P" d="M163 40V0H190L202 10V20L190 29H163" />
+    </g>}
   </svg>;
-}
-function Wordmark() {
-  return <>
-    <path d="M0 12H7V44H0ZM16 12H23L42 33V12H49V44H42L23 23V44H16Z"/>
-    <path fillRule="evenodd" d="M75 11C87 11 95 18 95 28S87 45 75 45S55 38 55 28S63 11 75 11ZM75 18C67 18 63 22 63 28S67 38 75 38S87 34 87 28S83 18 75 18Z"/>
-    <path fillRule="evenodd" d="M103 12H123C134 12 140 17 140 25S134 38 123 38H111V44H103ZM111 19V31H122C129 31 132 29 132 25S129 19 122 19Z"/>
-  </>;
 }

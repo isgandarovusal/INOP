@@ -1,6 +1,6 @@
 import { INOPConcept, type LogoProps } from './brand/INOPConcepts';
 
-/** Selected IO gateway identity, shared by login, sidebar and mobile navigation. */
+/** Original four-letter wordmark shared by all application brand surfaces. */
 export default function INOPLogo(props: Omit<LogoProps, 'concept'>) {
-  return <INOPConcept {...props} concept="B" />;
+  return <INOPConcept {...props} concept="A" />;
 }

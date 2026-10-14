@@ -6,7 +6,7 @@ test('Selected identity and static login composition preserve responsive form pr
  await withBrowserFixture(source,async h=>{
   for(const width of [1440,768,390]){
    await h.page.setViewportSize({width,height:1000});await h.open('admin','/login');await h.page.locator('#email').waitFor();
-   expect(await h.page.locator('.inop-logo').getAttribute('data-concept')).toBe('B');
+   expect(await h.page.locator('.inop-logo').getAttribute('data-concept')).toBe('A');
    expect(await h.page.locator('.auth-brand-art').getAttribute('aria-hidden')).toBe('true');
    expect(await h.page.locator('.auth-brand-art').isVisible()).toBe(width>680);
    expect(await h.page.locator('.auth-brand-copy').isVisible()).toBe(width>680);
