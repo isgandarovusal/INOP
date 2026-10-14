@@ -168,8 +168,7 @@
     "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
-    "heroTitle": "İnsan resursları üçün vahid platforma.",
-    "heroSubtitle": "Namizədlər, vakansiyalar və analitika bir yerdə.",
+    "heroTitle": "Bütün əməliyyatlar üçün vahid platforma.",
     "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
     "passwordRequired": "Şifrənizi daxil edin.",
     "features": {

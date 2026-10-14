@@ -68,7 +68,6 @@ const Login: React.FC = () => {
           </picture>
           <div className="auth-brand-copy">
             <h2>{t('auth.heroTitle')}</h2>
-            <p>{t('auth.heroSubtitle')}</p>
           </div>
         </section>
         <section className="auth-entry-panel">
