@@ -29,6 +29,7 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
     auditType: {
       type: String,
       enum: [
+        "hr",
         "service",
         "standard",
         "occupational-safety",

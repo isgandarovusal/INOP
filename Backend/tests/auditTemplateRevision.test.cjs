@@ -1,0 +1,34 @@
+const test = require('node:test'), assert = require('node:assert/strict');
+const { withAuditFixture } = require('./helpers/auditFixture.cjs');
+const Revision = require('../models/auditTemplateRevision.model');
+const Template = require('../models/auditTemplate.model');
+const fixture = { organizationId:'gfc',brandId:'kfc',brandName:'KFC',auditType:'service',name:'Synthetic QA only',sections:[{id:'s',title:'Synthetic',questions:[{id:'q',label:'Synthetic question',answerType:'yes-no-na'}]}] };
+test('Published template revisions are immutable and server-bind audits/executions', async () => withAuditFixture(async h => {
+  const create = await h.request('admin','POST','/audit-templates',fixture); assert.equal(create.status,201);
+  const id=create.data.id;
+  assert.equal((await h.request('hr','POST',`/audit-templates/${id}/publish`,{})).status,403);
+  const published=await h.request('admin','POST',`/audit-templates/${id}/publish`,{}); assert.equal(published.status,200);
+  const revision=published.data.data;
+  assert.equal((await h.request('admin','PUT',`/audit-templates/${id}`,{name:'Changed'})).status,409);
+  await assert.rejects(Revision.updateOne({_id:revision._id},{$set:{'content.name':'Forged'}}));
+  await assert.rejects(Revision.deleteOne({_id:revision._id}));
+  const audit=await h.request('admin','POST','/audits',{id:'revision-audit',restaurantId:'restaurant-admin',auditType:'service',date:'2026-10-14',templateId:id,templateSnapshot:{name:'Forged'}});
+  assert.equal(audit.status,201); assert.equal(audit.data.templateSnapshot.name,fixture.name);
+  const execution=await h.request('admin','POST','/audit-execution',{auditId:audit.data._id,checklistId:id,templateSnapshot:{name:'Forged'}});
+  assert.equal(execution.status,201); assert.equal(execution.data.data.templateSnapshot.name,fixture.name);
+  assert.equal((await h.request('admin','POST',`/audit-templates/${id}/draft`,{})).status,200);
+  assert.equal((await h.request('admin','PUT',`/audit-templates/${id}`,{name:'Revision two'})).status,200);
+  const second=await h.request('admin','POST',`/audit-templates/${id}/publish`,{}); assert.equal(second.status,200);
+  assert.notEqual(second.data.data._id,revision._id);
+  assert.equal((await Revision.findById(revision._id)).content.name,fixture.name);
+  assert.equal((await h.request('admin','GET',`/audit-execution/${execution.data.data._id}`)).data.data.templateSnapshot.name,fixture.name);
+  assert.equal((await h.request('admin','DELETE',`/audit-templates/${id}`)).status,200);
+  assert.ok(await Template.findById(id)); assert.equal((await Template.findById(id)).status,'archived');
+  assert.equal((await h.request('admin','GET',`/audit-execution/${execution.data.data._id}`)).status,200);
+}));
+test('Concurrent publish permits one immutable revision; direction/brand mismatch denied', async () => withAuditFixture(async h => {
+  const created=await h.request('admin','POST','/audit-templates',fixture); const id=created.data.id;
+  const results=await Promise.all([1,2].map(()=>h.request('admin','POST',`/audit-templates/${id}/publish`,{})));
+  assert.deepEqual(results.map(r=>r.status).sort(),[200,409]); assert.equal(await Revision.countDocuments({templateId:id}),1);
+  assert.equal((await h.request('admin','POST','/audits',{id:'wrong-direction',restaurantId:'restaurant-admin',auditType:'standard',date:'2026-10-14',templateId:id})).status,403);
+}));

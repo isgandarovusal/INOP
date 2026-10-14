@@ -42,7 +42,14 @@ exports.createExecution = async (req, res) => {
   try {
     const { checklistId, answers = [], findings, correctiveActions, status, totalScore, riskLevel } = req.body;
     if (!validAnswers(answers)) return res.status(400).json({ success: false, message: 'Invalid answers.' });
-    const execution = await Execution.create({ auditId: req.auditScopeId, createdBy: req.user.id, checklistId, answers, findings, correctiveActions, status, totalScore, riskLevel });
+    const audit = await require('../models/audit.model').findById(req.auditScopeId).lean();
+    const bound = {};
+    if (audit?.templateRevisionId) {
+      const revision = await require('../models/auditTemplateRevision.model').findById(audit.templateRevisionId).lean();
+      if (!revision || (checklistId && String(revision.templateId) !== String(checklistId))) return res.status(400).json({ message: 'Execution must use the audit revision.' });
+      bound.templateRevisionId = revision._id; bound.templateSnapshot = revision.content;
+    }
+    const execution = await Execution.create({ ...bound, auditId: req.auditScopeId, createdBy: req.user.id, checklistId, answers, findings, correctiveActions, status, totalScore, riskLevel });
     return res.status(201).json({ success: true, data: execution });
   } catch (error) { return fail(res, error); }
 };

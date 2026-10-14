@@ -215,6 +215,8 @@ router.delete(
   restaurantsController.deleteRestaurant
 );
 
+router.use('/audit-templates', require('./auditTemplateRevision.routes'));
+
 // Audit Template API
 router.get(
   '/audit-templates',

@@ -11,6 +11,7 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   if (user.role === 'auditor' || profile) {
     if (!profile?.active || !direction || direction !== profile.direction || !linked) throw Object.assign(new Error('Audit direction or organization denied.'), { status: 403 });
   }
+  await require('./auditTemplateRevision.service').resolveForAudit(payload, restaurant, direction);
   delete payload.organizationId;
   delete payload.direction;
   // Public id remains unchanged; internal identity and provenance are server-owned.
@@ -27,6 +28,10 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
         if (profile) {
           const current = await require('./auditorProfile.service').lockProfile(user.id, session);
           if (current.direction !== direction) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
+        }
+        if (payload.templateRevisionId) {
+          const bound = await require('../models/auditTemplate.model').updateOne({ _id: payload.templateId, status: 'active', publishedRevisionId: payload.templateRevisionId }, { $inc: { __v: 1 } }, { session });
+          if (!bound.modifiedCount) throw Object.assign(new Error('Template revision changed; retry.'), { status: 409 });
         }
         const [audit] = await Audit.create([{ ...payload, _id: auditId, auditorId: user.id }], { session });
         await require('../models/auditContext.model').create([{ _id: auditId, organizationId: 'gfc', brandId: restaurant.brandId, direction, restaurantId: restaurant.id, actorId: user.id }], { session });

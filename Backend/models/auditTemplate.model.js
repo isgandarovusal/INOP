@@ -70,7 +70,7 @@ const AuditTemplateSchema = new mongoose.Schema(
 
     auditType: {
       type: String,
-      enum: ["service", "standard", "occupational-safety"],
+      enum: ["hr", "service", "standard", "occupational-safety"],
       required: true,
       index: true,
     },
@@ -85,6 +85,9 @@ const AuditTemplateSchema = new mongoose.Schema(
       type: String,
       default: "1.0",
     },
+
+    revisionCounter: { type: Number, default: 0 },
+    publishedRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
 
     visitCount: {
       type: Number,
@@ -120,6 +123,7 @@ const AuditTemplateSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
   }
 );
 

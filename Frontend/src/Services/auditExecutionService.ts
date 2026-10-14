@@ -9,6 +9,8 @@ export interface AuditExecutionAnswer {
 }
 
 export interface AuditExecution {
+  templateRevisionId?: string;
+  templateSnapshot?: import('../Types/Audit').AuditTemplate;
   _id: string;
   auditId: string;
   checklistId?: string;

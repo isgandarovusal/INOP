@@ -5,7 +5,7 @@ import { auditErrorStatus, type AuditLoadStatus } from "./useAuditResource";
 
 export function useAuditAction(auditId: string, resource: string, action: string) {
   const { user } = useAuth();
-  const key = JSON.stringify([auditId, user?.id, user?.role, user?.departmentId, user?.hrAccess, user?.permissions]);
+  const key = JSON.stringify([auditId, user?.id, user?.role, user?.departmentId, user?.auditDirection, user?.hrAccess, user?.permissions]);
   const pending = useMemo(() => ({ key, controllers: new Set<AbortController>() }), [key]);
   useEffect(() => () => { for (const controller of pending.controllers) controller.abort(); pending.controllers.clear(); }, [pending]);
   const scope = getPermissionScope(user, resource, action);

@@ -10,6 +10,8 @@ const auditExecutionSchema = new mongoose.Schema(
  },
 
 
+ templateRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
+ templateSnapshot: mongoose.Schema.Types.Mixed,
  checklistId:{
   type:mongoose.Schema.Types.ObjectId,
   ref:"AuditTemplate"

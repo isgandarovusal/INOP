@@ -95,6 +95,7 @@ exports.createTemplate = async (req, res) => {
       });
     }
 
+    if (status === 'active' && !['admin','audit_manager'].includes(req.user.role)) return res.status(403).json({ message: 'Publication requires audit management.' });
     const template = await AuditTemplate.create({
       organizationId,
       brandId,
@@ -103,13 +104,17 @@ exports.createTemplate = async (req, res) => {
       name,
       version,
       visitCount,
-      status,
+      status: 'draft',
       sections,
       sourceDocumentIds,
       createdBy: req.user.id,
       updatedBy: req.user.id,
     });
 
+    if (status === 'active') {
+      await require('../services/auditTemplateRevision.service').publish(template._id, req.user.id);
+      template.status = 'active';
+    }
     try {
       await recordActivity({
         req,
@@ -128,8 +133,8 @@ exports.createTemplate = async (req, res) => {
     res.status(201).json(normalizeTemplate(template));
   } catch (error) {
     console.error('createTemplate error:', error);
-    res.status(500).json({
-      message: 'Audit template yaratmaq mümkün olmadı.',
+    res.status(error.status || 500).json({
+      message: error.status ? error.message : 'Audit template yaratmaq mümkün olmadı.',
     });
   }
 };
@@ -150,6 +155,10 @@ exports.updateTemplate = async (req, res) => {
       });
     }
 
+    if (template.status !== 'draft') {
+      if (req.body.status === 'archived' && Object.keys(req.body).every(key => ['status','id','_id'].includes(key))) return res.json(normalizeTemplate(await require('../services/auditTemplateRevision.service').retire(template._id, req.user.id)));
+      return res.status(409).json({ message: 'Published/legacy active template is immutable. Start a new draft.' });
+    }
     const allowedFields = [
       'organizationId',
       'brandId',
@@ -169,6 +178,7 @@ exports.updateTemplate = async (req, res) => {
       }
     }
 
+    if (req.body.status === 'active') return res.status(409).json({ message: 'Use the publish operation for a reviewed revision.' });
     template.updatedBy = req.user.id;
     await template.save();
 
@@ -204,7 +214,11 @@ exports.deleteTemplate = async (req, res) => {
       });
     }
 
-    const template = await AuditTemplate.findByIdAndDelete(req.params.id);
+    const template = await AuditTemplate.findById(req.params.id);
+    if (template) {
+      const retired = await require('../services/auditTemplateRevision.service').retire(template._id, req.user.id);
+      return res.json({ message: 'Audit template archived.', id: req.params.id, archived: retired.status === 'archived' });
+    }
 
     if (!template) {
       return res.status(404).json({
