@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import INOPLogo from "../../../Components/INOPLogo";
 import LanguageSwitcher from "../../../Components/LanguageSwitcher";
 import "../../../Styles/auth.css";
+import architecture from "../../../assets/brand/login-architecture.webp";
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -60,13 +61,11 @@ const Login: React.FC = () => {
     <div className="auth-page">
       <main className="auth-shell">
         <section className="auth-brand-panel" aria-label="INOP">
-          <INOPLogo tone="light" />
-          <svg className="auth-brand-art" viewBox="0 0 520 320" aria-hidden="true" focusable="false">
-            <path className="auth-brand-art__plane" d="M70 320V170L230 75L450 195V320Z" />
-            <path className="auth-brand-art__edge" d="M70 320V170L230 75L450 195V320M70 170L285 290L450 195M230 75V225" />
-            <path className="auth-brand-art__depth" d="M0 270L160 175L380 295M0 305L160 210L360 320M230 110L415 211M230 145L380 231" />
-            <path className="auth-brand-art__gateway" d="M186 239V163L230 137L292 171V249L272 261V186L230 163L206 177V250Z" />
-          </svg>
+          <INOPLogo tone="dark" />
+          <picture className="auth-brand-art" aria-hidden="true">
+            <source media="(min-width: 681px)" srcSet={architecture} />
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E" width={1200} height={800} alt="" decoding="async" />
+          </picture>
           <div className="auth-brand-copy">
             <h2>{t('auth.heroTitle')}</h2>
             <p>{t('auth.heroSubtitle')}</p>
