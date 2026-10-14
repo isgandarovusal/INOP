@@ -2,7 +2,8 @@ import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import "../auditAnalytics.css";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
 
 import {
   ResponsiveContainer,
@@ -25,30 +26,16 @@ import {
 import PageHeader from "../../../Components/PageHeader";
 
 import { getSafetyAnalytics } from "../../../Services/auditAnalyticsService";
-import type { SafetyAnalyticsData } from "../../../Services/auditAnalyticsService";
 import { ACCENT } from "../../../Utils/theme";
+
+const loadAnalytics = (_id: string, signal?: AbortSignal, scopeKey?: string) => getSafetyAnalytics(signal,scopeKey);
 
 const SafetyAuditAnalytics: React.FC = () => {
   const { t } = useTranslation();
-  const [data, setData] =
-    useState<SafetyAnalyticsData | null>(null);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    getSafetyAnalytics()
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(t("audit.safety.analytics.error"));
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [t]);
+  const resource = useAuditResource('safety','audit.analytics',loadAnalytics);
+  const data = resource.data?.data;
+  const loading = resource.status === 'loading';
+  const error = resource.status !== 'ready' && !loading ? t('audit.safety.analytics.error') : '';
 
   return (
     <div className="audit-analytics safety-audit-analytics">
@@ -82,7 +69,7 @@ const SafetyAuditAnalytics: React.FC = () => {
               <TrendingUp size={22} />
               <p>{t("audit.safety.analytics.averageScore")}</p>
               <h2>
-                {data.averageScorePercentage.toFixed(1)} %
+                {(data.averageScorePercentage === null ? "—" : data.averageScorePercentage.toFixed(1))} %
               </h2>
             </div>
 

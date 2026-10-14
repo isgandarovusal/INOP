@@ -10,6 +10,8 @@ const auditActionSchema = new mongoose.Schema(
  },
 
 
+ findingId:{type:mongoose.Schema.Types.ObjectId,ref:"AuditFinding"},
+ createdBy:{type:String,immutable:true},
  executionId:{
   type:mongoose.Schema.Types.ObjectId,
   ref:"AuditExecution"

@@ -15,7 +15,7 @@ function normalizeDocument(doc) {
   return {
     ...item,
     id: String(item._id || item.id),
-    _id: undefined,
+    _id: undefined, filePath: undefined, storageKey: undefined, processingToken: undefined,
   };
 }
 
@@ -25,7 +25,13 @@ exports.getDocuments = async (req, res) => {
 
   try {
 
-    const filter = {};
+    const filter = {archivedAt:null};
+    const {scalar,pagination}=require('../services/auditQuery.service');const window=pagination(req);
+    for(const key of ['templateId','brandId','auditType','organizationId'])scalar(req.query[key],key);
+    if(req.query.brandId&&!require('../services/auditCatalog.service').brandIds.includes(req.query.brandId))throw Object.assign(new Error('Unknown brand.'),{status:400});
+    if(req.query.organizationId && req.query.organizationId!=='gfc')throw Object.assign(new Error('Unknown organization.'),{status:400});
+    if(req.query.organizationId)filter.organizationId=req.query.organizationId;
+    const pageRequested=req.query.page!==undefined||req.query.limit!==undefined;
 
 
     if (req.query.templateId) {
@@ -39,7 +45,7 @@ exports.getDocuments = async (req, res) => {
 
 
     if (req.query.auditType) {
-      filter.auditType = req.query.auditType;
+      const direction=require('../services/auditDirection.service').canonicalDirection(req.query.auditType);if(!direction)throw Object.assign(new Error('Unknown direction.'),{status:400});filter.auditType={$in:require('../services/auditDirection.service').aliasesFor(direction)};
     }
 
 
@@ -49,7 +55,7 @@ exports.getDocuments = async (req, res) => {
         .sort({
           createdAt: -1,
         })
-        .lean();
+        .skip(pageRequested?window.skip:0).limit(pageRequested?window.limit:0).maxTimeMS(5000).lean();
 
 
     res.json(
@@ -64,7 +70,7 @@ exports.getDocuments = async (req, res) => {
       error
     );
 
-    res.status(500).json({
+    res.status(error.status||500).json({
       message:
         "Audit fayllarını yükləmək mümkün olmadı.",
     });
@@ -95,6 +101,10 @@ exports.uploadDocument = async (req, res) => {
     } = req.body;
 
 
+    const catalog=require('../services/auditCatalog.service');const direction=require('../services/auditDirection.service').canonicalDirection(auditType);
+    if(!direction||(brandId&&!catalog.brandIds.includes(brandId))||(organizationId&&organizationId!=='gfc'))return res.status(400).json({message:'Unknown organization, brand or direction.'});
+    const effectiveOrganization=organizationId||(brandId?'gfc':'');
+    if(templateId){if(!require('mongoose').isObjectIdOrHexString(templateId))return res.status(400).json({message:'Invalid template.'});const template=await require('../models/auditTemplate.model').findOne({_id:templateId,...(effectiveOrganization?{organizationId:effectiveOrganization}:{}),...(brandId?{brandId}:{}),auditType:direction}).lean();if(!template||(template.organizationId&&!['gfc'].includes(template.organizationId)))return res.status(400).json({message:'Template does not match source scope.'});}
     const document =
       await AuditSourceDocument.create({
 
@@ -103,11 +113,11 @@ exports.uploadDocument = async (req, res) => {
 
         templateId,
 
-        organizationId,
+        organizationId:effectiveOrganization,
 
         brandId,
 
-        auditType,
+        auditType:direction,
 
         fileName:
           req.file.filename,
@@ -169,7 +179,7 @@ exports.uploadDocument = async (req, res) => {
     );
 
 
-    res.status(500).json({
+    res.status(error.status||500).json({
       message:
         "Audit faylını saxlamaq mümkün olmadı.",
     });
@@ -185,9 +195,9 @@ exports.deleteDocument = async(req,res)=>{
   try {
 
     const document =
-      await AuditSourceDocument.findOneAndDelete({
-        ...require("./privateFiles.controller").sourceQuery(req.params.id),
-      });
+      await AuditSourceDocument.findOneAndUpdate({
+        ...require("./privateFiles.controller").sourceQuery(req.params.id),archivedAt:null,...(req.auditCatalogFilter||{}),
+      },{$set:{archivedAt:new Date(),archivedBy:req.user.id}},{returnDocument:"after"});
 
 
     if(!document){
@@ -225,7 +235,7 @@ exports.deleteDocument = async(req,res)=>{
 
     console.error(error);
 
-    res.status(500).json({
+    res.status(error.status||500).json({
       message:
         "Delete error",
     });

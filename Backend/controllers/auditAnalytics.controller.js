@@ -1,5 +1,7 @@
 const Audit = require("../models/audit.model");
-const { getAuditScopeFilter } = require("../middleware/auditScope.middleware");
+const { filterFor } = require("./auditDirectionAnalytics.controller");
+const { pagination } = require("../services/auditQuery.service");
+const { auditScoreExpression } = require("../services/auditScore.service");
 
 function safeNumber(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -7,12 +9,12 @@ function safeNumber(value) {
 
 function round(value, decimals = 2) {
   const factor = 10 ** decimals;
-  return Math.round(safeNumber(value) * factor) / factor;
+  return typeof value === "number" && Number.isFinite(value) ? Math.round(value * factor) / factor : null;
 }
 
 exports.getSummary = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor(req);
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
       { $match: scopeFilter },
@@ -55,7 +57,7 @@ exports.getSummary = async (req, res) => {
   } catch (error) {
     console.error("Audit summary analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Analytics error",
     });
@@ -64,14 +66,14 @@ exports.getSummary = async (req, res) => {
 
 exports.getByType = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor(req);
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
       { $match: scopeFilter },
       {
         $group: {
           _id: {
-            $ifNull: ["$auditType", "unknown"],
+            $switch:{branches:require('../services/auditDirection.service').directions.map(direction=>({case:{$in:[{$ifNull:['$auditType','$type']},require('../services/auditDirection.service').aliasesFor(direction)]},then:direction})),default:{$ifNull:['$auditType',{$ifNull:['$type','unknown']}]}} ,
           },
           value: {
             $sum: 1,
@@ -97,7 +99,7 @@ exports.getByType = async (req, res) => {
   } catch (error) {
     console.error("Audit type analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Type analytics error",
     });
@@ -106,7 +108,7 @@ exports.getByType = async (req, res) => {
 
 exports.getTrend = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor(req);
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const result = await Audit.aggregate([
       { $match: scopeFilter },
@@ -145,7 +147,7 @@ exports.getTrend = async (req, res) => {
   } catch (error) {
     console.error("Audit trend analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Trend analytics error",
     });
@@ -154,7 +156,7 @@ exports.getTrend = async (req, res) => {
 
 exports.getServiceAnalytics = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'service'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
       { $match: scopeFilter },
@@ -163,6 +165,7 @@ exports.getServiceAnalytics = async (req, res) => {
           auditType: "service",
         },
       },
+      {$set:{normalizedScore:auditScoreExpression}},
       {
         $facet: {
           overview: [
@@ -170,14 +173,10 @@ exports.getServiceAnalytics = async (req, res) => {
               $group: {
                 _id: null,
                 total: { $sum: 1 },
+                scored: {$sum:{$cond:[{$isNumber:"$normalizedScore"},1,0]}},
                 averageOverallPercentage: {
                   $avg: {
-                    $convert: {
-                      input: "$overallPercentage",
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
+                    $multiply: ['$normalizedScore',10],
                   },
                 },
               },
@@ -218,8 +217,8 @@ exports.getServiceAnalytics = async (req, res) => {
                     $convert: {
                       input: "$serviceTimeObservations.seconds",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
@@ -236,12 +235,14 @@ exports.getServiceAnalytics = async (req, res) => {
             },
             {
               $sort: {
-                _id: 1,
+                _id: -1,
               },
             },
+            {$skip:pagination(req,12).skip},
             {
-              $limit: 12,
+              $limit: pagination(req,12).limit,
             },
+            {$sort:{_id:1}},
           ],
         },
       },
@@ -272,6 +273,7 @@ exports.getServiceAnalytics = async (req, res) => {
       success: true,
       data: {
         total: overview.total || 0,
+        scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageOverallPercentage: round(
           overview.averageOverallPercentage
         ),
@@ -292,7 +294,7 @@ exports.getServiceAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Service analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Service analytics error",
     });
@@ -301,7 +303,7 @@ exports.getServiceAnalytics = async (req, res) => {
 
 exports.getStandardAnalytics = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'standard'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
       { $match: scopeFilter },
@@ -310,6 +312,7 @@ exports.getStandardAnalytics = async (req, res) => {
           auditType: "standard",
         },
       },
+      {$set:{normalizedScore:auditScoreExpression}},
       {
         $facet: {
           overview: [
@@ -317,14 +320,10 @@ exports.getStandardAnalytics = async (req, res) => {
               $group: {
                 _id: null,
                 total: { $sum: 1 },
+                scored: {$sum:{$cond:[{$isNumber:"$normalizedScore"},1,0]}},
                 averageCompliancePercentage: {
                   $avg: {
-                    $convert: {
-                      input: "$compliancePercentage",
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
+                    $multiply: ['$normalizedScore',10],
                   },
                 },
                 totalCritical: {
@@ -332,8 +331,8 @@ exports.getStandardAnalytics = async (req, res) => {
                     $convert: {
                       input: "$foundCritical",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
@@ -342,8 +341,8 @@ exports.getStandardAnalytics = async (req, res) => {
                     $convert: {
                       input: "$foundMajor",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
@@ -352,15 +351,16 @@ exports.getStandardAnalytics = async (req, res) => {
                     $convert: {
                       input: "$foundMinor",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
+                failed: {$sum:{$cond:[{$and:[{$isNumber:"$normalizedScore"},{$eq:["$passed",false]}]},1,0]}},
                 passed: {
                   $sum: {
                     $cond: [
-                      { $eq: ["$passed", true] },
+                      { $and: [{ $isNumber: "$normalizedScore" }, { $eq: ["$passed", true] }] },
                       1,
                       0,
                     ],
@@ -376,24 +376,21 @@ exports.getStandardAnalytics = async (req, res) => {
                 _id: "$date",
                 value: {
                   $avg: {
-                    $convert: {
-                      input: "$compliancePercentage",
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
+                    $multiply: ['$normalizedScore',10],
                   },
                 },
               },
             },
             {
               $sort: {
-                _id: 1,
+                _id: -1,
               },
             },
+            {$skip:pagination(req,12).skip},
             {
-              $limit: 12,
+              $limit: pagination(req,12).limit,
             },
+            {$sort:{_id:1}},
           ],
         },
       },
@@ -405,6 +402,7 @@ exports.getStandardAnalytics = async (req, res) => {
       success: true,
       data: {
         total: overview.total || 0,
+        scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageCompliancePercentage: round(
           overview.averageCompliancePercentage
         ),
@@ -414,10 +412,8 @@ exports.getStandardAnalytics = async (req, res) => {
           minor: safeNumber(overview.totalMinor),
         },
         passed: safeNumber(overview.passed),
-        failed: Math.max(
-          0,
-          safeNumber(overview.total) - safeNumber(overview.passed)
-        ),
+        failed: safeNumber(overview.failed),
+        outcomeUnknown:Math.max(0,(overview.scored||0)-safeNumber(overview.passed)-safeNumber(overview.failed)),
         trend: (summary?.trend || []).map((item) => ({
           label: item._id || "unknown",
           value: round(item.value),
@@ -427,7 +423,7 @@ exports.getStandardAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Standard analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Standard analytics error",
     });
@@ -436,15 +432,16 @@ exports.getStandardAnalytics = async (req, res) => {
 
 exports.getSafetyAnalytics = async (req, res) => {
   try {
-    const scopeFilter = await getAuditScopeFilter(req);
+    const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'occupational-safety'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
     const [summary] = await Audit.aggregate([
       { $match: scopeFilter },
       {
         $match: {
-          auditType: "occupational-safety",
+          auditType: {$in:["occupational-safety","safety"]},
         },
       },
+      {$set:{normalizedScore:auditScoreExpression}},
       {
         $facet: {
           overview: [
@@ -452,14 +449,10 @@ exports.getSafetyAnalytics = async (req, res) => {
               $group: {
                 _id: null,
                 total: { $sum: 1 },
+                scored: {$sum:{$cond:[{$isNumber:"$normalizedScore"},1,0]}},
                 averageScorePercentage: {
                   $avg: {
-                    $convert: {
-                      input: "$scorePercentage",
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
+                    $multiply: ['$normalizedScore',10],
                   },
                 },
                 averageTotalScore: {
@@ -467,8 +460,8 @@ exports.getSafetyAnalytics = async (req, res) => {
                     $convert: {
                       input: "$totalScore",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
@@ -477,8 +470,8 @@ exports.getSafetyAnalytics = async (req, res) => {
                     $convert: {
                       input: "$maxScore",
                       to: "double",
-                      onError: 0,
-                      onNull: 0,
+                      onError: null,
+                      onNull: null,
                     },
                   },
                 },
@@ -511,6 +504,7 @@ exports.getSafetyAnalytics = async (req, res) => {
                   },
                 },
                 total: { $sum: 1 },
+                scored: {$sum:{$cond:[{$isNumber:"$normalizedScore"},1,0]}},
               },
             },
           ],
@@ -541,24 +535,21 @@ exports.getSafetyAnalytics = async (req, res) => {
                 _id: "$date",
                 value: {
                   $avg: {
-                    $convert: {
-                      input: "$scorePercentage",
-                      to: "double",
-                      onError: 0,
-                      onNull: 0,
-                    },
+                    $multiply: ['$normalizedScore',10],
                   },
                 },
               },
             },
             {
               $sort: {
-                _id: 1,
+                _id: -1,
               },
             },
+            {$skip:pagination(req,12).skip},
             {
-              $limit: 12,
+              $limit: pagination(req,12).limit,
             },
+            {$sort:{_id:1}},
           ],
         },
       },
@@ -571,6 +562,7 @@ exports.getSafetyAnalytics = async (req, res) => {
       success: true,
       data: {
         total: overview.total || 0,
+        scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageScorePercentage: round(
           overview.averageScorePercentage
         ),
@@ -598,7 +590,7 @@ exports.getSafetyAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Safety analytics error:", error);
 
-    res.status(500).json({
+    res.status(error.status || 500).json({
       success: false,
       message: "Safety analytics error",
     });

@@ -66,6 +66,7 @@ router.use("/roles", rolesRoutes);
 
 // Audit Analytics API
 router.use('/audit-analytics', auditAnalyticsRoutes);
+router.use('/audit-actions', require('./auditAction.routes'));
 
 // Audit Module Routes
 router.use('/audit-module', auditModuleRoutes);
@@ -262,6 +263,8 @@ router.get('/candidates/:id/cv-preview', ...authorize('candidate', 'read'), priv
 router.get('/candidates/:id/cv', ...authorize('candidate', 'read'), privateFiles.candidate);
 router.get('/audit-source-documents/:id/file', ...authorize('audit.source_document', 'read'), requireGlobalSourceDocumentAccess, privateFiles.source);
 
+router.post('/audit-source-documents/:id/process', ...authorize('audit.source_document','create'), requireGlobalSourceDocumentAccess, require('./auditSourceProcessing.routes').process);
+
 // Audit Source Documents
 router.get(
   '/audit-source-documents',
@@ -273,8 +276,9 @@ router.get(
 router.post(
   '/audit-source-documents',
   ...authorize('audit.source_document', 'create'),
-  requireGlobalSourceDocumentAccess,
+  (req,res,next)=>{if(req.permission.scope!=='all')return res.status(403).json({message:'Source creation requires all scope.'});if(process.env.RENDER==='true'||process.env.NODE_ENV==='production')return res.status(503).json({message:'Durable source storage is required.'});next();},
   auditDocumentUpload,
+  requireGlobalSourceDocumentAccess,
   auditSourceDocumentsController.uploadDocument
 );
 

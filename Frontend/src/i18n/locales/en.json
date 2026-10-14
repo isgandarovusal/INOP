@@ -1708,6 +1708,9 @@
       "service": "Service Audit Analytics",
       "standard": "Standard Audit Analytics",
       "occupational-safety": "Occupational Safety Analytics"
-    }
+    },
+    "previous": "Previous",
+    "next": "Next",
+    "pagination": "Pagination"
   }
 }

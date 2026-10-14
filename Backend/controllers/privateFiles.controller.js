@@ -147,7 +147,7 @@ exports.candidate = async (req, res) => {
   return sendCandidateFile(req,res,candidate,req.permission.scope);
 };
 exports.source = async (req, res) => {
-  const source = await Source.findOne(sourceQuery(req.params.id)).lean();
+  const source = await Source.findOne({...sourceQuery(req.params.id),archivedAt:null,...(req.auditCatalogFilter||{})}).lean();
   if (!source) return missing(res);
   return sendPrivateFile(req, res, source.fileName, source.originalName);
 };
@@ -160,7 +160,12 @@ exports.legacy = async (req, res) => {
   if (!source && !require('../services/hrDepartmentAccess.service').isHRMember(req.user)) return res.status(403).json({code:'HR_DEPARTMENT_REQUIRED',message:'HR department access is required.'});
   const scope = await getPermissionScope(req.user.role, resource, 'read');
   if (!scope || scope === 'none' || (source && scope !== 'all')) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
-  if (source) return sendPrivateFile(req, res, filename, source.originalName);
+  if (source) {
+    if(source.archivedAt||(!['gfc',''].includes(source.organizationId)&&source.organizationId!=null))return missing(res);
+    const profile=await require('../models/auditorProfile.model').findById(req.user.id).lean();
+    if((req.user.role==='auditor'&&!profile)|| (profile&&(!profile.active||profile.direction!==require('../services/auditDirection.service').canonicalDirection(source.auditType)||profile.organizationId!==source.organizationId||!require('../services/auditCatalog.service').brandIds.includes(source.brandId))))return res.status(403).json({message:'Source scope denied.'});
+    return sendPrivateFile(req,res,filename,source.originalName);
+  }
   const filter = getDataScope({ user: req.user, permission: { scope } });
   if (filter === null) return res.status(403).json({ message: 'Fayla giriş icazəsi yoxdur.' });
   const candidate = await Candidate.findOne({ cvUrl: '/uploads/' + filename, ...filter }).select('+privateCvBlob +privateCvArchive +privateCvIntake').lean();

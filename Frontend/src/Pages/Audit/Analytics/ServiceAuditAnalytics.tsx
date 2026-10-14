@@ -1,7 +1,8 @@
 import "../auditModern.css";
 import "../auditAnalytics.css";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useAuditResource } from "../../../Hooks/useAuditResource";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -25,28 +26,16 @@ import {
 import PageHeader from "../../../Components/PageHeader";
 
 import { getServiceAnalytics } from "../../../Services/auditAnalyticsService";
-import type { ServiceAnalyticsData } from "../../../Services/auditAnalyticsService";
 import { ACCENT } from "../../../Utils/theme";
+
+const loadAnalytics = (_id: string, signal?: AbortSignal, scopeKey?: string) => getServiceAnalytics(signal,scopeKey);
 
 const ServiceAuditAnalytics: React.FC = () => {
   const { t } = useTranslation();
-  const [data, setData] = useState<ServiceAnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    getServiceAnalytics()
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(t("audit.service.analytics.error"));
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [t]);
+  const resource = useAuditResource('service','audit.analytics',loadAnalytics);
+  const data = resource.data?.data;
+  const loading = resource.status === 'loading';
+  const error = resource.status !== 'ready' && !loading ? t('audit.service.analytics.error') : '';
 
   return (
     <div className="audit-analytics service-audit-analytics">
@@ -80,7 +69,7 @@ const ServiceAuditAnalytics: React.FC = () => {
               <TrendingUp size={22} />
               <p>{t("audit.service.analytics.averageScore")}</p>
               <h2>
-                {data.averageOverallPercentage.toFixed(1)} %
+                {(data.averageOverallPercentage === null ? "—" : data.averageOverallPercentage.toFixed(1))} %
               </h2>
             </div>
 
@@ -88,7 +77,7 @@ const ServiceAuditAnalytics: React.FC = () => {
               <Clock3 size={22} />
               <p>{t("audit.service.analytics.averageServiceTime")}</p>
               <h2>
-                {data.averageServiceTimeSeconds.toFixed(0)} {t("audit.service.analytics.secondsShort")}
+                {(data.averageServiceTimeSeconds === null ? "—" : data.averageServiceTimeSeconds.toFixed(0))} {t("audit.service.analytics.secondsShort")}
               </h2>
             </div>
           </div>

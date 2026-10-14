@@ -1732,6 +1732,9 @@
       "service": "Servis Auditi Analitikası",
       "standard": "Standart Auditi Analitikası",
       "occupational-safety": "Əməyin Mühafizəsi Analitikası"
-    }
+    },
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "pagination": "Səhifələr"
   }
 }

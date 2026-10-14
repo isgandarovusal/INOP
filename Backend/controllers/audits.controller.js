@@ -71,11 +71,13 @@ async function getAudits(req, res) {
       });
     }
 
-    const audits = await Audit.find(filter).sort({
-      date: -1,
-      createdAt: -1,
-    });
-
+    const window = require('../services/auditQuery.service').pagination(req);
+    const paged = req.query.page !== undefined || req.query.limit !== undefined || req.query.format === 'page';
+    if(req.query.format!==undefined && req.query.format!=='page')throw Object.assign(new Error('Invalid response format.'),{status:400});
+    let query=Audit.find(filter).sort({date:-1,createdAt:-1,_id:-1}).maxTimeMS(5000);
+    if(paged)query=query.skip(window.skip).limit(window.limit);
+    const audits=await query;
+    if(req.query.format==='page'){const total=await Audit.countDocuments(filter).maxTimeMS(5000);return res.json({items:audits,total,page:window.page,limit:window.limit});}
     res.json(audits);
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });

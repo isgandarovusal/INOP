@@ -86,6 +86,11 @@ const AuditSourceDocumentSchema = new mongoose.Schema(
       default: "uploaded",
     },
 
+    archivedAt: Date,
+    archivedBy: String,
+    processingToken: {type:String,select:false},
+    processingStartedAt: Date,
+    processedAt: Date,
     extractedData: {
       type: mongoose.Schema.Types.Mixed,
       default: null,

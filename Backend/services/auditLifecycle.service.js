@@ -61,6 +61,7 @@ async function closeAudit(req) {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     const existing = await Closure.findOne({ auditId: audit._id, finalStatus: 'completed' }).session(session);
     if (existing && audit.status === 'completed') return existing;
+    if (await require('../models/auditAction.model').exists({auditId:audit._id,status:{$ne:'verified'}}).session(session))throw auditError(409,'Verify every corrective action first.');
     if (await Finding.exists({ auditId: audit._id, status: { $ne: 'closed' } }).session(session)) throw auditError(409, 'Close every finding first.');
     const approval = await Approval.findOne({ auditId: audit._id }).sort({ createdAt: -1 }).session(session);
     if (!approval || approval.status !== 'approved') throw auditError(409, 'Independent approval is required.');
@@ -91,6 +92,7 @@ async function setFindingStatus(req) {
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Closed audit is immutable.');
+    if(req.body.status==='closed' && await require('../models/auditAction.model').exists({auditId:audit._id,findingId:req.params.id,status:{$ne:'verified'}}).session(session))throw auditError(409,'Verify linked corrective actions before closing the finding.');
     if (!['open','assigned','in-progress','resolved','closed'].includes(req.body.status)) throw auditError(400, 'Invalid finding status.');
     const finding = await Finding.findOneAndUpdate({ _id: req.params.id, auditId: audit._id }, { $set: { status: req.body.status } }, { returnDocument: 'after', runValidators: true, session });
     if (!finding) throw auditError(404, 'Finding not found.');
@@ -105,4 +107,4 @@ async function createFinding(req) {
     await history(audit, req.user, 'finding-created', session); return finding;
   });
 }
-module.exports = { lockAudit, createApproval, resolveApproval, closeAudit, transition, setFindingStatus, createFinding };
+module.exports = { recordHistory: history, lockAudit, createApproval, resolveApproval, closeAudit, transition, setFindingStatus, createFinding };
