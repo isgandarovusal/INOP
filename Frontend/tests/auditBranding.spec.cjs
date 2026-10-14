@@ -10,10 +10,11 @@ test('Constrained branding preserves login, languages, wordmark and favicon',asy
   await h.page.setViewportSize({width,height:1000});await expect(h.page.locator('#email')).toBeVisible();expect(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   if(width>680)await h.page.waitForFunction(()=>{const image=document.querySelector('.auth-brand-art img');return image&&image.complete&&image.naturalWidth>1;});await h.page.evaluate(()=>document.fonts.ready);
   await h.page.screenshot({path:`${dir}/login-${label}-${width}.png`,fullPage:true});
+  if(!before)expect(await h.page.locator('.inop-logo path[data-letter=N]').first().evaluate(node=>node.isPointInFill(new DOMPoint(40,8)))).toBe(true);
  }
  if(!before){
   await h.page.setViewportSize({width:1440,height:1000});
-  const titles={'Azərbaycan':'Bütün əməliyyatlar üçün vahid platforma.','English':'One platform for all operations.','Русский':'Единая платформа для всех операций.'};
+  const titles={'Azərbaycan':'Bütün əməliyyatlar üçün vahid platforma','English':'One platform for all operations','Русский':'Единая платформа для всех операций'};
   for(const[language,title]of Object.entries(titles)){await h.page.locator(`.language-switcher button[title="${language}"]`).click();await expect(h.page.locator('.auth-brand-copy h2')).toHaveText(title);await expect(h.page.locator('.auth-brand-copy p')).toHaveCount(0);}
   await h.page.locator('.language-switcher button[title="Azərbaycan"]').click();await h.page.locator('button[type=submit]').click();await expect(h.page.locator('#email')).toHaveAttribute('aria-invalid','true');
   await h.page.locator('#password').fill('Synthetic only');await h.page.locator('.auth-password-field__toggle').click();await expect(h.page.locator('#password')).toHaveAttribute('type','text');

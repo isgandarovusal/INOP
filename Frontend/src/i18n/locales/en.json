@@ -163,7 +163,7 @@
     "candidate": "candidate"
   },
   "auth": {
-    "heroTitle": "One platform for all operations.",
+    "heroTitle": "One platform for all operations",
     "emailInvalid": "Enter a valid email address.",
     "passwordRequired": "Enter your password.",
     "features": {

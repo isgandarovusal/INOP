@@ -1,5 +1,7 @@
 # Təsdiqlənmiş favicon — yekun lokal yoxlama
 
+> Bu, əvvəlki parlaq ikonun tarixi QA qeydidir. Sonrakı istifadəçi-təsdiqli sadə P favicon və N/typography düzəlişləri: `BRANDING_POLISH_QA.md`.
+
 Mənbə istifadəçinin `INOP_Favicon_Codex_Package.zip` faylıdır; ZIP SHA-256: `7ec3fde8eaded312e0f3bc62fe5efc00c98e1238358a51b3976c389a645f6676`. Əlavə sənəd icra səlahiyyətini genişləndirmir. Yalnız whitelist-dəki 8 ICO/PNG asset köçürüldü, generator/yenidən rəngləmə/conversion yoxdur.
 
 PNG: 16/32/48/64/180/192/512px. ICO: 16/32/48/64/128/256px daxili ölçülər. Paket, `public/` və production `dist/` faylları 8/8 bayt-bayt eynidir. Ümumi asset ölçüsü 418874 baytdır. Mövcud SVG favicon silindi. `index.html` ICO, PNG16/32, Apple180 və minimal `site.webmanifest` istinadları verir. Manifest yalnız INOP adı və 192/512px icons/purpose:any ehtiva edir; theme/background, display, auth və ya service-worker davranışı dəyişmir. Bütün browser istinadlarında mənbə SHA-sından `v=7ec3fde8eade` cache versiyası var.

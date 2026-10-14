@@ -6,7 +6,7 @@
 .auth-brand-copy { position:relative; z-index:1; }
 .auth-brand-art { position:absolute; z-index:0; width:100%; height:58%; bottom:0; left:0; pointer-events:none; mask-image:linear-gradient(transparent,black 40%); }
 .auth-brand-art img { display:block; width:100%; height:100%; object-fit:cover; object-position:35% bottom; }
-.auth-brand-copy h2 { font-size:clamp(24px,2.5vw,32px); line-height:1.25; font-weight:650; letter-spacing:-.025em; max-width:17ch; margin:0 0 16px; }
+.auth-brand-copy h2 { font-size:clamp(21.84px,2.275vw,29.12px); line-height:1.28; font-weight:650; letter-spacing:-.025em; max-width:17ch; margin:0 0 16px; }
 .auth-brand-copy > p:last-child { color:var(--hr-slate); font-size:14px; line-height:1.8; }
 .auth-entry-panel { margin:32px; padding:36px; min-width:0; background:var(--surface); border:1px solid var(--hr-border); border-radius:var(--radius-xl); box-shadow:var(--shadow-card); display:flex; flex-direction:column; justify-content:center; }
 .auth-entry-panel > .language-switcher { margin-left:auto; margin-bottom:36px; }

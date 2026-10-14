@@ -168,7 +168,7 @@
     "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
-    "heroTitle": "Bütün əməliyyatlar üçün vahid platforma.",
+    "heroTitle": "Bütün əməliyyatlar üçün vahid platforma",
     "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
     "passwordRequired": "Şifrənizi daxil edin.",
     "features": {

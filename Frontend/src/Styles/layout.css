@@ -596,5 +596,5 @@
 .language-switcher button:focus-visible { outline: 2px solid #253b61; outline-offset: 2px; }
 .language-switcher img { display: block; object-fit: cover; border-radius: 2px; }
 .inop-logo { color: var(--hr-navy, #253b61); display: block; height: auto; max-width: 100%; object-fit: contain; }
-.admin-sidebar__brand .inop-logo { width: 144px; border-radius: 8px; }
+.admin-sidebar__brand .inop-logo { width: 131px; border-radius: 8px; }
 .admin-topbar__brand .inop-logo { width: 112px; border-radius: 6px; }

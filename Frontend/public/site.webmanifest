@@ -3,13 +3,13 @@
   "short_name": "INOP",
   "icons": [
     {
-      "src": "/favicon-192.png?v=7ec3fde8eade",
+      "src": "/favicon-192.png?v=b44d7aacc41e",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/favicon-512.png?v=7ec3fde8eade",
+      "src": "/favicon-512.png?v=b44d7aacc41e",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

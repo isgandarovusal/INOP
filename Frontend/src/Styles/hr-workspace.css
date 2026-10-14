@@ -170,7 +170,7 @@
 .hr-shell .admin-sidebar { background: var(--hr-nav-surface); box-shadow: 2px 0 12px rgb(37 59 97 / 4%); backdrop-filter: none; }
 .hr-shell .admin-main { background: var(--hr-page); }
 .hr-shell .admin-sidebar__brand { margin-bottom: 16px; }
-.hr-shell .admin-sidebar__brand .inop-logo { width: 136px; }
+.hr-shell .admin-sidebar__brand .inop-logo { width: 124px; }
 .hr-shell .admin-sidebar__group { margin-bottom: 16px; }
 .hr-shell .admin-sidebar__group + .admin-sidebar__group { border-top: 1px solid var(--hr-border); padding-top: 16px; }
 .hr-shell .admin-sidebar__group-title { color: var(--hr-slate); font-size: 10px; font-weight: 700; letter-spacing: .1em; padding: 6px 12px 8px; }
