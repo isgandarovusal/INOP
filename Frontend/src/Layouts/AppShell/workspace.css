@@ -1,0 +1,5 @@
+/* Route-owned workspace styles retain their original relative cascade order. */
+@import "../../Styles/dashboard.css";
+@import "../../Styles/recruitment.css";
+@import "../../Styles/audit.css";
+@import "../../Styles/hr-workspace.css";

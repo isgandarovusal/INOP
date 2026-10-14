@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import HRRoute from "./HRRoute";
-import AppShell from "../Layouts/AppShell/AppShell";
+const AppShell = lazy(() => import("../Layouts/AppShell/AppShell"));
 const Login = lazy(() => import("../Pages/Auth/Login/Login"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
 const JobsList = lazy(() => import("../Pages/Recruitment/Jobs/JobsList"));
