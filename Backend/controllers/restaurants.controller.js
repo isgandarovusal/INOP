@@ -87,7 +87,7 @@ async function updateRestaurant(req,res){
       await Restaurant.findOneAndUpdate(
         {id:req.params.id},
         {$set:req.body},
-        {new:true, runValidators:true}
+        {returnDocument: 'after', runValidators:true}
       );
 
 

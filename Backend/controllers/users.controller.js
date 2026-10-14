@@ -393,7 +393,7 @@ exports.updateUserStatus = async (req, res) => {
     const user = await User.findOneAndUpdate(
       query,
       { isActive: req.body.isActive },
-      { new: true }
+      { returnDocument: 'after' }
     )
       .select("-password")
       .lean();

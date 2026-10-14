@@ -423,7 +423,7 @@ exports.updateJob = async (req, res) => {
       }),
       { $set: update, $inc: { __v: 1 } },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );

@@ -179,7 +179,7 @@ exports.updateApproval = async (req, res) => {
         { _id: req.approvalParent._id, auditId: req.approvalParent.auditId },
         { $set: changes },
         {
-          new: true,
+          returnDocument: 'after',
           runValidators: true,
         }
       );

@@ -106,7 +106,7 @@ const productsController = ({
                 id,
                 updateData,
                 {
-                    new: true,
+                    returnDocument: 'after',
                     runValidators: true,
                 }
             )

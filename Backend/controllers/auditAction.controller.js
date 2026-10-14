@@ -122,7 +122,7 @@ req.params.id,
 update,
 
 {
- new:true
+ returnDocument: 'after'
 }
 
 );

@@ -383,7 +383,7 @@ exports.updateCandidate = async (req, res) => {
       }),
       { $set: update, $inc: { __v: 1 }, ...(req.file ? { $unset: { privateCvBlob: 1, privateCvArchive: 1, privateCvIntake: 1 } } : {}) },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
@@ -470,7 +470,7 @@ exports.updateCandidateStatus = async (req, res) => {
       }),
       { status },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );

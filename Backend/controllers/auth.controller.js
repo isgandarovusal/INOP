@@ -156,7 +156,7 @@ exports.logout = async (req, res) => {
         userId: req.user?.id || null,
         expiresAt,
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     return res.status(200).json({

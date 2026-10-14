@@ -186,7 +186,7 @@ async function updateAudit(req, res) {
       filter,
       { $set: payload },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
