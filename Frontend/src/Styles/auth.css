@@ -1,8 +1,14 @@
 /* Login uses the shared light enterprise tokens; no global auth overrides. */
 .auth-page { min-height:100dvh; display:grid; place-items:center; padding:var(--space-8); background:var(--surface-page); color:var(--text-primary); }
 .auth-shell { width:min(100%,1040px); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); border:1px solid var(--hr-border); border-radius:var(--radius-xl); overflow:clip; box-shadow:var(--shadow-overlay); background:var(--surface); }
-.auth-brand-panel { padding:64px 40px; display:flex; flex-direction:column; gap:32px; justify-content:center; background:var(--hr-hero); color:var(--hr-on-navy); min-width:0; }
-.auth-brand-panel .inop-logo { color:var(--hr-on-navy); width:260px; max-width:100%; }
+.auth-brand-panel { position:relative; isolation:isolate; overflow:hidden; padding:48px 40px; display:flex; flex-direction:column; gap:36px; justify-content:flex-start; background:radial-gradient(ellipse at 15% 0%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 65%),var(--hr-hero); color:var(--hr-on-navy); min-width:0; }
+.auth-brand-panel .inop-logo { position:relative; z-index:1; color:var(--hr-on-navy); width:260px; max-width:100%; }
+.auth-brand-copy { position:relative; z-index:1; }
+.auth-brand-art { position:absolute; z-index:0; width:100%; height:auto; bottom:-88px; left:0; pointer-events:none; color:var(--hr-on-navy-muted); }
+.auth-brand-art__plane { fill:currentColor; opacity:.045; }
+.auth-brand-art__edge { fill:none; stroke:currentColor; stroke-width:1; opacity:.2; }
+.auth-brand-art__depth { fill:none; stroke:currentColor; stroke-width:1; opacity:.09; }
+.auth-brand-art__gateway { fill:var(--hr-on-navy); opacity:.1; }
 .auth-brand-copy h2 { font-size:clamp(24px,2.5vw,32px); line-height:1.25; font-weight:650; letter-spacing:-.025em; max-width:17ch; margin:0 0 16px; }
 .auth-brand-copy > p:last-child { color:var(--hr-on-navy-muted); font-size:14px; line-height:1.8; }
 .auth-entry-panel { padding:36px 40px; min-width:0; background:var(--surface); display:flex; flex-direction:column; justify-content:center; }
@@ -28,7 +34,7 @@
  .auth-shell { max-width:460px; grid-template-columns:minmax(0,1fr); }
  .auth-brand-panel { padding:24px; gap:0; align-items:center; }
  .auth-brand-panel .inop-logo { width:180px; }
- .auth-brand-copy { display:none; }
+ .auth-brand-copy, .auth-brand-art { display:none; }
  .auth-entry-panel { padding:28px 24px; }
  .auth-entry-panel > .language-switcher { margin:0 auto 28px; }
  .auth-card__title { font-size:26px; }
