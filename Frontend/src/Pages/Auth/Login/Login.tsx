@@ -60,7 +60,7 @@ const Login: React.FC = () => {
     <div className="auth-page">
       <main className="auth-shell">
         <section className="auth-brand-panel" aria-label="INOP">
-          <INOPLogo />
+          <INOPLogo tone="light" />
           <div className="auth-brand-copy">
             <h2>{t('auth.heroTitle')}</h2>
             <p>{t('auth.heroSubtitle')}</p>
