@@ -37,7 +37,17 @@ function localStore(){return Object.freeze({
  });}
 function createPrivateStore(adapter,{timeoutMs=8000}={}){
  if(!adapter||typeof adapter.id!=='string'||adapter.id==='local'||!/^[a-z][a-z0-9-]{0,40}$/.test(adapter.id)||!['durable','private','versioned','conditionalWrites'].every(key=>adapter.capabilities?.[key]===true)||!['put','get','remove'].every(key=>typeof adapter[key]==='function')||!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>8000)throw error('AUDIT_STORAGE_INVALID_ADAPTER');
- async function operation(work){if(active>=2)throw error('AUDIT_STORAGE_BUSY');active++;let timer;const controller=new AbortController();try{return await Promise.race([work(controller.signal),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(error('AUDIT_STORAGE_TIMEOUT'));},timeoutMs);})]);}catch(failure){if(failure.code?.startsWith('AUDIT_STORAGE_'))throw failure;throw error('AUDIT_STORAGE_PROVIDER_FAILURE');}finally{clearTimeout(timer);active--;}}
+ async function operation(work){
+  if(active>=2)throw error('AUDIT_STORAGE_BUSY');
+  active++;let timer;const controller=new AbortController();
+  const pending=Promise.resolve().then(()=>work(controller.signal));
+  // A timed-out caller is not proof that provider work stopped. Retain its slot
+  // until settlement, including stream reads, even if the adapter ignores abort.
+  pending.then(()=>{active--;},()=>{active--;});
+  try{return await Promise.race([pending,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(error('AUDIT_STORAGE_TIMEOUT'));},timeoutMs);})]);}
+  catch(failure){if(failure.code?.startsWith('AUDIT_STORAGE_'))throw failure;throw error('AUDIT_STORAGE_PROVIDER_FAILURE');}
+  finally{clearTimeout(timer);}
+ }
  const get=(value)=>operation(async signal=>{const ref=reference(value);if(ref.provider!==adapter.id)throw error('AUDIT_STORAGE_INVALID_REFERENCE',400);return bounded(await adapter.get({key:ref.key,version:ref.version,signal}),ref);});
  return Object.freeze({provider:adapter.id,durable:true,get,
   put:async(input,bytes)=>{

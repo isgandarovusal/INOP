@@ -168,6 +168,12 @@ const legacyScopeFilter = async (req) => {
 };
 
 exports.getAuditScopeFilter = async req => {
+  // Internal reviewer resolution also uses this function, without route middleware.
+  // A role promotion never removes an existing profile's restrictions.
+  const profile = req.auditorProfile;
+  if ((req.user?.role === 'auditor' && !profile) ||
+      (profile && (!profile.active || profile.organizationId !== 'gfc' ||
+        !require('../services/auditDirection.service').canonicalDirection(profile.direction)))) return null;
   const base = await legacyScopeFilter(req);
   if (base === null) return null;
   const Context = require('../models/auditContext.model');

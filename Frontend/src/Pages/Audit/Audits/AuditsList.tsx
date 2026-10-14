@@ -14,6 +14,7 @@ import type { PublicUser } from "../../../Types/auth";
 import type { Restaurant } from "../../../Types/audit";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
+import { auditScore } from "../../../Utils/auditScore";
 
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
@@ -105,19 +106,11 @@ const AuditsList: React.FC = () => {
         audit,
         restaurant: restaurantMap.get(audit.restaurantId),
         auditor: userMap.get(audit.auditorId),
-        overall:
-          audit.overallPercentage && audit.overallPercentage > 0
-            ? audit.overallPercentage / 10
-            : (
-                audit.scores.cleanliness +
-                audit.scores.service +
-                audit.scores.food +
-                audit.scores.staff
-              ) / 4,
+        overall: auditScore(audit),
       }))
       .filter((r) => restaurantFilter === "all" || r.audit.restaurantId === restaurantFilter)
       .filter((r) => auditorFilter === "all" || r.audit.auditorId === auditorFilter)
-      .filter((r) => r.overall >= min);
+      .filter((r) => minScore === "" || (r.overall !== null && r.overall >= min));
   }, [audits, restaurantMap, userMap, restaurantFilter, auditorFilter, minScore]);
 
   const handleDelete = async () => {
@@ -264,7 +257,7 @@ const AuditsList: React.FC = () => {
                   <td>{audit.date}</td>
                   <td>{audit.auditType}</td>
                   <td>
-                    <Badge tone={scoreTone(overall)}>{overall.toFixed(1)} / 10</Badge>
+                    <Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>
                   </td>
                   {canManage && (
                     <td>

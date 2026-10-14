@@ -3,7 +3,7 @@ exports.requireAuditDirection = async (req, res, next) => {
   try {
     const profile = await Profile.findById(req.user.id).lean();
     if (req.user.role === 'auditor' || profile) {
-      if (!profile?.active || profile.organizationId !== 'gfc') return res.status(403).json({ message: 'Active audit direction assignment is required.', code: 'AUDIT_DIRECTION_REQUIRED' });
+      if (!profile?.active || profile.organizationId !== 'gfc' || !require('../services/auditDirection.service').canonicalDirection(profile.direction)) return res.status(403).json({ message: 'Active audit direction assignment is required.', code: 'AUDIT_DIRECTION_REQUIRED' });
       req.auditorProfile = profile;
     }
     next();
