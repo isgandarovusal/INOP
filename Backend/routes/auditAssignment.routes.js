@@ -35,4 +35,8 @@ router.delete('/:id', ...authorize('audit.assignment','update'), async(req,res,n
     await require('../models/auditActivity.model').create([{auditId:req.auditScopeId,userId:req.user.id,action:'assignment-revoked',resource:'assignment'}],{session});return assignment;
   });res.json({success:true,data});}catch(error){res.status(error.status||500).json({message:error.status?error.message:'Assignment revocation failed.'});}
 });
+router.get('/:auditId/candidates', ...authorize('audit.assignment','read'), requireAuditParentAccess, async(req,res)=>{
+  if(!['admin','audit_manager'].includes(req.user.role))return res.status(403).json({message:'Assignment directory requires management.'});
+  res.json({success:true,data:await require('../services/auditPeople.service').assignmentCandidates(req.auditScopeId)});
+});
 module.exports = router;

@@ -28,6 +28,8 @@ import type {
 } from "../../../Types/Audit";
 import { useTranslation } from "react-i18next";
 
+import AuditTemplateLifecycle from '../../../Components/AuditTemplateLifecycle';
+import { getAuditCatalog } from '../../../Services/auditCatalogService';
 import { useAuth } from "../../../Context/useAuth";
 import { useAuditResource, auditErrorStatus } from "../../../Hooks/useAuditResource";
 import { useAuditAction } from "../../../Hooks/useAuditAction";
@@ -40,7 +42,7 @@ import PrivateFilePreview from "../../../Components/PrivateFilePreview";
 const loadDocuments = (id: string, signal?: AbortSignal, scopeKey?: string) => getAuditSourceDocuments(id === "__new__" ? undefined : id, signal, scopeKey);
 
 const emptyTemplate = (): Partial<AuditTemplate> => ({
-  organizationId: "",
+  organizationId: "gfc",
   brandId: "",
   brandName: "",
   auditType: "service",
@@ -102,6 +104,7 @@ function AuditTemplateEditor() {
   const navigate = useNavigate();
 
   const { user, isLoading } = useAuth();
+  const catalog = useAuditResource('catalog', 'restaurant', getAuditCatalog);
   const primary = useAuditResource(id, "audit.template", getAuditTemplate);
   const source = useAuditResource(id || "__new__", "audit.source_document", loadDocuments);
   const [draft, setDraft] = useState<Partial<AuditTemplate> | null>(null);
@@ -382,12 +385,13 @@ function AuditTemplateEditor() {
           form="audit-template-form"
           type="submit"
           className="btn-primary"
-          disabled={saving}
+          disabled={saving || (id != null && template.status !== "draft")}
         >
           {saving ? t("audit.checklist.builder.saving") : t("audit.checklist.builder.save")}
         </button>
       </div>
 
+      {id && <AuditTemplateLifecycle id={id} status={template.status || 'draft'} reload={() => { setDraft(null); primary.reload(); }} />}
       <form id="audit-template-form" onSubmit={handleSubmit}>
         {save.status !== "ready" && save.status !== "loading" && <AuditResourceState status={save.status} />}
         <section className="audit-card">
@@ -401,30 +405,14 @@ function AuditTemplateEditor() {
           <div className="audit-form-grid">
             <label>
               {t("audit.checklist.builder.organization")}
-              <input
-                value={template.organizationId || ""}
-                onChange={(event) =>
-                  setTemplate({
-                    ...template,
-                    organizationId: event.target.value,
-                  })
-                }
-                placeholder={t("audit.checklist.builder.organizationPlaceholder")}
-              />
+              <input readOnly value={template.organizationId === 'gfc' ? 'GFC' : '—'} />
             </label>
 
             <label>
               {t("audit.checklist.builder.brand")}
-              <input
-                value={template.brandName || ""}
-                onChange={(event) =>
-                  setTemplate({
-                    ...template,
-                    brandName: event.target.value,
-                  })
-                }
-                placeholder={t("audit.checklist.builder.brandPlaceholder")}
-              />
+              <select value={template.brandId || ''} disabled={catalog.status !== 'ready'} onChange={event => setTemplate({ ...template, organizationId: 'gfc', brandId: event.target.value, brandName: catalog.data?.data.brands.find(brand => brand.id === event.target.value)?.name || '' })}>
+                <option value="">{t('auditFoundation.chooseBrand')}</option>{catalog.data?.data.brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
+              </select>
             </label>
 
             <label>
@@ -452,6 +440,7 @@ function AuditTemplateEditor() {
                   })
                 }
               >
+                <option value="hr">{t("auditFoundation.directions.hr")}</option>
                 <option value="service">{t("audit.checklist.builder.serviceAudit")}</option>
                 <option value="standard">{t("audit.checklist.builder.standardAudit")}</option>
                 <option value="occupational-safety">

@@ -1,55 +1,17 @@
-.audit-analytics {
-  width: 100%;
-}
-
-.audit-analytics .kpi-grid {
+.audit-workspace .audit-analytics .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin: 24px 0;
 }
 
-.audit-analytics .kpi-card {
+.audit-workspace .audit-analytics .kpi-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 22px;
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 16px;
-  background: var(--surface-color, #fff);
-  box-shadow: 0 4px 18px rgba(26, 29, 46, 0.05);
 }
 
-.audit-analytics .kpi-card svg {
-  width: 40px;
-  height: 40px;
-  padding: 9px;
-  border-radius: 11px;
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--accent);
-}
-
-.audit-analytics .kpi-card p {
-  margin: 4px 0 0;
-  color: var(--text-secondary, #6b7280);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.audit-analytics .kpi-card h2 {
-  margin: 0;
-  color: var(--text-primary, #111827);
-  font-size: 1.8rem;
-}
-
-.audit-analytics .charts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+.audit-workspace .audit-analytics .charts-grid {
   margin-bottom: 18px;
 }
 
-.audit-analytics .chart-card {
+.audit-workspace .audit-analytics .chart-card {
   min-width: 0;
   padding: 22px;
   border: 1px solid var(--border-color, #e5e7eb);
@@ -58,52 +20,31 @@
   box-shadow: 0 4px 18px rgba(26, 29, 46, 0.05);
 }
 
-.audit-analytics .chart-card h3 {
+.audit-workspace .audit-analytics .chart-card h3 {
   margin: 0 0 18px;
-  color: var(--text-primary, #111827);
+  color: var(--text-primary, var(--text-primary));
   font-size: 0.98rem;
   font-weight: 700;
 }
 
-.audit-analytics .recharts-cartesian-axis-tick-value {
-  fill: var(--text-secondary, #6b7280);
-  font-size: 11px;
-}
-
-.audit-analytics .recharts-cartesian-grid line {
-  stroke: rgba(107, 114, 128, 0.12);
-}
-
-.audit-analytics .empty-state {
-  margin-top: 24px;
-  padding: 48px 24px;
+.audit-workspace .audit-analytics .empty-state {
   text-align: center;
-  border: 1px dashed var(--border-color, #d1d5db);
-  border-radius: 16px;
-  color: var(--text-secondary, #6b7280);
-  background: var(--surface-color, #fff);
 }
 
 @media (max-width: 900px) {
-  .audit-analytics .charts-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 640px) {
-  .audit-analytics .kpi-grid {
-    grid-template-columns: 1fr;
-  }
 
-  .audit-analytics .chart-card,
-  .audit-analytics .kpi-card {
+  .audit-workspace .audit-analytics .chart-card,
+.audit-workspace .audit-analytics .kpi-card {
     padding: 16px;
   }
 }
 
 /* ── INOP executive analytics composition ───────────────────────────── */
 
-.audit-analytics {
+.audit-workspace .audit-analytics {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -111,13 +52,13 @@
 
 /* KPI summary */
 
-.audit-analytics .kpi-grid {
+.audit-workspace .audit-analytics .kpi-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin: 26px 0 18px;
 }
 
-.audit-analytics .kpi-card {
+.audit-workspace .audit-analytics .kpi-card {
   position: relative;
   min-height: 142px;
   justify-content: space-between;
@@ -142,7 +83,7 @@
     border-color 160ms ease;
 }
 
-.audit-analytics .kpi-card:hover {
+.audit-workspace .audit-analytics .kpi-card:hover {
   transform: translateY(-2px);
   border-color: rgba(99, 102, 241, 0.22);
   box-shadow:
@@ -150,7 +91,7 @@
     0 16px 34px rgba(15, 23, 42, 0.07);
 }
 
-.audit-analytics .kpi-card svg {
+.audit-workspace .audit-analytics .kpi-card svg {
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
@@ -161,7 +102,7 @@
   color: #5963d8;
 }
 
-.audit-analytics .kpi-card p {
+.audit-workspace .audit-analytics .kpi-card p {
   margin: auto 0 0;
   color: #64748b;
   font-size: 0.72rem;
@@ -171,7 +112,7 @@
   text-transform: uppercase;
 }
 
-.audit-analytics .kpi-card h2 {
+.audit-workspace .audit-analytics .kpi-card h2 {
   margin: 0;
   color: #202632;
   font-size: clamp(1.8rem, 2.4vw, 2.15rem);
@@ -182,15 +123,15 @@
 
 /* Chart composition */
 
-.audit-analytics .charts-grid {
+.audit-workspace .audit-analytics .charts-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin: 0 0 14px;
 }
 
-.audit-analytics .charts-grid > .audit-modern-card,
-.audit-analytics > .audit-modern-card {
+.audit-workspace .audit-analytics .charts-grid > .audit-modern-card,
+.audit-workspace .audit-analytics > .audit-modern-card {
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -202,16 +143,16 @@
     0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
-.audit-analytics .charts-grid > .audit-modern-card {
+.audit-workspace .audit-analytics .charts-grid > .audit-modern-card {
   padding: 0 18px 16px;
 }
 
-.audit-analytics > .audit-modern-card {
+.audit-workspace .audit-analytics > .audit-modern-card {
   padding: 0 20px 18px;
 }
 
-.audit-analytics .charts-grid > .audit-modern-card h3,
-.audit-analytics > .audit-modern-card h3 {
+.audit-workspace .audit-analytics .charts-grid > .audit-modern-card h3,
+.audit-workspace .audit-analytics > .audit-modern-card h3 {
   position: relative;
   margin: 0;
   padding: 17px 2px 14px;
@@ -224,51 +165,51 @@
   text-transform: uppercase;
 }
 
-.audit-analytics .charts-grid > .audit-modern-card h3::after,
-.audit-analytics > .audit-modern-card h3::after {
+.audit-workspace .audit-analytics .charts-grid > .audit-modern-card h3::after,
+.audit-workspace .audit-analytics > .audit-modern-card h3::after {
   position: absolute;
   left: 2px;
   bottom: -1px;
   width: 28px;
   height: 2px;
   border-radius: 999px;
-  background: #6366f1;
+  background: var(--accent);
   content: "";
 }
 
-.audit-analytics .charts-grid > .audit-modern-card .recharts-responsive-container {
+.audit-workspace .audit-analytics .charts-grid > .audit-modern-card .recharts-responsive-container {
   margin-top: 8px;
 }
 
-.audit-analytics > .audit-modern-card {
+.audit-workspace .audit-analytics > .audit-modern-card {
   margin-top: 0;
 }
 
-.audit-analytics > .audit-modern-card .recharts-responsive-container {
+.audit-workspace .audit-analytics > .audit-modern-card .recharts-responsive-container {
   margin-top: 8px;
 }
 
 /* Recharts surface language */
 
-.audit-analytics .recharts-cartesian-axis-tick-value {
+.audit-workspace .audit-analytics .recharts-cartesian-axis-tick-value {
   fill: #64748b;
   font-size: 11px;
   font-weight: 500;
 }
 
-.audit-analytics .recharts-cartesian-axis-line {
+.audit-workspace .audit-analytics .recharts-cartesian-axis-line {
   stroke: rgba(148, 163, 184, 0.24);
 }
 
-.audit-analytics .recharts-cartesian-grid line {
+.audit-workspace .audit-analytics .recharts-cartesian-grid line {
   stroke: rgba(148, 163, 184, 0.13);
 }
 
-.audit-analytics .recharts-tooltip-wrapper {
+.audit-workspace .audit-analytics .recharts-tooltip-wrapper {
   outline: none;
 }
 
-.audit-analytics .recharts-default-tooltip {
+.audit-workspace .audit-analytics .recharts-default-tooltip {
   border: 1px solid rgba(148, 163, 184, 0.2) !important;
   border-radius: 10px !important;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1) !important;
@@ -276,7 +217,7 @@
 
 /* Empty / loading surface */
 
-.audit-analytics .empty-state {
+.audit-workspace .audit-analytics .empty-state {
   margin-top: 24px;
   padding: 48px 24px;
   border: 1px dashed rgba(148, 163, 184, 0.35);
@@ -288,35 +229,35 @@
 /* Responsive */
 
 @media (max-width: 900px) {
-  .audit-analytics {
+  .audit-workspace .audit-analytics {
     max-width: none;
   }
 
-  .audit-analytics .charts-grid {
+  .audit-workspace .audit-analytics .charts-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .audit-analytics .kpi-grid {
+  .audit-workspace .audit-analytics .kpi-grid {
     grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 20px;
   }
 
-  .audit-analytics .kpi-card {
+  .audit-workspace .audit-analytics .kpi-card {
     min-height: 126px;
     padding: 18px;
   }
 
-  .audit-analytics .charts-grid > .audit-modern-card,
-  .audit-analytics > .audit-modern-card {
+  .audit-workspace .audit-analytics .charts-grid > .audit-modern-card,
+.audit-workspace .audit-analytics > .audit-modern-card {
     padding-left: 14px;
     padding-right: 14px;
   }
 
-  .audit-analytics .charts-grid > .audit-modern-card h3,
-  .audit-analytics > .audit-modern-card h3 {
+  .audit-workspace .audit-analytics .charts-grid > .audit-modern-card h3,
+.audit-workspace .audit-analytics > .audit-modern-card h3 {
     padding-top: 15px;
     padding-bottom: 12px;
   }
@@ -325,41 +266,41 @@
 
 /* Service Audit Analytics — page-specific composition */
 
-.service-audit-analytics .kpi-grid {
+.audit-workspace .service-audit-analytics .kpi-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   column-gap: 18px;
 }
 
 @media (max-width: 900px) {
-  .service-audit-analytics .kpi-grid {
+  .audit-workspace .service-audit-analytics .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .service-audit-analytics .kpi-grid {
+  .audit-workspace .service-audit-analytics .kpi-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* INOP — Standard Audit Analytics visual refinement */
 
-.standard-audit-analytics{
+.audit-workspace .standard-audit-analytics{
   width:100%;
   max-width:1220px;
   margin:0 auto;
   padding:8px 0 42px;
 }
 
-.standard-audit-analytics .page-header{
+.audit-workspace .standard-audit-analytics .page-header{
   margin-bottom:22px;
 }
 
-.standard-audit-analytics .kpi-grid{
+.audit-workspace .standard-audit-analytics .kpi-grid{
   gap:14px;
 }
 
-.standard-audit-analytics .kpi-card{
+.audit-workspace .standard-audit-analytics .kpi-card{
   min-height:154px;
   padding:20px 22px;
   border:1px solid #e0e5ee;
@@ -376,7 +317,7 @@
     box-shadow .16s ease;
 }
 
-.standard-audit-analytics .kpi-card:hover{
+.audit-workspace .standard-audit-analytics .kpi-card:hover{
   transform:translateY(-2px);
   border-color:#d5daf0;
   box-shadow:
@@ -384,7 +325,7 @@
     0 3px 7px rgba(20,28,45,.025);
 }
 
-.standard-audit-analytics .kpi-card > svg{
+.audit-workspace .standard-audit-analytics .kpi-card > svg{
   width:36px;
   height:36px;
   padding:8px;
@@ -392,10 +333,10 @@
   border:1px solid rgba(99,102,241,.14);
   border-radius:10px;
   background:linear-gradient(180deg,#f5f6ff 0%,#eef0ff 100%);
-  color:#6366f1;
+  color:var(--accent);
 }
 
-.standard-audit-analytics .kpi-card p{
+.audit-workspace .standard-audit-analytics .kpi-card p{
   margin:0 0 7px;
   color:#68748a;
   font-size:10px;
@@ -405,7 +346,7 @@
   text-transform:uppercase;
 }
 
-.standard-audit-analytics .kpi-card h2{
+.audit-workspace .standard-audit-analytics .kpi-card h2{
   margin:0;
   color:#202633;
   font-size:30px;
@@ -414,12 +355,12 @@
   line-height:1;
 }
 
-.standard-audit-analytics .charts-grid{
+.audit-workspace .standard-audit-analytics .charts-grid{
   gap:14px;
   margin-top:18px;
 }
 
-.standard-audit-analytics .charts-grid > .audit-modern-card{
+.audit-workspace .standard-audit-analytics .charts-grid > .audit-modern-card{
   min-height:350px;
   padding:18px 20px 14px;
   border:1px solid #e0e5ee;
@@ -430,7 +371,7 @@
     0 2px 5px rgba(20,28,45,.02);
 }
 
-.standard-audit-analytics .charts-grid > .audit-modern-card h3{
+.audit-workspace .standard-audit-analytics .charts-grid > .audit-modern-card h3{
   margin:0;
   padding:0 0 12px;
   border-bottom:1px solid #edf0f5;
@@ -442,54 +383,54 @@
   text-transform:uppercase;
 }
 
-.standard-audit-analytics .charts-grid > .audit-modern-card h3::after{
+.audit-workspace .standard-audit-analytics .charts-grid > .audit-modern-card h3::after{
   content:"";
   display:block;
   width:30px;
   height:2px;
   margin-top:11px;
   border-radius:999px;
-  background:#6366f1;
+  background:var(--accent);
 }
 
-.standard-audit-analytics .recharts-cartesian-axis-tick-value{
+.audit-workspace .standard-audit-analytics .recharts-cartesian-axis-tick-value{
   fill:#69758a;
   font-size:10px;
 }
 
-.standard-audit-analytics .recharts-cartesian-grid line{
+.audit-workspace .standard-audit-analytics .recharts-cartesian-grid line{
   stroke:#edf0f5;
 }
 
 @media (max-width:900px){
-  .standard-audit-analytics{
+  .audit-workspace .standard-audit-analytics{
     padding:6px 0 32px;
   }
 
-  .standard-audit-analytics .kpi-grid{
+  .audit-workspace .standard-audit-analytics .kpi-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  .standard-audit-analytics .charts-grid{
+  .audit-workspace .standard-audit-analytics .charts-grid{
     grid-template-columns:1fr;
   }
 }
 
 @media (max-width:640px){
-  .standard-audit-analytics{
+  .audit-workspace .standard-audit-analytics{
     padding:4px 0 24px;
   }
 
-  .standard-audit-analytics .kpi-grid{
+  .audit-workspace .standard-audit-analytics .kpi-grid{
     grid-template-columns:1fr;
   }
 
-  .standard-audit-analytics .kpi-card{
+  .audit-workspace .standard-audit-analytics .kpi-card{
     min-height:138px;
     padding:18px;
   }
 
-  .standard-audit-analytics .charts-grid > .audit-modern-card{
+  .audit-workspace .standard-audit-analytics .charts-grid > .audit-modern-card{
     min-height:320px;
     padding:16px 14px 12px;
     border-radius:13px;
@@ -503,20 +444,20 @@
    Scoped only to Safety Audit Analytics.
    ============================================================ */
 
-.safety-audit-analytics{
+.audit-workspace .safety-audit-analytics{
   max-width:1220px;
   margin:0 auto;
   padding:4px 0 40px;
 }
 
 /* KPI composition: three equal executive metrics */
-.safety-audit-analytics .kpi-grid{
+.audit-workspace .safety-audit-analytics .kpi-grid{
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:14px;
   margin:22px 0 18px;
 }
 
-.safety-audit-analytics .kpi-card{
+.audit-workspace .safety-audit-analytics .kpi-card{
   position:relative;
   min-height:138px;
   padding:18px 20px;
@@ -537,7 +478,7 @@
     box-shadow .16s ease;
 }
 
-.safety-audit-analytics .kpi-card:hover{
+.audit-workspace .safety-audit-analytics .kpi-card:hover{
   transform:translateY(-2px);
   border-color:#d5daf0;
   box-shadow:
@@ -545,7 +486,7 @@
     0 3px 7px rgba(20,28,45,.022);
 }
 
-.safety-audit-analytics .kpi-card > svg{
+.audit-workspace .safety-audit-analytics .kpi-card > svg{
   width:36px;
   height:36px;
   padding:8px;
@@ -553,10 +494,10 @@
   border:1px solid rgba(99,102,241,.14);
   border-radius:10px;
   background:linear-gradient(180deg,#f6f7ff 0%,#eef0ff 100%);
-  color:#6366f1;
+  color:var(--accent);
 }
 
-.safety-audit-analytics .kpi-card p{
+.audit-workspace .safety-audit-analytics .kpi-card p{
   margin:0 0 7px;
   color:#68748a;
   font-size:10px;
@@ -566,7 +507,7 @@
   text-transform:uppercase;
 }
 
-.safety-audit-analytics .kpi-card h2{
+.audit-workspace .safety-audit-analytics .kpi-card h2{
   margin:0;
   color:#202633;
   font-size:30px;
@@ -576,16 +517,13 @@
 }
 
 /* Percentage KPI gets slightly stronger visual emphasis */
-.safety-audit-analytics .kpi-card:nth-child(2) h2{
-  color:#4f46e5;
-}
 
-.safety-audit-analytics .charts-grid{
+.audit-workspace .safety-audit-analytics .charts-grid{
   gap:14px;
   margin:18px 0 0;
 }
 
-.safety-audit-analytics .charts-grid > .audit-modern-card{
+.audit-workspace .safety-audit-analytics .charts-grid > .audit-modern-card{
   min-height:350px;
   padding:18px 20px 14px;
   border:1px solid #e0e5ee;
@@ -596,7 +534,7 @@
     0 2px 5px rgba(20,28,45,.018);
 }
 
-.safety-audit-analytics .charts-grid > .audit-modern-card h3{
+.audit-workspace .safety-audit-analytics .charts-grid > .audit-modern-card h3{
   margin:0;
   padding:0 0 12px;
   border-bottom:1px solid #edf0f5;
@@ -608,60 +546,60 @@
   text-transform:uppercase;
 }
 
-.safety-audit-analytics .charts-grid > .audit-modern-card h3::after{
+.audit-workspace .safety-audit-analytics .charts-grid > .audit-modern-card h3::after{
   content:"";
   display:block;
   width:30px;
   height:2px;
   margin-top:11px;
   border-radius:999px;
-  background:#6366f1;
+  background:var(--accent);
 }
 
-.safety-audit-analytics .recharts-cartesian-axis-tick-value{
+.audit-workspace .safety-audit-analytics .recharts-cartesian-axis-tick-value{
   fill:#69758a;
   font-size:10px;
 }
 
-.safety-audit-analytics .recharts-cartesian-grid line{
+.audit-workspace .safety-audit-analytics .recharts-cartesian-grid line{
   stroke:#edf0f5;
 }
 
 /* Empty chart area remains intentional but visually quieter */
-.safety-audit-analytics .charts-grid > .audit-modern-card .recharts-wrapper{
+.audit-workspace .safety-audit-analytics .charts-grid > .audit-modern-card .recharts-wrapper{
   margin-top:2px;
 }
 
 /* Responsive */
 @media (max-width:900px){
-  .safety-audit-analytics{
+  .audit-workspace .safety-audit-analytics{
     padding:4px 0 32px;
   }
 
-  .safety-audit-analytics .kpi-grid{
+  .audit-workspace .safety-audit-analytics .kpi-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  .safety-audit-analytics .charts-grid{
+  .audit-workspace .safety-audit-analytics .charts-grid{
     grid-template-columns:1fr;
   }
 }
 
 @media (max-width:640px){
-  .safety-audit-analytics{
+  .audit-workspace .safety-audit-analytics{
     padding:2px 0 24px;
   }
 
-  .safety-audit-analytics .kpi-grid{
+  .audit-workspace .safety-audit-analytics .kpi-grid{
     grid-template-columns:1fr;
   }
 
-  .safety-audit-analytics .kpi-card{
+  .audit-workspace .safety-audit-analytics .kpi-card{
     min-height:132px;
     padding:17px 18px;
   }
 
-  .safety-audit-analytics .charts-grid > .audit-modern-card{
+  .audit-workspace .safety-audit-analytics .charts-grid > .audit-modern-card{
     min-height:320px;
     padding:16px 14px 12px;
     border-radius:13px;
@@ -669,21 +607,20 @@
 }
 
 /* Safety Analytics — percentage range emphasis */
-.safety-audit-analytics .kpi-card:nth-child(2){
+.audit-workspace .safety-audit-analytics .kpi-card:nth-child(2){
   background:
     radial-gradient(circle at 100% 0%,rgba(99,102,241,.11),transparent 45%),
     linear-gradient(180deg,#ffffff 0%,#f8f9ff 100%);
 }
 
-.safety-audit-analytics .kpi-card:nth-child(2) h2{
-  color:#4f46e5;
+.audit-workspace .safety-audit-analytics .kpi-card:nth-child(2) h2{
+  color:var(--accent);
   font-size:30px;
-  font-weight:800;
   letter-spacing:-.04em;
 }
 
 
-.safety-audit-analytics .kpi-card:nth-child(2) h2{
+.audit-workspace .safety-audit-analytics .kpi-card:nth-child(2) h2{
   font-weight:760;
 }
 

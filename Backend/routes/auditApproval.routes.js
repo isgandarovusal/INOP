@@ -29,4 +29,5 @@ router.patch(
   controller.updateApproval
 );
 
+router.get('/:auditId/reviewers', ...authorize('audit.approval','read'), requireAuditAccess, async(req,res)=>res.json({success:true,data:await require('../services/auditPeople.service').reviewerCandidates(req)}));
 module.exports = router;

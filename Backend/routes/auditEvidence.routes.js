@@ -21,6 +21,10 @@ router.post('/:auditId', ...authorize('audit','update'), requireAuditParentAcces
     res.status(201).json({success:true,data:{id:data._id,name:data.name,size:data.size,url:`/api/audit-evidence/${data._id}/file`}});
   }catch(error){res.status(error.status||500).json({message:error.status?error.message:'Evidence upload failed.'});}
 });
+router.get('/by-audit/:auditId', ...authorize('audit','read'), requireAuditParentAccess, async(req,res)=>{
+  const rows=await Evidence.find({auditId:req.auditScopeId}).select('_id name size').sort({createdAt:-1}).lean();
+  res.json({success:true,data:rows.map(row=>({id:String(row._id),name:row.name,size:row.size}))});
+});
 router.get('/:id/file', ...authorize('audit','read'), async(req,res,next)=> {
   if (!require('mongoose').Types.ObjectId.isValid(req.params.id)) return res.status(404).json({message:'Evidence not found.'});
   const evidence=await Evidence.findById(req.params.id).lean();

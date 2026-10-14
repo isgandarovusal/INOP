@@ -11,7 +11,7 @@ export interface AuditSourceDocument {
 }
 type Metadata = {
   templateId?: string; organizationId?: string; brandId?: string;
-  auditType?: "service" | "standard" | "occupational-safety"; uploadedBy?: string;
+  auditType?: "hr" | "service" | "standard" | "occupational-safety"; uploadedBy?: string;
 };
 export function getAuditSourceDocuments(templateId?: string, signal?: AbortSignal, scopeKey?: string): Promise<AuditSourceDocument[]> {
   const query = templateId ? `?${new URLSearchParams({ templateId })}` : "";

@@ -1,0 +1,33 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {withAuditFixture}=require('./helpers/auditFixture.cjs');
+const Profile=require('../models/auditorProfile.model');
+test('Foundation direction/brand analytics use real scoped data and reject invalid catalog values',async()=>withAuditFixture(async h=>{
+ const Restaurant=require('../models/restaurant.model');
+ await Restaurant.create({id:'pizza',name:'Synthetic Pizza Hut',organizationId:'gfc',brandId:'pizza-hut'});
+ const service=await h.audit('auditor','service',{overallPercentage:80});
+ await h.audit('auditor','standard',{compliancePercentage:90});
+ await h.audit('admin','service',{restaurantId:'pizza',overallPercentage:60});
+ await h.audit('auditor','service',{assessmentStatus:'unscored',overallPercentage:null});
+ const metrics=(await h.request('auditor','GET','/audit-analytics/overview?direction=service')).data.data;
+ assert.equal(metrics.total,3);assert.equal(metrics.scored,2);assert.equal(metrics.unscored,1);assert.equal(metrics.averageScore,7);
+ assert.equal((await h.request('auditor','GET','/audit-analytics/overview?direction=standard')).data.data.total,0);
+ assert.equal((await h.request('admin','GET','/audits?direction=service&brandId=pizza-hut')).data.length,1);
+ assert.equal((await h.request('admin','GET','/audits?brandId=gfc')).status,400);
+ assert.equal((await h.request('admin','GET','/audit-analytics/direction/unknown')).status,400);
+ assert.equal((await h.request('anonymous','GET','/audit-analytics/overview')).status,401);
+ assert.equal((await h.request('hr','GET','/audit-analytics/overview')).status,403);
+ const Context=require('../models/auditContext.model');
+ await Context.collection.insertOne({_id:service._id,organizationId:'foreign',brandId:'kfc',direction:'service'});
+ assert.equal((await h.request('admin','GET',`/audits/${service.id}`)).status,404);
+}));
+test('Directory endpoints expose only scoped names/IDs and profile provisioning stays explicit',async()=>withAuditFixture(async h=>{
+ const audit=await h.audit('admin','service');
+ const candidates=await h.request('admin','GET',`/audit-assignments/${audit.id}/candidates`);
+ assert.equal(candidates.status,200);assert.equal(candidates.data.data.length,1);
+ assert.deepEqual(Object.keys(candidates.data.data[0]).sort(),['id','name']);
+ assert.equal((await h.request('auditor','GET',`/audit-assignments/${audit.id}/candidates`)).status,403);
+ const reviewers=await h.request('admin','GET',`/audit-approval/${audit.id}/reviewers`);
+ assert.equal(reviewers.status,200);assert.ok(reviewers.data.data.every(row=>row.id!==String(h.actors.admin._id)&&Object.keys(row).length===2));
+ assert.equal((await h.request('admin','PUT',`/auditor-profiles/${h.actors.admin._id}`,{direction:'hr',reason:'Invalid management profile'})).status,400);
+ assert.equal(await Profile.countDocuments(),1);
+}));

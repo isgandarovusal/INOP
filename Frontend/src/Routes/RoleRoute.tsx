@@ -1,3 +1,4 @@
+import "../Styles/audit-workspace.css";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { canAccessSection, canAccessAuditDirection, hasPermission, type Section } from "../Utils/permissions";
@@ -11,7 +12,7 @@ const RoleRoute: React.FC<{ section: Section }> = ({ section }) => {
   if (!canAccessSection(user, section) || (section === "audit" && ((user.role === "auditor" && !user.auditDirection) || !hasPermission(user, resource, "read") || (direction && !canAccessAuditDirection(user, direction, resource))))) {
     return <Navigate to="/unauthorized" replace />;
   }
-  return <Outlet />;
+  return section === "audit" ? <div className="audit-workspace"><Outlet /></div> : <Outlet />;
 };
 
 export default RoleRoute;

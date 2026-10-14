@@ -163,15 +163,15 @@
     "candidate": "candidate"
   },
   "auth": {
-      "heroTitle": "One platform for human resources.",
-      "heroSubtitle": "Candidates, vacancies and analytics in one place.",
-      "emailInvalid": "Enter a valid email address.",
-      "passwordRequired": "Enter your password.",
-      "features": {
-        "recruitment": "Centralized recruitment",
-        "analytics": "GFC HR analytics",
-        "access": "Role-based access"
-      },
+    "heroTitle": "One platform for human resources.",
+    "heroSubtitle": "Candidates, vacancies and analytics in one place.",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordRequired": "Enter your password.",
+    "features": {
+      "recruitment": "Centralized recruitment",
+      "analytics": "GFC HR analytics",
+      "access": "Role-based access"
+    },
     "signIn": "Sign in",
     "subtitle": "Sign in to your account.",
     "email": "Email",
@@ -492,14 +492,14 @@
       "draft": "Draft"
     },
     "jobForm": {
-        "descriptionRequired": "A vacancy description is required.",
-        "fieldRequired": "This field is required.",
-        "experienceInvalid": "Experience must be a number of zero or more.",
-        "sections": {
-          "basic": "Basic information",
-          "organization": "Organization",
-          "requirements": "Requirements and skills"
-        },
+      "descriptionRequired": "A vacancy description is required.",
+      "fieldRequired": "This field is required.",
+      "experienceInvalid": "Experience must be a number of zero or more.",
+      "sections": {
+        "basic": "Basic information",
+        "organization": "Organization",
+        "requirements": "Requirements and skills"
+      },
       "editTitle": "Edit job",
       "newTitle": "Create new job",
       "subtitle": "Define the vacancy, workplace and selection criteria. AI suggestions require HR approval.",
@@ -755,7 +755,8 @@
         "save": "Save audit",
         "saving": "Saving…",
         "restaurantRequired": "Restaurant must be selected.",
-        "saveError": "An error occurred while saving the audit."
+        "saveError": "An error occurred while saving the audit.",
+        "incomplete": "Complete every question."
       },
       "detail": {
         "notFound": "Standard audit not found",
@@ -852,7 +853,8 @@
         "cancel": "Cancel",
         "save": "Save audit",
         "restaurantRequired": "Restaurant must be selected.",
-        "saveError": "An error occurred while saving the audit."
+        "saveError": "An error occurred while saving the audit.",
+        "incomplete": "Complete every question."
       },
       "detail": {
         "notFound": "Occupational safety audit not found",
@@ -1095,9 +1097,9 @@
     "page_limit": "Only the first 50 pages were processed. Review the complete original CV before confirming."
   },
   "hrCatalog": {
-      "catalogInvalid": "Enter a code and name. Use lowercase letters, numbers and hyphens in the code.",
-      "catalogDuplicate": "This code already exists. Select it from the list.",
-      "catalogHint": "Select an existing brand and branch first. Create a new record only when needed.",
+    "catalogInvalid": "Enter a code and name. Use lowercase letters, numbers and hyphens in the code.",
+    "catalogDuplicate": "This code already exists. Select it from the list.",
+    "catalogHint": "Select an existing brand and branch first. Create a new record only when needed.",
     "brand": "Brand",
     "branch": "Branch / workplace",
     "unset": "Unspecified",
@@ -1592,5 +1594,121 @@
     "visibility": "Vacancy visibility",
     "confirm": "Archive {{name}}? Applications and history will be retained.",
     "readOnly": "This vacancy is archived and does not accept new applications. An authorized HR/Admin must restore it before editing."
+  },
+  "auditFoundation": {
+    "center": "Audit Center",
+    "parent": "Parent company",
+    "structure": "GFC → Brand → Restaurant → Audit",
+    "directionDescription": "A dedicated workspace for audit records and results.",
+    "open": "Open",
+    "analytics": "Audit Analytics",
+    "management": "Management",
+    "history": "History",
+    "notifications": "Notifications",
+    "brand": "Brand",
+    "allBrands": "All brands",
+    "allRestaurants": "All restaurants",
+    "refresh": "Refresh",
+    "catalogPermission": "Restaurant read permission is required for the catalog.",
+    "average": "Average result",
+    "noScores": "No verified assessment is available.",
+    "audit": "Audit",
+    "date": "Date",
+    "status": "Status",
+    "result": "Result",
+    "emptyTitle": "No audit records",
+    "emptyDescription": "Audits will appear here after real templates are supplied and approved.",
+    "profiles": "Auditor directions",
+    "oneDirection": "Each auditor has only one active direction.",
+    "auditor": "Auditor",
+    "direction": "Direction",
+    "reason": "Reason for change",
+    "save": "Save",
+    "chooseAuditor": "Choose auditor",
+    "chooseDirection": "Choose direction",
+    "chooseBrand": "Choose brand",
+    "evidence": "Audit evidence",
+    "upload": "Upload file",
+    "download": "Download",
+    "immutable": "Published revisions are immutable. Start a new draft to make changes.",
+    "publish": "Publish revision",
+    "draft": "New draft",
+    "retire": "Retire template",
+    "retireConfirm": "The template will be closed to new audits. Historical revisions will be retained.",
+    "createDraft": "Create audit draft",
+    "chooseTemplate": "Choose a published template",
+    "noTemplates": "No published real template exists for this brand and direction.",
+    "execution": "Audit execution",
+    "startExecution": "Start execution",
+    "report": "Report",
+    "closeFinding": "Close finding",
+    "revoke": "Revoke assignment",
+    "legacyEvidence": "Legacy file reference; verify the original file.",
+    "directions": {
+      "hr": "HR Audit",
+      "service": "Service Audit",
+      "standard": "Standard Audit",
+      "occupational-safety": "Occupational Safety Audit"
+    },
+    "metrics": {
+      "total": "Total audits",
+      "completed": "Completed",
+      "scored": "Scored",
+      "unscored": "Unscored"
+    },
+    "statusLabels": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "in-progress": "In progress",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "assigned": "Assigned",
+      "accepted": "Accepted",
+      "started": "Started",
+      "revoked": "Revoked",
+      "pending": "Pending",
+      "open": "Open",
+      "closed": "Closed",
+      "resolved": "Resolved"
+    },
+    "assignments": "Assignments",
+    "assign": "Assign",
+    "findings": "Findings",
+    "findingTitle": "Finding title",
+    "addFinding": "Add finding",
+    "approval": "Approval",
+    "reviewer": "Reviewer",
+    "chooseReviewer": "Choose reviewer",
+    "requestApproval": "Request approval",
+    "answer": "Answer",
+    "chooseAnswer": "Choose answer",
+    "submitting": "Submitting…",
+    "submit": "Submit audit",
+    "closure": "Audit closure",
+    "closeAudit": "Close audit",
+    "answers": {
+      "yes": "Yes",
+      "no": "No",
+      "na": "N/A"
+    },
+    "checklistProgress": "Checklist progress",
+    "executionHelp": "Complete each checklist item before submitting the audit.",
+    "legacyExecution": "Legacy execution has no immutable template snapshot. Stored answers remain available.",
+    "noExecutionAnswers": "No checklist answers are available for this execution.",
+    "questionNumber": "Question {{number}}",
+    "enterAnswer": "Enter your answer",
+    "progressCount": "{{answered}} of {{total}} completed",
+    "timeline": "Audit timeline",
+    "noRecords": "No records",
+    "export": "Export",
+    "analyticsDirections": {
+      "hr": "HR Audit Analytics",
+      "service": "Service Audit Analytics",
+      "standard": "Standard Audit Analytics",
+      "occupational-safety": "Occupational Safety Analytics"
+    }
   }
 }

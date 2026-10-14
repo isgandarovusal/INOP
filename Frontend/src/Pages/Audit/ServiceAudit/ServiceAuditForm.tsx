@@ -462,7 +462,7 @@ getAuditTemplates({
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-cancel"
             onClick={() => navigate("/app/audit/service")}
           >
             Ləğv et

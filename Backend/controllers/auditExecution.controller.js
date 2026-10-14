@@ -43,7 +43,12 @@ exports.createExecution = async (req, res) => {
       if (!revision || (checklistId && String(revision.templateId) !== String(checklistId))) return res.status(400).json({ message: 'Execution must use the audit revision.' });
       bound.templateRevisionId = revision._id; bound.templateSnapshot = revision.content;
     }
-    const execution = await Execution.create({ ...bound, auditId: req.auditScopeId, createdBy: req.user.id, checklistId, answers: [], findings, correctiveActions, status: 'draft', totalScore: null, riskLevel: 'unscored' });
+    const execution = await require('../services/auditTransaction.service').transaction(async session => {
+      await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
+      const existing = await Execution.findOne({ auditId:req.auditScopeId, templateRevisionId:bound.templateRevisionId || null }).session(session);
+      if(existing)return existing;
+      const [created] = await Execution.create([{ ...bound, auditId:req.auditScopeId,createdBy:req.user.id,checklistId,answers:[],findings,correctiveActions,status:'draft',totalScore:null,riskLevel:'unscored' }],{session});return created;
+    });
     return res.status(201).json({ success: true, data: execution });
   } catch (error) { return fail(res, error); }
 };

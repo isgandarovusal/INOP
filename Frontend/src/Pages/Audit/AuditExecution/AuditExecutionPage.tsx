@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuditResourceState from '../../../Components/AuditResourceState';
 import { useAuditResource } from '../../../Hooks/useAuditResource';
 import { useAuditAction } from '../../../Hooks/useAuditAction';
@@ -10,6 +11,7 @@ const loadExecution = async (id: string, signal?: AbortSignal, scopeKey?: string
   (await getAuditExecution(id, signal, scopeKey)).data;
 
 function ExecutionForm({ execution, reload }: { execution: AuditExecution; reload: () => void }) {
+  const {t}=useTranslation();
   const content = execution.templateSnapshot;
   const items = (content?.sections || []).filter(section => section.active !== false).flatMap(section => [
     ...(section.questions || []).filter(question => question.active !== false),
@@ -26,19 +28,19 @@ function ExecutionForm({ execution, reload }: { execution: AuditExecution; reloa
   const total = answers.length;
   const progress = total ? Math.round(answered / total * 100) : 0;
   return <div className="audit-execution">
-    <header className="audit-execution__header"><span className="audit-execution__eyebrow">AUDIT EXECUTION</span><h1>Audit Execution</h1><p>Complete each checklist item before submitting the audit.</p></header>
-    {templateWarning && <p role="alert">Legacy execution has no immutable template snapshot. Stored answers remain available.</p>}
-    <section className="audit-execution__progress"><div className="audit-execution__progress-top"><div><span className="audit-execution__progress-label">CHECKLIST PROGRESS</span><strong>{answered} / {total}</strong></div><span className="audit-execution__progress-percent">{progress}%</span></div><div className="audit-execution__progress-track" aria-hidden="true"><div className="audit-execution__progress-fill" style={{ width: `${progress}%` }} /></div></section>
-    {!total && <p role="status">No checklist answers are available for this execution.</p>}
+    <header className="audit-execution__header"><span className="audit-execution__eyebrow">{t("auditFoundation.execution")}</span><h1>{t("auditFoundation.execution")}</h1><p>{t("auditFoundation.executionHelp")}</p></header>
+    {templateWarning && <p role="alert">{t("auditFoundation.legacyExecution")}</p>}
+    <section className="audit-execution__progress"><div className="audit-execution__progress-top"><div><span className="audit-execution__progress-label">{t("auditFoundation.checklistProgress")}</span><strong>{answered} / {total}</strong></div><span className="audit-execution__progress-percent">{progress}%</span></div><div className="audit-execution__progress-track" aria-hidden="true"><div className="audit-execution__progress-fill" style={{ width: `${progress}%` }} /></div></section>
+    {!total && <p role="status">{t("auditFoundation.noExecutionAnswers")}</p>}
     <section className="audit-execution__questions">{answers.map((answer, index) => <article key={answer.questionId || index} className={`audit-question ${answer.answer?.trim() ? 'audit-question--answered' : ''}`}>
-      <div className="audit-question__number">{String(index + 1).padStart(2, '0')}</div><div className="audit-question__body"><h3>{labels[answer.questionId || ''] || answer.questionId || `Question ${index + 1}`}</h3>
-      <input aria-label={labels[answer.questionId || ''] || answer.questionId || `Question ${index + 1}`} value={answer.answer || ''} disabled={!action.allowed || action.busy}
-        onChange={event => setAnswers(previous => previous.map((item, position) => position === index ? { ...item, answer: event.target.value } : item))} placeholder="Enter your answer" /></div>
+      <div className="audit-question__number">{String(index + 1).padStart(2, '0')}</div><div className="audit-question__body"><h3>{labels[answer.questionId || ''] || answer.questionId || t('auditFoundation.questionNumber',{number:index+1})}</h3>
+      {items.find(item=>item.id===answer.questionId)?.answerType==='yes-no-na'?<select aria-label={labels[answer.questionId||'']||answer.questionId||t('auditFoundation.answer')} value={answer.answer||''} disabled={!action.allowed||action.busy} onChange={event=>setAnswers(previous=>previous.map((item,position)=>position===index?{...item,answer:event.target.value}:item))}><option value="">{t('auditFoundation.chooseAnswer')}</option>{['yes','no','na'].map(value=><option key={value} value={value}>{t(`auditFoundation.answers.${value}`)}</option>)}</select>:<input aria-label={labels[answer.questionId || ''] || answer.questionId || t('auditFoundation.questionNumber',{number:index+1})} value={answer.answer || ''} disabled={!action.allowed || action.busy}
+        onChange={event => setAnswers(previous => previous.map((item, position) => position === index ? { ...item, answer: event.target.value } : item))} placeholder={t('auditFoundation.enterAnswer')} />}</div>
     </article>)}</section>
     {action.status !== 'ready' && action.status !== 'loading' && <AuditResourceState status={action.status} />}
-    <div className="audit-execution__actions"><div className="audit-execution__action-copy"><span>{answered} of {total} completed</span><small>Status: {execution.status}</small></div>
-      <button type="button" className="btn-primary audit-execution__submit" disabled={!action.allowed || action.busy || !total}
-        onClick={() => void action.run(signal => submitAuditAnswers(execution._id, answers, signal), reload)}>{action.busy ? 'Submitting…' : 'Submit Audit'}<span aria-hidden="true">→</span></button></div>
+    <div className="audit-execution__actions"><div className="audit-execution__action-copy"><span>{t('auditFoundation.progressCount',{answered,total})}</span><small>{t('auditFoundation.status')}: {t(`auditFoundation.statusLabels.${execution.status}`,{defaultValue:execution.status})}</small></div>
+      <button type="button" className="btn-primary audit-execution__submit" disabled={!action.allowed || action.busy || !total || items.some(item=>item.required!==false&&!answers.some(answer=>answer.questionId===item.id&&answer.answer?.trim()))}
+        onClick={() => void action.run(signal => submitAuditAnswers(execution._id, answers, signal), reload)}>{action.busy ? t('auditFoundation.submitting') : t('auditFoundation.submit')}<span aria-hidden="true">→</span></button></div>
   </div>;
 }
 

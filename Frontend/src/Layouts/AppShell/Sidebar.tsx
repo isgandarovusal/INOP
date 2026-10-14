@@ -87,78 +87,15 @@ const NAV_GROUPS: NavGroup[] = [
       },
     ],
   },
-  {
-    titleKey: "navigation.groups.audit",
-    items: [
-      {
-        to: "/app/audit/",
-        labelKey: "navigation.auditCenter",
-        icon: LayoutDashboard,
-        section: "audit",
-        end: true,
-      },
-      {
-        to: "/app/audit/restaurants",
-        labelKey: "navigation.restaurants",
-        icon: Store,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/audits",
-        labelKey: "navigation.audits",
-        icon: ClipboardCheck,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/analytics",
-        labelKey: "navigation.analytics",
-        icon: BarChart3,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/checklists",
-        labelKey: "navigation.checklists",
-        icon: ClipboardList,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/service",
-        labelKey: "navigation.serviceAudit",
-        icon: ClipboardCheck,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/service/analytics",
-        labelKey: "navigation.serviceAnalytics",
-        icon: BarChart3,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/standard",
-        labelKey: "navigation.standardAudit",
-        icon: ClipboardCheck,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/standard/analytics",
-        labelKey: "navigation.standardAnalytics",
-        icon: BarChart3,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/safety",
-        labelKey: "navigation.occupationalSafety",
-        icon: ClipboardCheck,
-        section: "audit",
-      },
-      {
-        to: "/app/audit/safety/analytics",
-        labelKey: "navigation.occupationalSafetyAnalytics",
-        icon: BarChart3,
-        section: "audit",
-      },
-    ],
-  },
+  {titleKey:'auditFoundation.management',items:[
+    {to:'/app/audit/',labelKey:'auditFoundation.center',icon:LayoutDashboard,section:'audit',end:true},
+    {to:'/app/audit/restaurants',labelKey:'navigation.restaurants',icon:Store,section:'audit',resource:'restaurant'},
+    {to:'/app/audit/analytics',labelKey:'auditFoundation.analytics',icon:BarChart3,section:'audit',resource:'audit.analytics'},
+  ]},
+  ...[{key:'hr',path:'hr'},{key:'service',path:'service'},{key:'standard',path:'standard'},{key:'occupational-safety',path:'safety'}].map(({key,path})=>({
+    titleKey:`auditFoundation.directions.${key}`,
+    items:[{to:`/app/audit/${path}`,labelKey:`auditFoundation.directions.${key}`,icon:ClipboardCheck,section:'audit' as const,end:true},{to:`/app/audit/${path}/analytics`,labelKey:`auditFoundation.analyticsDirections.${key}`,icon:BarChart3,section:'audit' as const,resource:'audit.analytics'}],
+  })),
   {
     titleKey: "navigation.groups.administration",
     items: [
@@ -222,7 +159,7 @@ const Sidebar: React.FC = () => {
     items: group.items.filter((item) => {
       if (item.section === 'audit') {
         if (user.role === 'auditor' && !user.auditDirection) return false;
-        const direction = item.to.includes('/service') ? 'service' : item.to.includes('/standard') ? 'standard' : item.to.includes('/safety') ? 'occupational-safety' : null;
+        const direction = item.to.includes('/audit/hr') ? 'hr' : item.to.includes('/service') ? 'service' : item.to.includes('/standard') ? 'standard' : item.to.includes('/safety') ? 'occupational-safety' : null;
         const resource = item.to.includes('analytics') ? 'audit.analytics' : item.to.includes('/restaurants') ? 'restaurant' : item.to.includes('/checklists') ? 'audit.template' : 'audit';
         return direction ? canAccessAuditDirection(user, direction, resource) : hasPermission(user, resource, 'read');
       }

@@ -16,6 +16,9 @@ test('Published template revisions are immutable and server-bind audits/executio
   assert.equal(audit.status,201); assert.equal(audit.data.templateSnapshot.name,fixture.name);
   const execution=await h.request('admin','POST','/audit-execution',{auditId:audit.data._id,checklistId:id,templateSnapshot:{name:'Forged'}});
   assert.equal(execution.status,201); assert.equal(execution.data.data.templateSnapshot.name,fixture.name);
+  const repeated=await Promise.all([1,2].map(()=>h.request('admin','POST','/audit-execution',{auditId:audit.data._id,checklistId:id})));
+  assert.ok(repeated.every(result=>result.status===201&&result.data.data._id===execution.data.data._id));
+  assert.equal(await h.models.Execution.countDocuments({auditId:audit.data._id}),1);
   assert.equal((await h.request('admin','POST',`/audit-templates/${id}/draft`,{})).status,200);
   assert.equal((await h.request('admin','PUT',`/audit-templates/${id}`,{name:'Revision two'})).status,200);
   const second=await h.request('admin','POST',`/audit-templates/${id}/publish`,{}); assert.equal(second.status,200);

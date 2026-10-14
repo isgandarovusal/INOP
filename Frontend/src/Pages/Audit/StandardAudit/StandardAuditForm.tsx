@@ -423,7 +423,7 @@ export default function StandardAuditForm() {
         <div className="audit-form-actions">
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-cancel"
             onClick={() => navigate("/app/audit/standard")}
           >
             {t("audit.standard.form.cancel")}

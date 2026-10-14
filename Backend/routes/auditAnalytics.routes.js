@@ -49,4 +49,6 @@ router.get(
   getSafetyAnalytics
 );
 
+router.get('/overview', ...authorize('audit.analytics','read'), require('../controllers/auditDirectionAnalytics.controller').overview);
+router.get('/direction/:direction', ...authorize('audit.analytics','read'), require('../controllers/auditDirectionAnalytics.controller').overview);
 module.exports = router;

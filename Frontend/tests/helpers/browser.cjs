@@ -53,6 +53,10 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
         }
         const body = route.request().postDataJSON();
         const result = await h.request(actor, route.request().method(), url.pathname.slice(4) + url.search, body === null ? undefined : body);
+        if (url.pathname === '/api/auth/login' && result.status === 200 && result.data?.token) {
+          const name = Object.keys(h.actors).find(name => String(h.actors[name]._id) === result.data.user?.id);
+          if (name) h.tokens[name] = result.data.token;
+        }
         return route.fulfill({ status: result.status, contentType: result.headers['content-type'], body: result.buffer });
       }
       if (route.request().isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: await vite.transformIndexHtml(url.pathname, `<html><body><div id="root"></div><script>const fixture=${JSON.stringify(initial).replaceAll('<', '\\u003c')};window.testUser=fixture.user;localStorage.setItem('inop_auth_token',fixture.token);</script><script type="module" src="/__inop_test.js"></script></body></html>`) });
@@ -65,7 +69,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     };
     async function open(actor, route) {
       initial = { user: await profile(actor), token: h.tokens[actor] };
-      await page.goto(origin + route);
+      await page.goto(origin + route, { waitUntil: 'domcontentloaded', timeout: 30000 });
       try { await page.waitForFunction(() => typeof window.navigateTest === 'function', null, { timeout: 10000 }); }
       catch (error) { throw Error(error.message + '\n' + JSON.stringify({ pageErrors, failures })); }
     }

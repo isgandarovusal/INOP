@@ -8,6 +8,8 @@ import React, {
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Paperclip, Pencil } from "lucide-react";
+import AuditExecutionTools from '../../../Components/AuditExecutionTools';
+import AuditEvidencePanel from '../../../Components/AuditEvidencePanel';
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
@@ -19,7 +21,7 @@ import AuditResourceState from "../../../Components/AuditResourceState";
 import type { Restaurant } from "../../../Types/audit";
 import type { PublicUser } from "../../../Types/auth";
 import { useAuth } from "../../../Context/AuthContext";
-import { canManageAudit } from "../../../Utils/permissions";
+import { canManageAudit, hasPermission } from "../../../Utils/permissions";
 
 const AuditFindingsList = lazy(
   () => import("../AuditFindings/AuditFindingsList")
@@ -85,14 +87,14 @@ const AuditDetail: React.FC = () => {
     let cancelled = false;
     if (!audit) return;
     setRestaurant(null); setAuditor(null);
-    void Promise.allSettled([getRestaurantById(audit.restaurantId), getUserById(audit.auditorId)])
+    void Promise.allSettled([hasPermission(user,'restaurant','read')?getRestaurantById(audit.restaurantId):Promise.resolve(null), hasPermission(user,'user','read')?getUserById(audit.auditorId):Promise.resolve(null)])
       .then(([restaurantResult, auditorResult]) => {
         if (cancelled) return;
         setRestaurant(restaurantResult.status === "fulfilled" ? restaurantResult.value ?? null : null);
         setAuditor(auditorResult.status === "fulfilled" ? auditorResult.value ?? null : null);
       });
     return () => { cancelled = true; };
-  }, [audit]);
+  }, [audit, user]);
 
   useEffect(() => {
     setRenderedBusinessModules(1);
@@ -161,6 +163,8 @@ const AuditDetail: React.FC = () => {
         }
       />
 
+      <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
+      <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
       <div className="detail-grid">
         <div>
           <div className="audit-modern-card">
@@ -230,18 +234,7 @@ const AuditDetail: React.FC = () => {
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{t("audit.generic.detail.noPhotos")}</p>
             ) : (
               <div className="thumb-grid">
-                {audit.photos.map((photo, idx) =>
-                  photo.blobUrl ? (
-                    <div className="thumb" key={idx}>
-                      <img src={photo.blobUrl} alt={photo.name} />
-                    </div>
-                  ) : (
-                    <div className="thumb thumb--placeholder" key={idx}>
-                      <ImageOff size={16} />
-                      not available
-                    </div>
-                  ),
-                )}
+                {audit.photos.map((photo, idx) => <div className="thumb thumb--placeholder" key={idx}><ImageOff size={16}/><span>{photo.name}</span><small>{t('auditFoundation.legacyEvidence')}</small></div>)}
               </div>
             )}
           </div>
@@ -251,7 +244,7 @@ const AuditDetail: React.FC = () => {
               <h3>{t("audit.generic.detail.attachments")}</h3>
               <div className="file-list">
                 {audit.attachments.map((file, idx) =>
-                  file.blobUrl ? (
+                  file.blobUrl && !file.blobUrl.startsWith("/api/audit-evidence/") && !file.blobUrl.startsWith("blob:") ? (
                     <a
                       key={idx}
                       href={file.blobUrl}
@@ -266,7 +259,7 @@ const AuditDetail: React.FC = () => {
                   ) : (
                     <div className="file-chip" key={idx}>
                       <Paperclip size={13} />
-                      <span>{file.name} — not available (no backend yet)</span>
+                      <span>{file.name} — {t('auditFoundation.legacyEvidence')}</span>
                     </div>
                   ),
                 )}

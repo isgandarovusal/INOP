@@ -168,15 +168,15 @@
     "auditLoadError": "Audit məlumatlarını yükləyərkən xəta baş verdi."
   },
   "auth": {
-      "heroTitle": "İnsan resursları üçün vahid platforma.",
-      "heroSubtitle": "Namizədlər, vakansiyalar və analitika bir yerdə.",
-      "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
-      "passwordRequired": "Şifrənizi daxil edin.",
-      "features": {
-        "recruitment": "Mərkəzləşdirilmiş işə qəbul",
-        "analytics": "GFC HR analitikası",
-        "access": "Rol əsaslı giriş"
-      },
+    "heroTitle": "İnsan resursları üçün vahid platforma.",
+    "heroSubtitle": "Namizədlər, vakansiyalar və analitika bir yerdə.",
+    "emailInvalid": "Düzgün e-poçt ünvanı daxil edin.",
+    "passwordRequired": "Şifrənizi daxil edin.",
+    "features": {
+      "recruitment": "Mərkəzləşdirilmiş işə qəbul",
+      "analytics": "GFC HR analitikası",
+      "access": "Rol əsaslı giriş"
+    },
     "signIn": "Daxil ol",
     "subtitle": "Hesabınıza daxil olun.",
     "email": "E-poçt",
@@ -516,14 +516,14 @@
       "draft": "Qaralama"
     },
     "jobForm": {
-        "descriptionRequired": "Vakansiyanın təsviri mütləqdir.",
-        "fieldRequired": "Bu sahə mütləqdir.",
-        "experienceInvalid": "Təcrübə ili 0 və ya daha böyük rəqəm olmalıdır.",
-        "sections": {
-          "basic": "Əsas məlumat",
-          "organization": "Təşkilati məlumat",
-          "requirements": "Tələblər və bacarıqlar"
-        },
+      "descriptionRequired": "Vakansiyanın təsviri mütləqdir.",
+      "fieldRequired": "Bu sahə mütləqdir.",
+      "experienceInvalid": "Təcrübə ili 0 və ya daha böyük rəqəm olmalıdır.",
+      "sections": {
+        "basic": "Əsas məlumat",
+        "organization": "Təşkilati məlumat",
+        "requirements": "Tələblər və bacarıqlar"
+      },
       "editTitle": "Vakansiyanı redaktə et",
       "newTitle": "Yeni vakansiya yaradın",
       "subtitle": "Vakansiya məlumatlarını, iş yerini və seçim meyarlarını müəyyən edin. AI təklifləri HR təsdiqi tələb edir.",
@@ -779,7 +779,8 @@
         "save": "Auditi yadda saxla",
         "saving": "Yadda saxlanılır…",
         "restaurantRequired": "Restoran seçilməlidir.",
-        "saveError": "Audit yadda saxlanarkən xəta baş verdi."
+        "saveError": "Audit yadda saxlanarkən xəta baş verdi.",
+        "incomplete": "Bütün sualları cavablandırın."
       },
       "detail": {
         "notFound": "Standart audit tapılmadı",
@@ -876,7 +877,8 @@
         "cancel": "Ləğv et",
         "save": "Auditi yadda saxla",
         "restaurantRequired": "Restoran seçilməlidir.",
-        "saveError": "Audit yadda saxlanarkən xəta baş verdi."
+        "saveError": "Audit yadda saxlanarkən xəta baş verdi.",
+        "incomplete": "Bütün sualları cavablandırın."
       },
       "detail": {
         "notFound": "Əməyin mühafizəsi auditi tapılmadı",
@@ -1119,9 +1121,9 @@
     "page_limit": "Yalnız ilk 50 səhifə emal edildi. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın."
   },
   "hrCatalog": {
-      "catalogInvalid": "Kod və ad daxil edin. Kod yalnız kiçik hərf, rəqəm və tire ola bilər.",
-      "catalogDuplicate": "Bu kod artıq mövcuddur. Siyahıdan seçin.",
-      "catalogHint": "Əvvəl mövcud brend və filialı seçin. Yeni qeyd yalnız ehtiyac olduqda yaradılmalıdır.",
+    "catalogInvalid": "Kod və ad daxil edin. Kod yalnız kiçik hərf, rəqəm və tire ola bilər.",
+    "catalogDuplicate": "Bu kod artıq mövcuddur. Siyahıdan seçin.",
+    "catalogHint": "Əvvəl mövcud brend və filialı seçin. Yeni qeyd yalnız ehtiyac olduqda yaradılmalıdır.",
     "brand": "Brend",
     "branch": "Filial / iş yeri",
     "unset": "Təyin edilməyib",
@@ -1616,5 +1618,121 @@
     "visibility": "Vakansiya siyahısı",
     "confirm": "{{name}} arxivlənsin? Müraciətlər və tarixçə qorunacaq.",
     "readOnly": "Bu vakansiya arxivdədir. Yeni müraciət qəbul etmir. Redaktə üçün səlahiyyətli HR/Admin tərəfindən bərpa edilməlidir."
+  },
+  "auditFoundation": {
+    "center": "Audit Mərkəzi",
+    "parent": "Ana şirkət",
+    "structure": "GFC → Brend → Restoran → Audit",
+    "directionDescription": "Audit qeydləri və nəticələr üçün ayrıca iş sahəsi.",
+    "open": "Aç",
+    "analytics": "Audit Analitikası",
+    "management": "Ümumi idarəetmə",
+    "history": "Tarixçə",
+    "notifications": "Bildirişlər",
+    "brand": "Brend",
+    "allBrands": "Bütün brendlər",
+    "allRestaurants": "Bütün restoranlar",
+    "refresh": "Yenilə",
+    "catalogPermission": "Kataloq üçün restoran oxuma icazəsi tələb olunur.",
+    "average": "Orta nəticə",
+    "noScores": "Təsdiqlənmiş qiymətləndirmə yoxdur.",
+    "audit": "Audit",
+    "date": "Tarix",
+    "status": "Status",
+    "result": "Nəticə",
+    "emptyTitle": "Audit qeydi yoxdur",
+    "emptyDescription": "Real şablonlar təqdim edildikdən və təsdiqləndikdən sonra bu istiqamətin auditləri burada görünəcək.",
+    "profiles": "Auditor istiqamətləri",
+    "oneDirection": "Hər auditor üçün yalnız bir aktiv istiqamət.",
+    "auditor": "Auditor",
+    "direction": "İstiqamət",
+    "reason": "Dəyişiklik səbəbi",
+    "save": "Saxla",
+    "chooseAuditor": "Auditor seçin",
+    "chooseDirection": "İstiqamət seçin",
+    "chooseBrand": "Brend seçin",
+    "evidence": "Audit sübutları",
+    "upload": "Fayl yüklə",
+    "download": "Endir",
+    "immutable": "Dərc edilmiş revision dəyişməzdir. Dəyişiklik üçün yeni qaralama açın.",
+    "publish": "Revision-u dərc et",
+    "draft": "Yeni qaralama",
+    "retire": "Şablonu arxivləşdir",
+    "retireConfirm": "Şablon yeni auditlər üçün bağlanacaq. Tarixi revision-lar saxlanacaq.",
+    "createDraft": "Audit qaralaması yarat",
+    "chooseTemplate": "Təsdiqlənmiş şablon seçin",
+    "noTemplates": "Bu brend və istiqamət üçün dərc edilmiş real şablon yoxdur.",
+    "execution": "Audit icrası",
+    "startExecution": "İcraya başla",
+    "report": "Hesabat",
+    "closeFinding": "Finding-i bağla",
+    "revoke": "Təyinatı ləğv et",
+    "legacyEvidence": "Köhnə fayl istinadı; orijinal fayl yoxlanılmalıdır.",
+    "directions": {
+      "hr": "HR Auditi",
+      "service": "Servis Auditi",
+      "standard": "Standart Auditi",
+      "occupational-safety": "Əməyin Mühafizəsi Auditi"
+    },
+    "metrics": {
+      "total": "Audit sayı",
+      "completed": "Tamamlanmış",
+      "scored": "Qiymətləndirilmiş",
+      "unscored": "Qiymətləndirilməmiş"
+    },
+    "statusLabels": {
+      "draft": "Qaralama",
+      "scheduled": "Planlaşdırılmış",
+      "in-progress": "İcra olunur",
+      "completed": "Tamamlanmış",
+      "failed": "Uğursuz",
+      "cancelled": "Ləğv edilmiş",
+      "approved": "Təsdiqlənmiş",
+      "rejected": "Rədd edilmiş",
+      "assigned": "Təyin edilmiş",
+      "accepted": "Qəbul edilmiş",
+      "started": "Başlanmış",
+      "revoked": "Geri alınmış",
+      "pending": "Gözləyir",
+      "open": "Açıq",
+      "closed": "Bağlanmış",
+      "resolved": "Həll edilmiş"
+    },
+    "assignments": "Təyinatlar",
+    "assign": "Təyin et",
+    "findings": "Finding-lər",
+    "findingTitle": "Finding başlığı",
+    "addFinding": "Finding əlavə et",
+    "approval": "Təsdiq",
+    "reviewer": "Reviewer",
+    "chooseReviewer": "Reviewer seçin",
+    "requestApproval": "Təsdiq istəyi göndər",
+    "answer": "Cavab",
+    "chooseAnswer": "Cavab seçin",
+    "submitting": "Göndərilir…",
+    "submit": "Auditi göndər",
+    "closure": "Audit bağlanması",
+    "closeAudit": "Auditi bağla",
+    "answers": {
+      "yes": "Bəli",
+      "no": "Xeyr",
+      "na": "Tətbiq edilmir"
+    },
+    "checklistProgress": "Yoxlama siyahısının gedişi",
+    "executionHelp": "Auditi göndərməzdən əvvəl yoxlama siyahısını tamamlayın.",
+    "legacyExecution": "Köhnə icranın dəyişməz şablon surəti yoxdur. Saxlanmış cavablar əlçatandır.",
+    "noExecutionAnswers": "Bu icrada yoxlama cavabı yoxdur.",
+    "questionNumber": "Sual {{number}}",
+    "enterAnswer": "Cavabınızı daxil edin",
+    "progressCount": "{{total}} cavabdan {{answered}} tamamlanıb",
+    "timeline": "Audit tarixçəsi",
+    "noRecords": "Qeyd yoxdur",
+    "export": "İxrac",
+    "analyticsDirections": {
+      "hr": "HR Auditi Analitikası",
+      "service": "Servis Auditi Analitikası",
+      "standard": "Standart Auditi Analitikası",
+      "occupational-safety": "Əməyin Mühafizəsi Analitikası"
+    }
   }
 }

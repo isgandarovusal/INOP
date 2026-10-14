@@ -1,4 +1,5 @@
 export type AuditTemplateType =
+  | "hr"
   | "service"
   | "standard"
   | "occupational-safety";

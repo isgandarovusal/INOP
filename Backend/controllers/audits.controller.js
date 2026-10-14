@@ -63,10 +63,7 @@ async function getAuditFilter(req, extra = {}) {
 
 async function getAudits(req, res) {
   try {
-    const direction = req.query.direction && require('../services/auditDirection.service').canonicalDirection(req.query.direction);
-    if (req.query.direction && !direction) return res.status(400).json({ message: 'Unknown audit direction.' });
-    const extra = direction ? { auditType: { $in: require('../services/auditDirection.service').aliasesFor(direction) } } : {};
-    const filter = await getAuditFilter(req, extra);
+    const filter = await require('./auditDirectionAnalytics.controller').filterFor(req);
 
     if (filter === null) {
       return res.status(403).json({
@@ -81,6 +78,7 @@ async function getAudits(req, res) {
 
     res.json(audits);
   } catch (error) {
+    if (error.status) return res.status(error.status).json({ message: error.message });
     console.error("Failed to fetch audits:", error);
     res.status(500).json({
       message: "Failed to fetch audits",

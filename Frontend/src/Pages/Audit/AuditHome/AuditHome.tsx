@@ -1,84 +1,29 @@
-import { Link } from "react-router-dom";
-import {
-  BarChart3,
-  ClipboardCheck,
-  ClipboardList,
-  ShieldCheck,
-  Wrench,
-  ArrowRight,
-} from "lucide-react";
-import "./auditHome.css";
-
-const auditItems = [
-  {
-    to: "/app/audit/analytics",
-    title: "Analytics",
-    description: "Audit nəticələrini, göstəriciləri və trendləri analiz edin.",
-    icon: BarChart3,
-  },
-  {
-    to: "/app/audit/standard",
-    title: "Standard Audit",
-    description: "Standart audit proseslərini yaradın və idarə edin.",
-    icon: ClipboardCheck,
-  },
-  {
-    to: "/app/audit/service",
-    title: "Service Audit",
-    description: "Xidmət keyfiyyəti üzrə auditləri qeyd edin və izləyin.",
-    icon: Wrench,
-  },
-  {
-    to: "/app/audit/safety",
-    title: "Occupational Safety Audit",
-    description: "Əməyin mühafizəsi və təhlükəsizlik auditlərini idarə edin.",
-    icon: ShieldCheck,
-  },
-  {
-    to: "/app/audit/checklists",
-    title: "Checklists",
-    description: "Audit üçün checklist-ləri yaradın və idarə edin.",
-    icon: ClipboardList,
-  },
-];
-
+import { Link } from 'react-router-dom';
+import { ClipboardCheck, BarChart3, Store, ArrowRight, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../../Context/useAuth';
+import { canAccessAuditDirection, hasPermission } from '../../../Utils/permissions';
+import PageHeader from '../../../Components/PageHeader';
+import { SectionCard } from '../../../Components/HRSection';
+import './auditHome.css';
+const directions = [{key:'hr',path:'hr'},{key:'service',path:'service'},{key:'standard',path:'standard'},{key:'occupational-safety',path:'safety'}];
 export default function AuditHome() {
-  return (
-    <div className="audit-home">
-      <div className="audit-home-header">
-        <div>
-          <span className="audit-home-eyebrow">AUDIT MANAGEMENT</span>
-          <h1>Audit Management</h1>
-          <p>
-            Audit proseslərini vahid platformadan idarə edin və nəticələri
-            daha rahat izləyin.
-          </p>
-        </div>
-      </div>
-
-      <div className="audit-home-grid">
-        {auditItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <Link key={item.to} to={item.to} className="audit-home-card">
-              <div className="audit-home-card-icon">
-                <Icon size={24} strokeWidth={2} />
-              </div>
-
-              <div className="audit-home-card-content">
-                <h2>{item.title}</h2>
-                <p>{item.description}</p>
-              </div>
-
-              <div className="audit-home-card-action">
-                <span>Open</span>
-                <ArrowRight size={18} />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const {t}=useTranslation(); const {user}=useAuth();
+  return <div className="audit-home">
+    <PageHeader title={t('auditFoundation.center')} subtitle={t('auditFoundation.structure')} icon={<ClipboardCheck/>}/>
+    <SectionCard className="audit-organization"><strong>GFC</strong><span>{t('auditFoundation.parent')}</span><p>KFC · Pizza Hut · Simit Sarayı</p></SectionCard>
+    <div className="audit-home-grid">{directions.filter(item=>canAccessAuditDirection(user,item.key)).map(item=><section key={item.key} className="audit-home-card">
+      <div className="audit-home-card-icon"><ClipboardCheck aria-hidden="true" size={24}/></div><h3>{t(`auditFoundation.directions.${item.key}`)}</h3><p>{t('auditFoundation.directionDescription')}</p>
+      <div className="audit-home-card-action"><Link to={`/app/audit/${item.path}`}>{t('auditFoundation.open')} <ArrowRight aria-hidden="true" size={16}/></Link>
+      {hasPermission(user,'audit.analytics','read')&&<Link to={`/app/audit/${item.path}/analytics`}>{t('auditFoundation.analytics')}</Link>}</div>
+    </section>)}</div>
+    <SectionCard><h3>{t('auditFoundation.management')}</h3><nav className="audit-management-links" aria-label={t('auditFoundation.management')}>
+      {hasPermission(user,'restaurant','read')&&<Link to="/app/audit/restaurants"><Store size={18}/>{t('navigation.restaurants')}</Link>}
+      {hasPermission(user,'audit.analytics','read')&&<Link to="/app/audit/analytics"><BarChart3 size={18}/>{t('auditFoundation.analytics')}</Link>}
+      {hasPermission(user,'audit.template','read')&&<Link to="/app/audit/checklists"><BookOpen size={18}/>{t('navigation.checklists')}</Link>}
+      {['admin','audit_manager'].includes(user?.role||'')&&hasPermission(user,'audit.assignment','read')&&<Link to="/app/audit/auditors">{t('auditFoundation.profiles')}</Link>}
+      <Link to="/app/audit/audits">{t('auditFoundation.history')}</Link>
+      {hasPermission(user,'audit.notification','read')&&<Link to="/app/audit/notifications">{t('auditFoundation.notifications')}</Link>}
+    </nav></SectionCard>
+  </div>;
 }

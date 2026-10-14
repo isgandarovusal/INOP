@@ -250,7 +250,7 @@ const AuditForm: React.FC = () => {
           )}
 
           <div className="form-actions">
-            <button type="button" className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
+            <button type="button" className="btn-cancel" onClick={() => navigate("/app/audit/audits")}>
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={saving}>

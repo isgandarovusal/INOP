@@ -15,6 +15,8 @@ async function changeDirection(userId, direction, actorId, reason) {
   return transaction(async session => {
     const user = await User.findOne({ _id: userId, isActive: true }).session(session);
     if (!user) throw auditError(404, 'Active user not found.');
+    const scope=await require('../middleware/auth.middleware').getPermissionScope(user.role,'audit','read');
+    if (['admin','audit_manager'].includes(user.role) || !scope || scope==='none') throw auditError(400,'Profile requires an audit worker account; management roles remain separate.');
     let profile = await Profile.findById(userId).session(session);
     if (profile) {
       profile = await lockProfile(userId, session);
