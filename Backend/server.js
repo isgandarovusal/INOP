@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const { configureTrustedProxy, createApiRateLimiter } = require('./middleware/networkSecurity.middleware');
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 const routes = require('./routes/route');
@@ -14,6 +14,7 @@ const {
 } = require('./middleware/error.middleware');
 
 const app = express();
+configureTrustedProxy(app);
 const PORT = process.env.PORT || 3001;
 
 // Security Middlewares
@@ -25,11 +26,7 @@ app.use(express.json());
 app.use(standardizeErrorResponses);
 
 // Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { message: 'Çoxlu sorğu göndərildi, xahiş olunur 15 dəqiqə sonra yenidən cəhd edin.' }
-});
+const limiter = createApiRateLimiter();
 app.use('/api/', limiter);
 
 // Uploads are private: resolve their owning record and current server permission.
