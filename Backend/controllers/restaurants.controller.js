@@ -46,6 +46,8 @@ async function createRestaurant(req,res){
     const restaurant = await Restaurant.create({
       id:req.body.id || `rest-${Date.now()}`,
       name:req.body.name,
+      organizationId:req.body.organizationId,
+      brandId:req.body.brandId,
       location:req.body.location,
       status:req.body.status || "active"
     });
@@ -70,6 +72,7 @@ async function createRestaurant(req,res){
 
   }catch(error){
 
+    if (error?.name === 'ValidationError') return res.status(400).json({ message: 'Invalid restaurant data' });
     console.error(error);
 
     res.status(500).json({
@@ -83,17 +86,31 @@ async function updateRestaurant(req,res){
 
   try{
 
+    if (Object.hasOwn(req.body, 'id') && req.body.id !== req.params.id) return res.status(400).json({ message: 'Restaurant id cannot be changed' });
+    const body = { ...req.body };
+    delete body.id;
+    delete body._id;
+    const filter = { id: req.params.id };
+    const linking = ['organizationId', 'brandId'].some(field => Object.hasOwn(body, field));
+    if (linking) {
+      const existing = await Restaurant.findOne(filter).lean();
+      if (!existing) return res.status(404).json({ message: 'Restaurant not found' });
+      for (const field of ['organizationId', 'brandId']) {
+        if (!Object.hasOwn(body, field)) body[field] = existing[field] ?? null;
+        filter[field] = Object.hasOwn(existing, field) ? existing[field] : { $exists: false };
+      }
+    }
     const restaurant =
       await Restaurant.findOneAndUpdate(
-        {id:req.params.id},
-        {$set:req.body},
+        filter,
+        {$set:body},
         {returnDocument: 'after', runValidators:true}
       );
 
 
     if(!restaurant){
-      return res.status(404).json({
-        message:"Restaurant not found"
+      return res.status(linking ? 409 : 404).json({
+        message: linking ? "Restaurant relationship changed; reload and retry" : "Restaurant not found"
       });
     }
 

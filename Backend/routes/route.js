@@ -174,6 +174,10 @@ router.delete(
 );
 
 
+// Read-only Audit identity; uses the existing global restaurant read grant.
+router.get('/audit-catalog', ...authorize('restaurant', 'read'), requireGlobalRestaurantAccess,
+  (_req, res) => res.json({ success: true, data: require('../services/auditCatalog.service').getCatalog() }));
+
 // Restaurants API
 router.get(
   '/restaurants',

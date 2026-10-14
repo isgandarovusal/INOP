@@ -1,6 +1,8 @@
 export type RestaurantStatus = "active" | "inactive";
 
 export interface Restaurant {
+  organizationId?: "gfc" | null;
+  brandId?: "kfc" | "pizza-hut" | "simit-sarayi" | null;
   id: string;
   name: string;
   location: string;

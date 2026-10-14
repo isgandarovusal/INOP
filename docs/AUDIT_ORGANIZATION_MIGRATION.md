@@ -1,0 +1,37 @@
+# Audit organization catalog / package 1
+
+Canonical parent: `gfc` (GFC). Brands, and only brands: `kfc` (KFC), `pizza-hut` (Pizza Hut), `simit-sarayi` (Simit Sarayı). IDs are stable and independent of RecruitmentBrand/RecruitmentBranch. The fixed read-only catalog is code-owned; there is no seed, mutable catalog endpoint or startup database write.
+
+## API and compatibility
+
+GET `/api/audit-catalog` returns `{success:true,data:{organizations:[{id,name}],brands:[{id,name,organizationId}]}}`. Existing JWT verification, `restaurant.read` and explicit `all` scope are required. No permission grants change. No POST/PUT/DELETE catalog routes exist. This is identity metadata, NOT new organization/brand authorization. Future direction/tenant restrictions must intersect existing access rather than infer permission from a selected brand.
+
+Restaurant JSON may additionally contain optional `organizationId` and `brandId`. Missing fields have no defaults, so old records/JSON stay unchanged. Null clears a link. Organization can be omitted/null or `gfc`; brand can be omitted/null or one canonical brand. Non-null brand requires organization `gfc`. API and document validation reject unknown/empty IDs and invalid pairs. A relation update merges the persisted pair and conditionally writes against its observed values: a competing relation change returns 409, requiring reload. Query middleware requires the complete valid pair for relation updates, preventing partial query writes from bypassing document validation. Unrelated legacy updates do not assign links. Restaurant public id cannot be renamed through PUT; old full-record clients may resend the same id. Audit.restaurantId, Mongo identities, timestamps/history and existing CRUD response envelopes are preserved. Relationship activity uses the existing authenticated activity logger; no client provenance authority is introduced.
+
+Existing Audit.restaurantId remains the public Restaurant.id string. No audit/child rewrite, new restaurant copy, automatic linkage or Recruitment data modification occurs. Frontend Restaurant type only gains optional fields; UI is unchanged.
+
+## Offline mapping preview
+
+`node Backend/scripts/previewAuditRestaurantMapping.cjs --input /approved/local/snapshot.json`
+
+Input: `{restaurants:[{id,name,organizationId?,brandId?}],audits?:[{id,restaurantId}]}`. Use a synthetic snapshot for tests. This CLI deliberately has no dotenv, Mongoose, network or DB imports. It reads at most a 20 MB local snapshot, prints JSON to stdout and never writes input or DB. Redirect output only to an approved local artifact directory; never commit real data.
+
+Report: `dryRun:true`, `writes:0`, rows, reviewRequired, unknown, conflicts and orphanAudits. Canonical-name matches are ONLY suggestions requiring human review. GFC alone is not a brand suggestion. Multiple brand matches, unknown/invalid relation, name/link contradictions, duplicate public ids and normalized duplicate names are separately flagged. A name mismatch is a review warning, not proof of a wrong DB link. A missing name token does not invalidate a canonical existing link. The optional audits input permits orphan-reference review; this does not prove the snapshot is complete. An omitted audits array cannot establish referential integrity. No fuzzy auto-decision or apply mode exists.
+
+## Separately authorized migration — NOT executed by this package
+
+1. Obtain approved read-only inventory and backup/export through the organization's data-handling process. Record snapshot provenance and date, record counts, existing index/validator definitions and public ID/audit/child references. No automatic production snapshot in this task.
+2. Run preview offline. Resolve every invalid/ambiguous/duplicate record with an explicit Restaurant.id-to-brand mapping approved by the data owner. Never infer final brand from restaurant name. Missing links remain unclassified; do not fabricate a fourth brand or KPI.
+3. Rehearse on isolated synthetic/local copies. Validate missing/null legacy relations, all known brands and wrong pairs. Preserve identifiers; reconcile conflicts instead of creating replacement restaurants. Do not alter historical audit organization classification without a separate approved snapshot policy.
+4. Propose a Mongo `$jsonSchema` validator: optional organizationId is null or enum `gfc`; optional brandId is null or one of the three canonical brand IDs; additional conditional rule (`$or`) requires organizationId=`gfc` whenever brandId is a canonical string. Other legacy fields and missing relations must remain allowed. Merge with existing validators, never replace them blindly. Existing violations must be reviewed before enforcement; validator rollout mode and collMod need explicit approval. Mongoose validation is not a DB validator and does not protect out-of-band/bulk/driver writes by itself.
+5. Inspect existing `id` unique index first (schema `unique:true` does not prove index existence). Duplicate IDs block index repair. Evaluate a non-unique `{organizationId:1,brandId:1,status:1}` restaurant index only once actual filter/explain evidence exists. Do NOT make brand or restaurant name unique: multiple restaurants per brand and repeated labels are legitimate. Future Audit indexes require measured access paths; no speculative index creation now. Production server uses autoIndex:false/autoCreate:false.
+6. Any later backfill must be a distinct reviewed migration: explicit ID mapping, conditional old-value checks, bounded batches, per-row prior values and actor/run provenance, idempotency and count/FK reconciliation. The preview cannot apply it. Restore previous link values through a separately approved compensating operation if required; no automatic rollback/delete/history rewrite.
+7. Deploy additive backend/types before any UI requires the new fields. Existing unlinked records and old API clients remain valid. No audit direction/template/scoring/KPI changes are included.
+
+Four future audit directions and single-direction auditor profiles can consume this catalog, but have no new grants, routes or enforcement in this package. Main Dashboard and HR styling/functions remain unchanged.
+
+## Local verification
+
+Final targeted run: 716 tests passed, zero failed/skipped. Files: auditCatalog, restaurantAuthorization, auditScopes, auditEndpoints, templateAuthorization, executionAuthorization, approvalAuthorization, auditDashboardScores. New catalog tests cover missing/invalid pairs, legacy JSON, read-only JWT/scope/revocation behavior, relationship concurrency (409), preserved Audit.restaurantId, query-validation bypass attempts, offline CLI and unchanged snapshot bytes. Tests use exclusively randomly named owned localhost MongoDB databases via auditFixture; only these test databases are removed.
+
+Frontend `npm run build` (TypeScript plus Vite) passed. Frontend lint: zero errors, nine existing warnings. Changed-backend-file lint using the installed ESLint recommended Node rules: zero errors, two existing unused-error warnings in restaurants.controller. Backend has no configured build/lint script; syntax checks and real Express/Mongoose integration smoke were used, not a claim of a nonexistent backend build. Diff whitespace and credential-pattern scans passed. No browser/UI redesign test is claimed; frontend change is optional types only. No dependencies, DB indices/validators, production backfill, grants or deployments were changed.
