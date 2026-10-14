@@ -31,7 +31,8 @@ new mongoose.Schema(
    "assigned",
    "accepted",
    "started",
-   "completed"
+   "completed",
+   "revoked"
   ],
   default:"assigned"
  },

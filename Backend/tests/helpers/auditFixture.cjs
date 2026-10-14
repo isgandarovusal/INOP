@@ -21,7 +21,7 @@ exports.withAuditFixture = async (callback, options = {}) => {
     Execution: require('../../models/auditExecution.model'), Activity: require('../../models/auditActivity.model'),
   };
   const database = `inop_audit_test_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
-  let owned = false, server;
+  let owned = false, server, cleanupError;
   const membership = require('../../services/hrDepartmentAccess.service');
   const canonicalMembership = membership.isHRMember;
   // Existing mathematical own/department/assigned scope fixtures model two HR
@@ -92,9 +92,10 @@ exports.withAuditFixture = async (callback, options = {}) => {
     membership.isHRMember = canonicalMembership;
     if (server) await new Promise(resolve => server.close(resolve));
     if (owned) {
-      if (!/^inop_audit_test_\d+_[a-f0-9]{12}$/.test(database) || mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) throw Error('Refusing cleanup');
-      await mongoose.connection.db.dropDatabase(); console.log('Removed only the owned local audit test database.');
+      if (!/^inop_audit_test_\d+_[a-f0-9]{12}$/.test(database) || mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) cleanupError = Error('Refusing cleanup');
+      else { await mongoose.connection.db.dropDatabase(); console.log('Removed only the owned local audit test database.'); }
     }
     await mongoose.disconnect();
   }
+  if (cleanupError) throw cleanupError;
 };

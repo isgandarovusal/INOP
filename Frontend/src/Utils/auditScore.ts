@@ -21,6 +21,7 @@ export function categoryScores(value: unknown): Partial<Record<typeof scoreCateg
 // Presence, rather than truthiness, distinguishes a genuine zero from missing data.
 export function auditScore(value: unknown): number | null {
   const audit = value as Record<string, unknown>;
+  if (audit.assessmentStatus && audit.assessmentStatus !== 'scored') return null;
   const type = audit.auditType || audit.type;
   let score: number | null = null;
   if (type === "standard") score = percentage(audit.compliancePercentage);

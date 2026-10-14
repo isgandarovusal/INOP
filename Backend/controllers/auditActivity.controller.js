@@ -113,11 +113,9 @@ const createActivity = async (req, res) => {
   try {
     const {
       auditId,
-      userId,
       action,
       resource,
       description,
-      metadata,
     } = req.body;
 
     if (!auditId || !action || !resource) {
@@ -129,11 +127,11 @@ const createActivity = async (req, res) => {
 
     const activity = await createAuditActivity({
       auditId,
-      userId,
-      action,
-      resource,
+      userId: req.user.id,
+      action: 'note',
+      resource: 'note',
       description,
-      metadata,
+      metadata: {},
     });
 
     if (!activity) {

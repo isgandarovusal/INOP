@@ -27,7 +27,8 @@ export default function SafetyAuditForm() {
     0
   );
 
-  const maxScore = checks.length * 5;
+  const expectedItems = occupationalSafetyChecklist.flatMap(category => category.items);
+  const maxScore = expectedItems.length * 5;
 
   const scorePercentage =
     maxScore > 0
@@ -79,6 +80,7 @@ export default function SafetyAuditForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (expectedItems.some(item => !checks.some(check => check.checkId === item.id && check.score != null))) { window.alert(t('audit.safety.form.incomplete', { defaultValue: 'Bütün sualları cavablandırın.' })); return; }
     if (!restaurantId.trim()) {
       window.alert(t("audit.safety.form.restaurantRequired"));
       return;

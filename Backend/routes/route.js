@@ -100,6 +100,7 @@ auditTimelineRoutes
 
 
 router.use('/audit-permission', auditPermissionRoutes);
+router.use('/audit-evidence', require('./auditEvidence.routes'));
 router.use('/auditor-profiles', require('./auditorProfile.routes'));
 const recruitmentCatalog = require('../controllers/recruitmentCatalog.controller');
 const applicationWorkflow = require('../controllers/applicationWorkflow.controller');

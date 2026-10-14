@@ -184,20 +184,21 @@ async function updateAudit(req, res) {
       });
     }
 
+    for (const field of ['status','template','templateId','templateRevisionId','templateSnapshot','assessmentStatus','checks','results',...require('../services/auditAssessment.service').trustedFields]) delete payload[field];
+    if (['photos','attachments'].some(field => (payload[field] || []).length)) return res.status(400).json({ message: 'Use private evidence uploads.' });
     delete payload.auditorId;
     delete payload.organizationId;
     delete payload.direction;
     delete payload.restaurantId;
     delete payload.auditType;
 
-    const audit = await Audit.findOneAndUpdate(
-      filter,
-      { $set: payload },
-      {
-        returnDocument: 'after',
-        runValidators: true,
-      }
-    );
+    const audit = await require('../services/auditTransaction.service').transaction(async session => {
+      const existing = await Audit.findOne(filter).session(session);
+      if (!existing) return null;
+      await require('../services/auditLifecycle.service').lockAudit(existing._id, session, req.user);
+      if (await require('../models/auditClosure.model').exists({ auditId: existing._id }).session(session)) throw Object.assign(new Error('Closed audit is immutable.'), { status: 409 });
+      return Audit.findOneAndUpdate(filter, { $set: payload }, { returnDocument: 'after', runValidators: true, session });
+    });
 
     if (!audit) {
       return res.status(404).json({
@@ -225,6 +226,7 @@ async function updateAudit(req, res) {
 
     res.json(audit);
   } catch (error) {
+    if (error.status) return res.status(error.status).json({ message: error.message });
     console.error("Failed to update audit:", error);
 
     if (error.name === "ValidationError") {
@@ -250,7 +252,11 @@ async function deleteAudit(req, res) {
       });
     }
 
-    const audit = await Audit.findOneAndDelete(filter);
+    const audit = await require('../services/auditTransaction.service').transaction(async session => {
+      const existing = await Audit.findOne(filter).session(session); if (!existing) return null;
+      const audit = await require('../services/auditLifecycle.service').lockAudit(existing._id,session,req.user);
+      audit.archivedAt = new Date(); audit.archivedBy = req.user.id; await audit.save({session}); return audit;
+    });
 
     if (!audit) {
       return res.status(404).json({
@@ -280,6 +286,7 @@ async function deleteAudit(req, res) {
       message: "Audit deleted successfully",
     });
   } catch (error) {
+    if (error.status) return res.status(error.status).json({ message: error.message });
     console.error("Failed to delete audit:", error);
 
     res.status(500).json({

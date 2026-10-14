@@ -1,10 +1,8 @@
 const AuditFinding = require("../models/auditFinding.model");
-const { recordActivity } = require("../services/activityLog.service");
 const {
   findAuditByIdentifier,
   userHasAuditAccess,
 } = require("../middleware/auditScope.middleware");
-const { createAuditActivity } = require("./auditActivity.controller");
 
 exports.getFindings = async (req, res) => {
   try {
@@ -50,79 +48,4 @@ exports.getFindings = async (req, res) => {
   }
 };
 
-exports.createFinding = async (req, res) => {
-  try {
-    const auditId = req.body.auditId;
-
-    const audit = await findAuditByIdentifier(auditId);
-
-    if (!audit) {
-      return res.status(404).json({
-        success: false,
-        message: "Audit not found",
-      });
-    }
-
-    if (req.permission?.scope === "assigned") {
-      const allowed = await userHasAuditAccess(req, auditId);
-
-      if (!allowed) {
-        return res.status(403).json({
-          success: false,
-          message: "Bu Audit-ə finding əlavə etmək icazəniz yoxdur.",
-        });
-      }
-    }
-
-    const finding = await AuditFinding.create({
-      auditId: audit._id,
-      executionId: req.body.executionId || undefined,
-      title: req.body.title,
-      description: req.body.description || "",
-      severity: req.body.severity || "medium",
-      category: req.body.category || "quality",
-      dueDate: req.body.dueDate || undefined,
-    });
-
-    await createAuditActivity({
-      auditId: audit._id,
-      action: "created",
-      resource: "finding",
-      description: `Finding yaradıldı: ${finding.title}`,
-      metadata: {
-        findingId: finding._id,
-        severity: finding.severity,
-        category: finding.category,
-        status: finding.status,
-        createdBy: req.user?.id || null,
-      },
-    });
-
-    try {
-      await recordActivity({
-        req,
-        action: "create",
-        entityType: "audit_finding",
-        entityId: finding._id,
-        description: `Audit finding yaradıldı: ${finding.title}`,
-      });
-    } catch (activityError) {
-      console.error(
-        "Audit finding activity log error:",
-        activityError
-      );
-    }
-
-    return res.status(201).json({
-      success: true,
-      data: finding,
-    });
-  } catch (error) {
-    console.error("Create finding error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Finding creation error",
-    });
-  }
-};
+exports.createFinding = async(req,res)=>{try{res.status(201).json({success:true,data:await require('../services/auditLifecycle.service').createFinding(req)});}catch(error){res.status(error.status||400).json({message:error.status?error.message:'Invalid finding data.'});}};

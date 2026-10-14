@@ -4,7 +4,7 @@ const { recordActivity } = require("../services/activityLog.service");
 
 async function getRestaurants(req, res) {
   try {
-    const restaurants = await Restaurant.find(req.auditorProfile ? { organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } } : {}).sort({
+    const restaurants = await Restaurant.find(req.auditorProfile ? { archivedAt: null, organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } } : { archivedAt: null }).sort({
       createdAt: -1,
     });
 
@@ -22,7 +22,7 @@ async function getRestaurantById(req, res) {
   try {
     const restaurant = await Restaurant.findOne({
       id: req.params.id,
-      ...(req.auditorProfile ? { organizationId: req.auditorProfile.organizationId } : {}),
+      ...(req.auditorProfile ? { organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } } : {}),
     });
 
     if (!restaurant) {
@@ -163,10 +163,7 @@ async function deleteRestaurant(req,res){
 
   try{
 
-    const restaurant =
-      await Restaurant.findOneAndDelete({
-        id:req.params.id
-      });
+    const restaurant = await Restaurant.findOneAndUpdate({ id:req.params.id }, { $set: { status: 'inactive', archivedAt: new Date(), archivedBy: req.user.id } }, { returnDocument: 'after' });
 
 
     if(!restaurant){

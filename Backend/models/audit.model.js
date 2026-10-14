@@ -47,6 +47,14 @@ const AuditSchema = new mongoose.Schema(
       default: 'completed',
     },
 
+    templateId: String,
+    templateRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
+    templateSnapshot: mongoose.Schema.Types.Mixed,
+    assessmentStatus: { type: String, enum: ['legacy-unscored','unscored','scored'] },
+    passed: Boolean,
+    archivedAt: Date,
+    archivedBy: String,
+    auditWriteVersion: Number,
     template: mongoose.Schema.Types.Mixed,
 
     scores: mongoose.Schema.Types.Mixed,

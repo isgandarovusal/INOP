@@ -21,6 +21,7 @@ async function changeDirection(userId, direction, actorId, reason) {
       // Writing the profile serializes direction changes and assignment creation.
       if (await Assignment.exists({ auditor: userId, status: { $in: ['assigned', 'accepted', 'started'] } }).session(session)) throw auditError(409, 'Finish or revoke active assignments before changing direction.');
     }
+    if (!profile && await Assignment.exists({ auditor: userId, status: { $in: ['assigned','accepted','started'] } }).session(session)) throw auditError(409, 'Review/revoke legacy assignments before creating a profile.');
     const from = profile?.direction || null;
     if (!profile) profile = new Profile({ _id: userId, organizationId: 'gfc', direction });
     profile.direction = direction;

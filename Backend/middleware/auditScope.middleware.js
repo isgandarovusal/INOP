@@ -172,7 +172,7 @@ exports.getAuditScopeFilter = async req => {
   if (base === null) return null;
   const Context = require('../models/auditContext.model');
   const foreignContexts = await Context.find({ organizationId: { $ne: 'gfc' } }).select('_id').lean();
-  const parts = [base, { _id: { $nin: foreignContexts.map(item => item._id) } }];
+  const parts = [base, { archivedAt: null }, { _id: { $nin: foreignContexts.map(item => item._id) } }];
   if (req.auditorProfile) {
     const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
     parts.push({ restaurantId: { $in: restaurants.map(item => item.id) }, auditType: { $in: require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction) } });

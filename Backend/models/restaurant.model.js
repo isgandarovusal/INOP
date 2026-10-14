@@ -19,6 +19,8 @@ const restaurantSchema = new mongoose.Schema(
       default: '',
     },
 
+    archivedAt: Date,
+    archivedBy: String,
     // No defaults: existing records and legacy JSON remain unchanged.
     organizationId: { type: String, enum: ['gfc', null] },
     brandId: { type: String, enum: [...brandIds, null] },

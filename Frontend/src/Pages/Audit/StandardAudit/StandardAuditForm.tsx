@@ -72,11 +72,11 @@ export default function StandardAuditForm() {
   const foundTotal = foundCritical + foundMajor + foundMinor;
 
   const compliancePercentage =
-    allItems.length > 0
+    allItems.length > 0 && results.length === allItems.length
       ? ((allItems.length - foundTotal) / allItems.length) * 100
-      : 0;
+      : null;
 
-  const passed = foundCritical === 0 && foundMajor === 0;
+  const passed = results.length === allItems.length && foundCritical === 0 && foundMajor === 0;
 
   function setResult(
     checkId: string,
@@ -128,6 +128,7 @@ export default function StandardAuditForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (!results.length || allItems.some(({item}) => !results.some(result => result.checkId === item.id))) { toast.error(t('audit.standard.form.incomplete', { defaultValue: 'Bütün sualları cavablandırın.' })); return; }
     if (!restaurantId.trim()) {
       toast.error(t("audit.standard.form.restaurantRequired"));
       return;
@@ -180,7 +181,7 @@ export default function StandardAuditForm() {
       foundMajor,
       foundMinor,
       foundTotal,
-      compliancePercentage,
+      compliancePercentage: compliancePercentage ?? 0,
       passed,
     };
 
@@ -209,7 +210,7 @@ export default function StandardAuditForm() {
             {passed ? t("audit.standard.form.passed") : t("audit.standard.form.failed")}
           </strong>
           {" · "}
-          {compliancePercentage.toFixed(1)}%
+          {compliancePercentage === null ? "—" : `${compliancePercentage.toFixed(1)}%`}
         </div>
       </div>
 
@@ -290,7 +291,7 @@ export default function StandardAuditForm() {
 
             <div>
               <strong>
-                {compliancePercentage.toFixed(1)}%
+                {compliancePercentage === null ? "—" : `${compliancePercentage.toFixed(1)}%`}
               </strong>
               <span>{t("audit.standard.form.compliance")}</span>
             </div>

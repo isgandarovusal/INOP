@@ -12,40 +12,23 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
     if (!profile?.active || !direction || direction !== profile.direction || !linked) throw Object.assign(new Error('Audit direction or organization denied.'), { status: 403 });
   }
   await require('./auditTemplateRevision.service').resolveForAudit(payload, restaurant, direction);
+  require('./auditAssessment.service').sanitizeNew(payload);
   delete payload.organizationId;
   delete payload.direction;
   // Public id remains unchanged; internal identity and provenance are server-owned.
   const auditId = new mongoose.Types.ObjectId();
-  await Snapshot.create({
-    auditId,
-    auditorId: user.id,
-    departmentId: user.departmentId || null,
+  return require('./auditTransaction.service').transaction(async session => {
+    if (profile) {
+      const current = await require('./auditorProfile.service').lockProfile(user.id, session);
+      if (current.direction !== direction) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
+    }
+    if (payload.templateRevisionId) {
+      const bound = await require('../models/auditTemplate.model').updateOne({ _id: payload.templateId, status: 'active', publishedRevisionId: payload.templateRevisionId }, { $inc: { __v: 1 } }, { session });
+      if (!bound.modifiedCount) throw Object.assign(new Error('Template revision changed; retry.'), { status: 409 });
+    }
+    await Snapshot.create([{ auditId, auditorId: user.id, departmentId: user.departmentId || null }], { session });
+    const [audit] = await Audit.create([{ ...payload, _id: auditId, auditorId: user.id }], { session });
+    if (direction && linked) await require('../models/auditContext.model').create([{ _id: auditId, organizationId: 'gfc', brandId: restaurant.brandId, direction, templateRevisionId: payload.templateRevisionId, restaurantId: restaurant.id, actorId: user.id }], { session });
+    return audit;
   });
-  try {
-    // Publish the audit only after its immutable authorization snapshot exists.
-    if (direction && linked) {
-      return await require('./auditTransaction.service').transaction(async session => {
-        if (profile) {
-          const current = await require('./auditorProfile.service').lockProfile(user.id, session);
-          if (current.direction !== direction) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
-        }
-        if (payload.templateRevisionId) {
-          const bound = await require('../models/auditTemplate.model').updateOne({ _id: payload.templateId, status: 'active', publishedRevisionId: payload.templateRevisionId }, { $inc: { __v: 1 } }, { session });
-          if (!bound.modifiedCount) throw Object.assign(new Error('Template revision changed; retry.'), { status: 409 });
-        }
-        const [audit] = await Audit.create([{ ...payload, _id: auditId, auditorId: user.id }], { session });
-        await require('../models/auditContext.model').create([{ _id: auditId, organizationId: 'gfc', brandId: restaurant.brandId, direction, restaurantId: restaurant.id, actorId: user.id }], { session });
-        return audit;
-      });
-    }
-    return await Audit.create({ ...payload, _id: auditId, auditorId: user.id });
-  } catch (error) {
-    try {
-      await Snapshot.deleteOne({ auditId });
-    } catch (cleanupError) {
-      // An orphan snapshot cannot expose data: its audit was never published.
-      console.error('Audit snapshot cleanup failed:', cleanupError);
-    }
-    throw error;
-  }
 };

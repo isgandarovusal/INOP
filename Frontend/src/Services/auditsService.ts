@@ -1,15 +1,7 @@
 import { readJson } from "../api/readRequest";
 import API from "../api/axios";
-import type { Audit, AuditFile, AuditScores } from "../Types/audit";
+import type { Audit, AuditScores } from "../Types/audit";
 import { auditScore } from "../Utils/auditScore";
-
-function toAuditFiles(files: File[]): AuditFile[] {
-  return files.map((file) => ({
-    name: file.name,
-    size: file.size,
-    blobUrl: URL.createObjectURL(file),
-  }));
-}
 
 export interface AuditInput {
   restaurantId: string;
@@ -40,27 +32,14 @@ export async function createAudit(
     ...rest
   } = input;
 
-  const payload = {
-    id: `aud-${Date.now()}`,
-    status: "completed",
-    overallPercentage:
-      (
-        input.scores.cleanliness +
-        input.scores.service +
-        input.scores.food +
-        input.scores.staff
-      ) * 2.5,
-    photos: toAuditFiles(photos),
-    attachments: toAuditFiles(attachments),
-    findings: [],
-    recommendations: [],
-    checks: [],
-    serviceTimeObservations: [],
-    ...rest,
-  };
+  const payload = { id: `aud-${crypto.randomUUID()}`, status: 'draft', photos: [], attachments: [], ...rest };
 
   const res = await API.post("/audits", payload);
 
+  for (const file of [...photos, ...attachments]) {
+    const form = new FormData(); form.append('file',file);
+    await API.post(`/audit-evidence/${res.data._id}`,form);
+  }
   return res.data;
 }
 

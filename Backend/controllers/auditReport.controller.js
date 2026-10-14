@@ -38,7 +38,7 @@ exports.getAuditReport = async (req, res) => {
       });
     }
 
-    const score =
+    const score = fullAudit.assessmentStatus && fullAudit.assessmentStatus !== 'scored' ? null :
       fullAudit.score ??
       fullAudit.overallScore ??
       fullAudit.overallPercentage ??

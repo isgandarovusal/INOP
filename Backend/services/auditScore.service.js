@@ -21,7 +21,7 @@ const typed = { $switch: { branches: [
   { case: { $in: [type, ['safety', 'occupational-safety']] }, then: safety },
 ], default: null } };
 
-exports.auditScoreExpression = { $let: {
+const legacyScoreExpression = { $let: {
   vars: { typed },
   in: { $cond: [{ $ne: ['$$typed', null] }, { $divide: ['$$typed', 10] }, { $ifNull: [legacy,
     { $cond: [{ $in: [type, ['standard', 'service', 'safety', 'occupational-safety']] }, null, { $divide: [numeric('$overallPercentage', 100), 10] }] },
@@ -29,3 +29,5 @@ exports.auditScoreExpression = { $let: {
 } };
 exports.categoryScoreExpression = key => numeric(`$scores.${key}`, 10);
 exports.categories = categories;
+
+exports.auditScoreExpression = { $cond: [{ $in: ['$assessmentStatus', ['unscored','legacy-unscored']] }, null, legacyScoreExpression] };
