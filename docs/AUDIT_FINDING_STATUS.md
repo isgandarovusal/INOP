@@ -27,7 +27,7 @@
 | Render ingress / X-Forwarded-For | blocked | trust proxy=1 və spoofing regression-ları saxlanır. Faktiki tək-hop ingress/direct access təsdiqlənməyib. |
 | Production dependency findings | blocked | XLSX high və Mammoth/argparse/sprintf-js chain riski release gate-dədir. Təhlükəsiz işlətmə patch hesab olunmur. |
 | Production browser QA | blocked | Effektiv custom allowlist boşdur; domenlər sınanmayıb. Lokal Chromium QA production sübutu deyil. |
-| Orijinal Luminous Glass P favicon asset | blocked | Söhbətdə vizual var; orijinal PNG baytları/file ID lokal əlçatan deyil. Alternativ ikon yaradılmayıb; Paket 9 sənədi. |
+| Orijinal Luminous Glass P favicon asset | resolved | İstifadəçinin INOP_Favicon_Codex_Package.zip paketi ilə 8 təsdiqlənmiş fayl baytları dəyişmədən tətbiq edildi. ICO/PNG/apple/manifest istinadları yeniləndi; `FAVICON_FINAL_QA.md`. Paket 9-un əvvəlki bloker qeydi tarixçədə saxlanır. |
 | Private storage timeout / paralellik | resolved | Caller timeout-dan sonra provider işinin faktiki settlement-inə qədər slot saxlanır; abort-a əməl etməyən adapter regression-u. Provider staging gate yenə blocked. |
 | Legacy nullable score consumers | partial | Generic siyahı shared auditScore ilə real 0/null fərqini qoruyur, minimum filtr düzəldilib. Köhnə safety /5 mexanizmi dəyişməyib, external strictly-number consumers review tələb edir. |
 | Yeni HR scoring və real istiqamət şablonları | blocked | Suallar/kontraktlar istifadəçi ilə razılaşdırılır. HR 0/0.5/1/N/A tətbiq olunmayıb, başqa istiqamətlərə ötürülməyib. |

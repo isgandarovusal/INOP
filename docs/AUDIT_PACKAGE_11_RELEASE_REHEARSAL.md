@@ -1,5 +1,7 @@
 # Paket 11 — offline release rehearsal və release gate
 
+> Sonrakı favicon düzəlişi Paket 9 asset blokerini həll edib (`FAVICON_FINAL_QA.md`). Aşağıdakı digər release gate-ləri dəyişməyib.
+
 ## Faktiki sərhəd
 
 Yalnız offline metadata fixture-ləri və təsadüfi adlı owned localhost QA bazaları istifadə olunub. Production snapshot, transaction topology, ingress, storage, backup və restore yoxlanmayıb. Yeni migration/index/validator tətbiq olunmayıb. Mövcud fixture-in öz test bazasındakı indeks hazırlığı production migration deyil.
