@@ -4,9 +4,12 @@ const {withBrowserFixture}=require('./helpers/browser.cjs');
 test('Selected identity and static login composition preserve responsive form priority and keyboard access',async()=>{
  const text=await fs.readFile(path.join(__dirname,'enterpriseLoginUI.test.cjs'),'utf8'),source=text.match(/const harness=`([\s\S]*?)`;/)[1];
  await withBrowserFixture(source,async h=>{
+  const imageRequests=[];h.page.on("request",r=>{if(r.resourceType()==="image"&&r.url().includes("login-architecture"))imageRequests.push(r.url());});
   for(const width of [1440,768,390]){
-   await h.page.setViewportSize({width,height:1000});await h.open('admin','/login');await h.page.locator('#email').waitFor();
+   await h.page.setViewportSize({width,height:1000});imageRequests.length=0;await h.open('admin','/login');await h.page.locator('#email').waitFor();
    expect(await h.page.locator('.inop-logo').getAttribute('data-concept')).toBe('A');
+   expect(await h.page.locator('.inop-logo path').evaluateAll(es=>es.map(e=>e.dataset.letter))).toEqual(['I','N','O','P']);
+   if(width===390){expect(imageRequests).toEqual([]);expect(await h.page.locator('.auth-brand-art img').evaluate(e=>e.currentSrc.startsWith('data:image/svg+xml'))).toBe(true);}
    expect(await h.page.locator('.auth-brand-art').getAttribute('aria-hidden')).toBe('true');
    expect(await h.page.locator('.auth-brand-art').isVisible()).toBe(width>680);
    expect(await h.page.locator('.auth-brand-copy').isVisible()).toBe(width>680);
@@ -16,7 +19,7 @@ test('Selected identity and static login composition preserve responsive form pr
    expect(await h.page.locator('.auth-password-field__toggle').evaluate(e=>document.activeElement===e)).toBe(true);
    await h.page.keyboard.press('Enter');expect(await h.page.locator('#password').getAttribute('type')).toBe('text');
    const focus=await h.page.locator('.auth-password-field__toggle').evaluate(e=>getComputedStyle(e).outlineStyle);expect(focus).not.toBe('none');
-   await fs.mkdir('/workspace/work/final-premium/login-qa',{recursive:true});await h.page.screenshot({path:`/workspace/work/final-premium/login-qa/login-${width}.png`,fullPage:true});
+   await fs.mkdir('/workspace/work/critical-login/login-qa',{recursive:true});await h.page.screenshot({path:`/workspace/work/critical-login/login-qa/login-${width}.png`,fullPage:true});
   }
   expect(h.pageErrors).toEqual([]);expect(h.wire.filter(r=>r.method==='POST')).toEqual([]);
  });
