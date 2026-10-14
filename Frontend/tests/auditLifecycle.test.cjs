@@ -65,10 +65,10 @@ test('Audit lifecycle browser contracts with isolated real authorization', async
     assert.equal(await h.page.getByText(first.restaurantId,{exact:true}).count(),0);
   });
   await t.test('Approval action remains usable under StrictMode and catches its failures', async () => {
-    const approval = await h.models.Approval.create({ auditId: first._id, status: 'pending' });
+    const approval = await h.models.Approval.create({ auditId: first._id, status: 'pending', requestedBy: String(h.actors.peer._id), reviewer: String(h.actors.own._id) });
     await h.open('own', `/standard/${first.id}`);
-    await h.page.getByRole('button',{name:'Approve',exact:true}).click();
-    await h.page.getByText('approved',{exact:true}).waitFor();
+    await h.page.getByRole('button',{name:'auditFoundation.statusLabels.approved',exact:true}).click();
+    await h.page.locator('strong').filter({hasText:'auditFoundation.statusLabels.approved'}).waitFor();
     assert.equal((await h.models.Approval.findById(approval._id)).status,'approved');
     assert.deepEqual(h.pageErrors,[]);
   });

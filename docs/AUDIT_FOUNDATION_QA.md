@@ -1,6 +1,6 @@
 # Audit packages 1–5: integration and release checklist
 
-> Historical P1–5 record. Current P6–8 finding status and release blockers: `AUDIT_FINDING_STATUS.md` and `AUDIT_PRODUCTION_RELEASE_PLAN.md`.
+> Historical P1–5 record. Current P1–11 finding status: `AUDIT_FINDING_STATUS.md`; release gates: `AUDIT_PRODUCTION_RELEASE_PLAN.md` and `AUDIT_PACKAGE_11_RELEASE_REHEARSAL.md`. Latest QA: `AUDIT_PACKAGE_9_11_QA.md`.
 
 Package 5 resumes the preserved Package 4 HEAD c6a6551; it does not recreate packages 1–4. Recruitment and Dashboard source/design files are unchanged. New navigation separates management and four audit directions. Existing detail, execution, report, finding, review, closure, template and history routes remain available under authorization.
 

@@ -13,17 +13,17 @@ createRoot(document.getElementById('root')).render(React.createElement(React.Str
 `;
 async function pdfBytes(){const Pdf=backend('pdfkit'),doc=new Pdf(),chunks=[];doc.on('data',bytes=>chunks.push(bytes));const done=new Promise(resolve=>doc.on('end',resolve));doc.text('Synthetic source preview');doc.end();await done;return Buffer.concat(chunks);}
 test('Source-document authenticated contract and editor lifecycle preserve private data boundaries',async t=>withBrowserFixture(harness,async h=>{
- const owned=[];const bytes=await pdfBytes();const first=await Template.create({name:'First template',brandName:'Synthetic brand',organizationId:'org-A',brandId:'brand-A',auditType:'standard',sections:[]});const second=await Template.create({name:'Second template',brandName:'Synthetic brand',auditType:'service',sections:[]});
+ const owned=[];const bytes=await pdfBytes();const first=await Template.create({name:'First template',brandName:'KFC',organizationId:'gfc',brandId:'kfc',auditType:'standard',status:'draft',sections:[]});const second=await Template.create({name:'Second template',brandName:'Synthetic brand',auditType:'service',sections:[]});
  const editorName=()=>h.page.getByLabel('audit.checklist.builder.checklistName',{exact:true});
  async function open(id=String(first._id)){await h.open('admin','/builder/'+id);await h.page.locator('[data-source-state="ready"]').waitFor({state:'attached'});await editorName().waitFor();}
  try{
   let documentId;
   await t.test('actual multipart service create/list/download/delete sends Bearer and all metadata',async()=>{
    await h.open('admin','/contract');
-   const result=await h.page.evaluate(async({templateId,bytes})=>{const service=window.sourceService;const file=new File([new Uint8Array(bytes)],'contract.pdf',{type:'application/pdf'});const doc=await service.uploadAuditSourceDocument(file,{templateId,organizationId:'org-A',brandId:'brand-A',auditType:'standard',uploadedBy:'forged'});const list=await service.getAuditSourceDocuments(templateId);const blob=await service.getAuditSourceDocumentFile(doc.id);return{doc,list,blobType:blob.type,blobSize:blob.size};},{templateId:String(first._id),bytes:[...bytes]});
+   const result=await h.page.evaluate(async({templateId,bytes})=>{const service=window.sourceService;const file=new File([new Uint8Array(bytes)],'contract.pdf',{type:'application/pdf'});const doc=await service.uploadAuditSourceDocument(file,{templateId,organizationId:'gfc',brandId:'kfc',auditType:'standard',uploadedBy:'forged'});const list=await service.getAuditSourceDocuments(templateId);const blob=await service.getAuditSourceDocumentFile(doc.id);return{doc,list,blobType:blob.type,blobSize:blob.size};},{templateId:String(first._id),bytes:[...bytes]});
    const stored=await Source.findById(result.doc.id);owned.push(stored.filePath);documentId=result.doc.id;
-   assert.equal(stored.organizationId,'org-A');assert.equal(stored.brandId,'brand-A');assert.equal(stored.auditType,'standard');assert.equal(stored.uploadedBy,String(h.actors.admin._id));assert.ok(result.list.some(d=>d.id===documentId));assert.equal(result.blobType,'application/pdf');assert.equal(result.blobSize,bytes.length);
-   await h.page.evaluate(id=>window.sourceService.deleteAuditSourceDocument(id),documentId);assert.equal(await Source.findById(documentId),null);
+   assert.equal(stored.organizationId,'gfc');assert.equal(stored.brandId,'kfc');assert.equal(stored.auditType,'standard');assert.equal(stored.uploadedBy,String(h.actors.admin._id));assert.ok(result.list.some(d=>d.id===documentId));assert.equal(result.blobType,'application/pdf');assert.equal(result.blobSize,bytes.length);
+   await h.page.evaluate(id=>window.sourceService.deleteAuditSourceDocument(id),documentId);assert.ok((await Source.findById(documentId)).archivedAt);
    assert.ok(h.wire.filter(r=>r.path.startsWith('/api/audit-source-documents')).every(r=>r.actor==='admin'));
   });
   await t.test('all editor upload→list→native PDF preview→download→delete works without raw static URL',async()=>{
@@ -34,7 +34,7 @@ test('Source-document authenticated contract and editor lifecycle preserve priva
    await row.getByRole('button',{name:'Aç / Endir'}).click();await h.page.getByRole('dialog').waitFor();
    const downloadPromise=h.page.waitForEvent('download');await h.page.getByRole('link',{name:'Endir: editor.pdf'}).click();const download=await downloadPromise;assert.equal(download.suggestedFilename(),'editor.pdf');assert.equal(await download.failure(),null);
    await h.page.getByRole('button',{name:'Bağla'}).click();assert.deepEqual(await h.page.evaluate(()=>[...window.created].sort()),await h.page.evaluate(()=>[...window.revoked].sort()));
-   await row.getByRole('button',{name:'Sil',exact:true}).click();await h.page.waitForFunction(()=>!Array.from(document.querySelectorAll('span')).some(e=>e.textContent==='editor.pdf'));assert.equal(await Source.findById(documentId),null);
+   await row.getByRole('button',{name:'Sil',exact:true}).click();await h.page.waitForFunction(()=>!Array.from(document.querySelectorAll('span')).some(e=>e.textContent==='editor.pdf'));assert.ok((await Source.findById(documentId)).archivedAt);
   });
   for(const status of [401,403,404,500])await t.test(`auxiliary HTTP ${status} has distinct state and does not become an empty successful list`,async()=>{
    await h.page.route('**/api/audit-source-documents?*',route=>route.fulfill({status,contentType:'application/json',body:JSON.stringify({message:'Synthetic auxiliary error'})}));
@@ -77,7 +77,7 @@ test('Source-document authenticated contract and editor lifecycle preserve priva
    try{await h.page.getByRole('button',{name:'audit.checklist.builder.save',exact:true}).click();await h.page.locator('[data-audit-state="server-error"]').waitFor();assert.equal(await editorName().inputValue(),'Save draft');}finally{await h.page.unroute('**/api/audit-templates/'+first._id);}
   });
   await t.test('create-only all template permission can save a new form without a read grant',async()=>{
-   await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{resource:'audit.template',action:'create',scope:'all'}}});await h.open('own','/builder');await editorName().fill('Create-only template');await h.page.getByLabel('audit.checklist.builder.brand',{exact:true}).fill('Synthetic brand');await h.page.getByRole('button',{name:'audit.checklist.builder.save',exact:true}).click();await h.page.getByText('Saved destination',{exact:true}).waitFor();const saved=await Template.findOne({name:'Create-only template'});assert.equal(saved.createdBy,String(h.actors.own._id));
+   await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{$each:[{resource:'audit.template',action:'create',scope:'all'},{resource:'restaurant',action:'read',scope:'all'}]}}});await h.open('own','/builder');await editorName().fill('Create-only template');await h.page.locator('select').filter({has:h.page.locator('option[value="kfc"]')}).first().selectOption('kfc');await h.page.getByRole('button',{name:'audit.checklist.builder.save',exact:true}).click();await h.page.getByText('Saved destination',{exact:true}).waitFor();const saved=await Template.findOne({name:'Create-only template'});assert.equal(saved.createdBy,String(h.actors.own._id));
   });
   await t.test('user permission loss clears editor and object URLs under StrictMode',async()=>{
    await open();await h.page.getByRole('button',{name:'Aç / Endir'}).click();await h.page.getByRole('dialog').waitFor();const profile=await h.profile('admin');profile.permissions=[];

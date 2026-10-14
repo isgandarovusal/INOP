@@ -1,4 +1,4 @@
-# Audit diaqnostikası — Paket 1–8 status checklist-i
+# Audit diaqnostikası — Paket 1–11 status checklist-i
 
 `resolved` tətbiq səviyyəsində yoxlanmış düzəlişdir; production migration/deploy edildiyi mənasına gəlmir. `partial` məhdud hissə həll olunub. `blocked` ayrıca qərar, provider və ya production sübutu tələb edir.
 
@@ -6,11 +6,11 @@
 |---|---|---|
 | GFC-nin brend kimi göstərilməsi, restoran dublikatları | resolved | Sabit kataloq, üç brend, ID qorunması və offline mapping testləri. Faktiki mapping ayrıca təsdiqlənəcək. |
 | Birdən çox aktiv auditor istiqaməti | resolved | Scalar profile, User `_id` uniqueness, seriallaşdırılmış direction/assignment yazıları; production rolları dəyişməyib. |
-| JWT/permission, organization/direction və child resource sızması | resolved | Parent scope intersection, action routing, source və evidence access; cross-scope və JWT regression-ları. |
+| JWT/permission, organization/direction və child resource sızması | resolved | Parent scope intersection, action/source/evidence access; Paket 10 daxili reviewer scope hesablamasında inactive/invalid profile guard-ını da tətbiq edir. |
 | Management roluna yüksəltmə / aktiv auditor profilinin taleyi | blocked | Role-string bypass yoxdur. Profil deaktivləşdirmə və assignment/provenance siyasəti ayrıca qərardır. |
 | Published template dəyişməsi və execution-un mutable template oxuması | resolved | Immutable revisions və server snapshot; concurrency testləri. Raw DB admin əməliyyatları ayrıca nəzarət tələb edir. |
 | Boş cavabdan 100%, səhv denominator, service yes/no/na uyğunsuzluğu | resolved | Bağlı revision üzrə completeness və mövcud scoring kontraktı; unknown/all-N/A unscored, tarixi rescore yoxdur. |
-| Client score/status/approval, self-approval, səhv status transitions | resolved | Server-owned fields, müstəqil reviewer, action verification və lifecycle testləri. |
+| Client score/status/approval, self-approval, səhv status transitions | resolved | Server-owned fields, müstəqil reviewer, action verification və lifecycle testləri. Paket 10 davamı bağlı auditə approval yaratma/qərar yazısını 409 ilə bloklayır. |
 | Duplicate assignments/execution, assignedBy provenance | resolved | Transaction/parent-profile locks, idempotency, server actor. |
 | Finding bağlanması / corrective action / closure race | resolved | Action verification tələb olunur; eyni parent lock closure ilə yarışları seriallaşdırır. |
 | Blob URL və davamlı private evidence storage | blocked | Adapter təməli, digest/read-back/metadata/access testləri hazırdır; provider/credentials/real durable adapter yoxdur. Production upload 503 qalır. |
@@ -27,6 +27,11 @@
 | Render ingress / X-Forwarded-For | blocked | trust proxy=1 və spoofing regression-ları saxlanır. Faktiki tək-hop ingress/direct access təsdiqlənməyib. |
 | Production dependency findings | blocked | XLSX high və Mammoth/argparse/sprintf-js chain riski release gate-dədir. Təhlükəsiz işlətmə patch hesab olunmur. |
 | Production browser QA | blocked | Effektiv custom allowlist boşdur; domenlər sınanmayıb. Lokal Chromium QA production sübutu deyil. |
+| Orijinal Luminous Glass P favicon asset | blocked | Söhbətdə vizual var; orijinal PNG baytları/file ID lokal əlçatan deyil. Alternativ ikon yaradılmayıb; Paket 9 sənədi. |
+| Private storage timeout / paralellik | resolved | Caller timeout-dan sonra provider işinin faktiki settlement-inə qədər slot saxlanır; abort-a əməl etməyən adapter regression-u. Provider staging gate yenə blocked. |
+| Legacy nullable score consumers | partial | Generic siyahı shared auditScore ilə real 0/null fərqini qoruyur, minimum filtr düzəldilib. Köhnə safety /5 mexanizmi dəyişməyib, external strictly-number consumers review tələb edir. |
+| Yeni HR scoring və real istiqamət şablonları | blocked | Suallar/kontraktlar istifadəçi ilə razılaşdırılır. HR 0/0.5/1/N/A tətbiq olunmayıb, başqa istiqamətlərə ötürülməyib. |
+| Seçilmiş köhnə frontend regression fixture/contract uyğunluğu | resolved | Execution snapshot/legacy 409, canonical GFC/KFC source metadata, archive, müstəqil reviewer və async approval nəticəsi üzrə fixture-lər modernləşdirildi. İlkin FAIL log saxlanır. Bu status bütün repository testlərinin yoxlandığı mənasına gəlmir. |
 
 Release üçün: provider və credential qərarı, concrete adapter staging QA, restore/topology təsdiqi, reviewed mapping/index/validator planı və external nullable-average consumer yoxlaması. Bunlardan sonra ayrıca push/deploy təsdiqi tələb olunur.
 
@@ -79,3 +84,9 @@ Release üçün: provider və credential qərarı, concrete adapter staging QA, 
 Əsas inteqrasiya 157/157; əlavə sənəd/Mongoose yoxlamaları ilkin geniş 174/174 keçiddə yoxlanılıb; proxy/rate-limit 7/7; son readiness fokuslu yoxlaması 13/13. Playwright 2/2, həmçinin Paket 6 əvvəl/sonra iki ayrıca vizual keçid. TypeScript/Vite build keçir. Frontend lint 0 xəta/9 mövcud warning, seçilmiş backend ESLint 0 xəta/4 warning (mövcud təhlükəsizlik məqsədli control-character regex-ləri üçün scoped rule exception). Mongoose xəbərdarlıqları yalnız equivalence testinin legacy `new:true` müqayisə qolundandır.
 
 Artifaktlar Git xaricində `/workspace/work/audit-next/` və `/workspace/work/audit-packages/` daxilindədir. Heç bir production ölçməsi və ya sürət artımı iddiası yoxdur.
+
+## Paket 9–11
+
+Favicon mənbə blokeri: `AUDIT_PACKAGE_9_FAVICON.md`. Təhlükəsizlik düzəlişləri və qalan borclar: `AUDIT_PACKAGE_10_SECURITY.md`. Offline mapping/context/revision rehearsal, migration/staging/dependency/rollback planı: `AUDIT_PACKAGE_11_RELEASE_REHEARSAL.md`. Cari QA: `AUDIT_PACKAGE_9_11_QA.md`.
+
+Npm production-only audit təkrarlandı: 4 affected package (1 high / 3 moderate), fixAvailable=false, lockfile dəyişməyib. Bütün əvvəlki partial/blocked finding-lər saxlanır; production-ready statusu verilmir. Cari artifaktlar `/workspace/work/audit-technical/` daxilindədir, əvvəlki nəticələr silinməyib.
