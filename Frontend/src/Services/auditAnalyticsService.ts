@@ -60,7 +60,7 @@ export interface StandardAnalyticsData {
   failed: number;
   trend: Array<{
     label: string;
-    value: number;
+    value: number | null;
   }>;
 }
 
@@ -73,11 +73,11 @@ export interface SafetyAnalyticsData {
   totalChecks: number;
   distribution: Array<{
     name: string;
-    value: number;
+    value: number | null;
   }>;
   trend: Array<{
     label: string;
-    value: number;
+    value: number | null;
   }>;
 }
 

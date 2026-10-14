@@ -8,6 +8,7 @@ test('Constrained branding preserves login, languages, wordmark and favicon',asy
  await h.open('admin','/app/audit');if(!before){await expect(h.page.locator('.admin-sidebar .inop-logo path')).toHaveCount(4);await h.page.setViewportSize({width:390,height:1000});await expect(h.page.locator('.admin-topbar .inop-logo path')).toHaveCount(4);await h.page.setViewportSize({width:1440,height:1000});}await h.page.locator('.admin-sidebar__logout').click();await h.page.locator('#email').waitFor();
  for(const width of [1440,768,390]){
   await h.page.setViewportSize({width,height:1000});await expect(h.page.locator('#email')).toBeVisible();expect(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  if(width>680)await h.page.waitForFunction(()=>{const image=document.querySelector('.auth-brand-art img');return image&&image.complete&&image.naturalWidth>1;});await h.page.evaluate(()=>document.fonts.ready);
   await h.page.screenshot({path:`${dir}/login-${label}-${width}.png`,fullPage:true});
  }
  if(!before){
@@ -19,6 +20,8 @@ test('Constrained branding preserves login, languages, wordmark and favicon',asy
   const icon=await h.page.request.get(h.origin+'/favicon.svg');expect(icon.status()).toBe(200);expect(await icon.text()).toContain('fill-rule="evenodd"');
   await h.page.evaluate(()=>{const gallery=document.createElement('div');gallery.id='favicon-gallery';gallery.style.cssText='padding:24px;background:#EDF3FB;display:flex;gap:24px;align-items:center';for(const size of[16,32,64]){const image=new Image(size,size);image.src='/favicon.svg';gallery.append(image);}document.body.append(gallery)});
   await h.page.waitForFunction(()=>[...document.querySelectorAll('#favicon-gallery img')].every(img=>img.complete&&img.naturalWidth));await h.page.locator('#favicon-gallery').screenshot({path:dir+'/favicon-sizes.png'});
+  await h.models.User.updateOne({_id:h.actors.admin._id},{$set:{password:await require('../../Backend/node_modules/bcryptjs').hash('SyntheticQaOnly!2026',4)}});await h.page.locator('#email').fill('admin@example.invalid');await h.page.locator('#password').fill('SyntheticQaOnly!2026');await h.page.locator('button[type=submit]').click();await expect(h.page).toHaveURL(/\/app\/dashboard/);
+
 
  }
  expect(h.pageErrors).toEqual([]);

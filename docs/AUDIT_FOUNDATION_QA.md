@@ -1,5 +1,7 @@
 # Audit packages 1–5: integration and release checklist
 
+> Historical P1–5 record. Current P6–8 finding status and release blockers: `AUDIT_FINDING_STATUS.md` and `AUDIT_PRODUCTION_RELEASE_PLAN.md`.
+
 Package 5 resumes the preserved Package 4 HEAD c6a6551; it does not recreate packages 1–4. Recruitment and Dashboard source/design files are unchanged. New navigation separates management and four audit directions. Existing detail, execution, report, finding, review, closure, template and history routes remain available under authorization.
 
 ## Verification scope
@@ -50,3 +52,7 @@ Package 5 resumes the preserved Package 4 HEAD c6a6551; it does not recreate pac
 3. Provide durable private evidence storage before enabling production uploads.
 4. Confirm frontend/backend coordinated release and smoke-test read scopes first, then synthetic authorized workflows in a staging environment.
 5. Push/deploy remains outside this task. Retain local QA infrastructure until its disposition is approved.
+
+## Packages 6–8 continuation
+
+The baseline tests above describe Package 5. Updated disposition is in `AUDIT_FINDING_STATUS.md`; release/storage gates are in `AUDIT_PRODUCTION_RELEASE_PLAN.md`. Legacy analytics and mounted action routing, scoped pagination and real bounded PDF/DOCX extraction are now implemented and tested. A concrete durable provider, credentials, production transaction/index/validator evidence and approved legacy mapping are still absent. Production uploads remain disabled. No role-string management bypass was added.

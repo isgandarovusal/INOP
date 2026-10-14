@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
-  auditId: { type: mongoose.Schema.Types.ObjectId, ref: 'Audit', required: true },
+  auditId: { type: mongoose.Schema.Types.ObjectId, ref: 'Audit', required: true, immutable: true },
+  storageReference: {type:mongoose.Schema.Types.Mixed,immutable:true},
   storageKey: { type: String, required: true, immutable: true },
   name: { type: String, required: true, immutable: true },
   size: { type: Number, required: true, immutable: true },

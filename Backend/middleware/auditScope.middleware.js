@@ -225,10 +225,10 @@ exports.requireAuditParentAccess = (req, res, next) => exports.requireAuditAcces
   }
 });
 
-exports.getAuditChildScopeFilter = async (req) => {
+exports.getAuditChildScopeFilter = async (req, narrowedParentFilter) => {
   const filter = await exports.getAuditScopeFilter(req);
   if (filter === null) return null;
 
-  const audits = await Audit.find(filter).select("_id").lean();
+  const audits = await Audit.find(narrowedParentFilter ? {$and:[filter,narrowedParentFilter]} : filter).select("_id").lean();
   return { auditId: { $in: audits.map(audit => audit._id) } };
 };

@@ -2,7 +2,7 @@ const Audit = require("../models/audit.model");
 const AuditExecution = require("../models/auditExecution.model");
 // Execution totals are raw points; legacy score is read only when totalScore is absent.
 const executionScore = { $ifNull: ["$totalScore", "$score"] };
-const { getAuditScopeFilter, getAuditChildScopeFilter } = require("../middleware/auditScope.middleware");
+const { getAuditChildScopeFilter } = require("../middleware/auditScope.middleware");
 
 
 
@@ -10,9 +10,9 @@ exports.getAuditDashboard = async(req,res)=>{
 
 try{
 
-const auditFilter = await getAuditScopeFilter(req);
+const auditFilter = await require('./auditDirectionAnalytics.controller').filterFor(req);
 if (auditFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
-const executionFilter = await getAuditChildScopeFilter(req);
+const executionFilter = await getAuditChildScopeFilter(req,auditFilter);
 
 
 const [
@@ -138,6 +138,7 @@ averageScore:
 scoreStats[0]?.averageScore ?? 0,
 
 scoredExecutions: scoreStats[0]?.scoredExecutions || 0,
+scoreUnit: "raw-points",
 
 riskStats,
 
@@ -160,7 +161,7 @@ error
 );
 
 
-res.status(500).json({
+res.status(error.status||500).json({
 
 success:false,
 

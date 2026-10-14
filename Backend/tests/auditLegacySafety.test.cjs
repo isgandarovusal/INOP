@@ -2,9 +2,9 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {withAuditFixture}=require('./helpers/auditFixture.cjs');
 test('Legacy analytics honor canonical filters, units, unscored and latest windows',async()=>withAuditFixture(async h=>{
  const Restaurant=require('../models/restaurant.model');await Restaurant.create({id:'pizza',name:'Synthetic',organizationId:'gfc',brandId:'pizza-hut'});
- await h.audit('auditor','service',{overallPercentage:80,date:'2026-01-01'});await h.audit('auditor','service',{overallPercentage:0,date:'2026-02-01'});
+ const kfcAudit=await h.audit('auditor','service',{overallPercentage:80,date:'2026-01-01'});await h.audit('auditor','service',{overallPercentage:0,date:'2026-02-01'});
  await h.audit('auditor','service',{overallPercentage:null,assessmentStatus:'legacy-unscored',date:'2026-03-01'});
- await h.audit('admin','service',{restaurantId:'pizza',overallPercentage:100});await h.audit('admin','safety',{scorePercentage:50});
+ const pizzaAudit=await h.audit('admin','service',{restaurantId:'pizza',overallPercentage:100});await h.audit('admin','safety',{scorePercentage:50});
  const row=(await h.request('admin','GET','/audit-analytics/service?brandId=kfc')).data.data;
  assert.equal(row.total,3);assert.equal(row.scored,2);assert.equal(row.unscored,1);assert.equal(row.averageOverallPercentage,40);assert.equal(row.scoreUnit,'percent');assert.equal(row.averageServiceTimeSeconds,null);
  assert.deepEqual((await h.request('admin','GET','/audit-analytics/service?brandId=kfc&limit=2')).data.data.trend.map(r=>r.label),['2026-02-01','2026-03-01']);
@@ -17,6 +17,8 @@ test('Legacy analytics honor canonical filters, units, unscored and latest windo
   assert.equal((await h.request('anonymous','GET',`/audit-analytics/${path}`)).status,401);
  }
  assert.equal((await h.request('admin','GET','/audit-analytics/service?direction=standard')).status,400);
+ await h.models.Execution.create({auditId:kfcAudit._id,status:'completed',totalScore:10});await h.models.Execution.create({auditId:pizzaAudit._id,status:'completed',totalScore:20});const dashboard=(await h.request('admin','GET','/audit-dashboard?direction=service&brandId=kfc')).data.data;assert.equal(dashboard.averageScore,10);assert.equal(dashboard.scoredExecutions,1);assert.equal(dashboard.scoreUnit,'raw-points');assert.equal((await h.request('admin','GET','/audit-dashboard?brandId=gfc')).status,400);
+
  assert.equal((await h.request('admin','GET','/audit-analytics/service?brandId=kfc&restaurantId=pizza')).status,400);
  for(const value of ['limit=0','page=-1','limit=201','dateFrom=2026-02-30','direction[$ne]=hr'])assert.equal((await h.request('admin','GET','/audits?'+value)).status,400);
  assert.ok(Array.isArray((await h.request('admin','GET','/audits')).data));const page=(await h.request('admin','GET','/audits?format=page&page=2&limit=2')).data;assert.equal(page.total,5);assert.equal(page.items.length,2);
@@ -46,9 +48,13 @@ test('Source extraction uses real bytes, explicit permission, CAS and archived h
   assert.equal(source.filePath,undefined);assert.equal((await h.request('hr','POST',`/audit-source-documents/${source.id}/process`,{})).status,403);
   const results=await Promise.all([1,2].map(()=>h.request('admin','POST',`/audit-source-documents/${source.id}/process`,{})));assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);assert.match(results.find(r=>r.status===200).data.data.extractedData.text,/Synthetic Audit source only/);
   assert.equal((await h.request('admin','GET','/audit-source-documents?brandId=gfc')).status,400);
+  await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{$each:[{resource:'audit.source_document',action:'read',scope:'all'},{resource:'audit.source_document',action:'create',scope:'all'}]}}});await require('../models/auditorProfile.model').create({_id:h.actors.own._id,organizationId:'gfc',direction:'occupational-safety'});
+  const alias=await require('../models/auditSourceDocument.model').findById(source.id).lean();alias._id=new h.mongoose.Types.ObjectId();alias.id='synthetic-alias-source';alias.auditType='safety';alias.status='uploaded';alias.extractedData=null;await require('../models/auditSourceDocument.model').collection.insertOne(alias);
+  assert.equal((await h.request('own','POST',`/audit-source-documents/${alias._id}/process`,{})).status,200);assert.equal((await require('../models/auditSourceDocument.model').findById(alias._id)).auditType,'safety');
+
   assert.equal((await h.request('admin','DELETE',`/audit-source-documents/${source.id}`)).status,200);
   const stored=await require('../models/auditSourceDocument.model').findById(source.id);assert.ok(stored.archivedAt);
   assert.equal((await h.request('admin','GET',`/audit-source-documents/${source.id}/file`)).status,404);
-  assert.equal((await h.request('admin','GET','/audit-source-documents')).data.length,0);
+  assert.ok((await h.request('admin','GET','/audit-source-documents')).data.every(row=>row.id!==source.id));
  }finally{const record=await require('../models/auditSourceDocument.model').findById(source.id);if(record)await require('node:fs/promises').unlink(require('node:path').join(require('../middleware/privateUpload.middleware').uploadsDir,record.fileName));}
 }));

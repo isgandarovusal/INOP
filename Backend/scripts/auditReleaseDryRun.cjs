@@ -1,0 +1,3 @@
+const fs=require('node:fs');
+if(process.argv.length!==4||process.argv[2]!=='--snapshot'||/^[a-z]+:\/\//i.test(process.argv[3]||'')){process.stderr.write('Usage: node auditReleaseDryRun.cjs --snapshot LOCAL_JSON\n');process.exitCode=1;}
+else{try{const snapshot=JSON.parse(fs.readFileSync(process.argv[3],'utf8'));const report=require('../services/auditReleasePlan.service').analyze(snapshot);process.stdout.write(JSON.stringify(report,null,2)+'\n');if(report.issues.some(issue=>issue.status==='blocked'))process.exitCode=2;}catch{process.stderr.write('Invalid offline snapshot; no writes performed.\n');process.exitCode=1;}}
