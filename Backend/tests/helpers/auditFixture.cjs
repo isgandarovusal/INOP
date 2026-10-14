@@ -30,7 +30,9 @@ exports.withAuditFixture = async (callback, options = {}) => {
   if (!options.canonicalHR) membership.isHRMember = user => canonicalMembership(user) ||
     (owned && mongoose.connection.name === database && mongoose.connection.host === '127.0.0.1' && ['dep_A', 'dep_B', 'dep_HR'].includes(user?.departmentId));
   try {
-    await mongoose.connect(`mongodb://127.0.0.1:27017/${database}`);
+    const port = process.env.INOP_AUDIT_TEST_PORT || '27017';
+    if (!['27017', '27018'].includes(port)) throw Error('Only isolated local test ports are allowed');
+    await mongoose.connect(`mongodb://127.0.0.1:${port}/${database}?directConnection=true`);
     if (mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) throw Error('Unexpected database');
     const databases = await mongoose.connection.db.admin().listDatabases();
     if (databases.databases.some(d => d.name === database)) throw Error('Refusing an existing database');
@@ -52,6 +54,11 @@ exports.withAuditFixture = async (callback, options = {}) => {
       tokens[name] = jwt.sign({ id: String(actors[name]._id), role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     }
     await models.Audit.createIndexes();
+    // Synthetic auditor profile and canonical restaurant fixtures only in this owned DB.
+    const Profile = require('../../models/auditorProfile.model');
+    const Restaurant = require('../../models/restaurant.model');
+    await Profile.create({ _id: actors.auditor._id, organizationId: 'gfc', direction: 'service' });
+    for (const owner of Object.keys(actors)) await Restaurant.create({ id: `restaurant-${owner}`, name: `Synthetic ${owner}`, organizationId: 'gfc', brandId: 'kfc' });
     const app = express(); app.use(express.json());
     app.use((req, res, next) => {
       const started = performance.now(), send = res.send;

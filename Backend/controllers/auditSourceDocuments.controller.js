@@ -45,7 +45,7 @@ exports.getDocuments = async (req, res) => {
 
     const documents =
       await AuditSourceDocument
-        .find(filter)
+        .find({ $and: [filter, req.auditCatalogFilter || {}] })
         .sort({
           createdAt: -1,
         })

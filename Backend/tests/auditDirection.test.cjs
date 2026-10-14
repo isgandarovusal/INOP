@@ -1,0 +1,36 @@
+const test = require('node:test'), assert = require('node:assert/strict');
+const { withAuditFixture } = require('./helpers/auditFixture.cjs');
+const Profile = require('../models/auditorProfile.model');
+const { canonicalDirection } = require('../services/auditDirection.service');
+test('Only explicit aliases normalize; unknown legacy types remain unknown', () => {
+  assert.equal(canonicalDirection('safety'), 'occupational-safety');
+  assert.equal(canonicalDirection('Routine'), null); assert.equal(canonicalDirection('HR Manager'), null);
+});
+test('Auditor profile, isolated reads and serialized changes/assignments', async () => withAuditFixture(async h => {
+  const service = await h.audit('auditor', 'service');
+  const standard = await h.audit('auditor', 'standard');
+  const unknown = await h.audit('auditor', 'Routine');
+  const unlinked = await h.audit('auditor', 'service', { restaurantId: 'unverified' });
+  assert.equal((await h.request('auditor', 'GET', `/audits/${unknown.id}`)).status, 404);
+  assert.equal((await h.request('auditor', 'GET', `/audits/${unlinked.id}`)).status, 404);
+  assert.deepEqual((await h.request('auditor', 'GET', '/audits?direction=standard')).data, []);
+  await assert.rejects(Profile.create({ _id: h.actors.auditor._id, direction: 'hr', organizationId: 'gfc' }), { code: 11000 });
+  const create = await h.request('admin', 'PUT', `/auditor-profiles/${h.actors.auditor._id}`, { direction: 'service', reason: 'Synthetic test' });
+  assert.equal(create.status, 200);
+  assert.equal(create.data.data.history[0].actorId, String(h.actors.admin._id));
+  assert.equal((await h.request('auditor', 'GET', `/audits/${standard.id}`)).status, 404);
+  assert.equal((await h.request('auditor', 'GET', `/audit-report/${standard.id}`)).status, 403);
+  assert.equal((await h.request('auditor', 'GET', `/audits/${service.id}`)).status, 200);
+  const results = await Promise.all(Array.from({ length: 3 }, () => h.request('admin', 'POST', '/audit-assignments', { auditId: String(service._id), auditor: String(h.actors.auditor._id), assignedBy: String(h.actors.foreign._id) })));
+  assert.ok(results.every(r => [200,201].includes(r.status)));
+  assert.equal(await h.models.Assignment.countDocuments({ auditId: service._id, auditor: h.actors.auditor._id }), 1);
+  const record = await h.models.Assignment.findOne({ auditId: service._id });
+  assert.equal(String(record.assignedBy), String(h.actors.admin._id));
+  assert.equal((await h.request('admin', 'PUT', `/auditor-profiles/${h.actors.auditor._id}`, { direction: 'standard', reason: 'Must block active assignment' })).status, 409);
+  assert.equal((await h.request('admin', 'POST', '/audit-assignments', { auditId: String(standard._id), auditor: String(h.actors.auditor._id) })).status, 403);
+  await Profile.deleteOne({ _id: h.actors.auditor._id });
+  assert.equal((await h.request('auditor', 'GET', '/audits')).status, 403);
+  assert.equal((await h.request('auditor', 'GET', '/audit-dashboard')).status, 403);
+  assert.equal((await h.request('admin', 'PUT', `/auditor-profiles/${h.actors.foreign._id}`, { direction: 'unknown', reason: 'invalid' })).status, 400);
+  assert.equal((await h.request('own', 'PUT', `/auditor-profiles/${h.actors.foreign._id}`, { direction: 'hr', reason: 'Denied' })).status, 403);
+}));

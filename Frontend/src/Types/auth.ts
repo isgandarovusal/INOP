@@ -34,6 +34,7 @@ export interface User {
   createdAt: string;
   permissions: Permission[];
   hrAccess?: boolean;
+  auditDirection?: "hr" | "service" | "standard" | "occupational-safety" | null;
 }
 
 export type PublicUser = Omit<User, "password">;

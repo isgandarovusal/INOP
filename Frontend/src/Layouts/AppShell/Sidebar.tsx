@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Context/AuthContext";
 import {
   canAccessSection,
+  canAccessAuditDirection,
   hasPermission,
   ROLE_LABELS,
   type Section,
@@ -218,9 +219,15 @@ const Sidebar: React.FC = () => {
 
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) =>
-      item.resource ? hasPermission(user, item.resource, "read") : canAccessSection(user, item.section)
-    ),
+    items: group.items.filter((item) => {
+      if (item.section === 'audit') {
+        if (user.role === 'auditor' && !user.auditDirection) return false;
+        const direction = item.to.includes('/service') ? 'service' : item.to.includes('/standard') ? 'standard' : item.to.includes('/safety') ? 'occupational-safety' : null;
+        const resource = item.to.includes('analytics') ? 'audit.analytics' : item.to.includes('/restaurants') ? 'restaurant' : item.to.includes('/checklists') ? 'audit.template' : 'audit';
+        return direction ? canAccessAuditDirection(user, direction, resource) : hasPermission(user, resource, 'read');
+      }
+      return item.resource ? hasPermission(user, item.resource, "read") : canAccessSection(user, item.section);
+    }),
   })).filter((group) => group.items.length > 0);
 
 

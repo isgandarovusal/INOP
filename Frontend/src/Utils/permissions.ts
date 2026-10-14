@@ -134,3 +134,9 @@ export const ROLE_LABELS: Record<string, string> = {
 export function getRoleLabel(role: Role): string {
   return ROLE_LABELS[role] || role;
 }
+
+export function canAccessAuditDirection(user: PublicUser | null, direction: string, resource = 'audit'): boolean {
+  if (!hasPermission(user, resource, 'read')) return false;
+  if (user?.role === 'auditor' && !user.auditDirection) return false;
+  return !user?.auditDirection || user.auditDirection === direction;
+}

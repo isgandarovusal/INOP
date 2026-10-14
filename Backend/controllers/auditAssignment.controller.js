@@ -13,8 +13,9 @@ const {
 
 exports.assignAudit = async (req, res) => {
   try {
-    const assignment =
-      await AuditAssignment.create(req.body);
+    const result = await require('../services/auditorProfile.service').assignAudit({ auditId: req.auditScopeId, auditor: req.body.auditor, actorId: req.user.id });
+    const assignment = result.assignment;
+    if (!result.created) return res.status(200).json({ success: true, data: assignment });
 
     await createAuditActivity({
       auditId: assignment.auditId,
@@ -61,9 +62,9 @@ exports.assignAudit = async (req, res) => {
   } catch (e) {
     console.error(e);
 
-    res.status(500).json({
+    res.status(e.status || (e.code === 11000 ? 409 : 500)).json({
       success: false,
-      message: "Assignment creation error",
+      message: e.status ? e.message : "Assignment creation error",
     });
   }
 };

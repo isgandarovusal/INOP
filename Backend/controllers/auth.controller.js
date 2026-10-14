@@ -15,7 +15,7 @@ function getJwtSecret() {
   return secret;
 }
 
-function publicUser(user, permissions = []) {
+async function publicUser(user, permissions = []) {
   return {
     id: String(user._id),
     name: user.name,
@@ -26,6 +26,7 @@ function publicUser(user, permissions = []) {
     isActive: user.isActive,
     createdAt: user.createdAt,
     permissions,
+    auditDirection: (await require('../models/auditorProfile.model').findOne({ _id: user._id, active: true, organizationId: 'gfc' }).select('direction').lean())?.direction || null,
     hrAccess: require("../services/hrDepartmentAccess.service").isHRMember(user),
   };
 }
@@ -96,7 +97,7 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       message: "Login uğurludur.",
       token,
-      user: publicUser(user, permissions),
+      user: await publicUser(user, permissions),
     });
   } catch (error) {
     console.error("Auth login error:", error);
@@ -120,7 +121,7 @@ exports.me = async (req, res) => {
     const permissions = await getUserPermissions(user.role);
 
     return res.status(200).json({
-      user: publicUser(user, permissions),
+      user: await publicUser(user, permissions),
     });
   } catch (error) {
     console.error("Auth me error:", error);

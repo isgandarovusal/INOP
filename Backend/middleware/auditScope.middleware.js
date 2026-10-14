@@ -151,7 +151,7 @@ exports.getAssignedAuditFilter = async (req) => {
   };
 };
 
-exports.getAuditScopeFilter = async (req) => {
+const legacyScopeFilter = async (req) => {
   if (!req.user?.id) return null;
   switch (req.permission?.scope) {
     case "all": return {};
@@ -165,6 +165,19 @@ exports.getAuditScopeFilter = async (req) => {
     }
     default: return null;
   }
+};
+
+exports.getAuditScopeFilter = async req => {
+  const base = await legacyScopeFilter(req);
+  if (base === null) return null;
+  const Context = require('../models/auditContext.model');
+  const foreignContexts = await Context.find({ organizationId: { $ne: 'gfc' } }).select('_id').lean();
+  const parts = [base, { _id: { $nin: foreignContexts.map(item => item._id) } }];
+  if (req.auditorProfile) {
+    const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
+    parts.push({ restaurantId: { $in: restaurants.map(item => item.id) }, auditType: { $in: require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction) } });
+  }
+  return { $and: parts };
 };
 
 exports.requireAuditAccess = async (req, res, next) => {
@@ -215,7 +228,7 @@ exports.requireAuditParentAccess = (req, res, next) => exports.requireAuditAcces
 exports.getAuditChildScopeFilter = async (req) => {
   const filter = await exports.getAuditScopeFilter(req);
   if (filter === null) return null;
-  if (req.permission.scope === "all") return {};
+
   const audits = await Audit.find(filter).select("_id").lean();
   return { auditId: { $in: audits.map(audit => audit._id) } };
 };

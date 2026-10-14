@@ -4,6 +4,15 @@ const Snapshot = require('../models/auditDepartmentSnapshot.model');
 
 exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   if (!user?.id) throw new Error('Authenticated audit author is required');
+  const direction = require('./auditDirection.service').canonicalDirection(payload.auditType);
+  const restaurant = await require('../models/restaurant.model').findOne({ id: payload.restaurantId }).lean();
+  const linked = restaurant?.organizationId === 'gfc' && require('./auditCatalog.service').brandIds.includes(restaurant.brandId);
+  const profile = await require('../models/auditorProfile.model').findById(user.id).lean();
+  if (user.role === 'auditor' || profile) {
+    if (!profile?.active || !direction || direction !== profile.direction || !linked) throw Object.assign(new Error('Audit direction or organization denied.'), { status: 403 });
+  }
+  delete payload.organizationId;
+  delete payload.direction;
   // Public id remains unchanged; internal identity and provenance are server-owned.
   const auditId = new mongoose.Types.ObjectId();
   await Snapshot.create({
@@ -13,6 +22,17 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   });
   try {
     // Publish the audit only after its immutable authorization snapshot exists.
+    if (direction && linked) {
+      return await require('./auditTransaction.service').transaction(async session => {
+        if (profile) {
+          const current = await require('./auditorProfile.service').lockProfile(user.id, session);
+          if (current.direction !== direction) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
+        }
+        const [audit] = await Audit.create([{ ...payload, _id: auditId, auditorId: user.id }], { session });
+        await require('../models/auditContext.model').create([{ _id: auditId, organizationId: 'gfc', brandId: restaurant.brandId, direction, restaurantId: restaurant.id, actorId: user.id }], { session });
+        return audit;
+      });
+    }
     return await Audit.create({ ...payload, _id: auditId, auditorId: user.id });
   } catch (error) {
     try {

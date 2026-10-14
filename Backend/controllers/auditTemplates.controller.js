@@ -30,7 +30,7 @@ exports.getTemplates = async (req, res) => {
       filter.status = req.query.status;
     }
 
-    const templates = await AuditTemplate.find(filter)
+    const templates = await AuditTemplate.find({ $and: [filter, req.auditCatalogFilter || {}] })
       .sort({ updatedAt: -1 })
       .lean();
 

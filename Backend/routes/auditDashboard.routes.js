@@ -11,6 +11,7 @@ const { authorize } = require("../middleware/authorization.middleware");
 router.get(
   "/",
   ...authorize("dashboard", "read"),
+  require('../middleware/auditDirection.middleware').requireAuditDirection,
   getAuditDashboard
 );
 

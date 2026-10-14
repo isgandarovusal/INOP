@@ -21,6 +21,7 @@ exports.authorize = (resource, action) => {
         });
       }
 
+      if (resource === 'audit' || resource.startsWith('audit.') || resource.startsWith('occupational_safety') || resource === 'restaurant') return require('./auditDirection.middleware').requireAuditDirection(req, res, next);
       next();
     },
   ];

@@ -63,7 +63,10 @@ async function getAuditFilter(req, extra = {}) {
 
 async function getAudits(req, res) {
   try {
-    const filter = await getAuditFilter(req);
+    const direction = req.query.direction && require('../services/auditDirection.service').canonicalDirection(req.query.direction);
+    if (req.query.direction && !direction) return res.status(400).json({ message: 'Unknown audit direction.' });
+    const extra = direction ? { auditType: { $in: require('../services/auditDirection.service').aliasesFor(direction) } } : {};
+    const filter = await getAuditFilter(req, extra);
 
     if (filter === null) {
       return res.status(403).json({
@@ -146,6 +149,7 @@ async function createAudit(req, res) {
   } catch (error) {
     console.error("Failed to create audit:", error);
 
+    if (error.status) return res.status(error.status).json({ message: error.message });
     if (error.code === 11000) {
       return res.status(409).json({
         message: "Audit id already exists",
@@ -181,6 +185,10 @@ async function updateAudit(req, res) {
     }
 
     delete payload.auditorId;
+    delete payload.organizationId;
+    delete payload.direction;
+    delete payload.restaurantId;
+    delete payload.auditType;
 
     const audit = await Audit.findOneAndUpdate(
       filter,
