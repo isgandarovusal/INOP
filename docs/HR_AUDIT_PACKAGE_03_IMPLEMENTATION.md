@@ -43,7 +43,7 @@ Mövcud generic execution, template, lifecycle, finding, action, evidence, appro
 ## Əməliyyat sərhədi və açıq hissələr
 
 1. **KFC scoring BLOCKED:** 47-nin mənası və tətbiq olunan meyar dəsti üçün əlavə mənbə/təsdiq lazımdır. Hazırkı build KFC yekun balını sertifikatlaşdırmır.
-2. Production DB/migration/index, push/merge/deploy və Render/storage konfiqurasiyası yoxdur. QA yalnız task-a məxsus loopback replica set və təsadüfi owned DB-lərdədir.
+2. Production DB/migration/index, merge/deploy və Render/storage konfiqurasiyası yoxdur. Yekun QA mərhələsində yalnız iş branch-inə adi push və inop-main hədəfli PR istifadəçi tərəfindən icazəlidir. QA yalnız task-a məxsus loopback replica set və təsadüfi owned DB-lərdədir.
 3. Mövcud production storage, restore, topology, validator/index, ingress və dependency gate-ləri qüvvədədir. `xlsx`/DOCX dependency riskləri bu paketlə patch edilməyib. Native PDF font/Unicode məhdudiyyətlərinin aradan qaldırıldığı iddia edilmir.
 4. Analytics bir sorğuda maksimum 5000 audit/execution pəncərəsini qəbul edir; daha geniş sorğu saxta/truncated nəticə əvəzinə 422 və daha dar tarix filtri tələb edir. Bu, ölçülmüş production performans iddiası deyil.
 5. Source-bound template əl ilə dəyişdirildikdə avtomatik source binding yenilənmir. Növbəti source/policy versiyası ayrıca reviewed release olmalı, köhnə snapshot-lar saxlanmalıdır.
@@ -102,3 +102,8 @@ QA nəticələri: `HR_AUDIT_PACKAGE_03_QA.md`.
 - `docs/HR_AUDIT_PACKAGE_03_IMPLEMENTATION.md`
 - `docs/HR_AUDIT_PACKAGE_03_QA.md`
 - `docs/HR_AUDIT_PACKAGE_03_SOURCE_MAP.md`
+
+
+## Yekun QA əlavəsi
+
+`24230f3` üzərində tətbiq koduna yeni düzəliş tələb edən regression aşkarlanmadı. `Backend/tests/hrAuditWorkflow.test.cjs` all-N/A və qarışıq cavabları PH/SS üçün DB, parent/history, analitika, report və real Excel export səviyyəsində yoxlayan əlavə testlə genişləndirildi. Yekun yeni suite **10 PASS / 0 FAIL**. Geniş legacy suite hər iki checkout-da **519 PASS / 44 FAIL**; hər ad/səbəb/actual/expected müqayisəsi `docs/HR_AUDIT_PACKAGE_03_REGRESSION.md`-dədir. QA əlavəsinin dəyişən faylları: həmin test, üç Paket 03 sənədi və yeni regression hesabatı. Yeni runtime dəyişiklik yoxdur. KFC scoring mənbə blokeri qalır.

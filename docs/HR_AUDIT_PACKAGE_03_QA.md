@@ -7,9 +7,9 @@ Tarix: 15 oktyabr 2026. Node: 24.19.0. Baza: `1238cc8207a9cebdf21157a85ab5abfdc2
 | Yoxlama | Faktiki nəticə |
 |---|---|
 | Orijinal Excel mənbə uyğunluğu | PASS: 3 workbook, 4 worksheet, 172 meyar; source SHA, bütün sual mətnləri/xanaları/ardıcıllıq, guidance, KFC 9 düstur, PH ikinci worksheet 48 xana |
-| Yeni HR backend testləri | 6 PASS / 0 FAIL / 0 SKIP |
+| Yeni HR backend testləri | 7 PASS / 0 FAIL / 0 SKIP |
 | Yeni HR real-browser testləri | 3 PASS / 0 FAIL / 0 SKIP |
-| Yeni HR suite cəmi | 9 PASS / 0 FAIL / 0 SKIP: birlikdə 8 test və əlavə actual-auth permission browser testi |
+| Yeni HR suite cəmi | 10 PASS / 0 FAIL / 0 SKIP: eyni qaçışda 7 backend və 3 real-browser testi |
 | HR responsive matrisi | 3 brend × AZ/EN/RU × 1440/768/390/320 = 36 form yoxlaması; əlavə 8 list/analytics viewport yoxlaması; document overflow və 44px buttons assert olunur |
 | Blok 02 vizual regressiyası | 1 scenario PASS; 25 route × 4 viewport = 100 geometry/screenshot yoxlaması, pagination/locales/error-retry/lazy-panels və HR isolation |
 | Frontend production build | PASS: TypeScript + Vite |
@@ -20,7 +20,7 @@ Tarix: 15 oktyabr 2026. Node: 24.19.0. Baza: `1238cc8207a9cebdf21157a85ab5abfdc2
 | Eyni regression ilkin 1238cc8 bazasında | Eyni 519 PASS / 44 FAIL; 44 uğursuz test adı eynidir, yeni fərqli uğursuzluq yoxdur |
 | Recruitment, əsas Dashboard, HR CSS, role seed və dependency faylları | Bazaya nəzərən diff yoxdur |
 
-Geniş suite **tam PASS deyil**. Köhnə hard-delete/approval/safety contract uyğunsuzluqları bu paketə aid dəyişikliklərlə gizlədilməyib. İki qaçışın logları və failed-name comparison saxlanır. Bu müqayisə bütün repository testlərinin yoxlanması demək deyil.
+Geniş suite **tam PASS deyil**. Köhnə hard-delete/approval/safety contract uyğunsuzluqları bu paketə aid dəyişikliklərlə gizlədilməyib. İki təkrar qaçışın logları və assertion müqayisəsi saxlanır. Hər 44 nəticənin adı, səbəbi, baza/current actual/expected dəyərləri və Paket 03 ilə əlaqəsi [ayrıca regression hesabatındadır](HR_AUDIT_PACKAGE_03_REGRESSION.md). Bu müqayisə bütün repository testlərinin yoxlanması demək deyil.
 
 ## Backend coverage
 
@@ -79,4 +79,31 @@ Backend fixture yalnız `127.0.0.1:27018` task-a məxsus `inop-hr-audit-p03-qa` 
 - `/tmp/inop-hr-audit-p03-screens/`: HR formaları, list/analytics screenshot-ları və geometry JSON.
 - `/tmp/inop-p03-block02-regression/`: 100 route/viewport screenshot-u və nəticə JSON.
 
-**PARTIAL:** PH/SS source scoring və təsvir olunmuş HR funksiyaları implementasiya/QA olunub; KFC final scoring açıq mənbə blokeridir. Production readiness, real provider, production topology/restore və əvvəlki dependency/legacy test borcları bu lokal QA ilə PASS sayılmır. Production DB/migration, push, remote merge və deploy edilməyib. Orijinal workbook-lar və real şəxsi məlumatlar commit edilmir.
+**PARTIAL:** PH/SS source scoring və təsvir olunmuş HR funksiyaları implementasiya/QA olunub; KFC final scoring açıq mənbə blokeridir. Production readiness, real provider, production topology/restore və əvvəlki dependency/legacy test borcları bu lokal QA ilə PASS sayılmır. Production DB/migration, remote merge və deploy edilməyib. İş branch-inə adi push və `inop-main` hədəfli PR bu yekun QA mərhələsində istifadəçi tərəfindən icazəlidir; merge/release təsdiqi deyil. Orijinal workbook-lar və real şəxsi məlumatlar commit edilmir.
+
+
+## Yekun QA / GitHub hazırlığı — 15 oktyabr 2026
+
+- Başlanğıc branch `audit/package-03-hr`, commit `24230f35c1e3fffaf8c32288ebc570982dce87b7`, worktree təmiz. `git ls-remote` ilə remote baza `1238cc8207a9cebdf21157a85ab5abfdc2cd944b` təsdiqləndi; başlanğıcda remote iş branch-i yoxdur.
+- Yeni inteqrasiya testi hər PH/SS brendində ayrıca all-N/A və 0/0.5/1/N/A ssenarisini real serverə submit edir. Client-in saxta `score:1` göndərməsinə baxmayaraq N/A persisted score `null` qalır; denominator 0/3, earned 0/1.5, nəticə null/50 olur. Parent cavabları və immutable save history N/A-nı saxlayır; avtomatik finding sayı 0-dır. Analytics nonconformities 0/2, N/A meyarlarının average-i null-dır; report və Excel də eyni nəticəni göstərir.
+- Bu QA-da tətbiq kodunda yeni xəta aşkarlanmadı; dəyişiklik əlavə regression testi və sübut sənədləridir. Köhnə testləri yaşıl göstərmək üçün kontraktlar dəyişdirilmədi.
+- Source verifier orijinal 3 workbook-u yenidən oxudu: bütün 172 meyar, 4 worksheet, mətn, sıra, bölmə, guidance, düsturlar və SHA uyğunluğu PASS. Raw Excel repoya əlavə edilmir.
+- Yekun HR suite: `final-qa-hr.log` — 10 PASS, 0 FAIL, 0 SKIP. Build PASS; frontend lint 0 error / 9 əvvəlki warning; əlavə backend testinin syntax və ESLint yoxlaması PASS.
+- Yekun Blok 02 regressiyası: `final-qa-block02.log` — 1 scenario PASS, 100 route/viewport yoxlaması, 0 FAIL / 0 SKIP; artifaktlar `/tmp/inop-p03-block02-final-qa/`-dadır.
+- Təkrar legacy suite: `final-baseline-regression.log` / `final-current-regression.log`, eyni 563 test və eyni 42 assertion failure + 2 parent failure. Tam ad/səbəb cədvəli ayrıca regression hesabatındadır.
+
+### Funksional əhatə və limitlər
+
+| Sahə | Faktiki yoxlama | Status |
+|---|---|---|
+| Brend/restoran, template revision | real API create, mismatch denial, immutable source snapshot, köhnə custom template saxlanır | PASS |
+| Draft/resume/complete/notes | browser save/reload, server validation, stale və paralel draft conflict, sual/bölmə/final qeydləri | PASS |
+| Evidence | mövcud evidence record-u əlaqələndirilir, başqa parent evidence rədd edilir | PASS: lokal DB əlaqəsi |
+| Foto/sənəd real storage provider upload/download | xarici provider və production storage sınağı aparılmayıb | BLOCKED: provider inteqrasiyası |
+| Actions/approval/closure | real API, 320px action UI, independent verification/review, closure guards | PASS |
+| History | model API update rəddi, submitted cavab dəyişməzliyi, legacy nəticə saxlanır | PASS; raw DB admin müdaxiləsinə dair zəmanət deyil |
+| Analytics/export | stored source results, all-N/A və mixed, KFC null, real XLSX parse | PASS |
+| AZ/EN/RU və responsive | 36 form kombinasiyası + 8 list/analytics ekranı, 1440/768/390/320px | PASS: browser geometry; hər ekranın insan vizual review-u deyil |
+| Permission/isolation | actual auth, assigned HR parent, direction/revocation denial, foreign restaurant/evidence, scoped aggregates | PASS: lokal sintetik GFC təşkilatı |
+| Ayrı tenant-lərlə production identity/DB topology | ayrıca multi-tenant production mühiti sınaqdan keçirilməyib | BLOCKED; lokal parent/direction scope testi bunu əvəz etmir |
+| KFC final scoring | mənbədə 47 böləninin mənası təsdiqlənməyib; 8 bölmə/66 meyar, draft və workflow saxlanır | BLOCKED: final bal; forma/workflow PASS |

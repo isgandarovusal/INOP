@@ -86,3 +86,8 @@ Orijinal workbook-da düstur yoxdur.
 `python Backend/scripts/verifyHrAuditSources.py KFC.xlsx PH.xlsx SS.xlsx` hər üç faylın SHA-sını, worksheet siyahısını, bütün 172 sualın tam mətnini/xanasını/ardıcıllığını, qiymətləndirici təlimatlarını, KFC-nin 9 düsturunu və PH ikinci worksheet-in 48 dolu xanasını yoxlayır. Yalnız Python standart kitabxanasından istifadə edir; DB-yə qoşulmur, heç nə yazmır.
 
 Blank restoran/müdir/menecer/imza sahələri real şəxsi məlumat sayılaraq nümunə ilə doldurulmur. Restoran və tarix mövcud auditdən, qiymətləndirici/provenance server actor-dan gəlir; müdir/menecer adları və qeydlər istifadəçi tərəfindən daxil olunur. İmza təsviri yaradılmır; mövcud independent approval rəqəmsal imza iddiası deyil.
+
+
+## Yekun mənbə uyğunluğu yoxlaması
+
+15 oktyabr 2026-da orijinal attachment-lərlə verifier yenidən icra edildi: KFC 8/66, Pizza Hut 8/71 və ayrıca 48 xanadan ibarət müsahibə worksheet-i, Simit Sarayı 4/35 — PASS. Bütün sual/bölmə mətnləri, sıra, source cell, guidance, worksheet siyahısı, 9 KFC düsturu və workbook SHA-256 əvvəlki mənbəyə tam uyğundur. Suallar və scoring qaydaları bu QA-da dəyişdirilməyib. PH/SS yekun düsturu Excel-dən deyil, istifadəçinin ayrıca təsdiqindən gəlir. KFC E93-dəki 47 icra edilmir və 66 ilə əvəz edilmir. N/A saxlanma/analitika/export uyğunluğu əlavə real-server regression testi ilə təsdiqlənib; all-N/A yekun null, mixed 0/0.5/1/N/A yekun 50%-dir.

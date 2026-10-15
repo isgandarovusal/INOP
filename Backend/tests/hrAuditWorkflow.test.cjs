@@ -78,3 +78,38 @@ test('Simit Sarayı and KFC: safe template coexistence, concurrent drafts, evide
  assert.equal((await Template.findById(custom._id)).name,'Existing custom template');assert.equal((await h.models.Audit.findById(legacy._id)).overallPercentage,72);
  const stats=await h.request('admin','GET','/audit-hr/analytics');assert.equal(stats.status,200);assert.equal(stats.data.data.scored,1);assert.equal(stats.data.data.unscored,1);assert.equal(stats.data.data.average,100);
 }));
+
+test('HR N/A persists neutrally through submission, analytics, report, Excel and history',{timeout:90000},async()=>withAuditFixture(async h=>{
+ const Restaurant=require('../models/restaurant.model'),XLSX=require('xlsx');
+ for(const brand of ['pizza-hut','simit-sarayi']){
+  assert.equal((await h.request('admin','POST',`/audit-hr/templates/${brand}`,{})).status,201);
+  const restaurantId=`na-${brand}`;await Restaurant.create({id:restaurantId,name:'Synthetic N/A restaurant',organizationId:'gfc',brandId:brand});
+  for(const mixed of [false,true]){
+   const created=await h.request('admin','POST','/audit-hr/audits',{brandId:brand,restaurantId,date:'2026-10-15'});assert.equal(created.status,201);
+   const auditId=created.data.data._id;
+   const execution=await h.request('admin','POST','/audit-execution',{auditId});assert.equal(execution.status,201);
+   const answers=hr.contentFor(brand).sections.flatMap(s=>s.questions.map(q=>({questionId:q.id,answer:'na',score:1})));
+   if(mixed) ['0','0.5','1'].forEach((answer,i)=>{answers[i].answer=answer;});
+   const response=await h.request('admin','PUT',`/audit-execution/${execution.data.data._id}/submit`,{answers,expectedVersion:0,details:{}});
+   assert.equal(response.status,200,JSON.stringify(response.data));const saved=response.data.data;
+   assert.equal(saved.overallPercentage,mixed?50:null);assert.equal(saved.assessmentStatus,mixed?'scored':'unscored');
+   assert.equal(saved.hrAssessment.applicable,mixed?3:0);assert.equal(saved.hrAssessment.earned,mixed?1.5:0);
+   assert.equal(saved.hrAssessment.na,answers.length-(mixed?3:0));
+   assert.ok(saved.answers.filter(a=>a.answer==='na').every(a=>a.score===null));
+   const parent=await h.models.Audit.findById(auditId).lean();assert.equal(parent.overallPercentage,mixed?50:null);
+   assert.equal(parent.checks.filter(a=>a.answer==='na').length,answers.length-(mixed?3:0));
+   assert.equal(await h.models.Finding.countDocuments({auditId}),0);
+   const history=await h.request('admin','GET',`/audit-execution/${saved._id}/hr-history`);
+   assert.equal(history.status,200);assert.equal(history.data.data[0].answers.filter(a=>a.answer==='na').length,answers.length-(mixed?3:0));
+   const report=await h.request('admin','GET',`/audit-report/${auditId}`);assert.equal(report.status,200);assert.equal(report.data.data.score,mixed?50:null);
+   const exported=await h.request('admin','GET',`/audit-export/${auditId}/excel`);assert.equal(exported.status,200);
+   const workbook=XLSX.read(exported.buffer,{type:'buffer'});
+   const rows=XLSX.utils.sheet_to_json(workbook.Sheets['HR Criteria']);assert.equal(rows.filter(r=>r.Answer==='na').length,answers.length-(mixed?3:0));
+   const source=XLSX.utils.sheet_to_json(workbook.Sheets['HR Source'])[0];assert.equal(source.OverallPercentage,mixed?50:'');
+   const stats=await h.request('admin','GET',`/audit-hr/analytics?brandId=${brand}`);assert.equal(stats.status,200);const data=stats.data.data;
+   assert.equal(data.average,mixed?50:null);assert.equal(data.scored,mixed?1:0);assert.equal(data.unscored,1);
+   assert.equal(data.nonconformities,mixed?2:0);
+   assert.ok(data.criteria.filter(c=>!mixed||!answers.slice(0,3).some(a=>a.questionId===c.id)).every(c=>c.average===null&&c.nonconformities===0));
+  }
+ }
+}));
