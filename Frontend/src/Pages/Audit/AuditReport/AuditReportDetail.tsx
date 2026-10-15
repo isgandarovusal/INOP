@@ -134,8 +134,11 @@ export default function AuditReportDetail(){
     <p>
      {t("auditPresentation.score")}:
      {" "}
-     {report.score}
+     {report.score===null?'—':`${report.score}${report.hr?'%':''}`}
     </p>
+     {report.hr&&<><p>{t(report.hr.assessment.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p><p>{report.hr.details.observations}</p><p>{report.hr.details.finalOpinion}</p></>}
+     {report.hr&&<p>{t('hrAudit.nonconformities')}: {report.hr.nonconformities}</p>}
+     {report.hr?.assessment.sections.map(section=><p key={section.id}>{section.title}: {section.percentage===null?'—':`${section.percentage.toFixed(1)}%`}</p>)}
 
 
    </div>
@@ -144,7 +147,7 @@ export default function AuditReportDetail(){
 
 
 
-   <div className="audit-card">
+   {!report.hr&&<div className="audit-card">
 
     <h3>
      {t("auditPresentation.checklist")}
@@ -172,7 +175,7 @@ export default function AuditReportDetail(){
     </p>
 
 
-   </div>
+   </div>}
 
 
 
@@ -208,7 +211,7 @@ export default function AuditReportDetail(){
 
 
 
-   <button className="btn-secondary" type="button"
+   {report.type!=='hr'&&<button className="btn-secondary" type="button"
 
     onClick={()=>{
 
@@ -222,7 +225,7 @@ export default function AuditReportDetail(){
 
     {t("auditPresentation.recalculate")}
 
-   </button>
+   </button>}
 
 
 

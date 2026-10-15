@@ -66,6 +66,7 @@ router.use("/roles", rolesRoutes);
 
 // Audit Analytics API
 router.use('/audit-analytics', auditAnalyticsRoutes);
+router.use('/audit-hr', require('./hrAudit.routes'));
 router.use('/audit-actions', require('./auditAction.routes'));
 
 // Audit Module Routes

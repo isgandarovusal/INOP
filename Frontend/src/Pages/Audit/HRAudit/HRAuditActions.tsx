@@ -1,0 +1,29 @@
+import {useCallback,useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {SectionCard} from '../../../Components/HRSection';
+import AuditResourceState from '../../../Components/AuditResourceState';
+import {useAuditResource} from '../../../Hooks/useAuditResource';
+import {useAuth} from '../../../Context/useAuth';
+import {useAuditAction} from '../../../Hooks/useAuditAction';
+import {readJson} from '../../../api/readRequest';
+import api from '../../../api/axios';
+interface Action {_id:string;createdBy:string;title:string;responsible:string;dueDate?:string;status:string;findingId?:string;verificationNote?:string}
+const load=(id:string,signal?:AbortSignal,scopeKey?:string)=>readJson<{data:Action[]}>(`/audit-actions/audit/${id}?page=1&limit=200`,{signal,scopeKey,suppressErrorToast:true});
+const findings=(id:string,signal?:AbortSignal,scopeKey?:string)=>readJson<{data:{_id:string;title:string}[]}>(`/audit-findings/${id}`,{signal,scopeKey,suppressErrorToast:true});
+const graph:Record<string,string[]>={open:['in-progress','completed'],'in-progress':['completed'],completed:['verified','rejected'],rejected:['in-progress'],verified:[]};
+export default function HRAuditActions({auditId}:{auditId:string}){
+ const{t}=useTranslation();const{user}=useAuth();const[search,setSearch]=useState('');const[peoplePage,setPeoplePage]=useState(1);
+ const people=useCallback((id:string,signal?:AbortSignal,scopeKey?:string)=>readJson<{data:{id:string;name:string}[];hasMore:boolean}>(`/audit-hr/${id}/action-people?q=${encodeURIComponent(search)}&page=${peoplePage}&limit=50`,{signal,scopeKey,suppressErrorToast:true}),[search,peoplePage]);
+ const rows=useAuditResource(auditId,'audit.action',load,{refreshOnFocus:false});const finding=useAuditResource(auditId,'audit.finding',findings,{refreshOnFocus:false});const directory=useAuditResource(auditId,'audit.action',people,{refreshOnFocus:false});
+ const create=useAuditAction(auditId,'audit.action','create'),update=useAuditAction(auditId,'audit.action','update'),review=useAuditAction(auditId,'audit.approval','update');
+ const[form,setForm]=useState({title:'',description:'',responsible:'',dueDate:'',findingId:''});const[note,setNote]=useState('');
+ return <SectionCard className="audit-hr-page"><h2>{t('hrAudit.actions')}</h2><div className="audit-control-row"><label>{t('hrAudit.searchPeople')}<input value={search} maxLength={128} onChange={e=>{setSearch(e.target.value);setPeoplePage(1);}}/></label><button type="button" className="btn-secondary" disabled={peoplePage<=1} onClick={()=>setPeoplePage(p=>p-1)}>{t('auditFoundation.previous')}</button><button type="button" className="btn-secondary" disabled={!directory.data?.hasMore} onClick={()=>setPeoplePage(p=>p+1)}>{t('auditFoundation.next')}</button></div>{create.allowed&&<form onSubmit={e=>{e.preventDefault();void create.run(async signal=>{await api.post('/audit-actions',{auditId,...form,findingId:form.findingId||undefined,dueDate:form.dueDate||undefined},{signal,suppressErrorToast:true});},()=>{setForm({title:'',description:'',responsible:'',dueDate:'',findingId:''});rows.reload();});}}>
+  <div className="audit-filter-grid"><label>{t('auditFoundation.findingTitle')}<input required maxLength={500} value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))}/></label><label>{t('hrAudit.responsible')}<select required value={form.responsible} onChange={e=>setForm(p=>({...p,responsible:e.target.value}))}><option value="">{t('hrAudit.choose')}</option>{form.responsible&&!directory.data?.data.some(p=>p.id===form.responsible)&&<option value={form.responsible}>{form.responsible}</option>}{directory.data?.data.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label>{t('hrAudit.dueDate')}<input type="date" value={form.dueDate} onChange={e=>setForm(p=>({...p,dueDate:e.target.value}))}/></label><label>{t('hrAudit.findings')}<select value={form.findingId} onChange={e=>setForm(p=>({...p,findingId:e.target.value}))}><option value="">{t('hrAudit.optional')}</option>{finding.data?.data.map(f=><option key={f._id} value={f._id}>{f.title}</option>)}</select></label></div>
+  <label className="audit-hr-note">{t('hrAudit.description')}<textarea maxLength={4000} value={form.description} onChange={e=>setForm(p=>({...p,description:e.target.value}))}/></label><button className="btn-primary" disabled={create.busy||!form.responsible}>{t('hrAudit.addAction')}</button>
+ </form>}
+ {rows.status!=='ready'?<AuditResourceState status={rows.status} retry={rows.reload}/>:rows.data?.data.length?rows.data.data.map(a=><article className="audit-hr-question" key={a._id}><h3>{a.title}</h3><p>{t(`auditFoundation.statusLabels.${a.status}`,{defaultValue:a.status})} · {directory.data?.data.find(p=>p.id===a.responsible)?.name||a.responsible} · {a.dueDate?.slice(0,10)}</p>{a.verificationNote&&<p>{a.verificationNote}</p>}<div className="audit-control-row">{update.allowed&&(graph[a.status]||[]).filter(s=>!['verified','rejected'].includes(s)||(review.allowed&&a.createdBy!==user?.id&&a.responsible!==user?.id)).map(s=><button className="btn-secondary" key={s} disabled={update.busy} type="button" onClick={()=>void update.run(async signal=>{await api.put(`/audit-actions/${a._id}/status`,{status:s,verificationNote:note},{signal,suppressErrorToast:true});},rows.reload)}>{t(`auditFoundation.statusLabels.${s}`,{defaultValue:s})}</button>)}</div></article>):<p>{t('hrAudit.empty')}</p>}
+ {review.allowed&&<label className="audit-hr-note">{t('hrAudit.verificationNote')}<textarea maxLength={4000} value={note} onChange={e=>setNote(e.target.value)}/></label>}
+ {create.status!=='ready'&&create.status!=='loading'&&<AuditResourceState status={create.status}/>}{update.status!=='ready'&&update.status!=='loading'&&<AuditResourceState status={update.status}/>}
+ {directory.status!=='ready'&&<AuditResourceState status={directory.status} retry={directory.reload}/>}
+ </SectionCard>;
+}

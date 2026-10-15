@@ -179,6 +179,11 @@ exports.getAuditScopeFilter = async req => {
   const Context = require('../models/auditContext.model');
   const foreignContexts = await Context.find({ organizationId: { $ne: 'gfc' } }).select('_id').lean();
   const parts = [base, { archivedAt: null }, { _id: { $nin: foreignContexts.map(item => item._id) } }];
+  // HR auditors never gain other restaurants through an analytics/report all grant.
+  // Management accounts and the three other audit directions retain their scopes.
+  if(req.user?.role==='auditor'&&req.auditorProfile?.direction==='hr'){
+    parts.push(await exports.getAssignedAuditFilter({...req,permission:{scope:'assigned'}}));
+  }
   if (req.auditorProfile) {
     const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
     parts.push({ restaurantId: { $in: restaurants.map(item => item.id) }, auditType: { $in: require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction) } });

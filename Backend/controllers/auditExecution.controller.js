@@ -44,10 +44,11 @@ exports.createExecution = async (req, res) => {
       bound.templateRevisionId = revision._id; bound.templateSnapshot = revision.content;
     }
     const execution = await require('../services/auditTransaction.service').transaction(async session => {
-      await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
+      const parent=await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
+      if(parent.auditType==='hr'&&await require('../models/auditClosure.model').exists({auditId:parent._id}).session(session))throw Object.assign(new Error('Closed HR audit is immutable.'),{status:409});
       const existing = await Execution.findOne({ auditId:req.auditScopeId, templateRevisionId:bound.templateRevisionId || null }).session(session);
       if(existing)return existing;
-      const [created] = await Execution.create([{ ...bound, auditId:req.auditScopeId,createdBy:req.user.id,checklistId,answers:[],findings,correctiveActions,status:'draft',totalScore:null,riskLevel:'unscored' }],{session});return created;
+      const [created] = await Execution.create([{ ...bound, auditId:req.auditScopeId,createdBy:req.user.id,checklistId,answers:[],...(bound.templateSnapshot?.hrSource?{}:{findings,correctiveActions}),status:'draft',totalScore:null,riskLevel:'unscored' }],{session});return created;
     });
     return res.status(201).json({ success: true, data: execution });
   } catch (error) { return fail(res, error); }
@@ -57,12 +58,18 @@ exports.getExecution = async (req, res) => {
   try {
     const execution = await Execution.findOne({ _id: req.executionId, auditId: req.auditScopeId });
     if (!execution) return res.status(404).json({ success: false, message: 'Execution not found.' });
+    if(execution.templateSnapshot?.hrSource){
+      const author=await require('../models/user.model').findById(execution.createdBy).select('name').lean();
+      return res.json({success:true,data:{...execution.toObject(),createdByName:author?.name||''}});
+    }
     return res.json({ success: true, data: execution });
   } catch (error) { return fail(res, error); }
 };
 
 exports.submitExecution = async (req, res) => {
   try {
+    const current = await Execution.findOne({_id:req.executionId,auditId:req.auditScopeId}).select('templateSnapshot.hrSource').lean();
+    if(current?.templateSnapshot?.hrSource) return res.json({success:true,data:await require('../services/hrAuditExecution.service').save(req,true)});
     const { answers = [] } = req.body;
     if (!validAnswers(answers)) return res.status(400).json({ success: false, message: 'Invalid answers.' });
     const execution = await require('../services/auditTransaction.service').transaction(async session => {

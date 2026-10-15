@@ -9,6 +9,11 @@ export interface AuditExecutionAnswer {
 }
 
 export interface AuditExecution {
+  createdByName?: string;
+  hrVersion?: number;
+  hrDetails?: import('./hrAuditService').HRDetails;
+  hrAssessment?: {contract:string;complete:boolean;sections:{id:string;title:string;percentage:number|null}[]};
+  overallPercentage?: number|null;
   templateRevisionId?: string;
   templateSnapshot?: import('../Types/Audit').AuditTemplate;
   _id: string;

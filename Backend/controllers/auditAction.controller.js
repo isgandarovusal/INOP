@@ -8,6 +8,11 @@ async function writable(req,session){const audit=await lockAudit(req.auditScopeI
 exports.createAction=async(req,res)=>{try{
  const row=await transaction(async session=>{
   const audit=await writable(req,session),body=req.body;
+  if(audit.auditType==='hr'){
+   await require('../services/hrAuditPeople.service').requireResponsible(body.responsible,audit._id,session);
+   if(typeof body.description!=='undefined'&&(typeof body.description!=='string'||body.description.length>4000))throw auditError(400,'Invalid HR action description.');
+   if(body.dueDate&&(typeof body.dueDate!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(body.dueDate)||!Number.isFinite(new Date(body.dueDate).getTime())||new Date(body.dueDate).toISOString().slice(0,10)!==body.dueDate))throw auditError(400,'Invalid HR action due date.');
+  }
   if(typeof body.title!=='string'||!body.title.trim()||body.title.length>500)throw auditError(400,'Action title is required.');
   for(const[field,model]of[['findingId','auditFinding'],['executionId','auditExecution']])if(body[field]){
    if(!mongoose.isObjectIdOrHexString(body[field])||!await require('../models/'+model+'.model').exists({_id:body[field],auditId:audit._id}).session(session))throw auditError(400,'Action reference must belong to this audit.');

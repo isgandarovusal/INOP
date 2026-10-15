@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Paperclip, Pencil } from "lucide-react";
 import AuditExecutionTools from '../../../Components/AuditExecutionTools';
 import AuditEvidencePanel from '../../../Components/AuditEvidencePanel';
+import HRAuditActions from '../HRAudit/HRAuditActions';
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
@@ -166,6 +167,8 @@ const AuditDetail: React.FC = () => {
 
       <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
       <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
+      {audit.auditType==='hr'&&<HRAuditActions auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
+      {audit.auditType==='hr'&&audit.hrAssessment&&<section className="hr-section audit-hr-page"><h2>{t('hrAudit.conclusion')}</h2><p>{t(audit.hrAssessment?.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p>{audit.hrDetails?.observations&&<p>{audit.hrDetails.observations}</p>}{audit.hrDetails?.finalOpinion&&<p>{audit.hrDetails.finalOpinion}</p>}{audit.hrAssessment?.sections.map(s=><div key={s.id} className="detail-row"><strong>{s.title}</strong><span>{s.percentage===null?'—':`${s.percentage.toFixed(1)}%`}</span>{audit.hrDetails?.sectionNotes?.[s.id]&&<p>{audit.hrDetails.sectionNotes[s.id]}</p>}</div>)}</section>}
       <div className="detail-grid">
         <div>
           <div className="audit-modern-card">
@@ -272,7 +275,7 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
-            <Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>
+            {audit.auditType==='hr'&&audit.hrAssessment?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:'—'}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
           </div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
