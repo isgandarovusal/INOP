@@ -255,7 +255,7 @@ exports.exportExcel = async (req, res) => {
       Title: safeValue(finding.title),
       Description: safeValue(finding.description),
       Status: safeValue(finding.status),
-      Priority: safeValue(finding.priority),
+      Priority: safeValue(data.audit.auditType==='hr'?finding.severity:finding.priority),
       CreatedAt: safeValue(finding.createdAt)
     }));
 
@@ -277,7 +277,7 @@ exports.exportExcel = async (req, res) => {
         action.description
       ),
       Status: safeValue(action.status),
-      Deadline: safeValue(action.deadline),
+      Deadline: safeValue(data.audit.auditType==='hr'?action.dueDate:action.deadline),
       ResponsibleUser: safeValue(
         action.responsibleUser ||
         action.assignedTo ||
@@ -342,6 +342,16 @@ exports.exportExcel = async (req, res) => {
       ),
       "Closures"
     );
+
+    if(data.audit.auditType==='hr'&&data.audit.templateSnapshot?.hrSource){
+      const snapshot=data.audit.templateSnapshot,assessment=data.audit.hrAssessment,details=data.audit.hrDetails||{};
+      const answers=new Map((data.audit.checks||[]).map(a=>[a.questionId,a]));
+      const editorial=require('../config/hrAuditEditorial.json');
+      const rows=snapshot.sections.flatMap(section=>section.questions.map(q=>({Section:section.title,SectionAZ:editorial.entries[section.id]?.az||section.title,Criterion:q.label,CriterionAZ:editorial.entries[q.id]?.az||q.label,CriterionEN:editorial.entries[q.id]?.en||q.label,CriterionRU:editorial.entries[q.id]?.ru||q.label,GuidanceAZ:editorial.entries[q.id]?.guidance?.az||q.guidance||'',Guidance:q.guidance||'',SourceCell:q.sourceCell,Answer:answers.get(q.id)?.answer||'',Note:answers.get(q.id)?.comment||''})));
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(rows),'HR Criteria');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.map(s=>({Section:s.title,Percentage:assessment?.sections?.find(a=>a.id===s.id)?.percentage??'',Note:details.sectionNotes?.[s.id]||''}))),'HR Sections');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet([{Brand:snapshot.brandName,SourceSHA256:snapshot.hrSource.sha256,Contract:snapshot.hrSource.scoringStatus,EditorialVersion:data.audit.hrDetails?.editorialVersion||editorial.version,PhotoEvidenceId:details.finalEvidence?.photoId||'',DocumentEvidenceIds:(details.finalEvidence?.documentIds||[]).filter(Boolean).join(', '),OverallPercentage:data.audit.assessmentStatus==='scored'?data.audit.overallPercentage:'',Observations:details.observations||'',FinalOpinion:details.finalOpinion||''}]),'HR Source');
+    }
 
     const buffer = XLSX.write(
       workbook,

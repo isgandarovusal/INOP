@@ -818,6 +818,7 @@ function QuestionEditor({
           })
         }
       >
+        {question.answerType==='hr-score'&&<option value="hr-score">HR: 0 / 0.5 / 1 / N/A</option>}
         <option value="yes-no-na">{t("audit.checklist.builder.yesNoNa")}</option>
         <option value="severity">
           Compliant / Minor / Major / Critical

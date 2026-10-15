@@ -128,3 +128,25 @@
 .audit-workspace.audit-workspace .audit-builder-title-input { flex: 1 1 180px; width: auto; }
 .audit-workspace.audit-workspace .audit-builder-toggle { min-height: 44px; color: var(--hr-navy); }
 .audit-workspace.audit-workspace .audit-icon-danger { min-height: 44px; min-width: 44px; color: var(--hr-danger); }
+
+/* HR Audit presentation; Recruitment and other directions retain their rules. */
+.audit-workspace .audit-hr-page { color: var(--hr-ink); }
+.audit-hr-page .audit-management-links { margin-bottom: var(--space-5); }
+.audit-hr-page :is(h2,h3,legend) { color: var(--hr-navy); line-height: 1.4; overflow-wrap: anywhere; }
+.audit-hr-page h2 { font-size: 19px; margin: 0 0 var(--space-4); }
+.audit-hr-page :is(button,.btn-secondary,.btn-primary) { min-height: 44px; }
+.audit-hr-page :is(input,select,textarea) { max-width: 100%; min-width: 0; font: inherit; }
+.audit-hr-page textarea { display: block; width: 100%; min-height: 96px; margin-top: 8px; padding: 12px; border: 1px solid var(--hr-border); border-radius: var(--radius-md); background: var(--surface); color: var(--hr-ink); resize: vertical; box-sizing: border-box; }
+.audit-hr-page :is(button,a,input,select,textarea,summary):focus-visible { outline: 2px solid var(--hr-focus); outline-offset: 3px; }
+.audit-hr-page .audit-filter-grid { grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: var(--space-4); }
+.audit-hr-page .audit-table-scroll table { min-width: 520px; }
+.audit-hr-question { padding: var(--space-4) 0; border-bottom: 1px solid var(--hr-border); }
+.audit-hr-question h3 { font-size: 15px; margin: 0 0 12px; }
+.audit-hr-guidance { color: var(--hr-slate); font-size: 13px; line-height: 1.65; white-space: pre-wrap; }
+.audit-hr-note { display: block; margin: 12px 0; font-size: 13px; font-weight: 600; }
+.audit-hr-notice { padding: var(--space-4); border: 1px solid var(--hr-blue-border); border-radius: var(--radius-md); background: var(--hr-blue-soft); color: var(--hr-blue-ink); line-height: 1.65; }
+.audit-hr-page progress { width: 100%; height: 12px; accent-color: var(--hr-primary); }
+.audit-hr-page fieldset:disabled { opacity: 1; }
+.audit-hr-page :is(select,input,textarea):disabled { color: var(--hr-ink); opacity: 1; }
+.audit-hr-page .hr-dialog .modal-card { max-height: calc(100dvh - 32px); overflow-y: auto; }
+@media(max-width:600px) { .audit-hr-page .audit-filter-grid { grid-template-columns: 1fr; } .audit-hr-page .audit-control-row > button { flex: 1 1 140px; } .audit-hr-page .audit-foundation-kpis { grid-template-columns: 1fr 1fr; } .audit-hr-page .audit-foundation-kpis article { padding: 12px; } }

@@ -24,6 +24,9 @@ export interface AuditFile {
 }
 
 export interface Audit {
+  assessmentStatus?: string;
+  hrAssessment?: {contract:string;sections:{id:string;title:string;percentage:number|null}[]};
+  hrDetails?: import('../Services/hrAuditService').HRDetails;
   id: string;
   restaurantId: string;
   auditorId: string;

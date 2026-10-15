@@ -1,0 +1,2180 @@
+[
+  {
+    "brandId": "kfc",
+    "brandName": "KFC",
+    "version": "source-v1",
+    "sha256": "d9535bb74d6078b0f75fab9969b6f28ffc868218c4879ad4e0d66cf65b4b6aa8",
+    "worksheet": "HRTR Yeni",
+    "worksheets": [
+      "HRTR Yeni"
+    ],
+    "scoringStatus": "blocked-kfc-denominator",
+    "scoringIssues": [
+      "denominator-47-for-66-criteria"
+    ],
+    "formulas": [
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E85",
+        "formula": "=SUM(E9:E15)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E86",
+        "formula": "=SUM(E17:E24)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E87",
+        "formula": "=SUM(E26:E33)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E88",
+        "formula": "=SUM(E35:E48)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E89",
+        "formula": "=SUM(E50:E66)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E90",
+        "formula": "=SUM(E68:E70)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E91",
+        "formula": "=SUM(E72:E76)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E92",
+        "formula": "=SUM(E78:E81)"
+      },
+      {
+        "sheet": "HRTR Yeni",
+        "cell": "E93",
+        "formula": "=(SUM(E85:E92)/47)"
+      }
+    ],
+    "interviewGuide": [],
+    "sections": [
+      {
+        "id": "kfc-s7",
+        "title": "Customer Experience və Brand Protection ",
+        "order": 0,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r9",
+            "label": "İşçilər qonaqpərvərdir, sifarişlər düzgün yığılır, xidmət müddəti 5 dəqiqəni keçmir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C9",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r10",
+            "label": "İşçilərin xarici görünüşü standartlara uyğundur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C10",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r11",
+            "label": "Kassir yenilikləri və sifarişə əlavələri təklif edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C11",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r12",
+            "label": "Kassada çalışan hər bir işçi iş standartlarına əməl edir, kimyəvi vasitələrlə işləməyi bacarır və qida təhlükəsizliyi qaydalarına riayət edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C12",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r13",
+            "label": "İşçilər Qonaqların nədən şikayət etdiklərini bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C13",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r14",
+            "label": "Unlama stansiyasında çalışan hər bir işçi QT əsaslarını bilir, kimyəvi vasitələrlə işləmə qaydaları  bələddir və bütün məhsulların unlanma qaydasına əməl edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "C14",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r15",
+            "label": "Mətbəx stansiyasında çalışan hər bir işçi QT əsaslarını bilir, kimyəvi vasitələrlə işləmə qaydaları bələddir və sendviçlərin hazırlanma qaydalarına əməl edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "C15",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s16",
+        "title": "Seçim və qəbul",
+        "order": 1,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r17",
+            "label": "Restoranın cari period üçün FTR nəticəsi 90%-dən yüksəkdir.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C17",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r18",
+            "label": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C18",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r19",
+            "label": "Müsahibənin keçirilməsi üzrə yaddaş kitabı mövcuddur.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C19",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r20",
+            "label": "Briqada üzvləri cari vakansiyalardan xəbərdardır, işçilər işə qəbul namizədinin suallarına necə cavab verməli olduqlarını bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C20",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r21",
+            "label": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatan yerdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C21",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r22",
+            "label": "Reklam materialları keyfiyyətlidir, əmək haqqı ilə bağlı məlumatlar düzgündür",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "C22",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r23",
+            "label": "\"Dostunu gətir\" plakatı mövcuddur (işçilərin görməsi üçün asılmışdır və yaxşı vəziyyətdədir), işçilər proqram haqqında məlumatlandırılmışdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "C23",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r24",
+            "label": "Bütün şəxsi qovluqlar düzgün yığılır, məlumatlar düzgündür, şəkillər əlavə olunub.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "C24",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s25",
+        "title": "İşçilərin adaptasiyası",
+        "order": 2,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r26",
+            "label": "İşçiyə işə başladığı ilk gün təlimçi/instruktor təyin edilib.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C26",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r27",
+            "label": "İşçi son yenilikləri bilir.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C27",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r28",
+            "label": "İşçi bir modul üzrə sertifikasiyadan keçmişdir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C28",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r29",
+            "label": "İşçi neçə saat işlədiyini və müvafiq məlumatı haradan əldə etməli olduğunu bilir.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C29",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r30",
+            "label": "İşçi növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C30",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r31",
+            "label": "İşçi bütün karyera imkanlarını bilir ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "C31",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r32",
+            "label": "İşçi restoranın bütün motivasiya proqramlarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "C32",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r33",
+            "label": "İşçinin uniforması standartlara uyğundur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "C33",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s34",
+        "title": "Vizual məlumatlar ",
+        "order": 3,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r35",
+            "label": "Lövhələr və yaddaş kitabçası üçün nəzərdə tutulmuş ciblər təmizdir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C35",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r36",
+            "label": "Bütün işçilər üçün məlumatlar əlçatandır: ROCC nəticələri, GES, DP üzrə nəticələr, cari yarışlar, 4P üzrə məqsəd və nəticələr. İşçilər məlumatlandırılıb",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C36",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r37",
+            "label": "Menecerlər cari BSC nəticələrini və əsas göstəricilər üzrə tədbirlər planını bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C37",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r38",
+            "label": "Restoran komandası ilə ayda 1 dəfə iclas keçirilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C38",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r39",
+            "label": "Motivasiya proqramları üzrə plakat mövcuddur və işçilərin görə biləcəyi yerdədir, məlumatlar aktualdır, işçilər məlumatlıdır.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C39",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r40",
+            "label": "SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir. RGM və ƏM nömrələri qeyd olunub və işçilər məlumatlandırılıb",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "C40",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r41",
+            "label": "Restoranda EES sorğusunun nəticələri üzrə iclas keçirilib. Tədbirlər planı tərtib olunub və işçilərin görə biləcəyi yerdə asılıb",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "C41",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r42",
+            "label": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "C42",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r43",
+            "label": "Uniforma standartları üzrə məlumatlar işçilər üçün əlçatan yerdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "C43",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r44",
+            "label": "Restoranda işçilər ad günləri və şəxsi nailiyyətləri münasibətilə təbrik olunur.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 9,
+            "sourceCell": "C44",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r45",
+            "label": "\"Şirkət mədəniyyəti\" plakatı yaxşı vəziyyətdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 10,
+            "sourceCell": "C45",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r46",
+            "label": "Menecer ABR nə olduğunu bilir, işçilərin tanış olması üçün ABR kartları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 11,
+            "sourceCell": "C46",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r47",
+            "label": "\"Sənin karyera yolun\" plakatı mövcuddur, işçilərin görə biləcəkləri yerdədir, məlumatlar aktualdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 12,
+            "sourceCell": "C47",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r48",
+            "label": "\"Özün haqqında danış\" plakatı mövcuddur, işçilərin görə biləcəyi yerdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 13,
+            "sourceCell": "C48",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s49",
+        "title": "İşçilərin təlimi və inkişafı",
+        "order": 4,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r50",
+            "label": "İşçilərin müdir/modul təlimçisi tərəfindən hazırlanmış təlim planı vard",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C50",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r51",
+            "label": "PPR üzrə tədbirlər planı The Vault sistemində təyin olunmuş modullara uyğun gəlir ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C51",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r52",
+            "label": "The Vaultda əsas və  əlavə təlim  tamamlanıb",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C52",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r53",
+            "label": "Təlimlərin izlənmə blankı düzgün doldurulur (bütün vəzifələr üçün )",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C53",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r54",
+            "label": "Menecerlərin şəxsi qovluğunda DR blankı mövcuddur (RGM, ARGM, SM).",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C54",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r55",
+            "label": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə müddətləri və 4 mərhələli təlim prosesini bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "C55",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r56",
+            "label": "Restoranda müdir daxil olmaqla, ən az 2 modul təlimçisi vardır. Bir modul təlimçisi eyni vaxtda 2-dən çox işçiyə təlim keçə bilməz.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "C56",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r57",
+            "label": "Modul təlimçisi təlim standartlarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "C57",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r58",
+            "label": "Menecerlər fərdi planlarını və cari il üçün G&R-nı bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "C58",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r59",
+            "label": "Menecerlər üzərində çalışmalı olduqları səriştələrdən xəbərdardır və öz inkişaf planları haqqında danışa bilirlər (IDP) ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 9,
+            "sourceCell": "C59",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r60",
+            "label": "Kassa stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 10,
+            "sourceCell": "C60",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r61",
+            "label": "Mətbəx stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 11,
+            "sourceCell": "C61",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r62",
+            "label": "Unlama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 12,
+            "sourceCell": "C62",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r63",
+            "label": "Yeni qəbul olunmuş işçilərin Şirkətlə tanışlıq və Qida təhlükəsizliyi təlimində 30 gün ərzində iştirakı təmin olunur (təlimlərdə iştirak faizi nəzərə alınmaqla).",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 13,
+            "sourceCell": "C63",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r64",
+            "label": "Restoranda 1 ildən artıq çalışan işçilərin BÜ-dən ARGM-ə qədər illik resertifikasiyası keçirilir və müvafiq qeydiyyat aparılır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 14,
+            "sourceCell": "C64",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r65",
+            "label": "İşçilərin sertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 15,
+            "sourceCell": "C65",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r66",
+            "label": "Menecerlərin sertifikasiyadan və resertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 16,
+            "sourceCell": "C66",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s67",
+        "title": "Mədəniyyət, ünsiyyət və işçilərə qayğı",
+        "order": 5,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r68",
+            "label": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C68",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r69",
+            "label": "İşçilər əsas KFC faktlarından xəbərdardır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C69",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r70",
+            "label": "İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur normaldır, ütü və ütü masası vardır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C70",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s71",
+        "title": "Kadrların idarə olunması",
+        "order": 6,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r72",
+            "label": "Cari il üçün məzuniyyət qrafikinin mövcudluğu. Restoran müdiri işçilərin məzuniyyət günlərinin sayına nəzarət edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C72",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r73",
+            "label": "Cari kvartal üzrə işçi dövriyyəsi plana uyğundur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C73",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r74",
+            "label": "İş cədvəlində işçilərin cədvəllə tanış olmasını təsdiqləyən imzaları mövcuddur, işçilərin cədvəl üzrə istəkləri nəzərə alınır, iş cədvəli həftənin cümə axşamından gec olmayaraq asılır.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C74",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r75",
+            "label": "İşçilər çalışma saatlarına harada baxa biləcəklərini bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C75",
+            "guidance": ""
+          },
+          {
+            "id": "kfc-r76",
+            "label": "İş cədvəlinin hazırlanması Ə.M-Э  uyğun şəkildə həyata keçirilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "C76",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "kfc-s77",
+        "title": "Əlavə pozisiyalar",
+        "order": 7,
+        "active": true,
+        "questions": [
+          {
+            "id": "kfc-r78",
+            "label": "Xostes  həyata keçirdiyi təlimin standartlarını bilir. Xostes  sertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "C78",
+            "guidance": "Xostesdən soruşmaq : xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri. Təlim üzrə modul keçirilmişdir və qiymətləndirmə vərəqini yoxlamaq"
+          },
+          {
+            "id": "kfc-r79",
+            "label": "Klikun  həyata keçirdiyi təlimin standartlarını bilir. Klikun sertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "C79",
+            "guidance": "Klikundan soruşmaq: klikun öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdirvə qiymətləndirmə vərəqini yoxlamaq"
+          },
+          {
+            "id": "kfc-r80",
+            "label": "Skaut  həyata keçirdiyi təlimin standartlarını bilir. Skaut sertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "C80",
+            "guidance": "Skautdan soruşmaq : xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdir. The Vault sistemini və qiymətləndirmə vərəqini yoxlamaq"
+          },
+          {
+            "id": "kfc-r81",
+            "label": "Brend Şef həyata keçirdiyi təlimin standartlarını bilir. Brend Şef sertifikasiyadan keçmələri təmin olunmuşdur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "C81",
+            "guidance": "Brend Şefden soruşmaq: xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdir  və qiymətləndirmə vərəqini yoxlamaq"
+          }
+        ]
+      }
+    ],
+    "approval": "User confirmed HR-only 0/0.5/1/N/A, max 1 per applicable criterion, sum/max*100; KFC final calculation explicitly blocked."
+  },
+  {
+    "brandId": "pizza-hut",
+    "brandName": "Pizza Hut",
+    "version": "source-v1",
+    "sha256": "14dace01b68395de1e1c1e89253778b4182338c7f4a75360651acc0aa0d13c49",
+    "worksheet": "HRTR Yeni",
+    "worksheets": [
+      "HRTR Yeni",
+      "Лист1"
+    ],
+    "scoringStatus": "approved-user-contract-v1",
+    "scoringIssues": [],
+    "formulas": [],
+    "interviewGuide": [
+      {
+        "sheet": "Лист1",
+        "cells": [
+          {
+            "cell": "B3",
+            "text": "Вопросы  на Аудит "
+          },
+          {
+            "cell": "B4",
+            "text": "1) Член бригады"
+          },
+          {
+            "cell": "D4",
+            "text": "1) Пищевая без"
+          },
+          {
+            "cell": "D5",
+            "text": "Мытье рук"
+          },
+          {
+            "cell": "D6",
+            "text": "Дезинф когда пров"
+          },
+          {
+            "cell": "D7",
+            "text": "Ротация и темпер."
+          },
+          {
+            "cell": "D8",
+            "text": "Внешний вид"
+          },
+          {
+            "cell": "D9",
+            "text": "Причины закрытия "
+          },
+          {
+            "cell": "D10",
+            "text": "2) Продажи:"
+          },
+          {
+            "cell": "D11",
+            "text": "Цель на месяц и на день"
+          },
+          {
+            "cell": "D12",
+            "text": "Рейтинги"
+          },
+          {
+            "cell": "D13",
+            "text": "скорость"
+          },
+          {
+            "cell": "D14",
+            "text": "3)Мотивация"
+          },
+          {
+            "cell": "D15",
+            "text": "4)Карьерный рост"
+          },
+          {
+            "cell": "D16",
+            "text": "5)Laster"
+          },
+          {
+            "cell": "D17",
+            "text": "6)ACE"
+          },
+          {
+            "cell": "D18",
+            "text": "8)susma"
+          },
+          {
+            "cell": "B19",
+            "text": "2)Тренер"
+          },
+          {
+            "cell": "D19",
+            "text": "1)Пищ без"
+          },
+          {
+            "cell": "D20",
+            "text": "Л1 и Л3"
+          },
+          {
+            "cell": "D21",
+            "text": "Причины закрытия "
+          },
+          {
+            "cell": "D22",
+            "text": "Перекрест заряж."
+          },
+          {
+            "cell": "D23",
+            "text": "Дезинф когда пров"
+          },
+          {
+            "cell": "D24",
+            "text": "2)Продажи"
+          },
+          {
+            "cell": "D25",
+            "text": "3)Мотивация и карьерный рост"
+          },
+          {
+            "cell": "D26",
+            "text": "4) Тренерский  блок"
+          },
+          {
+            "cell": "D27",
+            "text": "5) ACE, разница между бренд и пищ"
+          },
+          {
+            "cell": "D28",
+            "text": "6)Последние изм"
+          },
+          {
+            "cell": "D29",
+            "text": "7)On - boarding"
+          },
+          {
+            "cell": "D30",
+            "text": "ƏM/YT"
+          },
+          {
+            "cell": "D31",
+            "text": "8) SUSMA"
+          },
+          {
+            "cell": "B32",
+            "text": "3)менеджер"
+          },
+          {
+            "cell": "D32",
+            "text": "1) Продажи"
+          },
+          {
+            "cell": "D33",
+            "text": "2) Л1 и Л3"
+          },
+          {
+            "cell": "D34",
+            "text": "Дезинфекция"
+          },
+          {
+            "cell": "D35",
+            "text": "Перекрест заряж  "
+          },
+          {
+            "cell": "D36",
+            "text": "Разницв между бренд и пищ"
+          },
+          {
+            "cell": "D37",
+            "text": "Бренд Л3"
+          },
+          {
+            "cell": "D38",
+            "text": "ККТ 6 "
+          },
+          {
+            "cell": "D39",
+            "text": "3) Рез-ты рест"
+          },
+          {
+            "cell": "D40",
+            "text": "COL İŞÇİ axını"
+          },
+          {
+            "cell": "D41",
+            "text": "Silinmə"
+          },
+          {
+            "cell": "D42",
+            "text": "bsc"
+          },
+          {
+            "cell": "D43",
+            "text": "ace"
+          },
+          {
+            "cell": "D44",
+            "text": "surət"
+          },
+          {
+            "cell": "D45",
+            "text": "4)KİV"
+          },
+          {
+            "cell": "D46",
+            "text": "on boarding"
+          },
+          {
+            "cell": "D47",
+            "text": "ƏM/YT"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "pizza-hut-s7",
+        "title": "Brand Protection",
+        "order": 0,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r8",
+            "label": "Xəmir hazırlanma qaydalarını əks etdirən yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B8",
+            "guidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r9",
+            "label": "Doğrama zona üçün yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B9",
+            "guidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r10",
+            "label": "Kassa zona üçün yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B10",
+            "guidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r11",
+            "label": "Pizza hazırlama stansiyası üçün yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B11",
+            "guidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r12",
+            "label": "Restoranda Ecolab üzrə yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B12",
+            "guidance": "İşçiləri müşahidə etmək və iş qaydalarına necə riayət etdiklərini yoxlamaq mətbəx stansiyası işçisinin öhdəlikləri, əl yuma qaydaları, kimyəvi vasitələrlə iş və s.)"
+          },
+          {
+            "id": "pizza-hut-r13",
+            "label": "Əməkdaşlar kimyəvi vasitələrlə iş qaydalarına riayət edilər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B13",
+            "guidance": "İşçiləri müşahidə etmək və iş qaydalarına necə riayət etdiklərini yoxlamaq mətbəx stansiyası işçisinin öhdəlikləri, əl yuma qaydaları, kimyəvi vasitələrlə iş və s.)"
+          },
+          {
+            "id": "pizza-hut-r14",
+            "label": "Restoran təmzidir, qonaqlar üçün nəzərdə tutulmuş sahələr səliqəlidir, istehzal zona təmizdir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B14",
+            "guidance": "Yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r15",
+            "label": "Hut bot \"5 Star\" üzrə ortalam qiymət 3-dən yuxarıdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "B15",
+            "guidance": "Sistemdə yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r16",
+            "label": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "B16",
+            "guidance": "İşçilər sosial şəbəkələr və KİV ilə davranış qaydalarını, necə reaksiya verməli olduqlarını bilirlər, restoranın hər kəsə açıq sosial şəbəkə hesabı yoxdur"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s17",
+        "title": "Seçim və qəbul",
+        "order": 1,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r18",
+            "label": "İşə qəbul zamanı bütün qəbul pillələrindən istifadə olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B18",
+            "guidance": " RGM/ARGM-dən işə qəbul pillələrini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r19",
+            "label": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B19",
+            "guidance": "Menecerdən iş şərtləri və əmək haqqı, həmçinin namizədə hansı sualları verməli olduğu (yaddaş kitabçası üzrə) haqda soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r20",
+            "label": "Əmək haqqı ilə bağlı məlumatlar düzgündür",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B20",
+            "guidance": "Bir neçə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r21",
+            "label": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatan yerdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B21",
+            "guidance": "Yoxlama,Restoranda kifayət qədər materialın olub-olmamasını və işə qəbul məlumatlarının Qonaqlara əlçatan olmasını qiymətləndirmək"
+          },
+          {
+            "id": "pizza-hut-r22",
+            "label": "Reklam materialları keyfiyyətlidir (Qovluqlar) ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B22",
+            "guidance": "Yoxlama,Restoranda kifayət qədər materialın olub-olmamasını və işə qəbul məlumatlarının Qonaqlara əlçatan olmasını qiymətləndirmək"
+          },
+          {
+            "id": "pizza-hut-r23",
+            "label": "On - boarding istifadə olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B23",
+            "guidance": "Təzə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r24",
+            "label": "\"Dostunu gətir\" plakatı mövcuddur (işçilərin görməsi üçün asılmışdır və yaxşı vəziyyətdədir), işçilər proqram haqqında məlumatlandırılmışdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B24",
+            "guidance": "Bir neçə işçidən soruşmaq və plakatın vəziyyətini yoxlamaq"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s25",
+        "title": "İşçilərin adaptasiyası",
+        "order": 2,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r26",
+            "label": "İşçiyə işə başladığı ilk gün Təlimçi  təyin edilib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B26",
+            "guidance": "İşçidən soruşmaq "
+          },
+          {
+            "id": "pizza-hut-r27",
+            "label": "Hər bir işçi ən azı 1 modül üzrə sertifikasiyadan keçib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B27",
+            "guidance": "Hut university sistemı yoxlamaq (OCL)"
+          },
+          {
+            "id": "pizza-hut-r28",
+            "label": "İşçi növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir, İşçi bütün karyera imkanlarını bilir ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B28",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r29",
+            "label": " \"Sənin karyera yolun\" plakatı mövcuddur, işçilərin görə biləcəkləri yerdədir, məlumatlar aktualdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B29",
+            "guidance": "Yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r30",
+            "label": "Əməkdaşlar (BÜ) son yeniləkləri bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B30",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r31",
+            "label": "İşçi neçə saat işlədiyini və müvafiq məlumatı hardan əldən etməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B31",
+            "guidance": " Yeni işçidən soruşmaq, onun problem yarandıqda kimə müraciət etməli olduğunu bildiyindən əmin olmaq. İşçi əmək haqqının hesablanmasına dair nümunə göstərə bilir, həftəlik iş cədvəlinə harada baxmalı olduğunu bilir"
+          },
+          {
+            "id": "pizza-hut-r32",
+            "label": "İşçi Qid Təhülkəsizliyi qaydaları bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B32",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r33",
+            "label": "İşçi ƏM/YT qayldalarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "B33",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r34",
+            "label": "İşçi satış üzrə məqsədləri bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "B34",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r35",
+            "label": "İşçi Hut university  sisteminin nə olduğunu və necə işləmək lazım olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 9,
+            "sourceCell": "B35",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r36",
+            "label": "İşçi ACE nə olduğunu bilir. L3 sapmaları bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 10,
+            "sourceCell": "B36",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r37",
+            "label": "İşçi restoranın bütün motivasiya proqramlarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 11,
+            "sourceCell": "B37",
+            "guidance": "Bir necə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r38",
+            "label": "İşçi uniforması standartlarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 12,
+            "sourceCell": "B38",
+            "guidance": "İşçidə yeni uniforma komplekti var"
+          },
+          {
+            "id": "pizza-hut-r39",
+            "label": "Geyim otağında uniforma standartları ilə bağlı yaddaş kitabçaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 13,
+            "sourceCell": "B39",
+            "guidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilir"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s40",
+        "title": "İşçilərin saxlanması",
+        "order": 3,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r41",
+            "label": " İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur yaxşıdır, ütü və ütü masası vardır İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur yaxşıdır, ütü və ütü masası vardır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B41",
+            "guidance": "Ərazini yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r42",
+            "label": "  Cari rüb üzrə işçi dövriyyəsi plana uyğundur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B42",
+            "guidance": "Menecerdən işçinin işdən çıxarılmasının əsas qaydalarını soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r43",
+            "label": "Cari il üçün məzuniyyət qrafikinin mövcuddur. Restoran müdiri işçilərin məzuniyyət günlənin sayına nəzarət edir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B43",
+            "guidance": "Yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r44",
+            "label": "Məlumatlar əlçatandır: Məlumat löhvəsində ACE nəticələri, Satış, Reytinq nəticə və məqsədləri qeyd edilib ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B44",
+            "guidance": "İşçilər cari yeniliklərdən, Qonaqların nədən şikayət etdiklərindən, DP yerinə yetirilib-yetirilməməsindən, ACE yoxlamasının nəticələri və əsas pozuntulardan xəbərdardır"
+          },
+          {
+            "id": "pizza-hut-r45",
+            "label": "Restoran komandası ilə ayda 1 dəfə iclas keçirilir. İclasın keçirilməsi üzrə protokol mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B45",
+            "guidance": "Bir neçə menecer və işçidən nəyin müzakirə olunduğunu və kimlərin etiraf edildiyini soruşmaq"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s46",
+        "title": "İşçilərin təlimi və inkişafı",
+        "order": 4,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r47",
+            "label": "Kadr ehtiyatının saxlanması üzrə restoranda iş aparılır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B47",
+            "guidance": "Növbədəki işçilərlə söhbət etmək. İşçi təlimdəki məlumatlardan xəbərdardır və qarşıdakı sertifikasiya tarixini bilir "
+          },
+          {
+            "id": "pizza-hut-r48",
+            "label": "PPR kadr ehtiyatı planı aylıq yenilənir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B48",
+            "guidance": "Aktual PPR mövcuddur, aylıq mütəmadi ƏM ilə görüşlər aparılır, işçilərin inkişaf planı mövcuddur, gələcək tədbirlərin müddətləri təyin olunmuşdur, restoran müdiri kadr ehtiyatı üzrə məqsədlərdən xəbərdardır"
+          },
+          {
+            "id": "pizza-hut-r49",
+            "label": "İdarə heyəti əməkdaşlarının (NM, ARGM, RGM) şəxsi qovluğu var, lazım olan sənədlər mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B49",
+            "guidance": "Menecer həyatının şəxsi qovluqlarını yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r50",
+            "label": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə müddətləri və 4 mərhələli təlim prosesini bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B50",
+            "guidance": "Bir neçə təlimçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r51",
+            "label": "Kassa stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B51",
+            "guidance": "Hut university sistemı yoxlamaq (OCL)"
+          },
+          {
+            "id": "pizza-hut-r52",
+            "label": "Xəmir stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B52",
+            "guidance": "Hut university sistemı yoxlamaq (OCL)"
+          },
+          {
+            "id": "pizza-hut-r53",
+            "label": "Pizza hazırlama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B53",
+            "guidance": "Hut university sistemı yoxlamaq (OCL)"
+          },
+          {
+            "id": "pizza-hut-r54",
+            "label": "Doğrama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "B54",
+            "guidance": "Hut university sistemı yoxlamaq (OCL)"
+          },
+          {
+            "id": "pizza-hut-r55",
+            "label": "Təlimçi restoran göstəricilərini bilir (Satış, ACE, L3, son yeniliklər)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "B55",
+            "guidance": "Təlimçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r56",
+            "label": "Təlimci son dəyişiklikləri bilir (təlim, aksiyalar, məqsəd)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 9,
+            "sourceCell": "B56",
+            "guidance": "Təlimçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r57",
+            "label": "Təlimçi Hut university proqramda işləyə bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 10,
+            "sourceCell": "B57",
+            "guidance": "Təlimçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r58",
+            "label": "BÜ şəxsi qovluqları var, lazım olan sənədlər mövcuddur ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 11,
+            "sourceCell": "B58",
+            "guidance": "BÜ şəxsi qovluqlarını soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r59",
+            "label": "Təlimçi şəxsi qovluqda təlimçi çek-listi var",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 12,
+            "sourceCell": "B59",
+            "guidance": "Təlimçi şəxsi qovluqunu yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r60",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) restoranın əsas satış üzrə məqsədləri və nəticiləri bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 13,
+            "sourceCell": "B60",
+            "guidance": "Növbə menecerdən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r61",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) BSC/GES/ACE nə olduğunu və nəticələri bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 14,
+            "sourceCell": "B61",
+            "guidance": "Növbə menecerdən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r62",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) Silinmə/işçi axını/COL nəticələrini bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 15,
+            "sourceCell": "B62",
+            "guidance": "Növbə menecerdən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r63",
+            "label": "Resurs açılır və istifadə olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 16,
+            "sourceCell": "B63",
+            "guidance": "Növbə menecerdən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r64",
+            "label": "Komandanın >90% \"Şirkətlə Tanışlıq\" seminarında iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 17,
+            "sourceCell": "B64",
+            "guidance": "Təlim izlənmə blankını yoxla"
+          },
+          {
+            "id": "pizza-hut-r65",
+            "label": "Komandanın >90% \"Qida Təhlükəsizliyi\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 18,
+            "sourceCell": "B65",
+            "guidance": "Təlim izlənmə blankını yoxla"
+          },
+          {
+            "id": "pizza-hut-r66",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM) \"ABR\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 19,
+            "sourceCell": "B66",
+            "guidance": "Təlim izlənmə blankını yoxla"
+          },
+          {
+            "id": "pizza-hut-r67",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) \"Əməyin Mühafizəsi\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 20,
+            "sourceCell": "B67",
+            "guidance": "Təlim izlənmə blankını yoxla"
+          },
+          {
+            "id": "pizza-hut-r68",
+            "label": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və (Təlim izlənmə blankı) aktualdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 21,
+            "sourceCell": "B68",
+            "guidance": "Təlim izlənmə blankını yoxla"
+          },
+          {
+            "id": "pizza-hut-r69",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) Hut University proqramda işləyə bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 22,
+            "sourceCell": "B69",
+            "guidance": "Növbə menecerdən soruşmaq"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s70",
+        "title": "Mədəniyyət, ünsiyyət və işçilərə qayğı",
+        "order": 5,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r71",
+            "label": " SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir.",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B71",
+            "guidance": "Bir neçə işçidən soruşmaq "
+          },
+          {
+            "id": "pizza-hut-r72",
+            "label": "Restoranda işçilər ad günləri və şəxsi nailiyyətlərinə görə təbrik olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B72",
+            "guidance": "Bir neçə işçidən məlumatlı olub-olmamalarını soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r73",
+            "label": "Əməkdaşlarla mütəmadi əks-əlaqə (və ya Tet-a-tet) söhbətləri aparılır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B73",
+            "guidance": "Bir neçə işçidən soruşmaq "
+          },
+          {
+            "id": "pizza-hut-r74",
+            "label": "İşdən çıxan əməkdaşlarla şifahi exit-müsahibə aparır və səbəbi bilir (NM, ARGM, RGM)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B74",
+            "guidance": "İdarə heyəti əməkdaşlarında soruş"
+          },
+          {
+            "id": "pizza-hut-r75",
+            "label": "Restoran EES nədir bilir, nəticələrindən xəbərdardır və fəaliyyət planı mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B75",
+            "guidance": "Bir neçə işçidən soruşmaq "
+          },
+          {
+            "id": "pizza-hut-r76",
+            "label": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B76",
+            "guidance": "Bir neçə işçidən kimlərin uğurlarını etiraf etdiklərini soruşun, onlardan etiraf kartlarını hardan götürmək mümkün olduğunu soruşun"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s77",
+        "title": "Kadrların idarə olunması",
+        "order": 6,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r78",
+            "label": " İş cədvəlində işçilərin cədvəllə tanış olmasını təsdiqləyən imzaları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B78",
+            "guidance": "İş cədvəli arxivinə baxmaq, Restoran müdirindən cədvəli necə yoxladığını və nəzarət etdiyini soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r79",
+            "label": "İşçilərin cədvəl üzrə istəkləri nəzərə alınır, iş cədvəli həftənin cümə axşamından gec olmayaraq asılır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B79",
+            "guidance": "Bir neçə işçidən soruşmaq"
+          },
+          {
+            "id": "pizza-hut-r80",
+            "label": "İş cədvələnin hazırlanması ƏM uyğun şəkildə həyata keçirilir. İşçilər iş saatlarına harada baxa biləcəklərini bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B80",
+            "guidance": "Bir neçə işçidən soruşmaq. İş cədvəli arxivinə baxma, Restoran müdirindən cədvəli necə yoxladığını və nəzarət etdiyini soruşma. İşçilərdən əmək haqqının necə hesablanması, hansı bonusların olması və problem yarandığı halda kimə müraciət etməli olduqlarını bilib-bilmədiklərini soruşmaq"
+          }
+        ]
+      },
+      {
+        "id": "pizza-hut-s81",
+        "title": "ƏM və YT + Tibbi müayinə",
+        "order": 7,
+        "active": true,
+        "questions": [
+          {
+            "id": "pizza-hut-r82",
+            "label": "Bütün yeni işçilər ilk iş günlərində əməyin mühafizəsi və təhlükəsizlik texnikası üzrə təlim keçmişdir və daha sonra mütəmadi olaraq kompleks təlim keçir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B82",
+            "guidance": "Jurnalları yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r83",
+            "label": " Fərdi Qorunma Vasitələri (FQV) yerli tələblərə və ya normativ-hüquqi aktlara uyğun olaraq mövcuddur və yaxşı vəziyyətdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B83",
+            "guidance": " FQV olmasını və keyfiyyətini, həmçinin işçilərin şəxsi işlərində FQV verilməsi blankının olmasını, FQV jurnalının düzgün doldurulmasını yoxlamaq"
+          },
+          {
+            "id": "pizza-hut-r84",
+            "label": "İşçilər təxliyyə qaydaları və toplanış məntəqəsinin harada olduğunu bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B84",
+            "guidance": "Bir neçə işçidən soruşmaq "
+          },
+          {
+            "id": "pizza-hut-r85",
+            "label": "\"Fövqəladə hallar\" plakatı işçilərin görəcəyi yerdə yerləşir, işçilər məlumatlıdır. ",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B85",
+            "guidance": "Bir neçə işçidən soruşmaq "
+          }
+        ]
+      }
+    ],
+    "approval": "User confirmed HR-only 0/0.5/1/N/A, max 1 per applicable criterion, sum/max*100; KFC final calculation explicitly blocked."
+  },
+  {
+    "brandId": "simit-sarayi",
+    "brandName": "Simit Sarayı",
+    "version": "source-v1",
+    "sha256": "f19580b2fa3d2a3ab0d6aae07987023d6fc3e054f2d1bf83cf90e6a5d3fdb37a",
+    "worksheet": "Sheet1",
+    "worksheets": [
+      "Sheet1"
+    ],
+    "scoringStatus": "approved-user-contract-v1",
+    "scoringIssues": [],
+    "formulas": [],
+    "interviewGuide": [],
+    "sections": [
+      {
+        "id": "simit-sarayi-s11",
+        "title": "İŞƏ QƏBUL VƏ ORİYENTASİYA",
+        "order": 0,
+        "active": true,
+        "questions": [
+          {
+            "id": "simit-sarayi-r12",
+            "label": "İşə qəbul zamanı bütün qəbul pillələrindən istifadə olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B12",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r13",
+            "label": "Menecer vakantlarla müsahibəni necə keçirməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B13",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r14",
+            "label": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatandır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B14",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r15",
+            "label": "Əməkdaşlar \"Dostunu gətir\" proqramı haqqında məlumatlandırılmışdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B15",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r16",
+            "label": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B16",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "simit-sarayi-s18",
+        "title": "TƏLİM VƏ İNKİŞAF",
+        "order": 1,
+        "active": true,
+        "questions": [
+          {
+            "id": "simit-sarayi-r19",
+            "label": "Yeni əməkdaş işə başladığı ilk gün Təlimçi/İnstruktor təyin edilib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B19",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r20",
+            "label": "Əməkdaşlar sertifikasiyadan keçmişdir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B20",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r21",
+            "label": "Əməkdaşlar resertifikasiyadan keçmişdir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B21",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r22",
+            "label": "Əməkdaşlar növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B22",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r23",
+            "label": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə 5 mərhələli təlim prosesini bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B23",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r24",
+            "label": "Əməkdaşlar əsas Simit Sarayı faktların bilirlər",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B24",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r25",
+            "label": "Əməkdaşlar bütün karyera imkanlarını bilir (Karyera yolu blankı var)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B25",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r26",
+            "label": "Əməkdaşlar \"Şirkətlə Tanışlıq\" seminarında iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "B26",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r27",
+            "label": "Əməkdaşlar \"Qida Təhlükəsizlik\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "B27",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r28",
+            "label": "Əməkdaşlar \"Satış\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 9,
+            "sourceCell": "B28",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r29",
+            "label": "Təlimçi \"Təlimçi\" seminarında iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 10,
+            "sourceCell": "B29",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r30",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Menecer\" seminarında iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 11,
+            "sourceCell": "B30",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r31",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Liderlik\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 12,
+            "sourceCell": "B31",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r32",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM) \"ABR\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 13,
+            "sourceCell": "B32",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r33",
+            "label": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Əməyin Mühafizəsi\" təlimində iştirak edib",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 14,
+            "sourceCell": "B33",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r34",
+            "label": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və (Təlim izlənmə blankı) aktualdır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 15,
+            "sourceCell": "B34",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "simit-sarayi-s36",
+        "title": "MOTİVASİYA VƏ SAXLANMA",
+        "order": 2,
+        "active": true,
+        "questions": [
+          {
+            "id": "simit-sarayi-r37",
+            "label": "Aylıq iclas keçirilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B37",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r38",
+            "label": "Əməkdaşlarla mütəmadi əks-əlaqə (və ya Tet-a-tet) söhbətləri aparılır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B38",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r39",
+            "label": "Əməkdaşlar restoranın bütün motivasiya proqramlarını bilir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B39",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r40",
+            "label": "Cari kvartal üzrə işçi dövriyyəsi plana uyğundur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B40",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r41",
+            "label": "İşdən çıxan əməkdaşlarla şifahi exit-müsahibə aparır və səbəbi bilir (NM, ARGM)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B41",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r42",
+            "label": "Restoranda əməkdaşların ad günləri və şəxsi nailiyyətlərinə görə təbrik olunur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 5,
+            "sourceCell": "B42",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r43",
+            "label": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 6,
+            "sourceCell": "B43",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r44",
+            "label": "Restoran EES nədir bilir, nəticələrindən xəbərdardır və fəaliyyət planı mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 7,
+            "sourceCell": "B44",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r45",
+            "label": "Elan lövhəsi/daxili kommunikasiya kanalı aktual məlumatla yenilənir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 8,
+            "sourceCell": "B45",
+            "guidance": ""
+          }
+        ]
+      },
+      {
+        "id": "simit-sarayi-s47",
+        "title": "SƏNƏDLƏŞDİRMƏ VƏ HÜQUQİ UYĞUNLUQ",
+        "order": 3,
+        "active": true,
+        "questions": [
+          {
+            "id": "simit-sarayi-r48",
+            "label": "Cari il üçün məzuniyyət qrafikinin mövcudluğu",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 0,
+            "sourceCell": "B48",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r49",
+            "label": "Şəxsi işlər qaydasındadır",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 1,
+            "sourceCell": "B49",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r50",
+            "label": "SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 2,
+            "sourceCell": "B50",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r51",
+            "label": "Daxili İntizam Qaydaları ilə əməkdaş tanış edilib və imza vərəqi mövcuddur",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 3,
+            "sourceCell": "B51",
+            "guidance": ""
+          },
+          {
+            "id": "simit-sarayi-r52",
+            "label": "İş qrafiki Əmək Məcəlləsinə uyğundur (həftəlik saat limiti, istirahət günləri)",
+            "answerType": "hr-score",
+            "required": true,
+            "active": true,
+            "order": 4,
+            "sourceCell": "B52",
+            "guidance": ""
+          }
+        ]
+      }
+    ],
+    "approval": "User confirmed HR-only 0/0.5/1/N/A, max 1 per applicable criterion, sum/max*100; KFC final calculation explicitly blocked."
+  }
+]

@@ -13,11 +13,14 @@ export type AuditQuestionAnswerType =
   | "yes-no-na"
   | "severity"
   | "score"
+  | "hr-score"
   | "text";
 
 export interface AuditTemplateQuestion {
   id: string;
   label: string;
+  guidance?: string;
+  sourceCell?: string;
   answerType: AuditQuestionAnswerType;
   required: boolean;
   active: boolean;
@@ -42,6 +45,7 @@ export interface AuditTemplateSection {
 }
 
 export interface AuditTemplate {
+  hrSource?: {sha256:string;version:string;scoringStatus:string};
   id: string;
   organizationId: string;
   brandId: string;

@@ -11,7 +11,12 @@ const restaurant = { id:'restaurant-qa', name:'Synthetic restaurant', organizati
 const audit = {id:'synthetic-audit',_id:'0123456789abcdef01234567',restaurantId:restaurant.id,auditType:'standard',date:'2026-10-15',status:'draft',auditorId:'synthetic',scores:null,photos:[],attachments:[]};
 function response(url) {
   const p=url.pathname;
-  if(p==='/api/audit-catalog')return{data:{organizations:[{id:'gfc',name:'GFC'}],brands:[{id:'kfc',name:'KFC',organizationId:'gfc'}]}};
+  if(p==='/api/audit-hr/list')return{items:[{...audit,auditType:'hr',assessmentStatus:'unscored',overallPercentage:null}],total:51,page:Number(url.searchParams.get('page')||1),limit:25};
+ if(['/api/audit-hr/options','/api/audit-hr/analytics-options','/api/audit-hr/restaurants'].includes(p))return{data:[restaurant]};
+ if(p==='/api/audit-hr/sources')return{data:[]};
+ if(p==='/api/audit-hr/analytics')return{data:{total:0,submitted:0,scored:0,unscored:0,average:null,nonconformities:0,brands:[],restaurants:[],sections:[],criteria:[],trend:[],actions:[],findings:[],generatedAt:'2026-10-15T00:00:00Z'}};
+ if(p==='/api/audit-catalog')return{data:{organizations:[{id:'gfc',name:'GFC'}],brands:[{id:'kfc',name:'KFC',organizationId:'gfc'}]}};
+  if(['/api/hr/brands','/api/hr/branches'].includes(p))return[];
   if(p==='/api/restaurants')return[restaurant];
   if(p==='/api/users')return{users:[]};
   if(p.startsWith('/api/audit-source-documents'))return[];
@@ -36,7 +41,7 @@ test('Audit UI: responsive routes, locales, pagination, states and HR isolation'
  let browser;
  try {
   await vite.listen();const origin=`http://127.0.0.1:${vite.httpServer.address().port}`;
-  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+  browser=await chromium.launch({...(process.env.INOP_BROWSER_EXECUTABLE?{executablePath:process.env.INOP_BROWSER_EXECUTABLE}:{}),headless:true,args:['--no-sandbox']});
   const page=await browser.newPage();page.setDefaultTimeout(10000);const errors=[];const results=[];
   page.on('pageerror',error=>errors.push(error.message));
 
@@ -64,10 +69,10 @@ test('Audit UI: responsive routes, locales, pagination, states and HR isolation'
   await page.goto(origin+'/app/audit/hr');await page.locator('.audit-table-scroll tbody tr').first().waitFor();
   await page.getByRole('button',{name:'Növbəti',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('nav.audit-control-row')?.textContent.includes('2 / 3'));
-  const labels={az:'HR Auditi',en:'HR Audit',ru:'HR аудит'};
-  for(const[lang,label]of Object.entries(labels)){await page.evaluate(lang=>window.localeTest(lang),lang);await page.getByRole('heading',{name:label,exact:true}).waitFor();}
-  failed=true;await page.goto(origin+'/app/audit/hr');await page.locator('[data-audit-state="server-error"]').waitFor();
-  failed=false;await page.locator('[data-audit-state] button').click();await page.locator('.audit-table-scroll tbody tr').first().waitFor();
+  const labels={az:'HR auditi',en:'HR Audit',ru:'HR-аудит'};
+  for(const[lang,label]of Object.entries(labels)){await page.evaluate(lang=>window.localeTest(lang),lang);await page.locator('.page-header').getByRole('heading',{name:label,exact:true}).waitFor();}
+  failed=true;await page.goto(origin+'/app/audit/hr');await page.locator('.audit-hr-page > [data-audit-state="server-error"]').waitFor();
+  failed=false;await page.locator('.audit-hr-page > [data-audit-state] button').click();await page.locator('.audit-table-scroll tbody tr').first().waitFor();
   await page.goto(origin+'/app/audit/audits/synthetic-audit');
   await page.locator('.audit-business-modules').waitFor();
   for(let count=0;count<8;count++){
@@ -86,7 +91,7 @@ test('Audit UI: responsive routes, locales, pagination, states and HR isolation'
    await page.waitForFunction(()=>!document.querySelector('[data-audit-state]'),null,{timeout:10000});
   }
   // Audit scope never recolors Recruitment controls after navigation.
-  await page.goto(origin+'/app/recruitment/jobs/new');await page.locator('#job-position').waitFor();
+  await page.goto(origin+'/app/recruitment/jobs/new');await page.locator('#job-position').waitFor({timeout:30000}).catch(async error=>{await page.screenshot({path:path.join(output,'recruitment-failure.png'),fullPage:true});console.error('Recruitment isolation diagnostic:',page.url(),JSON.stringify(errors),await page.locator('body').innerText());throw error;});
   assert.equal(await page.locator('.audit-workspace').count(),0);
   assert.deepEqual(errors,[]);
   await fs.writeFile(path.join(output,'results.json'),JSON.stringify({results,pageErrors:errors},null,2));

@@ -29,6 +29,7 @@ const AuditDashboard = lazy(() => import("../Pages/Audit/AuditDashboard/AuditDas
 const AuditNotificationsList = lazy(() => import("../Pages/Audit/AuditNotifications/AuditNotificationsList"));
 const AuditorProfilesPage = lazy(() => import("../Pages/Audit/AuditorProfilesPage"));
 const AuditDirectionPage = lazy(() => import("../Pages/Audit/AuditDirectionPage"));
+const HRAuditPage = lazy(() => import("../Pages/Audit/HRAudit/HRAuditPage"));
 const AuditHome = lazy(() => import("../Pages/Audit/AuditHome/AuditHome"));
 const AuditReportDetail = lazy(() => import("../Pages/Audit/AuditReport/AuditReportDetail"));
 const AuditExecutionPage = lazy(() => import("../Pages/Audit/AuditExecution/AuditExecutionPage"));
@@ -114,8 +115,8 @@ const ROUTES: RouteObject[] = [
               { path: "audit/safety/:id", element: <SafetyAuditDetail /> },
               { path: "audit/safety/analytics", element: <AuditDirectionPage direction="occupational-safety" analytics /> },
               { path: "audit/auditors", element: <AuditorProfilesPage /> },
-              { path: "audit/hr", element: <AuditDirectionPage direction="hr" /> },
-              { path: "audit/hr/analytics", element: <AuditDirectionPage direction="hr" analytics /> },
+              { path: "audit/hr", element: <HRAuditPage /> },
+              { path: "audit/hr/analytics", element: <HRAuditPage analytics /> },
               { path: "audit", element: <AuditHome /> },
               { path: "audit/dashboard", element: <AuditDashboard /> },
               { path: "audit/notifications", element: <AuditNotificationsList /> },

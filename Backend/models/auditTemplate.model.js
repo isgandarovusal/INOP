@@ -4,9 +4,11 @@ const AuditQuestionSchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
     label: { type: String, required: true },
+    guidance: String,
+    sourceCell: String,
     answerType: {
       type: String,
-      enum: ["yes-no-na", "severity", "score", "text"],
+      enum: ["yes-no-na", "severity", "score", "text", "hr-score"],
       default: "yes-no-na",
     },
     required: { type: Boolean, default: true },
@@ -87,6 +89,7 @@ const AuditTemplateSchema = new mongoose.Schema(
     },
 
     revisionCounter: { type: Number, default: 0 },
+    hrSource: mongoose.Schema.Types.Mixed,
     publishedRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
 
     visitCount: {

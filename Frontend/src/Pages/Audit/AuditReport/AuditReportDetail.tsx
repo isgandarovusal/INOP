@@ -1,3 +1,4 @@
+import {hrText} from '../HRAudit/hrAuditPresentation';
 import { useTranslation } from "react-i18next";
 import {
  useEffect,
@@ -22,7 +23,7 @@ import {
 
 
 export default function AuditReportDetail(){
- const {t}=useTranslation();
+ const {t,i18n}=useTranslation();
 
 
  const {
@@ -134,8 +135,11 @@ export default function AuditReportDetail(){
     <p>
      {t("auditPresentation.score")}:
      {" "}
-     {report.score}
+     {report.score===null?(report.hr?t('hrAudit.notAssessed'):'—'):`${report.score}${report.hr?'%':''}`}
     </p>
+     {report.hr&&<><p>{t(report.hr.assessment.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p><p>{report.hr.details.observations}</p><p>{report.hr.details.finalOpinion}</p></>}
+     {report.hr&&<p>{t('hrAudit.nonconformities')}: {report.hr.nonconformities}</p>}
+     {report.hr?.assessment.sections.map(section=><p key={section.id}>{hrText(section.id,section.title,i18n.language)}: {section.percentage===null?t('hrAudit.notAssessed'):`${section.percentage.toFixed(1)}%`}</p>)}
 
 
    </div>
@@ -144,7 +148,7 @@ export default function AuditReportDetail(){
 
 
 
-   <div className="audit-card">
+   {!report.hr&&<div className="audit-card">
 
     <h3>
      {t("auditPresentation.checklist")}
@@ -172,7 +176,7 @@ export default function AuditReportDetail(){
     </p>
 
 
-   </div>
+   </div>}
 
 
 
@@ -208,7 +212,7 @@ export default function AuditReportDetail(){
 
 
 
-   <button className="btn-secondary" type="button"
+   {report.type!=='hr'&&<button className="btn-secondary" type="button"
 
     onClick={()=>{
 
@@ -222,7 +226,7 @@ export default function AuditReportDetail(){
 
     {t("auditPresentation.recalculate")}
 
-   </button>
+   </button>}
 
 
 

@@ -11,6 +11,9 @@ const auditExecutionSchema = new mongoose.Schema(
 
 
  assessmentStatus: String,
+ hrVersion: {type:Number,default:0},
+ hrDetails: mongoose.Schema.Types.Mixed,
+ hrAssessment: mongoose.Schema.Types.Mixed,
  overallPercentage: Number,
  templateRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
  templateSnapshot: mongoose.Schema.Types.Mixed,

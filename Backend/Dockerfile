@@ -11,6 +11,7 @@ RUN --mount=type=secret,id=npm-network --mount=type=secret,id=npm-ca \
     const pkg=require("./package.json");for(const name of Object.keys(pkg.dependencies))if(!fs.existsSync("node_modules/"+name+"/package.json"))throw Error("Dependency installation incomplete");'
 # Copy runtime code only; seeds, tests, local files and uploads are not image data.
 COPY server.js swagger.js ./
+COPY config ./config
 COPY controllers ./controllers
 COPY middleware ./middleware
 COPY models ./models

@@ -50,6 +50,7 @@ exports.getAuditReport = async (req, res) => {
       [];
 
     const report = {
+      ...(fullAudit.auditType==='hr'&&fullAudit.hrAssessment?{hr:{details:fullAudit.hrDetails||{},assessment:fullAudit.hrAssessment,nonconformities:checks.filter(a=>['0','0.5'].includes(a.answer)).length}}:{}),
       id: fullAudit._id,
       auditId: fullAudit.id,
       type: fullAudit.auditType,

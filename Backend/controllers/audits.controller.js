@@ -184,7 +184,7 @@ async function updateAudit(req, res) {
       });
     }
 
-    for (const field of ['status','template','templateId','templateRevisionId','templateSnapshot','assessmentStatus','checks','results',...require('../services/auditAssessment.service').trustedFields]) delete payload[field];
+    for (const field of ['hrAssessment','hrDetails','hrVersion','status','template','templateId','templateRevisionId','templateSnapshot','assessmentStatus','checks','results',...require('../services/auditAssessment.service').trustedFields]) delete payload[field];
     if (['photos','attachments'].some(field => (payload[field] || []).length)) return res.status(400).json({ message: 'Use private evidence uploads.' });
     delete payload.auditorId;
     delete payload.organizationId;
