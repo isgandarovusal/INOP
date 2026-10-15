@@ -1,3 +1,4 @@
+import ServiceFollowUp from '../ServiceSource/ServiceFollowUp';
 import {hrText} from '../HRAudit/hrAuditPresentation';
 import React, {
   lazy,
@@ -168,7 +169,9 @@ const AuditDetail: React.FC = () => {
 
       <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
       <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
+      {audit.auditType==='service'&&audit.templateSnapshot?.serviceSource&&<ServiceFollowUp auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}
       {audit.auditType==='hr'&&<HRAuditActions auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
+      {audit.auditType==='service'&&audit.serviceAssessment&&<section className="hr-section audit-hr-page"><h2>{t('serviceAudit.conclusion')}</h2><p>{audit.serviceDetails?.observations}</p><p>{audit.serviceDetails?.finalOpinion}</p>{audit.serviceAssessment.sections.map(s=><div className="detail-row" key={s.id}><strong>{s.title}</strong><span>{s.percentage===null?t('serviceAudit.notAssessed'):`${s.percentage.toFixed(1)}%`}</span><p>{audit.serviceDetails?.sectionNotes?.[s.id]}</p></div>)}</section>}
       {audit.auditType==='hr'&&audit.hrAssessment&&<section className="hr-section audit-hr-page"><h2>{t('hrAudit.conclusion')}</h2><p>{t(audit.hrAssessment?.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p>{audit.hrDetails?.observations&&<p>{audit.hrDetails.observations}</p>}{audit.hrDetails?.finalOpinion&&<p>{audit.hrDetails.finalOpinion}</p>}{audit.hrAssessment?.sections.map(s=><div key={s.id} className="detail-row"><strong>{hrText(s.id,s.title,i18n.language)}</strong><span>{s.percentage===null?t('hrAudit.notAssessed'):`${s.percentage.toFixed(1)}%`}</span>{audit.hrDetails?.sectionNotes?.[s.id]&&<p>{audit.hrDetails.sectionNotes[s.id]}</p>}</div>)}</section>}
       <div className="detail-grid">
         <div>
@@ -276,7 +279,7 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
-            {audit.auditType==='hr'&&audit.hrAssessment?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
+            {(audit.auditType==='hr'&&audit.hrAssessment||audit.auditType==='service'&&audit.serviceAssessment)?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
           </div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>

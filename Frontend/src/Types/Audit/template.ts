@@ -13,12 +13,13 @@ export type AuditQuestionAnswerType =
   | "yes-no-na"
   | "severity"
   | "score"
-  | "hr-score"
+  | "hr-score" | "service-score"
   | "text";
 
 export interface AuditTemplateQuestion {
   id: string;
   label: string;
+  clarification?:string;
   guidance?: string;
   sourceCell?: string;
   answerType: AuditQuestionAnswerType;
@@ -45,6 +46,7 @@ export interface AuditTemplateSection {
 }
 
 export interface AuditTemplate {
+  serviceSource?: {sha256:string;version:string;scoringStatus:string};
   hrSource?: {sha256:string;version:string;scoringStatus:string};
   id: string;
   organizationId: string;

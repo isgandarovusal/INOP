@@ -184,6 +184,9 @@ exports.getAuditScopeFilter = async req => {
   if(req.user?.role==='auditor'&&req.auditorProfile?.direction==='hr'){
     parts.push(await exports.getAssignedAuditFilter({...req,permission:{scope:'assigned'}}));
   }
+  if(req.user?.role==='auditor'&&req.auditorProfile?.direction==='service'){
+    parts.push({$or:[{'templateSnapshot.serviceSource':{$exists:false}},await exports.getAssignedAuditFilter({...req,permission:{scope:'assigned'}})]});
+  }
   if (req.auditorProfile) {
     const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
     parts.push({ restaurantId: { $in: restaurants.map(item => item.id) }, auditType: { $in: require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction) } });

@@ -11,6 +11,9 @@ const auditExecutionSchema = new mongoose.Schema(
 
 
  assessmentStatus: String,
+ serviceVersion: {type:Number,default:0},
+ serviceDetails: mongoose.Schema.Types.Mixed,
+ serviceAssessment: mongoose.Schema.Types.Mixed,
  hrVersion: {type:Number,default:0},
  hrDetails: mongoose.Schema.Types.Mixed,
  hrAssessment: mongoose.Schema.Types.Mixed,

@@ -70,6 +70,7 @@ async function closeAudit(req) {
     if (!['completed','in-progress'].includes(audit.status)) throw auditError(409, 'Audit is not ready for closure.');
     const context = await require('../models/auditContext.model').findById(audit._id).session(session);
     if (!audit.templateRevisionId || String(context?.templateRevisionId) !== String(audit.templateRevisionId)) throw auditError(409, 'Legacy unversioned audit requires reviewed closure migration.');
+    if(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
     if(audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
     require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
     const [closure] = await Closure.create([{ auditId: audit._id, executionId: req.body.executionId, approvalStatus: 'approved', finalStatus: 'completed', closedBy: req.user.id, comment: req.body.comment }], { session });
@@ -87,6 +88,7 @@ async function transition(req) {
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Use a reviewed reopening operation for closed audits.');
     if (!(allowed[audit.status] || []).includes(next)) throw auditError(409, 'Invalid audit status transition.');
     if (next === 'completed') Object.assign(audit, require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true));
+    if(next==='completed'&&audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
     if(next==='completed'&&audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
     if(next==='completed'){const context=await require('../models/auditContext.model').findById(audit._id).session(session);if(!audit.templateRevisionId||String(context?.templateRevisionId)!==String(audit.templateRevisionId))throw auditError(409,'Unversioned audit cannot be certified complete.');}
     audit.status = next; await audit.save({ session }); await history(audit, req.user, 'status-' + next, session); return audit;
@@ -107,7 +109,12 @@ async function createFinding(req) {
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Closed audit is immutable.');
-    const [finding] = await Finding.create([{ auditId: audit._id, executionId: req.body.executionId, title: req.body.title, description: req.body.description, severity: req.body.severity, category: req.body.category, dueDate: req.body.dueDate }], { session });
+    if(audit.templateSnapshot?.serviceSource){
+      if(typeof req.body.title!=='string'||!req.body.title.trim()||req.body.title.length>500||req.body.description!==undefined&&(typeof req.body.description!=='string'||req.body.description.length>4000))throw auditError(400,'Invalid Service finding text.');
+      if(req.body.executionId&&(!require('mongoose').isObjectIdOrHexString(req.body.executionId)||!await require('../models/auditExecution.model').exists({_id:req.body.executionId,auditId:audit._id}).session(session)))throw auditError(400,'Finding execution must belong to this audit.');
+    }
+    const extra=audit.templateSnapshot?.serviceSource&&req.body.evidenceIds!==undefined?{evidenceIds:await require('./serviceAuditEvidence.service').validate(req.body.evidenceIds,audit._id,session)}:{};
+    const [finding] = await Finding.create([{...extra, auditId: audit._id, executionId: req.body.executionId, title: req.body.title, description: req.body.description, severity: req.body.severity, category: req.body.category, dueDate: req.body.dueDate }], { session });
     await history(audit, req.user, 'finding-created', session); return finding;
   });
 }

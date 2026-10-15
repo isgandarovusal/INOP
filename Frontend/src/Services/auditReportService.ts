@@ -4,6 +4,7 @@ export interface AuditReport {
   type: string;
   status: string;
   score: number|null;
+  service?:{details:import('./serviceAuditService').ServiceDetails;assessment:{sections?:{id:string;title:string;percentage:number|null}[]};nonconformities:number};
   hr?: {details:import('./hrAuditService').HRDetails;assessment:{contract:string;sections:{id:string;title:string;percentage:number|null}[]};nonconformities:number};
   summary: {
     totalChecks: number;

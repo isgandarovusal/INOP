@@ -419,3 +419,5 @@ router.delete(
 router.use("/audit-activity", auditActivityRoutes);
 
 module.exports = router;
+
+router.use('/audit-service',require('./serviceAudit.routes'));

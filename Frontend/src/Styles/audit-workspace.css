@@ -150,3 +150,7 @@
 .audit-hr-page :is(select,input,textarea):disabled { color: var(--hr-ink); opacity: 1; }
 .audit-hr-page .hr-dialog .modal-card { max-height: calc(100dvh - 32px); overflow-y: auto; }
 @media(max-width:600px) { .audit-hr-page .audit-filter-grid { grid-template-columns: 1fr; } .audit-hr-page .audit-control-row > button { flex: 1 1 140px; } .audit-hr-page .audit-foundation-kpis { grid-template-columns: 1fr 1fr; } .audit-hr-page .audit-foundation-kpis article { padding: 12px; } }
+
+.audit-workspace .service-section-notes{border-top:1px solid var(--hr-border,#e2e8f0);padding-top:1rem;display:grid;gap:1rem}.audit-workspace .service-photo{min-width:0}.audit-workspace .service-photo input{max-width:100%}@media(min-width:1024px){.audit-workspace .service-section-notes{grid-template-columns:1fr 1fr}}
+
+.audit-workspace .service-section-layout{display:grid;gap:1.25rem;min-width:0}.audit-workspace .service-section-layout>div{min-width:0}@media(min-width:1024px){.audit-workspace .service-section-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px);align-items:start}.audit-workspace .service-section-notes{grid-template-columns:1fr;position:sticky;top:1rem}}

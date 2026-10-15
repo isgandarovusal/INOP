@@ -64,6 +64,7 @@ const auditActionSchema = new mongoose.Schema(
  verifiedBy:String,
 
 
+ evidenceIds:{type:[mongoose.Schema.Types.ObjectId],default:undefined},
  verificationNote:String
 
 

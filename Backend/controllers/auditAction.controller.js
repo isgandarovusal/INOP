@@ -8,7 +8,7 @@ async function writable(req,session){const audit=await lockAudit(req.auditScopeI
 exports.createAction=async(req,res)=>{try{
  const row=await transaction(async session=>{
   const audit=await writable(req,session),body=req.body;
-  if(audit.auditType==='hr'){
+  if(audit.auditType==='hr'||audit.templateSnapshot?.serviceSource){
    await require('../services/hrAuditPeople.service').requireResponsible(body.responsible,audit._id,session);
    if(typeof body.description!=='undefined'&&(typeof body.description!=='string'||body.description.length>4000))throw auditError(400,'Invalid HR action description.');
    if(body.dueDate&&(typeof body.dueDate!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(body.dueDate)||!Number.isFinite(new Date(body.dueDate).getTime())||new Date(body.dueDate).toISOString().slice(0,10)!==body.dueDate))throw auditError(400,'Invalid HR action due date.');
@@ -17,7 +17,8 @@ exports.createAction=async(req,res)=>{try{
   for(const[field,model]of[['findingId','auditFinding'],['executionId','auditExecution']])if(body[field]){
    if(!mongoose.isObjectIdOrHexString(body[field])||!await require('../models/'+model+'.model').exists({_id:body[field],auditId:audit._id}).session(session))throw auditError(400,'Action reference must belong to this audit.');
   }
-  const [created]=await Action.create([{auditId:audit._id,createdBy:req.user.id,title:body.title.trim(),description:body.description,priority:body.priority,responsible:body.responsible,dueDate:body.dueDate,findingId:body.findingId,executionId:body.executionId,status:'open'}],{session});
+  const extra=audit.templateSnapshot?.serviceSource&&body.evidenceIds!==undefined?{evidenceIds:await require('../services/serviceAuditEvidence.service').validate(body.evidenceIds,audit._id,session)}:{};
+  const [created]=await Action.create([{...extra,auditId:audit._id,createdBy:req.user.id,title:body.title.trim(),description:body.description,priority:body.priority,responsible:body.responsible,dueDate:body.dueDate,findingId:body.findingId,executionId:body.executionId,status:'open'}],{session});
   await recordHistory(audit,req.user,'action-created',session);return created;
  });res.status(201).json({success:true,data:row});
 }catch(error){fail(res,error);}};
@@ -37,6 +38,7 @@ exports.updateActionStatus=async(req,res)=>{try{
    if(action.createdBy===req.user.id||action.responsible===req.user.id)throw auditError(403,'Self-verification is forbidden.');
    action.verifiedBy=req.user.id;action.verificationNote=req.body.verificationNote||'';
   }
+  if(audit.templateSnapshot?.serviceSource&&req.body.evidenceIds!==undefined)action.evidenceIds=await require('../services/serviceAuditEvidence.service').validate(req.body.evidenceIds,audit._id,session);
   if(next==='completed')action.completedAt=new Date();action.status=next;await action.save({session});await recordHistory(audit,req.user,'action-'+next,session);return action;
  });res.json({success:true,data:row});
 }catch(error){fail(res,error);}};

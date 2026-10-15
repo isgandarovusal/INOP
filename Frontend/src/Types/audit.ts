@@ -24,7 +24,10 @@ export interface AuditFile {
 }
 
 export interface Audit {
+  templateSnapshot?:{serviceSource?:{sha256:string;version:string;scoringStatus:string}};
   assessmentStatus?: string;
+  serviceDetails?:import('../Services/serviceAuditService').ServiceDetails;
+  serviceAssessment?:{contract:string;sections:{id:string;title:string;percentage:number|null}[]};
   hrAssessment?: {contract:string;sections:{id:string;title:string;percentage:number|null}[]};
   hrDetails?: import('../Services/hrAuditService').HRDetails;
   id: string;

@@ -1,6 +1,7 @@
 const { questions } = require('./auditTemplateRevision.service');
 const { auditError } = require('./auditTransaction.service');
 function assess(snapshot, answers, submitting = false) {
+  if(snapshot?.auditType==='service'&&snapshot.serviceSource)return require('./serviceAuditAssessment.service').assessService(snapshot,answers,submitting);
   if (snapshot?.auditType === 'hr' && snapshot.hrSource) return require('./hrAuditAssessment.service').assessHR(snapshot, answers, submitting);
   if (!snapshot) return { assessmentStatus: 'legacy-unscored', overallPercentage: null, passed: null };
   const items = questions(snapshot);
@@ -25,6 +26,7 @@ function assess(snapshot, answers, submitting = false) {
 }
 const trustedFields = ['scores','score','overallScore','overallPercentage','compliancePercentage','passed','foundCritical','foundMajor','foundMinor','foundTotal','totalScore','maxScore','scorePercentage','riskLevel','approvedAt','approvalStatus','archivedAt','archivedBy','auditWriteVersion','assessmentStatus'];
 function sanitizeNew(payload) {
+  delete payload.serviceAssessment;delete payload.serviceDetails;delete payload.serviceVersion;
   delete payload.hrAssessment; delete payload.hrDetails; delete payload.hrVersion;
   if (['approved','archived'].includes(payload.status)) throw auditError(400, 'Approval/archival is a protected operation.');
   for (const field of trustedFields) delete payload[field];

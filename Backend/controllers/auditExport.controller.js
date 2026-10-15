@@ -255,7 +255,8 @@ exports.exportExcel = async (req, res) => {
       Title: safeValue(finding.title),
       Description: safeValue(finding.description),
       Status: safeValue(finding.status),
-      Priority: safeValue(data.audit.auditType==='hr'?finding.severity:finding.priority),
+      Priority: safeValue((data.audit.auditType==='hr'||data.audit.templateSnapshot?.serviceSource)?finding.severity:finding.priority),
+      ...(data.audit.templateSnapshot?.serviceSource?{EvidenceIds:(finding.evidenceIds||[]).join(', ')}:{}),
       CreatedAt: safeValue(finding.createdAt)
     }));
 
@@ -277,12 +278,13 @@ exports.exportExcel = async (req, res) => {
         action.description
       ),
       Status: safeValue(action.status),
-      Deadline: safeValue(data.audit.auditType==='hr'?action.dueDate:action.deadline),
+      Deadline: safeValue((data.audit.auditType==='hr'||data.audit.templateSnapshot?.serviceSource)?action.dueDate:action.deadline),
       ResponsibleUser: safeValue(
         action.responsibleUser ||
         action.assignedTo ||
         action.responsible
       ),
+      ...(data.audit.templateSnapshot?.serviceSource?{Description:action.description||'',EvidenceIds:(action.evidenceIds||[]).join(', '),VerificationNote:action.verificationNote||'',VerifiedBy:action.verifiedBy||'',CompletedAt:action.completedAt||''}:{}),
       CreatedAt: safeValue(action.createdAt)
     }));
 
@@ -351,6 +353,15 @@ exports.exportExcel = async (req, res) => {
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(rows),'HR Criteria');
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.map(s=>({Section:s.title,Percentage:assessment?.sections?.find(a=>a.id===s.id)?.percentage??'',Note:details.sectionNotes?.[s.id]||''}))),'HR Sections');
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet([{Brand:snapshot.brandName,SourceSHA256:snapshot.hrSource.sha256,Contract:snapshot.hrSource.scoringStatus,EditorialVersion:data.audit.hrDetails?.editorialVersion||editorial.version,PhotoEvidenceId:details.finalEvidence?.photoId||'',DocumentEvidenceIds:(details.finalEvidence?.documentIds||[]).filter(Boolean).join(', '),OverallPercentage:data.audit.assessmentStatus==='scored'?data.audit.overallPercentage:'',Observations:details.observations||'',FinalOpinion:details.finalOpinion||''}]),'HR Source');
+    }
+
+    if(data.audit.auditType==='service'&&data.audit.templateSnapshot?.serviceSource){
+      const snapshot=data.audit.templateSnapshot,assessment=data.audit.serviceAssessment,details=data.audit.serviceDetails||{};
+      const answers=new Map((data.audit.checks||[]).map(a=>[a.questionId,a]));
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.flatMap(section=>section.questions.map(q=>({Section:section.title,Criterion:q.label,OriginalCriterion:q.sourceText||'',SourceCell:q.sourceCell,SourceNumber:q.sourceNumber||'',Answer:answers.get(q.id)?.answer||'',Score:answers.get(q.id)?.score??'',Note:answers.get(q.id)?.comment||'',EvidenceIds:(details.evidenceLinks||[]).filter(l=>l.questionId===q.id).map(l=>l.evidenceId).join(', ')})))),'Service Criteria');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.map(s=>({Section:s.title,Percentage:assessment?.sections?.find(a=>a.id===s.id)?.percentage??'',Note:details.sectionNotes?.[s.id]||'',PhotoEvidenceId:details.sectionPhotos?.[s.id]||''}))),'Service Sections');
+      if(snapshot.serviceReferences?.length)XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.serviceReferences.map(r=>({SourceCell:r.sourceCell,OriginalText:r.sourceText,Label:r.label,Note:details.referenceNotes?.[r.id]||'',Scored:false}))),'Service References');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet([{Brand:snapshot.brandName,Restaurant:data.audit.restaurantId,Revision:String(data.audit.templateRevisionId),SourceSHA256:snapshot.serviceSource.sha256,Contract:snapshot.serviceSource.scoringStatus,AuditDate:data.audit.date,Auditor:data.audit.auditorId,OverallPercentage:data.audit.assessmentStatus==='scored'?data.audit.overallPercentage:'',Observations:details.observations||'',FinalOpinion:details.finalOpinion||'',PhotoEvidenceId:details.finalEvidence?.photoId||'',DocumentEvidenceIds:(details.finalEvidence?.documentIds||[]).filter(Boolean).join(', '),SourceReferenceNotes:JSON.stringify(details.referenceNotes||{})}]),'Service Source');
     }
 
     const buffer = XLSX.write(

@@ -1,0 +1,16 @@
+import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {SectionCard} from '../../../Components/HRSection';
+import {useAuditAction} from '../../../Hooks/useAuditAction';
+import {useAuditResource} from '../../../Hooks/useAuditResource';
+import AuditResourceState from '../../../Components/AuditResourceState';
+import HRAuditActions from '../HRAudit/HRAuditActions';
+import {readJson} from '../../../api/readRequest';
+import api from '../../../api/axios';
+const files=(id:string,signal?:AbortSignal,scopeKey?:string)=>readJson<{data:{id:string;name:string}[]}>(`/audit-evidence/by-audit/${id}`,{signal,scopeKey,suppressErrorToast:true});
+const findings=(id:string,signal?:AbortSignal,scopeKey?:string)=>readJson<{data:{_id:string;title:string;description?:string;status:string}[]}>(`/audit-findings/${id}`,{signal,scopeKey,suppressErrorToast:true});
+export default function ServiceFollowUp({auditId}:{auditId:string}){
+ const{t}=useTranslation();const[fileId,setFileId]=useState('');const[title,setTitle]=useState('');const[description,setDescription]=useState('');
+ const evidence=useAuditResource(auditId,'audit',files),rows=useAuditResource(auditId,'audit.finding',findings);const create=useAuditAction(auditId,'audit.finding','create'),update=useAuditAction(auditId,'audit.finding','update');
+ return <><SectionCard className="service-follow-up"><h2>{t('serviceAudit.findings')}</h2><label>{t('serviceAudit.evidenceLink')}<select value={fileId} onChange={e=>setFileId(e.target.value)}><option value="">{t('serviceAudit.noEvidence')}</option>{evidence.data?.data.map(f=><option key={f.id} value={f.id}>{f.name}</option>)}</select></label>{create.allowed&&<form onSubmit={e=>{e.preventDefault();void create.run(signal=>api.post('/audit-findings',{auditId,title,description,evidenceIds:fileId?[fileId]:[]},{signal,suppressErrorToast:true}),()=>{setTitle('');setDescription('');rows.reload();});}}><label>{t('auditFoundation.findingTitle')}<input required maxLength={500} value={title} onChange={e=>setTitle(e.target.value)}/></label><label>{t('serviceAudit.questionNote')}<textarea maxLength={4000} value={description} onChange={e=>setDescription(e.target.value)}/></label><button className="btn-primary" disabled={create.busy}>{t('serviceAudit.addFinding')}</button></form>}{rows.data?.data.map(row=><article key={row._id}><h3>{row.title}</h3><p>{row.description}</p><p>{t(`auditFoundation.statusLabels.${row.status}`,{defaultValue:row.status})}</p>{update.allowed&&row.status!=='closed'&&<button className="btn-secondary" disabled={update.busy} onClick={()=>void update.run(signal=>api.patch(`/audit-findings/${row._id}/status`,{status:'closed'},{signal,suppressErrorToast:true}),rows.reload)}>{t('serviceAudit.closeFinding')}</button>}</article>)}{rows.status!=='ready'&&<AuditResourceState status={rows.status} retry={rows.reload}/>}{create.status!=='ready'&&create.status!=='loading'&&<AuditResourceState status={create.status}/>} {update.status!=='ready'&&update.status!=='loading'&&<AuditResourceState status={update.status}/>} {evidence.status!=='ready'&&<AuditResourceState status={evidence.status} retry={evidence.reload}/>}<p>{t('serviceAudit.actionProofHint')}</p></SectionCard><HRAuditActions auditId={auditId} directoryPath="/audit-service" proofEvidenceId={fileId}/></>;
+}

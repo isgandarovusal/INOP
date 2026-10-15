@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AuditResourceState from '../../../Components/AuditResourceState';
+import ServiceAuditExecution from '../ServiceSource/ServiceAuditExecution';
 import HRAuditExecution from '../HRAudit/HRAuditExecution';
 import { useAuditResource } from '../../../Hooks/useAuditResource';
 import { useAuditAction } from '../../../Hooks/useAuditAction';
@@ -51,6 +52,7 @@ export default function AuditExecutionPage() {
   const resource = useAuditResource(id, 'audit.execution', loadExecution, {refreshOnFocus:false});
   const key = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
   if (resource.status !== 'ready' || !resource.data) return <AuditResourceState status={resource.status} retry={resource.reload} />;
+  if(resource.data.templateSnapshot?.auditType==='service'&&resource.data.templateSnapshot.serviceSource)return <ServiceAuditExecution key={JSON.stringify([key,resource.data.serviceVersion])} execution={resource.data} reload={resource.reload}/>;
   if(resource.data.templateSnapshot?.auditType==='hr'&&resource.data.templateSnapshot.hrSource) return <HRAuditExecution key={JSON.stringify([key,resource.data.hrVersion])} execution={resource.data} reload={resource.reload}/>;
   return <ExecutionForm key={JSON.stringify([key, resource.data.updatedAt])} execution={resource.data} reload={resource.reload} />;
 }

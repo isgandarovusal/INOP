@@ -19,6 +19,7 @@ const auditFindingSchema = new mongoose.Schema(
   required:true
  },
 
+ evidenceIds:{type:[mongoose.Schema.Types.ObjectId],default:undefined},
  description:{
   type:String
  },

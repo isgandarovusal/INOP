@@ -11,6 +11,10 @@ const restaurant = { id:'restaurant-qa', name:'Synthetic restaurant', organizati
 const audit = {id:'synthetic-audit',_id:'0123456789abcdef01234567',restaurantId:restaurant.id,auditType:'standard',date:'2026-10-15',status:'draft',auditorId:'synthetic',scores:null,photos:[],attachments:[]};
 function response(url) {
   const p=url.pathname;
+  if(p==='/api/audit-service/list')return{items:[{...audit,auditType:'service',assessmentStatus:'unscored',overallPercentage:null}],total:1,page:1,limit:25};
+  if(['/api/audit-service/options','/api/audit-service/analytics-options','/api/audit-service/restaurants'].includes(p))return{data:[restaurant]};
+  if(p==='/api/audit-service/sources')return{data:[]};
+  if(p==='/api/audit-service/analytics')return{data:{total:0,submitted:0,scored:0,unscored:0,average:null,nonconformities:0,brands:[],restaurants:[],sections:[],criteria:[],trend:[],actions:[],findings:[],statuses:{}}};
   if(p==='/api/audit-hr/list')return{items:[{...audit,auditType:'hr',assessmentStatus:'unscored',overallPercentage:null}],total:51,page:Number(url.searchParams.get('page')||1),limit:25};
  if(['/api/audit-hr/options','/api/audit-hr/analytics-options','/api/audit-hr/restaurants'].includes(p))return{data:[restaurant]};
  if(p==='/api/audit-hr/sources')return{data:[]};
