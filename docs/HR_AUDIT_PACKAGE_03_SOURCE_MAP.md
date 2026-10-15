@@ -1,3 +1,5 @@
+> YEKUN TƏSDİQ — 15 oktyabr 2026: KFC scoring blokeri yeni `source-v2` kontraktı üçün aradan qaldırılıb. Aşağıdakı əvvəlki BLOCKED qeydləri yalnız tarixi `source-v1` və əvvəlki QA mərhələsinə aiddir. Production storage məhdudiyyəti qalır.
+
 # Paket 03 — HR Audit mənbə uyğunluğu
 
 Baza: `1238cc8207a9cebdf21157a85ab5abfdc2cd944b`. Orijinal Excel faylları, imza şəkilləri və şəxsi məlumatlar commit edilmir. Yalnız boş formalardakı meyarlar, təlimatlar və mənbə identifikatorları çıxarılıb.
@@ -103,3 +105,14 @@ Blank restoran/müdir/menecer/imza sahələri real şəxsi məlumat sayılaraq n
 
 
 Frontend build context-i üçün editorial JSON-un eyni nüsxəsi `Frontend/src/i18n/hrAuditEditorial.json`-da saxlanır; eynilik avtomatik testlə qorunur. Mənbə verifier + original-to-editorial mapping testi birlikdə original Excel → source config → təqdimat → sistem ID zəncirini yoxlayır.
+
+
+## Paket 03 bağlanışı — təsdiqlənmiş KFC kontraktı
+
+KFC üçün yalnız yeni `source-v2` şablonunda `approved-user-contract-v2` tətbiq edilir: qiymətləndirilmiş 0/0.5/1 cavablarının cəmi / N/A olmayan meyarların sayı × 100. N/A surətə və məxrəcə daxil deyil; bütün N/A null — “Qiymətləndirilmir”dir. 47 sabit böləni runtime hesablamasında istifadə olunmur. Orijinal Excel-in düsturu yalnız mənbə izini qoruyan metadata olaraq saxlanır; workbook və original source JSON dəyişdirilmir.
+
+Yeni KFC source binding açarı source hash ilə yanaşı `source-v2` versiyasını da daşıyır. Manager-in ayrıca provisioning əməliyyatı yeni template/revision yaradır; köhnə binding/template/revision və auditlər əvəz edilmir. Köhnə `source-v1` snapshot-ları əvvəlki blocked kontraktını saxlayır və avtomatik yenidən hesablanmır. Yeni versiya mövcud köhnə draft-a səssiz tətbiq olunmur.
+
+Backend per-answer score, section score, yekun nəticə, analitika və Excel eyni saxlanmış kontraktdan istifadə edir. Analitikada əvvəlki brand-wide KFC exclusion kontrakt üzrə exclusion ilə əvəz edilib; yalnız tarixi blocked KFC nəticələri unscored qalır. Digər audit istiqamətlərinin scoring məntiqi dəyişdirilməyib.
+
+Production storage yoxlaması: repository bootstrap-da production private/durable/versioned adapter qeydiyyatı yoxdur; bu managed mühitdə production storage credential və runtime konfiqurasiyası əlçatan deyil. Production konfiqurasiyasız upload 503 ilə rədd edilir (API və browser testləri). Lokal storage upload/download PASS production storage PASS demək deyil. Public production `/health` read-only sorğusu 20 saniyədə 0 bayt ilə timeout verdi (curl 28, HTTP 000); buna əsasən nə storage nasazlığı, nə də işləkliyi təsdiqlənə bilər. Real provider read/write, retention/restore və production identity yoxlaması aparılmayıb. Production DB, upload, migration və manual deploy edilməyib.

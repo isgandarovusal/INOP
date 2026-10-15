@@ -1786,7 +1786,7 @@
     "dateFrom": "Başlanğıc tarix",
     "dateTo": "Son tarix",
     "allStatuses": "Bütün statuslar",
-    "scoringNotice": "Pizza Hut və Simit Sarayı: 0 / 0.5 / 1 / N/A. N/A neytraldır. KFC-nin 47 böləni təsdiqlənməyib; yekun bal göstərilmir.",
+    "scoringNotice": "Bütün brendlər üçün 0 / 0.5 / 1 / N/A. N/A toplanan bala və mümkün maksimum bala daxil edilmir. KFC-nin yeni şablonunda 47 sabit böləni tətbiq olunmur; köhnə nəticələr dəyişmir.",
     "total": "Audit sayı",
     "submitted": "Tamamlanmış formalar",
     "scored": "Qiymətləndirilmiş",

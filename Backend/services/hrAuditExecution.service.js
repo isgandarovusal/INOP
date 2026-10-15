@@ -31,7 +31,7 @@ async function save(req,complete=false){
    const file=await require('../models/auditEvidence.model').findOne({_id:id,auditId:audit._id}).session(session).lean();
    if(!file||id===details.finalEvidence.photoId&&(typeof file.mimeType!=='string'||!file.mimeType.startsWith('image/')))throw auditError(400,'Final evidence must belong to this HR audit; a photo must be an image.');
   }
-  const answers=req.body.answers.map(a=>({questionId:a.questionId,answer:a.answer,comment:hr.text(a.comment),score:row.templateSnapshot.brandId!=='kfc'&&['0','0.5','1'].includes(a.answer)?Number(a.answer):null}));
+  const answers=req.body.answers.map(a=>({questionId:a.questionId,answer:a.answer,comment:hr.text(a.comment),score:row.templateSnapshot.hrSource.scoringStatus!=='blocked-kfc-denominator'&&['0','0.5','1'].includes(a.answer)?Number(a.answer):null}));
   const evidence=req.body.evidenceLinks||[];
   const questionIds=new Set(row.templateSnapshot.sections.flatMap(s=>s.questions.map(q=>q.id)));
   if(!Array.isArray(evidence)||evidence.length>200)throw auditError(400,'Invalid HR evidence links.');

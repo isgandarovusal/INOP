@@ -1762,7 +1762,7 @@
     "dateFrom": "From date",
     "dateTo": "To date",
     "allStatuses": "All statuses",
-    "scoringNotice": "Pizza Hut and Simit Sarayı: 0 / 0.5 / 1 / N/A. N/A is neutral. KFC’s divisor of 47 is unresolved; no final score is shown.",
+    "scoringNotice": "All brands use 0 / 0.5 / 1 / N/A. N/A is excluded from earned and maximum points. New KFC templates do not use divisor 47; historical results are unchanged.",
     "total": "Audits",
     "submitted": "Submitted forms",
     "scored": "Scored",

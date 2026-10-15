@@ -1,3 +1,5 @@
+> YEKUN TƏSDİQ — 15 oktyabr 2026: KFC scoring blokeri yeni `source-v2` kontraktı üçün aradan qaldırılıb. Aşağıdakı əvvəlki BLOCKED qeydləri yalnız tarixi `source-v1` və əvvəlki QA mərhələsinə aiddir. Production storage məhdudiyyəti qalır.
+
 # Paket 03 — lokal QA nəticələri
 
 Tarix: 15 oktyabr 2026. Node: 24.19.0. Baza: `1238cc8207a9cebdf21157a85ab5abfdc2cd944b`.
@@ -136,3 +138,23 @@ Blok 02 diaqnostikasında ikinci problem test fixture-ində idi: Recruitment `/h
 
 
 Yekun Blok 02 qaçışı: `editorial-block02-delivery.log` — **1 scenario PASS / 0 FAIL / 0 SKIP**, 100 route/viewport yoxlaması, locale/pagination/retry/lazy-panels və Recruitment-ə keçiddə Audit CSS scope-unun olmaması təsdiqlənib. Son artefaktlar `/tmp/inop-p03-block02-delivery/` qovluğundadır.
+
+
+## Paket 03 bağlanışı — təsdiqlənmiş KFC kontraktı
+
+KFC üçün yalnız yeni `source-v2` şablonunda `approved-user-contract-v2` tətbiq edilir: qiymətləndirilmiş 0/0.5/1 cavablarının cəmi / N/A olmayan meyarların sayı × 100. N/A surətə və məxrəcə daxil deyil; bütün N/A null — “Qiymətləndirilmir”dir. 47 sabit böləni runtime hesablamasında istifadə olunmur. Orijinal Excel-in düsturu yalnız mənbə izini qoruyan metadata olaraq saxlanır; workbook və original source JSON dəyişdirilmir.
+
+Yeni KFC source binding açarı source hash ilə yanaşı `source-v2` versiyasını da daşıyır. Manager-in ayrıca provisioning əməliyyatı yeni template/revision yaradır; köhnə binding/template/revision və auditlər əvəz edilmir. Köhnə `source-v1` snapshot-ları əvvəlki blocked kontraktını saxlayır və avtomatik yenidən hesablanmır. Yeni versiya mövcud köhnə draft-a səssiz tətbiq olunmur.
+
+Backend per-answer score, section score, yekun nəticə, analitika və Excel eyni saxlanmış kontraktdan istifadə edir. Analitikada əvvəlki brand-wide KFC exclusion kontrakt üzrə exclusion ilə əvəz edilib; yalnız tarixi blocked KFC nəticələri unscored qalır. Digər audit istiqamətlərinin scoring məntiqi dəyişdirilməyib.
+
+Production storage yoxlaması: repository bootstrap-da production private/durable/versioned adapter qeydiyyatı yoxdur; bu managed mühitdə production storage credential və runtime konfiqurasiyası əlçatan deyil. Production konfiqurasiyasız upload 503 ilə rədd edilir (API və browser testləri). Lokal storage upload/download PASS production storage PASS demək deyil. Public production `/health` read-only sorğusu 20 saniyədə 0 bayt ilə timeout verdi (curl 28, HTTP 000); buna əsasən nə storage nasazlığı, nə də işləkliyi təsdiqlənə bilər. Real provider read/write, retention/restore və production identity yoxlaması aparılmayıb. Production DB, upload, migration və manual deploy edilməyib.
+
+
+### Bağlanış QA nəticələri
+
+- `closure-hr-tests.log`: **18 PASS / 0 FAIL / 0 SKIP** — 15 HR testi və 3 mövcud storage/release testi. KFC current/v1 kontraktları, 0/0.5/1/N/A, all-N/A null, 62 applicable + 4 N/A = 100%, 0/0.5/1 + qalan N/A = 50%, server per-answer score, analitika/report/Excel uyğunluğu, role/evidence/history/permission və browser matrisi keçib.
+- Yeni KFC provision testi köhnə v1 template və revision sənədlərini tam JSON müqayisəsi ilə eyni saxlandığını, əvvəlki binding-in dəyişmədiyini və 72 kimi saxlanmış tarixi nəticənin qorunduğunu yoxlayır. V2 provisioning idempotentdir.
+- `closure-legacy-regression.log`: **519 PASS / 44 FAIL**; baza ilə eyni adlar və actual/expected. `HR_AUDIT_PACKAGE_03_REGRESSION.md` son logun SHA-256-sı ilə yenilənib. Yeni regression yoxdur; köhnə suite tam PASS deyil.
+- Frontend build PASS, lint 0 error / 9 əvvəlki warning; dəyişən backend JS/CJS ESLint PASS; original Excel verifier PASS. Son UI/scoring ilə 36 form locale/viewport və əlavə 8 list/analytics yoxlaması keçib.
+- KFC scoring üzrə BLOCKED aradan qaldırılıb; production storage/provider əlçatanlığı təsdiqlənməyib və production fayl əməliyyatı edilməyib. PR #1 vasitəsilə merge və yalnız merge commit-i main-də təsdiqləndikdən sonra branch silinməsi istifadəçi tərəfindən açıq icazəlidir. Manual deploy və production DB write yoxdur.

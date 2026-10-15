@@ -39,7 +39,7 @@ export default function HRAuditExecution({execution,reload}:{execution:AuditExec
  const answered=answers.filter(a=>a.answer).length;
  return <div className="audit-direction-page audit-hr-page">
   <PageHeader title={`${t('hrAudit.title')} — ${snapshot.brandName}`} subtitle={t('hrAudit.sourceOriginal')} actions={<Link className="btn-secondary" to={`/app/audit/audits/${execution.auditId}`}>{t('hrAudit.workflow')}</Link>}/>
-  <p className="audit-hr-notice" role="note">{t(snapshot.brandId==='kfc'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p>
+  <p className="audit-hr-notice" role="note">{t(snapshot.hrSource?.scoringStatus==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p>
   {parent.status!=='ready'?<AuditResourceState status={parent.status} retry={parent.reload}/>:<SectionCard><dl><div className="detail-row"><dt>{t('hrAudit.restaurant')}</dt><dd>{parent.data?.options.find(r=>r.id===parent.data?.audit?.restaurantId)?.name||parent.data?.audit?.restaurantId}</dd></div><div className="detail-row"><dt>{t('hrAudit.date')}</dt><dd>{parent.data?.audit?.date}</dd></div><div className="detail-row"><dt>{t('auditFoundation.auditor')}</dt><dd>{execution.createdByName||parent.data?.audit?.auditorId}</dd></div></dl></SectionCard>}
   <SectionCard><p>{t('hrAudit.progress',{answered,total:questions.length})} · {t(`auditFoundation.statusLabels.${execution.status}`,{defaultValue:execution.status})}</p><progress max={questions.length} value={answered} aria-label={t('auditFoundation.checklistProgress')}/><p>{t('hrAudit.result')}: {execution.overallPercentage==null?t('hrAudit.notAssessed'):`${execution.overallPercentage.toFixed(1)}%`}</p></SectionCard>
   <form onSubmit={e=>{e.preventDefault();setConfirm(true);}}>
@@ -62,7 +62,7 @@ export default function HRAuditExecution({execution,reload}:{execution:AuditExec
   {evidence.status!=='ready'&&<AuditResourceState status={evidence.status} retry={evidence.reload}/>}
 
   <HRAuditVersions executionId={execution._id}/>
-  {confirm&&<HRConfirmDialog title={t('hrAudit.complete')} message={t(snapshot.brandId==='kfc'?'hrAudit.kfcConfirm':'hrAudit.completeConfirm')} confirmLabel={t('hrAudit.complete')} loading={action.busy} onCancel={()=>setConfirm(false)} onConfirm={()=>persist(true)}/>}
+  {confirm&&<HRConfirmDialog title={t('hrAudit.complete')} message={t(snapshot.hrSource?.scoringStatus==='blocked-kfc-denominator'?'hrAudit.kfcConfirm':'hrAudit.completeConfirm')} confirmLabel={t('hrAudit.complete')} loading={action.busy} onCancel={()=>setConfirm(false)} onConfirm={()=>persist(true)}/>}
   {blocker.state==='blocked'&&<HRConfirmDialog title={t('hrAudit.unsaved')} message={t('hrAudit.leaveConfirm')} confirmLabel={t('hrAudit.leave')} onCancel={()=>blocker.reset()} onConfirm={()=>blocker.proceed()}/>}
  </div>;
 }

@@ -68,20 +68,20 @@ test('Simit Sarayı and KFC: safe template coexistence, concurrent drafts, evide
   const payload={answers,expectedVersion:0,details:{finalOpinion:'Synthetic final opinion'},evidenceLinks:[{questionId:answers[0].questionId,evidenceId:String(own._id)}]};
   const saves=await Promise.all([h.request('admin','PUT',`/audit-execution/${id}/draft`,payload),h.request('admin','PUT',`/audit-execution/${id}/draft`,payload)]);assert.deepEqual(saves.map(r=>r.status).sort(),[200,409]);
   assert.equal((await h.request('admin','PATCH',`/audit-workflow/${audit._id}/status`,{status:'completed'})).status,409);
-  const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,{...payload,expectedVersion:1});assert.equal(completed.status,200,JSON.stringify(completed.data));assert.equal(completed.data.data.overallPercentage,brand==='kfc'?null:100);assert.equal(completed.data.data.hrDetails.evidenceLinks[0].evidenceId,String(own._id));assert.equal(completed.data.data.answers[0].score,brand==='kfc'?null:1);
+  const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,{...payload,expectedVersion:1});assert.equal(completed.status,200,JSON.stringify(completed.data));assert.equal(completed.data.data.overallPercentage,100);assert.equal(completed.data.data.hrDetails.evidenceLinks[0].evidenceId,String(own._id));assert.equal(completed.data.data.answers[0].score,1);
   const exported=await h.request('admin','GET',`/audit-export/${audit._id}/excel`);assert.equal(exported.status,200);
   const XLSX=require('xlsx'),workbook=XLSX.read(exported.buffer,{type:'buffer'});assert.ok(workbook.SheetNames.includes('HR Criteria'));const rows=XLSX.utils.sheet_to_json(workbook.Sheets['HR Criteria']);assert.equal(rows.length,answers.length);assert.equal(rows[0].SourceCell,hr.contentFor(brand).sections[0].questions[0].sourceCell);
-  const report=await h.request('admin','GET',`/audit-report/${audit._id}`);assert.equal(report.status,200);assert.equal(report.data.data.score,brand==='kfc'?null:100);
+  const report=await h.request('admin','GET',`/audit-report/${audit._id}`);assert.equal(report.status,200);assert.equal(report.data.data.score,100);
   assert.equal((await h.request('admin','POST',`/audit-score/${audit._id}/calculate`,{})).status,409);
 
  }
  assert.equal((await Template.findById(custom._id)).name,'Existing custom template');assert.equal((await h.models.Audit.findById(legacy._id)).overallPercentage,72);
- const stats=await h.request('admin','GET','/audit-hr/analytics');assert.equal(stats.status,200);assert.equal(stats.data.data.scored,1);assert.equal(stats.data.data.unscored,1);assert.equal(stats.data.data.average,100);
+ const stats=await h.request('admin','GET','/audit-hr/analytics');assert.equal(stats.status,200);assert.equal(stats.data.data.scored,2);assert.equal(stats.data.data.unscored,0);assert.equal(stats.data.data.average,100);
 }));
 
 test('HR N/A persists neutrally through submission, analytics, report, Excel and history',{timeout:90000},async()=>withAuditFixture(async h=>{
  const Restaurant=require('../models/restaurant.model'),XLSX=require('xlsx');
- for(const brand of ['pizza-hut','simit-sarayi']){
+ for(const brand of ['pizza-hut','simit-sarayi','kfc']){
   assert.equal((await h.request('admin','POST',`/audit-hr/templates/${brand}`,{})).status,201);
   const restaurantId=`na-${brand}`;await Restaurant.create({id:restaurantId,name:'Synthetic N/A restaurant',organizationId:'gfc',brandId:brand});
   for(const mixed of [false,true]){
@@ -129,18 +129,33 @@ test('HR final photo/three documents and KFC absent-role N/A bind to immutable d
   const details={observations:'Synthetic notes',finalOpinion:'Synthetic opinion',roleAvailability:Object.fromEntries(roleIds.map(id=>[id,false])),finalEvidence:{photoId:photo,documentIds:documents}};
   const payload={answers,expectedVersion:0,details};const draft=()=>h.request('admin','PUT',`/audit-execution/${id}/draft`,payload);
   assert.equal((await draft()).status,422);for(const answer of answers)if(roleIds.includes(answer.questionId))answer.answer='na';
-  const saved=await draft();assert.equal(saved.status,200,JSON.stringify(saved.data));assert.equal(saved.data.data.hrAssessment.na,4);assert.equal(saved.data.data.hrAssessment.earned,null);assert.equal(saved.data.data.overallPercentage,null);
+  const saved=await draft();assert.equal(saved.status,200,JSON.stringify(saved.data));assert.equal(saved.data.data.hrAssessment.na,4);assert.equal(saved.data.data.hrAssessment.earned,62);assert.equal(saved.data.data.overallPercentage,100);
   assert.deepEqual(saved.data.data.hrDetails.finalEvidence,details.finalEvidence);assert.equal(saved.data.data.hrDetails.editorialVersion,'editorial-v1');
   payload.expectedVersion=1;details.finalEvidence.documentIds=[...documents,photo];assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents;
   details.finalEvidence.photoId=documents[0];assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents.slice(1);assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents;details.finalEvidence.photoId=photo;
   const foreign=await h.audit('foreign','hr');const foreignFile=await Evidence.create({auditId:foreign._id,storageKey:'synthetic',mimeType:'image/png',name:'foreign.png',size:1,uploadedBy:String(h.actors.foreign._id)});
   details.finalEvidence.photoId=String(foreignFile._id);assert.equal((await draft()).status,400);details.finalEvidence.photoId=photo;
   details.roleAvailability['kfc-r79']=true;assert.equal((await draft()).status,422);details.roleAvailability['kfc-r79']=false;
-  const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,payload);assert.equal(completed.status,200);assert.equal(completed.data.data.overallPercentage,null);assert.equal(completed.data.data.hrAssessment.na,4);
+  const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,payload);assert.equal(completed.status,200);assert.equal(completed.data.data.overallPercentage,100);assert.equal(completed.data.data.hrAssessment.na,4);
   const history=await h.request('admin','GET',`/audit-execution/${id}/hr-history`);assert.equal(history.data.data.length,2);for(const v of history.data.data){assert.deepEqual(v.details.finalEvidence,details.finalEvidence);assert.ok(v.answers.filter(a=>roleIds.includes(a.questionId)).every(a=>a.answer==='na'&&a.score===null));}
-  const stats=await h.request('admin','GET','/audit-hr/analytics?brandId=kfc');assert.equal(stats.data.data.average,null);assert.equal(stats.data.data.nonconformities,0);
+  const stats=await h.request('admin','GET','/audit-hr/analytics?brandId=kfc');assert.equal(stats.data.data.average,100);assert.equal(stats.data.data.nonconformities,0);
   assert.equal((await h.request('foreign','GET',`/audit-evidence/${photo}/file`)).status,403);
   const before=await Evidence.countDocuments({auditId});const old=process.env.RENDER;process.env.RENDER='true';
   try{const form=new FormData();form.append('file',new Blob(['synthetic'],{type:'text/plain'}),'blocked.txt');const result=await fetch(h.apiBase+`/audit-evidence/${auditId}`,{method:'POST',headers:{Authorization:`Bearer ${h.tokens.admin}`},body:form});assert.equal(result.status,503);assert.equal(await Evidence.countDocuments({auditId}),before);}finally{if(old===undefined)delete process.env.RENDER;else process.env.RENDER=old;}
  }finally{for(const file of owned)await storage.forReference(file.storageReference,auditId).remove(file.storageReference);}
+}));
+
+test('KFC v2 provisioning preserves existing v1 template, binding, revision and historical result',{timeout:90000},async()=>withAuditFixture(async h=>{
+ const hr=require('../services/hrAuditAssessment.service'),Template=require('../models/auditTemplate.model'),Revision=require('../models/auditTemplateRevision.model'),Binding=require('../models/hrAuditSourceBinding.model');
+ const oldContent=hr.contentFor('kfc','source-v1');const templateId=new h.mongoose.Types.ObjectId(),revisionId=new h.mongoose.Types.ObjectId();
+ await Template.create({...oldContent,_id:templateId,status:'active',publishedRevisionId:revisionId,revisionCounter:1});
+ await Revision.create({_id:revisionId,templateId,revision:1,content:oldContent,publishedBy:String(h.actors.admin._id),publishedAt:new Date()});
+ const key=`kfc:${oldContent.hrSource.sha256}`;await Binding.create({_id:key,templateId,revisionId});
+ const previous=await h.audit('admin','hr',{templateId,templateRevisionId:revisionId,templateSnapshot:oldContent,overallPercentage:72,assessmentStatus:'scored'});
+ const before=JSON.stringify(await Template.findById(templateId).lean()),revisionBefore=JSON.stringify(await Revision.findById(revisionId).lean());
+ const provision=await h.request('admin','POST','/audit-hr/templates/kfc',{});assert.equal(provision.status,201);assert.notEqual(String(provision.data.data.templateId),String(templateId));
+ assert.equal(JSON.stringify(await Template.findById(templateId).lean()),before);assert.equal(JSON.stringify(await Revision.findById(revisionId).lean()),revisionBefore);
+ assert.equal(String((await Binding.findById(key)).templateId),String(templateId));assert.equal((await h.models.Audit.findById(previous._id)).overallPercentage,72);
+ assert.equal((await Revision.findById(provision.data.data.revisionId)).content.hrSource.version,'source-v2');
+ const again=await h.request('admin','POST','/audit-hr/templates/kfc',{});assert.equal(String(again.data.data.templateId),String(provision.data.data.templateId));
 }));

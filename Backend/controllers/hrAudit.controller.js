@@ -11,7 +11,7 @@ const fail=(res,e)=>res.status(e.status||(['ValidationError','CastError'].includ
 exports.hrOnly=(req,res,next)=>req.auditorProfile&&req.auditorProfile.direction!=='hr'?res.status(403).json({message:'HR audit direction required.'}):next();
 exports.sources=async(req,res)=>{
  try{const data=await Promise.all(hr.sources.map(async source=>{
-  const binding=await Binding.findById(`${source.brandId}:${source.sha256}`).lean();
+  const binding=await Binding.findById(hr.bindingKey(source)).lean();
   const template=binding&&await Template.findOne({_id:binding.templateId,status:'active',publishedRevisionId:binding.revisionId}).select('_id').lean();
   return {...source,templateId:template?String(template._id):null};
  }));res.json({data});}catch(e){fail(res,e);}
@@ -19,7 +19,7 @@ exports.sources=async(req,res)=>{
 exports.provision=async(req,res)=>{
  try{
   if(!['admin','audit_manager'].includes(req.user.role)||req.permission.scope!=='all'||await require('../middleware/auth.middleware').getPermissionScope(req.user.role,'audit.template','create')!=='all')throw auditError(403,'Explicit audit template management permission required.');
-  const content=hr.contentFor(req.params.brandId),source=hr.sourceFor(req.params.brandId),key=`${source.brandId}:${source.sha256}`;
+  const content=hr.contentFor(req.params.brandId),source=hr.sourceFor(req.params.brandId),key=hr.bindingKey(source);
   const data=await transaction(async session=>{
    const existing=await Binding.findById(key).session(session);
    if(existing){
@@ -51,7 +51,7 @@ exports.create=async(req,res)=>{
   const source=hr.sourceFor(brandId);if(!source)throw auditError(400,'Unknown HR audit brand.');
   const restaurant=(await allowedRestaurants(req)).find(r=>r.id===restaurantId&&r.brandId===brandId);
   if(!restaurant)throw auditError(403,'Restaurant is outside your HR audit access.');
-  const binding=await Binding.findById(`${brandId}:${source.sha256}`).lean();if(!binding)throw auditError(409,'An audit manager must provision the reviewed source template first.');
+  const binding=await Binding.findById(hr.bindingKey(source)).lean();if(!binding)throw auditError(409,'An audit manager must provision the reviewed source template first.');
   const revision=await Revision.findById(binding.revisionId).lean();if(!revision)throw auditError(409,'Source revision is unavailable.');hr.verifiedSource(revision.content);
   const row=await require('../services/auditCreation.service').createAuditWithDepartmentSnapshot({id:`hr-${require('node:crypto').randomUUID()}`,auditType:'hr',restaurantId,date,templateId:String(binding.templateId)},req.user);
   res.status(201).json({data:row});
@@ -76,15 +76,15 @@ exports.analytics=async(req,res)=>{
    if(seen.has(String(row.auditId))||!row.templateSnapshot?.hrSource||!row.hrAssessment?.complete)continue;seen.add(String(row.auditId));
    const parent=parents.get(String(row.auditId));const source=hr.sourceFor(row.templateSnapshot.brandId);
    if(!source)continue;
-   const score=source.brandId==='kfc'?null:row.overallPercentage;
+   const score=row.hrAssessment.contract==='blocked-kfc-denominator'?null:row.overallPercentage;
    if(typeof score==='number'&&Number.isFinite(score)){sum+=score;scored++;}
    add(groups.brands,source.brandId,source.brandName,score);add(groups.restaurants,parent.restaurantId,parent.restaurantId,score);add(groups.trend,parent.date.slice(0,7),parent.date.slice(0,7),score);
-   for(const section of row.hrAssessment.sections||[])add(groups.sections,`${source.brandId}:${section.id}`,section.title,source.brandId==='kfc'?null:section.percentage);
+   for(const section of row.hrAssessment.sections||[])add(groups.sections,`${source.brandId}:${section.id}`,section.title,row.hrAssessment.contract==='blocked-kfc-denominator'?null:section.percentage);
    for(const answer of row.answers||[]){
     const q=source.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q)continue;
     const rawValue=['0','0.5','1'].includes(answer.answer)?Number(answer.answer):null;
     const value=typeof answer.score==='number'&&[0,0.5,1].includes(answer.score)?answer.score:null;
-    const item=add(groups.criteria,q.id,q.label,source.brandId==='kfc'||value===null?null:value*100);
+    const item=add(groups.criteria,q.id,q.label,row.hrAssessment.contract==='blocked-kfc-denominator'||value===null?null:value*100);
     item.na=(item.na||0)+(answer.answer==='na'?1:0);item.nonconformities=(item.nonconformities||0)+(rawValue!==null&&rawValue<1?1:0);
     if(rawValue!==null&&rawValue<1)nonconformities++;
    }
