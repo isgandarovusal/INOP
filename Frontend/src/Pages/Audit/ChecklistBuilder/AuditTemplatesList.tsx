@@ -61,7 +61,7 @@ export default function AuditTemplatesList() {
           className="btn-primary checklist-create-action"
         >
           <Plus size={18} />
-          Yeni checklist
+          {t("audit.checklist.list.create")}
         </Link>
       </div>
 

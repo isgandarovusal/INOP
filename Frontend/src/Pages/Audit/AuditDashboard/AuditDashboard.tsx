@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
 import AuditResourceState from "../../../Components/AuditResourceState";
 
@@ -27,9 +28,10 @@ import {
 import {
   getAuditDashboard,
 } from "../../../Services/auditDashboardService";
-import { ACCENT } from "../../../Utils/theme";
+const AUDIT_CHART_COLOR = "#20365b";
 
 export default function AuditDashboard() {
+ const {t}=useTranslation();
  const {data,status,reload}=useAuditResource("dashboard","dashboard",getAuditDashboard);
  if(status !== "ready" || !data) return <AuditResourceState status={status} retry={reload}/>;
   return (
@@ -37,11 +39,11 @@ export default function AuditDashboard() {
       <div className="audit-dashboard__header">
         <div>
           <span className="audit-dashboard__eyebrow">
-            AUDIT MANAGEMENT
+            {t("auditFoundation.management")}
           </span>
-          <h1>Audit Dashboard</h1>
+          <h1>{t("auditPresentation.dashboard")}</h1>
           <p>
-            Operational overview of audit activity, risk and performance.
+            {t("auditPresentation.dashboardHelp")}
           </p>
         </div>
       </div>
@@ -51,7 +53,7 @@ export default function AuditDashboard() {
           <ClipboardCheck />
 
           <span>
-            Total Audits
+            {t("auditFoundation.metrics.total")}
           </span>
 
           <strong>
@@ -63,7 +65,7 @@ export default function AuditDashboard() {
           <CheckCircle />
 
           <span>
-            Completed
+            {t("auditFoundation.metrics.completed")}
           </span>
 
           <strong>
@@ -75,7 +77,7 @@ export default function AuditDashboard() {
           <TrendingUp />
 
           <span>
-            Average Score
+            {t("auditFoundation.average")}
           </span>
 
           <strong>
@@ -87,7 +89,7 @@ export default function AuditDashboard() {
           <AlertTriangle />
 
           <span>
-            Risks
+            {t("auditPresentation.risks")}
           </span>
 
           <strong>
@@ -102,7 +104,7 @@ export default function AuditDashboard() {
       <div className="charts-grid">
         <div className="audit-modern-card">
           <h3>
-            Audit Types
+            {t("auditFoundation.direction")}
           </h3>
 
           <ResponsiveContainer
@@ -139,7 +141,7 @@ export default function AuditDashboard() {
 
               <Bar
                 dataKey="count"
-                fill={ACCENT}
+                fill={AUDIT_CHART_COLOR}
                 radius={[5, 5, 0, 0]}
                 maxBarSize={42}
               />
@@ -149,7 +151,7 @@ export default function AuditDashboard() {
 
         <div className="audit-modern-card">
           <h3>
-            Risk Distribution
+            {t("auditPresentation.riskDistribution")}
           </h3>
 
           <ResponsiveContainer
@@ -174,7 +176,7 @@ export default function AuditDashboard() {
                       key={index}
                       fill={
                         [
-                          "#6366f1",
+                          AUDIT_CHART_COLOR,
                           "#f59e0b",
                           "#ef4444",
                           "#64748b",
@@ -194,7 +196,7 @@ export default function AuditDashboard() {
 
       <div className="audit-modern-card">
         <h3>
-          Audit Trend
+          {t("auditPresentation.trend")}
         </h3>
 
         <ResponsiveContainer
@@ -232,7 +234,7 @@ export default function AuditDashboard() {
             <Line
               type="monotone"
               dataKey="count"
-              stroke={ACCENT}
+              stroke={AUDIT_CHART_COLOR}
               strokeWidth={2.5}
               dot={{ r: 3, strokeWidth: 2, fill: "#ffffff" }}
               activeDot={{ r: 5, strokeWidth: 2 }}

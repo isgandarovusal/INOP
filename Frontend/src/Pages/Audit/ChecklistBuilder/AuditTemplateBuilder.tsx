@@ -545,7 +545,7 @@ function AuditTemplateEditor() {
                 <button type="button" disabled={preview.loading} onClick={event => {
                   event.preventDefault(); setPreviewName(document.originalName || document.name); setPreviewDocumentId(document.id);
                   void preview.open(signal => getAuditSourceDocumentFile(document.id, signal));
-                }}>Aç / Endir</button>
+                }}>{t("auditFoundation.open")} / {t("auditFoundation.download")}</button>
 
                 <button
                   type="button"

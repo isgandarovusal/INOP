@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import {
  useEffect,
  useState
 } from "react";
 
 import PageState from "../../../Components/PageState";
+import AuditResourceState from "../../../Components/AuditResourceState";
 
 
 import {
@@ -20,6 +22,7 @@ import {
 
 
 export default function AuditReportDetail(){
+ const {t}=useTranslation();
 
 
  const {
@@ -42,47 +45,57 @@ export default function AuditReportDetail(){
 
 
 
+ const [failed, setFailed] = useState(false);
+ const [attempt, setAttempt] = useState(0);
+ const [loadedId, setLoadedId] = useState<string>();
+
  useEffect(()=>{
+  let active = true;
 
 
-  if(!id)return;
+
+  if(!id) return;
 
 
   getAuditReport(id)
   .then(res=>{
 
-    setReport(
-     res.data
-    );
+    if(active) setReport(res.data);
 
   })
+  .catch(()=>{ if(active) setFailed(true); })
   .finally(()=>{
 
-    setLoading(false);
+    if(active) { setLoading(false); setLoadedId(id); }
 
   });
 
 
- },[id]);
+  return () => { active = false; };
+ },[id, attempt]);
 
 
 
 
 
- if(loading){
+ if(!id) return <AuditResourceState status="not-found" />;
 
-  return <PageState type="loading" />;
+ if(loading || loadedId !== id){
+
+  return <PageState type="loading" title={t("auditPresentation.states.loading")} />;
 
  }
 
 
 
 
+ if(failed) return <AuditResourceState status="error" retry={()=>{setLoading(true);setFailed(false);setAttempt(value=>value+1);}} />;
+
  if(!report){
 
   return (
    <div>
-    Audit report not found
+    {t("auditPresentation.states.not-found")}
    </div>
   );
 
@@ -97,7 +110,7 @@ export default function AuditReportDetail(){
 
 
    <h1>
-    Audit Report
+    {t("auditPresentation.report")}
    </h1>
 
 
@@ -105,21 +118,21 @@ export default function AuditReportDetail(){
    <div className="audit-card">
 
     <p>
-     Type:
+     {t("auditPresentation.type")}:
      {" "}
      {report.type}
     </p>
 
 
     <p>
-     Status:
+     {t("auditFoundation.status")}:
      {" "}
      {report.status}
     </p>
 
 
     <p>
-     Score:
+     {t("auditPresentation.score")}:
      {" "}
      {report.score}
     </p>
@@ -134,26 +147,26 @@ export default function AuditReportDetail(){
    <div className="audit-card">
 
     <h3>
-     Checklist
+     {t("auditPresentation.checklist")}
     </h3>
 
 
     <p>
-     Total:
+     {t("auditFoundation.metrics.total")}:
      {" "}
      {report.summary.totalChecks}
     </p>
 
 
     <p>
-     Passed:
+     {t("auditPresentation.passed")}:
      {" "}
      {report.summary.passed}
     </p>
 
 
     <p>
-     Failed:
+     {t("auditPresentation.failed")}:
      {" "}
      {report.summary.failed}
     </p>
@@ -171,19 +184,19 @@ export default function AuditReportDetail(){
     <div className="audit-card">
 
      <h3>
-      Occupational Safety
+      {t("auditFoundation.directions.occupational-safety")}
      </h3>
 
 
      <p>
-      Risk:
+      {t("auditPresentation.risk")}:
       {" "}
       {report.safety.riskLevel}
      </p>
 
 
      <p>
-      Violations:
+      {t("auditPresentation.violations")}:
       {" "}
       {report.safety.violations?.length || 0}
      </p>
@@ -195,7 +208,7 @@ export default function AuditReportDetail(){
 
 
 
-   <button
+   <button className="btn-secondary" type="button"
 
     onClick={()=>{
 
@@ -207,7 +220,7 @@ export default function AuditReportDetail(){
 
    >
 
-    Recalculate Score
+    {t("auditPresentation.recalculate")}
 
    </button>
 

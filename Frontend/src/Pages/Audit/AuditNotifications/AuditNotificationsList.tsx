@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import {
  useEffect,
  useState
 } from "react";
 
 import PageState from "../../../Components/PageState";
+import AuditResourceState from "../../../Components/AuditResourceState";
 
 import {
  getAuditNotifications,
@@ -14,6 +16,7 @@ from "../../../Services/auditNotificationService";
 
 
 export default function AuditNotificationsList(){
+ const {t}=useTranslation();
 
  const [
   notifications,
@@ -28,6 +31,8 @@ export default function AuditNotificationsList(){
 
 
 
+ const [failed, setFailed] = useState(false);
+
  async function load(){
 
   try{
@@ -36,12 +41,14 @@ export default function AuditNotificationsList(){
     await getAuditNotifications();
 
 
+   setFailed(false);
    setNotifications(
     result.data || []
    );
 
 
   }
+  catch { setFailed(true); }
   finally{
 
    setLoading(false);
@@ -54,17 +61,21 @@ export default function AuditNotificationsList(){
 
  useEffect(()=>{
 
-  load();
-
+  let active = true;
+  void getAuditNotifications().then(result => { if(active) setNotifications(result.data || []); })
+   .catch(() => { if(active) setFailed(true); })
+   .finally(() => { if(active) setLoading(false); });
+  return () => { active = false; };
  },[]);
 
 
 
  async function read(id:string){
 
-  await markNotificationRead(id);
-
-  load();
+  try {
+   await markNotificationRead(id);
+   await load();
+  } catch { setFailed(true); }
 
  }
 
@@ -72,7 +83,7 @@ export default function AuditNotificationsList(){
 
  if(loading){
 
-  return <PageState type="loading" />;
+  return <PageState type="loading" title={t("auditPresentation.states.loading")} />;
 
  }
 
@@ -82,16 +93,17 @@ export default function AuditNotificationsList(){
 
  <div className="audit-modern-card">
 
+  {failed && <AuditResourceState status="error" retry={()=>void load()} />}
   <h2>
-   Audit Notifications
+   {t("auditFoundation.notifications")}
   </h2>
 
 
   {
-   notifications.length===0 ?
+   notifications.length===0 && !failed ?
 
    <p>
-    No notifications
+    {t("auditPresentation.noNotifications")}
    </p>
 
    :
@@ -119,12 +131,12 @@ export default function AuditNotificationsList(){
 
      {
       !item.read &&
-      <button
+      <button className="btn-secondary" type="button"
        onClick={()=>
         read(item._id)
        }
       >
-       Mark read
+       {t("auditPresentation.markRead")}
       </button>
      }
 

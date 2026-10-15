@@ -50,12 +50,13 @@ type LazyAuditModuleProps = {
 };
 
 const LazyAuditModule: React.FC<LazyAuditModuleProps> = ({ children }) => {
+  const { t } = useTranslation();
   return (
     <div className="audit-business-module">
       <Suspense
         fallback={
           <div className="audit-business-module__loading">
-            Loading...
+            {t("auditPresentation.states.loading")}
           </div>
         }
       >
@@ -135,7 +136,7 @@ const AuditDetail: React.FC = () => {
   if (status !== "ready") return <AuditResourceState status={status} retry={reload} />;
 
   if (!audit) {
-    return <EmptyState icon={<ClipboardCheck size={28} />} title={t("audit.generic.detail.notFound")} hint="It may have been deleted." />;
+    return <EmptyState icon={<ClipboardCheck size={28} />} title={t("audit.generic.detail.notFound")} hint={t("auditPresentation.states.not-found")} />;
   }
 
   const overall = overallScore(audit);
@@ -143,12 +144,12 @@ const AuditDetail: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title={restaurant?.name ?? "Audit"}
-        subtitle={`${audit.auditType} · ${audit.date} · by ${auditor?.name ?? "Unknown"}`}
+        title={restaurant?.name ?? t("auditFoundation.audit")}
+        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${auditor?.name ?? t("auditPresentation.unknown")}`}
         actions={
           <>
             <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
-              <ArrowLeft size={15} /> Back
+              <ArrowLeft size={15} /> {t("auditPresentation.back")}
             </button>
 
             {canManage && (
@@ -156,7 +157,7 @@ const AuditDetail: React.FC = () => {
                 className="btn-secondary"
                 onClick={() => navigate(`/app/audit/audits/${audit.id}/edit`)}
               >
-                <Pencil size={15} /> Edit
+                <Pencil size={15} /> {t("auditPresentation.edit")}
               </button>
             )}
           </>
@@ -224,7 +225,7 @@ const AuditDetail: React.FC = () => {
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.comments")}</h3>
             <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>
-              {audit.comments || "No comments provided."}
+              {audit.comments || t("auditPresentation.noComments")}
             </p>
           </div>
 
@@ -276,19 +277,19 @@ const AuditDetail: React.FC = () => {
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
             <div className="detail-row">
-              <dt>Restaurant</dt>
-              <dd>{restaurant?.name ?? "Unknown"}</dd>
+              <dt>{t("navigation.restaurants")}</dt>
+              <dd>{restaurant?.name ?? t("auditPresentation.unknown")}</dd>
             </div>
             <div className="detail-row">
-              <dt>Auditor</dt>
-              <dd>{auditor?.name ?? "Unknown"}</dd>
+              <dt>{t("auditFoundation.auditor")}</dt>
+              <dd>{auditor?.name ?? t("auditPresentation.unknown")}</dd>
             </div>
             <div className="detail-row">
-              <dt>Type</dt>
+              <dt>{t("auditPresentation.type")}</dt>
               <dd>{audit.auditType}</dd>
             </div>
             <div className="detail-row">
-              <dt>Date</dt>
+              <dt>{t("auditFoundation.date")}</dt>
               <dd>{audit.date}</dd>
             </div>
           </div>

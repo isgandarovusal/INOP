@@ -16,7 +16,7 @@ interface OccupationalSafetyAudit {
 }
 
 export default function OccupationalSafetyAuditsList(){
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
 
  const [audits,setAudits]=useState<OccupationalSafetyAudit[]>([]);
@@ -64,7 +64,7 @@ return (
 
    <div className="audit-modern-header">
     <div>
-     <h1>Occupational Safety Audit</h1>
+     <h1>{t("auditFoundation.directions.occupational-safety")}</h1>
      <p>{t("audit.safety.list.subtitle")}</p>
     </div>
    </div>
@@ -116,7 +116,7 @@ return (
 
        <td>
         {new Date(a.createdAt)
-        .toLocaleDateString()}
+        .toLocaleDateString(i18n.language)}
        </td>
 
 
