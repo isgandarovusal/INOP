@@ -10,7 +10,7 @@ Baza: `1238cc8207a9cebdf21157a85ab5abfdc2cd944b`. Orijinal Excel faylları, imza
 
 Pizza Hut və Simit Sarayı workbook-larında yekun düstur yoxdur; formula Excel-dən götürülmüş kimi təqdim edilmir, məhz istifadəçinin əlavə təsdiqinə əsaslanır.
 
-UI idarəetmə mətnləri AZ/EN/RU-dur. Orijinal sual, bölmə və təlimat mətnləri mənbə dilində dəyişmədən qalır. Pizza Hut `Лист1` müsahibə bələdçisidir, ayrıca 48 dolu xana saxlanır; bal verilən əlavə meyarlara çevrilmir. Simit Sarayı workbook-dakı şəkil loqodur; scoring qaydası ehtiva etmir və repo-ya köçürülmür.
+UI idarəetmə mətnləri AZ/EN/RU-dur. Orijinal sual, bölmə və təlimat mətnləri immutable mənbədə dəyişmədən qalır; auditor ekranları ayrıca `editorial-v1` AZ/EN/RU təqdimatını göstərir. Pizza Hut `Лист1` müsahibə bələdçisidir; 48 dolu xana yalnız mənbə istinadında saxlanır, forma/panel/mərhələ və əlavə scoring meyarı deyil. Simit Sarayı workbook-dakı şəkil loqodur; scoring qaydası ehtiva etmir və repo-ya köçürülmür.
 
 ## KFC
 
@@ -91,3 +91,15 @@ Blank restoran/müdir/menecer/imza sahələri real şəxsi məlumat sayılaraq n
 ## Yekun mənbə uyğunluğu yoxlaması
 
 15 oktyabr 2026-da orijinal attachment-lərlə verifier yenidən icra edildi: KFC 8/66, Pizza Hut 8/71 və ayrıca 48 xanadan ibarət müsahibə worksheet-i, Simit Sarayı 4/35 — PASS. Bütün sual/bölmə mətnləri, sıra, source cell, guidance, worksheet siyahısı, 9 KFC düsturu və workbook SHA-256 əvvəlki mənbəyə tam uyğundur. Suallar və scoring qaydaları bu QA-da dəyişdirilməyib. PH/SS yekun düsturu Excel-dən deyil, istifadəçinin ayrıca təsdiqindən gəlir. KFC E93-dəki 47 icra edilmir və 66 ilə əvəz edilmir. N/A saxlanma/analitika/export uyğunluğu əlavə real-server regression testi ilə təsdiqlənib; all-N/A yekun null, mixed 0/0.5/1/N/A yekun 50%-dir.
+
+
+## Peşəkar dil redaktəsi və son təsdiqlər
+
+`HR_AUDIT_PACKAGE_03_EDITORIAL_MAP.md` bütün original → AZ mətnləri və auditor təlimatlarını göstərir. `Backend/config/hrAuditEditorial.json` eyni xəritənin AZ/EN/RU, brandId, worksheet, sourceCell, sectionId və criterion ID-ləri ilə maşın tərəfindən yoxlanan formasıdır. Redaktə: KFC 8 başlıq/66 meyar/4 təlimat; Pizza Hut 8/71/71; Simit Sarayı 4/35/0. Original source JSON və workbook hash-ləri dəyişməyib.
+
+İstifadəçinin son təsdiqi: Klikun və Skaut adları saxlanır, yeni funksiya təyin edilmir. Skaut təlimatındakı “xostesdən öhdəlikləri” → “Skautun vəzifə öhdəlikləri”; brend-şef üçün də həmin düzəliş təsdiqlənib. KPI, təlim mərhələləri, modul və sertifikasiya yoxlamaları saxlanır. Mövcud olmayan əlavə vəzifənin cavabı N/A-dır; KFC 47 ziddiyyəti bu qayda ilə həll edilmiş sayılmır.
+
+Ə.M-Э, YT və “Resurs” kimi açıqlanmayan ifadələr map-də ayrıca dəqiqləşdirilməli qeyd olunub. Şirkətdaxili qısaltmaların yeni mənaları, bal, çəki, threshold və məcburi meyar əlavə edilmir. PH/SS scoring əvvəlki istifadəçi təsdiqinə əsaslanır; mənbə Excel-də yekun düstur yoxdur.
+
+
+Frontend build context-i üçün editorial JSON-un eyni nüsxəsi `Frontend/src/i18n/hrAuditEditorial.json`-da saxlanır; eynilik avtomatik testlə qorunur. Mənbə verifier + original-to-editorial mapping testi birlikdə original Excel → source config → təqdimat → sistem ID zəncirini yoxlayır.

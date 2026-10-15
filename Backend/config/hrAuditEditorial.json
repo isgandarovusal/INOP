@@ -1,0 +1,2447 @@
+{
+  "version": "editorial-v1",
+  "entries": {
+    "kfc-s7": {
+      "az": "Qonaq təcrübəsi və brendin qorunması",
+      "en": "Guest experience and brand protection",
+      "ru": "Опыт гостей и защита бренда",
+      "source": "Customer Experience və Brand Protection ",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s16": {
+      "az": "Namizədlərin seçilməsi və işə qəbulu",
+      "en": "Candidate selection and recruitment",
+      "ru": "Отбор кандидатов и приём на работу",
+      "source": "Seçim və qəbul",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s25": {
+      "az": "Əməkdaşların işə uyğunlaşması",
+      "en": "Employee onboarding",
+      "ru": "Адаптация сотрудников",
+      "source": "İşçilərin adaptasiyası",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s34": {
+      "az": "Vizual məlumatlandırma",
+      "en": "Visual communication",
+      "ru": "Визуальное информирование",
+      "source": "Vizual məlumatlar ",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s49": {
+      "az": "Əməkdaşların təlimi və inkişafı",
+      "en": "Employee training and development",
+      "ru": "Обучение и развитие сотрудников",
+      "source": "İşçilərin təlimi və inkişafı",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s67": {
+      "az": "Mədəniyyət, ünsiyyət və əməkdaşlara qayğı",
+      "en": "Culture, communication and employee care",
+      "ru": "Культура, общение и забота о сотрудниках",
+      "source": "Mədəniyyət, ünsiyyət və işçilərə qayğı",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s71": {
+      "az": "Heyətin idarə edilməsi",
+      "en": "Personnel management",
+      "ru": "Управление персоналом",
+      "source": "Kadrların idarə olunması",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "kfc-s77": {
+      "az": "Əlavə vəzifələr",
+      "en": "Additional roles",
+      "ru": "Дополнительные должности",
+      "source": "Əlavə pozisiyalar",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s7": {
+      "az": "Brendin qorunması",
+      "en": "Brand protection",
+      "ru": "Защита бренда",
+      "source": "Brand Protection",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s17": {
+      "az": "Namizədlərin seçilməsi və işə qəbulu",
+      "en": "Candidate selection and recruitment",
+      "ru": "Отбор кандидатов и приём на работу",
+      "source": "Seçim və qəbul",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s25": {
+      "az": "Əməkdaşların işə uyğunlaşması",
+      "en": "Employee onboarding",
+      "ru": "Адаптация сотрудников",
+      "source": "İşçilərin adaptasiyası",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s40": {
+      "az": "Əməkdaşların işdə saxlanması",
+      "en": "Employee retention",
+      "ru": "Удержание сотрудников",
+      "source": "İşçilərin saxlanması",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s46": {
+      "az": "Əməkdaşların təlimi və inkişafı",
+      "en": "Employee training and development",
+      "ru": "Обучение и развитие сотрудников",
+      "source": "İşçilərin təlimi və inkişafı",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s70": {
+      "az": "Mədəniyyət, ünsiyyət və əməkdaşlara qayğı",
+      "en": "Culture, communication and employee care",
+      "ru": "Культура, общение и забота о сотрудниках",
+      "source": "Mədəniyyət, ünsiyyət və işçilərə qayğı",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s77": {
+      "az": "Heyətin idarə edilməsi",
+      "en": "Personnel management",
+      "ru": "Управление персоналом",
+      "source": "Kadrların idarə olunması",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni"
+    },
+    "pizza-hut-s81": {
+      "az": "Əməyin mühafizəsi, YT və tibbi müayinə",
+      "en": "Occupational safety, YT and medical examination",
+      "ru": "Охрана труда, YT и медицинский осмотр",
+      "source": "ƏM və YT + Tibbi müayinə",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "clarification": "YT qısaltmasının rəsmi açılışı təsdiqlənməlidir."
+    },
+    "simit-sarayi-s11": {
+      "az": "İşə qəbul və ilkin uyğunlaşma",
+      "en": "Recruitment and orientation",
+      "ru": "Приём на работу и вводная адаптация",
+      "source": "İŞƏ QƏBUL VƏ ORİYENTASİYA",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1"
+    },
+    "simit-sarayi-s18": {
+      "az": "Təlim və inkişaf",
+      "en": "Training and development",
+      "ru": "Обучение и развитие",
+      "source": "TƏLİM VƏ İNKİŞAF",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1"
+    },
+    "simit-sarayi-s36": {
+      "az": "Motivasiya və əməkdaşların işdə saxlanması",
+      "en": "Motivation and employee retention",
+      "ru": "Мотивация и удержание сотрудников",
+      "source": "MOTİVASİYA VƏ SAXLANMA",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1"
+    },
+    "simit-sarayi-s47": {
+      "az": "Sənədləşdirmə və hüquqi tələblərə uyğunluq",
+      "en": "Documentation and legal compliance",
+      "ru": "Документация и соблюдение правовых требований",
+      "source": "SƏNƏDLƏŞDİRMƏ VƏ HÜQUQİ UYĞUNLUQ",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1"
+    },
+    "kfc-r9": {
+      "az": "Əməkdaşlar qonaqpərvərdir, sifarişlər düzgün hazırlanır və xidmət müddəti 5 dəqiqəni keçmir.",
+      "en": "Employees are welcoming, orders are assembled correctly and service takes no more than 5 minutes.",
+      "ru": "Сотрудники гостеприимны, заказы собраны правильно, время обслуживания не превышает 5 минут.",
+      "source": "İşçilər qonaqpərvərdir, sifarişlər düzgün yığılır, xidmət müddəti 5 dəqiqəni keçmir",
+      "sourceGuidance": "",
+      "sourceCell": "C9",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r10": {
+      "az": "Əməkdaşların xarici görünüşü standartlara uyğundur.",
+      "en": "Employees' appearance meets the standards.",
+      "ru": "Внешний вид сотрудников соответствует стандартам.",
+      "source": "İşçilərin xarici görünüşü standartlara uyğundur",
+      "sourceGuidance": "",
+      "sourceCell": "C10",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r11": {
+      "az": "Kassir yeni məhsulları və sifarişə əlavələri təklif edir.",
+      "en": "The cashier offers new products and order add-ons.",
+      "ru": "Кассир предлагает новинки и дополнения к заказу.",
+      "source": "Kassir yenilikləri və sifarişə əlavələri təklif edir",
+      "sourceGuidance": "",
+      "sourceCell": "C11",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r12": {
+      "az": "Kassada çalışan hər bir əməkdaş iş standartlarına əməl edir, kimyəvi vasitələrlə işləməyi bacarır və qida təhlükəsizliyi qaydalarına riayət edir.",
+      "en": "Every cashier follows work standards, knows how to handle chemicals and complies with food safety rules.",
+      "ru": "Каждый сотрудник кассы соблюдает стандарты работы, умеет обращаться с химическими средствами и соблюдает правила пищевой безопасности.",
+      "source": "Kassada çalışan hər bir işçi iş standartlarına əməl edir, kimyəvi vasitələrlə işləməyi bacarır və qida təhlükəsizliyi qaydalarına riayət edir",
+      "sourceGuidance": "",
+      "sourceCell": "C12",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r13": {
+      "az": "Əməkdaşlar qonaqların şikayətlərinin səbəblərini bilirlər.",
+      "en": "Employees know the reasons for guest complaints.",
+      "ru": "Сотрудники знают причины жалоб гостей.",
+      "source": "İşçilər Qonaqların nədən şikayət etdiklərini bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C13",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r14": {
+      "az": "Unlama stansiyasında çalışan hər bir əməkdaş qida təhlükəsizliyinin əsaslarını və kimyəvi vasitələrlə işləmə qaydalarını bilir, bütün məhsulların unlanma qaydasına əməl edir.",
+      "en": "Every breading station employee knows food safety basics and chemical handling rules and follows the breading procedure for all products.",
+      "ru": "Каждый сотрудник панировочной станции знает основы пищевой безопасности и правила работы с химическими средствами, соблюдает правила панировки всех продуктов.",
+      "source": "Unlama stansiyasında çalışan hər bir işçi QT əsaslarını bilir, kimyəvi vasitələrlə işləmə qaydaları  bələddir və bütün məhsulların unlanma qaydasına əməl edir",
+      "sourceGuidance": "",
+      "sourceCell": "C14",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r15": {
+      "az": "Mətbəx stansiyasında çalışan hər bir əməkdaş qida təhlükəsizliyinin əsaslarını və kimyəvi vasitələrlə işləmə qaydalarını bilir, sendviçlərin hazırlanma qaydalarına əməl edir.",
+      "en": "Every kitchen station employee knows food safety basics and chemical handling rules and follows sandwich preparation procedures.",
+      "ru": "Каждый сотрудник кухонной станции знает основы пищевой безопасности и правила работы с химическими средствами, соблюдает правила приготовления сэндвичей.",
+      "source": "Mətbəx stansiyasında çalışan hər bir işçi QT əsaslarını bilir, kimyəvi vasitələrlə işləmə qaydaları bələddir və sendviçlərin hazırlanma qaydalarına əməl edir",
+      "sourceGuidance": "",
+      "sourceCell": "C15",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s7"
+    },
+    "kfc-r17": {
+      "az": "Restoranın cari dövr üzrə FTR nəticəsi 90%-dən yüksəkdir.",
+      "en": "The restaurant's FTR result for the current period exceeds 90%.",
+      "ru": "Результат FTR ресторана за текущий период превышает 90%.",
+      "source": "Restoranın cari period üçün FTR nəticəsi 90%-dən yüksəkdir.",
+      "sourceGuidance": "",
+      "sourceCell": "C17",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r18": {
+      "az": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir.",
+      "en": "The manager knows how to respond to job applicants and who should conduct the interview.",
+      "ru": "Менеджер знает, как отвечать кандидатам и кто должен проводить собеседование.",
+      "source": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir",
+      "sourceGuidance": "",
+      "sourceCell": "C18",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r19": {
+      "az": "Müsahibənin keçirilməsinə dair yaddaş kitabçası mövcuddur.",
+      "en": "An interview reference guide is available.",
+      "ru": "Имеется памятка по проведению собеседования.",
+      "source": "Müsahibənin keçirilməsi üzrə yaddaş kitabı mövcuddur.",
+      "sourceGuidance": "",
+      "sourceCell": "C19",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r20": {
+      "az": "Komanda üzvləri mövcud vakansiyalar barədə məlumatlıdır və işə qəbul namizədlərinin suallarına necə cavab verməli olduqlarını bilirlər.",
+      "en": "Team members know current vacancies and how to answer applicants' questions.",
+      "ru": "Члены команды знают об актуальных вакансиях и умеют отвечать на вопросы кандидатов.",
+      "source": "Briqada üzvləri cari vakansiyalardan xəbərdardır, işçilər işə qəbul namizədinin suallarına necə cavab verməli olduqlarını bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C20",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r21": {
+      "az": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatandır.",
+      "en": "Application forms are sufficient and accessible to applicants.",
+      "ru": "Анкеты для приёма на работу имеются в достаточном количестве и доступны кандидатам.",
+      "source": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatan yerdədir",
+      "sourceGuidance": "",
+      "sourceCell": "C21",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r22": {
+      "az": "Reklam materialları keyfiyyətlidir və əməkhaqqı barədə məlumatlar düzgündür.",
+      "en": "Advertising materials are of good quality and salary information is accurate.",
+      "ru": "Рекламные материалы качественные, сведения о заработной плате достоверны.",
+      "source": "Reklam materialları keyfiyyətlidir, əmək haqqı ilə bağlı məlumatlar düzgündür",
+      "sourceGuidance": "",
+      "sourceCell": "C22",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r23": {
+      "az": "“Dostunu gətir” plakatı əməkdaşların görə biləcəyi yerdə asılıb, yaxşı vəziyyətdədir və əməkdaşlar proqram barədə məlumatlıdırlar.",
+      "en": "The “Refer a friend” poster is visible to employees, in good condition, and employees know the programme.",
+      "ru": "Плакат «Приведи друга» размещён на видном сотрудникам месте, находится в хорошем состоянии; сотрудники знают о программе.",
+      "source": "\"Dostunu gətir\" plakatı mövcuddur (işçilərin görməsi üçün asılmışdır və yaxşı vəziyyətdədir), işçilər proqram haqqında məlumatlandırılmışdır",
+      "sourceGuidance": "",
+      "sourceCell": "C23",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r24": {
+      "az": "Bütün şəxsi iş qovluqları düzgün tərtib olunub, məlumatlar düzgündür və fotoşəkillər əlavə edilib.",
+      "en": "All personnel files are correctly compiled, contain accurate information and include photographs.",
+      "ru": "Все личные дела оформлены правильно, сведения достоверны, фотографии приложены.",
+      "source": "Bütün şəxsi qovluqlar düzgün yığılır, məlumatlar düzgündür, şəkillər əlavə olunub.",
+      "sourceGuidance": "",
+      "sourceCell": "C24",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s16"
+    },
+    "kfc-r26": {
+      "az": "Əməkdaşa işə başladığı ilk gün təlimçi və ya instruktor təyin edilib.",
+      "en": "A trainer or instructor was assigned on the employee's first working day.",
+      "ru": "В первый рабочий день сотруднику назначен тренер или инструктор.",
+      "source": "İşçiyə işə başladığı ilk gün təlimçi/instruktor təyin edilib.",
+      "sourceGuidance": "",
+      "sourceCell": "C26",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r27": {
+      "az": "Əməkdaş son yeniliklər barədə məlumatlıdır.",
+      "en": "The employee knows the latest updates.",
+      "ru": "Сотрудник знает о последних изменениях.",
+      "source": "İşçi son yenilikləri bilir.",
+      "sourceGuidance": "",
+      "sourceCell": "C27",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r28": {
+      "az": "Əməkdaş bir modul üzrə sertifikasiyadan keçib.",
+      "en": "The employee is certified in one module.",
+      "ru": "Сотрудник прошёл сертификацию по одному модулю.",
+      "source": "İşçi bir modul üzrə sertifikasiyadan keçmişdir",
+      "sourceGuidance": "",
+      "sourceCell": "C28",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r29": {
+      "az": "Əməkdaş neçə saat işlədiyini və bu məlumatı haradan əldə edə biləcəyini bilir.",
+      "en": "The employee knows their hours worked and where to find this information.",
+      "ru": "Сотрудник знает количество отработанных часов и где получить эти сведения.",
+      "source": "İşçi neçə saat işlədiyini və müvafiq məlumatı haradan əldə etməli olduğunu bilir.",
+      "sourceGuidance": "",
+      "sourceCell": "C29",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r30": {
+      "az": "Əməkdaş növbəti vəzifə pilləsinə keçmək üçün nə etməli və nəyi öyrənməli olduğunu bilir.",
+      "en": "The employee knows what to do and learn to progress to the next career level.",
+      "ru": "Сотрудник знает, что нужно сделать и изучить для перехода на следующую карьерную ступень.",
+      "source": "İşçi növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir",
+      "sourceGuidance": "",
+      "sourceCell": "C30",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r31": {
+      "az": "Əməkdaş bütün karyera imkanları barədə məlumatlıdır.",
+      "en": "The employee knows all career opportunities.",
+      "ru": "Сотрудник знает обо всех карьерных возможностях.",
+      "source": "İşçi bütün karyera imkanlarını bilir ",
+      "sourceGuidance": "",
+      "sourceCell": "C31",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r32": {
+      "az": "Əməkdaş restoranın bütün motivasiya proqramları barədə məlumatlıdır.",
+      "en": "The employee knows all restaurant motivation programmes.",
+      "ru": "Сотрудник знает обо всех мотивационных программах ресторана.",
+      "source": "İşçi restoranın bütün motivasiya proqramlarını bilir",
+      "sourceGuidance": "",
+      "sourceCell": "C32",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r33": {
+      "az": "Əməkdaşın iş geyimi standartlara uyğundur.",
+      "en": "The employee's uniform meets the standards.",
+      "ru": "Форма сотрудника соответствует стандартам.",
+      "source": "İşçinin uniforması standartlara uyğundur",
+      "sourceGuidance": "",
+      "sourceCell": "C33",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s25"
+    },
+    "kfc-r35": {
+      "az": "Məlumat lövhələri və yaddaş kitabçaları üçün nəzərdə tutulmuş ciblər təmizdir.",
+      "en": "Noticeboards and reference-guide pockets are clean.",
+      "ru": "Информационные стенды и карманы для памяток чистые.",
+      "source": "Lövhələr və yaddaş kitabçası üçün nəzərdə tutulmuş ciblər təmizdir",
+      "sourceGuidance": "",
+      "sourceCell": "C35",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r36": {
+      "az": "ROCC, GES və DP nəticələri, cari müsabiqələr, 4P üzrə məqsəd və nəticələr bütün əməkdaşlar üçün əlçatandır; əməkdaşlar bu məlumatlardan xəbərdardırlar.",
+      "en": "ROCC, GES and DP results, current competitions and 4P goals/results are accessible to all employees, who are informed about them.",
+      "ru": "Результаты ROCC, GES и DP, текущие конкурсы, цели и результаты 4P доступны всем сотрудникам; сотрудники осведомлены о них.",
+      "source": "Bütün işçilər üçün məlumatlar əlçatandır: ROCC nəticələri, GES, DP üzrə nəticələr, cari yarışlar, 4P üzrə məqsəd və nəticələr. İşçilər məlumatlandırılıb",
+      "sourceGuidance": "",
+      "sourceCell": "C36",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r37": {
+      "az": "Menecerlər cari BSC nəticələrini və əsas göstəricilər üzrə tədbirlər planını bilirlər.",
+      "en": "Managers know current BSC results and the action plan for key indicators.",
+      "ru": "Менеджеры знают текущие результаты BSC и план мероприятий по ключевым показателям.",
+      "source": "Menecerlər cari BSC nəticələrini və əsas göstəricilər üzrə tədbirlər planını bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C37",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r38": {
+      "az": "Restoran komandası ilə ayda bir dəfə iclas keçirilir.",
+      "en": "A restaurant team meeting is held once a month.",
+      "ru": "Собрание команды ресторана проводится один раз в месяц.",
+      "source": "Restoran komandası ilə ayda 1 dəfə iclas keçirilir",
+      "sourceGuidance": "",
+      "sourceCell": "C38",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r39": {
+      "az": "Motivasiya proqramları üzrə plakat əməkdaşların görə biləcəyi yerdədir, məlumatlar aktualdır və əməkdaşlar proqramlardan xəbərdardırlar.",
+      "en": "The motivation programme poster is visible, information is current and employees are informed.",
+      "ru": "Плакат мотивационных программ размещён на видном месте, сведения актуальны, сотрудники осведомлены.",
+      "source": "Motivasiya proqramları üzrə plakat mövcuddur və işçilərin görə biləcəyi yerdədir, məlumatlar aktualdır, işçilər məlumatlıdır.",
+      "sourceGuidance": "",
+      "sourceCell": "C39",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r40": {
+      "az": "“SUSMA!” plakatı əməkdaşların görə biləcəyi yerdədir; RGM və ƏM nömrələri qeyd olunub və əməkdaşlar məlumatlandırılıblar.",
+      "en": "The “SUSMA!” poster is visible to employees; RGM and ƏM numbers are shown and employees are informed.",
+      "ru": "Плакат «SUSMA!» размещён на видном месте; указаны номера RGM и ƏM, сотрудники осведомлены.",
+      "source": "SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir. RGM və ƏM nömrələri qeyd olunub və işçilər məlumatlandırılıb",
+      "sourceGuidance": "",
+      "sourceCell": "C40",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r41": {
+      "az": "Restoranda EES sorğusunun nəticələri üzrə iclas keçirilib, tədbirlər planı hazırlanıb və əməkdaşların görə biləcəyi yerdə asılıb.",
+      "en": "An EES results meeting was held; an action plan was prepared and displayed where employees can see it.",
+      "ru": "Проведено собрание по результатам EES; план мероприятий составлен и размещён на видном сотрудникам месте.",
+      "source": "Restoranda EES sorğusunun nəticələri üzrə iclas keçirilib. Tədbirlər planı tərtib olunub və işçilərin görə biləcəyi yerdə asılıb",
+      "sourceGuidance": "",
+      "sourceCell": "C41",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r42": {
+      "az": "Bütün əməkdaşlar sosial şəbəkələrdə və kütləvi informasiya vasitələri ilə ünsiyyətdə davranış qaydalarını bilirlər.",
+      "en": "All employees know the rules of conduct on social media and in communication with the media.",
+      "ru": "Все сотрудники знают правила поведения в социальных сетях и общения со СМИ.",
+      "source": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C42",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r43": {
+      "az": "İş geyimi standartları barədə məlumatlar əməkdaşlar üçün əlçatandır.",
+      "en": "Uniform standards information is accessible to employees.",
+      "ru": "Информация о стандартах формы доступна сотрудникам.",
+      "source": "Uniforma standartları üzrə məlumatlar işçilər üçün əlçatan yerdədir",
+      "sourceGuidance": "",
+      "sourceCell": "C43",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r44": {
+      "az": "Restoranda əməkdaşlar ad günləri və şəxsi nailiyyətləri münasibətilə təbrik olunurlar.",
+      "en": "Employees are congratulated on birthdays and personal achievements.",
+      "ru": "Сотрудников поздравляют с днями рождения и личными достижениями.",
+      "source": "Restoranda işçilər ad günləri və şəxsi nailiyyətləri münasibətilə təbrik olunur.",
+      "sourceGuidance": "",
+      "sourceCell": "C44",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r45": {
+      "az": "“Şirkət mədəniyyəti” plakatı yaxşı vəziyyətdədir.",
+      "en": "The “Company culture” poster is in good condition.",
+      "ru": "Плакат «Культура компании» находится в хорошем состоянии.",
+      "source": "\"Şirkət mədəniyyəti\" plakatı yaxşı vəziyyətdədir",
+      "sourceGuidance": "",
+      "sourceCell": "C45",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r46": {
+      "az": "Menecer ABR-nin nə olduğunu bilir və əməkdaşların tanış olması üçün ABR kartları mövcuddur.",
+      "en": "The manager knows what ABR is and ABR cards are available for employees.",
+      "ru": "Менеджер знает, что такое ABR; карточки ABR доступны сотрудникам для ознакомления.",
+      "source": "Menecer ABR nə olduğunu bilir, işçilərin tanış olması üçün ABR kartları mövcuddur",
+      "sourceGuidance": "",
+      "sourceCell": "C46",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r47": {
+      "az": "“Sənin karyera yolun” plakatı əməkdaşların görə biləcəyi yerdədir və məlumatlar aktualdır.",
+      "en": "The “Your career path” poster is visible to employees and up to date.",
+      "ru": "Плакат «Твой карьерный путь» размещён на видном сотрудникам месте, сведения актуальны.",
+      "source": "\"Sənin karyera yolun\" plakatı mövcuddur, işçilərin görə biləcəkləri yerdədir, məlumatlar aktualdır",
+      "sourceGuidance": "",
+      "sourceCell": "C47",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r48": {
+      "az": "“Özün haqqında danış” plakatı əməkdaşların görə biləcəyi yerdədir.",
+      "en": "The “Tell us about yourself” poster is visible to employees.",
+      "ru": "Плакат «Расскажи о себе» размещён на видном сотрудникам месте.",
+      "source": "\"Özün haqqında danış\" plakatı mövcuddur, işçilərin görə biləcəyi yerdədir",
+      "sourceGuidance": "",
+      "sourceCell": "C48",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s34"
+    },
+    "kfc-r50": {
+      "az": "Əməkdaşlar üçün müdir və ya modul təlimçisi tərəfindən hazırlanmış təlim planı mövcuddur.",
+      "en": "Employees have a training plan prepared by the manager or module trainer.",
+      "ru": "Для сотрудников имеется план обучения, подготовленный руководителем или тренером модуля.",
+      "source": "İşçilərin müdir/modul təlimçisi tərəfindən hazırlanmış təlim planı vard",
+      "sourceGuidance": "",
+      "sourceCell": "C50",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r51": {
+      "az": "PPR üzrə tədbirlər planı The Vault sistemində təyin edilmiş modullara uyğundur.",
+      "en": "The PPR action plan matches the assigned modules in The Vault.",
+      "ru": "План мероприятий PPR соответствует назначенным модулям в The Vault.",
+      "source": "PPR üzrə tədbirlər planı The Vault sistemində təyin olunmuş modullara uyğun gəlir ",
+      "sourceGuidance": "",
+      "sourceCell": "C51",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r52": {
+      "az": "The Vault sistemində əsas və əlavə təlimlər tamamlanıb.",
+      "en": "Core and additional training in The Vault is complete.",
+      "ru": "Основное и дополнительное обучение в The Vault завершено.",
+      "source": "The Vaultda əsas və  əlavə təlim  tamamlanıb",
+      "sourceGuidance": "",
+      "sourceCell": "C52",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r53": {
+      "az": "Təlimlərin izlənməsi forması bütün vəzifələr üzrə düzgün doldurulur.",
+      "en": "The training tracking form is completed correctly for all roles.",
+      "ru": "Форма отслеживания обучения правильно заполнена для всех должностей.",
+      "source": "Təlimlərin izlənmə blankı düzgün doldurulur (bütün vəzifələr üçün )",
+      "sourceGuidance": "",
+      "sourceCell": "C53",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r54": {
+      "az": "Menecerlərin (RGM, ARGM, SM) şəxsi iş qovluqlarında DR forması mövcuddur.",
+      "en": "Managers' (RGM, ARGM, SM) personnel files contain the DR form.",
+      "ru": "В личных делах менеджеров (RGM, ARGM, SM) имеется форма DR.",
+      "source": "Menecerlərin şəxsi qovluğunda DR blankı mövcuddur (RGM, ARGM, SM).",
+      "sourceGuidance": "",
+      "sourceCell": "C54",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r55": {
+      "az": "Təlimçilər BÜ üçün təlimin əsaslarını, modullar üzrə müddətləri və dördmərhələli təlim prosesini bilirlər.",
+      "en": "Trainers know BÜ training basics, module durations and the four-step training process.",
+      "ru": "Тренеры знают основы обучения BÜ, сроки модулей и четырёхэтапный процесс обучения.",
+      "source": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə müddətləri və 4 mərhələli təlim prosesini bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C55",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r56": {
+      "az": "Restoranda müdir də daxil olmaqla ən azı iki modul təlimçisi var. Bir modul təlimçisi eyni vaxtda ikidən çox əməkdaşa təlim keçə bilməz.",
+      "en": "The restaurant has at least two module trainers, including the manager. One module trainer may not train more than two employees at a time.",
+      "ru": "В ресторане не менее двух тренеров модулей, включая руководителя. Один тренер модуля не может обучать более двух сотрудников одновременно.",
+      "source": "Restoranda müdir daxil olmaqla, ən az 2 modul təlimçisi vardır. Bir modul təlimçisi eyni vaxtda 2-dən çox işçiyə təlim keçə bilməz.",
+      "sourceGuidance": "",
+      "sourceCell": "C56",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r57": {
+      "az": "Modul təlimçisi təlim standartlarını bilir.",
+      "en": "The module trainer knows the training standards.",
+      "ru": "Тренер модуля знает стандарты обучения.",
+      "source": "Modul təlimçisi təlim standartlarını bilir",
+      "sourceGuidance": "",
+      "sourceCell": "C57",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r58": {
+      "az": "Menecerlər fərdi planlarını və cari il üzrə G&R-ni bilirlər.",
+      "en": "Managers know their individual plans and G&R for the current year.",
+      "ru": "Менеджеры знают свои индивидуальные планы и G&R на текущий год.",
+      "source": "Menecerlər fərdi planlarını və cari il üçün G&R-nı bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C58",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r59": {
+      "az": "Menecerlər inkişaf etdirməli olduqları səriştələri bilirlər və fərdi inkişaf planlarını (IDP) izah edə bilirlər.",
+      "en": "Managers know the competencies they need to develop and can explain their individual development plans (IDP).",
+      "ru": "Менеджеры знают, какие компетенции нужно развивать, и могут объяснить свои индивидуальные планы развития (IDP).",
+      "source": "Menecerlər üzərində çalışmalı olduqları səriştələrdən xəbərdardır və öz inkişaf planları haqqında danışa bilirlər (IDP) ",
+      "sourceGuidance": "",
+      "sourceCell": "C59",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r60": {
+      "az": "Kassa stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All cashier station employees are certified in the relevant module.",
+      "ru": "Все сотрудники кассовой станции сертифицированы по соответствующему модулю.",
+      "source": "Kassa stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "",
+      "sourceCell": "C60",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r61": {
+      "az": "Mətbəx stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All kitchen station employees are certified in the relevant module.",
+      "ru": "Все сотрудники кухонной станции сертифицированы по соответствующему модулю.",
+      "source": "Mətbəx stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "",
+      "sourceCell": "C61",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r62": {
+      "az": "Unlama stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All breading station employees are certified in the relevant module.",
+      "ru": "Все сотрудники панировочной станции сертифицированы по соответствующему модулю.",
+      "source": "Unlama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "",
+      "sourceCell": "C62",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r63": {
+      "az": "Yeni işə qəbul olunan əməkdaşların 30 gün ərzində “Şirkətlə tanışlıq” və “Qida təhlükəsizliyi” təlimlərində iştirakı təmin olunur; təlimlərdə iştirak faizi nəzərə alınır.",
+      "en": "New employees attend “Company introduction” and “Food safety” training within 30 days, taking the attendance percentage into account.",
+      "ru": "Обеспечено участие новых сотрудников в обучении «Знакомство с компанией» и «Пищевая безопасность» в течение 30 дней с учётом процента участия.",
+      "source": "Yeni qəbul olunmuş işçilərin Şirkətlə tanışlıq və Qida təhlükəsizliyi təlimində 30 gün ərzində iştirakı təmin olunur (təlimlərdə iştirak faizi nəzərə alınmaqla).",
+      "sourceGuidance": "",
+      "sourceCell": "C63",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r64": {
+      "az": "Restoranda bir ildən artıq çalışan əməkdaşların BÜ-dən ARGM-ə qədər illik təkrar sertifikasiyası keçirilir və qeydiyyatı aparılır.",
+      "en": "Annual recertification is conducted and recorded for employees from BÜ to ARGM who have worked at the restaurant for over one year.",
+      "ru": "Проводится и регистрируется ежегодная повторная сертификация сотрудников от BÜ до ARGM, работающих в ресторане более года.",
+      "source": "Restoranda 1 ildən artıq çalışan işçilərin BÜ-dən ARGM-ə qədər illik resertifikasiyası keçirilir və müvafiq qeydiyyat aparılır",
+      "sourceGuidance": "",
+      "sourceCell": "C64",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r65": {
+      "az": "Əməkdaşların sertifikasiyadan keçməsi təmin olunub.",
+      "en": "Employee certification has been ensured.",
+      "ru": "Обеспечено прохождение сертификации сотрудниками.",
+      "source": "İşçilərin sertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "",
+      "sourceCell": "C65",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r66": {
+      "az": "Menecerlərin sertifikasiyadan və təkrar sertifikasiyadan keçməsi təmin olunub.",
+      "en": "Manager certification and recertification have been ensured.",
+      "ru": "Обеспечено прохождение менеджерами сертификации и повторной сертификации.",
+      "source": "Menecerlərin sertifikasiyadan və resertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "",
+      "sourceCell": "C66",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s49"
+    },
+    "kfc-r68": {
+      "az": "Restoranda əməkdaşların nailiyyətlərinin təqdir edilməsi sistemi işləyir və təqdir kartları mövcuddur.",
+      "en": "The restaurant's employee recognition system operates and recognition cards are available.",
+      "ru": "В ресторане действует система признания достижений сотрудников, имеются карточки признания.",
+      "source": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+      "sourceGuidance": "",
+      "sourceCell": "C68",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s67"
+    },
+    "kfc-r69": {
+      "az": "Əməkdaşlar KFC haqqında əsas məlumatları bilirlər.",
+      "en": "Employees know the key facts about KFC.",
+      "ru": "Сотрудники знают основные факты о KFC.",
+      "source": "İşçilər əsas KFC faktlarından xəbərdardır",
+      "sourceGuidance": "",
+      "sourceCell": "C69",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s67"
+    },
+    "kfc-r70": {
+      "az": "Əməkdaşlar üçün nəzərdə tutulmuş geyim, tualet və yemək otaqları təmiz, səliqəli və texniki cəhətdən işləkdir; temperatur normaldır, ütü və ütü masası mövcuddur.",
+      "en": "Employee changing rooms, toilets and dining rooms are clean, tidy and functional; temperature is normal and an iron and ironing board are available.",
+      "ru": "Раздевалки, туалеты и столовые сотрудников чистые, опрятные и исправные; температура нормальная, имеются утюг и гладильная доска.",
+      "source": "İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur normaldır, ütü və ütü masası vardır",
+      "sourceGuidance": "",
+      "sourceCell": "C70",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s67"
+    },
+    "kfc-r72": {
+      "az": "Cari il üzrə məzuniyyət qrafiki mövcuddur və restoran müdiri əməkdaşların məzuniyyət günlərinin sayına nəzarət edir.",
+      "en": "A leave schedule for the current year exists and the restaurant manager monitors employees' leave days.",
+      "ru": "Имеется график отпусков на текущий год; руководитель ресторана контролирует количество дней отпуска сотрудников.",
+      "source": "Cari il üçün məzuniyyət qrafikinin mövcudluğu. Restoran müdiri işçilərin məzuniyyət günlərinin sayına nəzarət edir",
+      "sourceGuidance": "",
+      "sourceCell": "C72",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s71"
+    },
+    "kfc-r73": {
+      "az": "Cari rüb üzrə əməkdaş dövriyyəsi plana uyğundur.",
+      "en": "Employee turnover for the current quarter is in line with the plan.",
+      "ru": "Текучесть персонала за текущий квартал соответствует плану.",
+      "source": "Cari kvartal üzrə işçi dövriyyəsi plana uyğundur",
+      "sourceGuidance": "",
+      "sourceCell": "C73",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s71"
+    },
+    "kfc-r74": {
+      "az": "İş qrafiki ilə tanışlığı təsdiqləyən əməkdaş imzaları mövcuddur, əməkdaşların qrafiklə bağlı istəkləri nəzərə alınır və qrafik cümə axşamından gec olmayaraq asılır.",
+      "en": "Employees have signed to acknowledge the schedule, their scheduling preferences are considered, and the schedule is posted no later than Thursday.",
+      "ru": "Имеются подписи сотрудников об ознакомлении с графиком, их пожелания учитываются, график вывешивается не позднее четверга.",
+      "source": "İş cədvəlində işçilərin cədvəllə tanış olmasını təsdiqləyən imzaları mövcuddur, işçilərin cədvəl üzrə istəkləri nəzərə alınır, iş cədvəli həftənin cümə axşamından gec olmayaraq asılır.",
+      "sourceGuidance": "",
+      "sourceCell": "C74",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s71"
+    },
+    "kfc-r75": {
+      "az": "Əməkdaşlar işlədikləri saatlara haradan baxa biləcəklərini bilirlər.",
+      "en": "Employees know where to view their hours worked.",
+      "ru": "Сотрудники знают, где посмотреть отработанные часы.",
+      "source": "İşçilər çalışma saatlarına harada baxa biləcəklərini bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "C75",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s71"
+    },
+    "kfc-r76": {
+      "az": "İş qrafiki mənbədə “Ə.M-Э” kimi göstərilən tələbə uyğun hazırlanır.",
+      "en": "The work schedule complies with the requirement identified in the source as “Ə.M-Э”.",
+      "ru": "График работы составляется в соответствии с требованием, обозначенным в источнике как «Ə.M-Э».",
+      "source": "İş cədvəlinin hazırlanması Ə.M-Э  uyğun şəkildə həyata keçirilir",
+      "sourceGuidance": "",
+      "sourceCell": "C76",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s71",
+      "clarification": "Ə.M-Э qısaltmasının açılışı mənbədə təsdiqlənmir."
+    },
+    "kfc-r78": {
+      "az": "Qonaqları qarşılayan əməkdaş (mənbədə “Xostes”) keçdiyi təlimin standartlarını bilir və sertifikasiyadan keçib.",
+      "en": "The guest host (source: “Xostes”) knows the standards of the training completed and is certified.",
+      "ru": "Сотрудник по встрече гостей (в источнике «Xostes») знает стандарты пройденного обучения и сертифицирован.",
+      "guidance": {
+        "az": "Qonaqları qarşılayan əməkdaşdan vəzifə öhdəliklərini və cavabdeh olduğu təlim mərhələlərini soruşun. Təlim modulunun keçirildiyini və qiymətləndirmə vərəqini yoxlayın.",
+        "en": "Ask the guest host about duties and training stages they are responsible for. Check that the training module was completed and review the assessment sheet.",
+        "ru": "Спросите сотрудника по встрече гостей об обязанностях и этапах обучения, за которые он отвечает. Проверьте прохождение учебного модуля и оценочный лист."
+      },
+      "source": "Xostes  həyata keçirdiyi təlimin standartlarını bilir. Xostes  sertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "Xostesdən soruşmaq : xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri. Təlim üzrə modul keçirilmişdir və qiymətləndirmə vərəqini yoxlamaq",
+      "sourceCell": "C78",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s77",
+      "optionalRole": true
+    },
+    "kfc-r79": {
+      "az": "Mənbədə “Klikun” adlandırılan vəzifəni tutan əməkdaş keçdiyi təlimin standartlarını bilir və sertifikasiyadan keçib.",
+      "en": "The employee in the role called “Klikun” in the source knows the standards of the training completed and is certified.",
+      "ru": "Сотрудник в должности, названной в источнике «Klikun», знает стандарты пройденного обучения и сертифицирован.",
+      "guidance": {
+        "az": "“Klikun” vəzifəsini tutan əməkdaşdan öhdəliklərini, cavabdeh olduğu təlim mərhələlərini və KPI göstəricilərini soruşun. Təlim modulunun keçirildiyini və qiymətləndirmə vərəqini yoxlayın.",
+        "en": "Ask the employee in the “Klikun” role about duties, training stages and KPIs. Check completion of the training module and the assessment sheet.",
+        "ru": "Спросите сотрудника в должности «Klikun» об обязанностях, этапах обучения и KPI. Проверьте прохождение учебного модуля и оценочный лист."
+      },
+      "source": "Klikun  həyata keçirdiyi təlimin standartlarını bilir. Klikun sertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "Klikundan soruşmaq: klikun öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdirvə qiymətləndirmə vərəqini yoxlamaq",
+      "sourceCell": "C79",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s77",
+      "optionalRole": true,
+      "clarification": "Klikun vəzifəsinin rəsmi Azərbaycan dili adı təsdiqlənməyib; istifadəçi mənbə adının saxlanmasını təsdiqləyib."
+    },
+    "kfc-r80": {
+      "az": "Mənbədə “Skaut” adlandırılan vəzifəni tutan əməkdaş keçdiyi təlimin standartlarını bilir və sertifikasiyadan keçib.",
+      "en": "The employee in the role called “Skaut” in the source knows the standards of the training completed and is certified.",
+      "ru": "Сотрудник в должности, названной в источнике «Skaut», знает стандарты пройденного обучения и сертифицирован.",
+      "guidance": {
+        "az": "Skautdan vəzifə öhdəliklərini, cavabdeh olduğu təlim mərhələlərini və KPI göstəricilərini soruşun. Təlim modulunun keçirildiyini, The Vault sistemini və qiymətləndirmə vərəqini yoxlayın.",
+        "en": "Ask the Skaut about role duties, training stages they are responsible for and KPIs. Check completion of the training module, The Vault and the assessment sheet.",
+        "ru": "Спросите сотрудника Skaut о должностных обязанностях, этапах обучения, за которые он отвечает, и KPI. Проверьте прохождение учебного модуля, The Vault и оценочный лист."
+      },
+      "source": "Skaut  həyata keçirdiyi təlimin standartlarını bilir. Skaut sertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "Skautdan soruşmaq : xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdir. The Vault sistemini və qiymətləndirmə vərəqini yoxlamaq",
+      "sourceCell": "C80",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s77",
+      "optionalRole": true,
+      "clarification": "Skaut vəzifəsinin rəsmi Azərbaycan dili adı təsdiqlənməyib; istifadəçi mənbə adının saxlanmasını təsdiqləyib."
+    },
+    "kfc-r81": {
+      "az": "Brend üzrə baş aşpaz keçdiyi təlimin standartlarını bilir və sertifikasiyadan keçib.",
+      "en": "The brand chef knows the standards of the training completed and is certified.",
+      "ru": "Бренд-шеф знает стандарты пройденного обучения и сертифицирован.",
+      "guidance": {
+        "az": "Brend üzrə baş aşpazdan vəzifə öhdəliklərini, cavabdeh olduğu təlim mərhələlərini və KPI göstəricilərini soruşun. Təlim modulunun keçirildiyini və qiymətləndirmə vərəqini yoxlayın.",
+        "en": "Ask the brand chef about role duties, training stages they are responsible for and KPIs. Check completion of the training module and the assessment sheet.",
+        "ru": "Спросите бренд-шефа о должностных обязанностях, этапах обучения, за которые он отвечает, и KPI. Проверьте прохождение учебного модуля и оценочный лист."
+      },
+      "source": "Brend Şef həyata keçirdiyi təlimin standartlarını bilir. Brend Şef sertifikasiyadan keçmələri təmin olunmuşdur",
+      "sourceGuidance": "Brend Şefden soruşmaq: xostesdən öhdəlikləri; onun məsul olduğunu təlim mərhələləri və KPİ. Təlim üzrə modul keçirilmişdir  və qiymətləndirmə vərəqini yoxlamaq",
+      "sourceCell": "C81",
+      "brandId": "kfc",
+      "sheet": "HRTR Yeni",
+      "sectionId": "kfc-s77",
+      "optionalRole": true
+    },
+    "pizza-hut-r8": {
+      "az": "Xəmirin hazırlanma qaydalarını əks etdirən yaddaş kitabçaları mövcuddur.",
+      "en": "Reference guides for dough preparation are available.",
+      "ru": "Имеются памятки по правилам приготовления теста.",
+      "guidance": {
+        "az": "Yaddaş kitabçalarının yerində olduğunu yoxlayın və əməkdaşlardan lazımi məlumatı haradan əldə edə biləcəklərini soruşun.",
+        "en": "Check that the guides are in place and ask employees where to find the required information.",
+        "ru": "Проверьте наличие памяток и спросите сотрудников, где получить нужную информацию."
+      },
+      "source": "Xəmir hazırlanma qaydalarını əks etdirən yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq",
+      "sourceCell": "B8",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r9": {
+      "az": "Doğrama sahəsi üçün yaddaş kitabçaları mövcuddur.",
+      "en": "Reference guides for the chopping area are available.",
+      "ru": "Имеются памятки для зоны нарезки.",
+      "guidance": {
+        "az": "Yaddaş kitabçalarının yerində olduğunu yoxlayın və əməkdaşlardan lazımi məlumatı haradan əldə edə biləcəklərini soruşun.",
+        "en": "Check that the guides are in place and ask employees where to find the required information.",
+        "ru": "Проверьте наличие памяток и спросите сотрудников, где получить нужную информацию."
+      },
+      "source": "Doğrama zona üçün yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq",
+      "sourceCell": "B9",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r10": {
+      "az": "Kassa sahəsi üçün yaddaş kitabçaları mövcuddur.",
+      "en": "Reference guides for the cashier area are available.",
+      "ru": "Имеются памятки для кассовой зоны.",
+      "guidance": {
+        "az": "Yaddaş kitabçalarının yerində olduğunu yoxlayın və əməkdaşlardan lazımi məlumatı haradan əldə edə biləcəklərini soruşun.",
+        "en": "Check that the guides are in place and ask employees where to find the required information.",
+        "ru": "Проверьте наличие памяток и спросите сотрудников, где получить нужную информацию."
+      },
+      "source": "Kassa zona üçün yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq",
+      "sourceCell": "B10",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r11": {
+      "az": "Pizza hazırlama stansiyası üçün yaddaş kitabçaları mövcuddur.",
+      "en": "Reference guides for the pizza preparation station are available.",
+      "ru": "Имеются памятки для станции приготовления пиццы.",
+      "guidance": {
+        "az": "Yaddaş kitabçalarının yerində olduğunu yoxlayın və əməkdaşlardan lazımi məlumatı haradan əldə edə biləcəklərini soruşun.",
+        "en": "Check that the guides are in place and ask employees where to find the required information.",
+        "ru": "Проверьте наличие памяток и спросите сотрудников, где получить нужную информацию."
+      },
+      "source": "Pizza hazırlama stansiyası üçün yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilib-bilmədiklərini soruşmaq",
+      "sourceCell": "B11",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r12": {
+      "az": "Restoranda Ecolab üzrə yaddaş kitabçaları mövcuddur.",
+      "en": "Ecolab reference guides are available at the restaurant.",
+      "ru": "В ресторане имеются памятки Ecolab.",
+      "guidance": {
+        "az": "Əməkdaşların iş qaydalarına, o cümlədən mətbəx stansiyasındakı vəzifələrə, əl yuma və kimyəvi vasitələrlə işləmə qaydalarına riayət etmələrini müşahidə edin.",
+        "en": "Observe compliance with work procedures, including kitchen station duties, handwashing and chemical handling.",
+        "ru": "Понаблюдайте за соблюдением рабочих процедур, включая обязанности на кухонной станции, мытьё рук и работу с химическими средствами."
+      },
+      "source": "Restoranda Ecolab üzrə yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "İşçiləri müşahidə etmək və iş qaydalarına necə riayət etdiklərini yoxlamaq mətbəx stansiyası işçisinin öhdəlikləri, əl yuma qaydaları, kimyəvi vasitələrlə iş və s.)",
+      "sourceCell": "B12",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r13": {
+      "az": "Əməkdaşlar kimyəvi vasitələrlə işləmə qaydalarına riayət edirlər.",
+      "en": "Employees follow chemical handling rules.",
+      "ru": "Сотрудники соблюдают правила работы с химическими средствами.",
+      "guidance": {
+        "az": "Əməkdaşların iş qaydalarına, o cümlədən mətbəx stansiyasındakı vəzifələrə, əl yuma və kimyəvi vasitələrlə işləmə qaydalarına riayət etmələrini müşahidə edin.",
+        "en": "Observe compliance with work procedures, including kitchen station duties, handwashing and chemical handling.",
+        "ru": "Понаблюдайте за соблюдением рабочих процедур, включая обязанности на кухонной станции, мытьё рук и работу с химическими средствами."
+      },
+      "source": "Əməkdaşlar kimyəvi vasitələrlə iş qaydalarına riayət edilər",
+      "sourceGuidance": "İşçiləri müşahidə etmək və iş qaydalarına necə riayət etdiklərini yoxlamaq mətbəx stansiyası işçisinin öhdəlikləri, əl yuma qaydaları, kimyəvi vasitələrlə iş və s.)",
+      "sourceCell": "B13",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r14": {
+      "az": "Restoran və istehsal sahəsi təmizdir, qonaqlar üçün nəzərdə tutulmuş sahələr səliqəlidir.",
+      "en": "The restaurant and production area are clean, and guest areas are tidy.",
+      "ru": "Ресторан и производственная зона чистые, гостевые зоны опрятные.",
+      "guidance": {
+        "az": "Yoxlayın.",
+        "en": "Check.",
+        "ru": "Проверьте."
+      },
+      "source": "Restoran təmzidir, qonaqlar üçün nəzərdə tutulmuş sahələr səliqəlidir, istehzal zona təmizdir",
+      "sourceGuidance": "Yoxlamaq",
+      "sourceCell": "B14",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r15": {
+      "az": "Hut bot sistemində “5 Star” üzrə orta qiymət 3-dən yüksəkdir.",
+      "en": "The average “5 Star” rating in Hut bot exceeds 3.",
+      "ru": "Средняя оценка «5 Star» в Hut bot превышает 3.",
+      "guidance": {
+        "az": "Sistemdə yoxlayın.",
+        "en": "Check in the system.",
+        "ru": "Проверьте в системе."
+      },
+      "source": "Hut bot \"5 Star\" üzrə ortalam qiymət 3-dən yuxarıdır",
+      "sourceGuidance": "Sistemdə yoxlamaq",
+      "sourceCell": "B15",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r16": {
+      "az": "Bütün əməkdaşlar sosial şəbəkələrdə və kütləvi informasiya vasitələri ilə ünsiyyətdə davranış qaydalarını bilirlər.",
+      "en": "All employees know the rules of conduct on social media and in communication with the media.",
+      "ru": "Все сотрудники знают правила поведения в социальных сетях и общения со СМИ.",
+      "guidance": {
+        "az": "Əməkdaşların sosial şəbəkələrdə və KİV ilə ünsiyyətdə davranış və reaksiya qaydalarını bildiklərini, restoranın hər kəsə açıq sosial şəbəkə hesabının olmadığını yoxlayın.",
+        "en": "Check that employees know social media/media conduct and response rules and that the restaurant has no publicly accessible social media account.",
+        "ru": "Проверьте знание сотрудниками правил поведения и реагирования в соцсетях и СМИ, а также отсутствие у ресторана общедоступного аккаунта в соцсетях."
+      },
+      "source": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+      "sourceGuidance": "İşçilər sosial şəbəkələr və KİV ilə davranış qaydalarını, necə reaksiya verməli olduqlarını bilirlər, restoranın hər kəsə açıq sosial şəbəkə hesabı yoxdur",
+      "sourceCell": "B16",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s7"
+    },
+    "pizza-hut-r18": {
+      "az": "İşə qəbul prosesinin bütün mərhələləri tətbiq olunur.",
+      "en": "All stages of the recruitment process are used.",
+      "ru": "Применяются все этапы процесса приёма на работу.",
+      "guidance": {
+        "az": "RGM/ARGM-dən işə qəbul mərhələlərini soruşun.",
+        "en": "Ask RGM/ARGM about the recruitment stages.",
+        "ru": "Спросите RGM/ARGM об этапах приёма на работу."
+      },
+      "source": "İşə qəbul zamanı bütün qəbul pillələrindən istifadə olunur",
+      "sourceGuidance": " RGM/ARGM-dən işə qəbul pillələrini soruşmaq",
+      "sourceCell": "B18",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r19": {
+      "az": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir.",
+      "en": "The manager knows how to respond to applicants and who should conduct the interview.",
+      "ru": "Менеджер знает, как отвечать кандидатам и кто должен проводить собеседование.",
+      "guidance": {
+        "az": "Menecerdən iş şərtləri, əməkhaqqı və yaddaş kitabçasına əsasən namizədə verilməli suallar barədə soruşun.",
+        "en": "Ask the manager about working conditions, salary and interview questions from the guide.",
+        "ru": "Спросите менеджера об условиях работы, зарплате и вопросах кандидату по памятке."
+      },
+      "source": "Menecer işə qəbul namizədlərinə necə cavab verməli olduğunu və müsahibəni kimin keçirməli olduğunu bilir",
+      "sourceGuidance": "Menecerdən iş şərtləri və əmək haqqı, həmçinin namizədə hansı sualları verməli olduğu (yaddaş kitabçası üzrə) haqda soruşmaq",
+      "sourceCell": "B19",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r20": {
+      "az": "Əməkhaqqı barədə məlumatlar düzgündür.",
+      "en": "Salary information is accurate.",
+      "ru": "Сведения о заработной плате достоверны.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "Əmək haqqı ilə bağlı məlumatlar düzgündür",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq",
+      "sourceCell": "B20",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r21": {
+      "az": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatandır.",
+      "en": "Application forms are sufficient and accessible to applicants.",
+      "ru": "Анкеты для приёма на работу имеются в достаточном количестве и доступны кандидатам.",
+      "guidance": {
+        "az": "Restoranda materialların kifayət qədər olduğunu və işə qəbul məlumatlarının qonaqlar üçün əlçatanlığını qiymətləndirin.",
+        "en": "Assess whether there are sufficient materials and recruitment information is accessible to guests.",
+        "ru": "Оцените достаточность материалов и доступность информации о приёме на работу для гостей."
+      },
+      "source": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatan yerdədir",
+      "sourceGuidance": "Yoxlama,Restoranda kifayət qədər materialın olub-olmamasını və işə qəbul məlumatlarının Qonaqlara əlçatan olmasını qiymətləndirmək",
+      "sourceCell": "B21",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r22": {
+      "az": "Reklam materialları (qovluqlar) keyfiyyətlidir.",
+      "en": "Advertising materials (folders) are of good quality.",
+      "ru": "Рекламные материалы (папки) качественные.",
+      "guidance": {
+        "az": "Restoranda materialların kifayət qədər olduğunu və işə qəbul məlumatlarının qonaqlar üçün əlçatanlığını qiymətləndirin.",
+        "en": "Assess whether there are sufficient materials and recruitment information is accessible to guests.",
+        "ru": "Оцените достаточность материалов и доступность информации о приёме на работу для гостей."
+      },
+      "source": "Reklam materialları keyfiyyətlidir (Qovluqlar) ",
+      "sourceGuidance": "Yoxlama,Restoranda kifayət qədər materialın olub-olmamasını və işə qəbul məlumatlarının Qonaqlara əlçatan olmasını qiymətləndirmək",
+      "sourceCell": "B22",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r23": {
+      "az": "Yeni əməkdaşların işə uyğunlaşması prosesi tətbiq olunur.",
+      "en": "Employee onboarding is used.",
+      "ru": "Применяется процесс адаптации новых сотрудников.",
+      "guidance": {
+        "az": "Yeni əməkdaşdan soruşun.",
+        "en": "Ask a new employee.",
+        "ru": "Спросите нового сотрудника."
+      },
+      "source": "On - boarding istifadə olunur",
+      "sourceGuidance": "Təzə işçidən soruşmaq",
+      "sourceCell": "B23",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r24": {
+      "az": "“Dostunu gətir” plakatı əməkdaşların görə biləcəyi yerdə asılıb, yaxşı vəziyyətdədir və əməkdaşlar proqram barədə məlumatlıdırlar.",
+      "en": "The “Refer a friend” poster is visible to employees, in good condition, and employees know the programme.",
+      "ru": "Плакат «Приведи друга» размещён на видном сотрудникам месте, находится в хорошем состоянии; сотрудники знают о программе.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun və plakatın vəziyyətini yoxlayın.",
+        "en": "Ask several employees and check the poster's condition.",
+        "ru": "Опросите нескольких сотрудников и проверьте состояние плаката."
+      },
+      "source": "\"Dostunu gətir\" plakatı mövcuddur (işçilərin görməsi üçün asılmışdır və yaxşı vəziyyətdədir), işçilər proqram haqqında məlumatlandırılmışdır",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq və plakatın vəziyyətini yoxlamaq",
+      "sourceCell": "B24",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s17"
+    },
+    "pizza-hut-r26": {
+      "az": "Əməkdaşa işə başladığı ilk gün təlimçi təyin edilib.",
+      "en": "A trainer was assigned on the employee's first working day.",
+      "ru": "В первый рабочий день сотруднику назначен тренер.",
+      "guidance": {
+        "az": "Əməkdaşdan soruşun.",
+        "en": "Ask the employee.",
+        "ru": "Спросите сотрудника."
+      },
+      "source": "İşçiyə işə başladığı ilk gün Təlimçi  təyin edilib",
+      "sourceGuidance": "İşçidən soruşmaq ",
+      "sourceCell": "B26",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r27": {
+      "az": "Hər bir əməkdaş ən azı bir modul üzrə sertifikasiyadan keçib.",
+      "en": "Every employee is certified in at least one module.",
+      "ru": "Каждый сотрудник сертифицирован как минимум по одному модулю.",
+      "guidance": {
+        "az": "Hut University sistemində yoxlayın (OCL).",
+        "en": "Check in Hut University (OCL).",
+        "ru": "Проверьте в Hut University (OCL)."
+      },
+      "source": "Hər bir işçi ən azı 1 modül üzrə sertifikasiyadan keçib",
+      "sourceGuidance": "Hut university sistemı yoxlamaq (OCL)",
+      "sourceCell": "B27",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r28": {
+      "az": "Əməkdaş növbəti vəzifə pilləsinə keçmək üçün nə etməli və nəyi öyrənməli olduğunu bilir, bütün karyera imkanlarından xəbərdardır.",
+      "en": "The employee knows what to do and learn to progress to the next career level and knows all career opportunities.",
+      "ru": "Сотрудник знает, что нужно сделать и изучить для перехода на следующую карьерную ступень, и осведомлён обо всех карьерных возможностях.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir, İşçi bütün karyera imkanlarını bilir ",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B28",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r29": {
+      "az": "“Sənin karyera yolun” plakatı əməkdaşların görə biləcəyi yerdədir və məlumatlar aktualdır.",
+      "en": "The “Your career path” poster is visible to employees and up to date.",
+      "ru": "Плакат «Твой карьерный путь» размещён на видном сотрудникам месте, сведения актуальны.",
+      "guidance": {
+        "az": "Yoxlayın.",
+        "en": "Check.",
+        "ru": "Проверьте."
+      },
+      "source": " \"Sənin karyera yolun\" plakatı mövcuddur, işçilərin görə biləcəkləri yerdədir, məlumatlar aktualdır",
+      "sourceGuidance": "Yoxlamaq",
+      "sourceCell": "B29",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r30": {
+      "az": "Əməkdaşlar (BÜ) son yeniliklər barədə məlumatlıdırlar.",
+      "en": "Employees (BÜ) know the latest updates.",
+      "ru": "Сотрудники (BÜ) знают о последних изменениях.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "Əməkdaşlar (BÜ) son yeniləkləri bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B30",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r31": {
+      "az": "Əməkdaş neçə saat işlədiyini və bu məlumatı haradan əldə edə biləcəyini bilir.",
+      "en": "The employee knows their hours worked and where to find this information.",
+      "ru": "Сотрудник знает количество отработанных часов и где получить эти сведения.",
+      "guidance": {
+        "az": "Yeni əməkdaşdan soruşun və problem yarandıqda kimə müraciət etməli olduğunu bildiyini yoxlayın. Əməkdaş əməkhaqqının hesablanmasına dair nümunə göstərə və həftəlik iş qrafikinə haradan baxmalı olduğunu izah edə bilməlidir.",
+        "en": "Ask a new employee and check they know whom to contact if a problem arises. The employee should demonstrate a salary calculation example and know where to view the weekly schedule.",
+        "ru": "Спросите нового сотрудника, к кому обращаться при проблемах. Сотрудник должен показать пример расчёта зарплаты и знать, где посмотреть недельный график."
+      },
+      "source": "İşçi neçə saat işlədiyini və müvafiq məlumatı hardan əldən etməli olduğunu bilir",
+      "sourceGuidance": " Yeni işçidən soruşmaq, onun problem yarandıqda kimə müraciət etməli olduğunu bildiyindən əmin olmaq. İşçi əmək haqqının hesablanmasına dair nümunə göstərə bilir, həftəlik iş cədvəlinə harada baxmalı olduğunu bilir",
+      "sourceCell": "B31",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r32": {
+      "az": "Əməkdaş qida təhlükəsizliyi qaydalarını bilir.",
+      "en": "The employee knows food safety rules.",
+      "ru": "Сотрудник знает правила пищевой безопасности.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi Qid Təhülkəsizliyi qaydaları bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B32",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r33": {
+      "az": "Əməkdaş ƏM/YT qaydalarını bilir.",
+      "en": "The employee knows ƏM/YT rules.",
+      "ru": "Сотрудник знает правила ƏM/YT.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi ƏM/YT qayldalarını bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B33",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25",
+      "clarification": "ƏM/YT qısaltmalarının rəsmi açılışı təsdiqlənməlidir."
+    },
+    "pizza-hut-r34": {
+      "az": "Əməkdaş satış üzrə hədəfləri bilir.",
+      "en": "The employee knows the sales targets.",
+      "ru": "Сотрудник знает цели по продажам.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi satış üzrə məqsədləri bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B34",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r35": {
+      "az": "Əməkdaş Hut University sisteminin nə olduğunu və ondan necə istifadə etməli olduğunu bilir.",
+      "en": "The employee knows what Hut University is and how to use it.",
+      "ru": "Сотрудник знает, что такое Hut University и как им пользоваться.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi Hut university  sisteminin nə olduğunu və necə işləmək lazım olduğunu bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B35",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r36": {
+      "az": "Əməkdaş ACE-nin nə olduğunu və L3 üzrə kənarlaşmaları bilir.",
+      "en": "The employee knows what ACE is and knows L3 deviations.",
+      "ru": "Сотрудник знает, что такое ACE, и отклонения по L3.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi ACE nə olduğunu bilir. L3 sapmaları bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B36",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r37": {
+      "az": "Əməkdaş restoranın bütün motivasiya proqramları barədə məlumatlıdır.",
+      "en": "The employee knows all restaurant motivation programmes.",
+      "ru": "Сотрудник знает обо всех мотивационных программах ресторана.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçi restoranın bütün motivasiya proqramlarını bilir",
+      "sourceGuidance": "Bir necə işçidən soruşmaq",
+      "sourceCell": "B37",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r38": {
+      "az": "Əməkdaş iş geyimi standartlarını bilir.",
+      "en": "The employee knows the uniform standards.",
+      "ru": "Сотрудник знает стандарты формы.",
+      "guidance": {
+        "az": "Əməkdaşda yeni iş geyimi dəstinin olduğunu yoxlayın.",
+        "en": "Check that the employee has a new uniform set.",
+        "ru": "Проверьте наличие у сотрудника нового комплекта формы."
+      },
+      "source": "İşçi uniforması standartlarını bilir",
+      "sourceGuidance": "İşçidə yeni uniforma komplekti var",
+      "sourceCell": "B38",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r39": {
+      "az": "Geyim otağında iş geyimi standartlarına dair yaddaş kitabçaları mövcuddur.",
+      "en": "Uniform reference guides are available in the changing room.",
+      "ru": "В раздевалке имеются памятки по стандартам формы.",
+      "guidance": {
+        "az": "Yaddaş kitabçalarının yerində olduğunu və əməkdaşların lazımi məlumatı haradan əldə edə biləcəklərini bildiklərini yoxlayın.",
+        "en": "Check that guides are in place and employees know where to find the required information.",
+        "ru": "Проверьте наличие памяток и знание сотрудниками того, где получить нужные сведения."
+      },
+      "source": "Geyim otağında uniforma standartları ilə bağlı yaddaş kitabçaları mövcuddur",
+      "sourceGuidance": "Yaddaş kitabçaları yerindədir, işçilərdən lazımi məlumatları hardan əldə edəcəklərini bilir",
+      "sourceCell": "B39",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s25"
+    },
+    "pizza-hut-r41": {
+      "az": "Əməkdaşlar üçün nəzərdə tutulmuş geyim, tualet və yemək otaqları təmiz, səliqəli və texniki cəhətdən işləkdir; temperatur normaldır, ütü və ütü masası mövcuddur.",
+      "en": "Employee changing rooms, toilets and dining rooms are clean, tidy and functional; temperature is normal and an iron and ironing board are available.",
+      "ru": "Раздевалки, туалеты и столовые сотрудников чистые, опрятные и исправные; температура нормальная, имеются утюг и гладильная доска.",
+      "guidance": {
+        "az": "Əməkdaşlar üçün nəzərdə tutulmuş sahələri yoxlayın.",
+        "en": "Inspect the employee areas.",
+        "ru": "Осмотрите помещения для сотрудников."
+      },
+      "source": " İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur yaxşıdır, ütü və ütü masası vardır İşçilər üçün ərazilər (qarderob otağı, tualet otağı və yemək otağı) təmizdir, səliqəlidir, texniki cəhətdən işləkdir, temperatur yaxşıdır, ütü və ütü masası vardır",
+      "sourceGuidance": "Ərazini yoxlamaq",
+      "sourceCell": "B41",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s40"
+    },
+    "pizza-hut-r42": {
+      "az": "Cari rüb üzrə əməkdaş dövriyyəsi plana uyğundur.",
+      "en": "Employee turnover for the current quarter is in line with the plan.",
+      "ru": "Текучесть персонала за текущий квартал соответствует плану.",
+      "guidance": {
+        "az": "Menecerdən əməkdaşın işdən çıxarılmasının əsas qaydalarını soruşun.",
+        "en": "Ask the manager about the main employee dismissal rules.",
+        "ru": "Спросите менеджера об основных правилах увольнения сотрудника."
+      },
+      "source": "  Cari rüb üzrə işçi dövriyyəsi plana uyğundur",
+      "sourceGuidance": "Menecerdən işçinin işdən çıxarılmasının əsas qaydalarını soruşmaq",
+      "sourceCell": "B42",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s40"
+    },
+    "pizza-hut-r43": {
+      "az": "Cari il üzrə məzuniyyət qrafiki mövcuddur və restoran müdiri əməkdaşların məzuniyyət günlərinin sayına nəzarət edir.",
+      "en": "A leave schedule for the current year exists and the restaurant manager monitors employees' leave days.",
+      "ru": "Имеется график отпусков на текущий год; руководитель ресторана контролирует количество дней отпуска сотрудников.",
+      "guidance": {
+        "az": "Yoxlayın.",
+        "en": "Check.",
+        "ru": "Проверьте."
+      },
+      "source": "Cari il üçün məzuniyyət qrafikinin mövcuddur. Restoran müdiri işçilərin məzuniyyət günlənin sayına nəzarət edir",
+      "sourceGuidance": "Yoxlamaq",
+      "sourceCell": "B43",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s40"
+    },
+    "pizza-hut-r44": {
+      "az": "ACE nəticələri, satış və reytinq üzrə nəticə və hədəflər məlumat lövhəsində göstərilir və əməkdaşlar üçün əlçatandır.",
+      "en": "ACE results and sales/rating results and targets are displayed on the noticeboard and accessible to employees.",
+      "ru": "Результаты ACE, результаты и цели по продажам и рейтингу указаны на стенде и доступны сотрудникам.",
+      "guidance": {
+        "az": "Əməkdaşların cari yenilikləri, qonaqların şikayət səbəblərini, DP-nin yerinə yetirilməsini, ACE yoxlamasının nəticələrini və əsas pozuntuları bildiklərini yoxlayın.",
+        "en": "Check employees know current updates, guest complaint reasons, DP achievement, ACE results and key violations.",
+        "ru": "Проверьте знание сотрудниками текущих изменений, причин жалоб гостей, выполнения DP, результатов ACE и основных нарушений."
+      },
+      "source": "Məlumatlar əlçatandır: Məlumat löhvəsində ACE nəticələri, Satış, Reytinq nəticə və məqsədləri qeyd edilib ",
+      "sourceGuidance": "İşçilər cari yeniliklərdən, Qonaqların nədən şikayət etdiklərindən, DP yerinə yetirilib-yetirilməməsindən, ACE yoxlamasının nəticələri və əsas pozuntulardan xəbərdardır",
+      "sourceCell": "B44",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s40"
+    },
+    "pizza-hut-r45": {
+      "az": "Restoran komandası ilə ayda bir dəfə iclas keçirilir və iclas protokolu mövcuddur.",
+      "en": "A restaurant team meeting is held once a month and meeting minutes are available.",
+      "ru": "Собрание команды ресторана проводится один раз в месяц, имеется протокол.",
+      "guidance": {
+        "az": "Bir neçə menecer və əməkdaşdan iclasda nələrin müzakirə olunduğunu və kimlərin nailiyyətlərinin təqdir edildiyini soruşun.",
+        "en": "Ask several managers and employees what was discussed and whose achievements were recognised.",
+        "ru": "Спросите нескольких менеджеров и сотрудников, что обсуждалось и чьи достижения были отмечены."
+      },
+      "source": "Restoran komandası ilə ayda 1 dəfə iclas keçirilir. İclasın keçirilməsi üzrə protokol mövcuddur",
+      "sourceGuidance": "Bir neçə menecer və işçidən nəyin müzakirə olunduğunu və kimlərin etiraf edildiyini soruşmaq",
+      "sourceCell": "B45",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s40"
+    },
+    "pizza-hut-r47": {
+      "az": "Restoranda kadr ehtiyatının saxlanması üzrə iş aparılır.",
+      "en": "The restaurant works to maintain its talent pool.",
+      "ru": "В ресторане ведётся работа по поддержанию кадрового резерва.",
+      "guidance": {
+        "az": "Növbədəki əməkdaşlarla söhbət edin; onların təlim məlumatlarını və qarşıdakı sertifikasiya tarixini bildiklərini yoxlayın.",
+        "en": "Talk to employees on shift; check they know the training information and upcoming certification date.",
+        "ru": "Поговорите с сотрудниками смены; проверьте знание учебной информации и даты предстоящей сертификации."
+      },
+      "source": "Kadr ehtiyatının saxlanması üzrə restoranda iş aparılır",
+      "sourceGuidance": "Növbədəki işçilərlə söhbət etmək. İşçi təlimdəki məlumatlardan xəbərdardır və qarşıdakı sertifikasiya tarixini bilir ",
+      "sourceCell": "B47",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r48": {
+      "az": "PPR kadr ehtiyatı planı hər ay yenilənir.",
+      "en": "The PPR talent pool plan is updated monthly.",
+      "ru": "План кадрового резерва PPR обновляется ежемесячно.",
+      "guidance": {
+        "az": "Aktual PPR-ni, ƏM ilə aylıq görüşləri, əməkdaşların inkişaf planını və gələcək tədbirlərin müddətlərini yoxlayın; restoran müdirinin kadr ehtiyatı hədəflərini bildiyinə əmin olun.",
+        "en": "Check current PPR, monthly meetings with ƏM, employee development plans and action deadlines; confirm the manager knows the talent pool targets.",
+        "ru": "Проверьте актуальный PPR, ежемесячные встречи с ƏM, планы развития сотрудников и сроки мероприятий; убедитесь, что руководитель знает цели кадрового резерва."
+      },
+      "source": "PPR kadr ehtiyatı planı aylıq yenilənir",
+      "sourceGuidance": "Aktual PPR mövcuddur, aylıq mütəmadi ƏM ilə görüşlər aparılır, işçilərin inkişaf planı mövcuddur, gələcək tədbirlərin müddətləri təyin olunmuşdur, restoran müdiri kadr ehtiyatı üzrə məqsədlərdən xəbərdardır",
+      "sourceCell": "B48",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r49": {
+      "az": "İdarəetmə heyəti üzvlərinin (NM, ARGM, RGM) şəxsi iş qovluqları və tələb olunan sənədləri mövcuddur.",
+      "en": "Management team members (NM, ARGM, RGM) have personnel files containing the required documents.",
+      "ru": "У членов управленческой команды (NM, ARGM, RGM) имеются личные дела с необходимыми документами.",
+      "guidance": {
+        "az": "Menecerlərin şəxsi iş qovluqlarını yoxlayın.",
+        "en": "Check managers' personnel files.",
+        "ru": "Проверьте личные дела менеджеров."
+      },
+      "source": "İdarə heyəti əməkdaşlarının (NM, ARGM, RGM) şəxsi qovluğu var, lazım olan sənədlər mövcuddur",
+      "sourceGuidance": "Menecer həyatının şəxsi qovluqlarını yoxlamaq",
+      "sourceCell": "B49",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r50": {
+      "az": "Təlimçilər BÜ üçün təlimin əsaslarını, modullar üzrə müddətləri və dördmərhələli təlim prosesini bilirlər.",
+      "en": "Trainers know BÜ training basics, module durations and the four-step training process.",
+      "ru": "Тренеры знают основы обучения BÜ, сроки модулей и четырёхэтапный процесс обучения.",
+      "guidance": {
+        "az": "Bir neçə təlimçidən soruşun.",
+        "en": "Ask several trainers.",
+        "ru": "Опросите нескольких тренеров."
+      },
+      "source": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə müddətləri və 4 mərhələli təlim prosesini bilirlər",
+      "sourceGuidance": "Bir neçə təlimçidən soruşmaq",
+      "sourceCell": "B50",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r51": {
+      "az": "Kassa stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All cashier station employees are certified in the relevant module.",
+      "ru": "Все сотрудники кассовой станции сертифицированы по соответствующему модулю.",
+      "guidance": {
+        "az": "Hut University sistemində yoxlayın (OCL).",
+        "en": "Check in Hut University (OCL).",
+        "ru": "Проверьте в Hut University (OCL)."
+      },
+      "source": "Kassa stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "Hut university sistemı yoxlamaq (OCL)",
+      "sourceCell": "B51",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r52": {
+      "az": "Xəmir stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All dough station employees are certified in the relevant module.",
+      "ru": "Все сотрудники станции теста сертифицированы по соответствующему модулю.",
+      "guidance": {
+        "az": "Hut University sistemində yoxlayın (OCL).",
+        "en": "Check in Hut University (OCL).",
+        "ru": "Проверьте в Hut University (OCL)."
+      },
+      "source": "Xəmir stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "Hut university sistemı yoxlamaq (OCL)",
+      "sourceCell": "B52",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r53": {
+      "az": "Pizza hazırlama stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All pizza station employees are certified in the relevant module.",
+      "ru": "Все сотрудники станции приготовления пиццы сертифицированы по соответствующему модулю.",
+      "guidance": {
+        "az": "Hut University sistemində yoxlayın (OCL).",
+        "en": "Check in Hut University (OCL).",
+        "ru": "Проверьте в Hut University (OCL)."
+      },
+      "source": "Pizza hazırlama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "Hut university sistemı yoxlamaq (OCL)",
+      "sourceCell": "B53",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r54": {
+      "az": "Doğrama stansiyasında çalışan bütün əməkdaşlar müvafiq modul üzrə sertifikasiyadan keçiblər.",
+      "en": "All chopping station employees are certified in the relevant module.",
+      "ru": "Все сотрудники станции нарезки сертифицированы по соответствующему модулю.",
+      "guidance": {
+        "az": "Hut University sistemində yoxlayın (OCL).",
+        "en": "Check in Hut University (OCL).",
+        "ru": "Проверьте в Hut University (OCL)."
+      },
+      "source": "Doğrama stansiyasında çalışan bütün işçilər müvafiq modul üzrə sertifikasiyadan keçiblər",
+      "sourceGuidance": "Hut university sistemı yoxlamaq (OCL)",
+      "sourceCell": "B54",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r55": {
+      "az": "Təlimçi restoranın satış, ACE və L3 göstəricilərini, eləcə də son yenilikləri bilir.",
+      "en": "The trainer knows the restaurant's sales, ACE and L3 indicators and latest updates.",
+      "ru": "Тренер знает показатели продаж, ACE и L3 ресторана, а также последние изменения.",
+      "guidance": {
+        "az": "Təlimçidən soruşun.",
+        "en": "Ask the trainer.",
+        "ru": "Спросите тренера."
+      },
+      "source": "Təlimçi restoran göstəricilərini bilir (Satış, ACE, L3, son yeniliklər)",
+      "sourceGuidance": "Təlimçidən soruşmaq",
+      "sourceCell": "B55",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r56": {
+      "az": "Təlimçi təlimlər, kampaniyalar və hədəflərlə bağlı son dəyişiklikləri bilir.",
+      "en": "The trainer knows the latest changes to training, campaigns and targets.",
+      "ru": "Тренер знает последние изменения в обучении, акциях и целях.",
+      "guidance": {
+        "az": "Təlimçidən soruşun.",
+        "en": "Ask the trainer.",
+        "ru": "Спросите тренера."
+      },
+      "source": "Təlimci son dəyişiklikləri bilir (təlim, aksiyalar, məqsəd)",
+      "sourceGuidance": "Təlimçidən soruşmaq",
+      "sourceCell": "B56",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r57": {
+      "az": "Təlimçi Hut University sistemindən istifadə edə bilir.",
+      "en": "The trainer can use Hut University.",
+      "ru": "Тренер умеет пользоваться Hut University.",
+      "guidance": {
+        "az": "Təlimçidən soruşun.",
+        "en": "Ask the trainer.",
+        "ru": "Спросите тренера."
+      },
+      "source": "Təlimçi Hut university proqramda işləyə bilir",
+      "sourceGuidance": "Təlimçidən soruşmaq",
+      "sourceCell": "B57",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r58": {
+      "az": "BÜ üçün şəxsi iş qovluqları və tələb olunan sənədlər mövcuddur.",
+      "en": "Personnel files and required documents are available for BÜ.",
+      "ru": "Для BÜ имеются личные дела и необходимые документы.",
+      "guidance": {
+        "az": "BÜ üçün şəxsi iş qovluqlarını istəyin.",
+        "en": "Request the personnel files for BÜ.",
+        "ru": "Запросите личные дела BÜ."
+      },
+      "source": "BÜ şəxsi qovluqları var, lazım olan sənədlər mövcuddur ",
+      "sourceGuidance": "BÜ şəxsi qovluqlarını soruşmaq",
+      "sourceCell": "B58",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r59": {
+      "az": "Təlimçinin şəxsi iş qovluğunda təlimçi yoxlama siyahısı mövcuddur.",
+      "en": "The trainer's personnel file contains the trainer checklist.",
+      "ru": "В личном деле тренера имеется контрольный список тренера.",
+      "guidance": {
+        "az": "Təlimçinin şəxsi iş qovluğunu yoxlayın.",
+        "en": "Check the trainer's personnel file.",
+        "ru": "Проверьте личное дело тренера."
+      },
+      "source": "Təlimçi şəxsi qovluqda təlimçi çek-listi var",
+      "sourceGuidance": "Təlimçi şəxsi qovluqunu yoxlamaq",
+      "sourceCell": "B59",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r60": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) restoranın əsas satış hədəflərini və nəticələrini bilir.",
+      "en": "The management team member (NM, ARGM, RGM) knows the restaurant's main sales targets and results.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) знает основные цели и результаты продаж ресторана.",
+      "guidance": {
+        "az": "Növbə menecerindən soruşun.",
+        "en": "Ask the shift manager.",
+        "ru": "Спросите менеджера смены."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) restoranın əsas satış üzrə məqsədləri və nəticiləri bilir",
+      "sourceGuidance": "Növbə menecerdən soruşmaq",
+      "sourceCell": "B60",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r61": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) BSC/GES/ACE-nin nə olduğunu və nəticələrini bilir.",
+      "en": "The management team member (NM, ARGM, RGM) knows what BSC/GES/ACE are and their results.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) знает, что такое BSC/GES/ACE, и их результаты.",
+      "guidance": {
+        "az": "Növbə menecerindən soruşun.",
+        "en": "Ask the shift manager.",
+        "ru": "Спросите менеджера смены."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) BSC/GES/ACE nə olduğunu və nəticələri bilir",
+      "sourceGuidance": "Növbə menecerdən soruşmaq",
+      "sourceCell": "B61",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r62": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) silinmə, əməkdaş dövriyyəsi və COL nəticələrini bilir.",
+      "en": "The management team member (NM, ARGM, RGM) knows write-off, employee turnover and COL results.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) знает результаты списаний, текучести персонала и COL.",
+      "guidance": {
+        "az": "Növbə menecerindən soruşun.",
+        "en": "Ask the shift manager.",
+        "ru": "Спросите менеджера смены."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) Silinmə/işçi axını/COL nəticələrini bilir",
+      "sourceGuidance": "Növbə menecerdən soruşmaq",
+      "sourceCell": "B62",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r63": {
+      "az": "Mənbədə “Resurs” adlandırılan vasitə açılır və istifadə olunur.",
+      "en": "The tool called “Resurs” in the source is opened and used.",
+      "ru": "Средство, названное в источнике «Resurs», открывается и используется.",
+      "guidance": {
+        "az": "Növbə menecerindən soruşun.",
+        "en": "Ask the shift manager.",
+        "ru": "Спросите менеджера смены."
+      },
+      "source": "Resurs açılır və istifadə olunur",
+      "sourceGuidance": "Növbə menecerdən soruşmaq",
+      "sourceCell": "B63",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46",
+      "clarification": "Resurs vasitəsinin adı və təyinatı mənbədə açıqlanmır."
+    },
+    "pizza-hut-r64": {
+      "az": "Komandanın 90%-dən çoxu “Şirkətlə tanışlıq” seminarında iştirak edib.",
+      "en": "More than 90% of the team attended the “Company introduction” seminar.",
+      "ru": "Более 90% команды участвовали в семинаре «Знакомство с компанией».",
+      "guidance": {
+        "az": "Təlimlərin izlənməsi formasını yoxlayın.",
+        "en": "Check the training tracking form.",
+        "ru": "Проверьте форму отслеживания обучения."
+      },
+      "source": "Komandanın >90% \"Şirkətlə Tanışlıq\" seminarında iştirak edib",
+      "sourceGuidance": "Təlim izlənmə blankını yoxla",
+      "sourceCell": "B64",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r65": {
+      "az": "Komandanın 90%-dən çoxu “Qida təhlükəsizliyi” təlimində iştirak edib.",
+      "en": "More than 90% of the team attended “Food safety” training.",
+      "ru": "Более 90% команды участвовали в обучении «Пищевая безопасность».",
+      "guidance": {
+        "az": "Təlimlərin izlənməsi formasını yoxlayın.",
+        "en": "Check the training tracking form.",
+        "ru": "Проверьте форму отслеживания обучения."
+      },
+      "source": "Komandanın >90% \"Qida Təhlükəsizliyi\" təlimində iştirak edib",
+      "sourceGuidance": "Təlim izlənmə blankını yoxla",
+      "sourceCell": "B65",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r66": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) “ABR” təlimində iştirak edib.",
+      "en": "The management team member (NM, ARGM) attended “ABR” training.",
+      "ru": "Член управленческой команды (NM, ARGM) участвовал в обучении «ABR».",
+      "guidance": {
+        "az": "Təlimlərin izlənməsi formasını yoxlayın.",
+        "en": "Check the training tracking form.",
+        "ru": "Проверьте форму отслеживания обучения."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM) \"ABR\" təlimində iştirak edib",
+      "sourceGuidance": "Təlim izlənmə blankını yoxla",
+      "sourceCell": "B66",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r67": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) “Əməyin mühafizəsi” təlimində iştirak edib.",
+      "en": "The management team member (NM, ARGM, RGM) attended “Occupational safety” training.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) участвовал в обучении «Охрана труда».",
+      "guidance": {
+        "az": "Təlimlərin izlənməsi formasını yoxlayın.",
+        "en": "Check the training tracking form.",
+        "ru": "Проверьте форму отслеживания обучения."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) \"Əməyin Mühafizəsi\" təlimində iştirak edib",
+      "sourceGuidance": "Təlim izlənmə blankını yoxla",
+      "sourceCell": "B67",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r68": {
+      "az": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və təlimlərin izlənməsi forması aktualdır.",
+      "en": "Trained employees are recorded and the training tracking form is up to date.",
+      "ru": "Ведётся учёт обученных сотрудников, форма отслеживания обучения актуальна.",
+      "guidance": {
+        "az": "Təlimlərin izlənməsi formasını yoxlayın.",
+        "en": "Check the training tracking form.",
+        "ru": "Проверьте форму отслеживания обучения."
+      },
+      "source": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və (Təlim izlənmə blankı) aktualdır",
+      "sourceGuidance": "Təlim izlənmə blankını yoxla",
+      "sourceCell": "B68",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r69": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) Hut University sistemindən istifadə edə bilir.",
+      "en": "The management team member (NM, ARGM, RGM) can use Hut University.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) умеет пользоваться Hut University.",
+      "guidance": {
+        "az": "Növbə menecerindən soruşun.",
+        "en": "Ask the shift manager.",
+        "ru": "Спросите менеджера смены."
+      },
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM, RGM) Hut University proqramda işləyə bilir",
+      "sourceGuidance": "Növbə menecerdən soruşmaq",
+      "sourceCell": "B69",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s46"
+    },
+    "pizza-hut-r71": {
+      "az": "“SUSMA!” plakatı əməkdaşların görə biləcəyi yerdədir.",
+      "en": "The “SUSMA!” poster is visible to employees.",
+      "ru": "Плакат «SUSMA!» размещён на видном сотрудникам месте.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": " SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir.",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq ",
+      "sourceCell": "B71",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r72": {
+      "az": "Restoranda əməkdaşlar ad günləri və şəxsi nailiyyətləri münasibətilə təbrik olunurlar.",
+      "en": "Employees are congratulated on birthdays and personal achievements.",
+      "ru": "Сотрудников поздравляют с днями рождения и личными достижениями.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşın bu barədə məlumatlı olub-olmadığını soruşun.",
+        "en": "Ask several employees whether they are informed about this.",
+        "ru": "Спросите нескольких сотрудников, осведомлены ли они об этом."
+      },
+      "source": "Restoranda işçilər ad günləri və şəxsi nailiyyətlərinə görə təbrik olunur",
+      "sourceGuidance": "Bir neçə işçidən məlumatlı olub-olmamalarını soruşmaq",
+      "sourceCell": "B72",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r73": {
+      "az": "Əməkdaşlarla mütəmadi fərdi əks-əlaqə söhbətləri aparılır.",
+      "en": "Regular individual feedback conversations are held with employees.",
+      "ru": "С сотрудниками регулярно проводятся индивидуальные беседы с обратной связью.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "Əməkdaşlarla mütəmadi əks-əlaqə (və ya Tet-a-tet) söhbətləri aparılır",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq ",
+      "sourceCell": "B73",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r74": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM, RGM) işdən ayrılan əməkdaşlarla şifahi yekun müsahibə aparır və ayrılma səbəbini bilir.",
+      "en": "The management team member (NM, ARGM, RGM) conducts oral exit interviews and knows why employees leave.",
+      "ru": "Член управленческой команды (NM, ARGM, RGM) проводит устные выходные интервью и знает причины ухода сотрудников.",
+      "guidance": {
+        "az": "İdarəetmə heyəti üzvlərindən soruşun.",
+        "en": "Ask management team members.",
+        "ru": "Спросите членов управленческой команды."
+      },
+      "source": "İşdən çıxan əməkdaşlarla şifahi exit-müsahibə aparır və səbəbi bilir (NM, ARGM, RGM)",
+      "sourceGuidance": "İdarə heyəti əməkdaşlarında soruş",
+      "sourceCell": "B74",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r75": {
+      "az": "Restoran komandası EES-in nə olduğunu və nəticələrini bilir, fəaliyyət planı mövcuddur.",
+      "en": "The restaurant team knows what EES is and its results; an action plan exists.",
+      "ru": "Команда ресторана знает, что такое EES, и результаты; имеется план действий.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "Restoran EES nədir bilir, nəticələrindən xəbərdardır və fəaliyyət planı mövcuddur",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq ",
+      "sourceCell": "B75",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r76": {
+      "az": "Restoranda əməkdaşların nailiyyətlərinin təqdir edilməsi sistemi işləyir və təqdir kartları mövcuddur.",
+      "en": "The restaurant's employee recognition system operates and recognition cards are available.",
+      "ru": "В ресторане действует система признания достижений сотрудников, имеются карточки признания.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan kimlərin nailiyyətlərini təqdir etdiklərini və təqdir kartlarını haradan əldə edə biləcəklərini soruşun.",
+        "en": "Ask several employees whose achievements they recognised and where to obtain recognition cards.",
+        "ru": "Спросите нескольких сотрудников, чьи достижения они отметили и где можно получить карточки признания."
+      },
+      "source": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+      "sourceGuidance": "Bir neçə işçidən kimlərin uğurlarını etiraf etdiklərini soruşun, onlardan etiraf kartlarını hardan götürmək mümkün olduğunu soruşun",
+      "sourceCell": "B76",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s70"
+    },
+    "pizza-hut-r78": {
+      "az": "İş qrafiki ilə tanışlığı təsdiqləyən əməkdaş imzaları mövcuddur.",
+      "en": "Employee signatures acknowledging the work schedule are available.",
+      "ru": "Имеются подписи сотрудников об ознакомлении с рабочим графиком.",
+      "guidance": {
+        "az": "İş qrafiki arxivini yoxlayın, restoran müdirindən qrafiki necə yoxladığını və onun icrasına necə nəzarət etdiyini soruşun.",
+        "en": "Review the schedule archive and ask the restaurant manager how they check and monitor schedules.",
+        "ru": "Проверьте архив графиков, спросите руководителя ресторана, как он проверяет график и контролирует его выполнение."
+      },
+      "source": " İş cədvəlində işçilərin cədvəllə tanış olmasını təsdiqləyən imzaları mövcuddur",
+      "sourceGuidance": "İş cədvəli arxivinə baxmaq, Restoran müdirindən cədvəli necə yoxladığını və nəzarət etdiyini soruşmaq",
+      "sourceCell": "B78",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s77"
+    },
+    "pizza-hut-r79": {
+      "az": "Əməkdaşların iş qrafiki ilə bağlı istəkləri nəzərə alınır və qrafik cümə axşamından gec olmayaraq asılır.",
+      "en": "Employees' scheduling preferences are considered and the schedule is posted no later than Thursday.",
+      "ru": "Пожелания сотрудников по графику учитываются, график вывешивается не позднее четверга.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçilərin cədvəl üzrə istəkləri nəzərə alınır, iş cədvəli həftənin cümə axşamından gec olmayaraq asılır",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq",
+      "sourceCell": "B79",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s77"
+    },
+    "pizza-hut-r80": {
+      "az": "İş qrafiki ƏM tələblərinə uyğun hazırlanır və əməkdaşlar iş saatlarına haradan baxa biləcəklərini bilirlər.",
+      "en": "The work schedule meets ƏM requirements and employees know where to view their working hours.",
+      "ru": "График составляется в соответствии с требованиями ƏM; сотрудники знают, где посмотреть рабочие часы.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun. İş qrafiki arxivini yoxlayın və restoran müdirindən qrafikə necə nəzarət etdiyini soruşun. Əməkdaşların əməkhaqqının hesablanmasını, bonusları və problem yarandıqda kimə müraciət etməli olduqlarını bildiklərini yoxlayın.",
+        "en": "Ask several employees. Review schedule archives and ask the restaurant manager how schedules are checked and monitored. Check that employees know salary calculation, bonuses and whom to contact about problems.",
+        "ru": "Опросите нескольких сотрудников. Проверьте архив графиков и спросите руководителя о проверке и контроле графиков. Проверьте знание сотрудниками расчёта зарплаты, бонусов и того, к кому обращаться при проблемах."
+      },
+      "source": "İş cədvələnin hazırlanması ƏM uyğun şəkildə həyata keçirilir. İşçilər iş saatlarına harada baxa biləcəklərini bilirlər",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq. İş cədvəli arxivinə baxma, Restoran müdirindən cədvəli necə yoxladığını və nəzarət etdiyini soruşma. İşçilərdən əmək haqqının necə hesablanması, hansı bonusların olması və problem yarandığı halda kimə müraciət etməli olduqlarını bilib-bilmədiklərini soruşmaq",
+      "sourceCell": "B80",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s77",
+      "clarification": "ƏM qısaltmasının bu meyardakı rəsmi açılışı təsdiqlənməlidir."
+    },
+    "pizza-hut-r82": {
+      "az": "Bütün yeni əməkdaşlar ilk iş günlərində əməyin mühafizəsi və təhlükəsizlik texnikası üzrə təlim keçirlər, sonra isə mütəmadi kompleks təlimlərdə iştirak edirlər.",
+      "en": "All new employees receive occupational safety and safety procedures training in their first working days and then attend regular comprehensive training.",
+      "ru": "Все новые сотрудники в первые рабочие дни проходят обучение по охране труда и технике безопасности, затем регулярно участвуют в комплексном обучении.",
+      "guidance": {
+        "az": "Jurnalları yoxlayın.",
+        "en": "Check the logs.",
+        "ru": "Проверьте журналы."
+      },
+      "source": "Bütün yeni işçilər ilk iş günlərində əməyin mühafizəsi və təhlükəsizlik texnikası üzrə təlim keçmişdir və daha sonra mütəmadi olaraq kompleks təlim keçir",
+      "sourceGuidance": "Jurnalları yoxlamaq",
+      "sourceCell": "B82",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s81"
+    },
+    "pizza-hut-r83": {
+      "az": "Fərdi qorunma vasitələri (FQV) yerli tələblərə və ya normativ hüquqi aktlara uyğun şəkildə mövcuddur və yaxşı vəziyyətdədir.",
+      "en": "Personal protective equipment (PPE) is available in accordance with local requirements or regulations and is in good condition.",
+      "ru": "Средства индивидуальной защиты (СИЗ) имеются в соответствии с местными требованиями или нормативными актами и находятся в хорошем состоянии.",
+      "guidance": {
+        "az": "FQV-nin mövcudluğunu və keyfiyyətini, şəxsi işlərdə FQV-nin verilməsi formasını və FQV jurnalının düzgün doldurulmasını yoxlayın.",
+        "en": "Check PPE availability and quality, issue forms in personnel files and correct completion of the PPE log.",
+        "ru": "Проверьте наличие и качество СИЗ, формы выдачи в личных делах и правильность заполнения журнала СИЗ."
+      },
+      "source": " Fərdi Qorunma Vasitələri (FQV) yerli tələblərə və ya normativ-hüquqi aktlara uyğun olaraq mövcuddur və yaxşı vəziyyətdədir",
+      "sourceGuidance": " FQV olmasını və keyfiyyətini, həmçinin işçilərin şəxsi işlərində FQV verilməsi blankının olmasını, FQV jurnalının düzgün doldurulmasını yoxlamaq",
+      "sourceCell": "B83",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s81"
+    },
+    "pizza-hut-r84": {
+      "az": "Əməkdaşlar təxliyə qaydalarını və toplanış məntəqəsinin yerini bilirlər.",
+      "en": "Employees know evacuation procedures and the assembly point location.",
+      "ru": "Сотрудники знают правила эвакуации и расположение места сбора.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "İşçilər təxliyyə qaydaları və toplanış məntəqəsinin harada olduğunu bilirlər",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq ",
+      "sourceCell": "B84",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s81"
+    },
+    "pizza-hut-r85": {
+      "az": "“Fövqəladə hallar” plakatı əməkdaşların görə biləcəyi yerdədir və əməkdaşlar məlumatlıdırlar.",
+      "en": "The “Emergencies” poster is visible to employees and employees are informed.",
+      "ru": "Плакат «Чрезвычайные ситуации» размещён на видном сотрудникам месте; сотрудники осведомлены.",
+      "guidance": {
+        "az": "Bir neçə əməkdaşdan soruşun.",
+        "en": "Ask several employees.",
+        "ru": "Опросите нескольких сотрудников."
+      },
+      "source": "\"Fövqəladə hallar\" plakatı işçilərin görəcəyi yerdə yerləşir, işçilər məlumatlıdır. ",
+      "sourceGuidance": "Bir neçə işçidən soruşmaq ",
+      "sourceCell": "B85",
+      "brandId": "pizza-hut",
+      "sheet": "HRTR Yeni",
+      "sectionId": "pizza-hut-s81"
+    },
+    "simit-sarayi-r12": {
+      "az": "İşə qəbul prosesinin bütün mərhələləri tətbiq olunur.",
+      "en": "All stages of the recruitment process are used.",
+      "ru": "Применяются все этапы процесса приёма на работу.",
+      "source": "İşə qəbul zamanı bütün qəbul pillələrindən istifadə olunur",
+      "sourceGuidance": "",
+      "sourceCell": "B12",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s11"
+    },
+    "simit-sarayi-r13": {
+      "az": "Menecer vakansiyalara müraciət edən namizədlərlə müsahibəni necə keçirməli olduğunu bilir.",
+      "en": "The manager knows how to interview applicants for vacancies.",
+      "ru": "Менеджер знает, как проводить собеседования с кандидатами на вакансии.",
+      "source": "Menecer vakantlarla müsahibəni necə keçirməli olduğunu bilir",
+      "sourceGuidance": "",
+      "sourceCell": "B13",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s11"
+    },
+    "simit-sarayi-r14": {
+      "az": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatandır.",
+      "en": "Application forms are sufficient and accessible to applicants.",
+      "ru": "Анкеты для приёма на работу имеются в достаточном количестве и доступны кандидатам.",
+      "source": "İşə qəbul anketləri kifayət qədərdir və namizədlər üçün əlçatandır",
+      "sourceGuidance": "",
+      "sourceCell": "B14",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s11"
+    },
+    "simit-sarayi-r15": {
+      "az": "Əməkdaşlar “Dostunu gətir” proqramı barədə məlumatlıdırlar.",
+      "en": "Employees know the “Refer a friend” programme.",
+      "ru": "Сотрудники знают о программе «Приведи друга».",
+      "source": "Əməkdaşlar \"Dostunu gətir\" proqramı haqqında məlumatlandırılmışdır",
+      "sourceGuidance": "",
+      "sourceCell": "B15",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s11"
+    },
+    "simit-sarayi-r16": {
+      "az": "Bütün əməkdaşlar sosial şəbəkələrdə və kütləvi informasiya vasitələri ilə ünsiyyətdə davranış qaydalarını bilirlər.",
+      "en": "All employees know the rules of conduct on social media and in communication with the media.",
+      "ru": "Все сотрудники знают правила поведения в социальных сетях и общения со СМИ.",
+      "source": "Bütün işçilər sosial şəbəkələr və KİV ilə davranış qaydalarını bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "B16",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s11"
+    },
+    "simit-sarayi-r19": {
+      "az": "Yeni əməkdaşa işə başladığı ilk gün təlimçi və ya instruktor təyin edilib.",
+      "en": "A trainer or instructor was assigned on the new employee's first working day.",
+      "ru": "В первый рабочий день новому сотруднику назначен тренер или инструктор.",
+      "source": "Yeni əməkdaş işə başladığı ilk gün Təlimçi/İnstruktor təyin edilib",
+      "sourceGuidance": "",
+      "sourceCell": "B19",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r20": {
+      "az": "Əməkdaşlar sertifikasiyadan keçiblər.",
+      "en": "Employees are certified.",
+      "ru": "Сотрудники прошли сертификацию.",
+      "source": "Əməkdaşlar sertifikasiyadan keçmişdir",
+      "sourceGuidance": "",
+      "sourceCell": "B20",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r21": {
+      "az": "Əməkdaşlar təkrar sertifikasiyadan keçiblər.",
+      "en": "Employees have been recertified.",
+      "ru": "Сотрудники прошли повторную сертификацию.",
+      "source": "Əməkdaşlar resertifikasiyadan keçmişdir",
+      "sourceGuidance": "",
+      "sourceCell": "B21",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r22": {
+      "az": "Əməkdaşlar növbəti vəzifə pilləsinə keçmək üçün nə etməli və nəyi öyrənməli olduqlarını bilirlər.",
+      "en": "Employees know what to do and learn to progress to the next career level.",
+      "ru": "Сотрудники знают, что нужно сделать и изучить для перехода на следующую карьерную ступень.",
+      "source": "Əməkdaşlar növbəti pilləyə keçmək üçün nə etməli və öyrənməli olduğunu bilir",
+      "sourceGuidance": "",
+      "sourceCell": "B22",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r23": {
+      "az": "Təlimçilər BÜ üçün təlimin əsaslarını və modullar üzrə beşmərhələli təlim prosesini bilirlər.",
+      "en": "Trainers know BÜ training basics and the five-step module training process.",
+      "ru": "Тренеры знают основы обучения BÜ и пятиэтапный процесс обучения по модулям.",
+      "source": "Təlimçilər BÜ təlim əsaslarını, modullar üzrə 5 mərhələli təlim prosesini bilir",
+      "sourceGuidance": "",
+      "sourceCell": "B23",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r24": {
+      "az": "Əməkdaşlar Simit Sarayı haqqında əsas məlumatları bilirlər.",
+      "en": "Employees know the key facts about Simit Sarayı.",
+      "ru": "Сотрудники знают основные факты о Simit Sarayı.",
+      "source": "Əməkdaşlar əsas Simit Sarayı faktların bilirlər",
+      "sourceGuidance": "",
+      "sourceCell": "B24",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r25": {
+      "az": "Əməkdaşlar bütün karyera imkanlarını bilirlər və “Karyera yolu” forması mövcuddur.",
+      "en": "Employees know all career opportunities and the “Career path” form is available.",
+      "ru": "Сотрудники знают обо всех карьерных возможностях; имеется форма «Карьерный путь».",
+      "source": "Əməkdaşlar bütün karyera imkanlarını bilir (Karyera yolu blankı var)",
+      "sourceGuidance": "",
+      "sourceCell": "B25",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r26": {
+      "az": "Əməkdaşlar “Şirkətlə tanışlıq” seminarında iştirak ediblər.",
+      "en": "Employees attended the “Company introduction” seminar.",
+      "ru": "Сотрудники участвовали в семинаре «Знакомство с компанией».",
+      "source": "Əməkdaşlar \"Şirkətlə Tanışlıq\" seminarında iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B26",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r27": {
+      "az": "Əməkdaşlar “Qida təhlükəsizliyi” təlimində iştirak ediblər.",
+      "en": "Employees attended “Food safety” training.",
+      "ru": "Сотрудники участвовали в обучении «Пищевая безопасность».",
+      "source": "Əməkdaşlar \"Qida Təhlükəsizlik\" təlimində iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B27",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r28": {
+      "az": "Əməkdaşlar “Satış” təlimində iştirak ediblər.",
+      "en": "Employees attended “Sales” training.",
+      "ru": "Сотрудники участвовали в обучении «Продажи».",
+      "source": "Əməkdaşlar \"Satış\" təlimində iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B28",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r29": {
+      "az": "Təlimçi “Təlimçi” seminarında iştirak edib.",
+      "en": "The trainer attended the “Trainer” seminar.",
+      "ru": "Тренер участвовал в семинаре «Тренер».",
+      "source": "Təlimçi \"Təlimçi\" seminarında iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B29",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r30": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) “Menecer” seminarında iştirak edib.",
+      "en": "The management team member (NM, ARGM) attended the “Manager” seminar.",
+      "ru": "Член управленческой команды (NM, ARGM) участвовал в семинаре «Менеджер».",
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Menecer\" seminarında iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B30",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r31": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) “Liderlik” təlimində iştirak edib.",
+      "en": "The management team member (NM, ARGM) attended “Leadership” training.",
+      "ru": "Член управленческой команды (NM, ARGM) участвовал в обучении «Лидерство».",
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Liderlik\" təlimində iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B31",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r32": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) “ABR” təlimində iştirak edib.",
+      "en": "The management team member (NM, ARGM) attended “ABR” training.",
+      "ru": "Член управленческой команды (NM, ARGM) участвовал в обучении «ABR».",
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM) \"ABR\" təlimində iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B32",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r33": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) “Əməyin mühafizəsi” təlimində iştirak edib.",
+      "en": "The management team member (NM, ARGM) attended “Occupational safety” training.",
+      "ru": "Член управленческой команды (NM, ARGM) участвовал в обучении «Охрана труда».",
+      "source": "İdarə Heyəti əməkdaşı (NM, ARGM) \"Əməyin Mühafizəsi\" təlimində iştirak edib",
+      "sourceGuidance": "",
+      "sourceCell": "B33",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r34": {
+      "az": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və təlimlərin izlənməsi forması aktualdır.",
+      "en": "Trained employees are recorded and the training tracking form is up to date.",
+      "ru": "Ведётся учёт обученных сотрудников, форма отслеживания обучения актуальна.",
+      "source": "Təlim keçmiş əməkdaşların qeydiyyatı aparılır və (Təlim izlənmə blankı) aktualdır",
+      "sourceGuidance": "",
+      "sourceCell": "B34",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s18"
+    },
+    "simit-sarayi-r37": {
+      "az": "Hər ay iclas keçirilir.",
+      "en": "A meeting is held every month.",
+      "ru": "Собрание проводится ежемесячно.",
+      "source": "Aylıq iclas keçirilir",
+      "sourceGuidance": "",
+      "sourceCell": "B37",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r38": {
+      "az": "Əməkdaşlarla mütəmadi fərdi əks-əlaqə söhbətləri aparılır.",
+      "en": "Regular individual feedback conversations are held with employees.",
+      "ru": "С сотрудниками регулярно проводятся индивидуальные беседы с обратной связью.",
+      "source": "Əməkdaşlarla mütəmadi əks-əlaqə (və ya Tet-a-tet) söhbətləri aparılır",
+      "sourceGuidance": "",
+      "sourceCell": "B38",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r39": {
+      "az": "Əməkdaşlar restoranın bütün motivasiya proqramları barədə məlumatlıdırlar.",
+      "en": "Employees know all restaurant motivation programmes.",
+      "ru": "Сотрудники знают обо всех мотивационных программах ресторана.",
+      "source": "Əməkdaşlar restoranın bütün motivasiya proqramlarını bilir",
+      "sourceGuidance": "",
+      "sourceCell": "B39",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r40": {
+      "az": "Cari rüb üzrə əməkdaş dövriyyəsi plana uyğundur.",
+      "en": "Employee turnover for the current quarter is in line with the plan.",
+      "ru": "Текучесть персонала за текущий квартал соответствует плану.",
+      "source": "Cari kvartal üzrə işçi dövriyyəsi plana uyğundur",
+      "sourceGuidance": "",
+      "sourceCell": "B40",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r41": {
+      "az": "İdarəetmə heyəti üzvü (NM, ARGM) işdən ayrılan əməkdaşlarla şifahi yekun müsahibə aparır və ayrılma səbəbini bilir.",
+      "en": "The management team member (NM, ARGM) conducts oral exit interviews and knows why employees leave.",
+      "ru": "Член управленческой команды (NM, ARGM) проводит устные выходные интервью и знает причины ухода сотрудников.",
+      "source": "İşdən çıxan əməkdaşlarla şifahi exit-müsahibə aparır və səbəbi bilir (NM, ARGM)",
+      "sourceGuidance": "",
+      "sourceCell": "B41",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r42": {
+      "az": "Restoranda əməkdaşlar ad günləri və şəxsi nailiyyətləri münasibətilə təbrik olunurlar.",
+      "en": "Employees are congratulated on birthdays and personal achievements.",
+      "ru": "Сотрудников поздравляют с днями рождения и личными достижениями.",
+      "source": "Restoranda əməkdaşların ad günləri və şəxsi nailiyyətlərinə görə təbrik olunur",
+      "sourceGuidance": "",
+      "sourceCell": "B42",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r43": {
+      "az": "Restoranda əməkdaşların nailiyyətlərinin təqdir edilməsi sistemi işləyir və təqdir kartları mövcuddur.",
+      "en": "The restaurant's employee recognition system operates and recognition cards are available.",
+      "ru": "В ресторане действует система признания достижений сотрудников, имеются карточки признания.",
+      "source": "Restoranda etiraf sistemi çalışır, etiraf kartları mövcuddur",
+      "sourceGuidance": "",
+      "sourceCell": "B43",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r44": {
+      "az": "Restoran komandası EES-in nə olduğunu və nəticələrini bilir, fəaliyyət planı mövcuddur.",
+      "en": "The restaurant team knows what EES is and its results; an action plan exists.",
+      "ru": "Команда ресторана знает, что такое EES, и результаты; имеется план действий.",
+      "source": "Restoran EES nədir bilir, nəticələrindən xəbərdardır və fəaliyyət planı mövcuddur",
+      "sourceGuidance": "",
+      "sourceCell": "B44",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r45": {
+      "az": "Elan lövhəsində və ya daxili kommunikasiya kanalında məlumatlar yenilənir və aktual saxlanılır.",
+      "en": "The noticeboard or internal communication channel is updated with current information.",
+      "ru": "Информационный стенд или внутренний канал связи обновляется актуальными сведениями.",
+      "source": "Elan lövhəsi/daxili kommunikasiya kanalı aktual məlumatla yenilənir",
+      "sourceGuidance": "",
+      "sourceCell": "B45",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s36"
+    },
+    "simit-sarayi-r48": {
+      "az": "Cari il üzrə məzuniyyət qrafiki mövcuddur.",
+      "en": "A leave schedule for the current year is available.",
+      "ru": "Имеется график отпусков на текущий год.",
+      "source": "Cari il üçün məzuniyyət qrafikinin mövcudluğu",
+      "sourceGuidance": "",
+      "sourceCell": "B48",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s47"
+    },
+    "simit-sarayi-r49": {
+      "az": "Əməkdaşların şəxsi işləri qaydasındadır.",
+      "en": "Employees' personnel files are in order.",
+      "ru": "Личные дела сотрудников в порядке.",
+      "source": "Şəxsi işlər qaydasındadır",
+      "sourceGuidance": "",
+      "sourceCell": "B49",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s47"
+    },
+    "simit-sarayi-r50": {
+      "az": "“SUSMA!” plakatı əməkdaşların görə biləcəyi yerdədir.",
+      "en": "The “SUSMA!” poster is visible to employees.",
+      "ru": "Плакат «SUSMA!» размещён на видном сотрудникам месте.",
+      "source": "SUSMA! Plakatı mövcuddur və işçilərin görə biləcəyi yerdədir",
+      "sourceGuidance": "",
+      "sourceCell": "B50",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s47"
+    },
+    "simit-sarayi-r51": {
+      "az": "Əməkdaş daxili intizam qaydaları ilə tanış edilib və bunu təsdiqləyən imza vərəqi mövcuddur.",
+      "en": "The employee has been informed of internal discipline rules and a signed acknowledgment sheet exists.",
+      "ru": "Сотрудник ознакомлен с правилами внутреннего распорядка; имеется лист с подписью об ознакомлении.",
+      "source": "Daxili İntizam Qaydaları ilə əməkdaş tanış edilib və imza vərəqi mövcuddur",
+      "sourceGuidance": "",
+      "sourceCell": "B51",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s47"
+    },
+    "simit-sarayi-r52": {
+      "az": "İş qrafiki həftəlik iş saatı limiti və istirahət günləri baxımından Əmək Məcəlləsinə uyğundur.",
+      "en": "The work schedule complies with the Labour Code regarding weekly working hour limits and rest days.",
+      "ru": "Рабочий график соответствует Трудовому кодексу в части недельного лимита часов и дней отдыха.",
+      "source": "İş qrafiki Əmək Məcəlləsinə uyğundur (həftəlik saat limiti, istirahət günləri)",
+      "sourceGuidance": "",
+      "sourceCell": "B52",
+      "brandId": "simit-sarayi",
+      "sheet": "Sheet1",
+      "sectionId": "simit-sarayi-s47"
+    }
+  },
+  "approvedCorrections": {
+    "kfc-r80": "İstifadəçi xostes əvəzinə Skautun vəzifə öhdəliklərini təsdiqləyib.",
+    "kfc-r81": "İstifadəçi xostes əvəzinə brend-şefin vəzifə öhdəliklərini təsdiqləyib."
+  }
+}

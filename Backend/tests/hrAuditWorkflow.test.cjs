@@ -113,3 +113,34 @@ test('HR N/A persists neutrally through submission, analytics, report, Excel and
   }
  }
 }));
+
+test('HR final photo/three documents and KFC absent-role N/A bind to immutable draft revisions',{timeout:90000},async()=>withAuditFixture(async h=>{
+ const Restaurant=require('../models/restaurant.model'),Evidence=require('../models/auditEvidence.model'),storage=require('../services/auditEvidenceStorage.service');
+ await Restaurant.create({id:'final-kfc',name:'Synthetic final KFC',organizationId:'gfc',brandId:'kfc'});
+ assert.equal((await h.request('admin','POST','/audit-hr/templates/kfc',{})).status,201);
+ const created=await h.request('admin','POST','/audit-hr/audits',{brandId:'kfc',restaurantId:'final-kfc',date:'2026-10-15'});assert.equal(created.status,201);const auditId=created.data.data._id;
+ const execution=await h.request('admin','POST','/audit-execution',{auditId});assert.equal(execution.status,201);const id=execution.data.data._id;
+ const owned=[];
+ const upload=async(bytes,mime,name)=>{const form=new FormData();form.append('file',new Blob([bytes],{type:mime}),name);const result=await fetch(h.apiBase+`/audit-evidence/${auditId}`,{method:'POST',headers:{Authorization:`Bearer ${h.tokens.admin}`},body:form});assert.equal(result.status,201);const data=await result.json();const row=await Evidence.findById(data.data.id).lean();owned.push(row);const downloaded=await h.request('admin','GET',`/audit-evidence/${row._id}/file`);assert.equal(downloaded.status,200);assert.deepEqual(downloaded.buffer,bytes);return String(row._id);};
+ try{
+  const photo=await upload(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64'),'image/png','synthetic.png');
+  const documents=[];for(let i=0;i<3;i++)documents.push(await upload(Buffer.from(`Synthetic document ${i}`),'text/plain',`synthetic-${i}.txt`));
+  const answers=hr.contentFor('kfc').sections.flatMap(s=>s.questions.map(q=>({questionId:q.id,answer:'1'})));const roleIds=['kfc-r78','kfc-r79','kfc-r80','kfc-r81'];
+  const details={observations:'Synthetic notes',finalOpinion:'Synthetic opinion',roleAvailability:Object.fromEntries(roleIds.map(id=>[id,false])),finalEvidence:{photoId:photo,documentIds:documents}};
+  const payload={answers,expectedVersion:0,details};const draft=()=>h.request('admin','PUT',`/audit-execution/${id}/draft`,payload);
+  assert.equal((await draft()).status,422);for(const answer of answers)if(roleIds.includes(answer.questionId))answer.answer='na';
+  const saved=await draft();assert.equal(saved.status,200,JSON.stringify(saved.data));assert.equal(saved.data.data.hrAssessment.na,4);assert.equal(saved.data.data.hrAssessment.earned,null);assert.equal(saved.data.data.overallPercentage,null);
+  assert.deepEqual(saved.data.data.hrDetails.finalEvidence,details.finalEvidence);assert.equal(saved.data.data.hrDetails.editorialVersion,'editorial-v1');
+  payload.expectedVersion=1;details.finalEvidence.documentIds=[...documents,photo];assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents;
+  details.finalEvidence.photoId=documents[0];assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents.slice(1);assert.equal((await draft()).status,400);details.finalEvidence.documentIds=documents;details.finalEvidence.photoId=photo;
+  const foreign=await h.audit('foreign','hr');const foreignFile=await Evidence.create({auditId:foreign._id,storageKey:'synthetic',mimeType:'image/png',name:'foreign.png',size:1,uploadedBy:String(h.actors.foreign._id)});
+  details.finalEvidence.photoId=String(foreignFile._id);assert.equal((await draft()).status,400);details.finalEvidence.photoId=photo;
+  details.roleAvailability['kfc-r79']=true;assert.equal((await draft()).status,422);details.roleAvailability['kfc-r79']=false;
+  const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,payload);assert.equal(completed.status,200);assert.equal(completed.data.data.overallPercentage,null);assert.equal(completed.data.data.hrAssessment.na,4);
+  const history=await h.request('admin','GET',`/audit-execution/${id}/hr-history`);assert.equal(history.data.data.length,2);for(const v of history.data.data){assert.deepEqual(v.details.finalEvidence,details.finalEvidence);assert.ok(v.answers.filter(a=>roleIds.includes(a.questionId)).every(a=>a.answer==='na'&&a.score===null));}
+  const stats=await h.request('admin','GET','/audit-hr/analytics?brandId=kfc');assert.equal(stats.data.data.average,null);assert.equal(stats.data.data.nonconformities,0);
+  assert.equal((await h.request('foreign','GET',`/audit-evidence/${photo}/file`)).status,403);
+  const before=await Evidence.countDocuments({auditId});const old=process.env.RENDER;process.env.RENDER='true';
+  try{const form=new FormData();form.append('file',new Blob(['synthetic'],{type:'text/plain'}),'blocked.txt');const result=await fetch(h.apiBase+`/audit-evidence/${auditId}`,{method:'POST',headers:{Authorization:`Bearer ${h.tokens.admin}`},body:form});assert.equal(result.status,503);assert.equal(await Evidence.countDocuments({auditId}),before);}finally{if(old===undefined)delete process.env.RENDER;else process.env.RENDER=old;}
+ }finally{for(const file of owned)await storage.forReference(file.storageReference,auditId).remove(file.storageReference);}
+}));

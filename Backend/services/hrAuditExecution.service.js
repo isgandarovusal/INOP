@@ -20,6 +20,17 @@ async function save(req,complete=false){
   if(!row.templateRevisionId||String(context?.templateRevisionId)!==String(row.templateRevisionId)||String(audit.templateRevisionId)!==String(row.templateRevisionId))throw auditError(409,'HR revision linkage is invalid.');
   const assessment=hr.assessHR(row.templateSnapshot,req.body.answers,complete);
   const details=hr.normalizeDetails(row.templateSnapshot,req.body.details);
+  for(const [id,present] of Object.entries(details.roleAvailability)){
+   const answer=req.body.answers.find(a=>a.questionId===id)?.answer;
+   if(!present&&answer!=='na'||present&&(answer==='na'||complete&&!['0','0.5','1'].includes(answer)))throw auditError(422,'Absent roles require N/A; present roles require an applicable answer.');
+  }
+  const finalIds=[details.finalEvidence.photoId,...details.finalEvidence.documentIds].filter(Boolean);
+  if(new Set(finalIds).size!==finalIds.length)throw auditError(400,'Duplicate HR final attachment.');
+  for(const id of finalIds){
+   if(!require('mongoose').isObjectIdOrHexString(id))throw auditError(400,'Invalid HR final evidence.');
+   const file=await require('../models/auditEvidence.model').findOne({_id:id,auditId:audit._id}).session(session).lean();
+   if(!file||id===details.finalEvidence.photoId&&(typeof file.mimeType!=='string'||!file.mimeType.startsWith('image/')))throw auditError(400,'Final evidence must belong to this HR audit; a photo must be an image.');
+  }
   const answers=req.body.answers.map(a=>({questionId:a.questionId,answer:a.answer,comment:hr.text(a.comment),score:row.templateSnapshot.brandId!=='kfc'&&['0','0.5','1'].includes(a.answer)?Number(a.answer):null}));
   const evidence=req.body.evidenceLinks||[];
   const questionIds=new Set(row.templateSnapshot.sections.flatMap(s=>s.questions.map(q=>q.id)));

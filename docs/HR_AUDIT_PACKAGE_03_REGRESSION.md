@@ -1,6 +1,6 @@
 # Paket 03 — 44 əvvəlki uğursuz testin müqayisəsi
 
-Baza: `1238cc8207a9cebdf21157a85ab5abfdc2cd944b`; Paket 03 tətbiq commit-i: `24230f35c1e3fffaf8c32288ebc570982dce87b7`, əlavə QA testi ilə. Hər iki qaçış: **563 test, 519 PASS, 44 FAIL, 0 SKIP**. Adlar və hər assertion-un actual/expected dəyərləri eynidir. Yeni uğursuzluq: **0**. 44 sayına iki parent test də daxildir; 42 ayrıca assertion failure var. Testlər dəyişdirilməyib.
+Baza: `1238cc8207a9cebdf21157a85ab5abfdc2cd944b`; Paket 03 tətbiq commit-i: `24230f3`; `13a5288` üzərində son dil/attachment implementasiyası ilə müqayisə. Hər iki qaçış: **563 test, 519 PASS, 44 FAIL, 0 SKIP**. Adlar və hər assertion-un actual/expected dəyərləri eynidir. Yeni uğursuzluq: **0**. 44 sayına iki parent test də daxildir; 42 ayrıca assertion failure var. Testlər dəyişdirilməyib.
 
 Lokal MongoDB 7 replica set, loopback 27018, hər fixture üçün ayrıca təsadüfi owned DB. Production-a çıxış yoxdur. İlkin detached worktree-də yeganə untracked fayl dependency symlink-i `Backend/node_modules`-dur; tracked mənbə diff-i yoxdur.
 
@@ -67,6 +67,6 @@ INOP_AUDIT_TEST_PORT=27018 node --test --test-isolation=none \
 
 Lokal tam loglar (repoya əlavə edilmir):
 - `/workspace/work/hr-audit-source/final-baseline-regression.log` — SHA-256 `176d3219be51af26342f171c387158046e18bdf2478a16004d9d6e735b521e8c`
-- `/workspace/work/hr-audit-source/final-current-regression.log` — SHA-256 `5ce0e438bcaceaf9da57bf2edbeb06b026fa276ecf74e269f7f6a40f2c747839`
+- `/workspace/work/hr-audit-source/editorial-legacy-regression.log` — SHA-256 `66b5f19484c0f5966c2781baf32fae25dc595a629452c4102b1caaa8e2d94c49`
 
 Bu sübut legacy uyğunsuzluqları aradan qaldırmır və bütün repository testlərini PASS elan etmir. Scope testlərini yaşıl etmək üçün lifecycle/direction/soft-delete təhlükəsizliyi geri çevrilməyib.
