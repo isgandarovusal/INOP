@@ -1,0 +1,216 @@
+{
+  "file": "KFC Amburan 05.10.2026.xlsx",
+  "sha256": "8ab1c080f71ec4e4ae55e9c61e5180d346231777717e21b2fe034fbaca5bbaf6",
+  "worksheets": [
+    "Cover",
+    "Sheet2"
+  ],
+  "embeddedMediaNotImported": 12,
+  "formulas": [
+    {
+      "worksheet": "Cover",
+      "cell": "D9",
+      "formula": "IF(H29>0, \"❌ UĞURSUZ / FAILED\", \"☑️ AUDİT UĞURLU / PASSED\")"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "C10",
+      "formula": "IF(H29>0, \"❌ AUDİT UĞURSUZ | AUDIT FAILED Filial qida təhlükəsizliyi standartlarını ödəmir — Dərhal düzəldici tədbirlər tələb olunur\", \"☑️ AUDİT UĞURLU | AUDIT PASSED Filial qida təhlükəsizliyi standartlarını ödəyir-The branch meets food safety standards\")"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "H15",
+      "formula": "H16+H17+H18+H19+H20+H21"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "I15",
+      "formula": "I16+I17+I18+I19+I20+I21"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "J15",
+      "formula": "J16+J17+J18+J19+J20+J21"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K15",
+      "formula": "J15+I15+H15"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L15",
+      "formula": "IF(D15=0,100,(D15-K15)/D15*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K16",
+      "formula": "J16+I16+H16"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L16",
+      "formula": "IF(D16=0,100,(D16-K16)/D16*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K17",
+      "formula": "H17+I17+J17"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L17",
+      "formula": "IF(D17=0,100,(D17-K17)/D17*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K18",
+      "formula": "J18+I18+H18"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L18",
+      "formula": "IF(D18=0,100,(D18-K18)/D18*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K19",
+      "formula": "H19+I19+J19"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L19",
+      "formula": "IF(D19=0,100,(D19-K19)/D19*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K20",
+      "formula": "J20+I20+H20"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L20",
+      "formula": "IF(D20=0,100,(D20-K20)/D20*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K21",
+      "formula": "J21+I21+H21"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L21",
+      "formula": "IF(D21=0,100,(D21-K21)/D21*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "H23",
+      "formula": "H24+H25+H26+H27"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "I23",
+      "formula": "I24+I25+I26+I27"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "J23",
+      "formula": "J24+J25+J26+J27"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K23",
+      "formula": "H23+I23+J23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L23",
+      "formula": "IF(D23=0,100,(D23-K23)/D23*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K24",
+      "formula": "H24+I24+J24"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L24",
+      "formula": "IF(D24=0,100,(D24-K24)/D24*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K25",
+      "formula": "H25+I25+J25"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L25",
+      "formula": "IF(D25=0,100,(D25-K25)/D25*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K26",
+      "formula": "H26+I26+J26"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L26",
+      "formula": "IF(D26=0,100,(D26-K26)/D26*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K27",
+      "formula": "H27+I27+J27"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L27",
+      "formula": "IF(D27=0,100,(D27-K27)/D27*100)"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "D29",
+      "formula": "D15+D23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "E29",
+      "formula": "E15+E23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "F29",
+      "formula": "F15+F23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "G29",
+      "formula": "G15+G23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "H29",
+      "formula": "H15+H23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "I29",
+      "formula": "I15+I23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "J29",
+      "formula": "J15+J23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "K29",
+      "formula": "K15+K23"
+    },
+    {
+      "worksheet": "Cover",
+      "cell": "L29",
+      "formula": "IF(D29=0,100,(D29-K29)/D29*100)"
+    }
+  ]
+}
