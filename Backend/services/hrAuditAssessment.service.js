@@ -48,12 +48,14 @@ function normalizeDetails(snapshot,value={}) {
   const sectionIds=new Set(snapshot.sections.map(s=>s.id));
   const notes=value.sectionNotes||{};
   if(typeof notes!=='object'||Array.isArray(notes)||Object.keys(notes).some(k=>!sectionIds.has(k)))throw auditError(400,'Unknown HR section.');
+  const photos=value.sectionPhotos||{};
+  if(typeof photos!=='object'||Array.isArray(photos)||Object.entries(photos).some(([id,v])=>!sectionIds.has(id)||typeof v!=='string'))throw auditError(400,'Invalid HR section photos.');
   const availability=value.roleAvailability||{};
   const roles=new Set(sourceFor(snapshot.brandId).sections.filter(s=>s.id==='kfc-s77').flatMap(s=>s.questions.map(q=>q.id)));
   if(typeof availability!=='object'||Array.isArray(availability)||Object.entries(availability).some(([k,v])=>!roles.has(k)||typeof v!=='boolean'))throw auditError(400,'Invalid HR role availability.');
   const finalEvidence=value.finalEvidence||{};
   if(typeof finalEvidence!=='object'||Array.isArray(finalEvidence)||finalEvidence.photoId!==undefined&&typeof finalEvidence.photoId!=='string'||finalEvidence.documentIds!==undefined&&(!Array.isArray(finalEvidence.documentIds)||finalEvidence.documentIds.length>3||finalEvidence.documentIds.some(v=>typeof v!=='string')))throw auditError(400,'Invalid HR final attachments.');
-  return {editorialVersion:require('../config/hrAuditEditorial.json').version,roleAvailability:availability,finalEvidence:{photoId:finalEvidence.photoId||'',documentIds:finalEvidence.documentIds||[]},sectionNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,text(v)])),observations:text(value.observations,10000),finalOpinion:text(value.finalOpinion,10000),restaurantManager:text(value.restaurantManager,200),shiftManager:text(value.shiftManager,200)};
+  return {sectionPhotos:photos,editorialVersion:require('../config/hrAuditEditorial.json').version,roleAvailability:availability,finalEvidence:{photoId:finalEvidence.photoId||'',documentIds:finalEvidence.documentIds||[]},sectionNotes:Object.fromEntries(Object.entries(notes).map(([k,v])=>[k,text(v)])),observations:text(value.observations,10000),finalOpinion:text(value.finalOpinion,10000),restaurantManager:text(value.restaurantManager,200),shiftManager:text(value.shiftManager,200)};
 }
 const bindingKey=source=>`${source.brandId}:${source.sha256}${source.brandId==='kfc'&&source.version!=='source-v1'?':'+source.version:''}`;
 module.exports={bindingKey,sources,sourceFor,contentFor,verifiedSource,assessHR,normalizeDetails,text};

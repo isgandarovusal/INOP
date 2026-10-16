@@ -3,19 +3,8 @@ const PDFDocument = require("pdfkit");
 const XLSX = require("xlsx");
 
 const Audit = require("../models/audit.model");
-const AuditFinding = require("../models/auditFinding.model");
-const AuditApproval = require("../models/auditApproval.model");
-const AuditClosure = require("../models/auditClosure.model");
 
-function getOptionalModel(name) {
-  try {
-    return mongoose.model(name);
-  } catch {
-    return null;
-  }
-}
-
-async function buildAuditData(auditId) {
+async function buildAuditData(auditId, req) {
   if (!mongoose.Types.ObjectId.isValid(auditId)) {
     const error = new Error("Invalid audit id");
     error.statusCode = 400;
@@ -30,34 +19,14 @@ async function buildAuditData(auditId) {
     throw error;
   }
 
-  const AuditAction = getOptionalModel("AuditAction");
-
-  const [findings, approvals, closures, actions] = await Promise.all([
-    AuditFinding.find({ auditId })
-      .sort({ createdAt: 1 })
-      .lean(),
-
-    AuditApproval.find({ auditId })
-      .sort({ createdAt: 1 })
-      .lean(),
-
-    AuditClosure.find({ auditId })
-      .sort({ createdAt: 1 })
-      .lean(),
-
-    AuditAction
-      ? AuditAction.find({ auditId })
-          .sort({ createdAt: 1 })
-          .lean()
-      : Promise.resolve([])
-  ]);
-
+  const bundle = await require("../services/auditReportBundle.service").build(audit.toObject(),req);
   return {
+    bundle,
     audit: audit.toObject(),
-    findings,
-    approvals,
-    actions,
-    closures
+    findings: bundle.findings || [],
+    approvals: bundle.approvals || [],
+    actions: bundle.actions || [],
+    closures: bundle.closures || []
   };
 }
 
@@ -78,7 +47,7 @@ function safeValue(value) {
 }
 
 function csvEscape(value) {
-  const text = safeValue(value);
+  const text = require("../services/auditWorkbook.service").csvText(safeValue(value));
 
   if (
     text.includes(",") ||
@@ -93,7 +62,7 @@ function csvEscape(value) {
 
 exports.exportCsv = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.auditScopeId || req.params.auditId, req);
 
     const rows = [
       ["AUDIT REPORT"],
@@ -165,7 +134,7 @@ exports.exportCsv = async (req, res) => {
         safeValue(action._id),
         safeValue(action.title || action.name || action.description),
         safeValue(action.status),
-        safeValue(action.deadline),
+        safeValue(action.dueDate || action.deadline),
         safeValue(
           action.responsibleUser ||
           action.assignedTo ||
@@ -208,7 +177,7 @@ exports.exportCsv = async (req, res) => {
 
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="audit-${req.params.auditId}.csv"`
+      `attachment; filename="audit-${data.audit._id}.csv"`
     );
 
     return res.send("\ufeff" + csv);
@@ -229,8 +198,11 @@ exports.exportCsv = async (req, res) => {
 
 exports.exportExcel = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.auditScopeId || req.params.auditId, req);
 
+    const kind=require('../services/auditReportBundle.service').kindOf(data.audit);
+    if(kind&&data.bundle.restrictions['audit.execution'])throw Object.assign(Error('Execution read permission is required for a complete source export.'),{status:403});
+    if(kind)await require(`../services/${kind}AuditExecution.service`).requireSubmitted(data.audit);
     const auditRows = [
       {
         Field: "Audit ID",
@@ -377,7 +349,7 @@ exports.exportExcel = async (req, res) => {
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(cover),'Cover');
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.flatMap(s=>s.questions.map(q=>({Id:q.id,Section:s.title,Category:s.category,CatalogVersion:snapshot.standardSource.version,File:q.sourceFile,Worksheet:q.worksheet,Row:q.sourceRow,Code:q.sourceCode||'',SourceMetadata:JSON.stringify(q.sourceMetadata||{}),SourceText:q.sourceText,Text:q.label,SourceRisk:q.sourceRisk||'',Result:answers.get(q.id)?.answer||'',Note:answers.get(q.id)?.comment||'',NAReason:details.naReasons?.[q.id]||'',Evidence:(details.evidenceLinks||[]).filter(l=>l.questionId===q.id).map(l=>l.evidenceId).join(', '),ObservationCount:(details.criterionObservations||[]).filter(o=>o.standardId===q.id).length})))),'Standards');
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet((details.criterionObservations||[]).map(o=>({Id:o.id,StandardId:o.standardId,Description:o.description,EvidenceIds:o.evidenceIds.join(', ')}))),'Observations');
-      const saves=await require('../models/standardAuditSave.model').find({auditId:data.audit._id}).sort({version:1}).lean();
+      const saves=data.bundle.saves||[];
       const history=[];
       for(const v of saves){const base={Version:v.version,Actor:v.actor,At:v.at,Status:v.status};
        history.push({...base,Kind:'audit-details',SubmittedBy:v.submission?.actorId||'',SubmittedAt:v.submission?.at||'',OverallPercentage:v.assessment?.overallPercentage??'',Observations:v.details?.observations||'',FinalOpinion:v.details?.finalOpinion||'',RestaurantManager:v.details?.restaurantManager||'',ShiftManager:v.details?.shiftManager||'',Photo:v.details?.finalEvidence?.photoId||'',Documents:(v.details?.finalEvidence?.documentIds||[]).join(', ')});
@@ -389,6 +361,8 @@ exports.exportExcel = async (req, res) => {
     }
 
     await require('../services/hseAuditExport.service').append(XLSX,workbook,data);
+    require('../services/auditReportExport.service').append(XLSX,workbook,data.bundle);
+    require('../services/auditWorkbook.service').finalize(XLSX,workbook);
     const buffer = XLSX.write(
       workbook,
       {
@@ -397,6 +371,7 @@ exports.exportExcel = async (req, res) => {
       }
     );
 
+    if(!await require('../services/auditReportBundle.service').recheck(req,res,data.audit,data.bundle,'audit.export'))return;
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -404,7 +379,7 @@ exports.exportExcel = async (req, res) => {
 
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="audit-${req.params.auditId}.xlsx"`
+      `attachment; filename="audit-${data.audit._id}.xlsx"`
     );
 
     return res.send(buffer);
@@ -425,7 +400,7 @@ exports.exportExcel = async (req, res) => {
 
 exports.exportPdf = async (req, res) => {
   try {
-    const data = await buildAuditData(req.params.auditId);
+    const data = await buildAuditData(req.auditScopeId || req.params.auditId, req);
 
     const doc = new PDFDocument({
       margin: 50
@@ -438,7 +413,7 @@ exports.exportPdf = async (req, res) => {
 
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="audit-${req.params.auditId}.pdf"`
+      `attachment; filename="audit-${data.audit._id}.pdf"`
     );
 
     doc.pipe(res);
@@ -604,9 +579,9 @@ exports.exportPdf = async (req, res) => {
           `Status: ${safeValue(action.status)}`
         );
 
-        if (action.deadline) {
+        if (action.dueDate || action.deadline) {
           doc.text(
-            `Deadline: ${safeValue(action.deadline)}`
+            `Deadline: ${safeValue(action.dueDate || action.deadline)}`
           );
         }
 

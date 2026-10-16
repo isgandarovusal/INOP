@@ -73,6 +73,14 @@ exports.getAuditReport = async (req, res) => {
     };
 
     if(fullAudit.templateSnapshot?.hseSource&&fullAudit.hseAssessment)report.summary={totalChecks:fullAudit.hseAssessment.total,passed:fullAudit.hseAssessment.compliant,failed:fullAudit.hseAssessment.noncompliant};
+    if(require("../services/auditReportBundle.service").kindOf(fullAudit)){
+      report.bundle = await require("../services/auditReportBundle.service").build(fullAudit,req);
+      if(!await require('../services/auditReportBundle.service').recheck(req,res,fullAudit,report.bundle,'audit.report'))return;
+      report.score=report.bundle.percentage;
+      if(fullAudit.standardAssessment)report.summary={totalChecks:fullAudit.standardAssessment.total,passed:fullAudit.standardAssessment.compliant,failed:fullAudit.standardAssessment.critical+fullAudit.standardAssessment.major+fullAudit.standardAssessment.minor};
+      if(fullAudit.hrAssessment||fullAudit.serviceAssessment)report.summary={totalChecks:checks.length,passed:checks.filter(a=>a.answer==='1').length,failed:checks.filter(a=>['0','0.5'].includes(a.answer)).length};
+      if(report.bundle.saves)report.bundle.saves=report.bundle.saves.map(({version,actor,at,status})=>({version,actor,at,status}));
+    }
     return res.json({
       success: true,
       data: report,
@@ -80,7 +88,7 @@ exports.getAuditReport = async (req, res) => {
   } catch (error) {
     console.error("Audit report error:", error);
 
-    return res.status(500).json({
+    return res.status(error.status || 500).json({
       success: false,
       message: "Report generation error",
     });

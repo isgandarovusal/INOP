@@ -24,12 +24,12 @@ async function save(req,complete=false){
    const answer=req.body.answers.find(a=>a.questionId===id)?.answer;
    if(!present&&answer!=='na'||present&&(answer==='na'||complete&&!['0','0.5','1'].includes(answer)))throw auditError(422,'Absent roles require N/A; present roles require an applicable answer.');
   }
-  const finalIds=[details.finalEvidence.photoId,...details.finalEvidence.documentIds].filter(Boolean);
-  if(new Set(finalIds).size!==finalIds.length)throw auditError(400,'Duplicate HR final attachment.');
+  const finalIds=[details.finalEvidence.photoId,...details.finalEvidence.documentIds,...Object.values(details.sectionPhotos)].filter(Boolean);
+  if(new Set([details.finalEvidence.photoId,...details.finalEvidence.documentIds].filter(Boolean)).size!==[details.finalEvidence.photoId,...details.finalEvidence.documentIds].filter(Boolean).length)throw auditError(400,'Duplicate HR final attachment.');
   for(const id of finalIds){
    if(!require('mongoose').isObjectIdOrHexString(id))throw auditError(400,'Invalid HR final evidence.');
    const file=await require('../models/auditEvidence.model').findOne({_id:id,auditId:audit._id}).session(session).lean();
-   if(!file||id===details.finalEvidence.photoId&&(typeof file.mimeType!=='string'||!file.mimeType.startsWith('image/')))throw auditError(400,'Final evidence must belong to this HR audit; a photo must be an image.');
+   if(!file||(id===details.finalEvidence.photoId||Object.values(details.sectionPhotos).includes(id))&&(typeof file.mimeType!=='string'||!file.mimeType.startsWith('image/')))throw auditError(400,'Final evidence must belong to this HR audit; a photo must be an image.');
   }
   const answers=req.body.answers.map(a=>({questionId:a.questionId,answer:a.answer,comment:hr.text(a.comment),score:row.templateSnapshot.hrSource.scoringStatus!=='blocked-kfc-denominator'&&['0','0.5','1'].includes(a.answer)?Number(a.answer):null}));
   const evidence=req.body.evidenceLinks||[];
