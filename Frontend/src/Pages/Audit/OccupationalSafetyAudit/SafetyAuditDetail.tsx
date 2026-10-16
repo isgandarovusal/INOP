@@ -2,7 +2,7 @@ import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
 import AuditResourceState from "../../../Components/AuditResourceState";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -32,6 +32,7 @@ export default function SafetyAuditDetail() {
     );
   }
 
+  if('hseAssessment' in audit)return <Navigate to={`/app/audit/audits/${audit.id}`} replace/>;
   const answered = audit.checks.filter(
     (item) => item.score !== null
   ).length;

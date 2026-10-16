@@ -27,7 +27,7 @@ const AuditEdit: React.FC = () => {
     if(!id) return;
 
     getAuditById(id).then((audit)=>{
-      if(audit.hrAssessment||audit.serviceAssessment||audit.standardAssessment){navigate(`/app/audit/audits/${audit.id}`,{replace:true});return;}
+      if(audit.hrAssessment||audit.serviceAssessment||audit.standardAssessment||audit.hseAssessment){navigate(`/app/audit/audits/${audit.id}`,{replace:true});return;}
       setScores(audit.scores||{cleanliness:0,service:0,food:0,staff:0});
       setComments(audit.comments || "");
       setLoading(false);

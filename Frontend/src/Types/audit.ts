@@ -24,9 +24,15 @@ export interface AuditFile {
 }
 
 export interface Audit {
-  templateSnapshot?:{standardSource?:{sha256:string;version:string;scoringStatus:string};serviceSource?:{sha256:string;version:string;scoringStatus:string}};
+  templateSnapshot?:{hseSource?:{objectType:import('../Services/hseAuditService').HseKind};standardSource?:{sha256:string;version:string;scoringStatus:string};serviceSource?:{sha256:string;version:string;scoringStatus:string}};
   assessmentStatus?: string;
   serviceDetails?:import('../Services/serviceAuditService').ServiceDetails;
+  hseObjectType?:import('../Services/hseAuditService').HseKind;
+  hseObjectId?:string;
+  hseObjectSnapshot?:import('../Services/hseAuditService').HseObject;
+  hseAssessment?:import('../Services/hseAuditService').HseAssessment;
+  hseDetails?:import('../Services/hseAuditService').HseDetails;
+  hseSubmission?:{actorId:string;name:string;at:string};
   standardSubmission?:{actorId:string;name:string;at:string};
   standardAssessment?:import('../Services/standardSourceService').StandardAssessment;
   standardDetails?:import('../Services/standardSourceService').StandardDetails;

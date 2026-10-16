@@ -4,6 +4,7 @@ export interface AuditReport {
   type: string;
   status: string;
   score: number|null;
+  hse?:{details:import('./hseAuditService').HseDetails;assessment:import('./hseAuditService').HseAssessment;object:import('./hseAuditService').HseObject};
   standard?:{details:import('./standardSourceService').StandardDetails;assessment:import('./standardSourceService').StandardAssessment};
   service?:{details:import('./serviceAuditService').ServiceDetails;assessment:{sections?:{id:string;title:string;percentage:number|null}[]};nonconformities:number};
   hr?: {details:import('./hrAuditService').HRDetails;assessment:{contract:string;sections:{id:string;title:string;percentage:number|null}[]};nonconformities:number};

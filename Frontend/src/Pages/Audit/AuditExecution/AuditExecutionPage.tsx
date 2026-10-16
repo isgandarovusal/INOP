@@ -1,3 +1,4 @@
+import HseAuditExecution from '../HSESource/HseAuditExecution';
 import StandardAuditExecution from '../StandardSource/StandardAuditExecution';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -53,6 +54,7 @@ export default function AuditExecutionPage() {
   const resource = useAuditResource(id, 'audit.execution', loadExecution, {refreshOnFocus:false});
   const key = JSON.stringify([id, user?.id, user?.role, user?.departmentId, user?.permissions]);
   if (resource.status !== 'ready' || !resource.data) return <AuditResourceState status={resource.status} retry={resource.reload} />;
+  if(resource.data.templateSnapshot?.hseSource)return <HseAuditExecution key={JSON.stringify([key,resource.data.hseVersion])} execution={resource.data} reload={resource.reload}/>;
   if(resource.data.templateSnapshot?.auditType==='standard'&&resource.data.templateSnapshot.standardSource)return <StandardAuditExecution key={JSON.stringify([key,resource.data.standardVersion])} execution={resource.data} reload={resource.reload}/>;
   if(resource.data.templateSnapshot?.auditType==='service'&&resource.data.templateSnapshot.serviceSource)return <ServiceAuditExecution key={JSON.stringify([key,resource.data.serviceVersion])} execution={resource.data} reload={resource.reload}/>;
   if(resource.data.templateSnapshot?.auditType==='hr'&&resource.data.templateSnapshot.hrSource) return <HRAuditExecution key={JSON.stringify([key,resource.data.hrVersion])} execution={resource.data} reload={resource.reload}/>;

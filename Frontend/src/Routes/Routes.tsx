@@ -38,7 +38,7 @@ const AuditExecutionPage = lazy(() => import("../Pages/Audit/AuditExecution/Audi
 const AuditTemplatesList = lazy(() => import("../Pages/Audit/ChecklistBuilder/AuditTemplatesList"));
 const AuditTemplateBuilder = lazy(() => import("../Pages/Audit/ChecklistBuilder/AuditTemplateBuilder"));
 const StandardAuditDetail = lazy(() => import("../Pages/Audit/StandardAudit/StandardAuditDetail"));
-const SafetyAuditForm = lazy(() => import("../Pages/Audit/OccupationalSafetyAudit/SafetyAuditForm"));
+const HseAuditPage = lazy(() => import("../Pages/Audit/HSESource/HseAuditPage"));
 const SafetyAuditDetail = lazy(() => import("../Pages/Audit/OccupationalSafetyAudit/SafetyAuditDetail"));
 const UsersList = lazy(() => import("../Pages/Users/UsersList"));
 const UserForm = lazy(() => import("../Pages/Users/UserForm"));
@@ -110,10 +110,11 @@ const ROUTES: RouteObject[] = [
               { path: "audit/standard/new", element: <StandardAuditPage createOnly /> },
               { path: "audit/standard/:id", element: <StandardAuditDetail /> },
               { path: "audit/standard/analytics", element: <StandardAuditPage analytics /> },
-              { path: "audit/safety", element: <AuditDirectionPage direction="occupational-safety" /> },
-              { path: "audit/safety/new", element: <SafetyAuditForm /> },
+              { path: "audit/safety", element: <HseAuditPage /> },
+              { path: "audit/safety/legacy", element: <AuditDirectionPage direction="occupational-safety" /> },
+              { path: "audit/safety/new", element: <HseAuditPage createOnly /> },
               { path: "audit/safety/:id", element: <SafetyAuditDetail /> },
-              { path: "audit/safety/analytics", element: <AuditDirectionPage direction="occupational-safety" analytics /> },
+              { path: "audit/safety/analytics", element: <HseAuditPage analytics /> },
               { path: "audit/auditors", element: <AuditorProfilesPage /> },
               { path: "audit/hr", element: <HRAuditPage /> },
               { path: "audit/hr/new", element: <HRAuditPage createOnly /> },

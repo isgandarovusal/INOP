@@ -818,6 +818,7 @@ function QuestionEditor({
           })
         }
       >
+        {question.answerType==='hse-result'&&<option value="hse-result">{t('hseAudit.scale')}</option>}
         {question.answerType==='standard-result'&&<option value="standard-result">{t('standardAudit.scale')}</option>}
         {question.answerType==='service-score'&&<option value="service-score">{t('serviceAudit.scale')}</option>}
         {question.answerType==='hr-score'&&<option value="hr-score">HR: 0 / 0.5 / 1 / N/A</option>}

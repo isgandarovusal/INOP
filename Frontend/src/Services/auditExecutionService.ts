@@ -10,6 +10,10 @@ export interface AuditExecutionAnswer {
 
 export interface AuditExecution {
   createdByName?: string;
+  hseSubmission?:{actorId:string;name:string;at:string};
+  hseVersion?:number;
+  hseDetails?:import('./hseAuditService').HseDetails;
+  hseAssessment?:import('./hseAuditService').HseAssessment;
   standardSubmission?:{actorId:string;name:string;at:string};
   standardVersion?:number;
   standardDetails?:import('./standardSourceService').StandardDetails;

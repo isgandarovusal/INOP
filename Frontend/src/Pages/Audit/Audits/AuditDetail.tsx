@@ -1,3 +1,4 @@
+import HseCover from '../HSESource/HseCover';
 import StandardCover from '../StandardSource/StandardCover';
 import ServiceFollowUp from '../ServiceSource/ServiceFollowUp';
 import {hrText} from '../HRAudit/hrAuditPresentation';
@@ -92,7 +93,7 @@ const AuditDetail: React.FC = () => {
     let cancelled = false;
     if (!audit) return;
     setRestaurant(null); setAuditor(null);
-    void Promise.allSettled([hasPermission(user,'restaurant','read')?getRestaurantById(audit.restaurantId):Promise.resolve(null), hasPermission(user,'user','read')?getUserById(audit.auditorId):Promise.resolve(null)])
+    void Promise.allSettled([hasPermission(user,'restaurant','read')&&audit.restaurantId?getRestaurantById(audit.restaurantId):Promise.resolve(null), hasPermission(user,'user','read')?getUserById(audit.auditorId):Promise.resolve(null)])
       .then(([restaurantResult, auditorResult]) => {
         if (cancelled) return;
         setRestaurant(restaurantResult.status === "fulfilled" ? restaurantResult.value ?? null : null);
@@ -148,15 +149,15 @@ const AuditDetail: React.FC = () => {
   return (
     <div>
       <PageHeader
-        title={restaurant?.name ?? t("auditFoundation.audit")}
-        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
+        title={audit.hseObjectSnapshot?.name ?? restaurant?.name ?? t("auditFoundation.audit")}
+        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${audit.hseSubmission?.name ?? audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
         actions={
           <>
             <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
               <ArrowLeft size={15} /> {t("auditPresentation.back")}
             </button>
 
-            {canManage && !audit.hrAssessment && !audit.serviceAssessment && !audit.standardAssessment && (
+            {canManage && !audit.hrAssessment && !audit.serviceAssessment && !audit.standardAssessment && !audit.hseAssessment && (
               <button
                 className="btn-secondary"
                 onClick={() => navigate(`/app/audit/audits/${audit.id}/edit`)}
@@ -170,6 +171,7 @@ const AuditDetail: React.FC = () => {
 
       <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
       <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
+      {audit.templateSnapshot?.hseSource&&<><HseCover assessment={audit.hseAssessment}/><ServiceFollowUp direction="hse" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.templateSnapshot?.standardSource&&<><StandardCover assessment={audit.standardAssessment}/><ServiceFollowUp direction="standard" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.auditType==='service'&&audit.templateSnapshot?.serviceSource&&<ServiceFollowUp auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}
       {audit.auditType==='hr'&&<HRAuditActions auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
@@ -281,17 +283,17 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
-            {(audit.auditType==='hr'&&audit.hrAssessment||audit.auditType==='service'&&audit.serviceAssessment||audit.standardAssessment)?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
+            {(audit.auditType==='hr'&&audit.hrAssessment||audit.auditType==='service'&&audit.serviceAssessment||audit.standardAssessment||audit.hseAssessment)?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
           </div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
             <div className="detail-row">
               <dt>{t("navigation.restaurants")}</dt>
-              <dd>{restaurant?.name ?? t("auditPresentation.unknown")}</dd>
+              <dd>{audit.hseObjectSnapshot?.name ?? restaurant?.name ?? t("auditPresentation.unknown")}</dd>
             </div>
             <div className="detail-row">
               <dt>{t("auditFoundation.auditor")}</dt>
-              <dd>{audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}</dd>
+              <dd>{audit.hseSubmission?.name ?? audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}</dd>
             </div>
             <div className="detail-row">
               <dt>{t("auditPresentation.type")}</dt>
@@ -327,9 +329,9 @@ const AuditDetail: React.FC = () => {
           </LazyAuditModule>
         )}
 
-        {renderedBusinessModules >= 4 && (!audit.templateSnapshot?.standardSource || audit.standardSubmission) && (
+        {renderedBusinessModules >= 4 && (!audit.templateSnapshot?.standardSource || audit.standardSubmission) && (!audit.templateSnapshot?.hseSource || audit.hseSubmission) && (
           <LazyAuditModule>
-            <AuditApprovalPanel key={JSON.stringify([audit.id,audit.standardDetails?.naReasons])} auditId={String(audit.id)} standardNaReasons={audit.templateSnapshot?.standardSource?Object.fromEntries((audit.checks||[]).filter((a):a is {questionId:string;answer:'na'}=>typeof a==='object'&&a!==null&&'answer'in a&&a.answer==='na'&&'questionId'in a&&typeof a.questionId==='string').map(a=>[a.questionId||'',audit.standardDetails?.naReasons?.[a.questionId||'']||''])):undefined} />
+            <AuditApprovalPanel key={JSON.stringify([audit.id,audit.standardDetails?.naReasons,audit.hseDetails?.naReasons])} auditId={String(audit.id)} standardNaReasons={(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)?Object.fromEntries((audit.checks||[]).filter((a):a is {questionId:string;answer:'na'}=>typeof a==='object'&&a!==null&&'answer'in a&&a.answer==='na'&&'questionId'in a&&typeof a.questionId==='string').map(a=>[a.questionId||'',(audit.hseDetails||audit.standardDetails)?.naReasons?.[a.questionId||'']||''])):undefined} />
           </LazyAuditModule>
         )}
 

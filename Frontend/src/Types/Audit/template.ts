@@ -13,7 +13,7 @@ export type AuditQuestionAnswerType =
   | "yes-no-na"
   | "severity"
   | "score"
-  | "hr-score" | "service-score" | "standard-result"
+  | "hr-score" | "service-score" | "standard-result" | "hse-result"
   | "text";
 
 export interface AuditTemplateQuestion {
@@ -23,6 +23,9 @@ export interface AuditTemplateQuestion {
   guidance?: string;
   sourceCell?: string;
   sourceRisk?: string|null;
+  sourceCode?:string;
+  weight?:number|null;
+  normativeReference?:string|null;
   sourceMetadata?:Record<string,string>;
   worksheet?: string;
   answerType: AuditQuestionAnswerType;
@@ -49,6 +52,7 @@ export interface AuditTemplateSection {
 }
 
 export interface AuditTemplate {
+  hseSource?:{objectType:import('../../Services/hseAuditService').HseKind;sha256:string;version:string;contract:string};
   standardSource?: {sha256:string;version:string;scoringStatus:string};
   serviceSource?: {sha256:string;version:string;scoringStatus:string};
   hrSource?: {sha256:string;version:string;scoringStatus:string};

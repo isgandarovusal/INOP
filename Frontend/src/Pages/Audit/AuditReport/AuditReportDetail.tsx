@@ -1,3 +1,4 @@
+import HseCover from '../HSESource/HseCover';
 import StandardCover from '../StandardSource/StandardCover';
 import {hrText} from '../HRAudit/hrAuditPresentation';
 import { useTranslation } from "react-i18next";
@@ -136,8 +137,9 @@ export default function AuditReportDetail(){
     <p>
      {t("auditPresentation.score")}:
      {" "}
-     {report.score===null?(report.hr?t('hrAudit.notAssessed'):'—'):`${report.score}${report.hr||report.service||report.standard?'%':''}`}
+     {report.score===null?(report.hr?t('hrAudit.notAssessed'):'—'):`${report.score}${report.hr||report.service||report.standard||report.hse?'%':''}`}
     </p>
+     {report.hse&&<HseCover assessment={report.hse.assessment}/>}
      {report.standard&&<StandardCover assessment={report.standard.assessment}/>}
  {report.service&&<><p>{report.service.details.observations}</p><p>{report.service.details.finalOpinion}</p>{report.service.assessment.sections?.map(section=><p key={section.id}>{section.title}: {section.percentage===null?t('serviceAudit.notAssessed'):`${section.percentage.toFixed(1)}%`}</p>)}</>}
      {report.hr&&<><p>{t(report.hr.assessment.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p><p>{report.hr.details.observations}</p><p>{report.hr.details.finalOpinion}</p></>}
@@ -215,7 +217,7 @@ export default function AuditReportDetail(){
 
 
 
-   {report.type!=='hr'&&!report.service&&!report.standard&&<button className="btn-secondary" type="button"
+   {report.type!=='hr'&&!report.service&&!report.standard&&!report.hse&&<button className="btn-secondary" type="button"
 
     onClick={()=>{
 
