@@ -117,3 +117,48 @@ test('Service photo/document/section history and corrective-action evidence are 
   await assert.rejects(()=>require('../models/serviceAuditSave.model').updateOne({executionId:id},{$set:{actor:'forged'}}));
  }}finally{for(const file of owned)await storage.forReference(file.storageReference,String(file.auditId)).remove(file.storageReference);}
 }));
+
+test('KFC reviewed v2 coexists with immutable v1 revisions and safely preserves legacy drafts/results',{timeout:90000},async()=>withAuditFixture(async h=>{
+ const Template=require('../models/auditTemplate.model'),Revision=require('../models/auditTemplateRevision.model'),Binding=require('../models/serviceAuditSourceBinding.model');
+ const Restaurant=require('../models/restaurant.model'),Execution=require('../models/auditExecution.model');
+ const content=hr.contentFor('kfc','service-source-v1'),templateId=new h.mongoose.Types.ObjectId(),revisionId=new h.mongoose.Types.ObjectId();
+ await Template.create({...content,_id:templateId,status:'active',revisionCounter:1,publishedRevisionId:revisionId,createdBy:String(h.actors.admin._id)});
+ await Revision.create({_id:revisionId,templateId,revision:1,content,publishedBy:String(h.actors.admin._id),publishedAt:new Date()});
+ const original=require('../config/serviceAuditSources.json').find(s=>s.brandId==='kfc');await Binding.create({_id:hr.bindingKey(original),templateId,revisionId});
+ await Restaurant.create({id:'legacy-kfc',name:'Synthetic legacy KFC',organizationId:'gfc',brandId:'kfc'});
+ const create=()=>require('../services/auditCreation.service').createAuditWithDepartmentSnapshot({id:require('node:crypto').randomUUID(),auditType:'service',restaurantId:'legacy-kfc',date:'2026-10-15',templateId:String(templateId)},{id:String(h.actors.admin._id),role:'admin',departmentId:'dep_A'});
+ const parent=await create();const started=await h.request('admin','POST','/audit-execution',{auditId:String(parent._id)});assert.equal(started.status,201);const id=started.data.data._id;
+ const answers=content.sections.flatMap(s=>s.questions.map(q=>({questionId:q.id,answer:'1'})));
+ const draft=await h.request('admin','PUT',`/audit-execution/${id}/service-draft`,{answers,expectedVersion:0,details:{observations:'Preserved legacy draft'}});assert.equal(draft.status,200,JSON.stringify(draft.data));
+ assert.equal(draft.data.data.overallPercentage,null);assert.equal(draft.data.data.answers.find(a=>a.questionId===hr.NEGATIVE_CRITERION).score,null);assert.equal(draft.data.data.answers.find(a=>a.questionId===hr.NEGATIVE_CRITERION).answer,'1');
+ const historyBefore=await h.request('admin','GET',`/audit-execution/${id}/service-history`);
+ const blocked=await h.request('admin','PUT',`/audit-execution/${id}/submit`,{answers,expectedVersion:1,details:{}});assert.equal(blocked.status,422);
+ assert.deepEqual((await h.request('admin','GET',`/audit-execution/${id}/service-history`)).data,historyBefore.data);
+ assert.equal((await h.request('admin','PATCH',`/audit-workflow/${parent._id}/status`,{status:'completed'})).status,409);
+ // An old audit with a genuinely inapplicable B67 remains completable: do not blanket-block v1.
+ const safeParent=await create();const safeStart=await h.request('admin','POST','/audit-execution',{auditId:String(safeParent._id)});assert.equal(safeStart.status,201);
+ const safeAnswers=answers.map(a=>({...a,answer:a.questionId===hr.NEGATIVE_CRITERION?'na':'0.5'}));
+ const safeSave=await h.request('admin','PUT',`/audit-execution/${safeStart.data.data._id}/submit`,{answers:safeAnswers,expectedVersion:0,details:{}});assert.equal(safeSave.status,200,JSON.stringify(safeSave.data));assert.equal(safeSave.data.data.overallPercentage,50);assert.equal(safeSave.data.data.serviceAssessment.applicable,93);
+ // Model-only fixture represents an already completed historical result, not a new API submission.
+ const historicalParent=await create();historicalParent.status='in-progress';historicalParent.checks=answers;historicalParent.overallPercentage=100;historicalParent.assessmentStatus='scored';await historicalParent.save();const historical=await Execution.create({auditId:historicalParent._id,templateRevisionId:revisionId,templateSnapshot:content,status:'completed',answers:answers.map(a=>({...a,score:1})),overallPercentage:100,assessmentStatus:'scored',serviceAssessment:{complete:true,contract:content.serviceSource.scoringStatus,sections:[]}});
+ const originalResult=await Execution.findById(historical._id).lean();
+ const provision=await h.request('admin','POST','/audit-service/templates/kfc',{});assert.equal(provision.status,201,JSON.stringify(provision.data));assert.notEqual(String(provision.data.data.templateId),String(templateId));
+ assert.equal((await Binding.findById(hr.bindingKey(original))).revisionId.toString(),revisionId.toString());assert.deepEqual((await Revision.findById(revisionId).lean()).content,content);
+ const fresh=await h.request('admin','POST','/audit-service/audits',{brandId:'kfc',restaurantId:'legacy-kfc',date:'2026-10-15'});assert.equal(fresh.status,201);assert.equal(fresh.data.data.templateSnapshot.serviceSource.version,'service-source-v2');
+ const stats=await h.request('admin','GET','/audit-service/analytics?brandId=kfc');assert.equal(stats.status,200,JSON.stringify(stats.data));assert.equal(stats.data.data.average,75);assert.equal(stats.data.data.legacyConformityExclusions,1);assert.ok(!stats.data.data.criteria.some(q=>q.id===hr.NEGATIVE_CRITERION));
+ assert.deepEqual(await Execution.findById(historical._id).lean(),originalResult);
+ const read=await h.request('admin','GET',`/audit-execution/${historical._id}`);assert.equal(read.status,200);assert.equal(read.data.data.overallPercentage,100);
+ const historicalReport=await h.request('admin','GET',`/audit-report/${historicalParent._id}`);assert.equal(historicalReport.status,200);assert.equal(historicalReport.data.data.score,100);
+ const historicalExport=await h.request('admin','GET',`/audit-export/${historicalParent._id}/excel`);assert.equal(historicalExport.status,200);
+ const XLSX=require('xlsx'),workbook=XLSX.read(historicalExport.buffer,{type:'buffer'});assert.equal(XLSX.utils.sheet_to_json(workbook.Sheets['Service Source'])[0].OverallPercentage,100);
+ // Existing independent review/closure is not gated by the new questionnaire version.
+ const reviewer=await h.models.User.create({name:'Historical Reviewer',email:'historical-reviewer@example.invalid',password:'synthetic',role:'admin',departmentId:'dep_A',isActive:true});
+ h.tokens.reviewer=require('jsonwebtoken').sign({id:String(reviewer._id),role:'admin'},process.env.JWT_SECRET,{expiresIn:'1h'});
+ const transition=await h.request('admin','PATCH',`/audit-workflow/${historicalParent._id}/status`,{status:'completed'});assert.equal(transition.status,200,JSON.stringify(transition.data));assert.equal((await h.models.Audit.findById(historicalParent._id)).overallPercentage,100);
+ const approval=await h.request('admin','POST','/audit-approval',{auditId:String(historicalParent._id),reviewer:String(reviewer._id)});assert.equal(approval.status,201,JSON.stringify(approval.data));
+ const approvalId=approval.data.data?._id||approval.data._id;
+ assert.equal((await h.request('reviewer','PATCH',`/audit-approval/${approvalId}`,{status:'approved'})).status,200);
+ assert.equal((await h.request('admin','POST','/audit-closure',{auditId:String(historicalParent._id)})).status,201);
+ assert.deepEqual(await Execution.findById(historical._id).lean(),originalResult);
+ assert.equal((await h.request('admin','PUT',`/audit-execution/${historical._id}/service-draft`,{answers,expectedVersion:0,details:{}})).status,409);
+}));

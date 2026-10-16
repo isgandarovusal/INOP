@@ -1936,6 +1936,8 @@
     "addFinding": "Add finding",
     "closeFinding": "Close finding",
     "actionProofHint": "Selected evidence is saved with action status updates. Independent verification and closure rules apply.",
-    "recurring": "Recurring nonconformities"
+    "recurring": "Recurring nonconformities",
+    "legacyReview": "This older KFC template uses negative wording at B67. You can save the draft. If this criterion is assessed, ask a manager to create a new audit with service-source-v2 before completion. Existing answers are not reinterpreted.",
+    "legacyAnalytics": "{{count}} numeric B67 responses from the older KFC template are excluded from criterion-level conformity statistics. Stored historical overall results are unchanged."
   }
 }

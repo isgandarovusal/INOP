@@ -69,25 +69,27 @@ exports.analytics=async(req,res)=>{
   const audits=await Audit.find({$and:parts}).select('_id restaurantId date status templateSnapshot.brandId').limit(5001).maxTimeMS(5000).lean();
   if(audits.length>5000)throw auditError(422,'Narrow the Service analytics date range (maximum 5000 audits).');
   const ids=audits.map(a=>a._id),parents=new Map(audits.map(a=>[String(a._id),a]));
-  const executions=await require('../models/auditExecution.model').find({auditId:{$in:ids},status:'completed','templateSnapshot.auditType':'service'}).select('auditId templateSnapshot.brandId templateSnapshot.serviceSource serviceAssessment overallPercentage answers').limit(5001).maxTimeMS(5000).lean();
+  const executions=await require('../models/auditExecution.model').find({auditId:{$in:ids},status:'completed','templateSnapshot.auditType':'service'}).select('auditId templateSnapshot.brandId templateSnapshot.serviceSource templateSnapshot.sections serviceAssessment overallPercentage answers').limit(5001).maxTimeMS(5000).lean();
   if(executions.length>5000)throw auditError(422,'Narrow the Service analytics date range.');
   const groups={brands:new Map(),restaurants:new Map(),sections:new Map(),criteria:new Map(),trend:new Map()};
   const add=(map,id,label,score)=>{if(!map.has(id))map.set(id,{id,label,count:0,scored:0,sum:0});const row=map.get(id);row.count++;if(typeof score==='number'&&Number.isFinite(score)){row.scored++;row.sum+=score;}return row;};
-  let sum=0,scored=0,nonconformities=0;
+  let sum=0,scored=0,nonconformities=0,legacyConformityExclusions=0;
   const seen=new Set();
   for(const row of executions){
    // Stored server assessment only. Never recalculate historical answers.
    if(seen.has(String(row.auditId))||!row.templateSnapshot?.serviceSource||!row.serviceAssessment?.complete)continue;seen.add(String(row.auditId));
-   const parent=parents.get(String(row.auditId));const source=hr.sourceFor(row.templateSnapshot.brandId);
+   const parent=parents.get(String(row.auditId));const source=hr.sourceFor(row.templateSnapshot.brandId,row.templateSnapshot.serviceSource.version);
    if(!source)continue;
    const score=row.overallPercentage;
    if(typeof score==='number'&&Number.isFinite(score)){sum+=score;scored++;}
    add(groups.brands,source.brandId,source.brandName,score);add(groups.restaurants,parent.restaurantId,parent.restaurantId,score);add(groups.trend,parent.date.slice(0,7),parent.date.slice(0,7),score);
    for(const section of row.serviceAssessment.sections||[])add(groups.sections,`${source.brandId}:${section.id}`,section.title,section.percentage);
    for(const answer of row.answers||[]){
-    const q=source.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q)continue;
+    const q=row.templateSnapshot.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q)continue;
+    // Preserve historical totals, but never label an old negative answer as new conformity.
+    if(hr.needsConformityReview(row.templateSnapshot)&&q.id===hr.NEGATIVE_CRITERION){if(['0','0.5','1'].includes(answer.answer))legacyConformityExclusions++;continue;}
     const rawValue=['0','0.5','1'].includes(answer.answer)?Number(answer.answer):null;
-    const value=typeof answer.score==='number'&&[0,0.5,1].includes(answer.score)?answer.score:null;
+    const value=rawValue!==null&&typeof answer.score==='number'&&[0,0.5,1].includes(answer.score)?answer.score:null;
     const item=add(groups.criteria,q.id,q.label,value===null?null:value*100);
     item.na=(item.na||0)+(answer.answer==='na'?1:0);item.nonconformities=(item.nonconformities||0)+(rawValue!==null&&rawValue<1?1:0);
     if(rawValue!==null&&rawValue<1)nonconformities++;
@@ -104,7 +106,7 @@ exports.analytics=async(req,res)=>{
    return Model.aggregate([{$match:{auditId:{$in:childParents.map(a=>a._id)}}},{$group:{_id:'$status',count:{$sum:1}}}]).option({maxTimeMS:5000});
   };
   const [actions,findings]=await Promise.all([countByStatus('audit.action',require('../models/auditAction.model')),countByStatus('audit.finding',require('../models/auditFinding.model'))]);
-  res.json({data:{statuses:audits.reduce((out,a)=>({...out,[a.status]:(out[a.status]||0)+1}),{}),total:audits.length,submitted:seen.size,scored,unscored:seen.size-scored,average:scored?sum/scored:null,nonconformities,...output,actions,findings,scoreUnit:'percent',generatedAt:new Date().toISOString()}});
+  res.json({data:{statuses:audits.reduce((out,a)=>({...out,[a.status]:(out[a.status]||0)+1}),{}),total:audits.length,submitted:seen.size,scored,unscored:seen.size-scored,average:scored?sum/scored:null,nonconformities,legacyConformityExclusions,...output,actions,findings,scoreUnit:'percent',generatedAt:new Date().toISOString()}});
  }catch(e){fail(res,e);}
 };
 exports.list=async(req,res)=>{

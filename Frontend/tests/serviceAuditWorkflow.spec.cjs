@@ -16,6 +16,11 @@ test('Real Service UI/API: source forms, draft resume, immutable submit, analyti
   await page.setViewportSize({width,height:1000});await h.open('admin',`/app/audit/execution/${executions[brand]._id}`);await page.locator('.audit-hr-question').first().waitFor();await page.evaluate(lang=>window.localeTest(lang),lang);
   const source=hr.sourceFor(brand);assert.equal(await page.locator('.audit-hr-question h3').first().textContent(),`1. ${source.sections[0].questions[0].label}`);assert.equal(await page.locator('.audit-hr-final-evidence input[type=file]').count(),4);assert.equal(await page.getByText('Лист1',{exact:false}).count(),0);
   assert.equal(await page.locator('.audit-hr-question').count(),hr.sourceFor(brand).sections.reduce((n,s)=>n+s.questions.length,0));
+  if(brand==='kfc'){
+   const criterion=page.locator('#service-kfc-r67-label');assert.match(await criterion.textContent(),/düzgün təşkil edilib/);assert.doesNotMatch(await criterion.textContent(),/edilməyib/);
+   assert.equal(await page.locator('select[aria-labelledby="service-kfc-r79-label"]').count(),0);
+   assert.equal(await page.locator('select[aria-labelledby="service-kfc-r67-label"] option[value="0.5"]').count(),1);
+  }
   const geometry=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth+1,smallButtons:[...document.querySelectorAll('.audit-hr-page button')].filter(e=>e.getBoundingClientRect().height>0&&e.getBoundingClientRect().height<43).length}));
   assert.equal(geometry.overflow,false,`${brand}/${lang}/${width}`);assert.equal(geometry.smallButtons,0);
   await page.screenshot({path:path.join(output,`${brand}-${lang}-${width}.png`),fullPage:false});checks.push({brand,lang,width,...geometry});

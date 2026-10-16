@@ -1,6 +1,6 @@
 # Paket 04 — Servis auditi mənbə uyğunluğu
 
-Baza: `52474890289f02fd987cb9c0db9c47c152336f53`. Bütün source məlumatı `Backend/config/serviceAuditSources.json`-dadır. Orijinal Excel-lər repoya əlavə edilmir.
+Baza: `52474890289f02fd987cb9c0db9c47c152336f53`. Orijinal source arxivi və v1 mətnləri `Backend/config/serviceAuditSources.json`-dadır; KFC-nin yeni `service-source-v2` təqdimatı `Backend/services/serviceAuditAssessment.service.js` daxilində versiyalı overlay ilə qurulur. Son yoxlamanın başlanğıc commit-i `edb4d804f9645be7160be02c3e2e4c9cf8d8b782`-dir. Orijinal Excel-lər repoya əlavə edilmir.
 
 | Brend | Worksheet (yalnız mənbə istinadı) | Bölmə | Qiymətləndirilən meyar | Əlavə mənbə sətri |
 |---|---|---:|---:|---:|
@@ -16,11 +16,37 @@ Cəmi 34 bölmə, 234 qiymətləndirilən meyar və 1 bal verilməyən mənbə g
 - KFC/PH-də Orta sütunu var; SS-də yoxdur. SS-yə Orta cavabı yalnız istifadəçinin açıq təsdiqinə əsasən əlavə edilib.
 - Hər workbook bir worksheet-dən ibarətdir. Formula, data validation, cell comment, external link, macro və embedded image yoxdur. Cavab və qeyd/foto sütunlarının xanaları boşdur.
 - Hər üç mənbədə ≥90% keçid qeydi var. Mənbə metadata-da saxlanır; təsdiqlənmiş yekun faiz kontraktına əlavə pass/fail, cərimə, ağırlıq və severity qaydası tətbiq edilmir (`passed=null`).
-- KFC B67 mənfi ifadədir: “düzgün təşkil edilməyib”. Dil redaktəsində inkarı silinməyib və bal tərsinə çevrilməyib; ayrıca dəqiqləşdirilməli qeyddir.
+- KFC B67 / 7.9 v1-də mənfi ifadədir: “düzgün təşkil edilməyib”. Yeni v2-də eyni iş sahəsinin düzgün təşkil olunması müsbət uyğunluq şəklində yoxlanır: “Sifarişi komplektləşdirən əməkdaşın iş sahəsi düzgün təşkil edilib.” Bəli=1 / Orta=0.5 / Xeyr=0 qalır; bal inversiyası, yeni tələb və ya çəki yoxdur. Orijinal mətn, ID, nömrə və sıra saxlanır. Köhnə v1 rəqəmsal cavabları avtomatik yeni mənaya çevrilmir.
 - KFC B77 “01:15/02:00” alternativ vaxtları, SS B52 “5:45” və ayrıca vaxt meyarları mənbədəki kimi saxlanır. Yeni SLA və ya avtomatik vaxt cəmlənməsi düsturu uydurulmayıb.
 - KFC B106/B115 “dolğunluq/orta dəyər” göstəricilərinin texniki açılışı mənbədə yoxdur; tərif və yeni ölçü vahidi təxmin edilməyib.
 - PH-də təkrarlanan 2.11 və 11-ci bölmədə 13.x nömrələri sourceNumber olaraq saxlanır. ID-lər worksheet row əsasında unikal olduğundan meyarlar birləşdirilmir.
 - Worksheet-dəki Zoo Park/Fontan adları yalnız mənbə izidir. Şablon brandId-yə bağlıdır; runtime restoranı istifadəçi mövcud GFC restoranları arasından seçir. Yeni real restoran/brend yaradılmır.
+
+
+## 16 oktyabr 2026 — KFC mənbə qərarları və tarixçənin qorunması
+
+### B79 / 8.36: bal verilməyən yekun istinad
+
+`Kfc Zoo Park!B79` mətninin tam forması `Orta göstərici:`-dir; A79-da qeyri-ardıcıl `8.36` nömrəsi saxlanır. Bu sətir `Xidmət vaxtı (KFC)` bölməsində B71–B78 yoxlamalarının sonunda, B80 / 9-cu bölmədən əvvəldir. B79-un stili 34-dür (B70 `Qonaq 1-5` başlığı ilə eyni), B78 meyarının stili 22-dir; C79 summary stili 55, C78 meyarının stili 14-dür. C79:G79 xanaları boşdur. Worksheet-də heç bir formula yoxdur.
+
+Beləliklə, mənbə hesablanan ortanın mövcud rəqəmini və ya düsturunu təqdim etmir; bu, yekun göstərici üçün boş istinad sətridir. B79 ayrıca yoxlama tələbi və `Orta` cavab variantı deyil. `service-kfc-r79` yalnız optional reference qeyd sahəsidir; 94 meyar, denominator, required answer və scoring-ə daxil edilmir. Verifier bu yerləşmə, stil, boş xanalar və meyarlardan kənar təsnifatı yoxlayır. Yeni orta düstur yaradılmır.
+
+### Mənfi və qeyri-dəqiq ifadələrin nəzərdən keçirilməsi
+
+| Mənbə | Yoxlama predmeti və qərar | Balın mənası |
+|---|---|---|
+| B67 / 7.9 | İş sahəsinin düzgün təşkili. v2-də yalnız uyğunluq yönümlü ifadə; mənbə/v1 ayrıca saxlanır. Normativ detal və yeni yoxlama predmeti əlavə olunmayıb. | Yeni v2-də Bəli düzgün təşkil olunmanı, Xeyr uyğunsuzluğu bildirir; Orta=0.5. Köhnə v1 cavabının mənası avtomatik dəyişmir. |
+| B106 / 13.7 və B115 / 13.15 | Əməkdaşın mənbədə adı çəkilən hədəfləri bilməsi yoxlanır. “Dolğunluq/orta dəyər” göstəricilərinin rəsmi tərifi və konkret hədəfi mənbədə yoxdur; biznes sahibinin terminoloji açıqlaması açıq qalır. Hər iki fərqli meyar saxlanır. | Bəli hədəfləri bilməyi təsdiqləyir, buna görə müsbət uyğunluqdur. Rəqəmsal hədəf, çəki və avtomatik KPI hesablama uydurulmur. |
+| B10, B12, B14–15, B17–18, B20–21, B31, B37, B50–51, B89 | Zədə, zərərverici, qoxu, sürüşkənlik və başqa arzuolunmaz halın olmaması müsbət uyğunluqdur. B39–40 da zədəsizliyi tələb edir. | “Yoxdur”, “deyil” və oxşar sözə görə avtomatik inversiya edilmir; Bəli müsbət vəziyyətin təsdiqidir. Mətnlər dəyişdirilməyib. |
+| B77 / 8.7; SS B52 | Mənbədəki `01:15/02:00` alternativləri və `5:45` saxlanır. Alternativlərin tətbiq şəraiti/ölçü vahidi ayrıca biznes izahı tələb edir. | Auditorun təsdiqlənmiş uyğunluq cavabı hesablanır; yeni SLA, vaxt norması və avtomatik timer qaydası yaradılmır. |
+
+### Köhnə auditlər üçün dəqiq sərhəd
+
+- Yeni KFC provision ayrıca `service:...:service-source-v2` binding/template/revision yaradır. Mövcud v1 binding-i, yayımlanmış revision-u və audit snapshot-u dəyişmir. Bu task real DB-də provision/migration icra etmir.
+- v1-də B67 üçün 0/0.5/1 cavabı olan qaralama saxlanıla və oxuna bilər. Yeni save nəticəsi `unscored`, overall və problemli bölmənin balı/faizi null, `reviewRequired=[service-kfc-r67]` olur; cavab mətninin özü saxlanır. Yeni submit 422-dir. Köhnə mənfi cavabın avtomatik çevrilməsi əvəzinə menecer yeni reviewed v2 audit təşkil etməlidir. Bu, bütün köhnə auditlərə qadağa deyil. N/A məsələdən yayınma vasitəsi kimi istifadə edilməməlidir.
+- B67 həqiqətən tətbiq olunmadıqda v1 N/A neytraldır və digər 93 meyar üzrə tamamlama işləyir. Digər brendlər və legacy Service yes/no/na kontraktı dəyişmir.
+- Əvvəl tamamlanmış v1 nəticəsi, cavabları və immutable save tarixçəsi yenidən hesablanmır. Oxuma, hesabat, Excel export, status tamamlanması, müstəqil approval və closure saxlanmış execution nəticəsinə əsaslanır; yeni sözləndirməyə görə bloklanmır.
+- Analitikada tarixi yekunlar saxlanmış nəticədən göstərilir. Köhnə v1 B67 cavabları yeni müsbət meyarın uyğunluq statistikası ilə qarışdırılmır; çıxarılan rəqəmsal cavabların sayı ayrıca `legacyConformityExclusions` və AZ/EN/RU xəbərdarlığı ilə açıq göstərilir. Bu istisna tarixi yekun faizi dəyişmir. Orijinal meyar/cavab export və audit tarixçəsində qalır.
 
 ## Source hash-ləri
 - KFC: `2c42c35e5eae628cb75d4a31b4d7b147601b66148f196a447943bb16f558ce49`
@@ -92,7 +118,7 @@ Bölmə title/sourceTitle, meyar label/sourceText, sourceCell/sourceNumber və g
 | `service-kfc-r64` / B64 / 7.6 | Zalda yoxsa Paket olacağını soruşulur | Sifarişin zalda istifadə, yoxsa özü ilə aparmaq üçün olduğu soruşulur. |
 | `service-kfc-r65` / B65 / 7.7 | Əməkdaşın məsulla bağlı bilgisi vardır | Əməkdaş məhsul barədə məlumatlıdır. |
 | `service-kfc-r66` / B66 / 7.8 | Menecer və ya səlahiyyətli şəxs (təlimçi) kassada dayanıb proseslərə nəzarət edir, pik saatlarda Sİ-SO qaydasına əməl edir  | Menecer və ya səlahiyyətli şəxs (təlimçi) kassada dayanıb proseslərə nəzarət edir, pik saatlarda Sİ-SO qaydasına əməl edir. |
-| `service-kfc-r67` / B67 / 7.9 | Sifariş yığan (Paker) zonası düzgün təşkil edilməyib | Sifarişi komplektləşdirən əməkdaşın iş sahəsi düzgün təşkil edilməyib. |
+| `service-kfc-r67` / B67 / 7.9 | Sifariş yığan (Paker) zonası düzgün təşkil edilməyib | Sifarişi komplektləşdirən əməkdaşın iş sahəsi düzgün təşkil edilib. (v2; v1 mətninin inkarı arxivdə saxlanır) |
 | `service-kfc-r68` / B68 / 7.10 | Fusion əməliyyat standartlarının icrası və rəqəmsal sistemlərin (monitorların) idarəedilməsi | Fusion əməliyyat standartlarının icrası və rəqəmsal sistemlərin (monitorların) idarə edilməsi. |
 | `service-kfc-s69` / B69 | Xidmət vaxtı (KFC): | Xidmət vaxtı (KFC) |
 | `service-kfc-r71` / B71 / 8.1 | Növbədə gözləmə – 2 d. | Növbədə gözləmə – 2 dəqiqə. |

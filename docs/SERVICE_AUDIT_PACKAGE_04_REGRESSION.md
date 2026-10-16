@@ -70,3 +70,15 @@ Lokal tam loglar (repoya əlavə edilmir):
 - `/workspace/work/hr-audit-source/../service-audit-p04/legacy-regression.log` — SHA-256 `5489fd3afaf3e4a2c6e0440ec3757f8464ea2d200120518c828c04ba5420e645`
 
 Bu sübut legacy uyğunsuzluqları aradan qaldırmır və bütün repository testlərini PASS elan etmir. Scope testlərini yaşıl etmək üçün lifecycle/direction/soft-delete təhlükəsizliyi geri çevrilməyib.
+
+## Yekun təkrar müqayisə — 16 oktyabr 2026
+
+Başlanğıc Paket 04 commit-i: `edb4d804f9645be7160be02c3e2e4c9cf8d8b782`. Yekun kodda geniş suite yenidən icra edildi: **563 test / 519 PASS / 44 FAIL / 0 SKIP**. Bu cədvəldəki 44 adın hamısı eynidir; 42 ayrıca assertion-un actual/expected dəyərləri də ilkin baza, Paket 03, Paket 04 ilkin və yekun logları arasında eynidir. Yeni failure 0. Müqayisə script-i bərabərliyi assert edib; ilkin testlər dəyişdirilməyib.
+
+Tam loglar repo xaricindədir. SHA-256 yoxlanmış sübutlar:
+- `/workspace/work/hr-audit-source/final-baseline-regression.log` — `176d3219be51af26342f171c387158046e18bdf2478a16004d9d6e735b521e8c`
+- `/workspace/work/hr-audit-source/closure-legacy-regression.log` — `aa5dbe88e2b35bc466c474233e3e275469dae5e3c16ab0cc3168cef4c149b87c`
+- `/workspace/work/service-audit-p04/legacy-regression.log` — `5489fd3afaf3e4a2c6e0440ec3757f8464ea2d200120518c828c04ba5420e645`
+- `/workspace/work/service-audit-p04/closure-legacy-final.log` — `aefd8e812c92c54e7d205e536458309d3b047c5269e0e29cd9d6000b177dabf2`
+
+Mühitin yenidən başlaması nəticəsində lokal QA container-i dayanmışdı; ilk bərpa cəhdindəki connection timeout-lar məlum 44 failure-a aid edilməyib. Yalnız öz QA container-i bərpa edilərək PRIMARY təsdiqlənəndən sonra tam suite yenidən qaçırılıb və yuxarıdakı yekun nəticə alınıb. Production və mövcud `inop-cloud-mongo` bazası istifadə edilməyib.

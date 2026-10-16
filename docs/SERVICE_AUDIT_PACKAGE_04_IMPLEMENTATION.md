@@ -16,6 +16,17 @@
 - Mövcud Excel exporter yeni `Service Criteria`, `Service Sections`, `Service Source` və KFC üçün `Service References` worksheet-ləri ilə genişləndirilib. Original və edited meyarlar, cavab/canonical score, section/result, notes/photo/document IDs, audit/revision/source provenance çıxır. Existing Findings/Actions/Approvals/Closures saxlanır; Service üçün dueDate/severity və execution evidence əlavə olunur. Köhnə audit yenidən hesablanmır.
 - Audit premium workspace, SectionCard/FormSection, action/history/final-evidence komponentləri təkrar istifadə edilir. HR action/history komponentlərinin yeni optional parametrlərinin default-u əvvəlki davranışdır; HR biznes və scoring dəyişmir. Recruitment və Main Dashboard fayllarında diff yoxdur.
 
+## Yekunlaşdırma düzəlişləri — 16 oktyabr 2026
+
+Başlanğıc lokal/remote `inop-main`: `edb4d804f9645be7160be02c3e2e4c9cf8d8b782`. Yarımçıq iş qorunaraq davam etdirilib; yeni branch və PR yaradılmayıb.
+
+- KFC B79 unscored summary təsnifatı orijinal worksheet-in sətri, yerləşməsi, format stilləri, boş cavab xanaları və formula olmaması ilə verifier-də yoxlanır.
+- B67 yeni KFC `service-source-v2` məzmununda müsbət uyğunluq şəklindədir. Bütün 94 ID, mənbə mətni/nömrəsi/sırası qorunur. `service-source-v1` snapshot-ları ayrıca doğrulanır, override edilmir.
+- Köhnə mənfi B67-yə verilmiş rəqəmsal cavab yeni submit-də yanlış uyğunluq yaratmır: draft mümkündür, yeni tamamlama 422 ilə konkret review tələb edir. B67 N/A olan v1 isə normal tamamlanır. Əvvəl tamamlanmış nəticələrə bu guard geriyə tətbiq edilmir.
+- Service workflow completion və closure yeni formula ilə rescore etmək əvəzinə revision-a bağlı, tamamlanmış execution-un saxlanmış server nəticəsini istifadə edir. Submit, context/revision, finding/action və independent approval qoruması saxlanır; HR branch-i dəyişmir.
+- Analitika meyarları auditin snapshot-undan oxuyur. Köhnə B67 ayrıca istisna və saylı xəbərdarlıqdır; tarixi yekunlar saxlanmış şəkildə qalır. Yoxlamada tapılan missing projection 500 xətası `templateSnapshot.sections` seçimi ilə düzəldilib.
+- Bu son dəyişikliklər source/verifier, Service assessment/execution/controller, shared lifecycle-in yalnız source-Service şərti, Service form/analytics/type, AZ/EN/RU resursları və regression testləri ilə məhdudlaşır. Dörd Paket 04 sənədi yenilənir; ilkin tam fayl siyahısı aşağıda saxlanır.
+
 ## Texniki məhdudiyyətlər
 
 Production private durable/versioned storage üçün mövcud adapter interfeysi saxlanır. Repository bootstrap-da real production provider qeydiyyatı yoxdur və bu mühitdən production credential/Render konfiqurasiyası əlçatan deyil. Lokal real upload/download yoxlanılır; production konfiqurasiyasız 503 testlə təsdiqlənir. Bu production storage-in işlək olması iddiası deyil. Production storage, retention/restore və production multi-tenant topology/identity sınaqları BLOCKED qalır.

@@ -34,12 +34,14 @@ export default function ServiceAuditExecution({execution,reload}:{execution:Audi
  const persist=(complete:boolean)=>void action.run(async signal=>{
   setError('');setMessage('');
   try{await saveService(execution,answers,details,complete,signal);setSaved(true);setConfirm(false);setMessage(t(complete?'serviceAudit.submittedMessage':'serviceAudit.savedMessage'));reload();}
-  catch(e){const status=isAxiosError(e)?e.response?.status:undefined;setError(t(status===409?'serviceAudit.conflict':status===422?'serviceAudit.incomplete':'serviceAudit.saveError'));throw e;}
+  catch(e){const status=isAxiosError(e)?e.response?.status:undefined;setError(t(status===409?'serviceAudit.conflict':status===422?(legacyReview?'serviceAudit.legacyReview':'serviceAudit.incomplete'):'serviceAudit.saveError'));throw e;}
  });
  const answered=answers.filter(a=>a.answer).length;
+ const legacyReview=snapshot.brandId==='kfc'&&snapshot.serviceSource?.version==='service-source-v1'&&writable;
  return <div className="audit-direction-page audit-hr-page">
   <PageHeader title={`${t('serviceAudit.title')} — ${snapshot.brandName}`} subtitle={t('serviceAudit.sourceOriginal')} actions={<Link className="btn-secondary" to={`/app/audit/audits/${execution.auditId}`}>{t('serviceAudit.workflow')}</Link>}/>
   <p className="audit-hr-notice" role="note">{t('serviceAudit.scale')}</p>
+  {legacyReview&&<p className="audit-hr-notice" role="alert">{t('serviceAudit.legacyReview')}</p>}
   {parent.status!=='ready'?<AuditResourceState status={parent.status} retry={parent.reload}/>:<SectionCard><dl><div className="detail-row"><dt>{t('serviceAudit.restaurant')}</dt><dd>{parent.data?.options.find(r=>r.id===parent.data?.audit?.restaurantId)?.name||parent.data?.audit?.restaurantId}</dd></div><div className="detail-row"><dt>{t('serviceAudit.date')}</dt><dd>{parent.data?.audit?.date}</dd></div><div className="detail-row"><dt>{t('auditFoundation.auditor')}</dt><dd>{execution.createdByName||parent.data?.audit?.auditorId}</dd></div></dl></SectionCard>}
   <SectionCard><p>{t('serviceAudit.progress',{answered,total:questions.length})} · {t(`auditFoundation.statusLabels.${execution.status}`,{defaultValue:execution.status})}</p><progress max={questions.length} value={answered} aria-label={t('auditFoundation.checklistProgress')}/><p>{t('serviceAudit.result')}: {execution.overallPercentage==null?t('serviceAudit.notAssessed'):`${execution.overallPercentage.toFixed(1)}%`}</p></SectionCard>
   <form onSubmit={e=>{e.preventDefault();setConfirm(true);}}>

@@ -72,7 +72,9 @@ async function closeAudit(req) {
     if (!audit.templateRevisionId || String(context?.templateRevisionId) !== String(audit.templateRevisionId)) throw auditError(409, 'Legacy unversioned audit requires reviewed closure migration.');
     if(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
     if(audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
-    require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
+    // Source Service completion was validated when submitted. Preserve its immutable result,
+    // including historical versions; closure must not reinterpret answers under new wording.
+    if(!(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
     const [closure] = await Closure.create([{ auditId: audit._id, executionId: req.body.executionId, approvalStatus: 'approved', finalStatus: 'completed', closedBy: req.user.id, comment: req.body.comment }], { session });
     audit.status = 'completed'; await audit.save({ session });
     await Assignment.updateMany({ auditId: audit._id }, { $set: { status: 'completed' } }, { session });
@@ -87,8 +89,10 @@ async function transition(req) {
     if (next === audit.status) return audit;
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Use a reviewed reopening operation for closed audits.');
     if (!(allowed[audit.status] || []).includes(next)) throw auditError(409, 'Invalid audit status transition.');
-    if (next === 'completed') Object.assign(audit, require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true));
-    if(next==='completed'&&audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
+    if(next==='completed'&&audit.auditType==='service'&&audit.templateSnapshot?.serviceSource){
+      const submitted=await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
+      Object.assign(audit,{assessmentStatus:submitted.assessmentStatus,overallPercentage:submitted.overallPercentage,passed:submitted.passed,serviceAssessment:submitted.serviceAssessment});
+    }else if(next==='completed')Object.assign(audit,require('./auditAssessment.service').assess(audit.templateSnapshot,audit.checks||[],true));
     if(next==='completed'&&audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
     if(next==='completed'){const context=await require('../models/auditContext.model').findById(audit._id).session(session);if(!audit.templateRevisionId||String(context?.templateRevisionId)!==String(audit.templateRevisionId))throw auditError(409,'Unversioned audit cannot be certified complete.');}
     audit.status = next; await audit.save({ session }); await history(audit, req.user, 'status-' + next, session); return audit;

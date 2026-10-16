@@ -1960,6 +1960,8 @@
     "addFinding": "Uyğunsuzluq əlavə et",
     "closeFinding": "Uyğunsuzluğu bağla",
     "actionProofHint": "Seçilmiş sübut tədbirin statusu yenilənərkən icra sübutu kimi saxlanılır. Müstəqil yoxlama və bağlanış qaydaları qüvvədədir.",
-    "recurring": "Təkrarlanan uyğunsuzluqlar"
+    "recurring": "Təkrarlanan uyğunsuzluqlar",
+    "legacyReview": "Bu köhnə KFC şablonunun B67 meyarı mənfi formada yazılıb. Qaralamanı saxlamaq olar. Həmin meyar qiymətləndirilirsə, tamamlamadan əvvəl menecerdən service-source-v2 şablonu ilə yeni audit yaratmasını istəyin. Köhnə cavablar avtomatik çevrilmir.",
+    "legacyAnalytics": "Köhnə KFC şablonundakı B67 üzrə {{count}} rəqəmsal cavab meyar səviyyəli uyğunluq statistikasına daxil edilmir. Saxlanmış tarixi yekun nəticələr dəyişdirilməyib."
   }
 }

@@ -10,13 +10,13 @@ def workbook(path):
   rel={r.attrib['Id']:r.attrib['Target'] for r in E.fromstring(z.read('xl/_rels/workbook.xml.rels'))};out={}
   for sheet in E.fromstring(z.read('xl/workbook.xml')).findall('s:sheets/s:sheet',N):
    target=rel[sheet.attrib['{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id']];target=target.lstrip('/') if target.startswith('/') else 'xl/'+target
-   tree=E.fromstring(z.read(target));cells={};formulas=[]
+   tree=E.fromstring(z.read(target));cells={};formulas=[];styles={}
    for c in tree.findall('.//s:sheetData/s:row/s:c',N):
-    v=c.find('s:v',N);f=c.find('s:f',N);value=v.text if v is not None else ''.join(c.find('s:is',N).itertext()) if c.find('s:is',N)is not None else ''
+    styles[c.attrib['r']]=c.attrib.get('s');v=c.find('s:v',N);f=c.find('s:f',N);value=v.text if v is not None else ''.join(c.find('s:is',N).itertext()) if c.find('s:is',N)is not None else ''
     if c.attrib.get('t')=='s':value=strings[int(value)]
     if f is not None:formulas.append((c.attrib['r'],'='+f.text))
     if value:cells[c.attrib['r']]=value
-   out[sheet.attrib['name']]={'cells':cells,'formulas':formulas}
+   out[sheet.attrib['name']]={'cells':cells,'formulas':formulas,'styles':styles}
   return out
 if __name__=='__main__':
  if len(sys.argv)!=4:raise SystemExit('Usage: verifyServiceAuditSources.py KFC.xlsx PizzaHut.xlsx SimitSarayi.xlsx')
@@ -35,6 +35,17 @@ if __name__=='__main__':
     assert lower<int(q['sourceCell'][1:])<upper
     assert cells[q['sourceCell']]==q['sourceText'];assert cells['A'+q['sourceCell'][1:]]==q['sourceNumber'];assert q['label'].strip();assert q['answerType']=='service-score'
   for row in source['referenceRows']:assert cells[row['sourceCell']]==row['sourceText'];assert row['kind']=='summary-no-formula'
+  if source['brandId']=='kfc':
+   # Summary label and dedicated summary styling, after 8.1-8.8 and before section 9.
+   # There is NO formula: do not invent an average or treat this as the Partial answer.
+   assert cells['A79']=='8.36' and cells['B79']=='Orta göstərici:'
+   assert cells['A78']=='8.8' and cells['A80']=='9'
+   assert sheet['styles']['B79']==sheet['styles']['B70']!=sheet['styles']['B78']
+   assert sheet['styles']['C79']!=sheet['styles']['C78']
+   assert all(column+'79' not in cells for column in 'CDEFG')
+   assert source['referenceRows'][0]['sourceCell']=='B79'
+   assert not any(q['sourceCell']=='B79' for section in source['sections'] for q in section['questions'])
+   print('PASS KFC B79: unfilled summary label, separate summary styling, no formula; not a criterion or Partial answer')
   references={r['sourceCell'] for r in source['referenceRows']}
   assert [q['sourceCell'] for s in source['sections'] for q in s['questions']]==[c for c in expected if c not in references]
   actual=[q['sourceCell'] for s in source['sections'] for q in s['questions']]+[r['sourceCell'] for r in source['referenceRows']]
