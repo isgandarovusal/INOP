@@ -34,6 +34,7 @@ export interface User {
   createdAt: string;
   permissions: Permission[];
   hrAccess?: boolean;
+  auditDirections?: ("hr" | "service" | "standard" | "occupational-safety")[];
   auditDirection?: "hr" | "service" | "standard" | "occupational-safety" | null;
 }
 

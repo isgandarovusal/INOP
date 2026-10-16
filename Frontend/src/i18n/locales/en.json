@@ -2270,5 +2270,32 @@
       "office": "Office",
       "warehouse": "Warehouse"
     }
+  },
+  "auditCenter": {
+    "title": "Audit Center oversight",
+    "methodology": "Different audit methodologies are not combined into one percentage or average score. Results remain in each direction’s own analytics.",
+    "all": "All",
+    "group": "Group",
+    "count": "Audit count",
+    "total": "Total audits",
+    "completed": "Completed forms",
+    "ongoing": "Ongoing audits",
+    "pendingApproval": "Awaiting approval",
+    "closed": "Closed audits",
+    "coverage": "Audited objects",
+    "openActions": "Open actions",
+    "overdue": "Overdue actions",
+    "critical": "Critical findings",
+    "directions": "Directions",
+    "brands": "Brands",
+    "objects": "Object types",
+    "statuses": "Statuses",
+    "trend": "Audit activity",
+    "recurrences": "Recurring findings — top 20",
+    "unspecified": "Unspecified",
+    "auditorId": "Auditor ID",
+    "sectionId": "Section ID",
+    "multipleDirections": "Granted audit directions",
+    "section": "Section"
   }
 }

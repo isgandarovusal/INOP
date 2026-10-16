@@ -14,7 +14,7 @@ import * as service from '../../../Services/serviceAuditService';
 const brands=[['kfc','KFC'],['pizza-hut','Pizza Hut'],['simit-sarayi','Simit Sarayı']];
 export default function ServiceAuditPage({analytics=false,createOnly=false}:{analytics?:boolean;createOnly?:boolean}){
  const{t}=useTranslation();const{user}=useAuth();const navigate=useNavigate();
- const[filters,setFilters]=useState({brandId:'',restaurantId:'',dateFrom:'',dateTo:'',status:''});const[page,setPage]=useState(1);
+ const[filters,setFilters]=useState({brandId:'',restaurantId:'',dateFrom:'',dateTo:'',status:'',auditorId:'',sectionId:''});const[page,setPage]=useState(1);
  const[createInput,setCreateInput]=useState({brandId:'',restaurantId:'',date:new Date().toISOString().slice(0,10)});
  const update=(key:keyof typeof filters,value:string)=>{setFilters(p=>({...p,[key]:value,...(key==='brandId'?{restaurantId:''}:{})}));setPage(1);};
  const query=new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([,v])=>v)));query.set('page',String(page));query.set('limit','25');
@@ -38,6 +38,7 @@ export default function ServiceAuditPage({analytics=false,createOnly=false}:{ana
    <label>{t('navigation.restaurants')}<select value={filters.restaurantId} onChange={e=>update('restaurantId',e.target.value)}><option value="">{t('auditFoundation.allRestaurants')}</option>{data?.options.filter(r=>!filters.brandId||r.brandId===filters.brandId).map(r=><option key={r.id} value={r.id}>{r.name}</option>)}</select></label>
    {(['dateFrom','dateTo'] as const).map(k=><label key={k}>{t(`serviceAudit.${k}`)}<input type="date" value={filters[k]} onChange={e=>update(k,e.target.value)}/></label>)}
    <label>{t('auditFoundation.status')}<select value={filters.status} onChange={e=>update('status',e.target.value)}><option value="">{t('serviceAudit.allStatuses')}</option>{['draft','scheduled','in-progress','completed','cancelled','failed'].map(s=><option key={s} value={s}>{t(`auditFoundation.statusLabels.${s}`,{defaultValue:s})}</option>)}</select></label>
+   {analytics&&<><label>{t('auditFoundation.auditor')}<select value={filters.auditorId} onChange={e=>update('auditorId',e.target.value)}><option value="">{t('auditCenter.all')}</option>{metrics?.filterOptions?.auditors.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label>{t('auditCenter.section')}<select value={filters.sectionId} onChange={e=>update('sectionId',e.target.value)}><option value="">{t('auditCenter.all')}</option>{metrics?.filterOptions?.sections.map(s=><option key={s.id} value={s.id}>{s.title}</option>)}</select></label></>}
    <button className="btn-secondary" type="button" onClick={resource.reload}>{t('auditFoundation.refresh')}</button>
   </div></SectionCard>
   <p className="audit-hr-notice" role="note">{t('serviceAudit.scoringNotice')}</p>

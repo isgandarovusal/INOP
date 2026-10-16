@@ -11,6 +11,7 @@ const restaurant = { id:'restaurant-qa', name:'Synthetic restaurant', organizati
 const audit = {id:'synthetic-audit',_id:'0123456789abcdef01234567',restaurantId:restaurant.id,auditType:'standard',date:'2026-10-15',status:'draft',auditorId:'synthetic',scores:null,photos:[],attachments:[]};
 function response(url) {
   const p=url.pathname;
+  if(p==='/api/audit-analytics/center')return{data:{total:0,completed:0,ongoing:0,coverage:0,pendingApproval:0,closed:0,overallPercentage:null,directions:[],brands:[],objects:[],statuses:[],trend:[],actions:{total:0,open:0,overdue:0,closed:0},findings:{total:0,critical:0},recurrences:[]}};
   if(p==='/api/audit-hse/list')return{items:[],total:0,page:1,limit:25};
   if(['/api/audit-hse/options','/api/audit-hse/analytics-options'].includes(p))return{data:[{...restaurant,objectType:'restaurant'}]};
   if(['/api/audit-hse/sources','/api/audit-hse/analytics-sources','/api/audit-hse/auditors'].includes(p))return{data:[]};

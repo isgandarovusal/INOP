@@ -1,3 +1,4 @@
+import AuditCenterSummary from '../AuditCenterSummary';
 import { Link } from 'react-router-dom';
 import { ClipboardCheck, BarChart3, Store, ArrowRight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ export default function AuditHome() {
       <div className="audit-home-card-action"><Link to={`/app/audit/${item.path}`}>{t('auditFoundation.open')} <ArrowRight aria-hidden="true" size={16}/></Link>
       {hasPermission(user,'audit.analytics','read')&&<Link to={`/app/audit/${item.path}/analytics`}>{t('auditFoundation.analytics')}</Link>}</div>
     </section>)}</div>
+    {hasPermission(user,'audit.analytics','read')&&<AuditCenterSummary compact/>}
     <SectionCard><h3>{t('auditFoundation.management')}</h3><nav className="audit-management-links" aria-label={t('auditFoundation.management')}>
       {hasPermission(user,'restaurant','read')&&<Link to="/app/audit/restaurants"><Store size={18}/>{t('navigation.restaurants')}</Link>}
       {hasPermission(user,'audit.analytics','read')&&<Link to="/app/audit/analytics"><BarChart3 size={18}/>{t('auditFoundation.analytics')}</Link>}

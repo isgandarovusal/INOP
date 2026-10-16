@@ -32,6 +32,7 @@ const AuditDirectionPage = lazy(() => import("../Pages/Audit/AuditDirectionPage"
 const StandardAuditPage=lazy(()=>import("../Pages/Audit/StandardSource/StandardAuditPage"));
 const ServiceAuditPage=lazy(()=>import("../Pages/Audit/ServiceSource/ServiceAuditPage"));
 const HRAuditPage = lazy(() => import("../Pages/Audit/HRAudit/HRAuditPage"));
+const AuditCenterSummary = lazy(() => import('../Pages/Audit/AuditCenterSummary'));
 const AuditHome = lazy(() => import("../Pages/Audit/AuditHome/AuditHome"));
 const AuditReportDetail = lazy(() => import("../Pages/Audit/AuditReport/AuditReportDetail"));
 const AuditExecutionPage = lazy(() => import("../Pages/Audit/AuditExecution/AuditExecutionPage"));
@@ -122,7 +123,7 @@ const ROUTES: RouteObject[] = [
               { path: "audit", element: <AuditHome /> },
               { path: "audit/dashboard", element: <AuditDashboard /> },
               { path: "audit/notifications", element: <AuditNotificationsList /> },
-              { path: "audit/analytics", element: <AuditDirectionPage analytics /> },
+              { path: "audit/analytics", element: <AuditCenterSummary /> },
               { path: "audit/report/:id", element: <AuditReportDetail /> },
               { path: "audit/execution/:id", element: <AuditExecutionPage /> },
             ],

@@ -15,7 +15,7 @@ export interface AuditDashboardTrend {
 export interface AuditDashboardData {
   totalAudits: number;
   completedAudits: number;
-  averageScore: number;
+  averageScore: number | null;
   scoredExecutions: number;
   riskStats: AuditDashboardStat[];
   typeStats: AuditDashboardStat[];

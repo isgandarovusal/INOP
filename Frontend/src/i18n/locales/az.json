@@ -2294,5 +2294,32 @@
       "office": "Ofis",
       "warehouse": "Anbar"
     }
+  },
+  "auditCenter": {
+    "title": "Audit Mərkəzinin ümumi nəzarəti",
+    "methodology": "Fərqli audit metodologiyaları vahid faizə və ya orta bala birləşdirilmir. Nəticələr hər istiqamətin analitikasında ayrıca göstərilir.",
+    "all": "Hamısı",
+    "group": "Qrup",
+    "count": "Audit sayı",
+    "total": "Ümumi auditlər",
+    "completed": "Tamamlanmış formalar",
+    "ongoing": "Davam edən auditlər",
+    "pendingApproval": "Təsdiq gözləyən",
+    "closed": "Bağlanmış auditlər",
+    "coverage": "Audit aparılmış obyektlər",
+    "openActions": "Açıq tədbirlər",
+    "overdue": "Gecikmiş tədbirlər",
+    "critical": "Kritik uyğunsuzluqlar",
+    "directions": "İstiqamətlər",
+    "brands": "Brendlər",
+    "objects": "Obyekt növləri",
+    "statuses": "Statuslar",
+    "trend": "Audit aktivliyi",
+    "recurrences": "Təkrarlanan uyğunsuzluqlar — ilk 20",
+    "unspecified": "Göstərilməyib",
+    "auditorId": "Auditor ID-si",
+    "sectionId": "Bölmə ID-si",
+    "multipleDirections": "İcazə verilmiş audit istiqamətləri",
+    "section": "Bölmə"
   }
 }

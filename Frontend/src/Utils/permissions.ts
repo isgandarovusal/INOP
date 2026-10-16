@@ -138,5 +138,5 @@ export function getRoleLabel(role: Role): string {
 export function canAccessAuditDirection(user: PublicUser | null, direction: string, resource = 'audit'): boolean {
   if (!hasPermission(user, resource, 'read')) return false;
   if (user?.role === 'auditor' && !user.auditDirection) return false;
-  return !user?.auditDirection || user.auditDirection === direction;
+  return !user?.auditDirection || (user.auditDirections || [user.auditDirection]).includes(direction as NonNullable<PublicUser['auditDirection']>);
 }

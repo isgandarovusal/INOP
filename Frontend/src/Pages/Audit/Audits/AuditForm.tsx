@@ -14,7 +14,7 @@ export default function AuditForm(){
  const {user}=useAuth();const {t}=useTranslation();const [params]=useSearchParams();
  const requested=params.get('direction');
  const canonical=requested==='safety'?'occupational-safety':requested;
- const selected=directions.find(d=>d.id===(canonical||user?.auditDirection));
+ const selected=directions.find(d=>d.id===(canonical||((user?.auditDirections?.length||1)===1?user?.auditDirection:null)));
  if(requested&&!selected)return <Navigate to="/unauthorized" replace/>;
  if(selected){
   if(!canAccessAuditDirection(user,selected.id)||!hasPermission(user,'audit','create'))return <Navigate to="/unauthorized" replace/>;
