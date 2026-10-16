@@ -14,6 +14,10 @@ const auditFindingSchema = new mongoose.Schema(
   ref:"AuditExecution"
  },
 
+ standardId:String,
+ catalogVersion:String,
+ code:String,
+ sourceRisk:String,
  title:{
   type:String,
   required:true
@@ -41,7 +45,7 @@ const auditFindingSchema = new mongoose.Schema(
    "low",
    "medium",
    "high",
-   "critical"
+   "critical", "major", "minor"
   ],
   default:"medium"
  },

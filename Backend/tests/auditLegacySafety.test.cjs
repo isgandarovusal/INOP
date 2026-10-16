@@ -50,6 +50,8 @@ test('Source extraction uses real bytes, explicit permission, CAS and archived h
   assert.equal((await h.request('admin','GET','/audit-source-documents?brandId=gfc')).status,400);
   await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{$each:[{resource:'audit.source_document',action:'read',scope:'all'},{resource:'audit.source_document',action:'create',scope:'all'}]}}});await require('../models/auditorProfile.model').create({_id:h.actors.own._id,organizationId:'gfc',direction:'occupational-safety'});
   const alias=await require('../models/auditSourceDocument.model').findById(source.id).lean();alias._id=new h.mongoose.Types.ObjectId();alias.id='synthetic-alias-source';alias.auditType='safety';alias.status='uploaded';alias.extractedData=null;await require('../models/auditSourceDocument.model').collection.insertOne(alias);
+  assert.equal((await h.request('own','POST',`/audit-source-documents/${alias._id}/process`,{})).status,403,'Source processing also requires the assigned brand');
+  await h.audit('own','safety');
   assert.equal((await h.request('own','POST',`/audit-source-documents/${alias._id}/process`,{})).status,200);assert.equal((await require('../models/auditSourceDocument.model').findById(alias._id)).auditType,'safety');
 
   assert.equal((await h.request('admin','DELETE',`/audit-source-documents/${source.id}`)).status,200);

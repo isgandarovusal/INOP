@@ -184,7 +184,7 @@ async function updateAudit(req, res) {
       });
     }
 
-    for (const field of ['serviceAssessment','serviceDetails','serviceVersion','hrAssessment','hrDetails','hrVersion','status','template','templateId','templateRevisionId','templateSnapshot','assessmentStatus','checks','results',...require('../services/auditAssessment.service').trustedFields]) delete payload[field];
+    for (const field of ['standardSubmission','standardRestaurantSnapshot','standardAuditorSnapshot','standardAssessment','standardDetails','standardVersion','serviceAssessment','serviceDetails','serviceVersion','hrAssessment','hrDetails','hrVersion','status','template','templateId','templateRevisionId','templateSnapshot','assessmentStatus','checks','results',...require('../services/auditAssessment.service').trustedFields]) delete payload[field];
     if (['photos','attachments'].some(field => (payload[field] || []).length)) return res.status(400).json({ message: 'Use private evidence uploads.' });
     delete payload.auditorId;
     delete payload.organizationId;
@@ -196,6 +196,7 @@ async function updateAudit(req, res) {
       const existing = await Audit.findOne(filter).session(session);
       if (!existing) return null;
       await require('../services/auditLifecycle.service').lockAudit(existing._id, session, req.user);
+      if(existing.templateSnapshot?.standardSource&&await require('../models/auditExecution.model').exists({auditId:existing._id,status:'completed'}).session(session))throw Object.assign(new Error('Completed Standard audit metadata is immutable.'),{status:409});
       if (await require('../models/auditClosure.model').exists({ auditId: existing._id }).session(session)) throw Object.assign(new Error('Closed audit is immutable.'), { status: 409 });
       return Audit.findOneAndUpdate(filter, { $set: payload }, { returnDocument: 'after', runValidators: true, session });
     });

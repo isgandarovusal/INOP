@@ -45,10 +45,10 @@ exports.createExecution = async (req, res) => {
     }
     const execution = await require('../services/auditTransaction.service').transaction(async session => {
       const parent=await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
-      if((parent.auditType==='hr'||parent.templateSnapshot?.serviceSource)&&await require('../models/auditClosure.model').exists({auditId:parent._id}).session(session))throw Object.assign(new Error('Closed HR audit is immutable.'),{status:409});
+      if((parent.auditType==='hr'||parent.templateSnapshot?.serviceSource||parent.templateSnapshot?.standardSource)&&await require('../models/auditClosure.model').exists({auditId:parent._id}).session(session))throw Object.assign(new Error('Closed HR audit is immutable.'),{status:409});
       const existing = await Execution.findOne({ auditId:req.auditScopeId, templateRevisionId:bound.templateRevisionId || null }).session(session);
       if(existing)return existing;
-      const [created] = await Execution.create([{ ...bound, auditId:req.auditScopeId,createdBy:req.user.id,checklistId,answers:[],...((bound.templateSnapshot?.hrSource||bound.templateSnapshot?.serviceSource)?{}:{findings,correctiveActions}),status:'draft',totalScore:null,riskLevel:'unscored' }],{session});return created;
+      const [created] = await Execution.create([{ ...bound, auditId:req.auditScopeId,createdBy:req.user.id,checklistId,answers:[],...((bound.templateSnapshot?.hrSource||bound.templateSnapshot?.serviceSource||bound.templateSnapshot?.standardSource)?{}:{findings,correctiveActions}),...(bound.templateSnapshot?.standardSource?require('../services/standardAuditAssessment.service').assessStandard(bound.templateSnapshot,[]):{}),status:'draft',totalScore:null,riskLevel:'unscored' }],{session});return created;
     });
     return res.status(201).json({ success: true, data: execution });
   } catch (error) { return fail(res, error); }
@@ -58,7 +58,7 @@ exports.getExecution = async (req, res) => {
   try {
     const execution = await Execution.findOne({ _id: req.executionId, auditId: req.auditScopeId });
     if (!execution) return res.status(404).json({ success: false, message: 'Execution not found.' });
-    if((execution.templateSnapshot?.hrSource||execution.templateSnapshot?.serviceSource)){
+    if((execution.templateSnapshot?.hrSource||execution.templateSnapshot?.serviceSource||execution.templateSnapshot?.standardSource)){
       const author=await require('../models/user.model').findById(execution.createdBy).select('name').lean();
       return res.json({success:true,data:{...execution.toObject(),createdByName:author?.name||''}});
     }
@@ -68,7 +68,8 @@ exports.getExecution = async (req, res) => {
 
 exports.submitExecution = async (req, res) => {
   try {
-    const current = await Execution.findOne({_id:req.executionId,auditId:req.auditScopeId}).select('templateSnapshot.hrSource templateSnapshot.serviceSource').lean();
+    const current = await Execution.findOne({_id:req.executionId,auditId:req.auditScopeId}).select('templateSnapshot.hrSource templateSnapshot.serviceSource templateSnapshot.standardSource').lean();
+    if(current?.templateSnapshot?.standardSource)return res.json({success:true,data:await require('../services/standardAuditExecution.service').save(req,true)});
     if(current?.templateSnapshot?.serviceSource)return res.json({success:true,data:await require('../services/serviceAuditExecution.service').save(req,true)});
     if(current?.templateSnapshot?.hrSource) return res.json({success:true,data:await require('../services/hrAuditExecution.service').save(req,true)});
     const { answers = [] } = req.body;

@@ -14,7 +14,7 @@ exports.serviceOnly=(req,res,next)=>{
  next();
 };
 exports.sources=async(req,res)=>{
- try{const data=await Promise.all(hr.sources.map(async source=>{
+ try{const brands=await require('../services/auditAudience.service').visibleBrands(req);const data=await Promise.all(hr.sources.filter(source=>brands.includes(source.brandId)).map(async source=>{
   const binding=await Binding.findById(hr.bindingKey(source)).lean();
   const template=binding&&await Template.findOne({_id:binding.templateId,status:'active',publishedRevisionId:binding.revisionId}).select('_id').lean();
   return {...source,templateId:template?String(template._id):null};
@@ -23,6 +23,7 @@ exports.sources=async(req,res)=>{
 exports.provision=async(req,res)=>{
  try{
   if(!['admin','audit_manager'].includes(req.user.role)||req.permission.scope!=='all'||await require('../middleware/auth.middleware').getPermissionScope(req.user.role,'audit.template','create')!=='all')throw auditError(403,'Explicit audit template management permission required.');
+  if(req.auditorProfile&&!(await require('../services/auditAudience.service').visibleBrands(req)).includes(req.params.brandId))throw auditError(403,'Template brand is outside your assignment.');
   const content=hr.contentFor(req.params.brandId),source=hr.sourceFor(req.params.brandId),key=hr.bindingKey(source);
   const data=await transaction(async session=>{
    const existing=await Binding.findById(key).session(session);
@@ -41,7 +42,7 @@ exports.provision=async(req,res)=>{
 };
 async function allowedRestaurants(req){
  let filter={organizationId:'gfc',brandId:{$in:hr.sources.map(s=>s.brandId)},archivedAt:null};
- if(req.permission.scope!=='all'||(req.user.role==='auditor'&&req.auditorProfile?.direction==='service')){
+ if(req.permission.scope!=='all'||req.auditorProfile){
   const scope=await getAuditScopeFilter(req);if(!scope)throw auditError(403,'Service restaurant access denied.');
   const ids=await Audit.distinct('restaurantId',{$and:[scope,{auditType:'service'}]}).maxTimeMS(5000);filter={$and:[filter,{id:{$in:ids}}]};
  }

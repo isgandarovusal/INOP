@@ -50,6 +50,7 @@ exports.getAuditReport = async (req, res) => {
       [];
 
     const report = {
+      ...(fullAudit.templateSnapshot?.standardSource?{standard:{details:fullAudit.standardDetails||{},assessment:fullAudit.standardAssessment||{}}}:{}),
       ...(fullAudit.templateSnapshot?.serviceSource?{service:{details:fullAudit.serviceDetails||{},assessment:fullAudit.serviceAssessment||{},nonconformities:checks.filter(a=>['0','0.5'].includes(a.answer)).length}}:{}),
       ...(fullAudit.auditType==='hr'&&fullAudit.hrAssessment?{hr:{details:fullAudit.hrDetails||{},assessment:fullAudit.hrAssessment,nonconformities:checks.filter(a=>['0','0.5'].includes(a.answer)).length}}:{}),
       id: fullAudit._id,

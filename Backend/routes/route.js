@@ -180,7 +180,7 @@ router.delete(
 
 // Read-only Audit identity; uses the existing global restaurant read grant.
 router.get('/audit-catalog', ...authorize('restaurant', 'read'), requireGlobalRestaurantAccess,
-  (_req, res) => res.json({ success: true, data: require('../services/auditCatalog.service').getCatalog() }));
+  async(req,res)=>{try{const catalog=require('../services/auditCatalog.service').getCatalog();const brands=await require('../services/auditAudience.service').visibleBrands(req);res.json({success:true,data:{...catalog,brands:catalog.brands.filter(b=>brands.includes(b.id))}});}catch{res.status(500).json({message:'Audit catalog access check failed.'});}});
 
 // Restaurants API
 router.get(
@@ -421,3 +421,4 @@ router.use("/audit-activity", auditActivityRoutes);
 module.exports = router;
 
 router.use('/audit-service',require('./serviceAudit.routes'));
+router.use('/audit-standard',require('./standardAudit.routes'));

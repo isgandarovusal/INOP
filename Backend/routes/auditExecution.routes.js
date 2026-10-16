@@ -57,3 +57,9 @@ router.put('/:id/service-draft',...authorize('audit.execution','update'),require
 router.get('/:id/service-history',...authorize('audit.execution','read'),requireExecutionAccess,async(req,res)=>{
  try{const window=require('../services/auditQuery.service').pagination(req,25);const data=await require('../models/serviceAuditSave.model').find({executionId:req.executionId,auditId:req.auditScopeId}).select('version actor at status answers details assessment').sort({version:-1}).skip(window.skip).limit(window.limit+1).maxTimeMS(5000).lean();res.json({data:data.slice(0,window.limit),page:window.page,hasMore:data.length>window.limit});}catch(e){res.status(e.status||500).json({message:'Service history unavailable.'});}
 });
+router.put('/:id/standard-draft',...authorize('audit.execution','update'),requireExecutionAccess,async(req,res)=>{
+ try{res.json({success:true,data:await require('../services/standardAuditExecution.service').save(req,false)});}catch(e){res.status(e.status||500).json({message:e.status?e.message:'Standard draft save failed.'});}
+});
+router.get('/:id/standard-history',...authorize('audit.execution','read'),requireExecutionAccess,async(req,res)=>{
+ try{const window=require('../services/auditQuery.service').pagination(req,25);const data=await require('../models/standardAuditSave.model').find({executionId:req.executionId,auditId:req.auditScopeId}).select('version actor at status answers details assessment').sort({version:-1}).skip(window.skip).limit(window.limit+1).maxTimeMS(5000).lean();res.json({data:data.slice(0,window.limit),page:window.page,hasMore:data.length>window.limit});}catch(e){res.status(e.status||500).json({message:'Standard history unavailable.'});}
+});

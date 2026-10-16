@@ -51,6 +51,7 @@ const auditApprovalSchema = new mongoose.Schema(
  },
 
 
+ applicabilityReview:mongoose.Schema.Types.Mixed,
  approvedAt:{
   type:Date
  }

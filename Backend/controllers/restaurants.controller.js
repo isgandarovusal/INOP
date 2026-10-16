@@ -4,7 +4,7 @@ const { recordActivity } = require("../services/activityLog.service");
 
 async function getRestaurants(req, res) {
   try {
-    const restaurants = await Restaurant.find(req.auditorProfile ? { archivedAt: null, organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } } : { archivedAt: null }).sort({
+    const restaurants = await Restaurant.find({$and:[{archivedAt:null},await require('../services/auditAudience.service').restaurantFilter(req)]}).sort({
       createdAt: -1,
     });
 
@@ -22,7 +22,7 @@ async function getRestaurantById(req, res) {
   try {
     const restaurant = await Restaurant.findOne({
       id: req.params.id,
-      ...(req.auditorProfile ? { organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } } : {}),
+      $and:[await require('../services/auditAudience.service').restaurantFilter(req)],
     });
 
     if (!restaurant) {

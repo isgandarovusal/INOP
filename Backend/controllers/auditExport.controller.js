@@ -214,7 +214,7 @@ exports.exportCsv = async (req, res) => {
     return res.send("\ufeff" + csv);
 
   } catch (error) {
-    const statusCode = error.statusCode || 500;
+    const statusCode = error.statusCode || error.status || 500;
 
     return res.status(statusCode).json({
       success: false,
@@ -255,8 +255,9 @@ exports.exportExcel = async (req, res) => {
       Title: safeValue(finding.title),
       Description: safeValue(finding.description),
       Status: safeValue(finding.status),
-      Priority: safeValue((data.audit.auditType==='hr'||data.audit.templateSnapshot?.serviceSource)?finding.severity:finding.priority),
-      ...(data.audit.templateSnapshot?.serviceSource?{EvidenceIds:(finding.evidenceIds||[]).join(', ')}:{}),
+      Priority: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource))?finding.severity:finding.priority),
+      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource)?{EvidenceIds:(finding.evidenceIds||[]).join(', ')}:{}),
+      ...(data.audit.templateSnapshot?.standardSource?{Code:finding.code||'',StandardId:finding.standardId||'',CatalogVersion:finding.catalogVersion||'',SourceRisk:finding.sourceRisk||'',Section:data.audit.templateSnapshot.sections.find(s=>s.questions.some(q=>q.id===finding.standardId))?.title||'',CorrectiveActions:JSON.stringify(data.actions.filter(a=>String(a.findingId)===String(finding._id)).map(a=>({id:String(a._id),title:a.title,responsible:a.responsible,dueDate:a.dueDate,status:a.status,evidenceIds:a.evidenceIds}))),ApprovalIds:data.approvals.map(a=>String(a._id)).join(', '),ClosureIds:data.closures.map(c=>String(c._id)).join(', ')}:{}),
       CreatedAt: safeValue(finding.createdAt)
     }));
 
@@ -267,6 +268,7 @@ exports.exportExcel = async (req, res) => {
       RequestedBy: safeValue(approval.requestedBy),
       Reviewer: safeValue(approval.reviewer),
       CreatedAt: safeValue(approval.createdAt),
+      ...(data.audit.templateSnapshot?.standardSource?{ApplicabilityReview:JSON.stringify(approval.applicabilityReview||{})}:{}),
       ApprovedAt: safeValue(approval.approvedAt)
     }));
 
@@ -278,13 +280,13 @@ exports.exportExcel = async (req, res) => {
         action.description
       ),
       Status: safeValue(action.status),
-      Deadline: safeValue((data.audit.auditType==='hr'||data.audit.templateSnapshot?.serviceSource)?action.dueDate:action.deadline),
+      Deadline: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource))?action.dueDate:action.deadline),
       ResponsibleUser: safeValue(
         action.responsibleUser ||
         action.assignedTo ||
         action.responsible
       ),
-      ...(data.audit.templateSnapshot?.serviceSource?{Description:action.description||'',EvidenceIds:(action.evidenceIds||[]).join(', '),VerificationNote:action.verificationNote||'',VerifiedBy:action.verifiedBy||'',CompletedAt:action.completedAt||''}:{}),
+      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource)?{Description:action.description||'',EvidenceIds:(action.evidenceIds||[]).join(', '),VerificationNote:action.verificationNote||'',VerifiedBy:action.verifiedBy||'',CompletedAt:action.completedAt||''}:{}),
       CreatedAt: safeValue(action.createdAt)
     }));
 
@@ -364,6 +366,27 @@ exports.exportExcel = async (req, res) => {
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet([{Brand:snapshot.brandName,Restaurant:data.audit.restaurantId,Revision:String(data.audit.templateRevisionId),SourceSHA256:snapshot.serviceSource.sha256,Contract:snapshot.serviceSource.scoringStatus,AuditDate:data.audit.date,Auditor:data.audit.auditorId,OverallPercentage:data.audit.assessmentStatus==='scored'?data.audit.overallPercentage:'',Observations:details.observations||'',FinalOpinion:details.finalOpinion||'',PhotoEvidenceId:details.finalEvidence?.photoId||'',DocumentEvidenceIds:(details.finalEvidence?.documentIds||[]).filter(Boolean).join(', '),SourceReferenceNotes:JSON.stringify(details.referenceNotes||{})}]),'Service Source');
     }
 
+    if(data.audit.templateSnapshot?.standardSource){
+      await require('../services/standardAuditExecution.service').requireSubmitted(data.audit);
+      const snapshot=data.audit.templateSnapshot,assessment=data.audit.standardAssessment,details=data.audit.standardDetails||{};
+      const restaurant=data.audit.standardRestaurantSnapshot||await require('../models/restaurant.model').findOne({id:data.audit.restaurantId}).select('name location').lean();
+      const answers=new Map((data.audit.checks||[]).map(a=>[a.questionId,a]));
+      const cover=[{Organization:'GFC',Brand:snapshot.brandName,Restaurant:restaurant?.name||data.audit.restaurantId,RestaurantId:data.audit.restaurantId,Area:restaurant?.location||'',AuditDate:data.audit.date,Auditor:data.audit.standardSubmission?.name||data.audit.standardAuditorSnapshot?.name||data.audit.auditorId,AuditorId:data.audit.standardSubmission?.actorId||data.audit.auditorId,CreatedBy:data.audit.standardAuditorSnapshot?.id||data.audit.auditorId,AuditorSignature:'',RestaurantManagerSignature:'',RestaurantManager:details.restaurantManager||'',ShiftManager:details.shiftManager||'',Status:data.audit.status,CatalogVersion:snapshot.standardSource.version,Revision:String(data.audit.templateRevisionId),SourceSHA256:snapshot.standardSource.sha256,ApprovalStatuses:data.approvals.map(a=>a.status).join(', '),Total:assessment?.total,Applicable:assessment?.applicable,NA:assessment?.na,Unanswered:assessment?.unanswered,Compliant:assessment?.compliant,Critical:assessment?.critical,Major:assessment?.major,Minor:assessment?.minor,SourceCritical:assessment?.sourceRisk?.critical,SourceMajor:assessment?.sourceRisk?.major,SourceMinor:assessment?.sourceRisk?.minor,SourceRiskUnspecified:assessment?.sourceRisk?.unspecified,Percentage:assessment?.percentage??'',CalculationReason:assessment?.reason,Observations:details.observations||'',FinalOpinion:details.finalOpinion||'',FinalPhoto:details.finalEvidence?.photoId||'',Documents:(details.finalEvidence?.documentIds||[]).join(', ')}];
+      for(const section of assessment?.sections||[])cover.push({Section:section.title,Category:section.category,Total:section.total,Applicable:section.applicable,NA:section.na,Unanswered:section.unanswered,Compliant:section.compliant,Critical:section.critical,Major:section.major,Minor:section.minor,SourceCritical:section.sourceRisk.critical,SourceMajor:section.sourceRisk.major,SourceMinor:section.sourceRisk.minor,SourceRiskUnspecified:section.sourceRisk.unspecified,Percentage:section.percentage??'',Notes:details.sectionNotes?.[section.id]||'',Photo:details.sectionPhotos?.[section.id]||''});
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(cover),'Cover');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(snapshot.sections.flatMap(s=>s.questions.map(q=>({Id:q.id,Section:s.title,Category:s.category,CatalogVersion:snapshot.standardSource.version,File:q.sourceFile,Worksheet:q.worksheet,Row:q.sourceRow,Code:q.sourceCode||'',SourceMetadata:JSON.stringify(q.sourceMetadata||{}),SourceText:q.sourceText,Text:q.label,SourceRisk:q.sourceRisk||'',Result:answers.get(q.id)?.answer||'',Note:answers.get(q.id)?.comment||'',NAReason:details.naReasons?.[q.id]||'',Evidence:(details.evidenceLinks||[]).filter(l=>l.questionId===q.id).map(l=>l.evidenceId).join(', '),ObservationCount:(details.criterionObservations||[]).filter(o=>o.standardId===q.id).length})))),'Standards');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet((details.criterionObservations||[]).map(o=>({Id:o.id,StandardId:o.standardId,Description:o.description,EvidenceIds:o.evidenceIds.join(', ')}))),'Observations');
+      const saves=await require('../models/standardAuditSave.model').find({auditId:data.audit._id}).sort({version:1}).lean();
+      const history=[];
+      for(const v of saves){const base={Version:v.version,Actor:v.actor,At:v.at,Status:v.status};
+       history.push({...base,Kind:'audit-details',SubmittedBy:v.submission?.actorId||'',SubmittedAt:v.submission?.at||'',OverallPercentage:v.assessment?.overallPercentage??'',Observations:v.details?.observations||'',FinalOpinion:v.details?.finalOpinion||'',RestaurantManager:v.details?.restaurantManager||'',ShiftManager:v.details?.shiftManager||'',Photo:v.details?.finalEvidence?.photoId||'',Documents:(v.details?.finalEvidence?.documentIds||[]).join(', ')});
+       for(const a of v.answers||[])history.push({...base,Kind:'answer',StandardId:a.questionId,Answer:a.answer,Note:a.comment||'',NAReason:v.details?.naReasons?.[a.questionId]||'',EvidenceIds:(v.details?.evidenceLinks||[]).filter(l=>l.questionId===a.questionId).map(l=>l.evidenceId).join(', ')});
+       for(const section of snapshot.sections)history.push({...base,Kind:'section-details',Section:section.id,Note:v.details?.sectionNotes?.[section.id]||'',Photo:v.details?.sectionPhotos?.[section.id]||'',Percentage:v.assessment?.standardAssessment?.sections?.find(s=>s.id===section.id)?.percentage??''});
+       for(const o of v.details?.criterionObservations||[])history.push({...base,Kind:'criterion-observation',StandardId:o.standardId,ObservationId:o.id,Note:o.description,EvidenceIds:o.evidenceIds.join(', ')});
+      }
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(history),'History');
+    }
+
     const buffer = XLSX.write(
       workbook,
       {
@@ -385,7 +408,7 @@ exports.exportExcel = async (req, res) => {
     return res.send(buffer);
 
   } catch (error) {
-    const statusCode = error.statusCode || 500;
+    const statusCode = error.statusCode || error.status || 500;
 
     return res.status(statusCode).json({
       success: false,
@@ -640,7 +663,7 @@ exports.exportPdf = async (req, res) => {
 
   } catch (error) {
     if (!res.headersSent) {
-      const statusCode = error.statusCode || 500;
+      const statusCode = error.statusCode || error.status || 500;
 
       return res.status(statusCode).json({
         success: false,

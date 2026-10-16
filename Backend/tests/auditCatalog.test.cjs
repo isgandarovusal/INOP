@@ -73,9 +73,11 @@ test('Catalog auth and restaurant relationship writes preserve legacy API and au
   await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'manager' } });
   for (const actor of ['admin', 'auditor', 'peer']) {
     const response = await h.request(actor, 'GET', '/audit-catalog');
-    assert.equal(response.status, 200); assert.deepEqual(response.data.data, getCatalog());
+    assert.equal(response.status, 200); assert.deepEqual(response.data.data, actor==='auditor'?{...getCatalog(),brands:[]}:getCatalog());
     assert.equal((await h.request(actor, 'POST', '/audit-catalog', {})).status, 404);
   }
+  await h.audit('auditor','service');
+  assert.deepEqual((await h.request('auditor','GET','/audit-catalog')).data.data.brands.map(b=>b.id),['kfc']);
   assert.deepEqual(await Restaurant.findById(legacy._id).lean(), before);
   assert.equal(Object.hasOwn((await h.request('admin', 'GET', '/restaurants/legacy')).data, 'brandId'), false);
   for (const invalid of [{ brandId: 'kfc' }, { organizationId: 'foreign' }, { organizationId: 'gfc', brandId: 'gfc' }]) {

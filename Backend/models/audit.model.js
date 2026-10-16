@@ -50,6 +50,17 @@ const AuditSchema = new mongoose.Schema(
     templateId: String,
     templateRevisionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AuditTemplateRevision' },
     templateSnapshot: mongoose.Schema.Types.Mixed,
+    // Optional source-bound fields need declared paths so draft assignments are
+    // persisted; strict:false alone does not track assignment to unknown paths.
+    standardRestaurantSnapshot:{type:mongoose.Schema.Types.Mixed,immutable:true},
+    standardAuditorSnapshot:{type:mongoose.Schema.Types.Mixed,immutable:true},
+    standardSubmission: mongoose.Schema.Types.Mixed,
+    standardAssessment: mongoose.Schema.Types.Mixed,
+    standardDetails: mongoose.Schema.Types.Mixed,
+    serviceAssessment: mongoose.Schema.Types.Mixed,
+    serviceDetails: mongoose.Schema.Types.Mixed,
+    hrAssessment: mongoose.Schema.Types.Mixed,
+    hrDetails: mongoose.Schema.Types.Mixed,
     assessmentStatus: { type: String, enum: ['legacy-unscored','unscored','scored'] },
     passed: Boolean,
     archivedAt: Date,

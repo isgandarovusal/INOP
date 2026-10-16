@@ -6,8 +6,10 @@ test('Foundation direction/brand analytics use real scoped data and reject inval
  await Restaurant.create({id:'pizza',name:'Synthetic Pizza Hut',organizationId:'gfc',brandId:'pizza-hut'});
  const service=await h.audit('auditor','service',{overallPercentage:80});
  await h.audit('auditor','standard',{compliancePercentage:90});
- await h.audit('admin','service',{restaurantId:'pizza',overallPercentage:60});
+ const assignedPizza=await h.audit('admin','service',{restaurantId:'pizza',overallPercentage:60});
  await h.audit('auditor','service',{assessmentStatus:'unscored',overallPercentage:null});
+ const restricted=(await h.request('auditor','GET','/audit-analytics/overview?direction=service')).data.data;assert.equal(restricted.total,2);assert.equal(restricted.averageScore,8);
+ await h.assign('auditor',assignedPizza);
  const metrics=(await h.request('auditor','GET','/audit-analytics/overview?direction=service')).data.data;
  assert.equal(metrics.total,3);assert.equal(metrics.scored,2);assert.equal(metrics.unscored,1);assert.equal(metrics.averageScore,7);
  assert.equal((await h.request('auditor','GET','/audit-analytics/overview?direction=standard')).data.data.total,0);

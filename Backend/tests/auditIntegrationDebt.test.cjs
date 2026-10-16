@@ -8,6 +8,8 @@ test('Promoted reviewers retain direction scope; inactive profiles cannot receiv
  const request=audit=>h.request('admin','POST','/audit-approval',{auditId:String(audit._id),reviewer:String(h.actors.peer._id)});
  assert.equal((await request(standard)).status,403);
  assert.equal((await h.request('peer','GET',`/audits/${standard.id}`)).status,404);
+ assert.equal((await request(service)).status,403,'Promotion alone is not a restaurant assignment');
+ await h.assign('peer',service);
  assert.equal((await request(service)).status,201);
  await h.models.Approval.deleteMany({auditId:service._id});
  await Profile.updateOne({_id:h.actors.peer._id},{$set:{active:false}});

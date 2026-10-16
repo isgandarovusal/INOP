@@ -11,6 +11,11 @@ const auditExecutionSchema = new mongoose.Schema(
 
 
  assessmentStatus: String,
+ passed: Boolean,
+ standardVersion: {type:Number,default:0},
+ standardDetails: mongoose.Schema.Types.Mixed,
+ standardSubmission: mongoose.Schema.Types.Mixed,
+ standardAssessment: mongoose.Schema.Types.Mixed,
  serviceVersion: {type:Number,default:0},
  serviceDetails: mongoose.Schema.Types.Mixed,
  serviceAssessment: mongoose.Schema.Types.Mixed,

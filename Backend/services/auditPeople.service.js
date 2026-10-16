@@ -12,8 +12,13 @@ async function assignmentCandidates(auditId) {
 }
 async function reviewerCandidates(req) {
   const users = await User.find({ isActive: true, _id: { $ne: req.user.id } }).select('_id name role departmentId').lean();
+  const audit = await Audit.findById(req.auditScopeId).lean();
+  const contributors = audit?.templateSnapshot?.standardSource
+    ? await require('../models/standardAuditSave.model').distinct('actor', { auditId: audit._id }) : [];
+  if (audit?.standardSubmission?.actorId) contributors.push(audit.standardSubmission.actorId);
   const output = [];
   for (const user of users) {
+    if (contributors.includes(String(user._id))) continue;
     const scope = await require('../middleware/auth.middleware').getPermissionScope(user.role, 'audit.approval', 'update');
     if (!scope || scope === 'none') continue;
     const profile = await Profile.findById(user._id).lean();
