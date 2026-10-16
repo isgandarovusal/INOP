@@ -45,7 +45,7 @@ const auditFindingSchema = new mongoose.Schema(
    "low",
    "medium",
    "high",
-   "critical", "major", "minor"
+   "critical", "major", "minor", "important", "small"
   ],
   default:"medium"
  },

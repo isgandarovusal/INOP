@@ -255,9 +255,9 @@ exports.exportExcel = async (req, res) => {
       Title: safeValue(finding.title),
       Description: safeValue(finding.description),
       Status: safeValue(finding.status),
-      Priority: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource))?finding.severity:finding.priority),
-      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource)?{EvidenceIds:(finding.evidenceIds||[]).join(', ')}:{}),
-      ...(data.audit.templateSnapshot?.standardSource?{Code:finding.code||'',StandardId:finding.standardId||'',CatalogVersion:finding.catalogVersion||'',SourceRisk:finding.sourceRisk||'',Section:data.audit.templateSnapshot.sections.find(s=>s.questions.some(q=>q.id===finding.standardId))?.title||'',CorrectiveActions:JSON.stringify(data.actions.filter(a=>String(a.findingId)===String(finding._id)).map(a=>({id:String(a._id),title:a.title,responsible:a.responsible,dueDate:a.dueDate,status:a.status,evidenceIds:a.evidenceIds}))),ApprovalIds:data.approvals.map(a=>String(a._id)).join(', '),ClosureIds:data.closures.map(c=>String(c._id)).join(', ')}:{}),
+      Priority: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource))?finding.severity:finding.priority),
+      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource)?{EvidenceIds:(finding.evidenceIds||[]).join(', ')}:{}),
+      ...((data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource)?{Code:finding.code||'',StandardId:finding.standardId||'',CatalogVersion:finding.catalogVersion||'',SourceRisk:finding.sourceRisk||'',Section:data.audit.templateSnapshot.sections.find(s=>s.questions.some(q=>q.id===finding.standardId))?.title||'',CorrectiveActions:data.audit.templateSnapshot?.hseSource?'See Actions (FindingId)':JSON.stringify(data.actions.filter(a=>String(a.findingId)===String(finding._id)).map(a=>({id:String(a._id),title:a.title,responsible:a.responsible,dueDate:a.dueDate,status:a.status,evidenceIds:a.evidenceIds}))),ApprovalIds:data.approvals.map(a=>String(a._id)).join(', '),ClosureIds:data.closures.map(c=>String(c._id)).join(', ')}:{}),
       CreatedAt: safeValue(finding.createdAt)
     }));
 
@@ -268,11 +268,12 @@ exports.exportExcel = async (req, res) => {
       RequestedBy: safeValue(approval.requestedBy),
       Reviewer: safeValue(approval.reviewer),
       CreatedAt: safeValue(approval.createdAt),
-      ...(data.audit.templateSnapshot?.standardSource?{ApplicabilityReview:JSON.stringify(approval.applicabilityReview||{})}:{}),
+      ...((data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource)?{ApplicabilityReview:data.audit.templateSnapshot?.hseSource?'See HSE Applicability':JSON.stringify(approval.applicabilityReview||{})}:{}),
       ApprovedAt: safeValue(approval.approvedAt)
     }));
 
     const actionRows = data.actions.map((action) => ({
+      ...(data.audit.templateSnapshot?.hseSource?{FindingId:String(action.findingId||''),ExecutionId:String(action.executionId||'')}:{}),
       ID: safeValue(action._id),
       Title: safeValue(
         action.title ||
@@ -280,13 +281,13 @@ exports.exportExcel = async (req, res) => {
         action.description
       ),
       Status: safeValue(action.status),
-      Deadline: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource))?action.dueDate:action.deadline),
+      Deadline: safeValue((data.audit.auditType==='hr'||(data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource))?action.dueDate:action.deadline),
       ResponsibleUser: safeValue(
         action.responsibleUser ||
         action.assignedTo ||
         action.responsible
       ),
-      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource)?{Description:action.description||'',EvidenceIds:(action.evidenceIds||[]).join(', '),VerificationNote:action.verificationNote||'',VerifiedBy:action.verifiedBy||'',CompletedAt:action.completedAt||''}:{}),
+      ...((data.audit.templateSnapshot?.serviceSource||data.audit.templateSnapshot?.standardSource||data.audit.templateSnapshot?.hseSource)?{Description:action.description||'',EvidenceIds:(action.evidenceIds||[]).join(', '),VerificationNote:action.verificationNote||'',VerifiedBy:action.verifiedBy||'',CompletedAt:action.completedAt||''}:{}),
       CreatedAt: safeValue(action.createdAt)
     }));
 
@@ -387,6 +388,7 @@ exports.exportExcel = async (req, res) => {
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(history),'History');
     }
 
+    await require('../services/hseAuditExport.service').append(XLSX,workbook,data);
     const buffer = XLSX.write(
       workbook,
       {

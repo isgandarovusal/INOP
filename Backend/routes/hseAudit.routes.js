@@ -1,0 +1,12 @@
+const router=require('express').Router();const c=require('../controllers/hseAudit.controller');const {authorize}=require('../middleware/authorization.middleware');
+for(const p of ['/options','/sources','/list'])router.get(p,...authorize('audit','read'),c.hseOnly,c[p.slice(1)]);
+router.get('/analytics-sources',...authorize('audit.analytics','read'),c.hseOnly,c.sources);
+router.get('/analytics-options',...authorize('audit.analytics','read'),c.hseOnly,c.options);
+router.get('/analytics',...authorize('audit.analytics','read'),c.hseOnly,c.analytics);
+router.get('/auditors',...authorize('audit.assignment','read'),c.hseOnly,c.auditors);
+router.post('/objects',...authorize('audit.assignment','create'),c.hseOnly,c.createObject);
+router.put('/object-grants',...authorize('audit.assignment','create'),c.hseOnly,c.grant);
+router.post('/templates/:objectType',...authorize('audit.template','create'),c.hseOnly,c.provision);
+router.post('/audits',...authorize('audit','create'),c.hseOnly,c.create);
+router.get('/:auditId/action-people',...authorize('audit.action','read'),c.hseOnly,require('../middleware/auditScope.middleware').requireAuditParentAccess,async(req,res)=>{try{if(!await require('../models/audit.model').exists({_id:req.auditScopeId,'templateSnapshot.hseSource':{$exists:true}}))return res.status(403).json({message:'Source HSE required.'});res.json(await require('../services/hrAuditPeople.service').candidates(req.auditScopeId,req));}catch(e){res.status(e.status||500).json({message:'Audit directory unavailable.'});}});
+module.exports=router;

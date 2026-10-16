@@ -39,7 +39,10 @@ async function assignAudit({ auditId, auditor, actorId }) {
     const audit = await Audit.findById(auditId).session(session);
     if (!user || !audit || canonicalDirection(audit.auditType) !== profile.direction) throw auditError(403, 'Auditor direction does not match audit.');
     const Restaurant = require('../models/restaurant.model');
-    if (!(await Restaurant.exists({ id: audit.restaurantId, organizationId: profile.organizationId, brandId: { $in: require('./auditCatalog.service').brandIds } }).session(session))) throw auditError(403, 'Audit organization is not verified.');
+    if(audit.templateSnapshot?.hseSource&&['office','warehouse'].includes(audit.hseObjectType)){
+      if(!await require('../models/hseObject.model').exists({id:audit.hseObjectId,objectType:audit.hseObjectType,organizationId:profile.organizationId,active:true}).session(session))throw auditError(403,'HSE object organization is not verified.');
+      await require('./hseObjectAccess.service').lockGrant({id:String(user._id)},profile,'assigned',audit.hseObjectId,session);
+    }else if (!(await Restaurant.exists({ id: audit.restaurantId, organizationId: profile.organizationId, brandId: { $in: require('./auditCatalog.service').brandIds } }).session(session))) throw auditError(403, 'Audit organization is not verified.');
     const existing = await Assignment.findOne({ auditId, auditor }).session(session);
     if (existing) return { assignment: existing, created: false };
     const [assignment] = await Assignment.create([{ auditId, auditor, assignedBy: actorId, status: 'assigned' }], { session });

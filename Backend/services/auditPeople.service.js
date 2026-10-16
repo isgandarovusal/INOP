@@ -6,15 +6,17 @@ async function assignmentCandidates(auditId) {
   const audit = await Audit.findById(auditId).lean();
   const direction = canonicalDirection(audit?.auditType);
   if (!direction) return [];
-  const profiles = await Profile.find({ active: true, organizationId: 'gfc', direction }).select('_id').lean();
+  let profiles = await Profile.find({ active: true, organizationId: 'gfc', direction }).select('_id').lean();
+  if(audit.templateSnapshot?.hseSource&&['office','warehouse'].includes(audit.hseObjectType)){const ids=await require('../models/hseObjectGrant.model').distinct('userId',{objectId:audit.hseObjectId,active:true});profiles=profiles.filter(p=>ids.includes(String(p._id)));}
   const users = await User.find({ _id: { $in: profiles.map(row => row._id) }, isActive: true }).select('_id name').lean();
   return users.map(row => ({ id: String(row._id), name: row.name }));
 }
 async function reviewerCandidates(req) {
   const users = await User.find({ isActive: true, _id: { $ne: req.user.id } }).select('_id name role departmentId').lean();
   const audit = await Audit.findById(req.auditScopeId).lean();
-  const contributors = audit?.templateSnapshot?.standardSource
-    ? await require('../models/standardAuditSave.model').distinct('actor', { auditId: audit._id }) : [];
+  const contributors = (audit?.templateSnapshot?.standardSource||audit?.templateSnapshot?.hseSource)
+    ? await require(`../models/${audit.templateSnapshot.hseSource?'hse':'standard'}AuditSave.model`).distinct('actor', { auditId: audit._id }) : [];
+  if(audit?.hseSubmission?.actorId)contributors.push(audit.hseSubmission.actorId);
   if (audit?.standardSubmission?.actorId) contributors.push(audit.standardSubmission.actorId);
   const output = [];
   for (const user of users) {

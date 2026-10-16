@@ -39,11 +39,12 @@ async function createApproval(req) {
     for (const [field, Model] of [['findingId', Finding], ['actionId', require('../models/auditAction.model')]]) {
       if (req.body[field] && !(await Model.exists({ _id: req.body[field], auditId: audit._id }).session(session))) throw auditError(400, 'Approval reference belongs to another audit.');
     }
-    if (audit.templateSnapshot?.standardSource) {
-      const execution = await require('./standardAuditExecution.service').requireSubmitted(audit, session);
-      const contributors = await require('../models/standardAuditSave.model').distinct('actor', { executionId: execution._id }).session(session);
-      if (!execution.standardSubmission?.actorId) throw auditError(409, 'Standard submission actor provenance is required.');
-      if (execution.standardSubmission.actorId === String(reviewer._id) || contributors.includes(String(reviewer._id))) throw auditError(403, 'An independent auditor must review Standard applicability.');
+    if (audit.templateSnapshot?.standardSource || audit.templateSnapshot?.hseSource) {
+      const kind=audit.templateSnapshot.hseSource?'hse':'standard';
+      const execution=await require(`./${kind}AuditExecution.service`).requireSubmitted(audit,session);
+      const contributors=await require(`../models/${kind}AuditSave.model`).distinct('actor',{executionId:execution._id}).session(session);
+      if(!execution[kind+'Submission']?.actorId)throw auditError(409,'Source submission actor provenance is required.');
+      if(execution[kind+'Submission'].actorId===String(reviewer._id)||contributors.includes(String(reviewer._id)))throw auditError(403,'An independent auditor must review applicability.');
     }
     const existing = await Approval.findOne({ auditId: audit._id, requestedBy: req.user.id, reviewer: reviewer._id, status: 'pending' }).session(session);
     if (existing) return existing;
@@ -60,15 +61,16 @@ async function resolveApproval(req) {
     if (String(approval.requestedBy) === req.user.id || (String(approval.reviewer) !== req.user.id && !(['admin','audit_manager'].includes(req.user.role) && req.permission.scope === 'all'))) throw auditError(403, 'Independent designated reviewer or authorized audit manager required.');
     if (approval.status !== 'pending') throw auditError(409, 'Approval is already resolved.');
     if (!['approved','rejected'].includes(req.body.status)) throw auditError(400, 'Invalid approval decision.');
-    if(audit.templateSnapshot?.standardSource&&req.body.status==='approved'){
-      const execution=await require('./standardAuditExecution.service').requireSubmitted(audit,session);
-      const contributors=await require('../models/standardAuditSave.model').distinct('actor',{executionId:execution._id}).session(session);
-      if(!execution.standardSubmission?.actorId)throw auditError(409,'Standard submission actor provenance is required.');
-      if(execution.standardSubmission.actorId===req.user.id||contributors.includes(req.user.id))throw auditError(403,'An independent auditor must review Standard applicability.');
-      const reasons=execution.standardDetails?.naReasons||{};
+    if((audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)&&req.body.status==='approved'){
+      const kind=audit.templateSnapshot.hseSource?'hse':'standard';
+      const execution=await require(`./${kind}AuditExecution.service`).requireSubmitted(audit,session);
+      const contributors=await require(`../models/${kind}AuditSave.model`).distinct('actor',{executionId:execution._id}).session(session);
+      if(!execution[kind+'Submission']?.actorId)throw auditError(409,'Source submission actor provenance is required.');
+      if(execution[kind+'Submission'].actorId===req.user.id||contributors.includes(req.user.id))throw auditError(403,'An independent auditor must review applicability.');
+      const reasons=execution[kind+'Details']?.naReasons||{};
       const na=execution.answers.filter(a=>a.answer==='na').map(a=>({standardId:a.questionId,reason:reasons[a.questionId]}));
       if(na.some(a=>!a.reason?.trim())||na.length&&req.body.naConfirmed!==true)throw auditError(422,'Explicit independent review of N/A reasons is required.');
-      approval.applicabilityReview={executionId:String(execution._id),catalogVersion:execution.templateSnapshot.standardSource.version,answerDigest:require('./standardAuditAssessment.service').digest(execution.answers),na,reviewedBy:req.user.id,reviewedAt:new Date()};
+      approval.applicabilityReview={executionId:String(execution._id),catalogVersion:execution.templateSnapshot[kind+'Source'].version,answerDigest:require('./standardAuditAssessment.service').digest(execution.answers),na,reviewedBy:req.user.id,reviewedAt:new Date()};
     }
     approval.status = req.body.status; approval.comment = req.body.comment || ''; approval.approvedAt = approval.status === 'approved' ? new Date() : null;
     await approval.save({ session }); await history(audit, req.user, 'approval-' + approval.status, session); return approval;
@@ -86,12 +88,12 @@ async function closeAudit(req) {
     if (!['completed','in-progress'].includes(audit.status)) throw auditError(409, 'Audit is not ready for closure.');
     const context = await require('../models/auditContext.model').findById(audit._id).session(session);
     if (!audit.templateRevisionId || String(context?.templateRevisionId) !== String(audit.templateRevisionId)) throw auditError(409, 'Legacy unversioned audit requires reviewed closure migration.');
-    if(audit.templateSnapshot?.standardSource){const execution=await require('./standardAuditExecution.service').requireSubmitted(audit,session);if(approval.applicabilityReview?.answerDigest!==require('./standardAuditAssessment.service').digest(execution.answers))throw auditError(409,'Independent Standard applicability review is required.');}
+    if(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource){const kind=audit.templateSnapshot.hseSource?'hse':'standard';const execution=await require(`./${kind}AuditExecution.service`).requireSubmitted(audit,session);if(approval.applicabilityReview?.answerDigest!==require('./standardAuditAssessment.service').digest(execution.answers))throw auditError(409,'Independent Standard applicability review is required.');}
     if(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
     if(audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
     // Source Service completion was validated when submitted. Preserve its immutable result,
     // including historical versions; closure must not reinterpret answers under new wording.
-    if(!((audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)||audit.templateSnapshot?.standardSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
+    if(!((audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
     const [closure] = await Closure.create([{ auditId: audit._id, executionId: req.body.executionId, approvalStatus: 'approved', finalStatus: 'completed', closedBy: req.user.id, comment: req.body.comment }], { session });
     audit.status = 'completed'; await audit.save({ session });
     await Assignment.updateMany({ auditId: audit._id }, { $set: { status: 'completed' } }, { session });
@@ -106,7 +108,10 @@ async function transition(req) {
     if (next === audit.status) return audit;
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Use a reviewed reopening operation for closed audits.');
     if (!(allowed[audit.status] || []).includes(next)) throw auditError(409, 'Invalid audit status transition.');
-    if(next==='completed'&&audit.templateSnapshot?.standardSource){
+    if(next==='completed'&&audit.templateSnapshot?.hseSource){
+      const submitted=await require('./hseAuditExecution.service').requireSubmitted(audit,session);
+      Object.assign(audit,{assessmentStatus:submitted.assessmentStatus,overallPercentage:submitted.overallPercentage,passed:submitted.passed,hseAssessment:submitted.hseAssessment});
+    }else if(next==='completed'&&audit.templateSnapshot?.standardSource){
       const submitted=await require('./standardAuditExecution.service').requireSubmitted(audit,session);
       Object.assign(audit,{assessmentStatus:submitted.assessmentStatus,overallPercentage:submitted.overallPercentage,passed:submitted.passed,standardAssessment:submitted.standardAssessment});
     }else if(next==='completed'&&audit.auditType==='service'&&audit.templateSnapshot?.serviceSource){
@@ -133,8 +138,8 @@ async function createFinding(req) {
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     if (await Closure.exists({ auditId: audit._id }).session(session)) throw auditError(409, 'Closed audit is immutable.');
-    if(audit.templateSnapshot?.standardSource)throw auditError(409,'Record Standard observations in the versioned form; completed findings cannot be injected independently.');
-    if(['major','minor'].includes(req.body.severity)&&!audit.templateSnapshot?.standardSource)throw auditError(400,'Standard severity requires a Standard catalog.');
+    if(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)throw auditError(409,'Record Standard observations in the versioned form; completed findings cannot be injected independently.');
+    if((['major','minor'].includes(req.body.severity)&&!audit.templateSnapshot?.standardSource)||(['important','small'].includes(req.body.severity)&&!audit.templateSnapshot?.hseSource))throw auditError(400,'Standard severity requires a Standard catalog.');
     if(audit.templateSnapshot?.serviceSource||audit.templateSnapshot?.standardSource){
       if(typeof req.body.title!=='string'||!req.body.title.trim()||req.body.title.length>500||req.body.description!==undefined&&(typeof req.body.description!=='string'||req.body.description.length>4000))throw auditError(400,'Invalid Service finding text.');
       if(req.body.executionId&&(!require('mongoose').isObjectIdOrHexString(req.body.executionId)||!await require('../models/auditExecution.model').exists({_id:req.body.executionId,auditId:audit._id}).session(session)))throw auditError(400,'Finding execution must belong to this audit.');

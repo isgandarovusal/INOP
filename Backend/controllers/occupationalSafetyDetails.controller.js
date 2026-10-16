@@ -77,6 +77,7 @@ exports.updateSafetyDetails = async (req, res) => {
       }
     }
 
+    if(await Audit.exists({_id:auditInfo._id,'templateSnapshot.hseSource':{$exists:true}}))return res.status(409).json({message:'Use the versioned HSE form.'});
     const safetyDetails = {
       riskLevel: req.body.riskLevel || "low",
       violations: Array.isArray(req.body.violations)
@@ -87,8 +88,8 @@ exports.updateSafetyDetails = async (req, res) => {
       deadline: req.body.deadline || null,
     };
 
-    const audit = await Audit.findByIdAndUpdate(
-      auditInfo._id,
+    const audit = await Audit.findOneAndUpdate(
+      {_id:auditInfo._id,'templateSnapshot.hseSource':{$exists:false}},
       {
         $set: {
           safetyDetails,

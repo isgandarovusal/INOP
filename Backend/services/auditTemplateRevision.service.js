@@ -18,7 +18,7 @@ async function publish(id, actorId) {
     const items = questions(template);
     if (!items.length || items.some(item => !item.id || !item.label) || new Set(items.map(item => item.id)).size !== items.length) throw auditError(400, 'Real unique template questions are required before publication.');
     const revision = (template.revisionCounter || 0) + 1;
-    const content = Object.fromEntries(['organizationId','brandId','brandName','auditType','name','version','sections','sourceDocumentIds','hrSource','serviceSource','standardSource'].map(key => [key, template[key]]));
+    const content = Object.fromEntries(['organizationId','brandId','brandName','auditType','name','version','sections','sourceDocumentIds','hrSource','serviceSource','standardSource','hseSource'].map(key => [key, template[key]]));
     const [published] = await Revision.create([{ templateId: template._id, revision, content, publishedBy: actorId, publishedAt: new Date() }], { session });
     const updated = await Template.updateOne({ _id: template._id, __v: template.__v, status: template.status }, { $set: { status: 'active', revisionCounter: revision, publishedRevisionId: published._id, updatedBy: actorId }, $inc: { __v: 1 } }, { session });
     if (!updated.modifiedCount) throw auditError(409, 'Template changed; reload.');
@@ -47,6 +47,7 @@ async function resolveForAudit(payload, restaurant, direction) {
   if (!template || template.status !== 'active' || !template.publishedRevisionId) throw auditError(409, 'Publish a reviewed template revision first.');
   const revision = await Revision.findById(template.publishedRevisionId).lean();
   if (!revision || revision.state !== 'published' || revision.content.organizationId !== 'gfc' || revision.content.brandId !== restaurant?.brandId || canonicalDirection(revision.content.auditType) !== direction) throw auditError(403, 'Template does not match audit organization, brand and direction.');
+  if(revision.content.hseSource)throw auditError(409,'Use the HSE object creation endpoint.');
   payload.templateRevisionId = revision._id; payload.templateSnapshot = revision.content;
 }
 module.exports = { publish, startDraft, retire, resolveForAudit, questions };

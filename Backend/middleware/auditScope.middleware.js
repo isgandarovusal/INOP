@@ -187,8 +187,14 @@ exports.getAuditScopeFilter = async req => {
   }
   if (req.auditorProfile) {
     const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
-    parts.push({ restaurantId: { $in: restaurants.map(item => item.id) }, auditType: { $in: require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction) } });
+    const restaurantPart={restaurantId:{$in:restaurants.map(item=>item.id)},hseObjectType:{$nin:['office','warehouse']}};
+    const targets=[restaurantPart];
+    if(req.auditorProfile.direction==='occupational-safety')targets.push({hseObjectType:{$in:['office','warehouse']},hseObjectId:{$in:await require('../services/hseObjectAccess.service').visibleIds(req)}});
+    parts.push({$or:targets}, {auditType:{$in:require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction)}});
   }
+  if(!req.auditorProfile&&req.permission.scope!=='all')parts.push({$or:[{hseObjectType:{$nin:['office','warehouse']}},{hseObjectId:{$in:await require('../services/hseObjectAccess.service').visibleIds(req)}}]});
+  const gfcObjects=await require('../models/hseObject.model').distinct('id',{organizationId:'gfc'});
+  parts.push({$or:[{hseObjectType:{$nin:['office','warehouse']}},{hseObjectId:{$in:gfcObjects}}]});
   return { $and: parts };
 };
 

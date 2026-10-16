@@ -50,6 +50,7 @@ exports.getAuditReport = async (req, res) => {
       [];
 
     const report = {
+      ...(fullAudit.templateSnapshot?.hseSource?{hse:{details:fullAudit.hseDetails||{},assessment:fullAudit.hseAssessment||{},object:fullAudit.hseObjectSnapshot}}:{}),
       ...(fullAudit.templateSnapshot?.standardSource?{standard:{details:fullAudit.standardDetails||{},assessment:fullAudit.standardAssessment||{}}}:{}),
       ...(fullAudit.templateSnapshot?.serviceSource?{service:{details:fullAudit.serviceDetails||{},assessment:fullAudit.serviceAssessment||{},nonconformities:checks.filter(a=>['0','0.5'].includes(a.answer)).length}}:{}),
       ...(fullAudit.auditType==='hr'&&fullAudit.hrAssessment?{hr:{details:fullAudit.hrDetails||{},assessment:fullAudit.hrAssessment,nonconformities:checks.filter(a=>['0','0.5'].includes(a.answer)).length}}:{}),
@@ -71,6 +72,7 @@ exports.getAuditReport = async (req, res) => {
       createdAt: fullAudit.createdAt,
     };
 
+    if(fullAudit.templateSnapshot?.hseSource&&fullAudit.hseAssessment)report.summary={totalChecks:fullAudit.hseAssessment.total,passed:fullAudit.hseAssessment.compliant,failed:fullAudit.hseAssessment.noncompliant};
     return res.json({
       success: true,
       data: report,

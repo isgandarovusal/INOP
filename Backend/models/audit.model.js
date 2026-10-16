@@ -20,7 +20,7 @@ const AuditSchema = new mongoose.Schema(
 
     restaurantId: {
       type: String,
-      required: true,
+      required: function(){return !this.hseObjectType||this.hseObjectType==='restaurant';},
       index: true,
     },
 
@@ -54,6 +54,12 @@ const AuditSchema = new mongoose.Schema(
     // persisted; strict:false alone does not track assignment to unknown paths.
     standardRestaurantSnapshot:{type:mongoose.Schema.Types.Mixed,immutable:true},
     standardAuditorSnapshot:{type:mongoose.Schema.Types.Mixed,immutable:true},
+    hseObjectType:{type:String,enum:['restaurant','office','warehouse'],immutable:true},
+    hseObjectId:{type:String,immutable:true},
+    hseObjectSnapshot:{type:mongoose.Schema.Types.Mixed,immutable:true},
+    hseSubmission:mongoose.Schema.Types.Mixed,
+    hseAssessment:mongoose.Schema.Types.Mixed,
+    hseDetails:mongoose.Schema.Types.Mixed,
     standardSubmission: mongoose.Schema.Types.Mixed,
     standardAssessment: mongoose.Schema.Types.Mixed,
     standardDetails: mongoose.Schema.Types.Mixed,
