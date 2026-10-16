@@ -1,6 +1,5 @@
 const path = require('node:path');
 const fs = require('node:fs');
-const os = require('node:os');
 const { createRequire } = require('node:module');
 const { spawnSync } = require('node:child_process');
 const frontend = path.resolve(__dirname, '../..');
@@ -10,8 +9,8 @@ const { withAuditFixture } = backendRequire('./tests/helpers/auditFixture.cjs');
 exports.withBrowserFixture = async (source, callback, options = {}) => withAuditFixture(async h => {
   const { chromium } = require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
   const { createServer } = await import(path.join(frontend, 'node_modules/vite/dist/node/index.js'));
-  const cacheDir = process.env.INOP_BROWSER_CACHE_DIR || fs.mkdtempSync(path.join(os.tmpdir(), 'inop-browser-cache-'));
-  fs.mkdirSync(cacheDir, { recursive: true });
+  const cache=await require('./ownedCache.cjs').create(process.env.INOP_BROWSER_CACHE_DIR);
+  const cacheDir=cache.dir;
   let vite, browser;
   try {
     vite = await createServer({ root: frontend, configLoader: 'runner', cacheDir, logLevel: 'error', define: { 'import.meta.env.VITE_API_BASE_URL': JSON.stringify('/api') },
@@ -75,8 +74,8 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     }
     await callback({ ...h, page, pageErrors, wire, origin, profile, open });
   } finally {
-    if (browser) await browser.close();
-    if (vite) await vite.close();
-    // Vite's unique scratch directory stays in /tmp; existing caches are preserved.
+    const closed=await Promise.allSettled([browser?.close(),vite?.close()]);
+    if(closed.every(r=>r.status==='fulfilled'))await cache.release();
+    else throw Error('Browser/Vite shutdown failed; owned cache retained for investigation.');
   }
 });

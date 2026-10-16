@@ -50,7 +50,8 @@ test('Audit UI: responsive routes, locales, pagination, states and HR isolation'
  const {createServer}=await import(path.join(root,'node_modules/vite/dist/node/index.js'));
  const output=process.env.INOP_AUDIT_SCREEN_DIR||await fs.mkdtemp(path.join(os.tmpdir(),'inop-block02-screens-'));
  await fs.mkdir(output,{recursive:true});
- const vite=await createServer({root,cacheDir:await fs.mkdtemp(path.join(os.tmpdir(),'inop-block02-vite-')),configLoader:'runner',logLevel:'error',define:{'import.meta.env.VITE_API_BASE_URL':JSON.stringify('/api')},server:{host:'127.0.0.1',port:0,hmr:false},plugins:[{name:'audit-visual-harness',enforce:'pre',resolveId(id){if(id==='/__audit_visual.js')return'\0audit-visual';},load(id){if(id==='\0audit-visual')return harness;}}]});
+ const cache=await require('./helpers/ownedCache.cjs').create();
+ const vite=await createServer({root,cacheDir:cache.dir,configLoader:'runner',logLevel:'error',define:{'import.meta.env.VITE_API_BASE_URL':JSON.stringify('/api')},server:{host:'127.0.0.1',port:0,hmr:false},plugins:[{name:'audit-visual-harness',enforce:'pre',resolveId(id){if(id==='/__audit_visual.js')return'\0audit-visual';},load(id){if(id==='\0audit-visual')return harness;}}]});
  let browser;
  try {
   await vite.listen();const origin=`http://127.0.0.1:${vite.httpServer.address().port}`;
@@ -109,5 +110,5 @@ test('Audit UI: responsive routes, locales, pagination, states and HR isolation'
   assert.deepEqual(errors,[]);
   await fs.writeFile(path.join(output,'results.json'),JSON.stringify({results,pageErrors:errors},null,2));
   console.log(`Visual artifacts: ${output}; ${results.length} route/viewport checks`);
- }finally{if(browser)await browser.close();await vite.close();}
+ }finally{const closed=await Promise.allSettled([browser?.close(),vite.close()]);if(closed.every(r=>r.status==='fulfilled'))await cache.release();else throw Error('Visual browser shutdown failed; cache preserved.');}
 });

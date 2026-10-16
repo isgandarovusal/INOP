@@ -5,6 +5,9 @@ const Snapshot = require('../models/auditDepartmentSnapshot.model');
 
 test('Audit lists, aggregates and child endpoints enforce their own permission scope', async t => withAuditFixture(async h => {
   const records = [], assignments = [];
+  // A valid assignment target is an active GFC worker, independent of the caller's read scope.
+  const candidate=await h.models.User.create({name:'Synthetic assignable worker',role:'auditor',departmentId:'dep_A',email:'candidate@example.invalid',password:h.actors.own.password});
+  await require('../models/auditorProfile.model').create({_id:candidate._id,organizationId:'gfc',direction:'standard',directions:['standard','service','occupational-safety']});
   for (const owner of ['own', 'peer', 'assigned', 'foreign']) for (const auditType of ['standard', 'service', 'occupational-safety']) {
     const value = { own: 10, peer: 20, assigned: 30, foreign: 90 }[owner];
     const audit = await h.audit(owner, auditType, {
@@ -37,13 +40,13 @@ test('Audit lists, aggregates and child endpoints enforce their own permission s
       }
     });
     for (const [endpoint, auditType, metric] of [['service', 'service', 'averageOverallPercentage'], ['standard', 'standard', 'averageCompliancePercentage'], ['safety', 'occupational-safety', 'averageScorePercentage']]) await t.test(`${actor}: ${endpoint} facets are scoped before averages/distributions`, async () => {
-      const expected = allowed.filter(r => r.audit.auditType === auditType), response = await h.request(actor, 'GET', `/audit-analytics/${endpoint}`);
+      const expected = allowed.filter(r => r.audit.auditType === auditType || endpoint==='safety'&&r.audit.auditType==='safety'), response = await h.request(actor, 'GET', `/audit-analytics/${endpoint}`);
       assert.equal(response.status, 200); assert.equal(response.data.data.total, expected.length);
-      const average = Math.round(expected.reduce((n, r) => n + r.audit.overallPercentage, 0) / expected.length * 100) / 100;
+      const average = Math.round(expected.reduce((n, r) => n + (r.owner==='legacy'?80:r.audit.overallPercentage), 0) / expected.length * 100) / 100;
       assert.equal(response.data.data[metric], average);
       if (endpoint === 'service') { assert.equal(response.data.data.averageServiceTimeSeconds, average); assert.equal(response.data.data.answerDistribution.reduce((n, x) => n + x.value, 0), expected.length); }
       if (endpoint === 'standard') assert.equal(response.data.data.findings.critical, expected.reduce((n, r) => n + r.audit.foundCritical, 0));
-      if (endpoint === 'safety') assert.equal(response.data.data.totalChecks, expected.length);
+      if (endpoint === 'safety') assert.equal(response.data.data.totalChecks, expected.filter(r=>r.owner!=='legacy').length);
     });
     await t.test(`${actor}: dashboard Audit and Execution aggregates share the permitted parents`, async () => {
       const response = await h.request(actor, 'GET', '/audit-dashboard'); assert.equal(response.status, 200);
@@ -84,18 +87,18 @@ test('Audit lists, aggregates and child endpoints enforce their own permission s
     });
     for (const [method, endpoint, body, success] of [
       ['PATCH', `/audit-workflow/${audit._id}/status`, { status: 'completed' }, 200],
-      ['POST', `/audit-score/${audit._id}/calculate`, {}, 200],
+      ['POST', `/audit-score/${audit._id}/calculate`, {}, 409],
       ['PATCH', `/occupational-safety-details/${audit._id}/details`, { correctiveAction: 'authorized-test' }, 200],
       ['POST', '/audit-findings', { auditId: String(audit._id), title: 'created-test' }, 201],
       ['POST', '/audit-activity', { auditId: String(audit._id), action: 'tested', resource: 'audit' }, 201],
-      ['POST', '/audit-assignments', { auditId: String(audit._id), auditor: String(h.actors[actor]._id) }, 201],
+      ['POST', '/audit-assignments', { auditId: String(audit._id), auditor: String(candidate._id) }, 201],
       ['POST', '/audit-notification', { auditId: String(audit._id), userId: String(h.actors[actor]._id), type: 'completed', title: 'test', message: 'local' }, 201],
     ]) await t.test(`${actor}: ${owner} ${endpoint.split('/')[1]} mutation scope`, async () => {
       // Clean valid findings before each new attempt; all denial paths must have no side effects.
       const before = await h.models.Audit.findById(audit._id).lean();
       const counts = await Promise.all([h.models.Finding.countDocuments(), h.models.Assignment.countDocuments(), h.models.Activity.countDocuments(), h.models.Notification.countDocuments()]);
       const response = await h.request(actor, method, endpoint, body); assert.equal(response.status, permitted ? success : 403);
-      if (!permitted) {
+      if (!permitted || success===409) {
         assert.deepEqual(await h.models.Audit.findById(audit._id).lean(), before);
         assert.deepEqual(await Promise.all([h.models.Finding.countDocuments(), h.models.Assignment.countDocuments(), h.models.Activity.countDocuments(), h.models.Notification.countDocuments()]), counts);
       } else {
@@ -105,13 +108,13 @@ test('Audit lists, aggregates and child endpoints enforce their own permission s
     });
     await t.test(`${actor}: ${owner} closure mutation scope`, async () => {
       const response = await h.request(actor, 'POST', '/audit-closure', { auditId: String(audit._id), comment: 'local' });
-      assert.equal(response.status, permitted ? 201 : 403);
+      assert.equal(response.status, permitted ? 409 : 403);if(permitted){assert.match(response.data.message,/Independent approval/);assert.equal(await require('../models/auditClosure.model').countDocuments({auditId:audit._id}),0);}
     });
   }
   await t.test('Parent public id is normalized before ObjectId child queries and writes', async () => {
     const audit = records.find(r => r.owner === 'own').audit;
     for (const endpoint of [`/audit-assignments/${audit.id}`, `/audit-closure/${audit.id}`, `/audit-timeline/${audit.id}`, `/audit-export/${audit.id}/csv`, `/audit-activity/${audit.id}`]) assert.equal((await h.request('own', 'GET', endpoint)).status, 200);
-    const created = await h.request('own', 'POST', '/audit-assignments', { auditId: audit.id, auditor: String(h.actors.own._id) });
+    const created = await h.request('own', 'POST', '/audit-assignments', { auditId: audit.id, auditor: String(candidate._id) });
     assert.equal(created.status, 201); assert.equal(created.data.data.auditId, String(audit._id));
   });
   for (const actor of ['none', 'department_missing', 'anonymous']) await t.test(`${actor}: child routes fail closed`, async () => {
@@ -148,14 +151,26 @@ test('Audit lists, aggregates and child endpoints enforce their own permission s
     assert.equal((await h.request('assigned', 'GET', '/audit-analytics/summary')).data.data.total, 3);
     assert.equal((await h.request('assigned', 'GET', '/audit-module/standard')).data.data.length, 1);
   });
-  await t.test('Real auditor retains explicitly granted all analytics/report and assigned Standard lists', async () => {
-    const audit = records.find(r => r.owner === 'foreign').audit;
-    assert.equal((await h.request('auditor', 'GET', '/audit-module/standard')).data.data.length, 0);
-    assert.equal((await h.request('auditor', 'GET', '/audit-analytics/summary')).data.data.total, await h.models.Audit.countDocuments());
-    assert.equal((await h.request('auditor', 'GET', `/audit-report/${audit._id}`)).status, 200);
-    assert.equal((await h.request('auditor', 'GET', `/audit-export/${audit._id}/csv`)).status, 403);
-    assert.equal((await h.request('hr', 'GET', '/audits')).status, 403);
-    assert.equal((await h.request('hr', 'GET', '/audit-dashboard')).status, 200);
+  await t.test('Real auditor all-role permissions remain restricted by direction and active assignments', async () => {
+    const audit = records.find(r => r.owner==='foreign'&&r.audit.auditType==='service').audit;
+    assert.equal((await h.request('auditor','GET','/audit-analytics/summary')).data.data.total,0);
+    assert.equal((await h.request('auditor','GET',`/audit-report/${audit._id}`)).status,403);
+    await h.assign('auditor',audit);
+    assert.equal((await h.request('auditor','GET','/audit-analytics/summary')).data.data.total,1);
+    assert.equal((await h.request('auditor','GET',`/audit-report/${audit._id}`)).status,200);
+    assert.equal((await h.request('auditor','GET',`/audit-export/${audit._id}/csv`)).status,200);
+    assert.equal((await h.request('auditor','GET','/audit-module/standard')).data.data.length,0);
+    await h.models.Assignment.deleteMany({auditor:h.actors.auditor._id});
+    assert.equal((await h.request('auditor','GET',`/audit-report/${audit._id}`)).status,403);
+    assert.equal((await h.request('hr','GET','/audits')).status,403);
+    assert.equal((await h.request('hr','GET','/audit-dashboard')).status,200);
+  });
+  await t.test('Unprofiled assignee and unversioned rescore fail without side effects',async()=>{
+    const audit=records.find(r=>r.owner==='own').audit,before=await h.models.Audit.findById(audit._id).lean(),n=await h.models.Assignment.countDocuments();
+    assert.equal((await h.request('admin','POST','/audit-assignments',{auditId:audit.id,auditor:String(h.actors.own._id)})).status,403);
+    assert.equal(await h.models.Assignment.countDocuments(),n);
+    assert.equal((await h.request('own','POST',`/audit-score/${audit._id}/calculate`,{})).status,409);
+    assert.deepEqual(await h.models.Audit.findById(audit._id).lean(),before);
   });
   await t.test('Permitted user with no audits receives empty analytics, never HTTP 500', async () => {
     const user = await h.models.User.create({ name: 'empty', role: 'test_own', departmentId: 'dep_A', email: 'empty@example.invalid', password: h.actors.own.password });

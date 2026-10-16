@@ -43,7 +43,7 @@ test('Generic Audit scope and trusted department provenance', async t => withAud
       await Snapshot.create({ auditId: audit._id, auditorId: audit.auditorId, departmentId: h.actors[owner].departmentId });
       const allowed = actor === 'admin' || (actor === 'own' && owner === 'own') || (actor === 'department' && owner === 'own');
       assert.equal((await h.request(actor, 'DELETE', `/audits/${audit.id}`)).status, allowed ? 200 : 404);
-      assert.equal(Boolean(await h.models.Audit.exists({ _id: audit._id })), !allowed);
+      const retained=await h.models.Audit.findById(audit._id).lean();assert.ok(retained,'Archive preserves the source record');assert.equal(Boolean(retained.archivedAt),allowed);if(allowed){assert.equal(retained.archivedBy,String(h.actors[actor]._id));assert.equal((await h.request(actor,'GET',`/audits/${audit.id}`)).status,404);}
       if (!allowed) await h.models.Audit.deleteOne({ _id: audit._id });
     });
   }
@@ -55,7 +55,7 @@ test('Generic Audit scope and trusted department provenance', async t => withAud
   await t.test('Assigned author may delete their own audit', async () => {
     const audit = await h.audit('assigned');
     assert.equal((await h.request('assigned', 'DELETE', `/audits/${audit.id}`)).status, 200);
-    assert.equal(await h.models.Audit.exists({ _id: audit._id }), null);
+    const retained=await h.models.Audit.findById(audit._id).lean();assert.ok(retained.archivedAt);assert.equal(retained.archivedBy,String(h.actors.assigned._id));assert.equal((await h.request('assigned','GET',`/audits/${audit.id}`)).status,404);
   });
   for (const status of ['assigned', 'accepted', 'started', 'completed']) await t.test(`${status}: assigned detail/update/delete remain permitted`, async () => {
     const audit = await h.audit('foreign'); await h.assign('assigned', audit, status);
@@ -107,7 +107,7 @@ test('Generic Audit scope and trusted department provenance', async t => withAud
     assert.equal(await h.models.Audit.countDocuments(), before);
   });
   await t.test('Department approval uses trusted snapshot and still rejects legacy forged JSON', async () => {
-    assert.equal((await h.request('department', 'POST', '/audit-approval', { auditId: String(records.peer._id) })).status, 201);
+    assert.equal((await h.request('department', 'POST', '/audit-approval', { auditId: String(records.peer._id), reviewer:String(h.actors.admin._id) })).status, 201);assert.equal((await h.request('department','POST','/audit-approval',{auditId:String(records.peer._id)})).status,400,'Independent reviewer is mandatory');
     assert.equal((await h.request('department', 'GET', `/audit-approval/${legacy._id}`)).status, 403);
   });
 }));

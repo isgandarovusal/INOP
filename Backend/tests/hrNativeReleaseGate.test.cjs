@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto'),net=require('node:net'),{spawn}=require('node:child_process');
 const mongoose=require('mongoose');
 test('Native Node release startup performs no automatic DDL or unapproved notification/provider work',async()=>{
- const timings=[];const owner=crypto.randomUUID(),database=`inop_native_gate_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`,uri=`mongodb://127.0.0.1:27017/${database}`;
+ const timings=[];const owner=crypto.randomUUID(),database=`inop_native_gate_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`,uri=`mongodb://127.0.0.1:${process.env.INOP_AUDIT_TEST_PORT||'27017'}/${database}`;
  const connection=await mongoose.createConnection(uri,{autoIndex:false,autoCreate:false}).asPromise();let owned=false,child,dir;
  try{
   assert.equal(connection.host,'127.0.0.1');assert.equal(connection.name,database);assert.ok(!(await connection.db.admin().listDatabases()).databases.some(d=>d.name===database));
