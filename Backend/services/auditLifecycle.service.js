@@ -13,7 +13,7 @@ async function lockAudit(id, session, user) {
     const profile = await Profile.findById(user.id).session(session);
     if (user.role === 'auditor' || profile) {
       const current = await require('./auditorProfile.service').lockProfile(user.id, session);
-      if (current.direction !== require('./auditDirection.service').canonicalDirection(audit.auditType)) throw auditError(403, 'Audit direction changed.');
+      if (!require('./auditDirection.service').hasDirection(current,audit.auditType)) throw auditError(403, 'Audit direction changed.');
     }
   }
   return audit;

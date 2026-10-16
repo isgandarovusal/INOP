@@ -17,7 +17,7 @@ const globalOnly = resource => async (req, res, next) => {
     const profile = req.auditorProfile;
     const brands = await require('../services/auditAudience.service').visibleBrands(req);
     const Model = resource === 'Template' ? require('../models/auditTemplate.model') : require('../models/auditSourceDocument.model');
-    const allowed = record => require('../services/auditDirection.service').canonicalDirection(record.auditType) === profile.direction && record.organizationId === profile.organizationId && brands.includes(record.brandId);
+    const allowed = record => require('../services/auditDirection.service').hasDirection(profile,record.auditType) && record.organizationId === profile.organizationId && brands.includes(record.brandId);
     let stored;
     if (req.params.id) {
       const query=resource==='Template'?{_id:req.params.id}:require('../controllers/privateFiles.controller').sourceQuery(req.params.id);
@@ -27,7 +27,7 @@ const globalOnly = resource => async (req, res, next) => {
       if (!record || !allowed(record)) return res.status(403).json({ message: 'Audit resource direction denied.' });
     }
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE' && !allowed({ ...stored, ...req.body })) return res.status(403).json({ message: 'Audit resource direction denied.' });
-    req.auditCatalogFilter = { organizationId: profile.organizationId, auditType: { $in: require('../services/auditDirection.service').aliasesFor(profile.direction) }, brandId: { $in: brands } };
+    req.auditCatalogFilter = { organizationId: profile.organizationId, auditType: { $in: require('../services/auditDirection.service').profileDirections(profile).flatMap(require('../services/auditDirection.service').aliasesFor) }, brandId: { $in: brands } };
   }
   return next();
 };
@@ -49,7 +49,7 @@ exports.requireExecutionTemplateAccess = async (req, res, next) => {
     }
     const Template = require('../models/auditTemplate.model');
     const template = await Template.findById(id).lean();
-    if (req.auditorProfile && (!template || template.organizationId !== req.auditorProfile.organizationId || require('../services/auditDirection.service').canonicalDirection(template.auditType) !== req.auditorProfile.direction)) return res.status(403).json({ message: 'Template direction denied.' });
+    if (req.auditorProfile && (!template || template.organizationId !== req.auditorProfile.organizationId || !require('../services/auditDirection.service').hasDirection(req.auditorProfile,template.auditType))) return res.status(403).json({ message: 'Template direction denied.' });
     if(req.auditorProfile&&!(await require('../services/auditAudience.service').visibleBrands(req)).includes(template?.brandId))return res.status(403).json({message:'Template brand denied.'});
     if (!template) {
       return res.status(404).json({ message: 'Template not found.' });

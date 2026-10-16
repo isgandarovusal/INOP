@@ -1,0 +1,4 @@
+// Offline only: never connects to MongoDB and has no write/apply mode.
+const fs=require('node:fs');
+if(process.argv.length!==4||process.argv[2]!=='--snapshot'||/^[a-z]+:\/\//i.test(process.argv[3]||'')){process.stderr.write('Usage: node auditProvisionDryRun.cjs --snapshot LOCAL_JSON\n');process.exitCode=1;}
+else try{const file=process.argv[3],stat=fs.statSync(file);if(!stat.isFile()||stat.size>32*1024*1024)throw Error('Invalid inventory size.');const plan=require('../services/auditProvisionPlan.service').inspect(JSON.parse(fs.readFileSync(file,'utf8')));process.stdout.write(JSON.stringify(plan,null,2)+'\n');if(plan.unknown.length||plan.issues.length||plan.templates.some(t=>t.status!=='PASS'))process.exitCode=2;}catch{process.stderr.write('Invalid offline inventory; no writes performed.\n');process.exitCode=1;}

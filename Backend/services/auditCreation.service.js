@@ -9,9 +9,9 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   const linked = restaurant?.organizationId === 'gfc' && require('./auditCatalog.service').brandIds.includes(restaurant.brandId);
   const profile = await require('../models/auditorProfile.model').findById(user.id).lean();
   if (user.role === 'auditor' || profile) {
-    if (!profile?.active || !direction || direction !== profile.direction || !linked) throw Object.assign(new Error('Audit direction or organization denied.'), { status: 403 });
+    if (!profile?.active || !direction || !require('./auditDirection.service').hasDirection(profile,direction) || !linked) throw Object.assign(new Error('Audit direction or organization denied.'), { status: 403 });
   }
-  if(!await require('./auditAudience.service').mayCreateAt(user,profile,restaurant))throw Object.assign(new Error('Restaurant is outside the audit assignment.'),{status:403});
+  if(!await require('./auditAudience.service').mayCreateAt(user,profile,restaurant,direction))throw Object.assign(new Error('Restaurant is outside the audit assignment.'),{status:403});
   await require('./auditTemplateRevision.service').resolveForAudit(payload, restaurant, direction);
   if(profile&&direction==='standard'){if(!payload.templateSnapshot?.standardSource)throw Object.assign(new Error('A complete reviewed Standard catalogue is required.'),{status:409});require('./standardAuditAssessment.service').verifiedSource(payload.templateSnapshot);}
   if(payload.templateSnapshot?.standardSource){payload.standardRestaurantSnapshot={id:restaurant.id,name:restaurant.name,location:restaurant.location||'',organizationId:restaurant.organizationId,brandId:restaurant.brandId};payload.standardAuditorSnapshot={id:user.id,name:(await require('../models/user.model').findById(user.id).select('name').lean())?.name||''};}else{delete payload.standardRestaurantSnapshot;delete payload.standardAuditorSnapshot;}
@@ -23,8 +23,8 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   return require('./auditTransaction.service').transaction(async session => {
     if (profile) {
       const current = await require('./auditorProfile.service').lockProfile(user.id, session);
-      if(!await require('./auditAudience.service').mayCreateAt(user,current,restaurant))throw Object.assign(new Error('Restaurant assignment changed; retry.'),{status:403});
-      if (current.direction !== direction) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
+      if(!await require('./auditAudience.service').mayCreateAt(user,current,restaurant,direction))throw Object.assign(new Error('Restaurant assignment changed; retry.'),{status:403});
+      if (!require('./auditDirection.service').hasDirection(current,direction)) throw Object.assign(new Error('Audit direction changed; retry.'), { status: 409 });
     }
     if (payload.templateRevisionId) {
       const bound = await require('../models/auditTemplate.model').updateOne({ _id: payload.templateId, status: 'active', publishedRevisionId: payload.templateRevisionId }, { $inc: { __v: 1 } }, { session });

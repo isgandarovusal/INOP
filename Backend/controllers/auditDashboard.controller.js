@@ -10,6 +10,7 @@ exports.getAuditDashboard = async(req,res)=>{
 
 try{
 
+const directionSelected=Boolean(req.query.direction||req.query.auditType);
 const auditFilter = await require('./auditDirectionAnalytics.controller').filterFor(req);
 if (auditFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
 const executionFilter = await getAuditChildScopeFilter(req,auditFilter);
@@ -76,7 +77,7 @@ AuditExecution.aggregate([
  $group:{
   _id:null,
   averageScore:{
-   $avg:executionScore
+   $avg:directionSelected?executionScore:null
   },
   scoredExecutions: { $sum: { $cond: [{ $isNumber: executionScore }, 1, 0] } }
  }
@@ -105,7 +106,7 @@ AuditExecution.aggregate([
   },
 
   averageScore:{
-   $avg:executionScore
+   $avg:directionSelected?executionScore:null
   }
 
  }
@@ -135,10 +136,11 @@ totalAudits,
 completedAudits,
 
 averageScore:
-scoreStats[0]?.averageScore ?? 0,
+directionSelected ? scoreStats[0]?.averageScore ?? null : null,
 
 scoredExecutions: scoreStats[0]?.scoredExecutions || 0,
-scoreUnit: "raw-points",
+scoreUnit: directionSelected?"raw-points":"not-combined",
+overallReason: directionSelected?null:"Different audit methodologies are not combined.",
 
 riskStats,
 

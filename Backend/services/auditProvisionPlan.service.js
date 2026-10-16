@@ -1,0 +1,21 @@
+const crypto=require('node:crypto');
+const specs=()=>['hr','service','standard','hse'].flatMap(kind=>{const service=require(`./${kind}AuditAssessment.service`);return service.sources.map(source=>({kind,source,service,key:service.bindingKey(source),target:source.objectType||source.brandId}));});
+function inspect(snapshot){
+ if(!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot))throw Error('Offline inventory object required.');
+ const issues=[],unknown=[];for(const name of ['templates','revisions','objects','grants','profiles','users','restaurants','bindings'])if(!snapshot[name]||name!=='bindings'&&!Array.isArray(snapshot[name]))unknown.push(name);
+ const rows=name=>Array.isArray(snapshot[name])?snapshot[name]:[];
+ const templates=specs().map(({kind,source,service,key,target})=>{
+  const bindings=snapshot.bindings?.[kind];if(!Array.isArray(bindings))return{kind,target,status:'BLOCKED',reason:'Binding inventory unavailable.'};
+  const matches=bindings.filter(b=>String(b._id)===key);if(matches.length>1)return{kind,target,status:'BLOCKED',reason:'Duplicate source binding.'};
+  const binding=matches[0];if(!binding&&rows('revisions').some(r=>r.content?.[kind+'Source']?.sha256===source.sha256&&r.content?.[kind+'Source']?.version===source.version&&rows('templates').some(t=>String(t._id)===String(r.templateId))))return{kind,target,status:'BLOCKED',reason:'Unbound source template already exists; manual reconciliation required.',action:'manual-review'};if(!binding)return{kind,target,status:'NOT PROVISIONED',action:'operator-provision',method:'POST',endpoint:`/audit-${kind}/templates/${target}`,sourceHash:source.sha256,version:source.version};
+  const template=rows('templates').find(t=>String(t._id)===String(binding.templateId)),revision=rows('revisions').find(r=>String(r._id)===String(binding.revisionId));
+  let reason=null;if(!template||template.status!=='active'||String(template.publishedRevisionId)!==String(binding.revisionId)||!revision||String(revision.templateId)!==String(binding.templateId)||revision.state!=='published')reason='Template/revision linkage is inactive, missing or changed.';
+  if(!reason)try{service.verifiedSource(revision.content);}catch{reason='Revision differs from the approved source catalogue.';}
+  return{kind,target,status:reason?'BLOCKED':'PASS',reason,bindingId:key,templateId:String(binding.templateId),revisionId:String(binding.revisionId),sourceHash:source.sha256,version:source.version,action:reason?'manual-review':'no-op'};
+ });
+ const objectIds=new Set();for(const object of rows('objects')){if(objectIds.has(object.id))issues.push({type:'object',id:object.id,reason:'Duplicate object identity.'});objectIds.add(object.id);if(object.organizationId!=='gfc'||!['office','warehouse'].includes(object.objectType))issues.push({type:'object',id:object.id,reason:'Invalid HSE tenant/type; do not convert a restaurant.'});}
+ for(const grant of rows('grants'))if(grant.active){const object=rows('objects').find(o=>o.id===grant.objectId&&o.organizationId==='gfc'&&o.active),profile=rows('profiles').find(p=>String(p._id)===String(grant.userId)),user=rows('users').find(u=>String(u._id)===String(grant.userId)&&u.isActive);if(!object||!user||!require('./auditDirection.service').hasDirection(profile,'occupational-safety'))issues.push({type:'grant',id:String(grant._id||''),reason:'Missing active GFC object, HSE profile or active user.'});}
+ const report={mode:'offline-read-only',writes:0,unknown,templates,objects:{office:rows('objects').filter(o=>o.active&&o.organizationId==='gfc'&&o.objectType==='office').length,warehouse:rows('objects').filter(o=>o.active&&o.organizationId==='gfc'&&o.objectType==='warehouse').length},issues,requiresOperatorApproval:true};
+ report.inventoryDigest=crypto.createHash('sha256').update(JSON.stringify(snapshot)).digest('hex');return report;
+}
+module.exports={inspect,specs};

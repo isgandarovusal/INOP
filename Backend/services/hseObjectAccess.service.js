@@ -1,7 +1,7 @@
 const ObjectModel=require('../models/hseObject.model');
 const Grant=require('../models/hseObjectGrant.model');
 async function visibleIds(req){
- if(req.auditorProfile&&(!req.auditorProfile.active||req.auditorProfile.direction!=='occupational-safety'||req.auditorProfile.organizationId!=='gfc'))return[];
+ if(req.auditorProfile&&(!req.auditorProfile.active||!require('./auditDirection.service').hasDirection(req.auditorProfile,'occupational-safety')||req.auditorProfile.organizationId!=='gfc'))return[];
  if(req.user.role==='auditor'&&!req.auditorProfile)return[];
  const filter={organizationId:'gfc'};
  if(req.auditorProfile||req.permission?.scope!=='all'){const grants=await Grant.find({userId:req.user.id,active:true}).select('objectId').lean();filter.id={$in:grants.map(g=>g.objectId)};}

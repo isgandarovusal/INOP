@@ -49,6 +49,7 @@ router.get(
   getSafetyAnalytics
 );
 
+router.get('/center',...authorize('audit.analytics','read'),require('../controllers/auditCenter.controller').overview);
 router.get('/overview', ...authorize('audit.analytics','read'), require('../controllers/auditDirectionAnalytics.controller').overview);
 router.get('/direction/:direction', ...authorize('audit.analytics','read'), require('../controllers/auditDirectionAnalytics.controller').overview);
 module.exports = router;

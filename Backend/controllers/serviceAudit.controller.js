@@ -9,9 +9,9 @@ const Binding=require('../models/serviceAuditSourceBinding.model');
 const {getAuditScopeFilter}=require('../middleware/auditScope.middleware');
 const fail=(res,e)=>res.status(e.status||(['ValidationError','CastError'].includes(e.name)?400:500)).json({message:e.status?e.message:'Service audit operation failed.'});
 exports.serviceOnly=(req,res,next)=>{
- if(req.auditorProfile&&req.auditorProfile.direction!=='service')return res.status(403).json({message:'Service audit direction required.'});
- if(req.user.role==='auditor'&&req.auditorProfile?.direction==='service'&&req.permission.scope==='all')req.permission={...req.permission,scope:'assigned'};
- next();
+ if(req.auditorProfile&&!require('../services/auditDirection.service').hasDirection(req.auditorProfile,'service'))return res.status(403).json({message:'Service audit direction required.'});
+ if(req.user.role==='auditor'&&require('../services/auditDirection.service').hasDirection(req.auditorProfile,'service')&&req.permission.scope==='all')req.permission={...req.permission,scope:'assigned'};
+ req.auditRequestedDirection='service';next();
 };
 exports.sources=async(req,res)=>{
  try{const brands=await require('../services/auditAudience.service').visibleBrands(req);const data=await Promise.all(hr.sources.filter(source=>brands.includes(source.brandId)).map(async source=>{
@@ -66,8 +66,9 @@ exports.analytics=async(req,res)=>{
  try{
   const filter=await require('./auditDirectionAnalytics.controller').filterFor({user:req.user,auditorProfile:req.auditorProfile,permission:req.permission,query:req.query,params:{direction:'service'}});
   const parts=[filter,{auditType:'service'}];
+  const scalar=k=>require('../services/auditQuery.service').scalar(req.query[k],k);const auditor=scalar('auditorId'),sectionId=scalar('sectionId');if(auditor)parts.push({auditorId:auditor});if(sectionId)parts.push({'templateSnapshot.sections.id':sectionId});
   if(req.query.status){if(!['draft','scheduled','in-progress','completed','cancelled','failed'].includes(req.query.status))throw auditError(400,'Unknown Service audit status.');parts.push({status:req.query.status});}
-  const audits=await Audit.find({$and:parts}).select('_id restaurantId date status templateSnapshot.brandId').limit(5001).maxTimeMS(5000).lean();
+  const audits=await Audit.find({$and:parts}).select('_id restaurantId auditorId date status templateSnapshot.brandId').limit(5001).maxTimeMS(5000).lean();
   if(audits.length>5000)throw auditError(422,'Narrow the Service analytics date range (maximum 5000 audits).');
   const ids=audits.map(a=>a._id),parents=new Map(audits.map(a=>[String(a._id),a]));
   const executions=await require('../models/auditExecution.model').find({auditId:{$in:ids},status:'completed','templateSnapshot.auditType':'service'}).select('auditId templateSnapshot.brandId templateSnapshot.serviceSource templateSnapshot.sections serviceAssessment overallPercentage answers').limit(5001).maxTimeMS(5000).lean();
@@ -84,9 +85,9 @@ exports.analytics=async(req,res)=>{
    const score=row.overallPercentage;
    if(typeof score==='number'&&Number.isFinite(score)){sum+=score;scored++;}
    add(groups.brands,source.brandId,source.brandName,score);add(groups.restaurants,parent.restaurantId,parent.restaurantId,score);add(groups.trend,parent.date.slice(0,7),parent.date.slice(0,7),score);
-   for(const section of row.serviceAssessment.sections||[])add(groups.sections,`${source.brandId}:${section.id}`,section.title,section.percentage);
+   for(const section of row.serviceAssessment.sections||[])if(!sectionId||section.id===sectionId)add(groups.sections,`${source.brandId}:${section.id}`,section.title,section.percentage);
    for(const answer of row.answers||[]){
-    const q=row.templateSnapshot.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q)continue;
+    const q=row.templateSnapshot.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q||sectionId&&!row.templateSnapshot.sections.find(s=>s.id===sectionId)?.questions.some(x=>x.id===q.id))continue;
     // Preserve historical totals, but never label an old negative answer as new conformity.
     if(hr.needsConformityReview(row.templateSnapshot)&&q.id===hr.NEGATIVE_CRITERION){if(['0','0.5','1'].includes(answer.answer))legacyConformityExclusions++;continue;}
     const rawValue=['0','0.5','1'].includes(answer.answer)?Number(answer.answer):null;
@@ -97,6 +98,8 @@ exports.analytics=async(req,res)=>{
    }
   }
   const restaurants=await Restaurant.find({id:{$in:audits.map(a=>a.restaurantId)}}).select('id name').maxTimeMS(5000).lean();const names=new Map(restaurants.map(r=>[r.id,r.name]));
+  const people=await require('../models/user.model').find({_id:{$in:[...new Set(audits.map(a=>a.auditorId))].filter(id=>mongoose.isObjectIdOrHexString(id))}}).select('_id name').lean();
+  const filterOptions={auditors:people.map(p=>({id:String(p._id),name:p.name})),sections:hr.sources.filter(s=>audits.some(a=>a.templateSnapshot?.brandId===s.brandId)).flatMap(s=>s.sections.map(sec=>({id:sec.id,title:sec.title,brandId:s.brandId})))};
   const order={brands:hr.sources.map(s=>s.brandId),sections:hr.sources.flatMap(s=>s.sections.map(sec=>`${s.brandId}:${sec.id}`)),criteria:hr.sources.flatMap(s=>s.sections.flatMap(sec=>sec.questions.map(q=>q.id)))};
   const output=Object.fromEntries(Object.entries(groups).map(([key,map])=>[key,[...map.values()].map(({sum,...r})=>({...r,label:key==='restaurants'?(names.get(r.id)||r.id):r.label,average:r.scored?sum/r.scored:null})).sort((a,b)=>order[key]?order[key].indexOf(a.id)-order[key].indexOf(b.id):a.id.localeCompare(b.id))]));
   const countByStatus=async(resource,Model)=>{
@@ -107,7 +110,7 @@ exports.analytics=async(req,res)=>{
    return Model.aggregate([{$match:{auditId:{$in:childParents.map(a=>a._id)}}},{$group:{_id:'$status',count:{$sum:1}}}]).option({maxTimeMS:5000});
   };
   const [actions,findings]=await Promise.all([countByStatus('audit.action',require('../models/auditAction.model')),countByStatus('audit.finding',require('../models/auditFinding.model'))]);
-  res.json({data:{statuses:audits.reduce((out,a)=>({...out,[a.status]:(out[a.status]||0)+1}),{}),total:audits.length,submitted:seen.size,scored,unscored:seen.size-scored,average:scored?sum/scored:null,nonconformities,legacyConformityExclusions,...output,actions,findings,scoreUnit:'percent',generatedAt:new Date().toISOString()}});
+  res.json({data:{statuses:audits.reduce((out,a)=>({...out,[a.status]:(out[a.status]||0)+1}),{}),total:audits.length,submitted:seen.size,scored,unscored:seen.size-scored,average:scored?sum/scored:null,nonconformities,legacyConformityExclusions,...output,filterOptions,actions,findings,scoreUnit:'percent',generatedAt:new Date().toISOString()}});
  }catch(e){fail(res,e);}
 };
 exports.list=async(req,res)=>{

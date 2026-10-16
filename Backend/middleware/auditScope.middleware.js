@@ -173,7 +173,7 @@ exports.getAuditScopeFilter = async req => {
   const profile = req.auditorProfile;
   if ((req.user?.role === 'auditor' && !profile) ||
       (profile && (!profile.active || profile.organizationId !== 'gfc' ||
-        !require('../services/auditDirection.service').canonicalDirection(profile.direction)))) return null;
+        !require('../services/auditDirection.service').profileDirections(profile).length))) return null;
   const base = await legacyScopeFilter(req);
   if (base === null) return null;
   const Context = require('../models/auditContext.model');
@@ -189,8 +189,8 @@ exports.getAuditScopeFilter = async req => {
     const restaurants = await require('../models/restaurant.model').find({ organizationId: req.auditorProfile.organizationId, brandId: { $in: require('../services/auditCatalog.service').brandIds } }).select('id').lean();
     const restaurantPart={restaurantId:{$in:restaurants.map(item=>item.id)},hseObjectType:{$nin:['office','warehouse']}};
     const targets=[restaurantPart];
-    if(req.auditorProfile.direction==='occupational-safety')targets.push({hseObjectType:{$in:['office','warehouse']},hseObjectId:{$in:await require('../services/hseObjectAccess.service').visibleIds(req)}});
-    parts.push({$or:targets}, {auditType:{$in:require('../services/auditDirection.service').aliasesFor(req.auditorProfile.direction)}});
+    if(require('../services/auditDirection.service').hasDirection(req.auditorProfile,'occupational-safety'))targets.push({hseObjectType:{$in:['office','warehouse']},hseObjectId:{$in:await require('../services/hseObjectAccess.service').visibleIds(req)}});
+    parts.push({$or:targets}, {auditType:{$in:require('../services/auditDirection.service').profileDirections(req.auditorProfile).flatMap(require('../services/auditDirection.service').aliasesFor)}});
   }
   if(!req.auditorProfile&&req.permission.scope!=='all')parts.push({$or:[{hseObjectType:{$nin:['office','warehouse']}},{hseObjectId:{$in:await require('../services/hseObjectAccess.service').visibleIds(req)}}]});
   const gfcObjects=await require('../models/hseObject.model').distinct('id',{organizationId:'gfc'});

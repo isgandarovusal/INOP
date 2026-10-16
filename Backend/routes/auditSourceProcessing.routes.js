@@ -16,7 +16,7 @@ exports.process=async(req,res)=>{
   await require('../middleware/auth.middleware').verifyToken(req,res,()=>{});if(res.headersSent)return;
   const scope=await require('../middleware/auth.middleware').getPermissionScope(req.user.role,'audit.source_document','create');
   const profile=await require('../models/auditorProfile.model').findById(req.user.id).lean();
-  if(scope!=='all'||(req.user.role==='auditor'&&!profile)||(profile&&(!profile.active||profile.direction!==require('../services/auditDirection.service').canonicalDirection(document.auditType)||profile.organizationId!==document.organizationId)))throw Object.assign(Error('Source permission changed.'),{status:403});
+  if(scope!=='all'||(req.user.role==='auditor'&&!profile)||(profile&&(!profile.active||!require('../services/auditDirection.service').hasDirection(profile,document.auditType)||profile.organizationId!==document.organizationId)))throw Object.assign(Error('Source permission changed.'),{status:403});
   const updated=await Source.findOneAndUpdate({_id:document._id,archivedAt:null,status:'processing',processingToken:token},{$set:{status:'processed',extractedData:{text:result.text,warnings:result.warnings||[],method:result.method||'bounded-extraction'},processedAt:new Date()},$unset:{processingToken:1}},{returnDocument:'after'}).lean();
   if(!updated)return res.status(409).json({message:'Source changed during extraction.'});
   await require('../services/activityLog.service').recordActivity({req,action:'update',entityType:'audit_source_document',entityId:document._id,description:'Audit source text extracted'});

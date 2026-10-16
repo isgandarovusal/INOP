@@ -163,7 +163,7 @@ exports.legacy = async (req, res) => {
   if (source) {
     if(source.archivedAt||(!['gfc',''].includes(source.organizationId)&&source.organizationId!=null))return missing(res);
     const profile=await require('../models/auditorProfile.model').findById(req.user.id).lean();
-    if((req.user.role==='auditor'&&!profile)|| (profile&&(!profile.active||profile.direction!==require('../services/auditDirection.service').canonicalDirection(source.auditType)||profile.organizationId!==source.organizationId||!require('../services/auditCatalog.service').brandIds.includes(source.brandId))))return res.status(403).json({message:'Source scope denied.'});
+    if((req.user.role==='auditor'&&!profile)|| (profile&&(!profile.active||!require('../services/auditDirection.service').hasDirection(profile,source.auditType)||profile.organizationId!==source.organizationId||!require('../services/auditCatalog.service').brandIds.includes(source.brandId))))return res.status(403).json({message:'Source scope denied.'});
     return sendPrivateFile(req,res,filename,source.originalName);
   }
   const filter = getDataScope({ user: req.user, permission: { scope } });

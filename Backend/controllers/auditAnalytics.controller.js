@@ -158,8 +158,9 @@ exports.getServiceAnalytics = async (req, res) => {
   try {
     const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'service'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
+    const legacyScope={$and:[scopeFilter,{'templateSnapshot.serviceSource':{$exists:false}}]};
     const [summary] = await Audit.aggregate([
-      { $match: scopeFilter },
+      { $match: legacyScope },
       {
         $match: {
           auditType: "service",
@@ -272,6 +273,7 @@ exports.getServiceAnalytics = async (req, res) => {
     res.json({
       success: true,
       data: {
+        legacyOnly:true, sourceAnalyticsPath:'/audit-service/analytics',
         total: overview.total || 0,
         scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageOverallPercentage: round(
@@ -305,8 +307,9 @@ exports.getStandardAnalytics = async (req, res) => {
   try {
     const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'standard'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
+    const legacyScope={$and:[scopeFilter,{'templateSnapshot.standardSource':{$exists:false}}]};
     const [summary] = await Audit.aggregate([
-      { $match: scopeFilter },
+      { $match: legacyScope },
       {
         $match: {
           auditType: "standard",
@@ -401,6 +404,7 @@ exports.getStandardAnalytics = async (req, res) => {
     res.json({
       success: true,
       data: {
+        legacyOnly:true, sourceAnalyticsPath:'/audit-standard/analytics',
         total: overview.total || 0,
         scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageCompliancePercentage: round(
@@ -434,8 +438,9 @@ exports.getSafetyAnalytics = async (req, res) => {
   try {
     const scopeFilter = await filterFor({...req,query:req.query,params:{...req.params,direction:'occupational-safety'}});
     if (scopeFilter === null) return res.status(403).json({ success: false, message: "Audit scope icazəsi yoxdur." });
+    const legacyScope={$and:[scopeFilter,{'templateSnapshot.hseSource':{$exists:false}}]};
     const [summary] = await Audit.aggregate([
-      { $match: scopeFilter },
+      { $match: legacyScope },
       {
         $match: {
           auditType: {$in:["occupational-safety","safety"]},
@@ -561,6 +566,7 @@ exports.getSafetyAnalytics = async (req, res) => {
     res.json({
       success: true,
       data: {
+        legacyOnly:true, sourceAnalyticsPath:'/audit-hse/analytics',
         total: overview.total || 0,
         scored:overview.scored||0,unscored:(overview.total||0)-(overview.scored||0),scoreUnit:"percent",
         averageScorePercentage: round(

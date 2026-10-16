@@ -16,6 +16,7 @@ function getJwtSecret() {
 }
 
 async function publicUser(user, permissions = []) {
+  const auditProfile=await require('../models/auditorProfile.model').findById(user._id).select('direction directions active organizationId').lean();
   return {
     id: String(user._id),
     name: user.name,
@@ -26,7 +27,8 @@ async function publicUser(user, permissions = []) {
     isActive: user.isActive,
     createdAt: user.createdAt,
     permissions,
-    auditDirection: (await require('../models/auditorProfile.model').findOne({ _id: user._id, active: true, organizationId: 'gfc' }).select('direction').lean())?.direction || null,
+    auditDirection: require('../services/auditDirection.service').profileDirections(auditProfile).length?auditProfile.direction:null,
+    auditDirections: require('../services/auditDirection.service').profileDirections(auditProfile),
     hrAccess: require("../services/hrDepartmentAccess.service").isHRMember(user),
   };
 }

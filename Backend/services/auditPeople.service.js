@@ -6,7 +6,7 @@ async function assignmentCandidates(auditId) {
   const audit = await Audit.findById(auditId).lean();
   const direction = canonicalDirection(audit?.auditType);
   if (!direction) return [];
-  let profiles = await Profile.find({ active: true, organizationId: 'gfc', direction }).select('_id').lean();
+  let profiles = await Profile.find({ active: true, organizationId: 'gfc', ...require('./auditDirection.service').profileQuery(direction) }).select('_id').lean();
   if(audit.templateSnapshot?.hseSource&&['office','warehouse'].includes(audit.hseObjectType)){const ids=await require('../models/hseObjectGrant.model').distinct('userId',{objectId:audit.hseObjectId,active:true});profiles=profiles.filter(p=>ids.includes(String(p._id)));}
   const users = await User.find({ _id: { $in: profiles.map(row => row._id) }, isActive: true }).select('_id name').lean();
   return users.map(row => ({ id: String(row._id), name: row.name }));

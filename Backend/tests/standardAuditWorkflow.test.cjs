@@ -98,9 +98,9 @@ test('An assigned Standard auditor creates only their full brand catalogue and c
  const row=await h.request('auditor','POST','/audit-execution',{auditId:created.data.data._id});assert.equal(row.status,201);assert.equal(row.data.data.templateSnapshot.sections.flatMap(s=>s.questions).length,190);
 }));
 
-test('Standard analytics refuses oversized windows instead of showing silently truncated counts',{timeout:90000},async()=>withAuditFixture(async h=>{
+test('Standard analytics includes more than 500 audits without silently truncating counts',{timeout:90000},async()=>withAuditFixture(async h=>{
  await h.models.Audit.insertMany(Array.from({length:501},(_,i)=>({id:`synthetic-window-${i}`,restaurantId:'restaurant-admin',auditorId:String(h.actors.admin._id),auditType:'standard',date:'2026-10-16',status:'draft',templateSnapshot:{brandId:'kfc',standardSource:{version:'synthetic-window-only'}}})));
- const response=await h.request('admin','GET','/audit-standard/analytics');assert.equal(response.status,422);assert.match(response.data.message,/500 audits/);
+ const response=await h.request('admin','GET','/audit-standard/analytics');assert.equal(response.status,200);assert.equal(response.data.data.total,501);assert.equal(response.data.data.completed,0);assert.equal(response.data.data.completeRange,true);
  assert.equal((await h.request('admin','GET','/audit-standard/analytics?dateFrom=2027-01-01')).status,200);
 }));
 

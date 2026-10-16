@@ -9,9 +9,9 @@ const Binding=require('../models/standardAuditSourceBinding.model');
 const {getAuditScopeFilter}=require('../middleware/auditScope.middleware');
 const fail=(res,e)=>res.status(e.status||(['ValidationError','CastError'].includes(e.name)?400:500)).json({message:e.status?e.message:'Standard audit operation failed.'});
 exports.standardOnly=(req,res,next)=>{
- if(req.auditorProfile&&req.auditorProfile.direction!=='standard')return res.status(403).json({message:'Standard audit direction required.'});
- if(req.user.role==='auditor'&&req.auditorProfile?.direction==='standard'&&req.permission.scope==='all')req.permission={...req.permission,scope:'assigned'};
- next();
+ if(req.auditorProfile&&!require('../services/auditDirection.service').hasDirection(req.auditorProfile,'standard'))return res.status(403).json({message:'Standard audit direction required.'});
+ if(req.user.role==='auditor'&&require('../services/auditDirection.service').hasDirection(req.auditorProfile,'standard')&&req.permission.scope==='all')req.permission={...req.permission,scope:'assigned'};
+ req.auditRequestedDirection='standard';next();
 };
 exports.sources=async(req,res)=>{
  try{const brands=await require('../services/auditAudience.service').visibleBrands(req);const data=await Promise.all(standard.sources.filter(source=>brands.includes(source.brandId)).map(async source=>{
@@ -72,7 +72,6 @@ exports.list=async(req,res)=>{
   res.json({items,total,page:window.page,limit:window.limit});
  }catch(e){fail(res,e);}
 };
-const MAX_ANALYTICS_AUDITS=500;
 exports.analytics=async(req,res)=>{
  try{
   const filter=await require('./auditDirectionAnalytics.controller').filterFor({user:req.user,auditorProfile:req.auditorProfile,permission:req.permission,query:req.query,params:{direction:'standard'}});
@@ -82,25 +81,8 @@ exports.analytics=async(req,res)=>{
   const auditorId=scalar('auditorId');if(auditorId)clauses.push({$or:[{'standardSubmission.actorId':auditorId},{standardSubmission:{$exists:false},auditorId}]});
   const catalogVersion=scalar('catalogVersion');if(catalogVersion)clauses.push({'templateSnapshot.standardSource.version':catalogVersion});
   const area=scalar('area');if(area){const restaurants=await Restaurant.find({location:area,organizationId:'gfc'}).select('id').lean();clauses.push({restaurantId:{$in:restaurants.map(r=>r.id)}});}
-  const sectionId=scalar('sectionId'),risk=scalar('risk'),result=scalar('result'),category=scalar('category',200);
+  scalar('sectionId');scalar('category',200);const risk=scalar('risk'),result=scalar('result');
   if(risk&&!['critical','major','minor','unspecified'].includes(risk)||result&&!standard.results.includes(result))throw auditError(400,'Unknown Standard risk/result.');
-  const parents=await Audit.find({$and:clauses}).select('_id restaurantId auditorId date status templateSnapshot.brandId').limit(MAX_ANALYTICS_AUDITS+1).maxTimeMS(5000).lean();if(parents.length>MAX_ANALYTICS_AUDITS)throw auditError(422,'Narrow the Standard analytics range (maximum 500 audits).');
-  const ids=parents.map(p=>p._id),byId=new Map(parents.map(p=>[String(p._id),p]));
-  const executions=await require('../models/auditExecution.model').find({auditId:{$in:ids},status:'completed','templateSnapshot.standardSource':{$exists:true}}).select('auditId answers standardAssessment templateSnapshot.brandId templateSnapshot.brandName templateSnapshot.standardSource templateSnapshot.sections.id templateSnapshot.sections.title templateSnapshot.sections.category templateSnapshot.sections.questions.id templateSnapshot.sections.questions.label templateSnapshot.sections.questions.sourceRisk').limit(MAX_ANALYTICS_AUDITS+1).maxTimeMS(5000).lean();if(executions.length>MAX_ANALYTICS_AUDITS)throw auditError(422,'Narrow the Standard analytics range (maximum 500 audits).');
-  const counts=()=>({total:0,applicable:0,na:0,unanswered:0,compliant:0,critical:0,major:0,minor:0,percentage:null});
-  const total=counts(),groups={brands:new Map(),restaurants:new Map(),sections:new Map(),criteria:new Map(),trend:new Map()},seen=new Set();
-  const add=(map,id,label,answer)=>{if(!map.has(id))map.set(id,{id,label,...counts()});const c=map.get(id);c.total++;if(answer){c[answer]++;if(answer!=='na')c.applicable++;}else c.unanswered++;};
-  for(const e of executions){if(!e.standardAssessment?.complete||seen.has(String(e.auditId)))continue;const p=byId.get(String(e.auditId));const answers=new Map(e.answers.map(a=>[a.questionId,a.answer]));let matched=false;
-   for(const s of e.templateSnapshot.sections)for(const q of s.questions){const answer=answers.get(q.id);if(sectionId&&s.id!==sectionId||category&&s.category!==category||risk&&(q.sourceRisk||'unspecified')!==risk||result&&answer!==result)continue;matched=true;total.total++;if(answer){total[answer]++;if(answer!=='na')total.applicable++;}else total.unanswered++;
-    add(groups.brands,e.templateSnapshot.brandId,e.templateSnapshot.brandName,answer);add(groups.restaurants,p.restaurantId,p.restaurantId,answer);add(groups.sections,s.id,s.title,answer);add(groups.criteria,q.id,q.label,answer);add(groups.trend,p.date.slice(0,7),p.date.slice(0,7),answer);
-   }if(matched)seen.add(String(e.auditId));
-  }
-  const childCount=async(resource,Model)=>{const scope=await require('../middleware/auth.middleware').getPermissionScope(req.user.role,resource,'read');if(!scope||scope==='none')return null;const allowed=await getAuditScopeFilter({...req,permission:{scope}});if(!allowed)return null;const visible=await Audit.find({$and:[{_id:{$in:[...seen]}},allowed]}).select('_id').lean();return Model.aggregate([{$match:{auditId:{$in:visible.map(a=>a._id)}}},{$group:{_id:{status:'$status',responsible:'$responsible'},count:{$sum:1}}}]).option({maxTimeMS:5000});};
-  const [actions,findings]=await Promise.all([childCount('audit.action',require('../models/auditAction.model')),childCount('audit.finding',require('../models/auditFinding.model'))]);
-  if(actions?.length){const responsibleIds=[...new Set(actions.map(a=>a._id.responsible).filter(id=>require('mongoose').isObjectIdOrHexString(id)))];const people=await require('../models/user.model').find({_id:{$in:responsibleIds}}).select('name').lean();const names=new Map(people.map(p=>[String(p._id),p.name]));for(const a of actions)a.responsibleName=names.get(String(a._id.responsible))||'';}
-  const restaurants=await Restaurant.find({id:{$in:parents.map(p=>p.restaurantId)}}).select('id name location').lean(),names=new Map(restaurants.map(r=>[r.id,r.name]));
-  const rate=c=>c.applicable?c.compliant/c.applicable*100:null;total.percentage=rate(total);
-  const output=Object.fromEntries(Object.entries(groups).map(([k,map])=>[k,[...map.values()].map(row=>({...row,percentage:rate(row),label:k==='restaurants'?names.get(row.id)||row.id:row.label}))]));
-  res.json({data:{counts:total,total:parents.length,completed:seen.size,coverage:{restaurants:new Set(parents.map(p=>p.restaurantId)).size,brands:new Set(parents.map(p=>p.templateSnapshot?.brandId)).size},statuses:parents.reduce((m,p)=>({...m,[p.status]:(m[p.status]||0)+1}),{}),...output,actions,findings,reason:total.applicable?null:'all-not-applicable',generatedAt:new Date().toISOString()}});
+  res.json({data:await require('../services/auditSourceAnalytics.service').aggregate(req,'standard',{$and:clauses})});
  }catch(e){fail(res,e);}
 };
