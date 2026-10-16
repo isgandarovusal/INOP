@@ -1,0 +1,26 @@
+const crypto=require('node:crypto');
+const catalogues=require('../config/hseAuditSources.json');
+const {auditError}=require('./auditTransaction.service');
+const sources=[...new Map(catalogues.map(s=>[s.objectType,s])).values()];
+const clone=v=>JSON.parse(JSON.stringify(v));
+const digest=v=>crypto.createHash('sha256').update(JSON.stringify(v)).digest('hex');
+const sourceFor=(kind,version,hash)=>version?catalogues.find(s=>s.objectType===kind&&s.version===version&&s.sha256===hash):sources.find(s=>s.objectType===kind);
+function contentFor(kind,version,hash){const s=sourceFor(kind,version,hash);if(!s)throw auditError(400,'Unknown HSE object type.');return{organizationId:'gfc',brandId:'',brandName:'GFC',auditType:'occupational-safety',name:`GFC HSE — ${kind}`,version:s.version,sections:clone(s.sections),sourceDocumentIds:[],hseSource:{objectType:kind,version:s.version,sha256:s.sha256,contract:s.contract,passThreshold:s.passThreshold}};}
+function verifiedSource(snapshot){const s=sourceFor(snapshot?.hseSource?.objectType,snapshot?.hseSource?.version,snapshot?.hseSource?.sha256);if(!s||snapshot.auditType!=='occupational-safety'||snapshot.organizationId!=='gfc'||digest(snapshot.hseSource)!==digest(contentFor(s.objectType,s.version,s.sha256).hseSource)||digest(snapshot.sections)!==digest(s.sections))throw auditError(409,'HSE revision must match the complete reviewed object catalogue.');return s;}
+const results=['compliant','noncompliant','na'];
+function assessHse(snapshot,answers,submitting=false,details={}){
+ const source=verifiedSource(snapshot),questions=source.sections.flatMap(s=>s.questions),known=new Set(questions.map(q=>q.id)),map=new Map();
+ if(!Array.isArray(answers)||answers.length>500)throw auditError(400,'Invalid HSE answers.');
+ for(const a of answers){if(!a||!known.has(a.questionId)||map.has(a.questionId)||!['',...results].includes(a.answer)||a.comment!==undefined&&typeof a.comment!=='string')throw auditError(400,'Invalid duplicate or foreign HSE answer.');map.set(a.questionId,a);}
+ const summarize=qs=>{const c={total:qs.length,applicable:0,na:0,unanswered:0,compliant:0,noncompliant:0,critical:0,weightTotal:0,weightEarned:0,percentage:null,weightedPercentage:null};for(const q of qs){const a=map.get(q.id)?.answer;if(!a){c.unanswered++;continue;}c[a]++;if(a!=='na'){c.applicable++;if(q.weight!=null){c.weightTotal+=q.weight;if(a==='compliant')c.weightEarned+=q.weight;}if(a==='noncompliant'&&q.sourceRisk==='critical')c.critical++;}}const ready=!c.unanswered&&qs.every(q=>map.get(q.id)?.answer!=='na'||details.naReasons?.[q.id]?.trim());if(ready&&c.applicable)c.percentage=c.compliant/c.applicable*100;if(ready&&source.objectType!=='restaurant'&&c.weightTotal)c.weightedPercentage=c.weightEarned/c.weightTotal*100;return c;};
+ const c=summarize(questions),complete=!c.unanswered&&questions.every(q=>map.get(q.id)?.answer!=='na'||details.naReasons?.[q.id]?.trim());
+ if(submitting&&!complete)throw auditError(422,'Answer every HSE criterion and justify every N/A.');
+ if(submitting&&questions.some(q=>map.get(q.id)?.answer==='noncompliant'&&!map.get(q.id)?.comment?.trim()&&!(details.criterionObservations||[]).some(o=>o.standardId===q.id&&o.description?.trim())))throw auditError(422,'Describe every HSE nonconformity.');
+ if(submitting&&(details.criterionObservations||[]).some(o=>!o.description?.trim()))throw auditError(422,'Describe or remove additional observations.');
+ const passed=c.percentage===null||source.passThreshold===null?null:c.percentage>=source.passThreshold;
+ return{assessmentStatus:c.percentage===null?'unscored':'scored',overallPercentage:c.percentage,passed,hseAssessment:{...c,passed,passThreshold:source.passThreshold,complete,objectType:source.objectType,contract:source.contract,catalogVersion:source.version,sourceHash:source.sha256,reason:!complete?'incomplete':c.applicable?null:'all-not-applicable',sections:source.sections.map(s=>({id:s.id,title:s.title,...summarize(s.questions)}))}};
+}
+const text=require('./standardAuditAssessment.service').text;
+function normalizeDetails(snapshot,v={}){const base=require('./standardAuditAssessment.service').normalizeDetails(snapshot,v);const ids=new Set(snapshot.sections.flatMap(s=>s.questions.map(q=>q.id)));const extra=v.criterionMetadata||{};if(!extra||typeof extra!=='object'||Array.isArray(extra)||Object.keys(extra).some(k=>!ids.has(k)))throw auditError(400,'Invalid HSE criterion metadata.');const nextAuditDate=text(v.nextAuditDate,20);if(nextAuditDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(nextAuditDate)||!Number.isFinite(new Date(nextAuditDate).getTime())||new Date(nextAuditDate).toISOString().slice(0,10)!==nextAuditDate))throw auditError(400,'Invalid next HSE audit date.');return{...base,nextAuditDate,criterionMetadata:Object.fromEntries(Object.entries(extra).map(([id,m])=>{if(!m||typeof m!=='object'||Array.isArray(m)||m.repeated!==undefined&&!['','yes','no'].includes(m.repeated))throw auditError(400,'Invalid HSE criterion metadata.');return[id,{rootCause:text(m.rootCause),sample:text(m.sample,200),repeated:m.repeated||''}];}))};}
+const bindingKey=s=>`hse:${s.objectType}:${s.sha256}:${s.version}`;
+module.exports={sources,sourceFor,contentFor,verifiedSource,assessHse,normalizeDetails,text,digest,results,bindingKey};
