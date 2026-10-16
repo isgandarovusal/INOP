@@ -1,6 +1,6 @@
 import api from "../api/axios";
 async function downloadAuditFile(auditId: string, format: "pdf" | "excel" | "csv", signal?: AbortSignal) {
- const response=await api.get(`/audit-export/${auditId}/${format}`,{responseType:"blob",signal});
+ const response=await api.get(`/audit-export/${encodeURIComponent(auditId)}/${format}`,{responseType:"blob",signal});
  if (signal?.aborted) return;
  const url=URL.createObjectURL(response.data);
  const link=document.createElement("a"); link.href=url;

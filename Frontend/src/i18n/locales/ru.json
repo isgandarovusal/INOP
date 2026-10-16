@@ -2187,5 +2187,49 @@
     "repeatedYes": "Да",
     "repeatedNo": "Нет",
     "nextAuditDate": "Дата следующего аудита"
+  },
+  "auditReportFinal": {
+    "title": "Итоговый отчёт аудита",
+    "auditId": "ID аудита",
+    "organization": "Организация",
+    "brand": "Бренд",
+    "objectType": "Тип объекта",
+    "objectName": "Объект",
+    "date": "Дата аудита",
+    "auditorId": "ID аудитора",
+    "catalogVersion": "Версия каталога",
+    "revision": "Ревизия шаблона",
+    "status": "Статус",
+    "findings": "Несоответствия",
+    "actions": "Корректирующие действия",
+    "approvals": "Согласования",
+    "closures": "Закрытия",
+    "history": "История",
+    "versions": "Версии",
+    "restricted": "Нет разрешения на просмотр этих данных.",
+    "answers": {
+      "compliant": "Соответствует",
+      "noncompliant": "Не соответствует",
+      "critical": "Критическое",
+      "major": "Значительное",
+      "minor": "Незначительное"
+    },
+    "links": {
+      "criterion": "Критерий",
+      "section": "Раздел",
+      "document": "Документ",
+      "final-photo": "Итоговое фото",
+      "finding": "Несоответствие",
+      "action": "Действие",
+      "observation": "Наблюдение"
+    },
+    "auditorName": "Аудитор",
+    "direction": "Направление аудита",
+    "submissionStatus": "Статус формы",
+    "objectTypes": {
+      "restaurant": "Ресторан",
+      "office": "Офис",
+      "warehouse": "Склад"
+    }
   }
 }

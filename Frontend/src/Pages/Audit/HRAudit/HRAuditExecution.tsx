@@ -1,3 +1,4 @@
+import ServicePhoto from '../ServiceSource/ServicePhoto';
 import {useEffect,useState} from 'react';
 import {Link,useBlocker} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
@@ -51,7 +52,9 @@ export default function HRAuditExecution({execution,reload}:{execution:AuditExec
      <div className="audit-filter-grid"><label>{t('hrAudit.answer')}<select disabled={details.roleAvailability?.[q.id]===false} aria-labelledby={`${q.id}-label`} value={a?.answer||''} onChange={e=>setAnswer(q.id,'answer',e.target.value)}><option value="">{t('hrAudit.choose')}</option>{['0','0.5','1','na'].map(v=><option key={v} value={v}>{v==='na'?'N/A':v}</option>)}</select></label>
      <label>{t('hrAudit.questionNote')}<textarea maxLength={4000} value={a?.comment||''} onChange={e=>setAnswer(q.id,'comment',e.target.value)}/></label>
      <label>{t('hrAudit.evidenceLink')}<select value={linked} onChange={e=>{setSaved(false);setDetails(p=>({...p,evidenceLinks:[...(p.evidenceLinks||[]).filter(l=>l.questionId!==q.id),...(e.target.value?[{questionId:q.id,evidenceId:e.target.value}]:[])]}));}}><option value="">{t('hrAudit.noEvidence')}</option>{evidence.data?.data.map(file=><option key={file.id} value={file.id}>{file.name}</option>)}</select></label></div>
+     <ServicePhoto auditId={execution.auditId} value={linked} files={evidence.data?.data||[]} disabled={!writable||action.busy} reload={evidence.reload} onBusyChange={setUploadBusy} onChange={id=>{setSaved(false);setDetails(p=>({...p,evidenceLinks:[...(p.evidenceLinks||[]).filter(l=>l.questionId!==q.id),...(id?[{questionId:q.id,evidenceId:id}]:[])]}));}}/>
     </article>;})}
+    <ServicePhoto auditId={execution.auditId} value={details.sectionPhotos?.[section.id]||''} files={evidence.data?.data||[]} disabled={!writable||action.busy} reload={evidence.reload} onBusyChange={setUploadBusy} onChange={id=>{setSaved(false);setDetails(p=>({...p,sectionPhotos:{...p.sectionPhotos,[section.id]:id}}));}}/>
     <label className="audit-hr-note">{t('hrAudit.sectionNote')}<textarea maxLength={4000} value={details.sectionNotes?.[section.id]||''} onChange={e=>{setSaved(false);setDetails(p=>({...p,sectionNotes:{...p.sectionNotes,[section.id]:e.target.value}}));}}/></label>
    </FormSection>)}
    <FormSection title={t('hrAudit.conclusion')} disabled={!writable||action.busy}>{(['observations','finalOpinion'] as const).map(k=><label className="audit-hr-note" key={k}>{t(`hrAudit.${k}`)}<textarea maxLength={10000} value={details[k]||''} onChange={e=>setDetail(k,e.target.value)}/></label>)}<HRFinalEvidence auditId={execution.auditId} details={details} onChange={value=>{setSaved(false);setDetails(value);}} files={evidence.data?.data||[]} reload={evidence.reload} onBusyChange={setUploadBusy} disabled={!writable||action.busy}/></FormSection>

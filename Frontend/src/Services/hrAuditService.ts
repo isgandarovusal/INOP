@@ -3,7 +3,7 @@ import api from '../api/axios';
 import type {AuditExecution,AuditExecutionAnswer} from './auditExecutionService';
 export interface HRSource {brandId:string;brandName:string;sha256:string;worksheet:string;worksheets:string[];scoringStatus:string;templateId:string|null;interviewGuide:{sheet:string;cells:{cell:string;text:string}[]}[]}
 export interface HRRestaurant {id:string;name:string;brandId:string;organizationId:string}
-export interface HRDetails {editorialVersion?:string;roleAvailability?:Record<string,boolean>;finalEvidence?:{photoId?:string;documentIds?:string[]};restaurantManager?:string;shiftManager?:string;sectionNotes?:Record<string,string>;observations?:string;finalOpinion?:string;evidenceLinks?:{questionId:string;evidenceId:string}[]}
+export interface HRDetails {sectionPhotos?:Record<string,string>;editorialVersion?:string;roleAvailability?:Record<string,boolean>;finalEvidence?:{photoId?:string;documentIds?:string[]};restaurantManager?:string;shiftManager?:string;sectionNotes?:Record<string,string>;observations?:string;finalOpinion?:string;evidenceLinks?:{questionId:string;evidenceId:string}[]}
 export interface HRGroup {id:string;label:string;count:number;scored:number;average:number|null;na?:number;nonconformities?:number}
 export interface HRMetrics {total:number;submitted:number;scored:number;unscored:number;average:number|null;nonconformities:number;brands:HRGroup[];restaurants:HRGroup[];sections:HRGroup[];criteria:HRGroup[];trend:HRGroup[];actions:{_id:string;count:number}[]|null;findings:{_id:string;count:number}[]|null;generatedAt:string}
 export interface HRRow {id:string;_id:string;restaurantId:string;date:string;status:string;overallPercentage:number|null;assessmentStatus:string;templateSnapshot?:{brandId:string}}

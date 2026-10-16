@@ -2226,5 +2226,49 @@
     "repeatedYes": "Yes",
     "repeatedNo": "No",
     "nextAuditDate": "Next audit date"
+  },
+  "auditReportFinal": {
+    "title": "Final audit report",
+    "auditId": "Audit ID",
+    "organization": "Organization",
+    "brand": "Brand",
+    "objectType": "Object type",
+    "objectName": "Object",
+    "date": "Audit date",
+    "auditorId": "Auditor ID",
+    "catalogVersion": "Catalogue version",
+    "revision": "Template revision",
+    "status": "Status",
+    "findings": "Findings",
+    "actions": "Corrective actions",
+    "approvals": "Approvals",
+    "closures": "Closures",
+    "history": "History",
+    "versions": "Versions",
+    "restricted": "You do not have permission to view this information.",
+    "answers": {
+      "compliant": "Compliant",
+      "noncompliant": "Noncompliant",
+      "critical": "Critical",
+      "major": "Major",
+      "minor": "Minor"
+    },
+    "links": {
+      "criterion": "Criterion",
+      "section": "Section",
+      "document": "Document",
+      "final-photo": "Final photo",
+      "finding": "Finding",
+      "action": "Action",
+      "observation": "Observation"
+    },
+    "auditorName": "Auditor",
+    "direction": "Audit direction",
+    "submissionStatus": "Form status",
+    "objectTypes": {
+      "restaurant": "Restaurant",
+      "office": "Office",
+      "warehouse": "Warehouse"
+    }
   }
 }

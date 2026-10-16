@@ -1,3 +1,5 @@
+import {FinalReportContent} from '../../../Components/AuditFinalReport';
+import AuditExportPanel from '../AuditExport/AuditExportPanel';
 import HseCover from '../HSESource/HseCover';
 import StandardCover from '../StandardSource/StandardCover';
 import {hrText} from '../HRAudit/hrAuditPresentation';
@@ -112,6 +114,7 @@ export default function AuditReportDetail(){
   <div className="audit-report">
 
 
+   {report.bundle&&<><FinalReportContent bundle={report.bundle}/><AuditExportPanel auditId={report.bundle.metadata.auditId}/></>}
    <h1>
     {t("auditPresentation.report")}
    </h1>

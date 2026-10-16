@@ -2250,5 +2250,49 @@
     "repeatedYes": "Bəli",
     "repeatedNo": "Xeyr",
     "nextAuditDate": "Növbəti audit tarixi"
+  },
+  "auditReportFinal": {
+    "title": "Yekun audit hesabatı",
+    "auditId": "Audit ID-si",
+    "organization": "Təşkilat",
+    "brand": "Brend",
+    "objectType": "Obyekt növü",
+    "objectName": "Obyekt",
+    "date": "Audit tarixi",
+    "auditorId": "Auditor ID-si",
+    "catalogVersion": "Kataloq versiyası",
+    "revision": "Şablon revision-u",
+    "status": "Status",
+    "findings": "Uyğunsuzluqlar",
+    "actions": "Düzəldici tədbirlər",
+    "approvals": "Təsdiqlər",
+    "closures": "Bağlanışlar",
+    "history": "Tarixçə",
+    "versions": "Versiyalar",
+    "restricted": "Bu məlumatlara baxış icazəsi yoxdur.",
+    "answers": {
+      "compliant": "Uyğun",
+      "noncompliant": "Uyğunsuz",
+      "critical": "Kritik",
+      "major": "Əhəmiyyətli",
+      "minor": "Kiçik"
+    },
+    "links": {
+      "criterion": "Meyar",
+      "section": "Bölmə",
+      "document": "Sənəd",
+      "final-photo": "Yekun foto",
+      "finding": "Uyğunsuzluq",
+      "action": "Tədbir",
+      "observation": "Müşahidə"
+    },
+    "auditorName": "Auditor",
+    "direction": "Audit istiqaməti",
+    "submissionStatus": "Formanın vəziyyəti",
+    "objectTypes": {
+      "restaurant": "Restoran",
+      "office": "Ofis",
+      "warehouse": "Anbar"
+    }
   }
 }

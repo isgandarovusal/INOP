@@ -36,8 +36,8 @@ export interface Audit {
   standardSubmission?:{actorId:string;name:string;at:string};
   standardAssessment?:import('../Services/standardSourceService').StandardAssessment;
   standardDetails?:import('../Services/standardSourceService').StandardDetails;
-  serviceAssessment?:{contract:string;sections:{id:string;title:string;percentage:number|null}[]};
-  hrAssessment?: {contract:string;sections:{id:string;title:string;percentage:number|null}[]};
+  serviceAssessment?:{complete?:boolean;contract:string;sections:{id:string;title:string;percentage:number|null}[]};
+  hrAssessment?: {complete?:boolean;contract:string;sections:{id:string;title:string;percentage:number|null}[]};
   hrDetails?: import('../Services/hrAuditService').HRDetails;
   id: string;
   restaurantId: string;

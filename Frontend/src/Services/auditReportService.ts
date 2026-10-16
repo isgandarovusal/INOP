@@ -1,6 +1,7 @@
 import {readJson} from '../api/readRequest';
 import api from '../api/axios';
 export interface AuditReport {
+  bundle?:import('./auditFinalReportService').FinalReportBundle;
   type: string;
   status: string;
   score: number|null;

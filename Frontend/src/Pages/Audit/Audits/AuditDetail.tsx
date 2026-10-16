@@ -1,3 +1,4 @@
+import AuditFinalReport from '../../../Components/AuditFinalReport';
 import HseCover from '../HSESource/HseCover';
 import StandardCover from '../StandardSource/StandardCover';
 import ServiceFollowUp from '../ServiceSource/ServiceFollowUp';
@@ -14,7 +15,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, ImageOff, Paperclip, Pencil } from "lucide-react";
 import AuditExecutionTools from '../../../Components/AuditExecutionTools';
 import AuditEvidencePanel from '../../../Components/AuditEvidencePanel';
-import HRAuditActions from '../HRAudit/HRAuditActions';
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
 import EmptyState from "../../../Components/EmptyState";
@@ -174,9 +174,10 @@ const AuditDetail: React.FC = () => {
       {audit.templateSnapshot?.hseSource&&<><HseCover assessment={audit.hseAssessment}/><ServiceFollowUp direction="hse" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.templateSnapshot?.standardSource&&<><StandardCover assessment={audit.standardAssessment}/><ServiceFollowUp direction="standard" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.auditType==='service'&&audit.templateSnapshot?.serviceSource&&<ServiceFollowUp auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}
-      {audit.auditType==='hr'&&<HRAuditActions auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
+      {audit.auditType==='hr'&&<ServiceFollowUp direction="hr" auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
       {audit.auditType==='service'&&audit.serviceAssessment&&<section className="hr-section audit-hr-page"><h2>{t('serviceAudit.conclusion')}</h2><p>{audit.serviceDetails?.observations}</p><p>{audit.serviceDetails?.finalOpinion}</p>{audit.serviceAssessment.sections.map(s=><div className="detail-row" key={s.id}><strong>{s.title}</strong><span>{s.percentage===null?t('serviceAudit.notAssessed'):`${s.percentage.toFixed(1)}%`}</span><p>{audit.serviceDetails?.sectionNotes?.[s.id]}</p></div>)}</section>}
       {audit.auditType==='hr'&&audit.hrAssessment&&<section className="hr-section audit-hr-page"><h2>{t('hrAudit.conclusion')}</h2><p>{t(audit.hrAssessment?.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p>{audit.hrDetails?.observations&&<p>{audit.hrDetails.observations}</p>}{audit.hrDetails?.finalOpinion&&<p>{audit.hrDetails.finalOpinion}</p>}{audit.hrAssessment?.sections.map(s=><div key={s.id} className="detail-row"><strong>{hrText(s.id,s.title,i18n.language)}</strong><span>{s.percentage===null?t('hrAudit.notAssessed'):`${s.percentage.toFixed(1)}%`}</span>{audit.hrDetails?.sectionNotes?.[s.id]&&<p>{audit.hrDetails.sectionNotes[s.id]}</p>}</div>)}</section>}
+      {(audit.hrAssessment?.complete||audit.serviceAssessment?.complete||audit.standardSubmission||audit.hseSubmission)&&<AuditFinalReport auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}
       <div className="detail-grid">
         <div>
           <div className="audit-modern-card">
