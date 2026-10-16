@@ -1,3 +1,4 @@
+import StandardCover from '../StandardSource/StandardCover';
 import {hrText} from '../HRAudit/hrAuditPresentation';
 import { useTranslation } from "react-i18next";
 import {
@@ -135,9 +136,10 @@ export default function AuditReportDetail(){
     <p>
      {t("auditPresentation.score")}:
      {" "}
-     {report.score===null?(report.hr?t('hrAudit.notAssessed'):'—'):`${report.score}${report.hr||report.service?'%':''}`}
+     {report.score===null?(report.hr?t('hrAudit.notAssessed'):'—'):`${report.score}${report.hr||report.service||report.standard?'%':''}`}
     </p>
-     {report.service&&<><p>{report.service.details.observations}</p><p>{report.service.details.finalOpinion}</p>{report.service.assessment.sections?.map(section=><p key={section.id}>{section.title}: {section.percentage===null?t('serviceAudit.notAssessed'):`${section.percentage.toFixed(1)}%`}</p>)}</>}
+     {report.standard&&<StandardCover assessment={report.standard.assessment}/>}
+ {report.service&&<><p>{report.service.details.observations}</p><p>{report.service.details.finalOpinion}</p>{report.service.assessment.sections?.map(section=><p key={section.id}>{section.title}: {section.percentage===null?t('serviceAudit.notAssessed'):`${section.percentage.toFixed(1)}%`}</p>)}</>}
      {report.hr&&<><p>{t(report.hr.assessment.contract==='blocked-kfc-denominator'?'hrAudit.kfcBlocked':'hrAudit.scale')}</p><p>{report.hr.details.observations}</p><p>{report.hr.details.finalOpinion}</p></>}
      {report.hr&&<p>{t('hrAudit.nonconformities')}: {report.hr.nonconformities}</p>}
      {report.hr?.assessment.sections.map(section=><p key={section.id}>{hrText(section.id,section.title,i18n.language)}: {section.percentage===null?t('hrAudit.notAssessed'):`${section.percentage.toFixed(1)}%`}</p>)}
@@ -213,7 +215,7 @@ export default function AuditReportDetail(){
 
 
 
-   {report.type!=='hr'&&!report.service&&<button className="btn-secondary" type="button"
+   {report.type!=='hr'&&!report.service&&!report.standard&&<button className="btn-secondary" type="button"
 
     onClick={()=>{
 

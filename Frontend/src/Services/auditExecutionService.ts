@@ -10,6 +10,10 @@ export interface AuditExecutionAnswer {
 
 export interface AuditExecution {
   createdByName?: string;
+  standardSubmission?:{actorId:string;name:string;at:string};
+  standardVersion?:number;
+  standardDetails?:import('./standardSourceService').StandardDetails;
+  standardAssessment?:import('./standardSourceService').StandardAssessment;
   serviceVersion?:number;
   serviceDetails?:import('./serviceAuditService').ServiceDetails;
   serviceAssessment?:{contract:string;complete:boolean;sections:{id:string;title:string;percentage:number|null}[]};

@@ -30,6 +30,7 @@ export interface CreateApprovalPayload {
 
 
 export interface UpdateApprovalPayload {
+  naConfirmed?:boolean;
   status?: ApprovalStatus;
   comment?: string;
 }

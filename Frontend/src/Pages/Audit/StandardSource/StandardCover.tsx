@@ -1,0 +1,7 @@
+import {useTranslation} from 'react-i18next';
+import {SectionCard} from '../../../Components/HRSection';
+import type {StandardAssessment} from '../../../Services/standardSourceService';
+const keys=['total','applicable','na','unanswered','compliant','critical','major','minor'] as const;
+export default function StandardCover({assessment}:{assessment?:StandardAssessment}){
+ const{t}=useTranslation();return <SectionCard><h2>{t('standardAudit.cover')}</h2><p role="note">{t('standardAudit.scoringNotice')}</p>{assessment?<><div className="audit-foundation-kpis">{keys.map(k=><article key={k}><span>{t(`standardAudit.counts.${k}`)}</span><strong>{assessment[k]}</strong></article>)}</div><p>{t('standardAudit.result')}: {assessment.percentage===null?t('standardAudit.notAssessed'):`${assessment.percentage.toFixed(2)}%`}</p><p>{t('standardAudit.sourceRisk')}: {Object.entries(assessment.sourceRisk||{}).map(([key,value])=>`${t(key==='unspecified'?'standardAudit.unspecifiedRisk':`standardAudit.answers.${key}`)}: ${value}`).join(' · ')}</p><div className="audit-table-scroll"><table className="admin-table"><thead><tr><th>{t('standardAudit.section')}</th>{keys.map(k=><th key={k}>{t(`standardAudit.counts.${k}`)}</th>)}</tr></thead><tbody>{assessment.sections.map(s=><tr key={s.id}><th scope="row">{s.category} · {s.title}</th>{keys.map(k=><td key={k}>{s[k]}</td>)}</tr>)}</tbody></table></div></>:<p>{t('standardAudit.coverAfterSave')}</p>}</SectionCard>;
+}

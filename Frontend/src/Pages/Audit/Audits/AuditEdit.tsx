@@ -27,12 +27,13 @@ const AuditEdit: React.FC = () => {
     if(!id) return;
 
     getAuditById(id).then((audit)=>{
-      setScores(audit.scores);
+      if(audit.hrAssessment||audit.serviceAssessment||audit.standardAssessment){navigate(`/app/audit/audits/${audit.id}`,{replace:true});return;}
+      setScores(audit.scores||{cleanliness:0,service:0,food:0,staff:0});
       setComments(audit.comments || "");
       setLoading(false);
     });
 
-  },[id]);
+  },[id,navigate]);
 
 
   async function submit(e:React.FormEvent){

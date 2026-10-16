@@ -29,6 +29,7 @@ const AuditDashboard = lazy(() => import("../Pages/Audit/AuditDashboard/AuditDas
 const AuditNotificationsList = lazy(() => import("../Pages/Audit/AuditNotifications/AuditNotificationsList"));
 const AuditorProfilesPage = lazy(() => import("../Pages/Audit/AuditorProfilesPage"));
 const AuditDirectionPage = lazy(() => import("../Pages/Audit/AuditDirectionPage"));
+const StandardAuditPage=lazy(()=>import("../Pages/Audit/StandardSource/StandardAuditPage"));
 const ServiceAuditPage=lazy(()=>import("../Pages/Audit/ServiceSource/ServiceAuditPage"));
 const HRAuditPage = lazy(() => import("../Pages/Audit/HRAudit/HRAuditPage"));
 const AuditHome = lazy(() => import("../Pages/Audit/AuditHome/AuditHome"));
@@ -36,8 +37,6 @@ const AuditReportDetail = lazy(() => import("../Pages/Audit/AuditReport/AuditRep
 const AuditExecutionPage = lazy(() => import("../Pages/Audit/AuditExecution/AuditExecutionPage"));
 const AuditTemplatesList = lazy(() => import("../Pages/Audit/ChecklistBuilder/AuditTemplatesList"));
 const AuditTemplateBuilder = lazy(() => import("../Pages/Audit/ChecklistBuilder/AuditTemplateBuilder"));
-const ServiceAuditForm = lazy(() => import("../Pages/Audit/ServiceAudit/ServiceAuditForm"));
-const StandardAuditForm = lazy(() => import("../Pages/Audit/StandardAudit/StandardAuditForm"));
 const StandardAuditDetail = lazy(() => import("../Pages/Audit/StandardAudit/StandardAuditDetail"));
 const SafetyAuditForm = lazy(() => import("../Pages/Audit/OccupationalSafetyAudit/SafetyAuditForm"));
 const SafetyAuditDetail = lazy(() => import("../Pages/Audit/OccupationalSafetyAudit/SafetyAuditDetail"));
@@ -105,18 +104,19 @@ const ROUTES: RouteObject[] = [
               { path: "audit/checklists/:id", element: <AuditTemplateBuilder /> },
 
 { path: "audit/service", element: <ServiceAuditPage /> },
-              { path: "audit/service/new", element: <ServiceAuditForm /> },
+              { path: "audit/service/new", element: <ServiceAuditPage createOnly /> },
 { path: "audit/service/analytics", element: <ServiceAuditPage analytics /> },
-              { path: "audit/standard", element: <AuditDirectionPage direction="standard" /> },
-              { path: "audit/standard/new", element: <StandardAuditForm /> },
+              { path: "audit/standard", element: <StandardAuditPage /> },
+              { path: "audit/standard/new", element: <StandardAuditPage createOnly /> },
               { path: "audit/standard/:id", element: <StandardAuditDetail /> },
-              { path: "audit/standard/analytics", element: <AuditDirectionPage direction="standard" analytics /> },
+              { path: "audit/standard/analytics", element: <StandardAuditPage analytics /> },
               { path: "audit/safety", element: <AuditDirectionPage direction="occupational-safety" /> },
               { path: "audit/safety/new", element: <SafetyAuditForm /> },
               { path: "audit/safety/:id", element: <SafetyAuditDetail /> },
               { path: "audit/safety/analytics", element: <AuditDirectionPage direction="occupational-safety" analytics /> },
               { path: "audit/auditors", element: <AuditorProfilesPage /> },
               { path: "audit/hr", element: <HRAuditPage /> },
+              { path: "audit/hr/new", element: <HRAuditPage createOnly /> },
               { path: "audit/hr/analytics", element: <HRAuditPage analytics /> },
               { path: "audit", element: <AuditHome /> },
               { path: "audit/dashboard", element: <AuditDashboard /> },

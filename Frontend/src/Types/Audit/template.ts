@@ -13,7 +13,7 @@ export type AuditQuestionAnswerType =
   | "yes-no-na"
   | "severity"
   | "score"
-  | "hr-score" | "service-score"
+  | "hr-score" | "service-score" | "standard-result"
   | "text";
 
 export interface AuditTemplateQuestion {
@@ -22,6 +22,9 @@ export interface AuditTemplateQuestion {
   clarification?:string;
   guidance?: string;
   sourceCell?: string;
+  sourceRisk?: string|null;
+  sourceMetadata?:Record<string,string>;
+  worksheet?: string;
   answerType: AuditQuestionAnswerType;
   required: boolean;
   active: boolean;
@@ -46,6 +49,7 @@ export interface AuditTemplateSection {
 }
 
 export interface AuditTemplate {
+  standardSource?: {sha256:string;version:string;scoringStatus:string};
   serviceSource?: {sha256:string;version:string;scoringStatus:string};
   hrSource?: {sha256:string;version:string;scoringStatus:string};
   id: string;

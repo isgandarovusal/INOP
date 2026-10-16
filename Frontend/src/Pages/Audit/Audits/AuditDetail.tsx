@@ -1,3 +1,4 @@
+import StandardCover from '../StandardSource/StandardCover';
 import ServiceFollowUp from '../ServiceSource/ServiceFollowUp';
 import {hrText} from '../HRAudit/hrAuditPresentation';
 import React, {
@@ -148,14 +149,14 @@ const AuditDetail: React.FC = () => {
     <div>
       <PageHeader
         title={restaurant?.name ?? t("auditFoundation.audit")}
-        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${auditor?.name ?? t("auditPresentation.unknown")}`}
+        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
         actions={
           <>
             <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
               <ArrowLeft size={15} /> {t("auditPresentation.back")}
             </button>
 
-            {canManage && (
+            {canManage && !audit.hrAssessment && !audit.serviceAssessment && !audit.standardAssessment && (
               <button
                 className="btn-secondary"
                 onClick={() => navigate(`/app/audit/audits/${audit.id}/edit`)}
@@ -169,6 +170,7 @@ const AuditDetail: React.FC = () => {
 
       <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
       <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
+      {audit.templateSnapshot?.standardSource&&<><StandardCover assessment={audit.standardAssessment}/><ServiceFollowUp direction="standard" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.auditType==='service'&&audit.templateSnapshot?.serviceSource&&<ServiceFollowUp auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}
       {audit.auditType==='hr'&&<HRAuditActions auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)}/>}
       {audit.auditType==='service'&&audit.serviceAssessment&&<section className="hr-section audit-hr-page"><h2>{t('serviceAudit.conclusion')}</h2><p>{audit.serviceDetails?.observations}</p><p>{audit.serviceDetails?.finalOpinion}</p>{audit.serviceAssessment.sections.map(s=><div className="detail-row" key={s.id}><strong>{s.title}</strong><span>{s.percentage===null?t('serviceAudit.notAssessed'):`${s.percentage.toFixed(1)}%`}</span><p>{audit.serviceDetails?.sectionNotes?.[s.id]}</p></div>)}</section>}
@@ -279,7 +281,7 @@ const AuditDetail: React.FC = () => {
         <div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.overallScore")}</h3>
-            {(audit.auditType==='hr'&&audit.hrAssessment||audit.auditType==='service'&&audit.serviceAssessment)?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
+            {(audit.auditType==='hr'&&audit.hrAssessment||audit.auditType==='service'&&audit.serviceAssessment||audit.standardAssessment)?<Badge tone="neutral">{audit.assessmentStatus==='scored'&&audit.overallPercentage!=null?`${audit.overallPercentage.toFixed(1)}%`:t('hrAudit.notAssessed')}</Badge>:<Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>}
           </div>
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.details")}</h3>
@@ -289,7 +291,7 @@ const AuditDetail: React.FC = () => {
             </div>
             <div className="detail-row">
               <dt>{t("auditFoundation.auditor")}</dt>
-              <dd>{auditor?.name ?? t("auditPresentation.unknown")}</dd>
+              <dd>{audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}</dd>
             </div>
             <div className="detail-row">
               <dt>{t("auditPresentation.type")}</dt>
@@ -325,9 +327,9 @@ const AuditDetail: React.FC = () => {
           </LazyAuditModule>
         )}
 
-        {renderedBusinessModules >= 4 && (
+        {renderedBusinessModules >= 4 && (!audit.templateSnapshot?.standardSource || audit.standardSubmission) && (
           <LazyAuditModule>
-            <AuditApprovalPanel auditId={String(audit.id)} />
+            <AuditApprovalPanel key={JSON.stringify([audit.id,audit.standardDetails?.naReasons])} auditId={String(audit.id)} standardNaReasons={audit.templateSnapshot?.standardSource?Object.fromEntries((audit.checks||[]).filter((a):a is {questionId:string;answer:'na'}=>typeof a==='object'&&a!==null&&'answer'in a&&a.answer==='na'&&'questionId'in a&&typeof a.questionId==='string').map(a=>[a.questionId||'',audit.standardDetails?.naReasons?.[a.questionId||'']||''])):undefined} />
           </LazyAuditModule>
         )}
 
