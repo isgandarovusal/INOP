@@ -2,7 +2,9 @@ name: Audit local release gate
 on:
   push:
     branches: [inop-main]
+    paths-ignore: ['docs/**']
   pull_request:
+    paths-ignore: ['docs/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -13,19 +15,36 @@ jobs:
   local-qa:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
     env:
       INOP_AUDIT_TEST_PORT: '27018'
       INOP_AUDIT_QA_CONTAINER: inop-audit-ci-qa
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
             Backend/package-lock.json
             Frontend/package-lock.json
-      - run: npm ci --prefix Backend && npm ci --prefix Frontend
+      - name: Reproducible locked installation
+        run: |
+          mkdir -p work/audit-ci
+          npm ci --prefix Backend 2>&1 | tee work/audit-ci/backend-install.log
+          npm ci --prefix Frontend 2>&1 | tee work/audit-ci/frontend-install.log
+      - name: Dependency security, full and production graphs
+        run: |
+          failed=0
+          for package in Backend Frontend; do
+            if ! npm audit --prefix "$package" --json > "work/audit-ci/$package-audit-full.json"; then failed=1; fi
+            if ! npm audit --prefix "$package" --omit=dev --json > "work/audit-ci/$package-audit-production.json"; then failed=1; fi
+          done
+          exit "$failed"
       - name: Native test prerequisites; no production credentials
         run: |
           sudo apt-get update
@@ -45,17 +64,34 @@ jobs:
           done
           exit 1
       - name: Every backend file, serial processes, bounded tests
-        run: npm test --prefix Backend
-      - run: npm run build --prefix Frontend && npm run lint --prefix Frontend
+        run: npm test --prefix Backend 2>&1 | tee work/audit-ci/backend.log
+      - name: Frontend build and lint
+        run: |
+          npm run build --prefix Frontend 2>&1 | tee work/audit-ci/build.log
+          npm run lint --prefix Frontend 2>&1 | tee work/audit-ci/lint.log
       - name: Browser runtime
         run: |
           cd Frontend
           npm exec -- playwright install --with-deps chromium
       - name: Audit browser, report, export and responsive gate
-        run: node Frontend/tests/runAuditBrowserSuite.cjs
+        run: node Frontend/tests/runAuditBrowserSuite.cjs 2>&1 | tee work/audit-ci/browser.log
       - name: Cleanup only owned QA container
         if: always()
         run: |
           if [ "$(docker inspect --format '{{ index .Config.Labels "inop.task" }}' "$INOP_AUDIT_QA_CONTAINER" 2>/dev/null)" = audit-ci ]; then
             docker rm -f -v "$INOP_AUDIT_QA_CONTAINER"
           fi
+      - name: Retain generated QA logs, never source documents or credentials
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: audit-qa-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            work/audit-ci/*.log
+            work/audit-ci/*.json
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Report gate result
+        if: always()
+        run: |
+          echo "Audit QA job status: ${{ job.status }}. See generated QA artifact and individual steps; this is not production approval." >> "$GITHUB_STEP_SUMMARY"
