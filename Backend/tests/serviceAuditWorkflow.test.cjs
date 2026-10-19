@@ -56,7 +56,7 @@ test('Service source provisioning, draft concurrency, evidence isolation, scorin
 }));
 
 test('Service N/A persists neutrally through submission, analytics, report, Excel and history',{timeout:90000},async()=>withAuditFixture(async h=>{
- const Restaurant=require('../models/restaurant.model'),XLSX=require('xlsx');
+ const Restaurant=require('../models/restaurant.model'),XLSX=require('./helpers/spreadsheet.cjs');
  for(const brand of ['pizza-hut','simit-sarayi','kfc']){
   assert.equal((await h.request('admin','POST',`/audit-service/templates/${brand}`,{})).status,201);
   const restaurantId=`na-${brand}`;await Restaurant.create({id:restaurantId,name:'Synthetic N/A restaurant',organizationId:'gfc',brandId:brand});
@@ -79,7 +79,7 @@ test('Service N/A persists neutrally through submission, analytics, report, Exce
    assert.equal(history.status,200);assert.equal(history.data.data[0].answers.filter(a=>a.answer==='na').length,answers.length-(mixed?3:0));
    const report=await h.request('admin','GET',`/audit-report/${auditId}`);assert.equal(report.status,200);assert.equal(report.data.data.score,mixed?50:null);
    const exported=await h.request('admin','GET',`/audit-export/${auditId}/excel`);assert.equal(exported.status,200);
-   const workbook=XLSX.read(exported.buffer,{type:'buffer'});
+   const workbook=await XLSX.read(exported.buffer,{type:'buffer'});
    const rows=XLSX.utils.sheet_to_json(workbook.Sheets['Service Criteria']);assert.equal(rows.filter(r=>r.Answer==='na').length,answers.length-(mixed?3:0));
    const source=XLSX.utils.sheet_to_json(workbook.Sheets['Service Source'])[0];assert.equal(source.OverallPercentage,mixed?50:'');
    const stats=await h.request('admin','GET',`/audit-service/analytics?brandId=${brand}`);assert.equal(stats.status,200);const data=stats.data.data;
@@ -150,7 +150,7 @@ test('KFC reviewed v2 coexists with immutable v1 revisions and safely preserves 
  const read=await h.request('admin','GET',`/audit-execution/${historical._id}`);assert.equal(read.status,200);assert.equal(read.data.data.overallPercentage,100);
  const historicalReport=await h.request('admin','GET',`/audit-report/${historicalParent._id}`);assert.equal(historicalReport.status,200);assert.equal(historicalReport.data.data.score,100);
  const historicalExport=await h.request('admin','GET',`/audit-export/${historicalParent._id}/excel`);assert.equal(historicalExport.status,200);
- const XLSX=require('xlsx'),workbook=XLSX.read(historicalExport.buffer,{type:'buffer'});assert.equal(XLSX.utils.sheet_to_json(workbook.Sheets['Service Source'])[0].OverallPercentage,100);
+ const XLSX=require('./helpers/spreadsheet.cjs'),workbook=await XLSX.read(historicalExport.buffer,{type:'buffer'});assert.equal(XLSX.utils.sheet_to_json(workbook.Sheets['Service Source'])[0].OverallPercentage,100);
  // Existing independent review/closure is not gated by the new questionnaire version.
  const reviewer=await h.models.User.create({name:'Historical Reviewer',email:'historical-reviewer@example.invalid',password:'synthetic',role:'admin',departmentId:'dep_A',isActive:true});
  h.tokens.reviewer=require('jsonwebtoken').sign({id:String(reviewer._id),role:'admin'},process.env.JWT_SECRET,{expiresIn:'1h'});

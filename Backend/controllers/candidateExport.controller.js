@@ -1,7 +1,7 @@
 const { logFailure } = require("../services/safeErrorLog.service");
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
-const XLSX = require("xlsx");
+const XLSX = require("../services/spreadsheet.service");
 
 const Candidate = require("../models/candidate.model");
 const Application = require("../models/application.model");
@@ -56,7 +56,7 @@ exports.exportCandidatesExcel = async (req, res) => {
       "Candidates"
     );
 
-    const buffer = XLSX.write(workbook, {
+    const buffer = await XLSX.write(workbook, {
       type: "buffer",
       bookType: "xlsx",
     });

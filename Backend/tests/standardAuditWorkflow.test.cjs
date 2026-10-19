@@ -1,7 +1,7 @@
 const{test}=require('node:test'),assert=require('node:assert/strict');
 const {withAuditFixture}=require('./helpers/auditFixture.cjs');const standard=require('../services/standardAuditAssessment.service');
 test('Three Standard catalogues: complete draft, source results, N/A, findings, analytics, export and immutable history',{timeout:120000},async()=>withAuditFixture(async h=>{
- const Restaurant=require('../models/restaurant.model'),XLSX=require('xlsx');
+ const Restaurant=require('../models/restaurant.model'),XLSX=require('./helpers/spreadsheet.cjs');
  for(const source of standard.sources){
   const p=await h.request('admin','POST',`/audit-standard/templates/${source.brandId}`,{});assert.equal(p.status,201,JSON.stringify(p.data));const p2=await h.request('admin','POST',`/audit-standard/templates/${source.brandId}`,{});assert.equal(p2.status,201,JSON.stringify(p2.data));assert.equal(p2.data.data.templateId,String(p.data.data.templateId));
   const restaurantId=`std-${source.brandId}`;await Restaurant.create({id:restaurantId,name:`Synthetic ${source.brandName}`,brandId:source.brandId,organizationId:'gfc',location:'Synthetic Area'});
@@ -20,7 +20,7 @@ test('Three Standard catalogues: complete draft, source results, N/A, findings, 
    assert.equal((await h.request('admin','POST','/audit-findings',{auditId:parent._id,title:'Injected finding',standardId:answers[0].questionId,severity:'critical'})).status,409);
    const findings=await h.models.Finding.find({auditId:parent._id}).lean();assert.equal(findings.length,allNA?0:4);assert.equal(new Set(findings.map(f=>f.code)).size,findings.length);assert.ok(findings.every(f=>f.standardId&&f.catalogVersion===source.version));
    const report=await h.request('admin','GET',`/audit-report/${parent._id}`);assert.equal(report.status,200);assert.equal(report.data.data.score,allNA?null:25);assert.equal(report.data.data.standard.assessment.na,answers.length-(allNA?0:4));
-   const exportFile=await h.request('admin','GET',`/audit-export/${parent._id}/excel`);assert.equal(exportFile.status,200,JSON.stringify(exportFile.data));const book=XLSX.read(exportFile.buffer,{type:'buffer'});for(const name of ['Cover','Findings','Standards','Actions','Approvals','Closures','History'])assert.ok(book.Sheets[name],name);
+   const exportFile=await h.request('admin','GET',`/audit-export/${parent._id}/excel`);assert.equal(exportFile.status,200,JSON.stringify(exportFile.data));const book=await XLSX.read(exportFile.buffer,{type:'buffer'});for(const name of ['Cover','Findings','Standards','Actions','Approvals','Closures','Audit History'])assert.ok(book.Sheets[name],name);
    const cover=XLSX.utils.sheet_to_json(book.Sheets.Cover)[0];assert.equal(cover.Total,answers.length);assert.equal(cover.Percentage,allNA?'':25);assert.equal(cover.NA,answers.length-(allNA?0:4));assert.equal(XLSX.utils.sheet_to_json(book.Sheets.Standards).length,answers.length);
    const history=await h.request('admin','GET',`/audit-execution/${e._id}/standard-history`);assert.equal(history.data.data.length,2);assert.equal(history.data.data[0].details.observations,details.observations);
    assert.equal((await h.request('admin','PUT',`/audit-execution/${e._id}/standard-draft`,{...payload,expectedVersion:2})).status,409);assert.equal((await h.request('admin','POST',`/audit-score/${parent._id}/calculate`,{})).status,409);
@@ -122,5 +122,5 @@ test('A scheduled audit records the actual submitting auditor and forbids contri
  assert.equal((await h.request('admin','PATCH',`/audit-approval/${independent.data.data._id}`,{status:'approved',naConfirmed:true})).status,200);
  const ownAnalytics=await h.request('admin','GET',`/audit-standard/analytics?auditorId=${h.actors.auditor._id}`);assert.equal(ownAnalytics.status,200);assert.equal(ownAnalytics.data.data.completed,1);
  const schedulerAnalytics=await h.request('admin','GET',`/audit-standard/analytics?auditorId=${h.actors.admin._id}`);assert.equal(schedulerAnalytics.data.data.completed,0);
- const XLSX=require('xlsx'),exported=await h.request('admin','GET',`/audit-export/${parent._id}/excel`);assert.equal(exported.status,200);const cover=XLSX.utils.sheet_to_json(XLSX.read(exported.buffer,{type:'buffer'}).Sheets.Cover)[0];assert.equal(cover.Auditor,'auditor');assert.equal(cover.CreatedBy,String(h.actors.admin._id));
+ const XLSX=require('./helpers/spreadsheet.cjs'),exported=await h.request('admin','GET',`/audit-export/${parent._id}/excel`);assert.equal(exported.status,200);const cover=XLSX.utils.sheet_to_json((await XLSX.read(exported.buffer,{type:'buffer'})).Sheets.Cover)[0];assert.equal(cover.Auditor,'auditor');assert.equal(cover.CreatedBy,String(h.actors.admin._id));
 }));

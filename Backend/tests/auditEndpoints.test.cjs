@@ -79,7 +79,7 @@ test('Audit lists, aggregates and child endpoints enforce their own permission s
       const response = await h.request(actor, 'GET', endpoint); assert.equal(response.status, permitted ? 200 : 403);
       if (permitted && endpoint.endsWith('/csv')) assert.ok(response.data.includes(String(audit._id)));
       if (permitted && endpoint.endsWith('/excel')) {
-        const XLSX = require('xlsx'), workbook = XLSX.read(response.buffer, { type: 'buffer' });
+        const XLSX = require('./helpers/spreadsheet.cjs'), workbook = await XLSX.read(response.buffer, { type: 'buffer' });
         const cells = workbook.SheetNames.map(name => XLSX.utils.sheet_to_csv(workbook.Sheets[name])).join('\n');
         assert.ok(cells.includes(String(audit._id)));
       }

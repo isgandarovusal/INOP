@@ -70,7 +70,7 @@ test('Simit Sarayı and KFC: safe template coexistence, concurrent drafts, evide
   assert.equal((await h.request('admin','PATCH',`/audit-workflow/${audit._id}/status`,{status:'completed'})).status,409);
   const completed=await h.request('admin','PUT',`/audit-execution/${id}/submit`,{...payload,expectedVersion:1});assert.equal(completed.status,200,JSON.stringify(completed.data));assert.equal(completed.data.data.overallPercentage,100);assert.equal(completed.data.data.hrDetails.evidenceLinks[0].evidenceId,String(own._id));assert.equal(completed.data.data.answers[0].score,1);
   const exported=await h.request('admin','GET',`/audit-export/${audit._id}/excel`);assert.equal(exported.status,200);
-  const XLSX=require('xlsx'),workbook=XLSX.read(exported.buffer,{type:'buffer'});assert.ok(workbook.SheetNames.includes('HR Criteria'));const rows=XLSX.utils.sheet_to_json(workbook.Sheets['HR Criteria']);assert.equal(rows.length,answers.length);assert.equal(rows[0].SourceCell,hr.contentFor(brand).sections[0].questions[0].sourceCell);
+  const XLSX=require('./helpers/spreadsheet.cjs'),workbook=await XLSX.read(exported.buffer,{type:'buffer'});assert.ok(workbook.SheetNames.includes('HR Criteria'));const rows=XLSX.utils.sheet_to_json(workbook.Sheets['HR Criteria']);assert.equal(rows.length,answers.length);assert.equal(rows[0].SourceCell,hr.contentFor(brand).sections[0].questions[0].sourceCell);
   const report=await h.request('admin','GET',`/audit-report/${audit._id}`);assert.equal(report.status,200);assert.equal(report.data.data.score,100);
   assert.equal((await h.request('admin','POST',`/audit-score/${audit._id}/calculate`,{})).status,409);
 
@@ -80,7 +80,7 @@ test('Simit Sarayı and KFC: safe template coexistence, concurrent drafts, evide
 }));
 
 test('HR N/A persists neutrally through submission, analytics, report, Excel and history',{timeout:90000},async()=>withAuditFixture(async h=>{
- const Restaurant=require('../models/restaurant.model'),XLSX=require('xlsx');
+ const Restaurant=require('../models/restaurant.model'),XLSX=require('./helpers/spreadsheet.cjs');
  for(const brand of ['pizza-hut','simit-sarayi','kfc']){
   assert.equal((await h.request('admin','POST',`/audit-hr/templates/${brand}`,{})).status,201);
   const restaurantId=`na-${brand}`;await Restaurant.create({id:restaurantId,name:'Synthetic N/A restaurant',organizationId:'gfc',brandId:brand});
@@ -103,7 +103,7 @@ test('HR N/A persists neutrally through submission, analytics, report, Excel and
    assert.equal(history.status,200);assert.equal(history.data.data[0].answers.filter(a=>a.answer==='na').length,answers.length-(mixed?3:0));
    const report=await h.request('admin','GET',`/audit-report/${auditId}`);assert.equal(report.status,200);assert.equal(report.data.data.score,mixed?50:null);
    const exported=await h.request('admin','GET',`/audit-export/${auditId}/excel`);assert.equal(exported.status,200);
-   const workbook=XLSX.read(exported.buffer,{type:'buffer'});
+   const workbook=await XLSX.read(exported.buffer,{type:'buffer'});
    const rows=XLSX.utils.sheet_to_json(workbook.Sheets['HR Criteria']);assert.equal(rows.filter(r=>r.Answer==='na').length,answers.length-(mixed?3:0));
    const source=XLSX.utils.sheet_to_json(workbook.Sheets['HR Source'])[0];assert.equal(source.OverallPercentage,mixed?50:'');
    const stats=await h.request('admin','GET',`/audit-hr/analytics?brandId=${brand}`);assert.equal(stats.status,200);const data=stats.data.data;

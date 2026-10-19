@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
-const XLSX = require("xlsx");
+const XLSX = require("../services/spreadsheet.service");
 
 const Audit = require("../models/audit.model");
 
@@ -357,13 +357,13 @@ exports.exportExcel = async (req, res) => {
        for(const section of snapshot.sections)history.push({...base,Kind:'section-details',Section:section.id,Note:v.details?.sectionNotes?.[section.id]||'',Photo:v.details?.sectionPhotos?.[section.id]||'',Percentage:v.assessment?.standardAssessment?.sections?.find(s=>s.id===section.id)?.percentage??''});
        for(const o of v.details?.criterionObservations||[])history.push({...base,Kind:'criterion-observation',StandardId:o.standardId,ObservationId:o.id,Note:o.description,EvidenceIds:o.evidenceIds.join(', ')});
       }
-      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(history),'History');
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.json_to_sheet(history),'Audit History');
     }
 
     await require('../services/hseAuditExport.service').append(XLSX,workbook,data);
     require('../services/auditReportExport.service').append(XLSX,workbook,data.bundle);
     require('../services/auditWorkbook.service').finalize(XLSX,workbook);
-    const buffer = XLSX.write(
+    const buffer = await XLSX.write(
       workbook,
       {
         type: "buffer",

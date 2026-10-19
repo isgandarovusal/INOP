@@ -1,0 +1,241 @@
+{
+  "provenance": {
+    "writer": "official xlsx@0.18.5",
+    "integrity": "matched pre-closure lockfile",
+    "synthetic": true
+  },
+  "rows": [
+    {
+      "Id": "synthetic-001",
+      "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+      "Answer": "na",
+      "Percentage": "",
+      "Score": 0,
+      "Half": 0.5,
+      "Passed": false,
+      "Date": "2026-10-16T10:11:12.000Z",
+      "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+      "Photo": "evidence-synthetic",
+      "Document1": "doc-a",
+      "Document2": "doc-b",
+      "Document3": "doc-c"
+    },
+    {
+      "Id": "synthetic-002",
+      "Text": "Uzun qeyd\nİkinci sətir",
+      "Answer": "1",
+      "Percentage": 100,
+      "Score": 1,
+      "Half": 0,
+      "Passed": true,
+      "Date": "2026-10-17T00:00:00.000Z",
+      "FormulaText": "@SUM(A1)",
+      "Photo": "",
+      "Document1": "",
+      "Document2": "",
+      "Document3": ""
+    }
+  ],
+  "names": [
+    "HR Criteria",
+    "Service Criteria",
+    "Standards",
+    "COVER",
+    "Office Results",
+    "Warehouse Results"
+  ],
+  "expected": {
+    "HR Criteria": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ],
+    "Service Criteria": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ],
+    "Standards": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ],
+    "COVER": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ],
+    "Office Results": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ],
+    "Warehouse Results": [
+      {
+        "Id": "synthetic-001",
+        "Text": "Peşəkar ƏM — AZ/EN/RU Русский",
+        "Answer": "na",
+        "Percentage": "",
+        "Score": 0,
+        "Half": 0.5,
+        "Passed": false,
+        "Date": "2026-10-16T10:11:11.999Z",
+        "FormulaText": "=HYPERLINK(\"https://example.invalid\",\"literal\")",
+        "Photo": "evidence-synthetic",
+        "Document1": "doc-a",
+        "Document2": "doc-b",
+        "Document3": "doc-c"
+      },
+      {
+        "Id": "synthetic-002",
+        "Text": "Uzun qeyd\nİkinci sətir",
+        "Answer": "1",
+        "Percentage": 100,
+        "Score": 1,
+        "Half": 0,
+        "Passed": true,
+        "Date": "2026-10-17T00:00:00.000Z",
+        "FormulaText": "@SUM(A1)",
+        "Photo": "",
+        "Document1": "",
+        "Document2": "",
+        "Document3": ""
+      }
+    ]
+  }
+}
