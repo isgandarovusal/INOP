@@ -42,7 +42,7 @@ exports.getTemplates = async (req, res) => {
       }))
     );
   } catch (error) {
-    console.error('getTemplates error:', error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: 'Audit template-ləri yükləmək mümkün olmadı.',
     });
@@ -67,7 +67,7 @@ exports.getTemplateById = async (req, res) => {
 
     res.json(normalizeTemplate(template));
   } catch (error) {
-    console.error('getTemplateById error:', error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: 'Audit template yüklənə bilmədi.',
     });
@@ -124,15 +124,12 @@ exports.createTemplate = async (req, res) => {
         description: `Audit template yaradıldı: ${template.name} (${template.auditType})`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit template create activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     res.status(201).json(normalizeTemplate(template));
   } catch (error) {
-    console.error('createTemplate error:', error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(error.status || 500).json({
       message: error.status ? error.message : 'Audit template yaratmaq mümkün olmadı.',
     });
@@ -191,15 +188,12 @@ exports.updateTemplate = async (req, res) => {
         description: `Audit template yeniləndi: ${template.name} (${template.auditType})`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit template update activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     res.json(normalizeTemplate(template));
   } catch (error) {
-    console.error('updateTemplate error:', error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: 'Audit template yenilənə bilmədi.',
     });
@@ -235,10 +229,7 @@ exports.deleteTemplate = async (req, res) => {
         description: `Audit template silindi: ${template.name} (${template.auditType})`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit template delete activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     res.json({
@@ -246,7 +237,7 @@ exports.deleteTemplate = async (req, res) => {
       id: req.params.id,
     });
   } catch (error) {
-    console.error('deleteTemplate error:', error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: 'Audit template silinə bilmədi.',
     });

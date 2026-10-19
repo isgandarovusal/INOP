@@ -86,7 +86,7 @@ exports.getAuditReport = async (req, res) => {
       data: report,
     });
   } catch (error) {
-    console.error("Audit report error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(error.status || 500).json({
       success: false,

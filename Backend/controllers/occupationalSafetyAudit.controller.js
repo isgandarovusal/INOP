@@ -32,7 +32,7 @@ exports.getOccupationalSafetyAudits = async (req, res) => {
       data: audits,
     });
   } catch (error) {
-    console.error("Occupational safety audit list error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -103,10 +103,7 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
         description: `Əməyin mühafizəsi auditi yaradıldı: ${audit.id || audit._id}`,
       });
     } catch (activityError) {
-      console.error(
-        "Occupational safety audit activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     return res.status(201).json({
@@ -114,7 +111,7 @@ exports.createOccupationalSafetyAudit = async (req, res) => {
       data: audit,
     });
   } catch (error) {
-    console.error("Create safety audit error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     if (error?.code === 11000) {
       return res.status(409).json({

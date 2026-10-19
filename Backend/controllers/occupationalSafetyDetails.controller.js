@@ -43,7 +43,7 @@ exports.getSafetyDetails = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get safety details error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -117,10 +117,7 @@ exports.updateSafetyDetails = async (req, res) => {
         description: `Əməyin mühafizəsi auditinin safety məlumatları yeniləndi: ${audit.id || audit._id}`,
       });
     } catch (activityError) {
-      console.error(
-        "Occupational safety details activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     return res.json({
@@ -128,7 +125,7 @@ exports.updateSafetyDetails = async (req, res) => {
       data: audit.safetyDetails,
     });
   } catch (error) {
-    console.error("Update safety details error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,

@@ -39,7 +39,7 @@ exports.getFindings = async (req, res) => {
       data,
     });
   } catch (error) {
-    console.error("Get findings error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,

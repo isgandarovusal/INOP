@@ -39,10 +39,7 @@ exports.assignAudit = async (req, res) => {
         description: "Audit auditor-a təyin edildi",
       });
     } catch (activityError) {
-      console.error(
-        "Audit assignment activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     await notifyUser({
@@ -60,7 +57,7 @@ exports.assignAudit = async (req, res) => {
     });
 
   } catch (e) {
-    console.error(e);
+    require('../services/safeErrorLog.service').logFailure(e);
 
     res.status(e.status || (e.code === 11000 ? 409 : 500)).json({
       success: false,
@@ -83,7 +80,7 @@ exports.getAssignments = async (req, res) => {
     });
 
   } catch (e) {
-    console.error(e);
+    require('../services/safeErrorLog.service').logFailure(e);
 
     res.status(500).json({
       success: false,

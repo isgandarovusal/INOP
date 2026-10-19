@@ -14,7 +14,7 @@ exports.resolveApprovalParent = async (req, res, next) => {
     req.auditScopeId = String(approval.auditId);
     next();
   } catch (error) {
-    console.error("Approval parent error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
     return res.status(500).json({ message: "Approval parent yoxlanıla bilmədi." });
   }
 };

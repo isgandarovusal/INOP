@@ -157,10 +157,7 @@ trend
 }catch(error){
 
 
-console.error(
-"Audit dashboard error",
-error
-);
+require('../services/safeErrorLog.service').logFailure(error);
 
 
 res.status(error.status||500).json({

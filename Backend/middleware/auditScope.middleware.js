@@ -107,7 +107,7 @@ exports.requireAssignedAuditAccess = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    console.error("Audit scope check error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -216,7 +216,7 @@ exports.requireAuditAccess = async (req, res, next) => {
     req.auditScopeId = String(audit._id);
     next();
   } catch (error) {
-    console.error("Audit access error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
     return res.status(500).json({ message: "Audit scope yoxlanıla bilmədi." });
   }
 };
@@ -238,7 +238,7 @@ exports.requireAuditParentAccess = (req, res, next) => exports.requireAuditAcces
     if (req.body?.auditId) req.body.auditId = req.auditScopeId;
     next();
   } catch (error) {
-    console.error("Audit parent check error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
     return res.status(500).json({ message: "Audit əlaqəsi yoxlanıla bilmədi." });
   }
 });

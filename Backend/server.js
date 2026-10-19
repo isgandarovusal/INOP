@@ -1,3 +1,4 @@
+require('./services/fatalError.service').install();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,6 +16,7 @@ const {
 
 const app = express();
 configureTrustedProxy(app);
+app.use(require('./middleware/operationalTelemetry.middleware').createTelemetry({enabled:process.env.API_REQUEST_LOG_ENABLED==='true'}).middleware);
 const PORT = process.env.PORT || 3001;
 
 // Security Middlewares
@@ -36,6 +38,8 @@ app.use('/uploads', require('./routes/privateUpload.routes'));
 app.get('/health', (_req, res) => {
   res.status(200).json({ success: true, status: 'ok' });
 });
+
+app.get('/ready',require('./services/readiness.service').createHandler());
 
 // Swagger
 setupSwagger(app);
@@ -66,4 +70,4 @@ mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
     }
     app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
   })
-  .catch((err) => console.error('Failed to connect to MongoDB:', err));
+  .catch((err) => { require('./services/safeErrorLog.service').logFailure(err);process.exitCode=1; });

@@ -81,7 +81,7 @@ async function getAudits(req, res) {
     res.json(audits);
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });
-    console.error("Failed to fetch audits:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: "Failed to fetch audits",
     });
@@ -109,7 +109,7 @@ async function getAuditById(req, res) {
 
     res.json(audit);
   } catch (error) {
-    console.error("Failed to fetch audit:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
     res.status(500).json({
       message: "Failed to fetch audit",
     });
@@ -138,16 +138,13 @@ async function createAudit(req, res) {
           description: `Servis auditi yaradıldı: ${audit.id}`,
         });
       } catch (logError) {
-        console.error(
-          "Failed to create activity log for audit:",
-          logError
-        );
+        require('../services/safeErrorLog.service').logFailure(logError);
       }
     }
 
     res.status(201).json(audit);
   } catch (error) {
-    console.error("Failed to create audit:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     if (error.status) return res.status(error.status).json({ message: error.message });
     if (error.code === 11000) {
@@ -218,17 +215,14 @@ async function updateAudit(req, res) {
           description: `Servis auditi yeniləndi: ${audit.id}`,
         });
       } catch (logError) {
-        console.error(
-          "Failed to create activity log for audit:",
-          logError
-        );
+        require('../services/safeErrorLog.service').logFailure(logError);
       }
     }
 
     res.json(audit);
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });
-    console.error("Failed to update audit:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -276,10 +270,7 @@ async function deleteAudit(req, res) {
           description: `Servis auditi silindi: ${audit.id}`,
         });
       } catch (logError) {
-        console.error(
-          "Failed to create activity log for audit:",
-          logError
-        );
+        require('../services/safeErrorLog.service').logFailure(logError);
       }
     }
 
@@ -288,7 +279,7 @@ async function deleteAudit(req, res) {
     });
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });
-    console.error("Failed to delete audit:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(500).json({
       message: "Failed to delete audit",
@@ -573,10 +564,7 @@ async function getAuditAnalytics(req, res) {
       historicalTrend,
     });
   } catch (error) {
-    console.error(
-      "Failed to calculate audit analytics:",
-      error
-    );
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(500).json({
       message: "Failed to calculate audit analytics",

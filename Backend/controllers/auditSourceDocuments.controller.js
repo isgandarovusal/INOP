@@ -65,10 +65,7 @@ exports.getDocuments = async (req, res) => {
 
   } catch(error) {
 
-    console.error(
-      "getDocuments error:",
-      error
-    );
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status||500).json({
       message:
@@ -159,10 +156,7 @@ exports.uploadDocument = async (req, res) => {
         description: `Audit source document yükləndi: ${document.originalName || document.name || document.id}`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit source document activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
 
@@ -173,10 +167,7 @@ exports.uploadDocument = async (req, res) => {
 
   } catch(error) {
 
-    console.error(
-      "uploadDocument error:",
-      error
-    );
+    require('../services/safeErrorLog.service').logFailure(error);
 
 
     res.status(error.status||500).json({
@@ -218,10 +209,7 @@ exports.deleteDocument = async(req,res)=>{
         description: `Audit source document silindi: ${document.originalName || document.name || document.id}`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit source document activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
 
@@ -233,7 +221,7 @@ exports.deleteDocument = async(req,res)=>{
 
   } catch(error){
 
-    console.error(error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status||500).json({
       message:

@@ -102,7 +102,7 @@ exports.login = async (req, res) => {
       user: await publicUser(user, permissions),
     });
   } catch (error) {
-    console.error("Auth login error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       message: "Login zamanı server xətası baş verdi.",
@@ -126,7 +126,7 @@ exports.me = async (req, res) => {
       user: await publicUser(user, permissions),
     });
   } catch (error) {
-    console.error("Auth me error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       message: "İstifadəçi məlumatları alınarkən server xətası baş verdi.",
@@ -166,7 +166,7 @@ exports.logout = async (req, res) => {
       message: "Logout uğurla tamamlandı.",
     });
   } catch (error) {
-    console.error("Auth logout error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       message: "Logout zamanı server xətası baş verdi.",

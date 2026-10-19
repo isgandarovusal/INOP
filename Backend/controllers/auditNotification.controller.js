@@ -25,7 +25,7 @@ exports.getNotifications = async (req, res) => {
       data: notifications,
     });
   } catch (error) {
-    console.error("Get notifications error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -127,10 +127,7 @@ exports.createNotification = async (req, res) => {
         description: `Audit notification yaradıldı: ${notificationResult.notification?.title || req.body.title || "Bildiriş"}`,
       });
     } catch (activityError) {
-      console.error(
-        "Audit notification activity log error:",
-        activityError
-      );
+      require('../services/safeErrorLog.service').logFailure(activityError);
     }
 
     return res.status(201).json({
@@ -139,7 +136,7 @@ exports.createNotification = async (req, res) => {
       email: notificationResult.email,
     });
   } catch (error) {
-    console.error("Create notification error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -185,7 +182,7 @@ exports.markRead = async (req, res) => {
       data: notification,
     });
   } catch (error) {
-    console.error("Mark notification read error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,

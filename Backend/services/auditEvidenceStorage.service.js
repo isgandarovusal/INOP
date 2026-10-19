@@ -53,6 +53,7 @@ function createPrivateStore(adapter,{timeoutMs=8000}={}){
   put:async(input,bytes)=>{
    reference({...input,version:'pending'});const snapshot=Buffer.from(bytes);if(input.provider!==adapter.id||snapshot.length!==input.size||hash(snapshot)!==input.sha256)throw error('AUDIT_STORAGE_IDENTITY_MISMATCH',409);
    const receipt=await operation(signal=>adapter.put({key:input.key,bytes:snapshot,mimeType:input.mimeType,sha256:input.sha256,ifAbsent:true,signal}));
+   if(!receipt||typeof receipt!=='object'||typeof receipt.version!=='string'||!receipt.version||receipt.version.length>128||Array.from(receipt.version).some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127))throw error('AUDIT_STORAGE_INVALID_RECEIPT');
    const ref=reference({...input,version:receipt.version});if(receipt.private!==true)throw error('AUDIT_STORAGE_NOT_PRIVATE');await get(ref);return ref;
   },
   remove:value=>operation(signal=>{const ref=reference(value);if(ref.provider!==adapter.id)throw error('AUDIT_STORAGE_INVALID_REFERENCE',400);return adapter.remove({key:ref.key,version:ref.version,signal});}),

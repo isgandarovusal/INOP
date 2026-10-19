@@ -50,7 +50,7 @@ exports.getStandardAudits = async (req, res) => {
       data: audits,
     });
   } catch (error) {
-    console.error("Standard audit error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(500).json({
       success: false,
@@ -76,7 +76,7 @@ exports.getServiceAudits = async (req, res) => {
       data: audits,
     });
   } catch (error) {
-    console.error("Service audit error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(500).json({
       success: false,

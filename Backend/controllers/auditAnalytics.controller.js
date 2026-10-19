@@ -55,7 +55,7 @@ exports.getSummary = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit summary analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,
@@ -97,7 +97,7 @@ exports.getByType = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit type analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,
@@ -145,7 +145,7 @@ exports.getTrend = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Audit trend analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,
@@ -294,7 +294,7 @@ exports.getServiceAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Service analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,
@@ -425,7 +425,7 @@ exports.getStandardAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Standard analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,
@@ -594,7 +594,7 @@ exports.getSafetyAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Safety analytics error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     res.status(error.status || 500).json({
       success: false,

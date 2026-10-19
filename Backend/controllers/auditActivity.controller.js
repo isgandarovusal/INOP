@@ -39,7 +39,7 @@ const createAuditActivity = async ({
       metadata,
     });
   } catch (error) {
-    console.error("Audit activity creation error:", error.message);
+    require('../services/safeErrorLog.service').logFailure(error);
     return null;
   }
 };
@@ -100,7 +100,7 @@ const getAuditHistory = async (req, res) => {
       data: activities,
     });
   } catch (error) {
-    console.error("Get audit history error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -146,7 +146,7 @@ const createActivity = async (req, res) => {
       data: activity,
     });
   } catch (error) {
-    console.error("Create audit activity error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
@@ -196,7 +196,7 @@ const getAuditTimeline = async (req, res) => {
       data: activities,
     });
   } catch (error) {
-    console.error("Get audit timeline error:", error);
+    require('../services/safeErrorLog.service').logFailure(error);
 
     return res.status(500).json({
       success: false,
