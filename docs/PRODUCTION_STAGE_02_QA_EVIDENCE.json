@@ -1,0 +1,180 @@
+{
+  "observedAt": "2026-10-19T15:17:01.627519+04:00",
+  "baseLocalCommit": "517ba41231ae245df64320968840c4d596ba0174",
+  "baseGithubCommit": "72b114fd1c193bfa2529f4569ecd35d7e5f2ee4d",
+  "productionWrites": 0,
+  "productionActivated": false,
+  "backend": {
+    "tests": 2018,
+    "pass": 2018,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "backendTestFiles": 120,
+  "backendDurationMs": 438142.113609,
+  "browser": {
+    "pass": 41,
+    "fail": 0,
+    "skip": 0,
+    "cancelled": 0,
+    "groups": [
+      2,
+      3,
+      8,
+      4,
+      1,
+      2,
+      1,
+      20
+    ],
+    "auditPass": 21,
+    "recruitmentPass": 20,
+    "matrices": {
+      "center": 36,
+      "report": 72,
+      "visual": 100
+    },
+    "locales": [
+      "az",
+      "en",
+      "ru"
+    ],
+    "viewports": [
+      320,
+      390,
+      768,
+      1440
+    ]
+  },
+  "build": "PASS",
+  "frontendLint": {
+    "errors": 0,
+    "existingWarnings": 9
+  },
+  "backendLint": {
+    "files": 18,
+    "errors": 0
+  },
+  "dependencyAudits": {
+    "Backend-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Backend-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Frontend-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Frontend-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "testedProductFileSha256": {
+    "Backend/.env.production.example": "796bb7bf93db825642f86936c1505000aac9d09bc48b7c453d7309828e831a0f",
+    "Backend/controllers/hrAudit.controller.js": "aa1ea0d43d2e353d5cb8f3dfbe7b713c8a582daacb8e13077b35196eb9c8813a",
+    "Backend/controllers/serviceAudit.controller.js": "1218b34599212b825ab9c45e0246ee805f8d7da7bb7cdadf2589d3fa35765682",
+    "Backend/server.js": "60e1ff94c0e92e1d8bcd1abc4d3a7685cfe99c8d74dc985ab04a08d73915c6d4",
+    "Backend/services/auditEvidenceStorage.service.js": "9986b14446834ef2d3756d02247d50171fc3f6eb150a347119b1212de2e177f6",
+    "Backend/services/auditProvisionPlan.service.js": "fa4fb0bb93d079d9d4e5f62dc4b7433902ab9b2c3cd622d27755713f8318dc5e",
+    "Backend/services/auditS3Adapter.service.js": "b8d0a2128a8e60ac45507673f0c10162675b89f1823f88a66535ab98ba9c9e20",
+    "Backend/services/auditStorageBootstrap.service.js": "55ba30387f15474f45d10bfae511c025b0d06af8e18c841a05f193f051dba361",
+    "Backend/services/hrPrivateObjectStorage.service.js": "c6fa5b6c5e80be2ce2a4248a9b4f044c6bd8f04b1120331c85c7df52186c8c7e",
+    "Backend/services/operationalRoutes.service.js": "c1ccc5a5a6a06cd8f4bcee62451b6fac59b3092dfb68bd6810beeeebc48cf042",
+    "Backend/services/readiness.service.js": "09923c9ddce89ebe277a4786854a6430bc0e0e03f9667d547de112c266ab124e",
+    "Backend/services/runtimeConfiguration.service.js": "3f7b1e46fd985df637e9204798325911f09b630c1627255f5a23f033ea635431",
+    "Backend/tests/auditProvisionActivation.test.cjs": "9e245015fd1959bd7041aac07443650994308f061d5b91892f22af9a2ff71a4e",
+    "Backend/tests/auditProvisionPlan.test.cjs": "bdb15b1de8a38900be785fda16bd063ab8aa44589104ea7194d106fce64089e5",
+    "Backend/tests/auditS3Adapter.test.cjs": "890f5ba7d1de0981d8b5e91a02d0cb8aa19fdfce675b190468f6ae698e222fdf",
+    "Backend/tests/auditS3Integration.test.cjs": "04672acb99168e16ac2c4510d2d833cce68812088fd20b069fa19cf558ab94d3",
+    "Backend/tests/helpers/auditS3Protocol.cjs": "2eb6c177e2cfa89d83822aed42447f44cc40a4f7cd14b87a8ac39d95502534c8",
+    "Backend/tests/hrNativeReleaseGate.test.cjs": "78a56b608440368d87400e6c06f41ad9a238cb5bbb41f36a3597b504baebf370",
+    "Backend/tests/runtimeConfiguration.test.cjs": "511304e09b9152ce5641c0083f945301cc2a88d35a25cf67d073cb31a0c74858"
+  },
+  "evidenceSha256": {
+    "backend-final.log": "8d80b2023619e64c85e3d79c00441b9655d4806577c2ca8853bf49ad8ce1be7d",
+    "build.log": "816def3509871d7e88f47d1df28e10ff214230764d78bd9f250c899a0cc07fa7",
+    "frontend-lint.log": "82c15b11f1d2f0cc82b230bbba08f8c15700d0470f18f8cb9de3ec4b42bd150f",
+    "backend-lint-all-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "provision-final.json": "027d4f010262d7293c8edb212717f324a1f2852f27aa09f3b31eeb158371c013",
+    "index-final.json": "afa5988df5f2ce7402e85e02ee5a3b29d60d04b923cdba53148dda7d9856c2a6",
+    "live-probes.json": "8c686f28b560f5a5f8c720c14a10ce52699d4f2c2a9afb8b12d57ac13689d8e2",
+    "browser-final.log": "46475073437f614397c40f7684b1e5a8b3e7cf9392ea1cfd6958f9f74b1c6112",
+    "live-final-probes.json": "def7457c68b54dc70e17c7a4c03e3dfdea99327ccf42c26c5efeb8a84124fe69",
+    "github-head-final.txt": "f419db542636903ef35d43a2d259a98790e895e068dc9aa7af439e316fc6d92a"
+  },
+  "publicProductionReadOnlyProbes": [
+    {
+      "route": "/health",
+      "method": "GET",
+      "observedAt": "2026-10-19T15:12:23.166692+04:00",
+      "errorType": "TimeoutError"
+    },
+    {
+      "route": "/ready",
+      "method": "GET",
+      "observedAt": "2026-10-19T15:12:35.220596+04:00",
+      "errorType": "TimeoutError"
+    },
+    {
+      "route": "/version",
+      "method": "GET",
+      "observedAt": "2026-10-19T15:12:47.255985+04:00",
+      "status": 404,
+      "safeResponse": {
+        "success": false
+      },
+      "runtimeSha": null
+    },
+    {
+      "route": "/health",
+      "attempt": 2,
+      "method": "GET",
+      "observedAt": "2026-10-19T15:13:27.952609+04:00",
+      "status": 200,
+      "safeResponse": {
+        "success": true,
+        "status": "ok"
+      }
+    },
+    {
+      "route": "/ready",
+      "attempt": 2,
+      "method": "GET",
+      "observedAt": "2026-10-19T15:13:28.185732+04:00",
+      "status": 404,
+      "safeResponse": {
+        "success": false
+      }
+    }
+  ],
+  "liveBackendSha": "UNVERIFIED",
+  "sourceFamiliesUnchanged": 12,
+  "offlineProvisionFamiliesPass": 12,
+  "offlineIndexesPass": 7,
+  "offlineWrites": 0,
+  "githubHeadVerified": "72b114fd1c193bfa2529f4569ecd35d7e5f2ee4d",
+  "githubPushPerformed": false,
+  "newCodeHostedCi": "NOT TESTED",
+  "productionReadiness": "BLOCKED"
+}
