@@ -1,0 +1,223 @@
+{
+  "observedAt": "2026-10-19T07:20:02.301Z",
+  "sourceCommit": "72b114fd1c193bfa2529f4569ecd35d7e5f2ee4d",
+  "productionAccess": false,
+  "hostedCi": {
+    "runId": 39212246965,
+    "status": "completed",
+    "conclusion": "success",
+    "testedSha": "1d8cc8871a0ca0849dd1f814d3095bc86c4d1384",
+    "baseDiffOnlyDocs": true,
+    "newFullSuiteRun": false
+  },
+  "targetedQa": {
+    "tests": 16,
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "cancelled": 0
+  },
+  "backupRestore": {
+    "collections": 15,
+    "documents": 45,
+    "digestVerified": true,
+    "indexesVerified": true,
+    "evidenceHashVerified": true,
+    "productionVerified": false
+  },
+  "indexRehearsal": {
+    "productionAccess": false,
+    "documentsPerCollection": 1000,
+    "indexes": [
+      {
+        "name": "audit_source_latest_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 500,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_direction_date_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 501,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_restaurant_direction_date_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 501,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_hse_object_date_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 501,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_action_status_due_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 500,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_finding_status_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 500,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      },
+      {
+        "name": "audit_evidence_parent_v1",
+        "matchingDocuments": 500,
+        "documentsExamined": 500,
+        "keysExamined": 500,
+        "hintedIndexVerified": true,
+        "resultPreserved": true
+      }
+    ],
+    "writeSamples": [
+      {
+        "model": "auditExecution",
+        "phase": "before-index",
+        "documents": 1000,
+        "elapsedMs": 36
+      },
+      {
+        "model": "audit",
+        "phase": "before-index",
+        "documents": 1000,
+        "elapsedMs": 22
+      },
+      {
+        "model": "auditAction",
+        "phase": "before-index",
+        "documents": 1000,
+        "elapsedMs": 20
+      },
+      {
+        "model": "auditFinding",
+        "phase": "before-index",
+        "documents": 1000,
+        "elapsedMs": 19
+      },
+      {
+        "model": "auditEvidence",
+        "phase": "before-index",
+        "documents": 1000,
+        "elapsedMs": 16
+      },
+      {
+        "model": "auditExecution",
+        "phase": "after-index",
+        "documents": 1000,
+        "elapsedMs": 16
+      },
+      {
+        "model": "audit",
+        "phase": "after-index",
+        "documents": 1000,
+        "elapsedMs": 17
+      },
+      {
+        "model": "auditAction",
+        "phase": "after-index",
+        "documents": 1000,
+        "elapsedMs": 17
+      },
+      {
+        "model": "auditFinding",
+        "phase": "after-index",
+        "documents": 1000,
+        "elapsedMs": 16
+      },
+      {
+        "model": "auditEvidence",
+        "phase": "after-index",
+        "documents": 1000,
+        "elapsedMs": 14
+      }
+    ],
+    "rollbackVerified": true
+  },
+  "offlinePlans": {
+    "provisionFamilies": 12,
+    "indexPlans": 7,
+    "filledStatus": "PASS",
+    "writes": 0,
+    "syntheticInput": true,
+    "emptyInventoryExitCodes": {
+      "provision": 2,
+      "index": 2
+    }
+  },
+  "publicHttpObservations": [
+    {
+      "url": "https://inop-backend.onrender.com/health",
+      "origin": "https://inop-ruby.vercel.app",
+      "observedAt": "2026-10-19T07:17:50.320229+00:00",
+      "method": "GET",
+      "errorType": "TimeoutError"
+    },
+    {
+      "url": "https://inop-backend.onrender.com/health",
+      "origin": "https://unauthorized.invalid",
+      "observedAt": "2026-10-19T07:18:15.385845+00:00",
+      "method": "GET",
+      "httpStatus": 200,
+      "headers": {
+        "server": "envoy",
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "safeResponse": {
+        "success": true,
+        "status": "ok"
+      }
+    },
+    {
+      "url": "https://inop-backend.onrender.com/ready",
+      "origin": null,
+      "observedAt": "2026-10-19T07:18:22.822974+00:00",
+      "method": "GET",
+      "httpStatus": 404,
+      "headers": {
+        "server": "envoy",
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8"
+      },
+      "safeResponse": {
+        "success": false
+      }
+    },
+    {
+      "url": "https://inop-ruby.vercel.app/",
+      "origin": null,
+      "observedAt": "2026-10-19T07:18:23.052208+00:00",
+      "method": "GET",
+      "httpStatus": 200,
+      "headers": {
+        "server": "envoy",
+        "access-control-allow-origin": "*",
+        "content-type": "text/html; charset=utf-8"
+      }
+    }
+  ],
+  "evidenceSha256": {
+    "targeted-qa.log": "11d8b4f7355c6ec8ae5fccecef3aabf65b62bce10ac9afd820fda309f1890ce9",
+    "index-rehearsal.json": "f58fe112e2776ea63f4812fd539c449e59de78f7f6b94bd9b8d704bd3c71a3f7",
+    "public-observations.json": "14c89cd3137d3d69b34b7c79883fb0c4b8efa46eafa948ccd2aa509ffb7c6e3f",
+    "provision-filled-plan.json": "027d4f010262d7293c8edb212717f324a1f2852f27aa09f3b31eeb158371c013",
+    "index-filled-plan.json": "afa5988df5f2ce7402e85e02ee5a3b29d60d04b923cdba53148dda7d9856c2a6"
+  }
+}
