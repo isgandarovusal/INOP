@@ -63,54 +63,12 @@ exports.create=async(req,res)=>{
  }catch(e){fail(res,e);}
 };
 exports.analytics=async(req,res)=>{
- try{
+ try{const authority=await require('../services/auditAnalyticsAuthority.service').capture(req);
   const filter=await require('./auditDirectionAnalytics.controller').filterFor({user:req.user,auditorProfile:req.auditorProfile,permission:req.permission,query:req.query,params:{direction:'service'}});
   const parts=[filter,{auditType:'service'}];
   const scalar=k=>require('../services/auditQuery.service').scalar(req.query[k],k);const auditor=scalar('auditorId'),sectionId=scalar('sectionId');if(auditor)parts.push({auditorId:auditor});if(sectionId)parts.push({'templateSnapshot.sections.id':sectionId});
   if(req.query.status){if(!['draft','scheduled','in-progress','completed','cancelled','failed'].includes(req.query.status))throw auditError(400,'Unknown Service audit status.');parts.push({status:req.query.status});}
-  const audits=await Audit.find({$and:parts}).select('_id restaurantId auditorId date status templateSnapshot.brandId').limit(5001).maxTimeMS(5000).lean();
-  if(audits.length>5000)throw auditError(422,'Narrow the Service analytics date range (maximum 5000 audits).');
-  const ids=audits.map(a=>a._id),parents=new Map(audits.map(a=>[String(a._id),a]));
-  const executions=await require('../models/auditExecution.model').find({auditId:{$in:ids},status:'completed','templateSnapshot.auditType':'service'}).select('auditId templateSnapshot.brandId templateSnapshot.serviceSource templateSnapshot.sections serviceAssessment overallPercentage answers').limit(5001).maxTimeMS(5000).lean();
-  if(executions.length>5000)throw auditError(422,'Narrow the Service analytics date range.');
-  const groups={brands:new Map(),restaurants:new Map(),sections:new Map(),criteria:new Map(),trend:new Map()};
-  const add=(map,id,label,score)=>{if(!map.has(id))map.set(id,{id,label,count:0,scored:0,sum:0});const row=map.get(id);row.count++;if(typeof score==='number'&&Number.isFinite(score)){row.scored++;row.sum+=score;}return row;};
-  let sum=0,scored=0,nonconformities=0,legacyConformityExclusions=0;
-  const seen=new Set();
-  for(const row of executions){
-   // Stored server assessment only. Never recalculate historical answers.
-   if(seen.has(String(row.auditId))||!row.templateSnapshot?.serviceSource||!row.serviceAssessment?.complete)continue;seen.add(String(row.auditId));
-   const parent=parents.get(String(row.auditId));const source=hr.sourceFor(row.templateSnapshot.brandId,row.templateSnapshot.serviceSource.version);
-   if(!source)continue;
-   const score=row.overallPercentage;
-   if(typeof score==='number'&&Number.isFinite(score)){sum+=score;scored++;}
-   add(groups.brands,source.brandId,source.brandName,score);add(groups.restaurants,parent.restaurantId,parent.restaurantId,score);add(groups.trend,parent.date.slice(0,7),parent.date.slice(0,7),score);
-   for(const section of row.serviceAssessment.sections||[])if(!sectionId||section.id===sectionId)add(groups.sections,`${source.brandId}:${section.id}`,section.title,section.percentage);
-   for(const answer of row.answers||[]){
-    const q=row.templateSnapshot.sections.flatMap(s=>s.questions).find(q=>q.id===answer.questionId);if(!q||sectionId&&!row.templateSnapshot.sections.find(s=>s.id===sectionId)?.questions.some(x=>x.id===q.id))continue;
-    // Preserve historical totals, but never label an old negative answer as new conformity.
-    if(hr.needsConformityReview(row.templateSnapshot)&&q.id===hr.NEGATIVE_CRITERION){if(['0','0.5','1'].includes(answer.answer))legacyConformityExclusions++;continue;}
-    const rawValue=['0','0.5','1'].includes(answer.answer)?Number(answer.answer):null;
-    const value=rawValue!==null&&typeof answer.score==='number'&&[0,0.5,1].includes(answer.score)?answer.score:null;
-    const item=add(groups.criteria,q.id,q.label,value===null?null:value*100);
-    item.na=(item.na||0)+(answer.answer==='na'?1:0);item.nonconformities=(item.nonconformities||0)+(rawValue!==null&&rawValue<1?1:0);
-    if(rawValue!==null&&rawValue<1)nonconformities++;
-   }
-  }
-  const restaurants=await Restaurant.find({id:{$in:audits.map(a=>a.restaurantId)}}).select('id name').maxTimeMS(5000).lean();const names=new Map(restaurants.map(r=>[r.id,r.name]));
-  const people=await require('../models/user.model').find({_id:{$in:[...new Set(audits.map(a=>a.auditorId))].filter(id=>mongoose.isObjectIdOrHexString(id))}}).select('_id name').lean();
-  const filterOptions={auditors:people.map(p=>({id:String(p._id),name:p.name})),sections:hr.sources.filter(s=>audits.some(a=>a.templateSnapshot?.brandId===s.brandId)).flatMap(s=>s.sections.map(sec=>({id:sec.id,title:sec.title,brandId:s.brandId})))};
-  const order={brands:hr.sources.map(s=>s.brandId),sections:hr.sources.flatMap(s=>s.sections.map(sec=>`${s.brandId}:${sec.id}`)),criteria:hr.sources.flatMap(s=>s.sections.flatMap(sec=>sec.questions.map(q=>q.id)))};
-  const output=Object.fromEntries(Object.entries(groups).map(([key,map])=>[key,[...map.values()].map(({sum,...r})=>({...r,label:key==='restaurants'?(names.get(r.id)||r.id):r.label,average:r.scored?sum/r.scored:null})).sort((a,b)=>order[key]?order[key].indexOf(a.id)-order[key].indexOf(b.id):a.id.localeCompare(b.id))]));
-  const countByStatus=async(resource,Model)=>{
-   const scope=await require('../middleware/auth.middleware').getPermissionScope(req.user.role,resource,'read');
-   if(!scope||scope==='none')return null;
-   const childScope=await getAuditScopeFilter({...req,permission:{scope}});if(!childScope)return null;
-   const childParents=await Audit.find({$and:[{_id:{$in:ids}},childScope]}).select('_id').lean();
-   return Model.aggregate([{$match:{auditId:{$in:childParents.map(a=>a._id)}}},{$group:{_id:'$status',count:{$sum:1}}}]).option({maxTimeMS:5000});
-  };
-  const [actions,findings]=await Promise.all([countByStatus('audit.action',require('../models/auditAction.model')),countByStatus('audit.finding',require('../models/auditFinding.model'))]);
-  res.json({data:{statuses:audits.reduce((out,a)=>({...out,[a.status]:(out[a.status]||0)+1}),{}),total:audits.length,submitted:seen.size,scored,unscored:seen.size-scored,average:scored?sum/scored:null,nonconformities,legacyConformityExclusions,...output,filterOptions,actions,findings,scoreUnit:'percent',generatedAt:new Date().toISOString()}});
+  const data=await require('../services/auditNumericAnalytics.service').aggregate(req,'service',{$and:parts});if(!await require('../services/auditAnalyticsAuthority.service').recheck(req,res,authority))return;res.json({data});
  }catch(e){fail(res,e);}
 };
 exports.list=async(req,res)=>{

@@ -1,0 +1,3 @@
+const fs=require('node:fs');
+if(process.argv.length!==4||process.argv[2]!=='--snapshot'||/^[a-z]+:\/\//i.test(process.argv[3]||'')){process.stderr.write('Usage: node auditIndexDryRun.cjs --snapshot LOCAL_JSON\n');process.exitCode=1;}
+else try{const p=process.argv[3],stat=fs.statSync(p);if(!stat.isFile()||stat.size>4*1024*1024)throw Error('Invalid inventory.');const report=require('../services/auditIndexPlan.service').inspect(JSON.parse(fs.readFileSync(p,'utf8')));process.stdout.write(JSON.stringify(report,null,2)+'\n');if(report.indexes.some(i=>i.status!=='PASS'))process.exitCode=2;}catch{process.stderr.write('Invalid offline index inventory; no writes performed.\n');process.exitCode=1;}

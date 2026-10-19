@@ -1,0 +1,9 @@
+[
+ {"model":"auditExecution","name":"audit_source_latest_v1","key":{"auditId":1,"templateRevisionId":1,"status":1,"updatedAt":-1,"_id":-1},"reason":"Source analytics latest completed execution lookup by parent and pinned revision"},
+ {"model":"audit","name":"audit_direction_date_v1","key":{"auditType":1,"archivedAt":1,"date":1},"reason":"Direction/date analytics after permission scope"},
+ {"model":"audit","name":"audit_restaurant_direction_date_v1","key":{"restaurantId":1,"auditType":1,"archivedAt":1,"date":1},"reason":"Restaurant-scoped source list and analytics"},
+ {"model":"audit","name":"audit_hse_object_date_v1","key":{"hseObjectId":1,"auditType":1,"archivedAt":1,"date":1},"reason":"HSE object-scoped source list and analytics"},
+ {"model":"auditAction","name":"audit_action_status_due_v1","key":{"auditId":1,"status":1,"dueDate":1},"reason":"Parent-scoped action status, closure and overdue lookup"},
+ {"model":"auditFinding","name":"audit_finding_status_v1","key":{"auditId":1,"status":1},"reason":"Parent-scoped findings/report/closure lookup"},
+ {"model":"auditEvidence","name":"audit_evidence_parent_v1","key":{"auditId":1},"reason":"Bounded parent evidence metadata/report lookup"}
+]

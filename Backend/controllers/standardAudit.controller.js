@@ -73,7 +73,7 @@ exports.list=async(req,res)=>{
  }catch(e){fail(res,e);}
 };
 exports.analytics=async(req,res)=>{
- try{
+ try{const authority=await require('../services/auditAnalyticsAuthority.service').capture(req);
   const filter=await require('./auditDirectionAnalytics.controller').filterFor({user:req.user,auditorProfile:req.auditorProfile,permission:req.permission,query:req.query,params:{direction:'standard'}});
   const clauses=[filter,{auditType:'standard','templateSnapshot.standardSource':{$exists:true}}];
   const scalar=(key,max=100)=>{const value=req.query[key];if(value!==undefined&&(typeof value!=='string'||value.length>max))throw auditError(400,'Invalid Standard analytics filter.');return value;};
@@ -83,6 +83,6 @@ exports.analytics=async(req,res)=>{
   const area=scalar('area');if(area){const restaurants=await Restaurant.find({location:area,organizationId:'gfc'}).select('id').lean();clauses.push({restaurantId:{$in:restaurants.map(r=>r.id)}});}
   scalar('sectionId');scalar('category',200);const risk=scalar('risk'),result=scalar('result');
   if(risk&&!['critical','major','minor','unspecified'].includes(risk)||result&&!standard.results.includes(result))throw auditError(400,'Unknown Standard risk/result.');
-  res.json({data:await require('../services/auditSourceAnalytics.service').aggregate(req,'standard',{$and:clauses})});
+  const data=await require('../services/auditSourceAnalytics.service').aggregate(req,'standard',{$and:clauses});if(!await require('../services/auditAnalyticsAuthority.service').recheck(req,res,authority))return;res.json({data});
  }catch(e){fail(res,e);}
 };
