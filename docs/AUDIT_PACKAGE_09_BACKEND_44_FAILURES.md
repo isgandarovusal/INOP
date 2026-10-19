@@ -64,3 +64,29 @@ Başlanğıc `5d886ccf36cce0b67d25a12119663e00d4125ce9`: təkrar icrada 563 test
 - `/workspace/work/audit-p09/backend-baseline.log` — SHA-256 `f3bd4323246f0b51e41c8eb9ef8afcecad614e2982b742c4eb57a288ff3f9123`
 - `/workspace/work/audit-p09/legacy-focused.log` — SHA-256 `e1a474779761e5a4f692c43702d70bf851238d999c540eddf1a9b22a4f8a581b`
 - `/workspace/work/audit-p09/backend-stabilized.log` — SHA-256 `55a25ff400bedb61d8dba561405b2089cf73253815ab7228db79964218d7911b`
+
+
+## Final bütün-backend yoxlaması — 19 oktyabr 2026
+
+Baza 12 fayllıq suite-də 519 PASS /44 FAIL faktiki təkrarlanıb. Həmin 44 müqavilə/fixture problemi düzəldilib; mühafizə zəiflədilməyib. Focused suite 532/532, ilkin geniş legacy suite əlavə denial testi ilə 564/564 olub.
+
+Bütün backend test faylları daxil ediləndə ilkin əlavə qaçış 1973 testdən 1914 PASS/59 FAIL göstərib. 59 sayına parent failure propagation daxildir: 51 detallı uğursuzluq +8 parent. Əlavə problemlər aşağıdakılardır:
+
+| Fayl qrupu | Detallı uğursuzluq | Kök səbəb / düzəliş |
+|---|---:|---|
+| approvalAuthorization | 10 | Explicit independent reviewer, pending→approved, resolved-history 409; parent/assignment deny saxlanır |
+| executionAuthorization | 18 | Certified published revision/context fixture, server-calculated score və immutable unversioned history 409 |
+| hrAnalyticsViews | 1 | Optimized countDocuments read hook-u da intercept edilir; bounded wait |
+| hrCvOcr HTTP / processing | 6 +6 | Rəsmi SHA-pinned native model preflight; worker handoff failure bounded edilir |
+| hrCvProcessing | 1 | Parser entry handshake, auth-dan əvvəl 20ms deadline ilə flaky test əvəz edilir; timeout/late-write guard qalır |
+| hrNativeReleaseGate | 1 | Explicit owned replica URI/directConnection və portable owned artifact |
+| hrSeed | 3 | Explicit owned 27018 replica URI/directConnection |
+| hrSignedSource | 1 | Scanner entry handshake; timeout/slot/429/no-late-upload saxlanır |
+| restaurantAuthorization | 2 | Archive/history və explicit auditor assignment müqaviləsi |
+| templateAuthorization | 2 | Canonical direction/brand fixture və idempotent immutable context müqaviləsi |
+
+Final runner **115 backend faylını** serial process-lərlə işə salıb: **2005 PASS /0 FAIL /0 SKIP /0 CANCELLED**, 388092 ms. Əvvəlki 564 sayından fərq bütün Recruitment/auth/CV/native/operational faylların və yeni təhlükəsizlik ssenarilərinin daxil edilməsidir; bu say unikal biznes assertion sayı deyil, Node test/subtest sayıdır. Test silinməyib, skip/todo/only ilə uğursuzluq gizlədilməyib.
+
+Test helper üçün implicit 27017 fallback tapılıb və bağlanıb: artıq `INOP_AUDIT_TEST_PORT=27018` açıq tələb edilir, digər/missing dəyərdə connection-dan əvvəl dayanır. Əvvəlki bir focused run yalnız yeni random owned scratch DB yaradıb təmizləmişdi; mövcud məlumat dəyişməyib. Son bütün-suite qaçışı strict helper ilə 27018-dədir. Production DB əməliyyatı yoxdur.
+
+Final log `/workspace/work/audit-p09/final-2026-10-19/backend-delivery.log`, SHA-256 `d345c02e604e3942857679486ed80d69eb821d48611a692616c49dd1d12f0371`.
