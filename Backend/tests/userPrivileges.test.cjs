@@ -72,7 +72,7 @@ test('User and role privilege authorization (isolated local MongoDB)', async (t)
   }
 
   try {
-    await mongoose.connect(`mongodb://127.0.0.1:${process.env.INOP_AUDIT_TEST_PORT||'27017'}/${database}`);
+    await mongoose.connect(`mongodb://127.0.0.1:${require('./helpers/localTestDatabase.cjs').port()}/${database}?directConnection=true`);
     assert.equal(mongoose.connection.host, '127.0.0.1');
     assert.equal(mongoose.connection.name, database);
     const databases = await mongoose.connection.db.admin().listDatabases();

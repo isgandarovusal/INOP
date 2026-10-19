@@ -7,7 +7,7 @@ const backendRequire = createRequire(path.resolve(frontend, '../Backend/package.
 const { withAuditFixture } = backendRequire('./tests/helpers/auditFixture.cjs');
 
 exports.withBrowserFixture = async (source, callback, options = {}) => withAuditFixture(async h => {
-  const { chromium } = require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+  const { chromium } = require(process.env.INOP_PLAYWRIGHT_MODULE||'playwright');
   const { createServer } = await import(path.join(frontend, 'node_modules/vite/dist/node/index.js'));
   const cache=await require('./ownedCache.cjs').create(process.env.INOP_BROWSER_CACHE_DIR);
   const cacheDir=cache.dir;
@@ -29,7 +29,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     });
     await vite.listen();
     const origin = `http://127.0.0.1:${vite.httpServer.address().port}`;
-    browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+    browser = await chromium.launch({ ...(process.env.INOP_BROWSER_EXECUTABLE?{executablePath:process.env.INOP_BROWSER_EXECUTABLE}:{}), headless: true, args: ['--no-sandbox'] });
     const page = await browser.newPage(); const pageErrors = [], failures = [], wire = [];
     page.setDefaultTimeout(process.env.INOP_BROWSER_BASELINE ? 3000 : 10000);
     page.on('requestfailed', request => failures.push(request.url() + ': ' + request.failure()?.errorText));

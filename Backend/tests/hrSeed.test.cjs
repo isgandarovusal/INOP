@@ -17,7 +17,7 @@ test('HR seed creates canonical roles and never repairs existing accounts implic
     const hr = inputs.find(user => user.position === 'HR Manager');
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'inop-hr-seed-'));
     const run = () => execFile(process.execPath, [path.join(__dirname, '../scripts/seedUsers.js')], {
-      cwd, env: { ...process.env, MONGO_URI: `mongodb://127.0.0.1:${process.env.INOP_AUDIT_TEST_PORT||'27017'}/${h.mongoose.connection.name}`, CS: '', SMTP_HOST: '' }, timeout: 30000,
+      cwd, env: { ...process.env, MONGO_URI: `mongodb://127.0.0.1:${require('./helpers/localTestDatabase.cjs').port()}/${h.mongoose.connection.name}?directConnection=true`, CS: '', SMTP_HOST: '' }, timeout: 30000,
     });
     try {
       await t.test('new seed uses an existing active canonical HR role', async () => {

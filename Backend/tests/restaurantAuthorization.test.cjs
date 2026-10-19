@@ -24,7 +24,7 @@ test('Restaurant access requires an explicit global grant until trusted scoped p
       assert.deepEqual(await Restaurant.find().sort({ _id: 1 }).lean(), before);
     });
   }
-  for (const actor of ['admin', 'auditor']) await t.test(`${actor}: explicit all preserves create/list/detail/update/delete envelopes`, async () => {
+  for (const actor of ['admin']) await t.test(`${actor}: explicit all preserves create/list/detail/update/delete envelopes`, async () => {
     const id = `global-${actor}`;
     const create = await h.request(actor, 'POST', '/restaurants', { id, name: 'Permitted' });
     assert.equal(create.status, 201); assert.equal(create.data.id, id);
@@ -34,7 +34,11 @@ test('Restaurant access requires an explicit global grant until trusted scoped p
     assert.equal((await h.request(actor, 'GET', `/restaurants/${id}`)).data.name, 'Permitted');
     assert.equal((await h.request(actor, 'PUT', `/restaurants/${id}`, { name: 'Updated' })).data.name, 'Updated');
     assert.equal((await h.request(actor, 'DELETE', `/restaurants/${id}`)).status, 200);
-    assert.equal(await Restaurant.exists({ id }), null);
+    const retained=await Restaurant.findOne({id}).lean();assert.ok(retained.archivedAt);assert.equal(retained.status,'inactive');assert.equal(retained.archivedBy,String(h.actors[actor]._id));assert.ok(!(await h.request(actor,'GET','/restaurants')).data.some(r=>r.id===id));
+  });
+  await t.test('Auditor all-role grant cannot create an unverified restaurant or read another assigned brand',async()=>{
+    const before=await Restaurant.countDocuments();assert.equal((await h.request('auditor','POST','/restaurants',{id:'forbidden-auditor',name:'Denied'})).status,403);assert.equal(await Restaurant.countDocuments(),before);assert.equal((await h.request('auditor','GET','/restaurants')).data.length,0);
+    const audit=await h.audit('admin','service');await h.assign('auditor',audit);const rows=await h.request('auditor','GET','/restaurants');assert.equal(rows.status,200);assert.deepEqual(rows.data.map(r=>r.id),[audit.restaurantId]);assert.equal((await h.request('auditor','GET',`/restaurants/${foreign.id}`)).status,404);
   });
   await t.test('read-only all grant does not authorize write actions', async () => {
     await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'manager' } });

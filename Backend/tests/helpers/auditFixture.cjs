@@ -30,8 +30,7 @@ exports.withAuditFixture = async (callback, options = {}) => {
   if (!options.canonicalHR) membership.isHRMember = user => canonicalMembership(user) ||
     (owned && mongoose.connection.name === database && mongoose.connection.host === '127.0.0.1' && ['dep_A', 'dep_B', 'dep_HR'].includes(user?.departmentId));
   try {
-    const port = process.env.INOP_AUDIT_TEST_PORT || '27017';
-    if (!['27017', '27018'].includes(port)) throw Error('Only isolated local test ports are allowed');
+    const port = require('./localTestDatabase.cjs').port();
     await mongoose.connect(`mongodb://127.0.0.1:${port}/${database}?directConnection=true`);
     if (mongoose.connection.host !== '127.0.0.1' || mongoose.connection.name !== database) throw Error('Unexpected database');
     const databases = await mongoose.connection.db.admin().listDatabases();

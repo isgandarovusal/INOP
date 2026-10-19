@@ -1,0 +1,61 @@
+name: Audit local release gate
+on:
+  push:
+    branches: [inop-main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: audit-qa-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  local-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      INOP_AUDIT_TEST_PORT: '27018'
+      INOP_AUDIT_QA_CONTAINER: inop-audit-ci-qa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            Backend/package-lock.json
+            Frontend/package-lock.json
+      - run: npm ci --prefix Backend && npm ci --prefix Frontend
+      - name: Native test prerequisites; no production credentials
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr fonts-dejavu-core
+          node Backend/scripts/prepareOcrTestModels.cjs
+      - name: Start owned replica set
+        run: |
+          docker run -d --name "$INOP_AUDIT_QA_CONTAINER" --label inop.task=audit-ci -p 127.0.0.1:27018:27017 mongo:7 --replSet inop_audit_ci_qa --bind_ip_all
+          for attempt in $(seq 1 30); do
+            if docker exec "$INOP_AUDIT_QA_CONTAINER" mongosh --quiet --eval 'db.adminCommand({ping:1})' >/dev/null; then break; fi
+            sleep 1
+          done
+          docker exec "$INOP_AUDIT_QA_CONTAINER" mongosh --quiet --eval 'rs.initiate({_id:"inop_audit_ci_qa",members:[{_id:0,host:"127.0.0.1:27017"}]})'
+          for attempt in $(seq 1 30); do
+            if docker exec "$INOP_AUDIT_QA_CONTAINER" mongosh --quiet --eval 'quit(db.hello().isWritablePrimary?0:1)'; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Every backend file, serial processes, bounded tests
+        run: npm test --prefix Backend
+      - run: npm run build --prefix Frontend && npm run lint --prefix Frontend
+      - name: Browser runtime
+        run: |
+          cd Frontend
+          npm exec -- playwright install --with-deps chromium
+      - name: Audit browser, report, export and responsive gate
+        run: node Frontend/tests/runAuditBrowserSuite.cjs
+      - name: Cleanup only owned QA container
+        if: always()
+        run: |
+          if [ "$(docker inspect --format '{{ index .Config.Labels "inop.task" }}' "$INOP_AUDIT_QA_CONTAINER" 2>/dev/null)" = audit-ci ]; then
+            docker rm -f -v "$INOP_AUDIT_QA_CONTAINER"
+          fi

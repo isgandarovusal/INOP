@@ -34,11 +34,14 @@ test('Template and linked source scopes fail closed without trusted provenance',
       assert.deepEqual({ templates: await Template.find().sort({ _id: 1 }).lean(), sources: await Source.find().sort({ _id: 1 }).lean() }, before);
     });
   }
+  await h.assign('auditor',await h.audit('admin','service'));
   for (const actor of ['admin', 'auditor']) await t.test(`${actor}: explicit all preserves template CRUD/filter/copy and binds metadata on server`, async () => {
-    const created = await h.request(actor, 'POST', '/audit-templates', { ...payload, createdBy: String(h.actors.foreign._id), updatedBy: 'forged' });
+    const allowedPayload=actor==='auditor'?{...payload,organizationId:'gfc',brandId:'kfc',brandName:'KFC',auditType:'service'}:payload;
+    if(actor==='auditor')assert.equal((await h.request(actor,'POST','/audit-templates',payload)).status,403,'Another direction cannot be selected');
+    const created = await h.request(actor, 'POST', '/audit-templates', { ...allowedPayload, createdBy: String(h.actors.foreign._id), updatedBy: 'forged' });
     assert.equal(created.status, 201); const id = created.data.id;
     assert.equal(created.data.createdBy, String(h.actors[actor]._id)); assert.equal(created.data.updatedBy, String(h.actors[actor]._id));
-    assert.ok((await h.request(actor, 'GET', '/audit-templates?auditType=standard')).data.some(item => item.id === id));
+    assert.ok((await h.request(actor, 'GET', `/audit-templates?auditType=${allowedPayload.auditType}`)).data.some(item => item.id === id));
     const detail = await h.request(actor, 'GET', `/audit-templates/${id}`); assert.equal(detail.status, 200);
     const updated = await h.request(actor, 'PUT', `/audit-templates/${id}`, { name: 'Updated', createdBy: 'forged', updatedBy: 'forged' });
     assert.equal(updated.status, 200); assert.equal(updated.data.createdBy, created.data.createdBy); assert.equal(updated.data.updatedBy, String(h.actors[actor]._id));
@@ -67,7 +70,7 @@ test('Template and linked source scopes fail closed without trusted provenance',
   });
   await t.test('global template read permits authorized Execution use; unknown/malformed references are 404/400', async () => {
     const response = await h.request('admin', 'POST', '/audit-execution', { auditId: audit.id, checklistId: String(foreign._id) });
-    assert.equal(response.status, 201); assert.equal(response.data.data.checklistId, String(foreign._id));
+    assert.equal(response.status,201);assert.equal(response.data.data.checklistId,undefined,'Idempotent create does not retrofit a template onto existing history');const fresh=await h.audit('own');const linked=await h.request('admin','POST','/audit-execution',{auditId:fresh.id,checklistId:String(foreign._id)});assert.equal(linked.status,201);assert.equal(linked.data.data.checklistId,String(foreign._id));
     assert.equal((await h.request('admin', 'POST', '/audit-execution', { auditId: audit.id, checklistId: String(new h.mongoose.Types.ObjectId()) })).status, 404);
     assert.equal((await h.request('admin', 'POST', '/audit-execution', { auditId: audit.id, checklistId: 'invalid' })).status, 400);
   });
