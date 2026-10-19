@@ -26,7 +26,9 @@ exports.provision=async(req,res)=>{
    if(existing){
     const template=await Template.findById(existing.templateId).session(session);
     if(!template||template.status!=='active'||String(template.publishedRevisionId)!==String(existing.revisionId))throw auditError(409,'Existing source template changed or retired; reviewed versioning is required.');
-    hr.verifiedSource((await Revision.findById(existing.revisionId).session(session)).content);return existing;
+    const revision=await Revision.findById(existing.revisionId).session(session);
+    if(!revision||revision.content?.hrSource?.sha256!==source.sha256||revision.content?.hrSource?.version!==source.version)throw auditError(409,'Existing binding does not pin the current source version; preserve historical revisions and review provisioning.');
+    hr.verifiedSource(revision.content);return existing;
    }
    const templateId=new mongoose.Types.ObjectId(),revisionId=new mongoose.Types.ObjectId();
    await Binding.create([{_id:key,templateId,revisionId}],{session});
