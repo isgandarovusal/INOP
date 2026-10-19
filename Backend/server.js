@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { configureTrustedProxy, createApiRateLimiter } = require('./middleware/networkSecurity.middleware');
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+const runtime = require('./services/runtimeConfiguration.service').configuration();
+require('./services/auditStorageBootstrap.service').initialize();
 
 const routes = require('./routes/route');
 const setupSwagger = require('./swagger');
@@ -17,7 +19,7 @@ const {
 const app = express();
 configureTrustedProxy(app);
 app.use(require('./middleware/operationalTelemetry.middleware').createTelemetry({enabled:process.env.API_REQUEST_LOG_ENABLED==='true'}).middleware);
-const PORT = process.env.PORT || 3001;
+const PORT = runtime.port;
 
 // Security Middlewares
 app.use(helmet());
@@ -34,12 +36,7 @@ app.use('/api/', limiter);
 // Uploads are private: resolve their owning record and current server permission.
 app.use('/uploads', require('./routes/privateUpload.routes'));
 
-// Public health check for deployment platforms
-app.get('/health', (_req, res) => {
-  res.status(200).json({ success: true, status: 'ok' });
-});
-
-app.get('/ready',require('./services/readiness.service').createHandler());
+require('./services/operationalRoutes.service').register(app);
 
 // Swagger
 setupSwagger(app);
@@ -52,7 +49,7 @@ app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || process.env.CS;
+const MONGO_URI = runtime.mongoUri;
 mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
   .then(() => {
     console.log('db connected');
