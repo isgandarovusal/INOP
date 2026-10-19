@@ -1,5 +1,8 @@
 # Paket 09 — provision planı
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 Production DB-də icra yoxdur. Mövcud source endpoint/binding və read-only `auditProvisionDryRun.cjs` təkmilləşdirilib; yeni seed/replace sistemi yaradılmır.
 
 ## İnventar
@@ -23,3 +26,8 @@ node Backend/scripts/auditProvisionDryRun.cjs --snapshot APPROVED_LOCAL_INVENTOR
 5. Hər addımdan sonra hash/pointer/count/grant status verifikasiyası və request ID/audit history qeyd edilir. Dry-run təkrarı no-op/PASS olmalıdır; returned assignment status revoked-dursa active kimi təqdim edilmir.
 
 Rollback source revision/history-ni silmir. Yeni auditin bağlandığı revision istifadə olunursa pointer downgrade və ya blind delete olmaz; əvvəl compatible app və reviewed rollback yolu tələb edilir. Canlı inventar/operator approval/backup əlçatan olmadığından production provision BLOCKED qalır.
+
+
+## Final closure — 19 oktyabr 2026
+
+Final read-only CLI təkrarlandı: synthetic filled inventory 12/12 PASS/no-op, exit0/writes0; empty inventory 12 NOT PROVISIONED, exit2/writes0. Full backend-də source version/idempotency/duplicate preservation/grant və parent tenant testləri keçir. Bu source plan validator sübutudur, production inventarının mövcudluğu deyil. Real ofis/anbar, role/auditor və grant matrix verilməyib. Production apply yoxdur; backup/digest/operator approval/rollback proseduru FINAL_OPERATOR_CHECKLIST-dədir.

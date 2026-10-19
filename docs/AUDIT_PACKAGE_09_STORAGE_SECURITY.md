@@ -1,5 +1,8 @@
 # Paket 09 — storage və təhlükəsizlik
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 ## Saxlanan provider müqaviləsi
 
 `AUDIT_EVIDENCE_STORAGE_PROVIDER`, `AUDIT_EVIDENCE_STORAGE_ENABLED=true`, bootstrap-da approved factory və `credentialsReady=true` tələb edilir. `NODE_ENV=production` / `RENDER=true` zamanı local write fallback yoxdur. Missing provider/credentials upload-da təhlükəsiz 503 saxlanır. Mövcud local historical references səbəbsiz dəyişdirilmir.
@@ -26,3 +29,12 @@ Read-only npm production audit-i xlsx üçün 1 high, mammoth → argparse → s
 
 
 19 oktyabr read-only audit yenidən eyni 4 dependency advisory-ni göstərdi. `xlsx` üçün npm fixAvailable=false; Mammoth zənciri üçün təklif 0.3.29-a böyük geriyə downgrade-dir. Rəsmi SheetJS patched artifact CDN sorğusu managed proxy-də CONNECT 403 ilə bloklanıb; GitHub-da yoxlanılan patched release tag-i tapılmayıb. Proxy bypass edilməyib. Bu səbəbdən dependency gate FAIL, production readiness BLOCKED qalır. Operator approved upstream artifact əldə edib integrity/version/compatibility yoxlaması və bütün XLSX/DOCX regressiyasını keçirməlidir. Bunlar tətbiq edilmədən xəbərdarlıqlar həll olunmuş sayılmır.
+
+
+## Final closure — 19 oktyabr 2026
+
+Final backend/frontend full və production dependency graph-ları 0 advisory-dir. Yuxarıdakı köhnə xlsx/sprintf FAIL bölməsi başlanğıc arxividir; cari remediation DEPENDENCY_REMEDIATION sənədindədir. Rəsmi patched SheetJS CDN 403 qalır, lakin runtime/dev xlsx removal ilə həmin dependency blocker həll edilib.
+
+Final 2007/2007 qaçışında actual source API+isolated provider upload/download, 6 report ailəsi, 3 independent document slot, receipt/private/version/hash/size/MIME/IDOR və safe503 yenidən keçir. `/health`, `/ready`, fatal/log redaction testləri keçir; real production storage PASS deyil. Current managed observations ready credential/provider binding göstərmir, secrets dəyərləri oxunmayıb/loglanmayıb.
+
+Writer asyncdir; Audit export mövcud post-build fresh-authority recheck-i saxlayır. Original source/evidence IDs və yollar dəyişmir. Concrete operator smoke, retention və monitoring addımları FINAL_OPERATOR_CHECKLIST-dədir. Registry signature audit download əmri managed proxy ilə də failed-to-download olub, ona əlavə PASS verilmir; npm ci SRI verification bundan ayrıdır.

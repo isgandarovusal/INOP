@@ -1,5 +1,8 @@
 # Paket 09 — tam sistem diaqnostikası
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 Baza `5d886ccf36cce0b67d25a12119663e00d4125ce9`, yalnız `inop-main`. İlk iş qovluğu təmiz idi; davametmə zamanı mövcud `9b1e256` commit-i və təhlükəsiz uncommitted dəyişikliklər qorundu. 19 oktyabr 2026-da mühit bərpa ediləndən sonra final QA yenidən icra edilib. Production DB/secrets/deploy üzərində əməliyyat yoxdur.
 
 ## İstifadə edilən mənbələr
@@ -29,3 +32,12 @@ Paket 01–08 Audit/source map/QA/regression/release sənədləri; 51 Audit/rele
 Backend/API authentication və current-role authorization; Audit lifecycle/scoring/source revisions; Recruitment və Main Dashboard regressiyası; Mongo model/index/transaction; private evidence və export; real analytics; default-disabled notification/CV/OCR background jobs; native startup/build/lint və CI nəzərə alınıb. Auditdən kənar dəyişikliklər yalnız test infrastrukturu və ümumi runtime sabitliyinə aiddir. Recruitment/Main Dashboard biznes funksiyaları və vizual dizaynı dəyişdirilmir.
 
 Final faktiki nəticələr QA və PRODUCTION_GATE sənədlərindədir. Köhnə loglar saxlanılıb, yarımçıq/uğursuz qaçışlar gizlədilmir.
+
+
+## Final closure — 19 oktyabr 2026
+
+Başlanğıc `66e67f7`, dependency/export code commit `fb209ef`, hosted portability/CI commit `0543e04`. Lokal və remote HEAD başlanğıcda eyni və təmiz idi. Əvvəlki dəyişikliklər qorundu.
+
+Yeni həll edilən P1-lər: full dependency graph əlavə HIGH-ları; vulnerable xlsx removal; Mammoth parser və ExcelJS UUID transitive patch; Node native dev watch; frontend source-map-js patch; iki hosted-only path və real minute-boundary quota test flake. Npm clean installs, 2007 backend və 41 browser testi keçib. Mənbə/scoring/UI business dəyişməyib.
+
+Hosted CI cari vəziyyəti: **NOT TESTED**, `0543e04`, Yeni code üçün hosted run hələ təsdiqlənməyib. Köhnə hosted run 39208759764-də 2001 PASS/4 FAIL (3 root cause +parent) idi; səbəblər CI_EVIDENCE sənədindədir. Production DB/secrets/deploy əməliyyatı yoxdur. Signature/attestation audit download əlavə yoxlaması NOT TESTED; lockfile SRI+official registry+clean ci uğurludur. Detallar DEPENDENCY_REMEDIATION və FINAL_OPERATOR_CHECKLIST sənədlərindədir.

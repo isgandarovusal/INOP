@@ -1,5 +1,8 @@
 # Paket 09 — 44 backend uğursuzluğunun kök səbəbləri
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 Başlanğıc `5d886ccf36cce0b67d25a12119663e00d4125ce9`: təkrar icrada 563 test, 519 PASS / 44 FAIL. Minimal düzəlişdən sonra **564 PASS / 0 FAIL / 0 SKIP / 0 CANCELLED**. Yeni bir denial/no-side-effect subtest əlavə edilib. 44 rəqəminin ikisi parent failure-dır, 42-si assertion failure-dır. Məhsul guard-ları bu düzəliş üçün dəyişdirilməyib. Test silinməyib, skip/todo/only əlavə edilməyib.
 
 | # | Test / fayl | Əvvəl expected / actual | Kök səbəb və sübut | Təhlükəsiz düzəliş / son nəticə |
@@ -90,3 +93,10 @@ Final runner **115 backend faylını** serial process-lərlə işə salıb: **20
 Test helper üçün implicit 27017 fallback tapılıb və bağlanıb: artıq `INOP_AUDIT_TEST_PORT=27018` açıq tələb edilir, digər/missing dəyərdə connection-dan əvvəl dayanır. Əvvəlki bir focused run yalnız yeni random owned scratch DB yaradıb təmizləmişdi; mövcud məlumat dəyişməyib. Son bütün-suite qaçışı strict helper ilə 27018-dədir. Production DB əməliyyatı yoxdur.
 
 Final log `/workspace/work/audit-p09/final-2026-10-19/backend-delivery.log`, SHA-256 `d345c02e604e3942857679486ed80d69eb821d48611a692616c49dd1d12f0371`.
+
+
+## Final closure — 19 oktyabr 2026
+
+Əvvəlki 44/44 həll qorunur. Bu davamda 116 backend faylı **2007 PASS/0 FAIL/0 SKIP/0 CANCELLED**, 394883 ms. Əvvəlki 2005 test saxlanıb; synthetic SheetJS→ExcelJS semantic baseline və Mammoth help/HTML/Markdown/API üçün 2 yeni test əlavə edilib.
+
+Hosted ilkin 4 FAIL həmin köhnə 44-ə aid deyil: hardcoded dry-run cwd, hardcoded 5000-application artifact path və dəqiqə sərhədində quota rollover (parent failure daxil). Yollar __dirname/os.tmpdir ilə portativdir; rate testində mövcud injected clock sabitlənib, real HMAC/HTTP/Mongo quota və 429 assertion-u saxlanıb. Guard/assertion zəiflədilməyib. Son hosted gate **NOT TESTED**: Yeni code üçün hosted run hələ təsdiqlənməyib.

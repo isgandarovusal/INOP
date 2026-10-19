@@ -1,5 +1,8 @@
 # Paket 09 — MongoDB indeks planı
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 `Backend/config/auditOperationalIndexes.json` real query pattern-lərinə bağlı **7 nonunique** indeks hazırlayır. Runtime model startup onları avtomatik qurmur; server autoIndex/autoCreate=false qalır. Production DDL icra edilməyib.
 
 | İndeks | Query |
@@ -25,3 +28,12 @@ Rollout: backup receipt → reviewed staging restore → baseline explain/latenc
 Rollback yalnız bu approved planla yaradıldığı sübut edilmiş indeksin `dropIndex(name)` əməliyyatıdır. Əvvəlki/unique constraint indeksləri silinmir; istifadə olunan query-nin təhlükəsiz scan/422 davranışı saxlanır. Bu paket production-da create/drop/index migration etmir.
 
 Local compose artıq transaction-capable replica-set init-i və loopback Mongo port-u nəzərdə tutur. Mövcud volume üçün backup/operator review olmadan compose init işlədilməməlidir. Bu task compose up etməyib və mövcud `inop-cloud-mongo` konteynerinə toxunmayıb. QA yalnız `inop-audit-p09-qa`, 127.0.0.1:27018 və random owned DB-lərdədir.
+
+
+## Final closure — 19 oktyabr 2026
+
+Yeddi təklif edilən indeksin hamısı ayrıca random owned `inop_audit_index_rehearsal_*` DB-də yaradılıb, hinted explain və full query result equality ilə yoxlanıb; sonra yalnız yeni indekslər drop olunub və `_id_` baseline qalıb. Hər 5 collection-da əvvəl1000/sonra1000 synthetic insert sample var. Hər indexed query 500/1000 uyğun sənəd verib, docsExamined500/keysExamined500–501. Bu 50% sintetik selectivity və explicit hint-dir; production optimizer və distribution iddiası deyil. Mövcud latest-source scale testi ayrıca real auto plan-da docsExamined1 saxlayır.
+
+Before-index 1000 insert sample-ləri execution50ms/audit18/action32/finding23/evidence20; after-index19/19/21/12/14ms. Warm-cache, az sample və fərqli phase səbəbindən causal overhead/speedup nəticəsi çıxarılmır; production write overhead NOT TESTED qalır. Result preservation və rollback 7/7 PASS. Scratch DB finally silinib; əlaqəsiz DB/konteyner dəyişməyib.
+
+Offline CLI populated 7 PASS/no-op, empty7 NOT TESTED, writes0. Production create/drop/index rollout edilməyib. Staging explain/capacity/backup/approval operator addımları saxlanır.

@@ -1,5 +1,8 @@
 # Paket 09 — backup, restore və rollback
 
+> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+
 ## Lokal rehearsal
 
 `auditBackupRestore.test.cjs` yalnız label-i `inop.task=audit-p09` /audit-ci olan konteyneri və port 27018-i qəbul edir. Source random `inop_audit_test_*`, restore isə yeni `inop_audit_restore_*` DB-dir. Mövcud restore DB üzərinə yazmaq və source `--drop` yoxdur.
@@ -23,3 +26,8 @@ Real mongodump gzip archive → mongorestore namespace mapping → bütün colle
 6. Incident zamanı public/private URL bypass bağlanır, approved operational procedure ilə trafik/işlər idarə edilir, request ID və redacted status qeydləri saxlanır. Təsdiqlənməmiş SLA, retention və alert həddi yaradılmır.
 
 Production backup/restore/retention, monitoring və staged rollback operator rehearsal-ı NOT TESTED/BLOCKED qalır. Production DB, backup və storage üzərində bu task əməliyyat aparmır.
+
+
+## Final closure — 19 oktyabr 2026
+
+Final tam backend qaçışında real isolated mongodump/mongorestore rehearsal yenidən keçib: 15 collection/45 sənəd; source digest, index key/name/unique və private evidence SHA-256 uyğun gəlib. 7 yeni QA indeksinin rollback rehearsal-ı da keçib. Source/catalog/saved result/history dəyişdirilməyib. Production DB+provider consistent backup, live restore, retention və application rollback operator rehearsal-ı hələ NOT TESTED/BLOCKED-dir.
