@@ -25,3 +25,23 @@ test('Protocol adapter rejects foreign key shapes, unversioned access, cancellat
  const key=storage.prepare(pdf,'application/pdf',auditId,'s3').key;for(const v of [undefined,'null','', 'bad\nversion'])await assert.rejects(adapter.get({key,version:v,signal:new AbortController().signal}),{code:'AUDIT_STORAGE_INVALID_REFERENCE'});
  await assert.rejects(adapter.get({key,version:'v',signal:abort.signal}),{code:'AUDIT_STORAGE_TIMEOUT'});assert.equal(h.requests.length,0);
 });
+test('Ambiguous or nested bucket XML fails closed before any object write',async()=>{
+ const cases=[
+  {state:versionXml.replace('</VersioningConfiguration>','<Status>Disabled</Status></VersioningConfiguration>')},
+  {state:'<VersioningConfiguration><Unexpected><Status>Enabled</Status></Unexpected></VersioningConfiguration>'},
+  {policy:privateXml.replace('<PublicAccessBlockConfiguration>','<PublicAccessBlockConfiguration><Unexpected>').replace('</PublicAccessBlockConfiguration>','</Unexpected></PublicAccessBlockConfiguration>')},
+  {state:versionXml.replace('</VersioningConfiguration>','<Unexpected>Enabled</Unexpected></VersioningConfiguration>')},
+ ];
+ for(const sample of cases){const h=harness();if(sample.state)h.setState(sample.state);if(sample.policy)h.setPolicy(sample.policy);
+  const adapter=createAdapter(env,{transport:h.transport}),input=storage.prepare(pdf,'application/pdf',auditId,'s3');
+  await assert.rejects(storage.createPrivateStore(adapter).put(input,pdf),e=>e.status===503);
+  assert.ok(!h.requests.some(r=>r.method==='PUT'));
+ }
+});
+test('Standard S3 XML namespace, declaration, whitespace and optional MFA status preserve private versioned reads',async()=>{
+ const h=harness(),namespace=' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"';
+ h.setPolicy('<?xml version="1.0" encoding="UTF-8"?>\n'+privateXml.replace('<PublicAccessBlockConfiguration>','<PublicAccessBlockConfiguration'+namespace+'>'));
+ h.setState(versionXml.replace('<VersioningConfiguration>','<VersioningConfiguration'+namespace+'>').replace('</VersioningConfiguration>','<MfaDelete>Disabled</MfaDelete></VersioningConfiguration>'));
+ const store=storage.createPrivateStore(createAdapter(env,{transport:h.transport})),ref=await store.put(storage.prepare(pdf,'application/pdf',auditId,'s3'),pdf);
+ assert.deepEqual(await store.get(ref),pdf);
+});

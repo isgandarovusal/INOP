@@ -9,6 +9,20 @@ function configFromEnvironment(env){
  try{return protocol.configValue({provider:'s3',endpoint:env.AUDIT_EVIDENCE_STORAGE_ENDPOINT,bucket:env.AUDIT_EVIDENCE_STORAGE_BUCKET,region:env.AUDIT_EVIDENCE_STORAGE_REGION,accessKeyId:env.AUDIT_EVIDENCE_STORAGE_ACCESS_KEY_ID,secretAccessKey:env.AUDIT_EVIDENCE_STORAGE_SECRET_ACCESS_KEY,...(env.AUDIT_EVIDENCE_STORAGE_SESSION_TOKEN?{sessionToken:env.AUDIT_EVIDENCE_STORAGE_SESSION_TOKEN}:{})});}catch{throw fail();}
 }
 async function smallBody(body,signal){let value='';for await(const chunk of body||[]){if(signal?.aborted)throw fail('AUDIT_STORAGE_TIMEOUT');value+=Buffer.from(chunk).toString('utf8');if(Buffer.byteLength(value)>8192)throw fail();}if(signal?.aborted)throw fail('AUDIT_STORAGE_TIMEOUT');if(/<!|&/.test(value))throw fail();return value;}
+// S3 configuration responses contain flat scalar fields. Reject ambiguous XML,
+// including nested/duplicate values, rather than treating a matching substring
+// as evidence of private/versioned custody. No entities or general XML parsing.
+function configurationFields(xml,root,allowed){
+ const outer=new RegExp('^\\s*(?:<\\?xml[^?]*\\?>\\s*)?<'+root+'(?:\\s+xmlns=(?:"[^"<>]*"|\'[^\'<>]*\'))?\\s*>([\\s\\S]*)</'+root+'>\\s*$').exec(xml);
+ if(!outer)throw fail();
+ const fields=Object.create(null);let invalid=false;
+ const rest=outer[1].replace(/<([A-Za-z]+)>\s*([A-Za-z]+)\s*<\/\1>/g,(_match,name,value)=>{
+  if(!allowed.includes(name)||Object.hasOwn(fields,name))invalid=true;
+  fields[name]=value;return '';
+ });
+ if(invalid||rest.trim())throw fail();
+ return fields;
+}
 function createAdapter(env,{transport=protocol.nativeTransport,now=()=>new Date()}={}){
  const config=configFromEnvironment(env);
  async function request(method,key,signal,{query={},bytes,headers={}}={}){
@@ -23,10 +37,12 @@ function createAdapter(env,{transport=protocol.nativeTransport,now=()=>new Date(
  async function verifyBucket(signal){
   // Never trust an environment flag alone as proof of private/versioned custody.
   const policy=await request('GET','',signal,{query:{publicAccessBlock:''}}),xml=await smallBody(policy.body,signal);
-  if(!/^\s*(?:<\?xml[^?]*\?>\s*)?<PublicAccessBlockConfiguration(?:\s[^>]*)?>[\s\S]*<\/PublicAccessBlockConfiguration>\s*$/.test(xml))throw fail('AUDIT_STORAGE_NOT_PRIVATE');
-  for(const name of ['BlockPublicAcls','IgnorePublicAcls','BlockPublicPolicy','RestrictPublicBuckets'])if((xml.match(new RegExp('<'+name+'>','g'))||[]).length!==1||(xml.match(new RegExp('<'+name+'>true</'+name+'>','g'))||[]).length!==1)throw fail('AUDIT_STORAGE_NOT_PRIVATE');
+  const names=['BlockPublicAcls','IgnorePublicAcls','BlockPublicPolicy','RestrictPublicBuckets'];
+  const flags=configurationFields(xml,'PublicAccessBlockConfiguration',names);
+  for(const name of names)if(flags[name]!=='true')throw fail('AUDIT_STORAGE_NOT_PRIVATE');
   const state=await request('GET','',signal,{query:{versioning:''}}),v=await smallBody(state.body,signal);
-  if(!/^\s*(?:<\?xml[^?]*\?>\s*)?<VersioningConfiguration(?:\s[^>]*)?>[\s\S]*<\/VersioningConfiguration>\s*$/.test(v)||(v.match(/<Status>Enabled<\/Status>/g)||[]).length!==1||v.includes('<Status>Suspended</Status>'))throw fail();
+  const stateFields=configurationFields(v,'VersioningConfiguration',['Status','MfaDelete']);
+  if(stateFields.Status!=='Enabled'||stateFields.MfaDelete!==undefined&&!['Enabled','Disabled'].includes(stateFields.MfaDelete))throw fail();
  }
  const check=(key,v)=>{if(!keyValid(key)||v!==undefined&&!version(v))throw fail('AUDIT_STORAGE_INVALID_REFERENCE',400);};
  return Object.freeze({id:'s3',credentialsReady:true,capabilities:{private:true,durable:true,versioned:true,conditionalWrites:true},
