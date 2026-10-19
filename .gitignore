@@ -5,3 +5,6 @@ Backend/.env
 Frontend/.env
 **/.env
 **/.env.*
+
+# Reproducible CI logs and temporary task output (never source/evidence)
+/work/

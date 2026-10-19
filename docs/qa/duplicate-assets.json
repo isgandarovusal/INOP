@@ -1,0 +1,120 @@
+{
+  "baseCommit": "2b811d55857d110454fb5365f4cf0c8db20e0f2c",
+  "reason": "Byte-identical screenshots in the same evidence directory; retained bytes preserve both historical observations. References updated; no test or unique evidence removed.",
+  "aliases": [
+    {
+      "removed": "docs/qa/hr21/applications-board.jpg",
+      "retained": "docs/qa/hr21/application-board-route-1910.jpg",
+      "sha256": "057613e1d75eb8993d3607173108b310252f9ae8efc6cb163e0306e5180ec223",
+      "bytes": 169817
+    },
+    {
+      "removed": "docs/qa/hr21/applications-route-1910.jpg",
+      "retained": "docs/qa/hr21/applications-filled.jpg",
+      "sha256": "930132537d3a95eac3385aaf826c07a80cce2e00cd7787e02619c8ac33d179fe",
+      "bytes": 360944
+    },
+    {
+      "removed": "docs/qa/hr21/candidate-edit-route-1910.jpg",
+      "retained": "docs/qa/hr21/candidate-edit-1910.jpg",
+      "sha256": "60fc2edfe8034f607101b545b5aebec0a434121f50a5133a7744c32a072a634f",
+      "bytes": 124912
+    },
+    {
+      "removed": "docs/qa/hr21/candidate-edit-route-390.jpg",
+      "retained": "docs/qa/hr21/candidate-edit-390.jpg",
+      "sha256": "e555ef0007d5ea8536cc5f0659791a7569d88afbcce74e8617c26a9253d7a3de",
+      "bytes": 76644
+    },
+    {
+      "removed": "docs/qa/hr21/candidate-edit-route-768.jpg",
+      "retained": "docs/qa/hr21/candidate-edit-768.jpg",
+      "sha256": "c042fb3772b3f79462a9a4e01ab50fe30c6a52d63cdb97c9f33dcfa3657550a3",
+      "bytes": 84557
+    },
+    {
+      "removed": "docs/qa/hr21/candidates-route-1910.jpg",
+      "retained": "docs/qa/hr21/candidates-filled.jpg",
+      "sha256": "1ab587852a7d294ecbe4265604168def2f14c445724fed2d3e46cac048012408",
+      "bytes": 260312
+    },
+    {
+      "removed": "docs/qa/hr21/intake-disabled-route-1910.jpg",
+      "retained": "docs/qa/hr21/intake-detail-disabled-route-1910.jpg",
+      "sha256": "ddcf3c8baa7f1b368c4502779b401efbec979a6a967c69bdbcd7a090299d1b6a",
+      "bytes": 50888
+    },
+    {
+      "removed": "docs/qa/hr21/intake-disabled-route-390.jpg",
+      "retained": "docs/qa/hr21/intake-detail-disabled-route-390.jpg",
+      "sha256": "c69a7c3af03ccf7d49cb3193293b241d47ee57c14f68b465204561c17f03d8f5",
+      "bytes": 23658
+    },
+    {
+      "removed": "docs/qa/hr21/intake-disabled-route-768.jpg",
+      "retained": "docs/qa/hr21/intake-detail-disabled-route-768.jpg",
+      "sha256": "053c43959cba5a492b1f46dca9797f7979e2f2cd9ca635a2ceca980b211e7172",
+      "bytes": 27306
+    },
+    {
+      "removed": "docs/qa/hr21/job-create-route-390.jpg",
+      "retained": "docs/qa/hr21/job-create-390.jpg",
+      "sha256": "d46b286a495d03d89a674fe4026d8b6f67956f80ee571d46a1b30c0393ac7760",
+      "bytes": 78599
+    },
+    {
+      "removed": "docs/qa/hr21/job-create-route-768.jpg",
+      "retained": "docs/qa/hr21/job-create-768.jpg",
+      "sha256": "68fa7d04b39397d031f72ed1a1b0585c0bd767b1db14f43df508cf15a39c3ca2",
+      "bytes": 82332
+    },
+    {
+      "removed": "docs/qa/hr22/C/candidates-table.jpg",
+      "retained": "docs/qa/hr22/C/candidates-filled.jpg",
+      "sha256": "993a32c62c4569fb541f81888c7c3313fa8ebea8fe4229baa8bf8144ad5cea73",
+      "bytes": 326926
+    },
+    {
+      "removed": "docs/qa/hr22/F/before-intake-disabled-route-1440.jpg",
+      "retained": "docs/qa/hr22/F/before-intake-detail-disabled-route-1440.jpg",
+      "sha256": "457f06905a9edada5da6292e94d52c8554b0b933d0bac297e70027cc7dcebe04",
+      "bytes": 47117
+    },
+    {
+      "removed": "docs/qa/hr22/F/intake-disabled-route-1440.jpg",
+      "retained": "docs/qa/hr22/F/intake-detail-disabled-route-1440.jpg",
+      "sha256": "2673efaa7925472ec4ac4f73d719193246385d442a59e0436c1110f93c2453d7",
+      "bytes": 45426
+    },
+    {
+      "removed": "docs/qa/hr22/F/intake-disabled-route-390.jpg",
+      "retained": "docs/qa/hr22/F/intake-detail-disabled-route-390.jpg",
+      "sha256": "6ef8007f10216596763f3b91fc77eeb4254258fcde0b95f580d7e600f9c41b9f",
+      "bytes": 24220
+    },
+    {
+      "removed": "docs/qa/hr22/F/intake-disabled-route-768.jpg",
+      "retained": "docs/qa/hr22/F/intake-detail-disabled-route-768.jpg",
+      "sha256": "f32fd302f425673cc20e5000470ce4713eb512cf15156b47f15a6d7f5aabe071",
+      "bytes": 27871
+    },
+    {
+      "removed": "docs/qa/hr23/routes/intake-disabled-route-1440.jpg",
+      "retained": "docs/qa/hr23/routes/intake-detail-disabled-route-1440.jpg",
+      "sha256": "5605ef4c91a90aabe53f23a37ba3aa7b9cf888772da6e43155c17df7538df09c",
+      "bytes": 45849
+    },
+    {
+      "removed": "docs/qa/hr23/routes/intake-disabled-route-390.jpg",
+      "retained": "docs/qa/hr23/routes/intake-detail-disabled-route-390.jpg",
+      "sha256": "6ef8007f10216596763f3b91fc77eeb4254258fcde0b95f580d7e600f9c41b9f",
+      "bytes": 24220
+    },
+    {
+      "removed": "docs/qa/hr23/routes/intake-disabled-route-768.jpg",
+      "retained": "docs/qa/hr23/routes/intake-detail-disabled-route-768.jpg",
+      "sha256": "f32fd302f425673cc20e5000470ce4713eb512cf15156b47f15a6d7f5aabe071",
+      "bytes": 27871
+    }
+  ]
+}

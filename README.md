@@ -66,7 +66,6 @@ INOP is a full-stack internal operations platform covering **Recruitment / ATS**
 - Context API
 - i18next / react-i18next
 - Recharts
-- Formik
 - Lucide React
 - React Hot Toast
 
@@ -82,7 +81,7 @@ INOP is a full-stack internal operations platform covering **Recruitment / ATS**
 - Mammoth
 - Nodemailer
 - PDFKit
-- XLSX
+- ExcelJS
 
 ### Infrastructure
 - Docker
@@ -114,3 +113,6 @@ INOP/
 │   └── src/
 ├── docker-compose.yml
 └── README.md
+```
+
+See [Development workflow](docs/DEVELOPMENT_WORKFLOW.md) for setup, QA and release responsibilities.
