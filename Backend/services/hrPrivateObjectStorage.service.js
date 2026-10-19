@@ -35,18 +35,23 @@ function configValue(input) {
       host.length > 253 || !host.includes('.') || net.isIP(host) || !host.split('.').every(label => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) || /(^|\.)(localhost|local|internal|test|invalid)$/.test(host) ||
       !/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(input.bucket || '') || !/^[a-z0-9-]{1,40}$/.test(input.region || '') ||
       !/^[A-Za-z0-9_-]{3,128}$/.test(input.accessKeyId || '') || typeof input.secretAccessKey !== 'string' || input.secretAccessKey.length < 8 || input.secretAccessKey.length > 256 ||
+      // eslint-disable-next-line no-control-regex -- Reject credential header injection; intentional control-character validation.
       /[\x00-\x1f\x7f]/.test(input.secretAccessKey) || (input.sessionToken !== undefined && (typeof input.sessionToken !== 'string' || input.sessionToken.length > 4096 || /[\x00-\x1f\x7f]/.test(input.sessionToken)))) throw fail('STORAGE_INVALID_CONFIG');
   return Object.freeze({ ...input, endpoint: endpoint.origin });
 }
 const hmac = (key, text) => crypto.createHmac('sha256', key).update(text).digest();
-function sign(config, method, blob, at, body) {
+function sign(config, method, blob, at, body, options = {}) {
   const timestamp = at.toISOString().replace(/[:-]|\.\d{3}/g, ''), date = timestamp.slice(0,8);
   const url = new URL(config.endpoint + '/' + config.bucket + '/' + blob.key);
+  const encode = value => encodeURIComponent(value).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  const query = Object.entries(options.query || {}).map(([key,value]) => [encode(key),encode(String(value))]).sort(([a,av],[b,bv]) => a < b ? -1 : a > b ? 1 : av < bv ? -1 : av > bv ? 1 : 0).map(pair => pair.join('=')).join('&');
+  url.search = query;
   const headers = { host: url.host, 'x-amz-date': timestamp, 'x-amz-content-sha256': digest(body || Buffer.alloc(0)) };
   if (config.sessionToken) headers['x-amz-security-token'] = config.sessionToken;
   if (method === 'PUT') Object.assign(headers, { 'content-type': blob.mimeType, 'cache-control': 'private, no-store', 'if-none-match': '*', 'x-amz-meta-sha256': blob.sha256, 'x-amz-server-side-encryption': 'AES256' });
+  Object.assign(headers, options.headers || {});
   const names = Object.keys(headers).sort(), signed = names.join(';');
-  const canonical = [method,url.pathname,'', names.map(k => k + ':' + headers[k].trim() + '\n').join(''), signed,headers['x-amz-content-sha256']].join('\n');
+  const canonical = [method,url.pathname,query, names.map(k => k + ':' + headers[k].trim() + '\n').join(''), signed,headers['x-amz-content-sha256']].join('\n');
   const scope = date + '/' + config.region + '/s3/aws4_request';
   const key = hmac(hmac(hmac(hmac('AWS4' + config.secretAccessKey,date),config.region),'s3'),'aws4_request');
   const signature = crypto.createHmac('sha256',key).update(['AWS4-HMAC-SHA256',timestamp,scope,digest(canonical)].join('\n')).digest('hex');
@@ -62,7 +67,7 @@ async function nativeTransport(options) {
     const request = https.request(url, { method: options.method, headers: options.headers, signal: options.signal, agent: false,
       // Pin the validated DNS answer to prevent rebinding between validation and connect.
       lookup: (_host, opts, callback) => opts.all ? callback(null, [address]) : callback(null,address.address,address.family),
-    }, response => resolve({ status: response.statusCode, body: response }));
+    }, response => resolve({ status: response.statusCode, headers: response.headers, body: response }));
     request.once('error', reject); request.end(options.body);
   });
 }
@@ -121,4 +126,6 @@ function fromEnvironment(env = process.env) {
     accessKeyId: env.HR_CV_STORAGE_ACCESS_KEY_ID, secretAccessKey: env.HR_CV_STORAGE_SECRET_ACCESS_KEY,
     ...(env.HR_CV_STORAGE_SESSION_TOKEN ? { sessionToken: env.HR_CV_STORAGE_SESSION_TOKEN } : {}) });
 }
-module.exports = { prepare, reference, createStore, fromEnvironment, publicAddress, MAX_BYTES };
+// Technical primitives only. Audit uses its own keys, immutable version receipts,
+// configuration and permissions; Recruitment's reference/business contract stays intact.
+module.exports = { prepare, reference, createStore, fromEnvironment, publicAddress, MAX_BYTES, protocol: Object.freeze({ configValue, sign, nativeTransport }) };

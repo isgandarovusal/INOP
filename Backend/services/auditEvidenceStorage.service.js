@@ -45,11 +45,12 @@ function createPrivateStore(adapter,{timeoutMs=8000}={}){
   // until settlement, including stream reads, even if the adapter ignores abort.
   pending.then(()=>{active--;},()=>{active--;});
   try{return await Promise.race([pending,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(error('AUDIT_STORAGE_TIMEOUT'));},timeoutMs);})]);}
-  catch(failure){if(failure.code?.startsWith('AUDIT_STORAGE_'))throw failure;throw error('AUDIT_STORAGE_PROVIDER_FAILURE');}
+  catch(failure){const codes={AUDIT_STORAGE_IDENTITY_MISMATCH:409,AUDIT_STORAGE_NOT_FOUND:404,AUDIT_STORAGE_INVALID_REFERENCE:400,AUDIT_STORAGE_WRITE_CONFLICT:409,AUDIT_STORAGE_TIMEOUT:503,AUDIT_STORAGE_NETWORK_DENIED:503,AUDIT_STORAGE_NOT_PRIVATE:503,AUDIT_STORAGE_INVALID_RECEIPT:503};if(Object.hasOwn(codes,failure?.code))throw error(failure.code,codes[failure.code]);throw error('AUDIT_STORAGE_PROVIDER_FAILURE');}
   finally{clearTimeout(timer);}
  }
  const get=(value)=>operation(async signal=>{const ref=reference(value);if(ref.provider!==adapter.id)throw error('AUDIT_STORAGE_INVALID_REFERENCE',400);return bounded(await adapter.get({key:ref.key,version:ref.version,signal}),ref);});
  return Object.freeze({provider:adapter.id,durable:true,get,
+  ...(typeof adapter.probe==='function'?{checkAvailability:()=>operation(signal=>adapter.probe({signal}))}:{}),
   put:async(input,bytes)=>{
    reference({...input,version:'pending'});const snapshot=Buffer.from(bytes);if(input.provider!==adapter.id||snapshot.length!==input.size||hash(snapshot)!==input.sha256)throw error('AUDIT_STORAGE_IDENTITY_MISMATCH',409);
    const receipt=await operation(signal=>adapter.put({key:input.key,bytes:snapshot,mimeType:input.mimeType,sha256:input.sha256,ifAbsent:true,signal}));
@@ -59,7 +60,7 @@ function createPrivateStore(adapter,{timeoutMs=8000}={}){
   remove:value=>operation(signal=>{const ref=reference(value);if(ref.provider!==adapter.id)throw error('AUDIT_STORAGE_INVALID_REFERENCE',400);return adapter.remove({key:ref.key,version:ref.version,signal});}),
  });
 }
-// Server bootstrap only: no provider is registered/enabled by this release.
+// Server bootstrap registers supported protocols; explicit configuration enables one.
 function registerProvider(id,factory){if(typeof id!=='string'||id==='local'||!/^[a-z][a-z0-9-]{0,40}$/.test(id)||typeof factory!=='function'||factories.has(id))throw error('AUDIT_STORAGE_INVALID_ADAPTER');factories.set(id,factory);}
 function fromEnvironment(env=process.env){
  const production=env.RENDER==='true'||env.NODE_ENV==='production';
