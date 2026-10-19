@@ -1,0 +1,493 @@
+{
+  "recordedAt": "2026-10-19T12:38:26.690302+00:00",
+  "initialGithubHead": "0d782d09fa70c8c44384e1aebda997427dcf3c95",
+  "testedCodeCommit": "fd1b82cbea8b002ef9c4b5d2841b1407cb918605",
+  "testedBackendTree": "86206e2c52f276d4b47b4542e0e3326476f9bfb5",
+  "testedFrontendTree": "4163ea52a65da7ab6005babeca813a530687c74a",
+  "operatorReportedLiveBackendSha": "5d886ccf36cce0b67d25a12119663e00d4125ce9",
+  "renderMetadataSource": "operator Dashboard/Events; no control-plane credentials",
+  "renderServiceId": "srv-dafrn72d0e5s73dnnhbg",
+  "renderSettingsVerified": false,
+  "renderAutoDeploy": "OFF, operator-confirmed",
+  "sourceFamilies": [
+    {
+      "kind": "hr",
+      "target": "kfc",
+      "version": "source-v2",
+      "sha256": "d9535bb74d6078b0f75fab9969b6f28ffc868218c4879ad4e0d66cf65b4b6aa8",
+      "sections": 8,
+      "criteria": 66
+    },
+    {
+      "kind": "hr",
+      "target": "pizza-hut",
+      "version": "source-v1",
+      "sha256": "14dace01b68395de1e1c1e89253778b4182338c7f4a75360651acc0aa0d13c49",
+      "sections": 8,
+      "criteria": 71
+    },
+    {
+      "kind": "hr",
+      "target": "simit-sarayi",
+      "version": "source-v1",
+      "sha256": "f19580b2fa3d2a3ab0d6aae07987023d6fc3e054f2d1bf83cf90e6a5d3fdb37a",
+      "sections": 4,
+      "criteria": 35
+    },
+    {
+      "kind": "service",
+      "target": "kfc",
+      "version": "service-source-v2",
+      "sha256": "2c42c35e5eae628cb75d4a31b4d7b147601b66148f196a447943bb16f558ce49",
+      "sections": 13,
+      "criteria": 94
+    },
+    {
+      "kind": "service",
+      "target": "pizza-hut",
+      "version": "service-source-v1",
+      "sha256": "82340f5c838abcc42355a394830db7ba7424a97e0fca03b2e2745a83652de032",
+      "sections": 11,
+      "criteria": 79
+    },
+    {
+      "kind": "service",
+      "target": "simit-sarayi",
+      "version": "service-source-v1",
+      "sha256": "5ae33e9224c38bd5ff02cef91159d31531dd9cd8d67798b609739fc8b64dfa64",
+      "sections": 10,
+      "criteria": 61
+    },
+    {
+      "kind": "standard",
+      "target": "kfc",
+      "version": "standard-source-v1",
+      "sha256": "66aaa8c423d5066afb664c14dae811db72b5f2061c3a58dca8e7713133c6b9b5",
+      "sections": 10,
+      "criteria": 190
+    },
+    {
+      "kind": "standard",
+      "target": "pizza-hut",
+      "version": "standard-source-v1",
+      "sha256": "b8bdb1b2138b3518f0f19c862f22ba4516d74f8c9755d6caa9d8353f87179c5a",
+      "sections": 10,
+      "criteria": 123
+    },
+    {
+      "kind": "standard",
+      "target": "simit-sarayi",
+      "version": "standard-source-v1",
+      "sha256": "fb6bca39879fa1896ef314a4d452b460ecabd517329ac1e55f36f07bdc7b117a",
+      "sections": 10,
+      "criteria": 71
+    },
+    {
+      "kind": "hse",
+      "target": "warehouse",
+      "version": "hse-source-v1",
+      "sha256": "db204f4bde2fcae933729a2e914a1a31b5f91dca931703ce91ac9364a609c12e",
+      "sections": 6,
+      "criteria": 29
+    },
+    {
+      "kind": "hse",
+      "target": "office",
+      "version": "hse-source-v1",
+      "sha256": "f2243f51f37a46c1f253152c7aade214e90bb6d0b9c849eee144e7c391631381",
+      "sections": 5,
+      "criteria": 19
+    },
+    {
+      "kind": "hse",
+      "target": "restaurant",
+      "version": "hse-source-v1",
+      "sha256": "3f47324b9bd8fd09beab15537a43b106f03fbc975b8ed774a5efc7c6c4fb259c",
+      "sections": 6,
+      "criteria": 52
+    }
+  ],
+  "localBackend": {
+    "files": 121,
+    "pass": 2021,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 708587.464068
+  },
+  "storageRuntimeTargetedPass": 10,
+  "legacyCodeCurrentFrontendBrowser": {
+    "pass": 40,
+    "fail": 1,
+    "groupsPass": [
+      2,
+      3,
+      8,
+      4,
+      1,
+      1,
+      1,
+      20
+    ],
+    "groupsFail": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "skipped": 0,
+    "cancelled": 0,
+    "failure": "Strict metadata Percentage expected literal empty string; ExcelJS reader of historical SheetJS cell returns undefined. Original FAIL retained."
+  },
+  "legacyExports": {
+    "mode": "baseline",
+    "productionAccess": false,
+    "scenarios": [
+      {
+        "kind": "hr",
+        "target": "kfc",
+        "count": 66,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "service",
+        "target": "kfc",
+        "count": 94,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "standard",
+        "target": "kfc",
+        "count": 190,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": "LEGACY_HISTORY_NAME_REJECTED_BY_EXCELJS",
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "restaurant",
+        "count": 52,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "office",
+        "count": 19,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "warehouse",
+        "count": 29,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "undefined",
+        "excelJsReaderValue": "(undefined)",
+        "nullNeverNumericZero": true
+      }
+    ]
+  },
+  "currentExports": {
+    "mode": "current",
+    "productionAccess": false,
+    "scenarios": [
+      {
+        "kind": "hr",
+        "target": "kfc",
+        "count": 66,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "service",
+        "target": "kfc",
+        "count": 94,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "standard",
+        "target": "kfc",
+        "count": 190,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "restaurant",
+        "count": 52,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "office",
+        "count": 19,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      },
+      {
+        "kind": "hse",
+        "target": "warehouse",
+        "count": 29,
+        "http": 200,
+        "storedPercentage": null,
+        "readerError": null,
+        "sheetJsReaderValue": "",
+        "excelJsReaderType": "string",
+        "excelJsReaderValue": "",
+        "nullNeverNumericZero": true
+      }
+    ]
+  },
+  "syntheticProvision": {
+    "familiesPass": 12,
+    "indexNoOpPass": 7,
+    "writes": 0,
+    "productionVerified": false
+  },
+  "backupRestore": {
+    "collections": 15,
+    "documents": 45,
+    "digestVerified": true,
+    "indexesVerified": true,
+    "evidenceHashVerified": true,
+    "productionAccess": false
+  },
+  "build": "PASS",
+  "frontendLint": {
+    "errors": 0,
+    "previousWarnings": 9
+  },
+  "changedBackendLint": {
+    "files": 3,
+    "errors": 0
+  },
+  "dependencyAudits": {
+    "Frontend-audit-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Backend-audit-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Backend-audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "Frontend-audit-production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "legacyLockfileFullAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 3,
+    "high": 4,
+    "critical": 0,
+    "total": 7
+  },
+  "legacyLockfileProductionAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 3,
+    "high": 1,
+    "critical": 0,
+    "total": 4
+  },
+  "liveFrontend": {
+    "observedAt": "2026-10-19T12:33:44.371845+00:00",
+    "readOnly": true,
+    "indexHttpStatus": 200,
+    "indexMatchesBuild": true,
+    "assetsTotal": 141,
+    "assetsMatching": 141,
+    "publicApiOrigin": "https://inop-backend.onrender.com/api"
+  },
+  "hostedCi": {
+    "runId": 39252810594,
+    "jobId": 118060540798,
+    "sha": "fd1b82cbea8b002ef9c4b5d2841b1407cb918605",
+    "status": "completed",
+    "url": "https://github.com/isgandarovusal/INOP/actions/runs/39252810594",
+    "conclusion": "success",
+    "backendPass": 2021,
+    "browserPass": 41,
+    "auditBrowserPass": 21,
+    "recruitmentBrowserPass": 20,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "groupPassCounts": [
+      2021,
+      2,
+      3,
+      8,
+      4,
+      1,
+      2,
+      1,
+      20
+    ],
+    "matrices": {
+      "center": 36,
+      "report": 72,
+      "visual": 100
+    },
+    "evidence": "decoded Actions job118060540798 log and terminal run metadata"
+  },
+  "testedFileSha256": {
+    "Backend/services/auditS3Adapter.service.js": "2b21ec82abc1b8d81048bb19595d3b5470defaee4025d8cadee423c79476319e",
+    "Backend/tests/auditS3Adapter.test.cjs": "b5f4ab7390557884cba85af2894a7a6ba3426459b1086537caaaf5f97bb67112",
+    "Backend/tests/auditIndexExplain.test.cjs": "6192f2adc217527af2e08c7b918a78866e4ec379d5eb1255cbcf3d3f9eff9f4d"
+  },
+  "evidenceSha256": {
+    "backend-full.log": "79ddb0c53a7740070991004c0606c576bca6e5b87f9e624a0b1e386b094516d0",
+    "live-code-compat-browser.log": "e695dd994d3ec56b18d2044d6b4f7a64d4a8b3c5f70a8f4f2b13209b7ff23bc6",
+    "storage-runtime-targeted.log": "fdecced3793fe5095b26fd2ce964f517fa90dcb2033c2d8e4f6ef9281f0c80c0",
+    "s3-before.log": "30e4634cfa70f4ec401fab8ea252d8270b709e354b36ad725313aff63d240769",
+    "index-explain.log": "cf16786542f33589569f3e1b1dd8df690cee565c481739dd47b047516992713d",
+    "baseline-export-comparison.log": "463efdaa566f1ac07cfe6a79a571c7067601b577a012754a27375d353f184085",
+    "current-export-comparison.log": "b4848d60054fa634969bcbb2b7100643a5b934e34633d9dac0202695b7bd6d51"
+  },
+  "productionDatabaseWrites": 0,
+  "storageActivated": false,
+  "secretsChanged": false,
+  "manualRenderDeployment": false,
+  "productionReadiness": "BLOCKED",
+  "exportArtifactSha256": {
+    "baseline-hr-kfc.xlsx": "0d4512857c35affb36f22a453c195ac930c1da737117146289e3c04242e0c467",
+    "baseline-hse-warehouse.xlsx": "0dd651273105c5f27d7325297f671143a660999e12c1810f5dfda3b293cfe65e",
+    "baseline-hse-restaurant.xlsx": "40aed07ab29cb0504ea53df0584f36092bbeb6e2809cf1cc01072b963ce78ecc",
+    "baseline-standard-kfc.xlsx": "487874f66a5107e9fa3a3a7fe46bde60d01265fe9f6d4ac9174477ed604cfbd9",
+    "baseline-service-kfc.xlsx": "2c11968a0a6cad5ec3a620ba440bc11ca1a90b8f3b986f20e43aee9690076005",
+    "baseline-hse-office.xlsx": "7dd94a27b0822d4891610c89338cb1e8f9babcfcf8e1f0aa6fd42a5a2bccb488",
+    "current-hse-office.xlsx": "bc803dd197c15b5f40fb8be7891c741b3d17bef42594d3b74eb8bb49c11e8009",
+    "current-service-kfc.xlsx": "0facf2fe42eb867f4db1b48ebc4637a264a5b43d2fc622c8dd99bd725d0b7dd4",
+    "current-hse-restaurant.xlsx": "3ae7b5d80049d083c2d31c34129d3bcb571e890671665154f8676972e52e0d3f",
+    "current-hr-kfc.xlsx": "e0cdd9c69c68d00f51e3fc04c2fab69d7dba4df3c63f6e185022cd0d7718a749",
+    "current-standard-kfc.xlsx": "a63ee96fc17301515dd27cfdd1c538bcd44bd1fc64a7f561ea7ca48cb1bcca36",
+    "current-hse-warehouse.xlsx": "24c33daff43dc6b4ea55b0fee46930022896a93d33e617cb8b80022afffc7b42"
+  },
+  "operationalRoutes": {
+    "readyIntroduced": "c45773f",
+    "versionIntroduced": "4ee72d3",
+    "absentInLiveSource5d886cc": true
+  },
+  "liveReadOnlyProbes": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "observedAt": "2026-10-19T12:05:24.169280+00:00",
+      "status": 200,
+      "safeResponse": {
+        "success": true,
+        "status": "ok"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/ready",
+      "observedAt": "2026-10-19T12:05:24.425433+00:00",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/ready/",
+      "observedAt": "2026-10-19T12:05:24.698257+00:00",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/version",
+      "observedAt": "2026-10-19T12:05:24.974598+00:00",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/ready",
+      "observedAt": "2026-10-19T12:05:25.191039+00:00",
+      "status": 401
+    }
+  ],
+  "finalQaRecordedAt": "2026-10-19T12:51:19.805514+00:00",
+  "localTechnicalPreparation": "COMPLETE",
+  "stage3Overall": "PARTIAL"
+}
