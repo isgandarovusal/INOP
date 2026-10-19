@@ -1,6 +1,51 @@
 # Paket 09 — yekun QA
 
-> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+> Cari final closure: **COMPLETE** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+## Final closure — 19 oktyabr 2026
+
+**Lokal texniki status COMPLETE; production BLOCKED.** Əvvəlki cədvəllər `66e67f7` icrasının arxividir.
+
+| Final yoxlama | Faktiki nəticə |
+|---|---|
+| Backend,116 fayl | **2007 PASS/0 FAIL/0 SKIP/0 CANCELLED**,394883ms |
+| Audit browser | **21/21 PASS**: center2,HSE3,Standard/Service8,HR4,report1,evidence/export2,visual1 |
+| Recruitment UI | **20/20 PASS** |
+| Matrix | Center36/report72/visual100 PASS; AZ/EN/RU və320/390/768/1440 |
+| Build | PASS |
+| Frontend lint | 0 error/9 əvvəlki warning |
+| Bütün Paket09 dəyişən backend JS/CJS | 72 fayl,0 error |
+| Clean npm ci | Backend/Frontend PASS; locked normal install |
+| Dependency full+production | Backend0/Frontend0 advisory |
+| Six real reports/XLSX | All brands,NA/null,3 slots,independent workflow,history və injection PASS |
+| Large report | 190standards+250actions,75166bytes,150ms,46queries,evidence1query; text loss yoxdur |
+| Provision/index offline CLI | Filled12/7 PASS,no-op/writes0; empty12/7 safe exit2 |
+| 7-index local rehearsal | Result equality/explain/rollback PASS;production overhead NOT TESTED |
+| Isolated restore | 15collection45doc,digest/index/evidencehash PASS |
+| Hosted CI | **PASS**, `1d8cc8871a0ca0849dd1f814d3095bc86c4d1384`, https://github.com/isgandarovusal/INOP/actions/runs/39212246965 |
+| Signature/attestation audit | NOT TESTED: failed-to-download; npm ci SRI verification PASS-dan ayrıdır |
+
+Mənbə Excel/catalog/verifier/scoring business kodu dəyişmir. Candidate exportda yalnız writer/await dəyişib; Recruitment/Main Dashboard UI və business logic dəyişdirilməyib. Worksheet History→Audit History migration fərqi ayrıca sənədləşdirilib. İlkin focused fail (History reserved-name) və 1ms date delta düzəldilib; loglar gizlədilmir. Final14/14 focused və full2007/2007 keçib.
+
+Cloud browser explicit external Playwright1.62.1 və Chromium istifadə edib; CI installed pinned Playwright runtime-ı istifadə edir. Vizual100 presentation-only synthetic response matrix-dir; digər workflow/report qrupları real isolated API/DB ilə ayrıca işləyib. Original Excel faylları/credential/binary baseline commit edilməyib; synthetic golden JSON var.
+
+Log kökü `/workspace/work/audit-p09-closure`. Əvvəlki failed/intermediate qaçışlar saxlanır. Final digest-lər:
+
+| Log | SHA-256 |
+|---|---|
+| backend-final.log | d95a24e6eaf1e75f9b1a1b5f23f45ca1621151bf559ee000c70cab655f6b33e8 |
+| browser-final.log | c069b2752b4d1aa1eee28704bad96ccf5300c30f5683bba9eedd3dd782d042a2 |
+| build.log | 4bcf32004949ecf5560aae951dbd4005e55e03e4cfb9a3dc2be2850e019c5d52 |
+| lint.log | 82c15b11f1d2f0cc82b230bbba08f8c15700d0470f18f8cb9de3ec4b42bd150f |
+| backend-lint-all.log | 219d4bd7a30fdf3108c383866da16f56960ba4607bcb1d209162fa49c264f7fb |
+| index-rehearsal.json | bb717dd42934bedbdd6662140cca6379e0e07c25aa97ddb419374c268fdd042f |
+| dry-run-final.json | 951cea9bcd7b86055d017bd59b339731aa7714bbcc4cd565a2e1bbdfc2ce4632 |
+| backend-audit-final.json | b20d9716a841e644aeb16231fdcff804ba0dd685bbd94d523a805a4f97cd4d5c |
+| frontend-audit-final.json | e5620420bfbbc6a2b2e19f97194cdce6320b8bd52badcc78f882a217ab99c2ab |
+
+Code/dependency commit `fb209ef`, CI/portability commit `0543e04`. Hosted run sonrası final evidence commit-i yalnız docs-dur; workflow docs-only push-ları ignore edir. Həmin final docs diff-i runtime/test/workflow dəyişmədiyi üçün hosted code nəticəsi ilə ayrıca əlaqələndirilir.
+
+## Başlanğıc sənəd — arxiv (66e67f7)
 
 
 19 oktyabr 2026. Repository `isgandarovusal/INOP`, branch `inop-main`, baza `5d886ccf36cce0b67d25a12119663e00d4125ce9`. Əvvəlki dəyişikliklər davam etdirilib, sıfırdan başlanmayıb. Production DB/secrets/deploy əməliyyatı yoxdur.
@@ -89,45 +134,5 @@ Final Git commit/push nəticəsi bu sənədləri ehtiva edən commit və GitHub 
 Final browser delivery SHA-256 `5a0196ded31120e8068054cbf10d67c27d6d418e478a3e58b7c78c351c3ca35c`. Vizual 100 matrix presentation-only synthetic responses üzərindədir; funksional workflow/report qrupları real isolated API/DB ilə ayrıca keçir.
 
 
-## Final closure — 19 oktyabr 2026
 
-**Lokal texniki status PARTIAL; production BLOCKED.** Əvvəlki cədvəllər `66e67f7` icrasının arxividir.
-
-| Final yoxlama | Faktiki nəticə |
-|---|---|
-| Backend,116 fayl | **2007 PASS/0 FAIL/0 SKIP/0 CANCELLED**,394883ms |
-| Audit browser | **21/21 PASS**: center2,HSE3,Standard/Service8,HR4,report1,evidence/export2,visual1 |
-| Recruitment UI | **20/20 PASS** |
-| Matrix | Center36/report72/visual100 PASS; AZ/EN/RU və320/390/768/1440 |
-| Build | PASS |
-| Frontend lint | 0 error/9 əvvəlki warning |
-| Bütün Paket09 dəyişən backend JS/CJS | 72 fayl,0 error |
-| Clean npm ci | Backend/Frontend PASS; locked normal install |
-| Dependency full+production | Backend0/Frontend0 advisory |
-| Six real reports/XLSX | All brands,NA/null,3 slots,independent workflow,history və injection PASS |
-| Large report | 190standards+250actions,75166bytes,150ms,46queries,evidence1query; text loss yoxdur |
-| Provision/index offline CLI | Filled12/7 PASS,no-op/writes0; empty12/7 safe exit2 |
-| 7-index local rehearsal | Result equality/explain/rollback PASS;production overhead NOT TESTED |
-| Isolated restore | 15collection45doc,digest/index/evidencehash PASS |
-| Hosted CI | **NOT TESTED**, `0543e04`, Yeni code üçün hosted run hələ təsdiqlənməyib |
-| Signature/attestation audit | NOT TESTED: failed-to-download; npm ci SRI verification PASS-dan ayrıdır |
-
-Mənbə Excel/catalog/verifier/scoring business kodu dəyişmir. Candidate exportda yalnız writer/await dəyişib; Recruitment/Main Dashboard UI və business logic dəyişdirilməyib. Worksheet History→Audit History migration fərqi ayrıca sənədləşdirilib. İlkin focused fail (History reserved-name) və 1ms date delta düzəldilib; loglar gizlədilmir. Final14/14 focused və full2007/2007 keçib.
-
-Cloud browser explicit external Playwright1.62.1 və Chromium istifadə edib; CI installed pinned Playwright runtime-ı istifadə edir. Vizual100 presentation-only synthetic response matrix-dir; digər workflow/report qrupları real isolated API/DB ilə ayrıca işləyib. Original Excel faylları/credential/binary baseline commit edilməyib; synthetic golden JSON var.
-
-Log kökü `/workspace/work/audit-p09-closure`. Əvvəlki failed/intermediate qaçışlar saxlanır. Final digest-lər:
-
-| Log | SHA-256 |
-|---|---|
-| backend-final.log | d95a24e6eaf1e75f9b1a1b5f23f45ca1621151bf559ee000c70cab655f6b33e8 |
-| browser-final.log | c069b2752b4d1aa1eee28704bad96ccf5300c30f5683bba9eedd3dd782d042a2 |
-| build.log | 4bcf32004949ecf5560aae951dbd4005e55e03e4cfb9a3dc2be2850e019c5d52 |
-| lint.log | 82c15b11f1d2f0cc82b230bbba08f8c15700d0470f18f8cb9de3ec4b42bd150f |
-| backend-lint-all.log | 219d4bd7a30fdf3108c383866da16f56960ba4607bcb1d209162fa49c264f7fb |
-| index-rehearsal.json | bb717dd42934bedbdd6662140cca6379e0e07c25aa97ddb419374c268fdd042f |
-| dry-run-final.json | 951cea9bcd7b86055d017bd59b339731aa7714bbcc4cd565a2e1bbdfc2ce4632 |
-| backend-audit-final.json | b20d9716a841e644aeb16231fdcff804ba0dd685bbd94d523a805a4f97cd4d5c |
-| frontend-audit-final.json | e5620420bfbbc6a2b2e19f97194cdce6320b8bd52badcc78f882a217ab99c2ab |
-
-Code/dependency commit `fb209ef`, CI/portability commit `0543e04`. Hosted run sonrası final evidence commit-i yalnız docs-dur; workflow docs-only push-ları ignore edir. Həmin final docs diff-i runtime/test/workflow dəyişmədiyi üçün hosted code nəticəsi ilə ayrıca əlaqələndirilir.
+Final hosted job log: SHA-256 `ecd5ffb6f2fdebe4e3dc6a9319321665178203709e6feaba592b6e86c5442951`,backend2007/browser41/0FAIL;artifact və tested SHA CI_EVIDENCE sənədindədir. Müstəqil openpyxl3.1.5 synthetic before/after reader:6sheets/234cells,semantic match,0formula,30logicalblank XML representation fərqi,0ms date delta. Bu format sübutu real audit scoring-i dəyişmir.

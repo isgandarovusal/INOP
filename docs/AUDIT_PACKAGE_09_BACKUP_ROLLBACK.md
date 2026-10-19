@@ -1,6 +1,12 @@
 # Paket 09 — backup, restore və rollback
 
-> Cari final closure: **PARTIAL** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+> Cari final closure: **COMPLETE** (lokal texniki). Production readiness: **BLOCKED**. Əvvəlki nəticələr tarixidir; aşağıdakı final closure bölməsi cari vəziyyətdir.
+
+## Final closure — 19 oktyabr 2026
+
+Final tam backend qaçışında real isolated mongodump/mongorestore rehearsal yenidən keçib: 15 collection/45 sənəd; source digest, index key/name/unique və private evidence SHA-256 uyğun gəlib. 7 yeni QA indeksinin rollback rehearsal-ı da keçib. Source/catalog/saved result/history dəyişdirilməyib. Production DB+provider consistent backup, live restore, retention və application rollback operator rehearsal-ı hələ NOT TESTED/BLOCKED-dir.
+
+## Başlanğıc sənəd — arxiv (66e67f7)
 
 
 ## Lokal rehearsal
@@ -26,8 +32,3 @@ Real mongodump gzip archive → mongorestore namespace mapping → bütün colle
 6. Incident zamanı public/private URL bypass bağlanır, approved operational procedure ilə trafik/işlər idarə edilir, request ID və redacted status qeydləri saxlanır. Təsdiqlənməmiş SLA, retention və alert həddi yaradılmır.
 
 Production backup/restore/retention, monitoring və staged rollback operator rehearsal-ı NOT TESTED/BLOCKED qalır. Production DB, backup və storage üzərində bu task əməliyyat aparmır.
-
-
-## Final closure — 19 oktyabr 2026
-
-Final tam backend qaçışında real isolated mongodump/mongorestore rehearsal yenidən keçib: 15 collection/45 sənəd; source digest, index key/name/unique və private evidence SHA-256 uyğun gəlib. 7 yeni QA indeksinin rollback rehearsal-ı da keçib. Source/catalog/saved result/history dəyişdirilməyib. Production DB+provider consistent backup, live restore, retention və application rollback operator rehearsal-ı hələ NOT TESTED/BLOCKED-dir.

@@ -1,6 +1,6 @@
 # Paket 09 — final production release gate
 
-19 oktyabr2026. **Lokal texniki Paket09:PARTIAL. Production readiness:BLOCKED.** Base66e67f7. Tarixi dependency FAIL və CI NOT TESTED nəticələri cari cədvəllə əvəz edilir; sübutlar QA/DEPENDENCY_REMEDIATION/CI_EVIDENCE sənədlərindədir.
+19 oktyabr2026. **Lokal texniki Paket09:COMPLETE. Production readiness:BLOCKED.** Base66e67f7. Tarixi dependency FAIL və CI NOT TESTED nəticələri cari cədvəllə əvəz edilir; sübutlar QA/DEPENDENCY_REMEDIATION/CI_EVIDENCE sənədlərindədir.
 
 | Gate | Status | Sübut / tələb |
 |---|---|---|
@@ -17,7 +17,7 @@
 | Offline provision | PASS | Synthetic12,no writes,idempotent/conflict/duplicate checks |
 | Local index proof/rollback | PASS | 7hinted result-preserving plans+rollback;latestscale autoexplain1doc |
 | Isolated DB/evidence restore | PASS | 15collection45doc,digest/index/evidencehash |
-| GitHub hosted CI | NOT TESTED | `0543e04`;Yeni code üçün hosted run hələ təsdiqlənməyib |
+| GitHub hosted CI | PASS | `1d8cc8871a0ca0849dd1f814d3095bc86c4d1384`;https://github.com/isgandarovusal/INOP/actions/runs/39212246965 |
 | Registry signature/attestation extra check | NOT TESTED | Managed download failure;official registry+SRI clean installs verified |
 | Production provider/credentials | BLOCKED | Approved binding/credentials əlçatan deyil |
 | Real production upload/download | BLOCKED | 6source private/hash/deny smoke operator tərəfindən keçirilməlidir |

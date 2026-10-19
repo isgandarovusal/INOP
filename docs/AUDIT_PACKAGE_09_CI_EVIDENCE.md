@@ -20,4 +20,15 @@ Push inop-main/PR code change və manual dispatch işləyir;docs-only change ign
 
 ## Cari hosted nəticə
 
-**NOT TESTED**. Run:Yeni code üçün hosted run hələ təsdiqlənməyib. Tested SHA:`0543e04`. Conclusion:`pending`. Job/backend/browser nəticələrinin detalları real final run logs ilə final closure mərhələsində tamamlanır. Lokal ekvivalent:backend2007/0,browser41/0,build/lint və audit0.
+**PASS**. Run:https://github.com/isgandarovusal/INOP/actions/runs/39212246965. Tested SHA:`1d8cc8871a0ca0849dd1f814d3095bc86c4d1384`. Conclusion:`success`. Bütün job step-ləri success-dir; actual nəticələr aşağıdadır. Lokal ekvivalent:backend2007/0,browser41/0,build/lint və audit0.
+
+
+## Completed hosted sübutu
+
+Run `39212246965`, attempt1, job `117928025443`; push event, GitHub-hosted Ubuntu24.04.5. 06:50:26→07:08:13 UTC, job17m44s. Backend **2007/2007**,browser **41/41** (Audit21+Recruitment20),0 FAIL/SKIP/CANCELLED. Center36/report72/visual100;dependency full/prod,build/lint,native prerequisites,replica setup,cleanup,artifact və summary addımlarının hamısı success.
+
+Artifact `audit-qa-39212246965-1`, ID `12168668039`,57989bytes;digest `sha256:263d909582bfa51e71e43140d3f222695daf24e975bae8c20bf2416b1b03ae65`;expiry2026-10-26T07:08:07Z. Yalnız generated QA logs/JSON,7day retention. Metadata GitHub Actions API-dən götürülüb; archive bytes ayrıca download/re-hash edilməyib, digest server metadata-sıdır.
+
+Completed job log SHA-256 `ecd5ffb6f2fdebe4e3dc6a9319321665178203709e6feaba592b6e86c5442951`. Logs GitHub connector ilə endirilib və PASS/FAIL summary-ləri avtomatik assert edilib: `[2007,2,3,8,4,1,2,1,20]` PASS və9×0 FAIL. Temporary in-progress log404 final job tamamlandıqdan sonra aradan qalxıb.
+
+Tested commit `1d8cc8871a0ca0849dd1f814d3095bc86c4d1384`-dür. Son evidence commit-i yalnız docs dəyişir; runtime,test,lockfile və workflow həmin tested SHA ilə eyni qalır. Docs-only push workflow-un path filter-i ilə yenidən code QA başlatmır; final Git diff bu sərhədi təsdiqləyir. Hosted PASS final code-a aiddir, production release approval-u deyil.
