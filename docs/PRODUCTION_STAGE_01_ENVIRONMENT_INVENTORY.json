@@ -1,0 +1,274 @@
+{
+  "scope": "Code references only; no .env files, values, or production secrets were read",
+  "presenceEvidence": "Production control plane unavailable; names are not proof of configured values",
+  "components": {
+    "Backend": [
+      {
+        "name": "API_REQUEST_LOG_ENABLED",
+        "codeFiles": [
+          "Backend/server.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "AUDIT_EVIDENCE_STORAGE_ENABLED",
+        "codeFiles": [
+          "Backend/services/auditEvidenceStorage.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "AUDIT_EVIDENCE_STORAGE_PROVIDER",
+        "codeFiles": [
+          "Backend/services/auditEvidenceStorage.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "BACKEND_ENV_FILE",
+        "codeFiles": [
+          "Backend/scripts/seedRoles.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "CS",
+        "codeFiles": [
+          "Backend/scripts/seedUsers.js",
+          "Backend/server.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_AI_CV_REVIEW_APPROVED",
+        "codeFiles": [
+          "Backend/controllers/hrAi.controller.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_CV_AI_PROCESSING_ENABLED",
+        "codeFiles": [
+          "Backend/server.js",
+          "Backend/services/hrCvTaskProfiles.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_CV_OCR_DATA_DIRECTORY",
+        "codeFiles": [
+          "Backend/services/hrCvTaskProfiles.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_CV_OCR_ENABLED",
+        "codeFiles": [
+          "Backend/server.js",
+          "Backend/services/hrCvTaskProfiles.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_CV_PROCESSING_ENABLED",
+        "codeFiles": [
+          "Backend/server.js",
+          "Backend/services/hrCvProcessing.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "HR_NOTIFICATION_WORKER_ENABLED",
+        "codeFiles": [
+          "Backend/server.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "INOP_AUDIT_TEST_PORT",
+        "codeFiles": [
+          "Backend/scripts/runBackendTests.cjs"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "QA-only, never production DB opt-in"
+      },
+      {
+        "name": "INOP_TRUST_RENDER_PROXY",
+        "codeFiles": [
+          "Backend/middleware/networkSecurity.middleware.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "JWT_EXPIRES_IN",
+        "codeFiles": [
+          "Backend/controllers/auth.controller.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "JWT_SECRET",
+        "codeFiles": [
+          "Backend/controllers/auth.controller.js",
+          "Backend/controllers/hrBoard.controller.js",
+          "Backend/controllers/hrRanking.controller.js",
+          "Backend/middleware/auth.middleware.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "MONGO_URI",
+        "codeFiles": [
+          "Backend/scripts/seedRoles.js",
+          "Backend/scripts/seedUsers.js",
+          "Backend/server.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "NODE_ENV",
+        "codeFiles": [
+          "Backend/routes/route.js",
+          "Backend/services/documentWorkerPool.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "PORT",
+        "codeFiles": [
+          "Backend/server.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "RENDER",
+        "codeFiles": [
+          "Backend/routes/route.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "RENDER_SERVICE_TYPE",
+        "codeFiles": [
+          "Backend/middleware/networkSecurity.middleware.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_FROM",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_HOST",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_PASS",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_PORT",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_SECURE",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "SMTP_USER",
+        "codeFiles": [
+          "Backend/services/email.service.js"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      }
+    ],
+    "Frontend": [
+      {
+        "name": "BASE_URL",
+        "codeFiles": [
+          "Frontend/src/Routes/hrRouteModules.ts"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Vite built-in, not an operator secret"
+      },
+      {
+        "name": "PROD",
+        "codeFiles": [
+          "Frontend/src/Routes/hrRouteModules.ts"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Vite built-in, not an operator secret"
+      },
+      {
+        "name": "VITE_API_BASE_URL",
+        "codeFiles": [
+          "Frontend/src/Pages/Audit/OccupationalSafetyAudit/OccupationalSafetyAuditsList.tsx",
+          "Frontend/src/Services/auditNotificationService.ts",
+          "Frontend/src/Services/auditPermissionService.ts",
+          "Frontend/src/api/axios.ts"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "VITE_ENABLE_SPEED_INSIGHTS",
+        "codeFiles": [
+          "Frontend/src/main.tsx"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      },
+      {
+        "name": "VITE_HR_DURABLE_INTAKE_ENABLED",
+        "codeFiles": [
+          "Frontend/src/Pages/Recruitment/Candidates/CandidateForm.tsx",
+          "Frontend/src/Pages/Recruitment/Candidates/CandidatesList.tsx",
+          "Frontend/src/Pages/Recruitment/Candidates/CvIntakeDetail.tsx",
+          "Frontend/src/Pages/Recruitment/Candidates/CvIntakeQueue.tsx"
+        ],
+        "productionPresence": "UNVERIFIED",
+        "kind": "Code-referenced configuration; not proof of production presence"
+      }
+    ]
+  }
+}

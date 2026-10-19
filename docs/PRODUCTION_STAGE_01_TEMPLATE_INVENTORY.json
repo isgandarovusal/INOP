@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-19T07:20:02.301Z",
+  "repository": "isgandarovusal/INOP",
+  "branch": "inop-main",
+  "sourceCommit": "72b114fd1c193bfa2529f4569ecd35d7e5f2ee4d",
+  "writes": 0,
+  "productionConnected": false,
+  "families": [
+    {
+      "direction": "hr",
+      "target": "kfc",
+      "effectiveVersion": "source-v2",
+      "sourceFile": "HR audit - KFC.xlsx",
+      "sourceSha256": "d9535bb74d6078b0f75fab9969b6f28ffc868218c4879ad4e0d66cf65b4b6aa8",
+      "contentSha256": "ee31f4824cf1a6663a262362b17abf9eac6fa530b1bbffb5a9797b1639750bc9",
+      "bindingKey": "kfc:d9535bb74d6078b0f75fab9969b6f28ffc868218c4879ad4e0d66cf65b4b6aa8:source-v2",
+      "catalogueFile": "Backend/config/hrAuditSources.json",
+      "worksheets": [
+        "HRTR Yeni"
+      ],
+      "sections": 8,
+      "criteria": 66,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "hr",
+      "target": "pizza-hut",
+      "effectiveVersion": "source-v1",
+      "sourceFile": "HR audit -PH.xlsx",
+      "sourceSha256": "14dace01b68395de1e1c1e89253778b4182338c7f4a75360651acc0aa0d13c49",
+      "contentSha256": "9118042addd3cfa75f0b5778ec49464943966244bed7837cac51bbd3d8e7a429",
+      "bindingKey": "pizza-hut:14dace01b68395de1e1c1e89253778b4182338c7f4a75360651acc0aa0d13c49",
+      "catalogueFile": "Backend/config/hrAuditSources.json",
+      "worksheets": [
+        "HRTR Yeni",
+        "Лист1"
+      ],
+      "sections": 8,
+      "criteria": 71,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "hr",
+      "target": "simit-sarayi",
+      "effectiveVersion": "source-v1",
+      "sourceFile": "HR AUDİT - Simit Sarayı (SS).xlsx",
+      "sourceSha256": "f19580b2fa3d2a3ab0d6aae07987023d6fc3e054f2d1bf83cf90e6a5d3fdb37a",
+      "contentSha256": "8622baa6af3543f2f353979bd705f07f478718f33d82586853aa8126b68079a9",
+      "bindingKey": "simit-sarayi:f19580b2fa3d2a3ab0d6aae07987023d6fc3e054f2d1bf83cf90e6a5d3fdb37a",
+      "catalogueFile": "Backend/config/hrAuditSources.json",
+      "worksheets": [
+        "Sheet1"
+      ],
+      "sections": 4,
+      "criteria": 35,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "service",
+      "target": "kfc",
+      "effectiveVersion": "service-source-v2",
+      "sourceFile": "Servis auditi - Kfc.xlsx",
+      "sourceSha256": "2c42c35e5eae628cb75d4a31b4d7b147601b66148f196a447943bb16f558ce49",
+      "contentSha256": "bab91cd523e5658b93ba225cc80e8ba37302627420670a6551700f2c63792307",
+      "bindingKey": "service:kfc:2c42c35e5eae628cb75d4a31b4d7b147601b66148f196a447943bb16f558ce49:service-source-v2",
+      "catalogueFile": "Backend/config/serviceAuditSources.json",
+      "worksheets": [
+        "Kfc Zoo Park"
+      ],
+      "sections": 13,
+      "criteria": 94,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "service",
+      "target": "pizza-hut",
+      "effectiveVersion": "service-source-v1",
+      "sourceFile": "Servis auditi - Ph.xlsx",
+      "sourceSha256": "82340f5c838abcc42355a394830db7ba7424a97e0fca03b2e2745a83652de032",
+      "contentSha256": "93e19933804a96f26f2a0d99e5c21c7b75f17bd5753b5633f10385c23630d586",
+      "bindingKey": "service:pizza-hut:82340f5c838abcc42355a394830db7ba7424a97e0fca03b2e2745a83652de032:service-source-v1",
+      "catalogueFile": "Backend/config/serviceAuditSources.json",
+      "worksheets": [
+        "PH Fontan "
+      ],
+      "sections": 11,
+      "criteria": 79,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "service",
+      "target": "simit-sarayi",
+      "effectiveVersion": "service-source-v1",
+      "sourceFile": "Servis auditi - SS.xlsx",
+      "sourceSha256": "5ae33e9224c38bd5ff02cef91159d31531dd9cd8d67798b609739fc8b64dfa64",
+      "contentSha256": "0ba18ee1ef853b07dd64589f4fd9cfd28b4935c2f115fb0af2dce99cdd04466d",
+      "bindingKey": "service:simit-sarayi:5ae33e9224c38bd5ff02cef91159d31531dd9cd8d67798b609739fc8b64dfa64:service-source-v1",
+      "catalogueFile": "Backend/config/serviceAuditSources.json",
+      "worksheets": [
+        "SS "
+      ],
+      "sections": 10,
+      "criteria": 61,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "standard",
+      "target": "kfc",
+      "effectiveVersion": "standard-source-v1",
+      "sourceFile": "Standart Audit - KFC.xlsx",
+      "sourceSha256": "66aaa8c423d5066afb664c14dae811db72b5f2061c3a58dca8e7713133c6b9b5",
+      "contentSha256": "216f1b7fd8009e66f482f6258bf20144e378f101a9d03a19ac9d64e722fcb521",
+      "bindingKey": "standard:kfc:66aaa8c423d5066afb664c14dae811db72b5f2061c3a58dca8e7713133c6b9b5:standard-source-v1",
+      "catalogueFile": "Backend/config/standardAuditSources.json",
+      "worksheets": [
+        "QT",
+        "Ümumi Standartlar"
+      ],
+      "sections": 10,
+      "criteria": 190,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "standard",
+      "target": "pizza-hut",
+      "effectiveVersion": "standard-source-v1",
+      "sourceFile": "Standart Audit - Pizza_Hut.xlsx",
+      "sourceSha256": "b8bdb1b2138b3518f0f19c862f22ba4516d74f8c9755d6caa9d8353f87179c5a",
+      "contentSha256": "f36bc44d24e07337eec0e3de7604b904af10a472545abc4745a21aa8eedc1249",
+      "bindingKey": "standard:pizza-hut:b8bdb1b2138b3518f0f19c862f22ba4516d74f8c9755d6caa9d8353f87179c5a:standard-source-v1",
+      "catalogueFile": "Backend/config/standardAuditSources.json",
+      "worksheets": [
+        "Pizza Hut QT",
+        "Лист1"
+      ],
+      "sections": 10,
+      "criteria": 123,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "standard",
+      "target": "simit-sarayi",
+      "effectiveVersion": "standard-source-v1",
+      "sourceFile": "Standart Audit - Simit_Sarayi.xlsx",
+      "sourceSha256": "fb6bca39879fa1896ef314a4d452b460ecabd517329ac1e55f36f07bdc7b117a",
+      "contentSha256": "5af744c44c87f70f06dfc7afe86a5ffcc2fdfcf605d770dd4aac09bec0178a98",
+      "bindingKey": "standard:simit-sarayi:fb6bca39879fa1896ef314a4d452b460ecabd517329ac1e55f36f07bdc7b117a:standard-source-v1",
+      "catalogueFile": "Backend/config/standardAuditSources.json",
+      "worksheets": [
+        "Simit Sarayı Brend Standartları",
+        "Simit Sarayı Audit Matrisi"
+      ],
+      "sections": 10,
+      "criteria": 71,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "hse",
+      "target": "warehouse",
+      "effectiveVersion": "hse-source-v1",
+      "sourceFile": "ƏM - GFC_HSE_Audit_Blanki_Anbar.xlsx",
+      "sourceSha256": "db204f4bde2fcae933729a2e914a1a31b5f91dca931703ce91ac9364a609c12e",
+      "contentSha256": "e26ccba1e57154bf8ace3953b09a848b2713e394bc3e4675590fa824c17779e8",
+      "bindingKey": "hse:warehouse:db204f4bde2fcae933729a2e914a1a31b5f91dca931703ce91ac9364a609c12e:hse-source-v1",
+      "catalogueFile": "Backend/config/hseAuditSources.json",
+      "worksheets": [
+        "AUDİT BLANKI - Anbar"
+      ],
+      "sections": 6,
+      "criteria": 29,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "hse",
+      "target": "office",
+      "effectiveVersion": "hse-source-v1",
+      "sourceFile": "ƏM -GFC_HSE_Audit_Blanki_Ofis.xlsx",
+      "sourceSha256": "f2243f51f37a46c1f253152c7aade214e90bb6d0b9c849eee144e7c391631381",
+      "contentSha256": "f86317d0059b57bf40d99d2d2a8faf4e396918e1c177c4d45e9cff1887eaacc4",
+      "bindingKey": "hse:office:f2243f51f37a46c1f253152c7aade214e90bb6d0b9c849eee144e7c391631381:hse-source-v1",
+      "catalogueFile": "Backend/config/hseAuditSources.json",
+      "worksheets": [
+        "AUDİT BLANKI - Ofis"
+      ],
+      "sections": 5,
+      "criteria": 19,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    },
+    {
+      "direction": "hse",
+      "target": "restaurant",
+      "effectiveVersion": "hse-source-v1",
+      "sourceFile": "ƏM - GFC_ HSE_Audit_Blanki Son versiya.xlsx",
+      "sourceSha256": "3f47324b9bd8fd09beab15537a43b106f03fbc975b8ed774a5efc7c6c4fb259c",
+      "contentSha256": "1fb258aade9882e3c68147c67e3ffd62a73221549fb35463eaeb3837e92ec4f6",
+      "bindingKey": "hse:restaurant:3f47324b9bd8fd09beab15537a43b106f03fbc975b8ed774a5efc7c6c4fb259c:hse-source-v1",
+      "catalogueFile": "Backend/config/hseAuditSources.json",
+      "worksheets": [
+        "COVER",
+        "AUDİT BLANKI"
+      ],
+      "sections": 6,
+      "criteria": 52,
+      "localSourceVerification": "PASS",
+      "productionTemplateId": null,
+      "productionRevisionId": null,
+      "productionActiveStatus": "UNVERIFIED",
+      "productionProvisionStatus": "UNVERIFIED"
+    }
+  ]
+}
