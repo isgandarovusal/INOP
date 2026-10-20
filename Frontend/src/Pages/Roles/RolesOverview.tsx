@@ -500,7 +500,7 @@ const RolesOverview: React.FC = () => {
                 <input aria-label={t('roles.form.name')} autoFocus
                   className="input-field"
                   value={form.name}
-                  placeholder="Məsələn: Senior Auditor"
+                  placeholder={t("roles.form.namePlaceholder")}
                   onChange={(event) => {
                     const name = event.target.value;
 
@@ -533,7 +533,7 @@ const RolesOverview: React.FC = () => {
                 />
                 {!editingRole && (
                   <p className="role-modal__field-hint">
-                    Rol adından avtomatik yaradılır.
+                    {t("roles.form.keyHint")}
                   </p>
                 )}
               </div>

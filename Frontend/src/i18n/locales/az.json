@@ -322,7 +322,9 @@
       "cancel": "Ləğv et",
       "saving": "Saxlanılır...",
       "save": "Dəyişiklikləri saxla",
-      "create": "Rol yarat"
+      "create": "Rol yarat",
+      "namePlaceholder": "Məsələn: Senior Auditor",
+      "keyHint": "Rol adından avtomatik yaradılır."
     },
     "scopes": {
       "all": "Bütün uyğun məlumatlar",

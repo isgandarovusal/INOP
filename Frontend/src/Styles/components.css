@@ -139,10 +139,11 @@
     border-color var(--transition-fast),
     box-shadow var(--transition-fast),
     color var(--transition-fast);
+  font-weight: 400;
 }
 
 .input-field::placeholder {
-  color: var(--text-disabled);
+  color: var(--hr-slate);
 }
 
 .input-field:hover:not(:disabled) {
@@ -563,7 +564,7 @@ tbody tr:hover {
 :is(.admin-table-container,.audit-modern-table-wrapper) table, table.audit-modern-table { border-collapse:collapse; border-spacing:0; }
 :is(.admin-table-container,.audit-modern-table-wrapper) :is(th,td), table.audit-modern-table :is(th,td) { padding:13px 16px; border-bottom:1px solid var(--hr-border); text-align:start; line-height:1.5; }
 :is(.admin-table-container,.audit-modern-table-wrapper) th, table.audit-modern-table th { background:var(--hr-subtle); color:var(--hr-slate); font-size:12px; font-weight:600; text-transform:none; letter-spacing:.015em; }
-:is(.admin-table-container,.audit-modern-table-wrapper) td, table.audit-modern-table td { background:transparent; color:var(--hr-ink); font-size:14px; font-weight:400; }
+:is(.admin-table-container,.audit-modern-table-wrapper) td, table.audit-modern-table td { background:transparent; color:var(--hr-ink); font-size:14px; font-weight: 400; }
 :is(.admin-table-container,.audit-modern-table-wrapper) tbody tr:hover { background:var(--hr-blue-soft); }
 :is(.admin-table-container,.audit-modern-table-wrapper) tbody tr:last-child td { border-bottom:0; }
 .badge--info { color: var(--hr-blue-ink); background: var(--hr-blue-soft); border: 1px solid var(--hr-blue-border); }
@@ -1496,7 +1497,7 @@ tbody tr:hover {
 }
 
 .search-field input::placeholder {
-  color: #a0a8b4;
+  color: var(--hr-slate);
 }
 
 .search-field input:hover {
@@ -1942,49 +1943,6 @@ table.audit-modern-table {
 
 .form-card:has(.form-grid) .form-group {
   gap: 7px;
-}
-
-.form-card:has(.form-grid) .form-label {
-  color: #4b5565;
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.02em;
-}
-
-.form-card:has(.form-grid) .input-field {
-  min-height: 40px;
-  height: 40px;
-  border: 1px solid #dfe4ec;
-  border-radius: 9px;
-  background: #ffffff;
-  color: #252b38;
-  font-size: 12px;
-  box-shadow:
-    inset 0 1px 2px rgba(20, 28, 45, 0.018),
-    0 1px 1px rgba(20, 28, 45, 0.012);
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease;
-}
-
-.form-card:has(.form-grid) .input-field:hover:not(:disabled) {
-  border-color: #cbd2df;
-}
-
-.form-card:has(.form-grid) .input-field:focus {
-  border-color: #818cf8;
-  background: #fff;
-  box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.09),
-    0 2px 5px rgba(20, 28, 45, 0.025);
-  outline: none;
-}
-
-.form-card:has(.form-grid) .input-field:disabled {
-  background: #f5f6f8;
-  color: #8992a1;
-  cursor: not-allowed;
 }
 
 .form-card:has(.form-grid) .form-actions {

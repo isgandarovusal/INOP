@@ -315,7 +315,9 @@
       "cancel": "Cancel",
       "saving": "Saving...",
       "save": "Save changes",
-      "create": "Create role"
+      "create": "Create role",
+      "namePlaceholder": "e.g. Senior Auditor",
+      "keyHint": "Generated automatically from the role name."
     },
     "scopes": {
       "all": "All",
