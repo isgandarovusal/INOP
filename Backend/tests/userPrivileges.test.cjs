@@ -177,10 +177,11 @@ test('User and role privilege authorization (isolated local MongoDB)', async (t)
     for (const actor of ['hr', 'department', 'editor']) await t.test(`${actor} may edit its profile with unchanged role/department`, async () => {
       const before = await userSnapshot(actors[actor]._id);
       try {
-        const response = await request(actor, 'PUT', `/users/${before._id}`, { role: before.role.toUpperCase(), departmentId: before.departmentId, managerId: null, name: 'Legitimate profile', password: 'test-only-self-password' });
+        const response = await request(actor, 'PUT', `/users/${before._id}`, { role: before.role.toUpperCase(), departmentId: before.departmentId, managerId: null, name: 'Legitimate profile' });
         assert.equal(response.status, 200); assert.equal(response.body.user.role, before.role);
         assert.equal(response.body.user.name, 'Legitimate profile');
-        assert.ok(await bcrypt.compare('test-only-self-password', (await userSnapshot(before._id)).password));
+        assert.equal((await userSnapshot(before._id)).password,before.password,'Ordinary profile edits preserve the password');
+        await protectedUpdate(actor,actor,{password:'test-only-self-password'},400);
       } finally { await User.collection.replaceOne({ _id: before._id }, before); }
     });
     await t.test('HR may update a same-department employee ordinary profile', async () => {
@@ -218,7 +219,10 @@ test('User and role privilege authorization (isolated local MongoDB)', async (t)
         const response = await request(actor, 'PUT', `/users/${before._id}`, { role: 'audit_manager', departmentId: 'dep_B', managerId: String(actors.admin._id), email: 'authorized-change@example.invalid', password: 'test-only-admin-password' });
         assert.equal(response.status, 200); assert.equal(response.body.user.role, 'audit_manager');
         assert.equal(response.body.user.departmentId, 'dep_B');
-        assert.equal((await request('employee', 'GET', '/audits')).status, 200);
+        assert.equal((await request('employee', 'GET', '/audits')).status, 401,'Password reset revokes the old JWT');
+        const login=await request('employee','POST','/auth/login',{email:'authorized-change@example.invalid',password:'test-only-admin-password'});
+        assert.equal(login.status,200);assert.ok(login.body.token);
+        const previousToken=tokens.employee;try{tokens.employee=login.body.token;assert.equal((await request('employee','GET','/audits')).status,200);}finally{tokens.employee=previousToken;}
       } finally { await User.collection.replaceOne({ _id: before._id }, before); }
     });
     await t.test('Admin demotion invalidates old JWT authority immediately', async () => {
