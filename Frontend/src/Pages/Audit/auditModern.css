@@ -96,30 +96,7 @@
 }
 
 .audit-workspace .audit-modern-table th {
-  padding: 12px 14px;
-  background: var(--surface-subtle);
-  border-bottom: 1px solid #e5eaf1;
-  color: var(--text-muted);
   text-align: left;
-  font-size: 11px;
-  font-weight: 750;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.audit-workspace .audit-modern-table td {
-  padding: 14px;
-  border-bottom: 1px solid #eef2f7;
-  color: var(--text-secondary-strong);
-  font-size: 13px;
-}
-
-.audit-workspace .audit-modern-table tr:last-child td {
-  border-bottom: 0;
-}
-
-.audit-workspace .audit-modern-table tr:hover td {
-  background: #f8fbff;
 }
 
 .audit-workspace .audit-status::before {
@@ -176,14 +153,12 @@
 .audit-workspace .audit-modern-table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border-radius: 16px;
 }
 
 .audit-workspace .audit-table,
 .audit-workspace .audit-modern-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--surface, #fff);
 }
 
 .audit-workspace .audit-table th,
@@ -2104,12 +2079,10 @@
 /* INOP — Audits List business surface */
 .audit-workspace .audit-list-page{max-width:1220px;margin:0 auto;padding-bottom:48px}
 .audit-workspace .audit-list-page .filter-bar{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding:12px;background:linear-gradient(180deg,#fff,#f8f9fb);border:1px solid #e4e8ef;border-radius:14px;box-shadow:0 8px 24px rgba(20,28,45,.045)}
-.audit-workspace .audit-list-page .admin-table-container{border:1px solid #e3e7ee;border-radius:16px;background:#fff;box-shadow:0 12px 32px rgba(20,28,45,.06);overflow:hidden}
+.audit-workspace .audit-list-page .admin-table-container{overflow:hidden}
 .audit-workspace .audit-list-page .admin-table-container table{min-width:760px}
-.audit-workspace .audit-list-page .admin-table-container th{height:48px;padding:0 18px;background:#f7f8fa;color:#697386;border-bottom:1px solid #e5e8ee;font-size:10px;font-weight:750;letter-spacing:.075em;text-transform:uppercase}
-.audit-workspace .audit-list-page .admin-table-container td{padding:15px 18px;border-bottom:1px solid #eef1f5;font-size:13px;color:#343b49}
+.audit-workspace .audit-list-page .admin-table-container th{height:48px}
 .audit-workspace .audit-list-page .admin-table-container tbody tr{transition:background .16s ease,box-shadow .16s ease}
-.audit-workspace .audit-list-page .admin-table-container tbody tr:hover{background:#fafbff;box-shadow:inset 3px 0 0 var(--accent)}
 .audit-workspace .audit-list-page .cell-title--clickable{font-weight:700;color:#252b38;cursor:pointer}
 .audit-workspace .audit-list-page .cell-title--clickable:hover{color:var(--accent)}
 .audit-workspace .audit-list-page .cell-muted{color:#747e8e}
@@ -2157,10 +2130,6 @@
 
 .audit-workspace .audit-standard-list-page .admin-table-container{
   position:relative;
-  border:1px solid #e3e7ee;
-  border-radius:16px;
-  background:#fff;
-  box-shadow:0 12px 32px rgba(20,28,45,.06);
   overflow:hidden;
 }
 
@@ -2171,35 +2140,14 @@
 
 .audit-workspace .audit-standard-list-page .admin-table-container th{
   height:48px;
-  padding:0 18px;
-  background:#f7f8fa;
-  color:#697386;
-  border-bottom:1px solid #e5e8ee;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
 }
 
 .audit-workspace .audit-standard-list-page .admin-table-container td{
-  padding:15px 18px;
-  border-bottom:1px solid #eef1f5;
-  color:#343b49;
-  font-size:13px;
   vertical-align:middle;
 }
 
 .audit-workspace .audit-standard-list-page .admin-table-container tbody tr{
   transition:background .16s ease,box-shadow .16s ease;
-}
-
-.audit-workspace .audit-standard-list-page .admin-table-container tbody tr:hover{
-  background:#fafbff;
-  box-shadow:inset 3px 0 0 var(--accent);
-}
-
-.audit-workspace .audit-standard-list-page .admin-table-container tbody tr:last-child td{
-  border-bottom:0;
 }
 
 .audit-workspace .audit-standard-list-page .admin-table-container td:nth-child(1){
@@ -2226,14 +2174,9 @@
 .audit-workspace .audit-standard-list-page .admin-table-container .badge{
   min-width:76px;
   justify-content:center;
-  border-radius:999px;
-  font-weight:750;
 }
 
 .audit-workspace .audit-standard-list-page .admin-table-container [role="status"]{
-  border:1px solid #e3e7ee;
-  color:#667085;
-  box-shadow:0 6px 18px rgba(20,28,45,.08);
   backdrop-filter:blur(10px);
 }
 
@@ -2263,10 +2206,6 @@
 
   .audit-workspace .audit-standard-list-page .filter-bar .btn-secondary{
     width:100%;
-  }
-
-  .audit-workspace .audit-standard-list-page .admin-table-container{
-    border-radius:13px;
   }
 }
 
@@ -2311,10 +2250,6 @@
 
 .audit-workspace .service-audits-page .admin-table-container{
   position:relative;
-  border:1px solid #e3e7ee;
-  border-radius:16px;
-  background:#fff;
-  box-shadow:0 12px 32px rgba(20,28,45,.06);
   overflow:hidden;
 }
 
@@ -2325,41 +2260,15 @@
 
 .audit-workspace .service-audits-page .admin-table-container th{
   height:48px;
-  padding:0 18px;
-  background:#f7f8fa;
-  color:#697386;
-  border-bottom:1px solid #e5e8ee;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
   text-align:left;
 }
 
 .audit-workspace .service-audits-page .admin-table-container td{
-  padding:15px 18px;
-  border-bottom:1px solid #eef1f5;
-  color:#343b49;
-  font-size:13px;
   vertical-align:middle;
 }
 
 .audit-workspace .service-audits-page .admin-table-container tbody tr{
   transition:background .16s ease,box-shadow .16s ease;
-}
-
-.audit-workspace .service-audits-page .admin-table-container tbody tr:hover{
-  background:#fafbff;
-  box-shadow:inset 3px 0 0 var(--accent);
-}
-
-.audit-workspace .service-audits-page .admin-table-container tbody tr:last-child td{
-  border-bottom:0;
-}
-
-.audit-workspace .service-audits-page .admin-table-container td:first-child{
-  color:#252b38;
-  font-weight:700;
 }
 
 .audit-workspace .service-audits-page .admin-table-container td:nth-child(2){
@@ -2381,14 +2290,9 @@
 .audit-workspace .service-audits-page .admin-table-container .badge{
   min-width:76px;
   justify-content:center;
-  border-radius:999px;
-  font-weight:750;
 }
 
 .audit-workspace .service-audits-page .admin-table-container [role="status"]{
-  border:1px solid #e3e7ee;
-  color:#667085;
-  box-shadow:0 6px 18px rgba(20,28,45,.08);
   backdrop-filter:blur(10px);
 }
 
@@ -2421,10 +2325,6 @@
 
   .audit-workspace .service-audits-page .filter-bar .btn-secondary{
     width:100%;
-  }
-
-  .audit-workspace .service-audits-page .admin-table-container{
-    border-radius:13px;
   }
 }
 
@@ -2468,41 +2368,15 @@
 
 .audit-workspace .audit-modern-page .audit-modern-table th{
   height:46px;
-  padding:0 18px;
-  background:#f7f8fa;
-  border-bottom:1px solid #e5e8ee;
-  color:#697386;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
   text-align:left;
 }
 
 .audit-workspace .audit-modern-page .audit-modern-table td{
-  padding:15px 18px;
-  border-bottom:1px solid #eef1f5;
-  color:#343b49;
-  font-size:13px;
   vertical-align:middle;
 }
 
 .audit-workspace .audit-modern-page .audit-modern-table tbody tr{
   transition:background .16s ease,box-shadow .16s ease;
-}
-
-.audit-workspace .audit-modern-page .audit-modern-table tbody tr:hover{
-  background:#fafbff;
-  box-shadow:inset 3px 0 0 var(--accent);
-}
-
-.audit-workspace .audit-modern-page .audit-modern-table tbody tr:last-child td{
-  border-bottom:0;
-}
-
-.audit-workspace .audit-modern-page .audit-modern-table td:first-child{
-  color:#252b38;
-  font-weight:700;
 }
 
 .audit-workspace .audit-modern-page .audit-modern-table td:nth-child(2){
@@ -2530,12 +2404,6 @@
 
   .audit-workspace .audit-modern-page .audit-card-header{
     padding:15px 16px;
-  }
-
-  .audit-workspace .audit-modern-page .audit-modern-table th,
-.audit-workspace .audit-modern-page .audit-modern-table td{
-    padding-left:14px;
-    padding-right:14px;
   }
 }
 
@@ -3234,12 +3102,6 @@
 
 .audit-workspace .audit-standard-list-page > .admin-table-container{
   overflow:hidden;
-  border:1px solid #e0e5ee;
-  border-radius:16px;
-  background:#fff;
-  box-shadow:
-    0 14px 34px rgba(20,28,45,.055),
-    0 2px 5px rgba(20,28,45,.02);
 }
 
 .audit-workspace .audit-standard-list-page > .admin-table-container table{
@@ -3250,27 +3112,11 @@
 
 .audit-workspace .audit-standard-list-page > .admin-table-container thead th{
   height:46px;
-  padding:0 18px;
-  border-bottom:1px solid #e5e9f0;
-  background:#f8f9fc;
-  color:#647087;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
   white-space:nowrap;
 }
 
 .audit-workspace .audit-standard-list-page > .admin-table-container tbody td[colspan]{
   height:178px;
-  padding:28px 20px;
-  border:0;
-  background:
-    radial-gradient(circle at 50% 38%,rgba(99,102,241,.035),transparent 34%),
-    #fff;
-  color:#697386;
-  font-size:13px;
-  font-weight:650;
   text-align:center;
   vertical-align:middle;
 }
@@ -3280,9 +3126,6 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#667085;
-  font-size:13px;
-  font-weight:650;
 }
 
 .audit-workspace .audit-standard-state{
@@ -3374,14 +3217,6 @@
   .audit-workspace .audit-standard-list-page > .filter-bar > .btn-secondary{
     grid-column:1;
     justify-self:stretch;
-  }
-
-  .audit-workspace .audit-standard-list-page > .admin-table-container{
-    border-radius:13px;
-  }
-
-  .audit-workspace .audit-standard-list-page > .admin-table-container thead th{
-    padding:0 12px;
   }
 
   .audit-workspace .audit-standard-state{
@@ -4627,12 +4462,6 @@
 
 .audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table th{
   height:34px;
-  padding:0 13px;
-  background:#fbfcfe;
-  color:#8a93a2;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.07em;
 }
 
 .audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table th:first-child{
@@ -4650,25 +4479,7 @@
 
 .audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table td{
   height:54px;
-  padding:7px 12px;
-  border-bottom:1px solid #edf0f4;
-  color:#394150;
-  font-size:12px;
-  line-height:1.4;
   vertical-align:middle;
-}
-
-.audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table tbody tr:last-child td{
-  border-bottom:0;
-}
-
-.audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table tbody tr:hover{
-  background:#fafbff;
-}
-
-.audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table td:first-child{
-  color:#303746;
-  font-weight:600;
 }
 
 .audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table td:nth-child(2){
@@ -4705,22 +4516,9 @@
   width:100%;
   height:34px;
   min-height:34px;
-  padding:0 10px;
-  border:1px solid #e0e4eb;
-  border-radius:8px;
-  background:#fff;
-  color:#3c4453;
-  font-size:11px;
-  box-shadow:none;
-}
-
-.audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table .audit-modern-input::placeholder{
-  color:#a0a8b5;
 }
 
 .audit-workspace .safety-audit-form .audit-safety-table-wrapper .audit-modern-table .audit-modern-input:focus{
-  border-color:#818cf8;
-  box-shadow:0 0 0 3px rgba(99,102,241,.09);
   outline:none;
 }
 
@@ -4883,10 +4681,6 @@
 .audit-workspace .safety-audit-form .audit-checklist-section
 .audit-modern-table tbody tr td:first-child{
   position:relative;
-  padding-left:18px;
-  color:#343b49;
-  font-size:12px;
-  font-weight:600;
 }
 
 .audit-workspace .safety-audit-form .audit-checklist-section
@@ -4896,8 +4690,6 @@
   width:5px;
   height:5px;
   margin:0 9px 2px 0;
-  border-radius:50%;
-  background:#c7ccd7;
   transition:
     background .16s ease,
     transform .16s ease;
@@ -4905,30 +4697,10 @@
 
 .audit-workspace .safety-audit-form .audit-checklist-section
 .audit-modern-table tbody tr:hover td:first-child::before{
-  background:var(--accent);
   transform:scale(1.25);
 }
 
-.audit-workspace .safety-audit-form .audit-checklist-section
-.audit-modern-table tbody tr:hover{
-  background:#fafaff;
-}
-
 /* Stronger separation between category and questions */
-
-.audit-workspace .safety-audit-form .audit-checklist-section
-.audit-modern-table thead{
-  border-bottom:1px solid #edf0f4;
-}
-
-.audit-workspace .safety-audit-form .audit-checklist-section
-.audit-modern-table thead th{
-  background:#fbfcfe;
-  color:#8a93a2;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.07em;
-}
 
 /* Note field remains secondary */
 
@@ -4938,7 +4710,6 @@
 .audit-modern-table th:last-child,
 .audit-workspace .safety-audit-form .audit-checklist-section
 .audit-modern-table td:last-child{
-  background:#fafbfe;
   border-left:1px solid #edf0f4;
 }
 
@@ -4947,11 +4718,6 @@
     min-height:43px;
     padding:0 13px;
     font-size:10px;
-  }
-
-  .audit-workspace .safety-audit-form .audit-checklist-section
-  .audit-modern-table tbody tr td:first-child{
-    padding-left:13px;
   }
 }
 
@@ -5481,7 +5247,6 @@
   word-break:normal;
   overflow:hidden;
   text-overflow:clip;
-  line-height:1.5;
   vertical-align:middle;
 }
 
@@ -5512,10 +5277,6 @@
 
 
 /* Slight readability increase — Occupational Safety checklist */
-.audit-workspace .safety-audit-form .audit-checklist-section
-.audit-modern-table tbody td:first-child{
-  font-size:11.5px;
-}
 
 .audit-workspace .safety-audit-form .audit-checklist-section
 .audit-modern-table tbody td:nth-child(2)

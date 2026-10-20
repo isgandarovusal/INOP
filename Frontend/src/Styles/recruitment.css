@@ -138,7 +138,6 @@
 /* Recruitment tables */
 .page-container .admin-table-container {
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
 }
 
 .page-container .admin-table-container table {
@@ -147,18 +146,12 @@
 
 .page-container .admin-table-container thead th {
   height: 44px;
-  background: #f7f8fc;
-  letter-spacing: 0.055em;
 }
 
 .page-container .admin-table-container tbody tr {
   transition:
     background 150ms ease,
     box-shadow 150ms ease;
-}
-
-.page-container .admin-table-container tbody tr:hover {
-  background: #f8faff;
 }
 
 .page-container .admin-table-container td {
@@ -458,18 +451,12 @@
 
 .recruitment-list-page .admin-table-container thead th {
   height: 44px;
-  background: #f7f8fc;
-  letter-spacing: 0.055em;
 }
 
 .recruitment-list-page .admin-table-container tbody tr {
   transition:
     background 150ms ease,
     box-shadow 150ms ease;
-}
-
-.recruitment-list-page .admin-table-container tbody tr:hover {
-  background: #f8faff;
 }
 
 .recruitment-list-page .admin-table-container td {
@@ -1120,10 +1107,6 @@
 }
 
 @media (max-width: 560px) {
-
-  .recruitment-list-page .admin-table-container {
-    border-radius: 13px;
-  }
 }
 
 
@@ -1291,10 +1274,6 @@
    TABLE HEADERS — SOFT INDIGO SURFACE
    ================================================================ */
 
-.recruitment-list-page .admin-table-container {
-  border-color: rgba(79, 70, 229, 0.13) !important;
-}
-
 /* ================================================================
    KANBAN — DEEP INDIGO HEADERS
    ================================================================ */
@@ -1379,17 +1358,6 @@
 .recruitment-list-page .admin-table-container {
   overflow: hidden;
   margin-top: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.20);
-  border-radius: 16px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.99),
-      rgba(248, 250, 252, 0.98)
-    );
-  box-shadow:
-    0 18px 38px rgba(15, 23, 42, 0.055),
-    0 3px 9px rgba(15, 23, 42, 0.025);
 }
 
 /* Job identity */
@@ -1492,10 +1460,6 @@
 /* Compact screens */
 
 @media (max-width: 760px) {
-
-  .recruitment-list-page .admin-table-container {
-    border-radius: 13px;
-  }
 }
 
 /* ── INOP Job Detail business composition ─────────────────────── */

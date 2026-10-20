@@ -63,13 +63,9 @@
 .audit-workspace.audit-workspace .audit-control-row { margin-block: 12px; align-items: end; }
 .audit-workspace.audit-workspace :is(.filter-bar,.table-toolbar) { background: var(--hr-white); border: 1px solid var(--hr-border); border-radius: 12px; padding: 16px; box-shadow: none; }
 .audit-workspace.audit-workspace :is(.filter-bar,.table-toolbar) > * { min-width: 0; max-width: 100%; }
-.audit-workspace.audit-workspace :is(.admin-table-container,.audit-table-scroll,.audit-table-wrapper,.audit-modern-table-wrapper,.audit-standard-table-wrapper) { min-width: 0; max-width: 100%; width: 100%; overflow-x: auto; border: 1px solid var(--hr-border); border-radius: 12px; background: var(--hr-white); box-shadow: none; overscroll-behavior-x: contain; }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) { width: 100%; border-collapse: collapse; background: var(--hr-white); }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) th { background: var(--hr-subtle); color: var(--hr-slate); font-size: 12px; font-weight: 600; text-transform: none; letter-spacing: .015em; }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) :is(th,td) { padding: 13px 16px; line-height: 1.5; text-align: start; border-bottom: 1px solid var(--hr-border); }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) td { color: var(--hr-ink); font-size: 13px; }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) tbody tr:hover { background: var(--hr-subtle); }
-.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) tbody tr:last-child :is(th,td) { border-bottom: 0; }
+.audit-workspace.audit-workspace :is(.admin-table-container,.audit-table-scroll,.audit-table-wrapper,.audit-modern-table-wrapper,.audit-standard-table-wrapper) { min-width: 0; max-width: 100%; width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) { width: 100%; border-collapse: collapse; }
+.audit-workspace.audit-workspace :is(.admin-table,.audit-table,.audit-modern-table) :is(th,td) { text-align: start; }
 .audit-workspace.audit-workspace :is(.audit-foundation-empty,.audit-empty-state,.audit-modern-empty) { min-height: 180px; padding: 28px 20px; color: var(--hr-slate); background: var(--hr-subtle); border-radius: 12px; text-align: center; }
 .audit-workspace.audit-workspace .audit-inline-empty { padding: 20px; border: 1px dashed var(--hr-border); border-radius: 10px; color: var(--hr-slate); background: var(--hr-white); }
 .audit-workspace.audit-workspace .detail-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-block: 16px; border-bottom: 1px solid var(--hr-border); }

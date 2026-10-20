@@ -52,10 +52,10 @@
 }
 
 .view-switcher__button.active {
-  background: var(--surface);
-  color: var(--accent);
-  border-color: var(--border-subtle);
-  box-shadow: var(--shadow-card);
+  background: var(--hr-navy);
+  color: var(--hr-white);
+  border-color: var(--hr-navy);
+  box-shadow: var(--shadow-sm);
 }
 
 .view-switcher__button:disabled {
@@ -533,36 +533,6 @@ tbody tr:hover {
   white-space: nowrap;
 }
 
-.badge--neutral {
-  background: var(--surface-muted);
-  color: var(--text-secondary-strong);
-}
-
-.badge--info {
-  background: var(--info-soft);
-  color: var(--info);
-}
-
-.badge--success {
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.badge--warning {
-  background: var(--warning-soft);
-  color: var(--warning);
-}
-
-.badge--danger {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-
-.badge--accent {
-  background: var(--accent-soft);
-  color: var(--accent-hover);
-}
-
 /* ── Empty state ─────────────────────────────────────── */
 
 .empty-state svg {
@@ -587,6 +557,21 @@ tbody tr:hover {
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* Shared data surfaces: module files retain column/layout rules only. */
+:is(.admin-table-container,.audit-modern-table-wrapper) { border:1px solid var(--hr-border); border-radius:var(--radius-lg); background:var(--surface); box-shadow:var(--shadow-card); }
+:is(.admin-table-container,.audit-modern-table-wrapper) table, table.audit-modern-table { border-collapse:collapse; border-spacing:0; }
+:is(.admin-table-container,.audit-modern-table-wrapper) :is(th,td), table.audit-modern-table :is(th,td) { padding:13px 16px; border-bottom:1px solid var(--hr-border); text-align:start; line-height:1.5; }
+:is(.admin-table-container,.audit-modern-table-wrapper) th, table.audit-modern-table th { background:var(--hr-subtle); color:var(--hr-slate); font-size:12px; font-weight:600; text-transform:none; letter-spacing:.015em; }
+:is(.admin-table-container,.audit-modern-table-wrapper) td, table.audit-modern-table td { background:transparent; color:var(--hr-ink); font-size:14px; font-weight:400; }
+:is(.admin-table-container,.audit-modern-table-wrapper) tbody tr:hover { background:var(--hr-blue-soft); }
+:is(.admin-table-container,.audit-modern-table-wrapper) tbody tr:last-child td { border-bottom:0; }
+.badge--info { color: var(--hr-blue-ink); background: var(--hr-blue-soft); border: 1px solid var(--hr-blue-border); }
+.badge--accent { color: var(--hr-purple-hover); background: var(--hr-purple-soft); border: 1px solid var(--hr-purple-border); }
+.badge--success { color: var(--hr-success); background: var(--hr-success-soft); border: 1px solid #bce5ca; }
+.badge--warning { color: var(--hr-warning); background: var(--hr-warning-soft); border: 1px solid #f3d791; }
+.badge--danger { color: var(--hr-danger); background: #feeeee; border: 1px solid #f7c9c5; }
+.badge--neutral { color: #475569; background: #eef2f7; border: 1px solid #d5deea; }
 
 /* ── Modals ──────────────────────────────────────────── */
 .modal-backdrop {
@@ -1566,51 +1551,16 @@ tbody tr:hover {
 .admin-table-container {
   margin-top: 4px;
   overflow-x: auto;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.025),
-    0 8px 24px rgba(15, 23, 42, 0.035);
 }
 
 .admin-table-container table {
   min-width: 640px;
 }
 
-.admin-table-container th,
-.admin-table-container td {
-  padding: 13px 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.admin-table-container th {
-  background: #f8f9fc;
-  color: #727c8a;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-.admin-table-container tbody td {
-  color: #4b5563;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
 .admin-table-container tbody tr {
   transition:
     background-color 150ms ease,
     box-shadow 150ms ease;
-}
-
-.admin-table-container tbody tr:hover {
-  background: rgba(99, 102, 241, 0.025);
-}
-
-.admin-table-container tbody tr:last-child td {
-  border-bottom: 0;
 }
 
 .admin-table-container .cell-title {
@@ -1643,14 +1593,6 @@ tbody tr:hover {
 /* Keep glass wrappers visually subordinate to the shared table surface. */
 
 @media (max-width: 720px) {
-  .admin-table-container {
-    border-radius: 12px;
-  }
-
-  .admin-table-container th,
-  .admin-table-container td {
-    padding: 12px 13px;
-  }
 }
 
 /* ── INOP premium state surfaces ──────────────────── */
@@ -1812,8 +1754,6 @@ tbody tr:hover {
 .admin-table-container td[colspan] {
   height: 150px;
   text-align: center;
-  color: #8a94a2;
-  font-size: 13px;
 }
 
 /* Avoid the old "glass panel" look on state containers. */
@@ -1830,29 +1770,9 @@ tbody tr:hover {
 .audit-modern-table-wrapper {
   margin-top: 4px;
   overflow-x: auto;
-
-  border: 1px solid rgba(148, 163, 184, 0.20);
-  border-radius: 15px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.985),
-      rgba(248, 249, 252, 0.96)
-    );
-
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.025),
-    0 10px 28px rgba(15, 23, 42, 0.035);
 }
 
 .admin-table-container.glass {
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.985),
-      rgba(248, 249, 252, 0.96)
-    );
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -1871,8 +1791,6 @@ table.audit-modern-table {
 .audit-modern-table-wrapper td,
 .audit-modern-table th,
 .audit-modern-table td {
-  padding: 13px 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.13);
   text-align: left;
   white-space: nowrap;
 }
@@ -1881,27 +1799,12 @@ table.audit-modern-table {
 .audit-modern-table-wrapper th,
 .audit-modern-table th {
   height: 44px;
-  background: rgba(248, 249, 252, 0.88);
-
-  color: #747e8c;
-  font-size: 10.5px;
-  font-weight: 750;
-  line-height: 1;
-  letter-spacing: 0.065em;
-  text-transform: uppercase;
 }
 
 .admin-table-container td,
 .audit-modern-table-wrapper td,
 .audit-modern-table td {
   height: 54px;
-
-  background: transparent;
-  color: #4d5663;
-
-  font-size: 12.5px;
-  font-weight: 450;
-  line-height: 1.45;
 }
 
 .admin-table-container tbody tr,
@@ -1910,18 +1813,6 @@ table.audit-modern-table {
   transition:
     background-color 150ms ease,
     box-shadow 150ms ease;
-}
-
-.admin-table-container tbody tr:hover,
-.audit-modern-table-wrapper tbody tr:hover,
-.audit-modern-table tbody tr:hover {
-  background: rgba(99, 102, 241, 0.022);
-}
-
-.admin-table-container tbody tr:last-child td,
-.audit-modern-table-wrapper tbody tr:last-child td,
-.audit-modern-table tbody tr:last-child td {
-  border-bottom: 0;
 }
 
 .admin-table-container .cell-title,
@@ -1960,39 +1851,17 @@ table.audit-modern-table {
   align-items: center;
   justify-content: center;
   gap: 9px;
-
-  color: #8a94a2;
-  font-size: 12px;
-}
-
-.admin-table-container .audit-modern-empty svg,
-.audit-modern-table-wrapper .audit-modern-empty svg {
-  color: #777bd4;
 }
 
 .admin-table-container td[colspan],
 .audit-modern-table-wrapper td[colspan],
 .audit-modern-table td[colspan] {
   height: 150px;
-  padding: 24px;
   text-align: center;
   white-space: normal;
 }
 
 @media (max-width: 720px) {
-  .admin-table-container,
-  .audit-modern-table-wrapper {
-    border-radius: 13px;
-  }
-
-  .admin-table-container th,
-  .admin-table-container td,
-  .audit-modern-table-wrapper th,
-  .audit-modern-table-wrapper td,
-  .audit-modern-table th,
-  .audit-modern-table td {
-    padding: 12px 13px;
-  }
 }
 
 

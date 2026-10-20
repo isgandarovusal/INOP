@@ -22,10 +22,6 @@
 }
 
 .audit-restaurants-page .admin-table-container{
-  border:1px solid #e3e7ee;
-  border-radius:16px;
-  background:#fff;
-  box-shadow:0 12px 32px rgba(20,28,45,.06);
   overflow:hidden;
 }
 
@@ -36,35 +32,14 @@
 
 .audit-restaurants-page .admin-table-container th{
   height:48px;
-  padding:0 18px;
-  background:#f7f8fa;
-  color:#697386;
-  border-bottom:1px solid #e5e8ee;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
 }
 
 .audit-restaurants-page .admin-table-container td{
-  padding:15px 18px;
-  border-bottom:1px solid #eef1f5;
-  font-size:13px;
-  color:#343b49;
   vertical-align:middle;
 }
 
 .audit-restaurants-page .admin-table-container tbody tr{
   transition:background .16s ease,box-shadow .16s ease;
-}
-
-.audit-restaurants-page .admin-table-container tbody tr:hover{
-  background:#fafbff;
-  box-shadow:inset 3px 0 0 #6366f1;
-}
-
-.audit-restaurants-page .admin-table-container tbody tr:last-child td{
-  border-bottom:0;
 }
 
 .audit-restaurants-page .cell-title--clickable{
@@ -84,9 +59,6 @@
 .audit-restaurants-page .admin-table-container .badge{
   min-width:72px;
   justify-content:center;
-  border-radius:999px;
-  font-weight:750;
-  text-transform:capitalize;
 }
 
 .audit-restaurants-page .row-actions{
@@ -142,10 +114,6 @@
 
   .audit-restaurants-page .filter-bar:where(:not(.hr-workspace *)) .btn-secondary{
     width:100%;
-  }
-
-  .audit-restaurants-page .admin-table-container{
-    border-radius:13px;
   }
 }
 
@@ -238,10 +206,6 @@
 
 .restaurant-detail-page .admin-table-container{
   margin-top:4px;
-  border:1px solid #e3e7ee;
-  border-radius:14px;
-  background:#fff;
-  box-shadow:0 8px 22px rgba(20,28,45,.045);
   overflow:hidden;
 }
 
@@ -252,44 +216,15 @@
 
 .restaurant-detail-page .admin-table-container th{
   height:46px;
-  padding:0 16px;
-  background:#f7f8fa;
-  border-bottom:1px solid #e5e8ee;
-  color:#697386;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:.075em;
-  text-transform:uppercase;
   text-align:left;
-}
-
-.restaurant-detail-page .admin-table-container td{
-  padding:14px 16px;
-  border-bottom:1px solid #eef1f5;
-  color:#343b49;
-  font-size:13px;
 }
 
 .restaurant-detail-page .admin-table-container tbody tr{
   transition:background .16s ease,box-shadow .16s ease;
 }
 
-.restaurant-detail-page .admin-table-container tbody tr:hover{
-  background:#fafbff;
-  box-shadow:inset 3px 0 0 #6366f1;
-}
-
-.restaurant-detail-page .admin-table-container tbody tr:last-child td{
-  border-bottom:0;
-}
-
 .restaurant-detail-page .admin-table-container tbody tr.cell-title--clickable{
   cursor:pointer;
-}
-
-.restaurant-detail-page .admin-table-container tbody td:first-child{
-  color:#596273;
-  font-variant-numeric:tabular-nums;
 }
 
 .restaurant-detail-page .admin-table-container tbody td:nth-child(2){
