@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useListResource } from "../../../Hooks/useListResource";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck } from "lucide-react";
@@ -9,29 +10,16 @@ import {
 import type { OccupationalSafetyAudit } from "../../../Types/Audit";
 import PageState from "../../../Components/PageState";
 
+const EMPTY_ITEMS: OccupationalSafetyAudit[] = [];
+
 export default function SafetyAuditsList() {
   const { t } = useTranslation();
-  const [audits, setAudits] = useState<OccupationalSafetyAudit[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setLoadError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
+  const { data: audits, loading, error: readError, reload: load } = useListResource(getOccupationalSafetyAudits, EMPTY_ITEMS);
+  const loadError = readError || actionError;
 
-    try {
-      setAudits(await getOccupationalSafetyAudits());
-    } catch {
-      setLoadError(t("auth.somethingWentWrong"));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   const sortedAudits = useMemo(
     () =>
@@ -77,12 +65,12 @@ export default function SafetyAuditsList() {
       ) : loadError ? (
         <PageState
           type="error"
-          message={loadError}
+          message={t('auth.somethingWentWrong')}
           action={
             <button
               type="button"
               className="btn-secondary"
-              onClick={() => void load()}
+              onClick={load}
             >
               {t("common.retry")}
             </button>

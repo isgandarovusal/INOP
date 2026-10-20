@@ -6,13 +6,8 @@
 .audit-home-card h3 { margin: 0; font-size: 18px; color: var(--text-primary); }
 .audit-home-card p { margin: 0; color: var(--text-secondary); line-height: 1.6; }
 .audit-home-card-action { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: auto; padding-top: var(--space-3); }
-.audit-home-card-action a { display: inline-flex; align-items: center; gap: var(--space-2); border-radius: var(--radius-md); padding: var(--space-3); color: var(--accent); border: 1px solid var(--hr-border); background: var(--surface); text-decoration: none; }
-.audit-home-card-action a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.audit-home-card-action a:hover { border-color: var(--accent); }
 @media (max-width: 760px) { .audit-home-grid { grid-template-columns: 1fr; } }
 .audit-home-grid .audit-home-card { background:var(--surface); gap:10px; padding:20px; }
 .audit-home-grid .audit-home-card-icon { background:var(--hr-blue-soft); color:var(--hr-navy); }
 .audit-home-grid .audit-home-card-action { width:100%; padding-top:8px; gap:10px; }
-.audit-home-grid .audit-home-card-action a { min-height:44px; padding:10px 14px; font-size:13px; font-weight:600; color:var(--hr-navy); }
-.audit-home-grid .audit-home-card-action a:first-child { background:var(--hr-navy); border-color:var(--hr-navy); color:white; }
 .audit-home .audit-organization { padding:16px 20px; }

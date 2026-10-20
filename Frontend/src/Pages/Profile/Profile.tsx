@@ -21,7 +21,7 @@ export default function Profile() {
     finally{setSaving(false);}
   };
   return <div className="administration-page"><PageHeader title={t('adminUI.profile')} subtitle={user?.name}/><section className="form-card administration-form"><h2>{t('adminUI.changePassword')}</h2><p className="admin-help">{t('adminUI.passwordRules')}</p>
-    <form onSubmit={submit}>
+    <form onSubmit={submit} noValidate>
       <input type="text" autoComplete="username" value={user?.email||''} readOnly hidden aria-hidden="true"/>
       {([['current-password',t('adminUI.currentPassword'),currentPassword,setCurrent,'current-password'],['new-password',t('adminUI.newPassword'),newPassword,setNew,'new-password'],['confirm-password',t('adminUI.confirmPassword'),confirm,setConfirm,'new-password']] as const).map(([id,label,value,setter,autoComplete])=><div className="form-group" key={id}><label className="form-label" htmlFor={id}>{label}</label><input id={id} type="password" className="input-field" autoComplete={autoComplete} required value={value} onChange={e=>setter(e.target.value)} disabled={saving}/></div>)}
       {error&&<p className="form-error" role="alert">{error}</p>}<button className="btn-primary" disabled={saving}>{saving?t('common.loading'):t('adminUI.changePassword')}</button>

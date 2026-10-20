@@ -206,6 +206,7 @@ const Sidebar: React.FC = () => {
         </h2>
 
         <LanguageSwitcher />
+        <NavLink to="/app/profile" className="admin-sidebar__account-link">{t("adminUI.profile")} · {t("adminUI.changePassword")}</NavLink>
 
         {visibleGroups.map((group) => (
           <div className="admin-sidebar__group" key={group.titleKey}>
@@ -227,6 +228,7 @@ const Sidebar: React.FC = () => {
         <div className="admin-sidebar__user">
           <div className="admin-sidebar__user-info">
             <NavLink to="/app/profile" className="admin-sidebar__user-name" title={t("adminUI.profile")}>{user.name}</NavLink>
+            <NavLink to="/app/profile" className="admin-sidebar__account-link">{t("adminUI.changePassword")}</NavLink>
             <p className="admin-sidebar__user-role">
               {ROLE_LABELS[user.role] || user.role}
             </p>

@@ -5,6 +5,7 @@ import ServiceFollowUp from '../ServiceSource/ServiceFollowUp';
 import {hrText} from '../HRAudit/hrAuditPresentation';
 import React, {
   lazy,
+  useCallback,
   Suspense,
   useEffect,
   useRef,
@@ -23,7 +24,7 @@ import { getRestaurantById } from "../../../Services/restaurantsService";
 import { getUserById } from "../../../Services/usersService";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
 import AuditResourceState from "../../../Components/AuditResourceState";
-import type { Restaurant } from "../../../Types/audit";
+import type { Audit, Restaurant } from "../../../Types/audit";
 import type { PublicUser } from "../../../Types/auth";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit, hasPermission } from "../../../Utils/permissions";
@@ -73,60 +74,24 @@ const LazyAuditModule: React.FC<LazyAuditModuleProps> = ({ children }) => {
 
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
-const AuditDetail: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const { id } = useParams();
-  const navigate = useNavigate();
 
-  const { user } = useAuth();
-  const canManage = user ? canManageAudit(user) : false;
-
-  const { data: audit, status, reload } = useAuditResource(id, "audit", getAuditById);
-  const loading = status === "loading";
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [auditor, setAuditor] = useState<PublicUser | null>(null);
-
-  const [renderedBusinessModules, setRenderedBusinessModules] = useState(1);
+function AuditBusinessModules({ audit, renderedBusinessModules, advance }: { audit: Audit; renderedBusinessModules: number; advance: () => void }) {
   const businessModulesSentinelRef = useRef<HTMLDivElement | null>(null);
 
+  const hasObserver = typeof IntersectionObserver !== 'undefined';
+  const visibleModules = hasObserver ? renderedBusinessModules : 7;
   useEffect(() => {
-    let cancelled = false;
-    if (!audit) return;
-    setRestaurant(null); setAuditor(null);
-    void Promise.allSettled([hasPermission(user,'restaurant','read')&&audit.restaurantId?getRestaurantById(audit.restaurantId):Promise.resolve(null), hasPermission(user,'user','read')?getUserById(audit.auditorId):Promise.resolve(null)])
-      .then(([restaurantResult, auditorResult]) => {
-        if (cancelled) return;
-        setRestaurant(restaurantResult.status === "fulfilled" ? restaurantResult.value ?? null : null);
-        setAuditor(auditorResult.status === "fulfilled" ? auditorResult.value ?? null : null);
-      });
-    return () => { cancelled = true; };
-  }, [audit, user]);
-
-  useEffect(() => {
-    setRenderedBusinessModules(1);
-  }, [id]);
-
-  useEffect(() => {
-    if (loading || renderedBusinessModules >= 7) return;
+    if (!hasObserver || renderedBusinessModules >= 7) return;
 
     const sentinel = businessModulesSentinelRef.current;
 
     if (!sentinel) return;
 
-    if (!("IntersectionObserver" in window)) {
-      setRenderedBusinessModules((current) =>
-        Math.min(current + 1, 7),
-      );
-      return;
-    }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
 
-        setRenderedBusinessModules((current) =>
-          Math.min(current + 1, 7),
-        );
+        advance();
       },
       {
         rootMargin: "300px 0px",
@@ -136,7 +101,99 @@ const AuditDetail: React.FC = () => {
     observer.observe(sentinel);
 
     return () => observer.disconnect();
-  }, [loading, renderedBusinessModules]);
+  }, [hasObserver, renderedBusinessModules, advance]);
+
+  return (
+      <div className="audit-business-modules" key={String(audit.id)}>
+        {visibleModules >= 1 && (
+          <LazyAuditModule>
+            <AuditFindingsList auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 2 && (
+          <LazyAuditModule>
+            <AuditAssignmentsList auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 3 && (
+          <LazyAuditModule>
+            <AuditTimeline auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 4 && (!audit.templateSnapshot?.standardSource || audit.standardSubmission) && (!audit.templateSnapshot?.hseSource || audit.hseSubmission) && (
+          <LazyAuditModule>
+            <AuditApprovalPanel key={JSON.stringify([audit.id,audit.standardDetails?.naReasons,audit.hseDetails?.naReasons])} auditId={String(audit.id)} standardNaReasons={(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)?Object.fromEntries((audit.checks||[]).filter((a):a is {questionId:string;answer:'na'}=>typeof a==='object'&&a!==null&&'answer'in a&&a.answer==='na'&&'questionId'in a&&typeof a.questionId==='string').map(a=>[a.questionId||'',(audit.hseDetails||audit.standardDetails)?.naReasons?.[a.questionId||'']||''])):undefined} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 5 && (
+          <LazyAuditModule>
+            <AuditClosurePanel auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 6 && (
+          <LazyAuditModule>
+            <AuditExportPanel auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules >= 7 && (
+          <LazyAuditModule>
+            <AuditHistoryPanel auditId={String(audit.id)} />
+          </LazyAuditModule>
+        )}
+
+        {visibleModules < 7 && (
+          <div
+            ref={businessModulesSentinelRef}
+            className="audit-business-modules__sentinel"
+            aria-hidden="true"
+          />
+        )}
+      </div>
+  );
+}
+
+const AuditDetail: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const { id } = useParams();
+  const [progress, setProgress] = useState({ id, count: 1 });
+  const renderedBusinessModules = progress.id === id ? progress.count : 1;
+  const advance = useCallback(() => setProgress(current => ({ id, count: current.id === id ? Math.min(current.count + 1, 7) : 2 })), [id]);
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const canManage = user ? canManageAudit(user) : false;
+
+  const { data: audit, status, reload } = useAuditResource(id, "audit", getAuditById);
+  const relationsKey = JSON.stringify([
+    audit?.restaurantId, audit?.auditorId,
+    hasPermission(user, 'restaurant', 'read'), hasPermission(user, 'user', 'read'),
+    [user?.id, user?.role, user?.departmentId, user?.isActive, user?.hrAccess, user?.auditDirection, user?.auditDirections, user?.permissions],
+  ]);
+  const [relations, setRelations] = useState<{ key: string; restaurant: Restaurant | null; auditor: PublicUser | null } | null>(null);
+  const restaurant = relations?.key === relationsKey ? relations.restaurant : null;
+  const auditor = relations?.key === relationsKey ? relations.auditor : null;
+  useEffect(() => {
+    const [restaurantId, auditorId, readRestaurant, readUser] = JSON.parse(relationsKey) as [string | null, string | null, boolean, boolean];
+    if (!restaurantId && !auditorId) return;
+    let current = true;
+    void Promise.allSettled([
+      readRestaurant && restaurantId ? getRestaurantById(restaurantId) : Promise.resolve(null),
+      readUser && auditorId ? getUserById(auditorId) : Promise.resolve(null),
+    ]).then(([restaurantResult, auditorResult]) => {
+      if (!current) return;
+      setRelations({ key: relationsKey,
+        restaurant: restaurantResult.status === 'fulfilled' ? restaurantResult.value ?? null : null,
+        auditor: auditorResult.status === 'fulfilled' ? auditorResult.value ?? null : null,
+      });
+    });
+    return () => { current = false; };
+  }, [relationsKey]);
 
   if (status !== "ready") return <AuditResourceState status={status} retry={reload} />;
 
@@ -150,7 +207,7 @@ const AuditDetail: React.FC = () => {
     <div>
       <PageHeader
         title={audit.hseObjectSnapshot?.name ?? restaurant?.name ?? t("auditFoundation.audit")}
-        subtitle={`${audit.auditType} · ${audit.date} · ${t("auditPresentation.by")} ${audit.hseSubmission?.name ?? audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
+        subtitle={`${t(`auditFoundation.directions.${audit.auditType}`, { defaultValue: audit.auditType })} · ${audit.date} · ${t("auditPresentation.by")} ${audit.hseSubmission?.name ?? audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
         actions={
           <>
             <button className="btn-secondary" onClick={() => navigate("/app/audit/audits")}>
@@ -196,7 +253,7 @@ const AuditDetail: React.FC = () => {
           <div className="audit-modern-card">
             <h3>{t("audit.generic.detail.status")}</h3>
             <Badge tone={audit.status === "completed" ? "success" : "warning"}>
-              {audit.status ?? "unknown"}
+              {t(`auditFoundation.statusLabels.${audit.status}`, { defaultValue: t('auditPresentation.unknown') })}
             </Badge>
           </div>
 
@@ -298,7 +355,7 @@ const AuditDetail: React.FC = () => {
             </div>
             <div className="detail-row">
               <dt>{t("auditPresentation.type")}</dt>
-              <dd>{audit.auditType}</dd>
+              <dd>{t(`auditFoundation.directions.${audit.auditType}`, { defaultValue: audit.auditType })}</dd>
             </div>
             <div className="detail-row">
               <dt>{t("auditFoundation.date")}</dt>
@@ -311,57 +368,7 @@ const AuditDetail: React.FC = () => {
 
       {/* AUDIT BUSINESS MODULES */}
 
-      <div className="audit-business-modules" key={String(audit.id)}>
-        {renderedBusinessModules >= 1 && (
-          <LazyAuditModule>
-            <AuditFindingsList auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 2 && (
-          <LazyAuditModule>
-            <AuditAssignmentsList auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 3 && (
-          <LazyAuditModule>
-            <AuditTimeline auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 4 && (!audit.templateSnapshot?.standardSource || audit.standardSubmission) && (!audit.templateSnapshot?.hseSource || audit.hseSubmission) && (
-          <LazyAuditModule>
-            <AuditApprovalPanel key={JSON.stringify([audit.id,audit.standardDetails?.naReasons,audit.hseDetails?.naReasons])} auditId={String(audit.id)} standardNaReasons={(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)?Object.fromEntries((audit.checks||[]).filter((a):a is {questionId:string;answer:'na'}=>typeof a==='object'&&a!==null&&'answer'in a&&a.answer==='na'&&'questionId'in a&&typeof a.questionId==='string').map(a=>[a.questionId||'',(audit.hseDetails||audit.standardDetails)?.naReasons?.[a.questionId||'']||''])):undefined} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 5 && (
-          <LazyAuditModule>
-            <AuditClosurePanel auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 6 && (
-          <LazyAuditModule>
-            <AuditExportPanel auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules >= 7 && (
-          <LazyAuditModule>
-            <AuditHistoryPanel auditId={String(audit.id)} />
-          </LazyAuditModule>
-        )}
-
-        {renderedBusinessModules < 7 && (
-          <div
-            ref={businessModulesSentinelRef}
-            className="audit-business-modules__sentinel"
-            aria-hidden="true"
-          />
-        )}
-      </div>
+      <AuditBusinessModules key={String(audit.id)} audit={audit} renderedBusinessModules={renderedBusinessModules} advance={advance} />
 
 
     </div>

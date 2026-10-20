@@ -27,7 +27,7 @@ export default function StandardAuditPage({analytics=false,createOnly=false}:{an
  const countKeys=['total','applicable','na','unanswered','compliant','critical','major','minor'] as const;
  return <div className="audit-direction-page audit-hr-page" data-audit-direction="standard">
   <PageHeader title={t(analytics?'standardAudit.analytics':createOnly?'standardAudit.create':'standardAudit.title')} subtitle={t('auditFoundation.structure')} actions={<Link className="btn-secondary" to="/app/audit">{t('auditFoundation.center')}</Link>}/>
-  <nav className="audit-management-links"><Link to="/app/audit/standard">{t('auditSeparation.list')}</Link>{create.allowed&&<Link to="/app/audit/standard/new">{t('standardAudit.create')}</Link>}{hasPermission(user,'audit.analytics','read','standard')&&<Link to="/app/audit/standard/analytics">{t('standardAudit.analytics')}</Link>}</nav>
+  <nav className="audit-management-links"><Link className="btn-secondary" to="/app/audit/standard">{t('auditSeparation.list')}</Link>{create.allowed&&<Link className="btn-secondary" to="/app/audit/standard/new">{t('standardAudit.create')}</Link>}{hasPermission(user,'audit.analytics','read','standard')&&<Link className="btn-secondary" to="/app/audit/standard/analytics">{t('standardAudit.analytics')}</Link>}</nav>
   <p role="note" className="audit-hr-notice">{t('standardAudit.scoringNotice')}</p>
   {source.status!=='ready'&&<AuditResourceState status={source.status} retry={source.reload}/>}{options.status!=='ready'&&<AuditResourceState status={options.status} retry={options.reload}/>}
   {!createOnly&&<><SectionCard><h2>{t('standardAudit.filters')}</h2><div className="audit-filter-grid">

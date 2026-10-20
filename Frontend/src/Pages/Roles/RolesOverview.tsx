@@ -1,5 +1,6 @@
+import { useListResource } from "../../Hooks/useListResource";
 import Modal from "../../Components/Modal";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Check,
   Edit3,
@@ -36,6 +37,8 @@ interface RoleFormState {
   permissions: Permission[];
 }
 
+const EMPTY_ROLES: RoleRecord[] = [];
+
 const EMPTY_FORM: RoleFormState = {
   name: "",
   key: "",
@@ -51,10 +54,7 @@ const RolesOverview: React.FC = () => {
   const canUpdateRole = hasPermission(user, "role", "update");
   const canDeleteRole = hasPermission(user, "role", "delete");
 
-  const [roles, setRoles] = useState<RoleRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  const { data: roles, setData: setRoles, loading, error, reload: loadRoles } = useListResource(getRoles, EMPTY_ROLES);
 
   const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -70,26 +70,7 @@ const RolesOverview: React.FC = () => {
     null,
   );
 
-  const loadRoles = () => {
-    setLoading(true);
-    setError(false);
 
-    getRoles()
-      .then((result) => {
-        setRoles(result);
-      })
-      .catch((err) => {
-        console.error("Failed to load roles:", err);
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    loadRoles();
-  }, [retryCount]);
 
 
   const openCreate = () => {
@@ -271,7 +252,7 @@ const RolesOverview: React.FC = () => {
             <button
               type="button"
               className="btn-secondary"
-              onClick={() => setRetryCount((value) => value + 1)}
+              onClick={loadRoles}
             >
               {t("common.retry")}
             </button>

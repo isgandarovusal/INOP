@@ -1,5 +1,6 @@
+import { useListResource } from "../../Hooks/useListResource";
 import Modal from "../../Components/Modal";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   AlertCircle,
   Building2,
@@ -22,6 +23,8 @@ import {
   deleteDepartment,
 } from "../../Services/departmentsService";
 import type { Department } from "../../Types/core";
+
+const EMPTY_ITEMS: Department[] = [];
 
 const DepartmentsList: React.FC = () => {
   const { t } = useTranslation();
@@ -51,9 +54,6 @@ const DepartmentsList: React.FC = () => {
 
 
 
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Department | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -63,24 +63,9 @@ const DepartmentsList: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
+  const { data: departments, loading, error: readError, reload: load } = useListResource(getDepartments, EMPTY_ITEMS);
+  const loadError = readError;
 
-    try {
-      const result = await getDepartments();
-      setDepartments(result);
-    } catch (error) {
-      console.error("Failed to load departments:", error);
-      setLoadError(t("auth.somethingWentWrong"));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   const openCreate = () => {
     setEditing(null);
@@ -172,7 +157,7 @@ const DepartmentsList: React.FC = () => {
         }
       />
 
-      {error && !showForm && <p className="admin-notice" role="alert">{error}</p>}
+      {error && !showForm && <p className="admin-notice" role="alert">{t(error)}</p>}
       <div className="admin-table-container glass">
         <table>
           <thead>
@@ -200,12 +185,12 @@ const DepartmentsList: React.FC = () => {
                   <EmptyState
                     icon={<Building2 size={28} />}
                     title={t("auth.somethingWentWrong")}
-                    hint={loadError}
+                    hint={t('common.retry')}
                   />
                   <div style={{ textAlign: "center", marginTop: "12px" }}>
                     <button
                       className="btn-secondary"
-                      onClick={() => void load()}
+                      onClick={load}
                     >
                       {t("common.retry")}
                     </button>

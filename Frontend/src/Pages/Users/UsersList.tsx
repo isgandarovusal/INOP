@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useListResource } from "../../Hooks/useListResource";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2, Pencil, Plus, PowerOff, Power, UserCog } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,13 @@ import type { PublicUser } from "../../Types/auth";
 import type { Department } from "../../Types/core";
 import { hasPermission, getPermissionScope, getRoleLabel } from "../../Utils/permissions";
 
+const EMPTY_DIRECTORY: { users: PublicUser[]; departments: Department[]; roles: RoleRecord[]; lookupError: boolean } = { users: [], departments: [], roles: [], lookupError: false };
+async function loadDirectory() {
+  const [users, departments, roles] = await Promise.allSettled([getUsers(), getDepartments(), getRoles()]);
+  if (users.status === 'rejected') throw users.reason;
+  return { users: users.value, departments: departments.status === 'fulfilled' ? departments.value : [], roles: roles.status === 'fulfilled' ? roles.value : [], lookupError: departments.status === 'rejected' || roles.status === 'rejected' };
+}
+
 const UsersList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,39 +31,16 @@ const UsersList: React.FC = () => {
   const [departmentFilter,setDepartmentFilter] = useState(params.get('departmentId') || '');
   const [roleFilter,setRoleFilter] = useState('');
   const [statusFilter,setStatusFilter] = useState('');
-  const [roles,setRoles] = useState<RoleRecord[]>([]);
-  const [lookupError,setLookupError] = useState(false);
   const [statusTarget,setStatusTarget] = useState<PublicUser|null>(null);
 
-  const [users, setUsers] = useState<PublicUser[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const { data, loading, error: readError, reload: load, setData } = useListResource(loadDirectory, EMPTY_DIRECTORY);
+  const { users, departments, roles, lookupError } = data;
+  const error = readError || actionError;
 
-    try {
-      const [userResult, deptResult, roleResult] = await Promise.allSettled([getUsers(), getDepartments(), getRoles()]);
-      if (userResult.status === 'rejected') throw userResult.reason;
-      setUsers(userResult.value);
-      setDepartments(deptResult.status === 'fulfilled' ? deptResult.value : []);
-      setRoles(roleResult.status === 'fulfilled' ? roleResult.value : []);
-      setLookupError(deptResult.status === 'rejected' || roleResult.status === 'rejected');
-    } catch (error) {
-      console.error("Failed to load users:", error);
-      setError(t("auth.somethingWentWrong"));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
@@ -69,7 +54,7 @@ const UsersList: React.FC = () => {
     setTogglingId(statusTarget.id);
     try {
       const updated = await setUserActive(statusTarget.id, !statusTarget.isActive);
-      setUsers(current => current.map(u => u.id === updated.id ? updated : u)); setStatusTarget(null);
+      setData(current => ({ ...current, users: current.users.map(u => u.id === updated.id ? updated : u) })); setStatusTarget(null);
     } catch { setError(t('auth.somethingWentWrong')); }
     finally { setTogglingId(null); }
   };
@@ -131,12 +116,12 @@ const UsersList: React.FC = () => {
                   <EmptyState
                     icon={<UserCog size={28} />}
                     title={t("auth.somethingWentWrong")}
-                    hint={error}
+                    hint={typeof error === 'string' ? t(error) : t('common.retry')}
                   />
                   <div style={{ textAlign: "center", marginTop: "12px" }}>
                     <button
                       className="btn-secondary"
-                      onClick={() => void load()}
+                      onClick={load}
                     >
                       {t("common.retry")}
                     </button>

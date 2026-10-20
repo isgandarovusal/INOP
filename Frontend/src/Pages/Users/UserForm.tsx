@@ -15,11 +15,10 @@ import type { Department } from "../../Types/core";
 import { useAuth } from "../../Context/useAuth";
 import { getPermissionScope, getRoleLabel } from "../../Utils/permissions";
 
-const UserForm: React.FC = () => {
+const UserFormFields: React.FC<{ id?: string }> = ({ id }) => {
   const { t } = useTranslation();
   const {user} = useAuth();
   const canAssign = getPermissionScope(user,'role','update') === 'all';
-  const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
@@ -40,9 +39,6 @@ const UserForm: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false;
-
-    setLoading(true);
-    setLoadError(null);
 
     Promise.all([
       getDepartments(),
@@ -77,7 +73,7 @@ const UserForm: React.FC = () => {
             setDepartmentId(existing.departmentId);
             setPosition(existing.position);
           } else {
-            setLoadError(t("auth.somethingWentWrong"));
+            setLoadError("auth.somethingWentWrong");
           }
         }
       })
@@ -85,7 +81,7 @@ const UserForm: React.FC = () => {
         console.error("Failed to load user form data:", err);
 
         if (!cancelled) {
-          setLoadError(t("auth.somethingWentWrong"));
+          setLoadError("auth.somethingWentWrong");
         }
       })
       .finally(() => {
@@ -98,8 +94,7 @@ const UserForm: React.FC = () => {
       cancelled = true;
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, retryCount]);
+  }, [id, isEdit, retryCount]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,11 +154,11 @@ const UserForm: React.FC = () => {
     return (
       <div className="empty-state">
         <AlertCircle size={28} />
-        <p>{loadError}</p>
+        <p>{t(loadError)}</p>
         <button
           type="button"
           className="btn-secondary"
-          onClick={() => setRetryCount((value) => value + 1)}
+          onClick={() => { setLoading(true); setLoadError(null); setRetryCount(value => value + 1); }}
         >
           {t("common.retry")}
         </button>
@@ -322,4 +317,7 @@ const UserForm: React.FC = () => {
   );
 };
 
-export default UserForm;
+export default function UserForm() {
+  const { id } = useParams();
+  return <UserFormFields key={id || 'new'} id={id} />;
+}

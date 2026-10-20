@@ -527,3 +527,6 @@
 .inop-logo { color: var(--hr-navy, #253b61); display: block; height: auto; max-width: 100%; object-fit: contain; }
 .admin-sidebar__brand .inop-logo { width: 131px; border-radius: 8px; }
 .admin-topbar__brand .inop-logo { width: 112px; border-radius: 6px; }
+
+.admin-sidebar__account-link { display:block; margin:8px 14px; padding:10px 12px; border:1px solid var(--control-border); border-radius:var(--radius-md); background:var(--hr-blue-soft); color:var(--hr-navy); font-size:12px; line-height:1.5; text-decoration:none; }
+.admin-sidebar__user .admin-sidebar__account-link { margin:4px 0 0; padding:0; border:0; background:none; }

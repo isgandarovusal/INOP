@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useListResource } from "../../../Hooks/useListResource";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Pencil, Plus, Store, Trash2 } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
@@ -12,20 +13,20 @@ import type { Restaurant, RestaurantStatus } from "../../../Types/audit";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
+const EMPTY_ITEMS: Restaurant[] = [];
+
 const RestaurantsList: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const canManage = user ? canManageAudit(user) : false;
 
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
   const [brandFilter,setBrandFilter]=useState('');
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | RestaurantStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Restaurant | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setLoadError] = useState<string | null>(null);
 
   const filtersActive =
     query.trim() !== "" || statusFilter !== "all" || Boolean(brandFilter);
@@ -35,22 +36,9 @@ const RestaurantsList: React.FC = () => {
     setStatusFilter("all");
   };
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
+  const { data: restaurants, loading, error: readError, reload: load } = useListResource(getRestaurants, EMPTY_ITEMS);
+  const loadError = readError || actionError;
 
-    try {
-      setRestaurants(await getRestaurants());
-    } catch {
-      setLoadError(t("auth.somethingWentWrong"));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   const filtered = useMemo(() => {
     return restaurants
@@ -99,6 +87,7 @@ const RestaurantsList: React.FC = () => {
         <SearchInput value={query} onChange={setQuery} placeholder={t("audit.restaurants.list.searchPlaceholder")} />
         <select
           className="input-field"
+          aria-label={t('audit.restaurants.list.status')}
           style={{ width: 160 }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "all" | RestaurantStatus)}
@@ -150,7 +139,7 @@ const RestaurantsList: React.FC = () => {
                     <button
                       type="button"
                       className="btn-secondary"
-                      onClick={() => void load()}
+                      onClick={load}
                     >
                       {t("common.retry")}
                     </button>
@@ -181,11 +170,8 @@ const RestaurantsList: React.FC = () => {
                   key={restaurant.id}
                   className={deletingId === restaurant.id ? "row--removing" : ""}
                 >
-                  <td
-                    className="cell-title cell-title--clickable"
-                    onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}`)}
-                  >
-                    {restaurant.name}<div className="cell-muted">{({'kfc':'KFC','pizza-hut':'Pizza Hut','simit-sarayi':'Simit Sarayı'} as Record<string,string>)[restaurant.brandId||'']||t('adminUI.unassigned')}</div>
+                  <td className="cell-title">
+                    <Link className="cell-title--clickable" to={`/app/audit/restaurants/${restaurant.id}`}>{restaurant.name}</Link><div className="cell-muted">{({'kfc':'KFC','pizza-hut':'Pizza Hut','simit-sarayi':'Simit Sarayı'} as Record<string,string>)[restaurant.brandId||'']||t('adminUI.unassigned')}</div>
                   </td>
                   <td className="cell-muted">{restaurant.location}</td>
                   <td>

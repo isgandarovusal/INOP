@@ -36,6 +36,12 @@ test('Shared controls, N proportions, localized dashboard stability, administrat
    for(const width of sizes){await p.setViewportSize({width,height:900});await p.waitForTimeout(350);await p.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0)});
     const overflow=await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert.equal(overflow,false,`${route} ${lang} ${width} overflow`);
     await p.screenshot({path:path.join(out,`${route.replaceAll('/','-')}-${lang}-${width}.png`),fullPage:true});
+    const faint = await p.locator('.admin-main button:not(:disabled):not([aria-disabled=true])').evaluateAll(nodes => nodes.filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').flatMap(e => {
+      const s = getComputedStyle(e);
+      return Number(s.opacity) < 0.7 ? [{text:e.textContent.trim(),className:e.className,opacity:s.opacity}] : [];
+    }));
+    assert.deepEqual(faint, [], `${route} ${lang} ${width}: active buttons must not look disabled`);
+
    }
   }
   console.log('Visual QA:',route);

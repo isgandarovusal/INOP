@@ -24,7 +24,6 @@
 .audit-organization p { margin-left: auto; }
 .audit-management-links, .audit-control-row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
 .audit-control-row label { display: grid; gap: var(--space-2); min-width: 0; flex: 1 1 180px; }
-.audit-management-links a { display: inline-flex; gap: var(--space-2); align-items: center; padding: var(--space-3); border: 1px solid var(--hr-border); border-radius: var(--radius-md); color: var(--accent); background: var(--surface); text-decoration: none; }
 .audit-template-lifecycle { padding: var(--space-4); margin-bottom: var(--space-4); border: 1px solid var(--hr-border); border-radius: var(--radius-lg); background: var(--hr-subtle); }
 .audit-template-lifecycle p { margin-bottom: var(--space-3); }
 @media (max-width: 900px) { .audit-filter-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .audit-foundation-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); } }
@@ -78,7 +77,6 @@
 .audit-workspace.audit-workspace :is(.audit-builder-section-header,.audit-template-lifecycle,.audit-execution__progress,.audit-execution__actions) { background: var(--hr-subtle); border-color: var(--hr-border); }
 .audit-workspace.audit-workspace :is(.audit-builder-content,.audit-builder-question,.audit-question__body) { min-width: 0; }
 .audit-workspace.audit-workspace .audit-execution__progress-fill { background: var(--hr-navy); }
-.audit-workspace.audit-workspace :is(.audit-management-links a,.audit-home-card-action a) { color: var(--hr-navy); min-height: 44px; border-color: var(--hr-border); }
 @media (max-width: 900px) {
   .audit-workspace.audit-workspace :is(.audit-modern-grid,.audit-kpi-grid,.audit-detail-grid,.audit-template-grid) { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .audit-workspace.audit-workspace .audit-builder-question { grid-template-columns: minmax(0,1fr) minmax(100px,.5fr); }
@@ -150,3 +148,8 @@
 @media(max-width:680px) { .audit-draft-form > .btn-primary { width:100%; } }
 /* Object grants and audit options keep native checkboxes compact. */
 .audit-workspace .audit-filter-grid input[type="checkbox"], .audit-workspace .audit-control-row input[type="checkbox"] { width:18px; height:18px; min-height:18px; padding:0; flex:0 0 18px; accent-color:var(--hr-navy); }
+
+.audit-foundation-kpis--empty { gap:8px; }
+.audit-foundation-kpis--empty article { padding:10px 12px; min-height:0; }
+.audit-foundation-kpis--empty article strong { font-size:22px; }
+@media(max-width:600px) { .audit-hr-page .audit-foundation-kpis--empty article { padding:10px; } }

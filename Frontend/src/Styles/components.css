@@ -1,21 +1,21 @@
 /* Shared controls: one source of truth for semantic variants. */
 :is(.btn,.btn-primary,.btn-add,.btn-secondary,.btn-cancel,.btn-danger,.btn-danger-solid,.btn-success,.btn-ai) { display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2); min-height:var(--control-height-lg); padding:10px 16px; border:1px solid transparent; border-radius:var(--radius-md); font:600 13px/1.3 var(--font-sans); cursor:pointer; text-decoration:none; transition:background-color var(--transition-fast),border-color var(--transition-fast),box-shadow var(--transition-fast); }
 :is(.btn-primary,.btn-add) { color:var(--on-accent); background:var(--hr-navy); border-color:var(--hr-navy); box-shadow:none; }
-:is(.btn-primary,.btn-add):hover:not(:disabled) { background:var(--hr-navy-hover); border-color:var(--hr-navy-hover); }
-.btn-secondary { background:var(--surface); color:var(--text-primary); border-color:var(--border-strong); }
-.btn-secondary:hover:not(:disabled) { background:var(--hr-blue-soft); border-color:var(--hr-blue-border); }
+:is(.btn-primary,.btn-add):hover:not(:disabled):not([aria-disabled=true]) { background:var(--hr-navy-hover); border-color:var(--hr-navy-hover); }
+.btn-secondary { background:var(--hr-blue-soft); color:var(--hr-navy); border-color:var(--control-border); }
+.btn-secondary:hover:not(:disabled):not([aria-disabled=true]) { background:var(--hr-control-hover); border-color:var(--hr-navy); }
 /* Cancel is navigation, destructive actions have their own explicit variant. */
-.btn-cancel { background:var(--surface); color:var(--hr-navy); border-color:var(--hr-border); width:auto; }
-.btn-cancel:hover:not(:disabled) { background:var(--hr-subtle); border-color:var(--hr-navy); }
+.btn-cancel { background:var(--surface); color:var(--hr-navy); border-color:var(--control-border); width:auto; }
+.btn-cancel:hover:not(:disabled):not([aria-disabled=true]) { background:var(--hr-subtle); border-color:var(--hr-navy); }
 .btn-danger { background:var(--danger-soft); color:var(--danger); border-color:var(--danger); }
-.btn-danger:hover:not(:disabled) { background:var(--danger-bg); }
+.btn-danger:hover:not(:disabled):not([aria-disabled=true]) { background:var(--danger-bg); }
 .btn-danger-solid { background:var(--danger); color:var(--on-accent); border-color:var(--danger); }
-.btn-danger-solid:hover:not(:disabled) { background:var(--danger-hover); }
+.btn-danger-solid:hover:not(:disabled):not([aria-disabled=true]) { background:var(--danger-hover); }
 .btn-success { background:var(--success); color:var(--on-accent); border-color:var(--success); }
-.btn-success:hover:not(:disabled) { background:var(--hr-success-hover); }
+.btn-success:hover:not(:disabled):not([aria-disabled=true]) { background:var(--hr-success-hover); }
 .btn-ai { background:var(--hr-purple); color:var(--on-accent); border-color:var(--hr-purple); }
-.btn-ai:hover:not(:disabled) { background:var(--hr-purple-hover); }
-:is(.btn,.btn-primary,.btn-add,.btn-secondary,.btn-cancel,.btn-danger,.btn-danger-solid,.btn-success,.btn-ai,.icon-btn):disabled { opacity:.55; cursor:not-allowed; box-shadow:none; transform:none; }
+.btn-ai:hover:not(:disabled):not([aria-disabled=true]) { background:var(--hr-purple-hover); }
+:is(button,.btn,.btn-primary,.btn-add,.btn-secondary,.btn-cancel,.btn-danger,.btn-danger-solid,.btn-success,.btn-ai,.icon-btn):is(:disabled,[aria-disabled=true]) { opacity:.55; cursor:not-allowed; box-shadow:none; transform:none; }
 :is(button,a,input,select,textarea,summary):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 :is(input[type=checkbox],input[type=radio]) { accent-color:var(--accent); width:18px; height:18px; }
 :is(input,select,textarea)[aria-invalid=true] { border-color:var(--danger); }
@@ -35,10 +35,10 @@
   width: var(--control-height-sm);
   height: var(--control-height-sm);
   padding: 0;
-  border: 1px solid transparent;
+  border: 1px solid var(--control-border);
   border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--text-secondary);
+  background: var(--hr-blue-soft);
+  color: var(--hr-navy);
   cursor: pointer;
   transition:
     background-color var(--transition-fast),
@@ -64,12 +64,15 @@
 }
 
 .icon-btn {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--border-default);
-  color: var(--text-secondary);
+  border: 1px solid var(--control-border);
+  color: var(--hr-navy);
   cursor: pointer;
   transition:
     background-color var(--transition-fast),
@@ -79,9 +82,8 @@
     transform var(--transition-fast);
 }
 
-.icon-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-card);
+.icon-btn:hover:not(:disabled):not([aria-disabled=true]) {
+  box-shadow: 0 3px 9px rgba(15, 23, 42, 0.06);
 }
 
 .icon-btn--edit:hover {
@@ -90,9 +92,11 @@
   background: var(--accent-soft);
 }
 
+.icon-btn--danger { color:var(--danger); border-color:var(--danger); background:var(--danger-soft); }
+
 .icon-btn--danger:hover {
   color: var(--danger);
-  border-color: rgba(239, 68, 68, 0.32);
+  border-color: var(--danger);
   background: var(--danger-soft);
 }
 
@@ -146,7 +150,7 @@
   color: var(--hr-slate);
 }
 
-.input-field:hover:not(:disabled) {
+.input-field:hover:not(:disabled):not([aria-disabled=true]) {
   border-color: var(--border-strong);
 }
 
@@ -1168,7 +1172,7 @@ tbody tr:hover {
 }
 
 .candidate-ai-textarea::placeholder {
-  color: #a7abc0;
+  color: var(--hr-slate);
 }
 
 .candidate-ai-textarea:focus {
@@ -1392,19 +1396,8 @@ tbody tr:hover {
   }
 }
 
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  border-color: rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
-}
 
-.icon-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 9px rgba(15, 23, 42, 0.06);
-}
+
 
 .page-header {
   margin-bottom: 26px;
@@ -1424,7 +1417,7 @@ tbody tr:hover {
 .page-header__subtitle {
   max-width: 680px;
   margin-top: 7px;
-  color: #7a8492;
+  color: var(--hr-slate);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -1570,7 +1563,7 @@ tbody tr:hover {
 }
 
 .admin-table-container .cell-muted {
-  color: #8b94a1;
+  color: var(--hr-slate);
 }
 
 .admin-table-container .col-actions {
@@ -1607,7 +1600,7 @@ tbody tr:hover {
   justify-content: center;
   gap: 8px;
   text-align: center;
-  color: #7b8593;
+  color: var(--hr-slate);
 }
 
 .empty-state > svg,
@@ -1634,7 +1627,7 @@ tbody tr:hover {
 .empty-state__message {
   max-width: 460px;
   margin: 0;
-  color: #8a94a2;
+  color: var(--hr-slate);
   font-size: 12.5px;
   line-height: 1.55;
 }
@@ -1660,7 +1653,7 @@ tbody tr:hover {
   justify-content: center;
   gap: 9px;
   text-align: center;
-  color: #7b8593;
+  color: var(--hr-slate);
 }
 
 .page-state h1,
@@ -1677,7 +1670,7 @@ tbody tr:hover {
 .page-state p {
   max-width: 520px;
   margin: 0;
-  color: #89929f;
+  color: var(--hr-slate);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -1731,7 +1724,7 @@ tbody tr:hover {
 /* Loading states */
 .page-state--loading,
 .loading-state {
-  color: #8a94a2;
+  color: var(--hr-slate);
 }
 
 .page-state--loading::before,
@@ -1826,7 +1819,7 @@ table.audit-modern-table {
 .admin-table-container .cell-muted,
 .audit-modern-table-wrapper .cell-muted,
 .audit-modern-table .cell-muted {
-  color: #7f8996;
+  color: var(--hr-slate);
 }
 
 .admin-table-container .col-actions,
@@ -1904,7 +1897,7 @@ table.audit-modern-table {
 .state-page__message{
   max-width:460px;
   margin:7px 0 0;
-  color:#7a8392;
+  color:var(--hr-slate);
   font-size:13px;
   line-height:1.55;
 }
@@ -2048,7 +2041,6 @@ table.audit-modern-table {
 }
 
 .roles-grid .role-card:hover{
-  transform:translateY(-2px);
   border-color:#d5daf0;
   box-shadow:
     0 15px 32px rgba(20,28,45,.065),
@@ -2080,7 +2072,7 @@ table.audit-modern-table {
 
 .roles-grid .role-card > p:first-of-type{
   margin:9px 0 4px !important;
-  color:#7b8494 !important;
+  color:var(--hr-slate) !important;
   font-size:10.5px !important;
   font-weight:600;
   letter-spacing:.015em;
@@ -2282,7 +2274,7 @@ table.audit-modern-table {
 
 .role-modal__permissions .empty-state__title{
   margin:0;
-  color:#8a94a3;
+  color:var(--hr-slate);
   font-size:12px;
   font-weight:500;
 }
@@ -2370,10 +2362,10 @@ table.audit-modern-table {
   display:grid;
   place-items:center;
   padding:0;
-  border:1px solid #e1e5ec;
+  border:1px solid var(--control-border);
   border-radius:9px;
-  background:#f8f9fb;
-  color:#667085;
+  background:var(--hr-blue-soft);
+  color:var(--hr-navy);
   box-shadow:none;
   transition:
     background .16s ease,
@@ -2382,11 +2374,10 @@ table.audit-modern-table {
     transform .16s ease;
 }
 
-.role-modal__close:hover:not(:disabled){
+.role-modal__close:hover:not(:disabled):not([aria-disabled=true]){
   background:#f1f3f6;
   border-color:#d3d8e1;
   color:#2f3743;
-  transform:translateY(-1px);
 }
 
 .role-template-field{
@@ -2402,7 +2393,7 @@ table.audit-modern-table {
 
 .role-modal__field-hint{
   margin:6px 0 0;
-  color:#8a94a3;
+  color:var(--hr-slate);
   font-size:10.5px;
   line-height:1.4;
 }
@@ -2430,3 +2421,18 @@ table.audit-modern-table {
 .resource-state > button { flex-shrink:0; }
 @media (prefers-reduced-motion:reduce) { .resource-state .spin { animation:none; } }
 @media (max-width:420px) { .resource-state { flex-wrap:wrap; } .resource-state > button { margin-left:30px; } }
+
+/* Shared embedded feedback and document overlay; use the same surface and controls. */
+.state-page--embedded { min-height:96px; padding:20px; border:0; border-radius:0; background:transparent; box-shadow:none; }
+.file-preview-modal { width:min(960px,100%); }
+.file-preview-modal__header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.file-preview-modal__header h2 { min-width:0; overflow-wrap:anywhere; font-size:18px; }
+.file-preview-modal > .btn-secondary { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .icon-btn:hover:not(:disabled):not([aria-disabled=true]), .role-modal__close:hover:not(:disabled):not([aria-disabled=true]) { transform:translateY(-1px); }
+  .roles-grid .role-card:hover { transform:translateY(-2px); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .icon-btn, .role-modal__close { transition:background-color var(--transition-fast),border-color var(--transition-fast),color var(--transition-fast); }
+  .roles-grid .role-card:hover { transform:none; }
+}

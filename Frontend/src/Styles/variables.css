@@ -15,6 +15,7 @@
   --hr-ink: var(--text-primary);
   --hr-slate: var(--text-secondary);
   --hr-border: #d7e2f1;
+  --control-border: #7486a2;
   --hr-white: #fff;
   --hr-subtle: #f3f7fd;
   --hr-danger: var(--danger);
