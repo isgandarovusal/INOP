@@ -1,4 +1,5 @@
 import "./workspace.css";
+import "../../Styles/administration.css";
 import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";

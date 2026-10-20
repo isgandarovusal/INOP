@@ -60,7 +60,7 @@
 .audit-workspace.audit-workspace :is(.btn-cancel,.btn-danger) { background: var(--hr-danger); color: #fff; border: 1px solid var(--hr-danger); }
 .audit-workspace.audit-workspace button:disabled { color: var(--text-disabled); background: var(--control-disabled-bg); border-color: var(--control-disabled-border); box-shadow: none; transform: none; }
 .audit-workspace.audit-workspace :is(button,a,input,select,textarea,[tabindex]):focus-visible { outline: 2px solid var(--hr-navy); outline-offset: 3px; }
-.audit-workspace.audit-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea) { min-width: 0; max-width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-white); color: var(--hr-ink); box-shadow: none; }
+.audit-workspace.audit-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=search]),select,textarea) { min-width: 0; max-width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--hr-border); border-radius: 10px; background: var(--hr-white); color: var(--hr-ink); box-shadow: none; }
 .audit-workspace.audit-workspace textarea { min-height: 100px; resize: vertical; }
 .audit-workspace.audit-workspace :is(input,textarea)::placeholder { color: var(--hr-slate); }
 .audit-workspace.audit-workspace :is(input,select,textarea):disabled { background: var(--control-disabled-bg); color: var(--text-disabled); cursor: not-allowed; }
@@ -154,3 +154,5 @@
 .audit-workspace .service-section-notes{border-top:1px solid var(--hr-border,#e2e8f0);padding-top:1rem;display:grid;gap:1rem}.audit-workspace .service-photo{min-width:0}.audit-workspace .service-photo input{max-width:100%}@media(min-width:1024px){.audit-workspace .service-section-notes{grid-template-columns:1fr 1fr}}
 
 .audit-workspace .service-section-layout{display:grid;gap:1.25rem;min-width:0}.audit-workspace .service-section-layout>div{min-width:0}@media(min-width:1024px){.audit-workspace .service-section-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px);align-items:start}.audit-workspace .service-section-notes{grid-template-columns:1fr;position:sticky;top:1rem}}
+
+.audit-workspace .search-field input[type="search"] { padding-left:38px; padding-right:38px; min-height:44px; }

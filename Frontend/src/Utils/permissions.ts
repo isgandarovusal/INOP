@@ -20,21 +20,6 @@ export function hasHRAccess(user: PublicUser | null): boolean {
   return user.role === 'admin' || (user.departmentId === 'dep_hr' && user.hrAccess !== false);
 }
 
-function permissionMatches(
-  permission: Permission,
-  resource: string,
-  action: string,
-): boolean {
-  const resourceMatches =
-    permission.resource === "*" ||
-    permission.resource === resource;
-
-  const actionMatches =
-    permission.action === "*" ||
-    permission.action === action;
-
-  return resourceMatches && actionMatches;
-}
 
 export function hasPermission(
   user: PublicUser | null,
@@ -60,11 +45,8 @@ export function getPermissionScope(
 
   if (['recruitment', 'candidate', 'application'].includes(resource) && !hasHRAccess(user)) return null;
 
-  const permission = (user.permissions || []).find((item) =>
-    permissionMatches(item, resource, action),
-  );
+  return permissionScope(user.permissions || [], resource, action);
 
-  return permission?.scope || null;
 }
 
 const SECTION_PERMISSIONS: Record<Section, [string, string][]> = {
@@ -136,7 +118,19 @@ export function getRoleLabel(role: Role): string {
 }
 
 export function canAccessAuditDirection(user: PublicUser | null, direction: string, resource = 'audit'): boolean {
-  if (!hasPermission(user, resource, 'read')) return false;
+  if (!user || !['all','department','assigned','own'].includes(permissionScope(user.permissions || [], resource, 'read', direction) || '')) return false;
   if (user?.role === 'auditor' && !user.auditDirection) return false;
   return !user?.auditDirection || (user.auditDirections || [user.auditDirection]).includes(direction as NonNullable<PublicUser['auditDirection']>);
+}
+
+export function permissionScope(permissions: Permission[], resource: string, action: string, direction?: string): Permission['scope'] | null {
+  const legacy = permissions.find(p => (p.resource === '*' || p.resource === resource) && (p.action === '*' || p.action === action))?.scope || null;
+  if (direction) {
+    const key = resource === 'audit' ? `audit.${direction}` : resource.startsWith('audit.') ? `audit.${direction}.${resource.slice(6)}` : resource === 'occupational_safety_audit' && direction === 'occupational-safety' ? `audit.${direction}` : null;
+    const exact = key && permissions.find(p => p.resource === key && (p.action === action || p.action === '*'));
+    return exact ? exact.scope : legacy;
+  }
+  if (legacy) return legacy;
+  const scopes = ['hr','service','standard','occupational-safety'].map(d => permissionScope(permissions, resource, action, d));
+  return (['all','department','assigned','own'] as const).find(s => scopes.includes(s)) || null;
 }

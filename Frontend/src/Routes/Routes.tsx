@@ -6,6 +6,7 @@ import RoleRoute from "./RoleRoute";
 import HRRoute from "./HRRoute";
 const AppShell = lazy(() => import("../Layouts/AppShell/AppShell"));
 const Login = lazy(() => import("../Pages/Auth/Login/Login"));
+const Profile = lazy(() => import("../Pages/Profile/Profile"));
 const Dashboard = lazy(() => import("../Pages/Dashboard/Dashboard"));
 const JobsList = lazy(() => import("../Pages/Recruitment/Jobs/JobsList"));
 const JobForm = lazy(() => import("../Pages/Recruitment/Jobs/JobForm"));
@@ -62,6 +63,7 @@ const ROUTES: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
           { path: "dashboard", element: <Dashboard /> },
+          { path: "profile", element: <Profile /> },
           { element: <HRRoute resource="recruitment" action="read" />, children: [
             { path: "recruitment/jobs", element: <JobsList /> },
             { path: "recruitment/jobs/:id", element: <JobDetail /> },

@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
+    credentialVersion: { type: Number, default: 0, select: false },
+
     // Role is intentionally stored as a string rather than
     // a hard-coded enum so new roles can be introduced later.
     role: {

@@ -1,20 +1,31 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2, Pencil, Plus, PowerOff, Power, UserCog } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../Components/PageHeader";
 import SearchInput from "../../Components/SearchInput";
 import EmptyState from "../../Components/EmptyState";
+import ConfirmDialog from "../../Components/ConfirmDialog";
+import { useAuth } from "../../Context/AuthContext";
+import { getRoles, type RoleRecord } from "../../Services/rolesService";
 import Badge from "../../Components/Badge";
 import { getUsers, setUserActive } from "../../Services/usersService";
 import { getDepartments } from "../../Services/departmentsService";
 import type { PublicUser } from "../../Types/auth";
 import type { Department } from "../../Types/core";
-import { ROLE_LABELS } from "../../Utils/permissions";
+import { hasPermission, getPermissionScope, getRoleLabel } from "../../Utils/permissions";
 
 const UsersList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {user: currentUser} = useAuth();
+  const [params] = useSearchParams();
+  const [departmentFilter,setDepartmentFilter] = useState(params.get('departmentId') || '');
+  const [roleFilter,setRoleFilter] = useState('');
+  const [statusFilter,setStatusFilter] = useState('');
+  const [roles,setRoles] = useState<RoleRecord[]>([]);
+  const [lookupError,setLookupError] = useState(false);
+  const [statusTarget,setStatusTarget] = useState<PublicUser|null>(null);
 
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -28,13 +39,12 @@ const UsersList: React.FC = () => {
     setError(null);
 
     try {
-      const [userResult, deptResult] = await Promise.all([
-        getUsers(),
-        getDepartments(),
-      ]);
-
-      setUsers(userResult);
-      setDepartments(deptResult);
+      const [userResult, deptResult, roleResult] = await Promise.allSettled([getUsers(), getDepartments(), getRoles()]);
+      if (userResult.status === 'rejected') throw userResult.reason;
+      setUsers(userResult.value);
+      setDepartments(deptResult.status === 'fulfilled' ? deptResult.value : []);
+      setRoles(roleResult.status === 'fulfilled' ? roleResult.value : []);
+      setLookupError(deptResult.status === 'rejected' || roleResult.status === 'rejected');
     } catch (error) {
       console.error("Failed to load users:", error);
       setError(t("auth.somethingWentWrong"));
@@ -48,29 +58,24 @@ const UsersList: React.FC = () => {
   }, [load]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return users;
-
-    const q = query.toLowerCase();
-
-    return users.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q),
-    );
-  }, [users, query]);
-
-  const departmentName = (id: string) =>
-    departments.find((d) => d.id === id)?.name ?? "—";
-
-  const toggleActive = async (user: PublicUser) => {
-    setTogglingId(user.id);
-    await setUserActive(user.id, !user.isActive);
-    setTogglingId(null);
-    load();
+    const q = query.trim().toLocaleLowerCase();
+    return users.filter(u => (!q || `${u.name} ${u.email} ${u.position} ${u.role}`.toLocaleLowerCase().includes(q)) &&
+      (!departmentFilter || u.departmentId === departmentFilter) && (!roleFilter || u.role === roleFilter) &&
+      (!statusFilter || String(u.isActive) === statusFilter));
+  }, [users, query, departmentFilter, roleFilter, statusFilter]);
+  const departmentName = (id: string) => departments.find(d => d.id === id)?.name || (id === 'dep_hr' ? t('departments.humanResources') : id || t('adminUI.unassigned'));
+  const toggleActive = async () => {
+    if (!statusTarget) return;
+    setTogglingId(statusTarget.id);
+    try {
+      const updated = await setUserActive(statusTarget.id, !statusTarget.isActive);
+      setUsers(current => current.map(u => u.id === updated.id ? updated : u)); setStatusTarget(null);
+    } catch { setError(t('auth.somethingWentWrong')); }
+    finally { setTogglingId(null); }
   };
 
   return (
-    <div>
+    <div className="administration-page">
       <PageHeader
         title={t("users.title")}
         subtitle={t("users.totalShown", {
@@ -78,7 +83,7 @@ const UsersList: React.FC = () => {
           shown: filtered.length,
         })}
         actions={
-          <button
+          hasPermission(currentUser,'user','create') && getPermissionScope(currentUser,'role','update') === 'all' && <button
             className="btn-add"
             onClick={() => navigate("/app/users/new")}
           >
@@ -88,14 +93,17 @@ const UsersList: React.FC = () => {
         }
       />
 
-      <div className="filter-bar">
+      {lookupError && <p role="status" className="admin-notice">{t('adminUI.lookupError')}</p>}
+      <div className="filter-bar administration-filters">
         <SearchInput
           value={query}
           onChange={setQuery}
           placeholder={t("users.search")}
         />
+        <select className="input-field" aria-label={t('users.role')} value={roleFilter} onChange={e=>setRoleFilter(e.target.value)}><option value="">{t('adminUI.allRoles')}</option>{[...new Set(users.map(u=>u.role))].map(key=><option key={key} value={key}>{roles.find(r=>r.key===key)?.name || getRoleLabel(key)}</option>)}</select>
+        <select className="input-field" aria-label={t('users.department')} value={departmentFilter} onChange={e=>setDepartmentFilter(e.target.value)}><option value="">{t('adminUI.allDepartments')}</option>{[...new Set(users.map(u=>u.departmentId).filter(Boolean))].map(id=><option key={id} value={id}>{departmentName(id)}</option>)}</select>
+        <select className="input-field" aria-label={t('users.status')} value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option value="">{t('adminUI.allStatuses')}</option><option value="true">{t('common.status.active')}</option><option value="false">{t('common.status.inactive')}</option></select>
       </div>
-
       <div className="admin-table-container glass">
         <table>
           <thead>
@@ -160,12 +168,13 @@ const UsersList: React.FC = () => {
 
                   <td>
                     <Badge tone="accent">
-                      {ROLE_LABELS[user.role]}
+                      {roles.find(r=>r.key===user.role)?.name || getRoleLabel(user.role)}
                     </Badge>
                   </td>
 
                   <td className="cell-muted">
                     {departmentName(user.departmentId)}
+                    <div className="admin-help">{user.position || t('adminUI.positionMissing')}</div>
                   </td>
 
                   <td>
@@ -180,7 +189,7 @@ const UsersList: React.FC = () => {
 
                   <td>
                     <div className="row-actions">
-                      <button
+                      {hasPermission(currentUser,'user','update') && <><button
                         className="icon-btn icon-btn--edit"
                         title={t("users.edit")}
                         onClick={() =>
@@ -197,8 +206,8 @@ const UsersList: React.FC = () => {
                             ? t("users.deactivate")
                             : t("users.activate")
                         }
-                        disabled={togglingId === user.id}
-                        onClick={() => toggleActive(user)}
+                        disabled={togglingId === user.id || currentUser?.id === user.id}
+                        onClick={() => setStatusTarget(user)}
                       >
                         {togglingId === user.id ? (
                           <Loader2 size={15} className="spin" />
@@ -207,7 +216,7 @@ const UsersList: React.FC = () => {
                         ) : (
                           <Power size={15} />
                         )}
-                      </button>
+                      </button></>}
                     </div>
                   </td>
                 </tr>
@@ -216,6 +225,7 @@ const UsersList: React.FC = () => {
           </tbody>
         </table>
       </div>
+      {statusTarget && <ConfirmDialog title={statusTarget.isActive ? t('users.deactivate') : t('users.activate')} message={t('adminUI.statusConfirm',{name:statusTarget.name})} loading={Boolean(togglingId)} onCancel={()=>setStatusTarget(null)} onConfirm={()=>void toggleActive()} />}
     </div>
   );
 };

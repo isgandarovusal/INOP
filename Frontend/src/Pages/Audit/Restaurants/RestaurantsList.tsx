@@ -82,12 +82,12 @@ const RestaurantsList: React.FC = () => {
     <div className="audit-restaurants-page">
       <PageHeader
         title={t("audit.restaurants.list.title")}
-        subtitle={`${restaurants.length} total · ${filtered.length} shown`}
+        subtitle={t("users.totalShown",{total:restaurants.length,shown:filtered.length})}
         actions={
           canManage && (
             <button className="btn-add" onClick={() => navigate("/app/audit/restaurants/new")}>
               <Plus size={16} />
-              Add restaurant
+              {t("adminUI.addRestaurant")}
             </button>
           )
         }
@@ -188,7 +188,7 @@ const RestaurantsList: React.FC = () => {
                   <td className="cell-muted">{restaurant.location}</td>
                   <td>
                     <Badge tone={restaurant.status === "active" ? "success" : "neutral"}>
-                      {restaurant.status}
+                      {t(`common.status.${restaurant.status}`,{defaultValue:restaurant.status})}
                     </Badge>
                   </td>
                   <td>

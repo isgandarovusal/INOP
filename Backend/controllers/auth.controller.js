@@ -51,6 +51,7 @@ function createToken(user) {
       role: user.role,
       email: user.email,
       jti: crypto.randomUUID(),
+      cv: user.credentialVersion || 0,
     },
     getJwtSecret(),
     {
@@ -71,7 +72,7 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({
       email: String(email).trim().toLowerCase(),
-    }).select("+password");
+    }).select("+password +credentialVersion");
 
     if (!user) {
       return res.status(401).json({
@@ -171,5 +172,29 @@ exports.logout = async (req, res) => {
     return res.status(500).json({
       message: "Logout zamanı server xətası baş verdi.",
     });
+  }
+};
+
+// Changes only the authenticated account; no target account can be supplied.
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body || {};
+    if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' ||
+        Buffer.byteLength(currentPassword, 'utf8') > 72 || Buffer.byteLength(newPassword, 'utf8') > 72 ||
+        newPassword.length < 12 || !/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword) || currentPassword === newPassword) {
+      return res.status(400).json({ code: 'PASSWORD_INVALID', message: 'Yeni şifrə ən azı 12 simvol, hərf və rəqəmdən ibarət olmalıdır (maksimum 72 bayt).' });
+    }
+    const user = await User.findById(req.user.id).select('+password +credentialVersion');
+    if (!user || !user.isActive || !(await bcrypt.compare(currentPassword, user.password))) {
+      return res.status(400).json({ code: 'CURRENT_PASSWORD_INVALID', message: 'Cari şifrə düzgün deyil.' });
+    }
+    const password = await bcrypt.hash(newPassword, 12);
+    // Compare-and-swap also rejects simultaneous attempts using the old password.
+    const result = await User.updateOne({ _id: user._id, password: user.password }, { $set: { password }, $inc: { credentialVersion: 1 } });
+    if (result.modifiedCount !== 1) return res.status(409).json({ code: 'PASSWORD_CHANGED', message: 'Şifrə artıq dəyişib. Yenidən daxil olun.' });
+    return res.status(200).json({ message: 'Şifrə dəyişdirildi. Yenidən daxil olun.' });
+  } catch (error) {
+    require('../services/safeErrorLog.service').logFailure(error);
+    return res.status(500).json({ message: 'Şifrəni dəyişmək mümkün olmadı.' });
   }
 };

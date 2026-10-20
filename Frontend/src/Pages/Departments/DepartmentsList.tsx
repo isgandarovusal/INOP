@@ -8,6 +8,9 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
+import { hasPermission } from "../../Utils/permissions";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
 import ConfirmDialog from "../../Components/ConfirmDialog";
@@ -21,6 +24,7 @@ import type { Department } from "../../Types/core";
 
 const DepartmentsList: React.FC = () => {
   const { t } = useTranslation();
+  const {user} = useAuth();
   const getDepartmentName = (name: string) => {
     const normalized = name.trim().toLowerCase();
 
@@ -170,20 +174,21 @@ const DepartmentsList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="administration-page">
       <PageHeader
         title={t("departments.title")}
         subtitle={t("departments.total", {
           count: departments.length,
         })}
         actions={
-          <button className="btn-add" onClick={openCreate}>
+          hasPermission(user,'department','create') && <button className="btn-add" onClick={openCreate}>
             <Plus size={16} />
             {t("departments.newDepartment")}
           </button>
         }
       />
 
+      {error && !showForm && <p className="admin-notice" role="alert">{error}</p>}
       <div className="admin-table-container glass">
         <table>
           <thead>
@@ -243,22 +248,22 @@ const DepartmentsList: React.FC = () => {
                       : ""
                   }
                 >
-                  <td className="cell-title">{getDepartmentName(dept.name)}</td>
+                  <td className="cell-title">{getDepartmentName(dept.name)}{hasPermission(user,'user','read') && <div><Link className="admin-member-link" to={`/app/users?departmentId=${encodeURIComponent(dept.id)}`}>{t('adminUI.viewMembers')}</Link></div>}</td>
                   <td className="cell-muted">
                     {dept.description || "—"}
                   </td>
 
                   <td>
                     <div className="row-actions">
-                      <button
+                      {hasPermission(user,'department','update') && <button
                         className="icon-btn icon-btn--edit"
                         title={t("departments.edit")}
                         onClick={() => openEdit(dept)}
                       >
                         <Pencil size={15} />
-                      </button>
+                      </button>}
 
-                      <button
+                      {hasPermission(user,'department','delete') && <button
                         className="icon-btn icon-btn--danger"
                         title={t("departments.delete")}
                         disabled={deletingId === dept.id}
@@ -269,7 +274,7 @@ const DepartmentsList: React.FC = () => {
                         ) : (
                           <Trash2 size={15} />
                         )}
-                      </button>
+                      </button>}
                     </div>
                   </td>
                 </tr>
@@ -311,11 +316,11 @@ const DepartmentsList: React.FC = () => {
               style={{ marginTop: 16 }}
             >
               <div className="form-group">
-                <label className="form-label">
+                <label className="form-label" htmlFor="department-name">
                   {t("departments.name")}
                 </label>
 
-                <input
+                <input id="department-name" autoFocus
                   className="input-field"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -323,11 +328,11 @@ const DepartmentsList: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">
+                <label className="form-label" htmlFor="department-description">
                   {t("departments.description")}
                 </label>
 
-                <textarea
+                <textarea id="department-description"
                   className="input-field input-field--textarea"
                   rows={3}
                   value={description}

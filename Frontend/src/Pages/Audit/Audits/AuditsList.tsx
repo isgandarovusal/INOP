@@ -135,12 +135,12 @@ const AuditsList: React.FC = () => {
     <div className="audit-list-page">
       <PageHeader
         title={t("audit.generic.list.title")}
-        subtitle={`${audits.length} total · ${rows.length} shown`}
+        subtitle={t("users.totalShown",{total:audits.length,shown:rows.length})}
         actions={
           canManage && (
             <button className="btn-add" onClick={() => navigate("/app/audit/audits/new")}>
               <Plus size={16} />
-              New audit
+              {t("adminUI.newAudit")}
             </button>
           )
         }
@@ -240,7 +240,7 @@ const AuditsList: React.FC = () => {
                   <EmptyState
                     icon={<ClipboardCheck size={28} />}
                     title={t("audit.generic.list.noAudits")}
-                    hint="Audits you submit will show up here."
+                    hint={t("adminUI.auditEmptyHint")}
                   />
                 </td>
               </tr>

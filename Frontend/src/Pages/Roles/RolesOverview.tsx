@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Context/AuthContext";
 import PageHeader from "../../Components/PageHeader";
+import { PermissionEditor } from "../../Components/PermissionEditor";
 import Badge from "../../Components/Badge";
 import PageState from "../../Components/PageState";
 import ConfirmDialog from "../../Components/ConfirmDialog";
@@ -24,17 +25,8 @@ import {
 } from "../../Services/rolesService";
 import type {
   Permission,
-  PermissionScope,
 } from "../../Types/auth";
 import { hasPermission } from "../../Utils/permissions";
-
-const SCOPES: PermissionScope[] = [
-  "all",
-  "department",
-  "assigned",
-  "own",
-  "none",
-];
 
 interface RoleFormState {
   name: string;
@@ -66,9 +58,9 @@ const RolesOverview: React.FC = () => {
   const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState<RoleFormState>(EMPTY_FORM);
-  const [roleTemplateKey, setRoleTemplateKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [actionError,setActionError] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<RoleRecord | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -98,16 +90,21 @@ const RolesOverview: React.FC = () => {
     loadRoles();
   }, [retryCount]);
 
+  useEffect(() => {
+    if ((!showCreate && !editingRole) || saving) return;
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setEditingRole(null); setShowCreate(false); } };
+    document.addEventListener('keydown', escape);
+    return () => document.removeEventListener('keydown', escape);
+  }, [showCreate, editingRole, saving]);
+
   const openCreate = () => {
     setEditingRole(null);
     setForm(EMPTY_FORM);
-    setRoleTemplateKey("");
     setFormError(null);
     setShowCreate(true);
   };
 
   const openEdit = (role: RoleRecord) => {
-    setRoleTemplateKey("");
     setEditingRole(role);
     setForm({
       name: role.name,
@@ -127,36 +124,7 @@ const RolesOverview: React.FC = () => {
     setEditingRole(null);
     setShowCreate(false);
     setForm(EMPTY_FORM);
-    setRoleTemplateKey("");
     setFormError(null);
-  };
-
-  const handleRoleTemplateChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const templateKey = event.target.value;
-    setRoleTemplateKey(templateKey);
-
-    if (!templateKey) {
-      setForm((current) => ({
-        ...current,
-        description: "",
-        permissions: [],
-      }));
-      return;
-    }
-
-    const template = roles.find((role) => role.key === templateKey);
-
-    if (!template) return;
-
-    setForm((current) => ({
-      ...current,
-      description: template.description,
-      permissions: template.permissions.map((permission) => ({
-        ...permission,
-      })),
-    }));
   };
 
   const slugifyRoleKey = (value: string) =>
@@ -172,43 +140,6 @@ const RolesOverview: React.FC = () => {
       .replace(/ğ/g, "g")
       .replace(/[^a-z0-9]+/g, "_")
       .replace(/^_+|_+$/g, "");
-
-  const addPermission = () => {
-    setForm((current) => ({
-      ...current,
-      permissions: [
-        ...current.permissions,
-        {
-          resource: "",
-          action: "",
-          scope: "all",
-        },
-      ],
-    }));
-  };
-
-  const updatePermission = (
-    index: number,
-    patch: Partial<Permission>,
-  ) => {
-    setForm((current) => ({
-      ...current,
-      permissions: current.permissions.map((permission, itemIndex) =>
-        itemIndex === index
-          ? { ...permission, ...patch }
-          : permission,
-      ),
-    }));
-  };
-
-  const removePermission = (index: number) => {
-    setForm((current) => ({
-      ...current,
-      permissions: current.permissions.filter(
-        (_, itemIndex) => itemIndex !== index,
-      ),
-    }));
-  };
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -256,7 +187,7 @@ const RolesOverview: React.FC = () => {
         setRoles((current) => [...current, created]);
       }
 
-      closeForm();
+      setEditingRole(null); setShowCreate(false);
     } catch (err) {
       console.error("Failed to save role:", err);
 
@@ -287,7 +218,7 @@ const RolesOverview: React.FC = () => {
         ),
       );
     } catch (err) {
-      console.error("Failed to update role status:", err);
+      console.error("Failed to update role status:", err); setActionError(true);
     } finally {
       setStatusLoadingId(null);
     }
@@ -307,7 +238,7 @@ const RolesOverview: React.FC = () => {
 
       setDeleteTarget(null);
     } catch (err) {
-      console.error("Failed to delete role:", err);
+      console.error("Failed to delete role:", err); setActionError(true);
     } finally {
       setDeleting(false);
     }
@@ -356,7 +287,7 @@ const RolesOverview: React.FC = () => {
   }
 
   return (
-    <div className="roles-page">
+    <div className="roles-page administration-page">
       <PageHeader
         title={t("roles.title")}
         subtitle={t("roles.subtitle")}
@@ -382,6 +313,7 @@ const RolesOverview: React.FC = () => {
         )}
       </div>
 
+      {actionError && <p className="admin-notice" role="alert">{t('auth.somethingWentWrong')}</p>}
       {roles.length === 0 ? (
         <PageState
           type="empty"
@@ -474,16 +406,8 @@ const RolesOverview: React.FC = () => {
                 </p>
               )}
 
-              <div className="tag-list">
-                {role.permissions.map((permission) => (
-                  <Badge
-                    tone="accent"
-                    key={`${permission.resource}:${permission.action}:${permission.scope}`}
-                  >
-                    {`${permission.resource}.${permission.action}:${permission.scope}`}
-                  </Badge>
-                ))}
-              </div>
+              <p className="admin-help">{t('adminUI.permissionCount', {count: role.permissions.length})}</p>
+              <div className="tag-list">{[...new Set(role.permissions.map(p => p.resource))].slice(0,6).map(resource => <Badge key={resource} tone="accent">{resource === '*' ? t('adminUI.allSections') : t(`adminUI.resources.${resource.replaceAll('.','_')}`, {defaultValue: t('roles.form.permissions')})}</Badge>)}</div>
 
               <div
                 style={{
@@ -547,7 +471,7 @@ const RolesOverview: React.FC = () => {
           className="modal-backdrop"
           onClick={() => {
             if (!saving) {
-              closeForm();
+              setEditingRole(null); setShowCreate(false);
             }
           }}
         >
@@ -587,38 +511,12 @@ const RolesOverview: React.FC = () => {
             </div>
 
             <form onSubmit={handleSave} noValidate>
-              {!editingRole && (
-                <div className="form-group role-template-field">
-                  <label className="form-label">
-                    Rol şablonu
-                  </label>
-                  <select
-                    className="input-field"
-                    value={roleTemplateKey}
-                    onChange={handleRoleTemplateChange}
-                    disabled={saving}
-                  >
-                    <option value="">Şablon seçin</option>
-                    {roles
-                      .filter((role) => role.isSystemRole && role.isActive)
-                      .map((role) => (
-                        <option key={role.key} value={role.key}>
-                          {role.name}
-                        </option>
-                      ))}
-                  </select>
-                  <p className="role-modal__field-hint">
-                    Mövcud sistem rolunu başlanğıc şablon kimi seçin.
-                  </p>
-                </div>
-              )}
-
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">
                     {t("roles.form.name")}
                   </label>
-                  <input
+                  <input aria-label={t('roles.form.name')} autoFocus
                     className="input-field"
                     value={form.name}
                     placeholder="Məsələn: Senior Auditor"
@@ -644,7 +542,7 @@ const RolesOverview: React.FC = () => {
                     className="input-field role-key-field"
                     value={form.key}
                     readOnly={!editingRole}
-                    disabled={Boolean(editingRole?.isSystemRole)}
+                    disabled={Boolean(editingRole?.isSystemRole || editingRole?.userCount)}
                     onChange={(event) =>
                       setForm((current) => ({
                         ...current,
@@ -677,114 +575,7 @@ const RolesOverview: React.FC = () => {
                 />
               </div>
 
-              <div className="form-group role-modal__permissions">
-                <div className="role-modal__section-header">
-                  <label className="form-label" style={{ margin: 0 }}>
-                    {t("roles.form.permissions")}
-                  </label>
-
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={addPermission}
-                    disabled={saving}
-                  >
-                    <Plus size={14} />
-                    {t("roles.form.addPermission")}
-                  </button>
-                </div>
-
-                {form.permissions.length === 0 ? (
-                  <div className="empty-state">
-                    <p className="empty-state__title">
-                      {t("roles.form.noPermissions")}
-                    </p>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "grid",
-                      gap: 10,
-                    }}
-                  >
-                    {form.permissions.map((permission, index) => (
-                      <div
-                        key={`${index}-${permission.resource}-${permission.action}`}
-                        className="role-modal__permission-row"
-                      >
-                        <div className="form-group" style={{ margin: 0 }}>
-                          <label className="form-label">
-                            {t("roles.form.resource")}
-                          </label>
-                          <input
-                            className="input-field"
-                            value={permission.resource}
-                            onChange={(event) =>
-                              updatePermission(index, {
-                                resource: event.target.value,
-                              })
-                            }
-                            placeholder="audit"
-                            disabled={saving}
-                          />
-                        </div>
-
-                        <div className="form-group" style={{ margin: 0 }}>
-                          <label className="form-label">
-                            {t("roles.form.action")}
-                          </label>
-                          <input
-                            className="input-field"
-                            value={permission.action}
-                            onChange={(event) =>
-                              updatePermission(index, {
-                                action: event.target.value,
-                              })
-                            }
-                            placeholder="read"
-                            disabled={saving}
-                          />
-                        </div>
-
-                        <div className="form-group" style={{ margin: 0 }}>
-                          <label className="form-label">
-                            {t("roles.form.scope")}
-                          </label>
-                          <select
-                            className="input-field"
-                            value={permission.scope}
-                            onChange={(event) =>
-                              updatePermission(index, {
-                                scope: event.target
-                                  .value as PermissionScope,
-                              })
-                            }
-                            disabled={saving}
-                          >
-                            {SCOPES.map((scope) => (
-                              <option key={scope} value={scope}>
-                                {t(`roles.scopes.${scope}`)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="btn-icon"
-                          onClick={() => removePermission(index)}
-                          disabled={saving}
-                          aria-label={t(
-                            "roles.form.removePermission",
-                          )}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <PermissionEditor value={form.permissions} disabled={saving} onChange={permissions => setForm(current => ({...current, permissions}))} />
 
               {formError && (
                 <p className="form-error form-error--submit">

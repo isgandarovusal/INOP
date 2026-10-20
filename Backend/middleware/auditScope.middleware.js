@@ -180,6 +180,19 @@ exports.getAuditScopeFilter = async req => {
   const foreignContexts = await Context.find({ organizationId: { $ne: 'gfc' } }).select('_id').lean();
   const foreignRestaurants=await require('../models/restaurant.model').find({organizationId:{$exists:true,$nin:['gfc','',null]}}).select('id').lean();
   const parts = [base,{restaurantId:{$nin:foreignRestaurants.map(r=>r.id)}}, { archivedAt: null }, { _id: { $nin: foreignContexts.map(item => item._id) } }];
+  // Each directional grant keeps its own ownership scope on lists, children,
+  // reports and exports; the aggregate scope is never a cross-direction grant.
+  const directional = require('../services/directionalPermissions.service');
+  if ((req.authRole?.permissions || []).some(p => directional.directions.some(d => p.resource === `audit.${d}` || p.resource.startsWith(`audit.${d}.`)))) {
+    const alternatives = [];
+    for (const direction of directional.directions) {
+      const scope = directional.scope(req.authRole.permissions, req.permission.resource || 'audit', req.permission.action || 'read', direction);
+      if (!scope || scope === 'none') continue;
+      const ownership = await legacyScopeFilter({ ...req, permission: { ...req.permission, scope } });
+      if (ownership) alternatives.push({ $and: [ownership, { auditType: { $in: require('../services/auditDirection.service').aliasesFor(direction) } }] });
+    }
+    parts.push({ $or: alternatives.length ? alternatives : [{ _id: { $in: [] } }] });
+  }
   // A direction profile restricts every operation, including all-scope report,
   // analytics and exports. Role promotion cannot remove restaurant assignments.
   if(req.auditorProfile){

@@ -114,7 +114,8 @@ const Dashboard: React.FC = () => {
   const [auditError, setAuditError] = useState<string | null>(null);
 
   useEffect(() => {
-    const refresh = () => setRefreshRevision(value => value + 1);
+    let lastRefresh = 0;
+    const refresh = () => { const now = Date.now(); if (document.visibilityState !== 'visible' || now - lastRefresh < 1000) return; lastRefresh = now; setRefreshRevision(value => value + 1); };
     const visible = () => { if (document.visibilityState === "visible") refresh(); };
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", visible);
@@ -125,6 +126,7 @@ const Dashboard: React.FC = () => {
     let mounted = true;
     const controller = new AbortController();
     const requestScopeKey = JSON.stringify([dataScopeKey, refreshRevision]);
+    const deadline = setTimeout(() => controller.abort(), 15000);
 
     const loadDashboard = () => {
       setLoadedScopeKey(dataScopeKey);
@@ -151,7 +153,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || ""
+              error?.response?.data?.message || t("auth.somethingWentWrong")
             );
           })
           .finally(() => {
@@ -171,7 +173,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || ""
+              error?.response?.data?.message || t("auth.somethingWentWrong")
             );
           })
           .finally(() => {
@@ -191,7 +193,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || ""
+              error?.response?.data?.message || t("auth.somethingWentWrong")
             );
           })
           .finally(() => {
@@ -219,7 +221,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setAuditError(
-              error?.response?.data?.message || ""
+              error?.response?.data?.message || t("auth.somethingWentWrong")
             );
           })
           .finally(() => {
@@ -236,9 +238,10 @@ const Dashboard: React.FC = () => {
 
     return () => {
       mounted = false;
+      clearTimeout(deadline);
       controller.abort();
     };
-  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit]);
+  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, t]);
 
   const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
   const statusBreakdown=candidates.statusBreakdown;

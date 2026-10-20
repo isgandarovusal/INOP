@@ -226,9 +226,9 @@ const Sidebar: React.FC = () => {
 
         <div className="admin-sidebar__user">
           <div className="admin-sidebar__user-info">
-            <p className="admin-sidebar__user-name">{user.name}</p>
+            <NavLink to="/app/profile" className="admin-sidebar__user-name" title={t("adminUI.profile")}>{user.name}</NavLink>
             <p className="admin-sidebar__user-role">
-              {ROLE_LABELS[user.role]}
+              {ROLE_LABELS[user.role] || user.role}
             </p>
           </div>
 

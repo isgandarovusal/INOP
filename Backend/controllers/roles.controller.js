@@ -286,6 +286,7 @@ exports.updateRole = async (req, res) => {
       }
 
       if (requestedKey !== role.key) {
+        if (await User.exists({ role: role.key })) return res.status(409).json({ message: 'İstifadəçilərə təyin edilmiş rolun identifikatoru dəyişdirilə bilməz.' });
         const existing = await Role.findOne({
           key: requestedKey,
           _id: { $ne: role._id },

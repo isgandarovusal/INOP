@@ -5,17 +5,20 @@ import { useTranslation } from "react-i18next";
 import PageHeader from "../../Components/PageHeader";
 import {
   createUser,
-  getUsers,
+  getUserById,
   updateUser,
 } from "../../Services/usersService";
 import { getDepartments } from "../../Services/departmentsService";
 import { getRoles, type RoleRecord } from "../../Services/rolesService";
 import type { Role } from "../../Types/auth";
 import type { Department } from "../../Types/core";
-import { getRoleLabel } from "../../Utils/permissions";
+import { useAuth } from "../../Context/useAuth";
+import { getPermissionScope, getRoleLabel } from "../../Utils/permissions";
 
 const UserForm: React.FC = () => {
   const { t } = useTranslation();
+  const {user} = useAuth();
+  const canAssign = getPermissionScope(user,'role','update') === 'all';
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -44,7 +47,7 @@ const UserForm: React.FC = () => {
     Promise.all([
       getDepartments(),
       getRoles(),
-      isEdit ? getUsers() : Promise.resolve([]),
+      isEdit && id ? getUserById(id) : Promise.resolve(null),
     ])
       .then(([deptResult, roleResult, userResult]) => {
         if (cancelled) return;
@@ -58,20 +61,14 @@ const UserForm: React.FC = () => {
           );
 
           const defaultRole =
-            activeRoles.find((item) => item.key === "employee") ||
-            activeRoles[0];
+            activeRoles.find((item) => item.key === "employee");
 
-          if (defaultRole) {
-            setRole(defaultRole.key);
-          }
+          setRole(defaultRole?.key || '');
         }
 
-        if (deptResult.length && !departmentId) {
-          setDepartmentId(deptResult[0].id);
-        }
 
         if (isEdit && id) {
-          const existing = userResult.find((u) => u.id === id);
+          const existing = userResult;
 
           if (existing) {
             setName(existing.name);
@@ -107,11 +104,14 @@ const UserForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !email.trim() || (!isEdit && !password.trim())) {
+    if (!name.trim() || !email.trim() || !role || (!isEdit && !password.trim())) {
       setError(t("userForm.required"));
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || (!isEdit && password.length < 6)) {
+      setError(t("adminUI.invalidUser")); return;
+    }
     setSaving(true);
     setError(null);
 
@@ -172,12 +172,12 @@ const UserForm: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="administration-page">
       <PageHeader
         title={isEdit ? t("userForm.editUser") : t("userForm.newUser")}
       />
 
-      <div className="form-card">
+      <div className="form-card administration-form">
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
             <div className="form-group">
@@ -186,7 +186,7 @@ const UserForm: React.FC = () => {
               </label>
               <input
                 className="input-field"
-                value={name}
+                aria-label={t("userForm.fullName")} value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
@@ -198,7 +198,7 @@ const UserForm: React.FC = () => {
               <input
                 type="email"
                 className="input-field"
-                value={email}
+                aria-label={t("userForm.email")} value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isEdit}
               />
@@ -213,7 +213,7 @@ const UserForm: React.FC = () => {
               <input
                 type="password"
                 className="input-field"
-                value={password}
+                aria-label={t("userForm.password")} value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t("userForm.minimumPassword")}
               />
@@ -228,9 +228,11 @@ const UserForm: React.FC = () => {
 
               <select
                 className="input-field"
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
+                aria-label={t("userForm.role")} value={role}
+                disabled={!canAssign || saving} onChange={(e) => setRole(e.target.value as Role)}
               >
+                <option value="">{t('adminUI.unassigned')}</option>
+                {role && !roles.some(r=>r.key===role) && <option value={role}>{role}</option>}
                 {roles
                   .filter(
                     (item) =>
@@ -239,7 +241,7 @@ const UserForm: React.FC = () => {
                   )
                   .map((item) => (
                     <option key={item.id} value={item.key}>
-                      {getRoleLabel(item.key)}
+                      {item.name || getRoleLabel(item.key)}
                     </option>
                   ))}
               </select>
@@ -252,9 +254,11 @@ const UserForm: React.FC = () => {
 
               <select
                 className="input-field"
-                value={departmentId}
-                onChange={(e) => setDepartmentId(e.target.value)}
+                aria-label={t("userForm.department")} value={departmentId}
+                disabled={!canAssign || saving} onChange={(e) => setDepartmentId(e.target.value)}
               >
+                <option value="">{t("adminUI.unassigned")}</option>
+                {departmentId && !departments.some(d => d.id === departmentId) && <option aria-label={t("userForm.department")} value={departmentId}>{departmentId}</option>}
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -271,7 +275,7 @@ const UserForm: React.FC = () => {
 
             <input
               className="input-field"
-              value={position}
+              aria-label={t("userForm.position")} value={position}
               onChange={(e) => setPosition(e.target.value)}
               placeholder={t("userForm.positionPlaceholder")}
             />

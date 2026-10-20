@@ -23,7 +23,7 @@ exports.getDepartments = async (req, res) => {
       .lean();
 
     return res.status(200).json({
-      departments,
+      departments: departments.map(d => ({ ...d, id: String(d._id) })),
     });
   } catch (error) {
     console.error("Get departments error:", error);
@@ -58,7 +58,7 @@ exports.getDepartmentById = async (req, res) => {
     }
 
     return res.status(200).json({
-      department,
+      department: { ...(department.toObject ? department.toObject() : department), id: String(department._id) },
     });
   } catch (error) {
     console.error("Get department error:", error);
@@ -109,7 +109,7 @@ exports.createDepartment = async (req, res) => {
 
     return res.status(201).json({
       message: "Şöbə uğurla yaradıldı.",
-      department,
+      department: { ...(department.toObject ? department.toObject() : department), id: String(department._id) },
     });
   } catch (error) {
     console.error("Create department error:", error);
@@ -192,7 +192,7 @@ exports.updateDepartment = async (req, res) => {
 
     return res.status(200).json({
       message: "Şöbə uğurla yeniləndi.",
-      department,
+      department: { ...(department.toObject ? department.toObject() : department), id: String(department._id) },
     });
   } catch (error) {
     console.error("Update department error:", error);
@@ -225,6 +225,10 @@ exports.deleteDepartment = async (req, res) => {
       Object.assign(query, req.dataScope);
     }
 
+    const existing = await Department.findOne(query).lean();
+    if (existing && await require('../models/user.model').exists({ departmentId: String(existing._id) })) {
+      return res.status(409).json({ message: 'Şöbəyə bağlı istifadəçilər var. Əvvəlcə onları başqa şöbəyə təyin edin.' });
+    }
     const department = await Department.findOneAndDelete(query);
 
     if (!department) {

@@ -18,7 +18,7 @@ export async function getDepartments(): Promise<Department[]> {
   const response =
     await api.get<DepartmentsResponse>("/departments");
 
-  return response.data.departments;
+  return response.data.departments.map(d => ({ ...d, id: d.id || String((d as Department & { _id?: string })._id || "") }));
 }
 
 export async function getDepartmentById(

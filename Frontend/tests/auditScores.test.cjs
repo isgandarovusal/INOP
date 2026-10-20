@@ -10,7 +10,9 @@ test('Audit dashboard envelope and heterogeneous score contracts',async t=>withB
  await h.open('own','/dashboard');await h.page.waitForLoadState('networkidle');
  await t.test('Dashboard unwraps data and formats the Mongo month/year trend',async()=>{
   const data=await h.page.evaluate(async()=> (await import('/src/Services/auditDashboardService.ts')).getAuditDashboard());
-  assert.equal(data.totalAudits,5);assert.equal(data.completedAudits,2);assert.equal(data.averageScore,10);assert.equal(data.scoredExecutions,2);
+  assert.equal(data.totalAudits,5);assert.equal(data.completedAudits,2);assert.equal(data.averageScore,null);assert.equal(data.scoredExecutions,2);
+  const scoped=await h.page.evaluate(async()=> (await (await import('/src/api/axios.ts')).default.get('/audit-dashboard?direction=standard')).data.data);
+  assert.equal(scoped.averageScore,10);assert.equal(data.trend[0].averageScore,null);
   assert.match(data.trend[0].label,/^2026-\d\d$/);assert.equal(data.trend[0].count,2);assert.deepEqual(h.pageErrors,[]);
  });
  await t.test('Canonical zero, missing scores, safety ratio and legacy scores are distinct',async()=>{

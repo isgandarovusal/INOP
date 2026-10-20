@@ -43,12 +43,12 @@ exports.verifyToken = async (req, res, next) => {
       RevokedToken.exists({ tokenHash }),
       User.findById(decoded.id)
         .select(
-          "_id name email role departmentId position managerId isActive"
+          "_id name email role departmentId position managerId isActive +credentialVersion"
         )
         .lean(),
     ]);
 
-    if (revoked) {
+    if (revoked || (user && (decoded.cv || 0) !== (user.credentialVersion || 0))) {
       return res.status(401).json({
         message: "Authentication token artıq etibarlı deyil.",
       });
@@ -119,24 +119,8 @@ async function getRole(roleKey) {
   }).lean();
 }
 
-function permissionMatches(permission, resource, action) {
-  const resourceMatches =
-    permission.resource === "*" ||
-    permission.resource === resource;
-
-  const actionMatches =
-    permission.action === "*" ||
-    permission.action === action;
-
-  return resourceMatches && actionMatches;
-}
-
 function getPermissionScope(permissions, resource, action) {
-  const matchedPermission = permissions.find((permission) =>
-    permissionMatches(permission, resource, action)
-  );
-
-  return matchedPermission?.scope || null;
+  return require('../services/directionalPermissions.service').scope(permissions, resource, action);
 }
 
 exports.requirePermission = (resource, action) => {
@@ -167,10 +151,9 @@ exports.requirePermission = (resource, action) => {
         });
       }
 
-      const scope = getPermissionScope(
-        role.permissions || [],
-        resource,
-        action
+      const scope = require('../services/directionalPermissions.service').scope(
+        role.permissions || [], resource, action,
+        require('../services/directionalPermissions.service').requestDirection(req)
       );
 
       if (!scope) {

@@ -318,6 +318,7 @@ exports.updateUser = async (req, res) => {
     }
 
     if (req.body.password !== undefined) {
+      if (isSelf) return res.status(400).json({ message: 'Öz şifrənizi cari şifrə təsdiqi ilə profil bölməsində dəyişin.' });
       if (
         typeof req.body.password !== "string" ||
         req.body.password.length < 6
@@ -328,6 +329,7 @@ exports.updateUser = async (req, res) => {
       }
 
       user.password = await bcrypt.hash(req.body.password, 12);
+      user.$inc('credentialVersion', 1);
     }
 
     await user.save();
@@ -389,6 +391,11 @@ exports.updateUserStatus = async (req, res) => {
     if (req.dataScope && Object.keys(req.dataScope).length > 0) {
       Object.assign(query, req.dataScope);
     }
+
+    const target = await User.findOne(query).select('_id role').lean();
+    if (target && String(target._id) === req.user.id && req.body.isActive === false) return res.status(400).json({ message: 'Öz hesabınızı deaktiv edə bilməzsiniz.' });
+    if (target && await getPermissionScope(target.role, 'role', 'update') === 'all' && !(await canManagePrivileges(req))) return denyPrivilegeChange(res);
+    if (target?.role === 'admin' && req.body.isActive === false && await User.countDocuments({ role: 'admin', isActive: true }) <= 1) return res.status(409).json({ message: 'Son aktiv administrator deaktiv edilə bilməz.' });
 
     const user = await User.findOneAndUpdate(
       query,
