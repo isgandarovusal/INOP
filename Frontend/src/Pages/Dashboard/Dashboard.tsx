@@ -339,11 +339,12 @@ const Dashboard: React.FC = () => {
                     </div>
                   ) : (
                     <div className="donut-wrap">
-                      <React.Suspense fallback={<div className="empty-state">{t("dashboard.loading")}</div>}><CandidateStatusDonut data={statusBreakdown} /></React.Suspense>
+                      <React.Suspense fallback={<div className="empty-state">{t("dashboard.loading")}</div>}><CandidateStatusDonut data={statusBreakdown} />
                       <div className="donut-center">
                         <span className="donut-center__value">{candidates.total}</span>
                         <span className="donut-center__label">{candidates.total === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>
                       </div>
+                      </React.Suspense>
                     </div>
                   )}
                 </div>
