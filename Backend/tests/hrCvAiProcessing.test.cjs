@@ -63,7 +63,7 @@ test('Durable professional AI task profile preserves parse contracts, source aut
   await t.test('outage retry, deadline and bounded lifetime survive recreation without raw private error persistence',async()=>{
    const c=await cv();let clock=new Date(),count=0;const options={enabled:true,now:()=>clock,provider:{suggestCv:async()=>{count++;throw Error('PRIVATE_PROVIDER_BODY_TOKEN');}}},queue=createAiProcessing(options),job=await enqueue(c,'own',queue);
    for(let i=1;i<=3;i++){await createAiProcessing(options).runOnce();const row=await Jobs.findById(job.id).lean();assert.equal(row.attempts,i);assert.equal(row.state,i===3?'failed':'retry');assert.ok(!JSON.stringify(row).includes('PRIVATE_PROVIDER'));clock=new Date(clock.getTime()+301000);}assert.equal(count,3);assert.equal((await Jobs.findById(job.id).lean()).queueSlot,undefined);
-   let release;const ignored=createAiProcessing({enabled:true,timeoutMs:50,provider:{suggestCv:()=>new Promise(resolve=>release=()=>resolve({}))}}),timeoutJob=await enqueue(await cv(),'own',ignored);await ignored.runOnce();assert.equal((await ignored.get(req('own'),timeoutJob.id)).code,'PROCESSING_TIMEOUT');release();await new Promise(r=>setImmediate(r));
+   let release;const ignored=createAiProcessing({enabled:true,timeoutMs:1000,provider:{suggestCv:()=>new Promise(resolve=>release=()=>resolve({}))}}),timeoutJob=await enqueue(await cv(),'own',ignored);await ignored.runOnce();assert.equal((await ignored.get(req('own'),timeoutJob.id)).code,'PROCESSING_TIMEOUT');release();await new Promise(r=>setImmediate(r));
   });
  }finally{for(const file of owned)await fs.unlink(file);}
 }));

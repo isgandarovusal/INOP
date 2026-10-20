@@ -47,8 +47,10 @@ test('Original CV preview preserves independent current read scope, file identit
    await h.models.User.updateOne({_id:h.actors.assigned._id},{$set:{isActive:true}});
   });
   await t.test('busy preview queue is retryable 503 without disclosing original text',async()=>{
-   const signal=new AbortController(),pending=Array.from({length:9},()=>pool.run('extract',bytes,'cv.docx',{signal:signal.signal})),settled=Promise.allSettled(pending);
-   try{const r=await h.request('own','GET',route());assert.equal(r.status,503);assert.equal(r.data.code,'DOCUMENT_BUSY');assert.equal(r.data.rawText,undefined);}finally{signal.abort();await settled;}
+   // Fast DOCX workers can finish during auth/DB reads: hold actual pool capacity instead.
+   const workerFile=pool.workerFile;pool.workerFile=path.join(__dirname,'helpers/documentTestWorker.cjs');
+   const signal=new AbortController(),pending=Array.from({length:9},()=>pool.run('validate',Buffer.from('hold'),'fixture.txt',{signal:signal.signal})),settled=Promise.allSettled(pending);
+   try{assert.equal(pool.stats().active,1);assert.equal(pool.stats().queued,8);const r=await h.request('own','GET',route());assert.equal(r.status,503);assert.equal(r.data.code,'DOCUMENT_BUSY');assert.equal(r.data.rawText,undefined);}finally{signal.abort();await settled;pool.workerFile=workerFile;}
   });
   await t.test('JWT revoked during extraction cannot use its earlier authorization',async()=>{
    const RevokedToken=require('../models/revokedToken.model'),tokenHash=digest(Buffer.from(h.tokens.assigned));
