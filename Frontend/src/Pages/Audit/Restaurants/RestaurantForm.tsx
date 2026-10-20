@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowRight, Loader2 } from "lucide-react";
@@ -16,6 +16,9 @@ const RestaurantForm: React.FC = () => {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
+  const submitLock=useRef(false);
+  const [brandId,setBrandId]=useState('');
+  const [originalBrand,setOriginalBrand]=useState('');
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState<RestaurantStatus>("active");
@@ -34,17 +37,18 @@ const RestaurantForm: React.FC = () => {
         if (cancelled) return;
 
         if (!restaurant) {
-          setError("Restaurant not found.");
+          setError(t('auditFlow.restaurantNotFound'));
           return;
         }
 
+        setBrandId(restaurant.brandId || ''); setOriginalBrand(restaurant.brandId || '');
         setName(restaurant.name ?? "");
         setLocation(restaurant.location ?? "");
         setStatus(restaurant.status ?? "active");
       })
       .catch(() => {
         if (!cancelled) {
-          setError("Failed to load restaurant.");
+          setError(t('auditFlow.optionsFailed'));
         }
       })
       .finally(() => {
@@ -56,17 +60,18 @@ const RestaurantForm: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, t]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); if(submitLock.current)return;
 
     if (!name.trim() || !location.trim()) {
-      setError("Name and location are required.");
+      setError(t('auditFlow.restaurantRequired'));
       return;
     }
 
+    submitLock.current=true;
     setSaving(true);
     setError(null);
 
@@ -75,6 +80,7 @@ const RestaurantForm: React.FC = () => {
         name: name.trim(),
         location: location.trim(),
         status,
+        ...((!isEdit && brandId) || (isEdit && brandId !== originalBrand) ? { organizationId: brandId ? 'gfc' : null, brandId: brandId || null } : {}),
       };
 
       if (isEdit && id) {
@@ -86,9 +92,9 @@ const RestaurantForm: React.FC = () => {
       navigate("/app/audit/restaurants");
 
     } catch {
-      setError("Restoran yadda saxlanılarkən xəta baş verdi.");
+      setError(t('auth.somethingWentWrong'));
     } finally {
-      setSaving(false);
+      submitLock.current=false; setSaving(false);
     }
   };
 
@@ -118,6 +124,7 @@ const RestaurantForm: React.FC = () => {
       <div className="audit-modern-card">
 
         <form onSubmit={handleSubmit} noValidate>
+          <div className="form-group"><label className="form-label" htmlFor="restaurant-brand">{t('auditFoundation.brand')}</label><select id="restaurant-brand" className="input-field" value={brandId} onChange={e=>setBrandId(e.target.value)}><option value="">{t('adminUI.unassigned')}</option>{[['kfc','KFC'],['pizza-hut','Pizza Hut'],['simit-sarayi','Simit Sarayı']].map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>{!brandId&&<p className="admin-help">{t('auditFlow.unlinkedRestaurant')}</p>}</div>
 
 
           <div className="form-group">

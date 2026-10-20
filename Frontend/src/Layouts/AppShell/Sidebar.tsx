@@ -88,7 +88,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {titleKey:'auditFoundation.management',items:[
-    {to:'/app/audit/',labelKey:'auditFoundation.center',icon:LayoutDashboard,section:'audit',end:true},
+    {to:'/app/audit',labelKey:'auditFoundation.center',icon:LayoutDashboard,section:'audit',end:true},
     {to:'/app/audit/restaurants',labelKey:'navigation.restaurants',icon:Store,section:'audit',resource:'restaurant'},
     {to:'/app/audit/analytics',labelKey:'auditFoundation.analytics',icon:BarChart3,section:'audit',resource:'audit.analytics'},
   ]},
@@ -215,7 +215,7 @@ const Sidebar: React.FC = () => {
 
             <nav className="admin-sidebar__nav">
               {group.items.map(({ to, labelKey, icon: Icon, end }) => (
-                <NavLink key={to} to={to} end={end} onPointerEnter={event => { if (event.pointerType !== "touch") preloadHRRoute(to, user); }} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) preloadHRRoute(to, user); }}>
+                <NavLink key={to} to={to} end={end} className={({isActive}) => isActive || (end && location.pathname === `${to}/new`) ? "active" : undefined} onPointerEnter={event => { if (event.pointerType !== "touch") preloadHRRoute(to, user); }} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) preloadHRRoute(to, user); }}>
                   <Icon size={17} className="admin-sidebar__icon" />
                   {t(labelKey)}
                 </NavLink>

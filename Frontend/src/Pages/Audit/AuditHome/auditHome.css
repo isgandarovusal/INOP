@@ -10,3 +10,9 @@
 .audit-home-card-action a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .audit-home-card-action a:hover { border-color: var(--accent); }
 @media (max-width: 760px) { .audit-home-grid { grid-template-columns: 1fr; } }
+.audit-home-grid .audit-home-card { background:var(--surface); gap:10px; padding:20px; }
+.audit-home-grid .audit-home-card-icon { background:var(--hr-blue-soft); color:var(--hr-navy); }
+.audit-home-grid .audit-home-card-action { width:100%; padding-top:8px; gap:10px; }
+.audit-home-grid .audit-home-card-action a { min-height:44px; padding:10px 14px; font-size:13px; font-weight:600; color:var(--hr-navy); }
+.audit-home-grid .audit-home-card-action a:first-child { background:var(--hr-navy); border-color:var(--hr-navy); color:white; }
+.audit-home .audit-organization { padding:16px 20px; }

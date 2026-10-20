@@ -86,7 +86,10 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const recruitmentScope = getPermissionScope(user, "recruitment", "read");
-  const showRecruitment = !!recruitmentScope && recruitmentScope !== "none";
+  const canJobs = Boolean(recruitmentScope && recruitmentScope !== 'none');
+  const candidateScope=getPermissionScope(user,'candidate','read'),applicationScope=getPermissionScope(user,'application','read');
+  const canCandidates=Boolean(candidateScope && candidateScope!=='none'),canApplications=Boolean(applicationScope && applicationScope!=='none');
+  const showRecruitment = canJobs || canCandidates || canApplications;
   const auditScope = getPermissionScope(user, "audit", "read");
   const showAudit = !!auditScope && auditScope !== "none";
   // Translation changes do not change the user's data scope.
@@ -110,6 +113,7 @@ const Dashboard: React.FC = () => {
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [auditLoading, setAuditLoading] = useState(true);
+  const [summaryErrors,setSummaryErrors] = useState({jobs:false,candidates:false,applications:false});
   const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
 
@@ -131,6 +135,7 @@ const Dashboard: React.FC = () => {
     const loadDashboard = () => {
       setLoadedScopeKey(dataScopeKey);
       setRecruitmentError(null);
+      setSummaryErrors({jobs:false,candidates:false,applications:false});
       setAuditError(null);
       setJobs({total:0});
       setCandidates({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
@@ -142,6 +147,7 @@ const Dashboard: React.FC = () => {
         setCandidatesLoading(true);
         setApplicationsLoading(true);
 
+        if (canJobs) {
         void getJobsSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
@@ -149,6 +155,7 @@ const Dashboard: React.FC = () => {
           })
           .catch((error) => {
             console.error("Jobs dashboard load error:", error);
+            if (mounted) setSummaryErrors(current=>({...current,jobs:true}));
 
             if (!mounted) return;
 
@@ -161,7 +168,9 @@ const Dashboard: React.FC = () => {
               setJobsLoading(false);
             }
           });
+        } else { setJobsLoading(false); }
 
+        if (canCandidates) {
         void getCandidatesSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
@@ -169,6 +178,7 @@ const Dashboard: React.FC = () => {
           })
           .catch((error) => {
             console.error("Candidates dashboard load error:", error);
+            if (mounted) setSummaryErrors(current=>({...current,candidates:true}));
 
             if (!mounted) return;
 
@@ -181,7 +191,9 @@ const Dashboard: React.FC = () => {
               setCandidatesLoading(false);
             }
           });
+        } else { setCandidatesLoading(false); }
 
+        if (canApplications) {
         void getApplicationsSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
@@ -189,6 +201,7 @@ const Dashboard: React.FC = () => {
           })
           .catch((error) => {
             console.error("Applications dashboard load error:", error);
+            if (mounted) setSummaryErrors(current=>({...current,applications:true}));
 
             if (!mounted) return;
 
@@ -201,6 +214,7 @@ const Dashboard: React.FC = () => {
               setApplicationsLoading(false);
             }
           });
+        } else { setApplicationsLoading(false); }
       } else {
         setJobsLoading(false);
         setCandidatesLoading(false);
@@ -241,7 +255,7 @@ const Dashboard: React.FC = () => {
       clearTimeout(deadline);
       controller.abort();
     };
-  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, t]);
+  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications, t]);
 
   const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
   const statusBreakdown=candidates.statusBreakdown;
@@ -251,7 +265,7 @@ const Dashboard: React.FC = () => {
   if (loadedScopeKey !== dataScopeKey) return <PageState type="loading" message={t("dashboard.loading")} />;
 
   return (
-    <div>
+    <div className="main-dashboard">
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
           {showRecruitment && (
@@ -263,51 +277,58 @@ const Dashboard: React.FC = () => {
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.recruitmentLoadErrorTitle")}</strong>
-                    <p>{recruitmentError || t("dashboard.recruitmentLoadError")}</p>
+                    <p>{recruitmentError || t("dashboard.recruitmentLoadError")}</p><button className="btn-secondary" onClick={()=>setRefreshRevision(v=>v+1)}>{t('common.retry')}</button>
                   </div>
                 </div>
               )}
               <div className="kpi-grid">
+                {canJobs && (
                 <div className="kpi-card anim-in">
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.accent.background }}>
                     <Briefcase size={18} color={ACCENT} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
                   <p className="kpi-card__value">
-                    {jobsLoading ? "—" : jobs.total}
+                    {jobsLoading ? t("dashboard.loading") : summaryErrors.jobs ? t("auditFlow.unavailable") : jobs.total}
                   </p>
                 </div>
+                )}
+                {canCandidates && (
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.05s" }}>
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.info.background }}>
                     <UserSquare2 size={18} color={KPI_ICON_STYLES.info.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
                   <p className="kpi-card__value">
-                    {candidatesLoading ? "—" : candidates.total}
+                    {candidatesLoading ? t("dashboard.loading") : summaryErrors.candidates ? t("auditFlow.unavailable") : candidates.total}
                   </p>
                 </div>
+                )}
+                {canApplications && (
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.1s" }}>
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.success.background }}>
                     <ClipboardList size={18} color={KPI_ICON_STYLES.success.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.applications")}</p>
                   <p className="kpi-card__value">
-                    {applicationsLoading ? "—" : applications.total}
+                    {applicationsLoading ? t("dashboard.loading") : summaryErrors.applications ? t("auditFlow.unavailable") : applications.total}
                   </p>
                 </div>
+                )}
+                {canCandidates && (
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.warning.background }}>
                     <Star size={18} color={KPI_ICON_STYLES.warning.color} />
                   </div>
                   <p className="kpi-card__label">{t("dashboard.shortlisted")}</p>
                   <p className="kpi-card__value">
-                    {candidatesLoading
-                      ? "—"
-                      : candidateStatusStats.shortlistedCount}
+                    {candidatesLoading ? t("dashboard.loading") : summaryErrors.candidates ? t("auditFlow.unavailable") : candidateStatusStats.shortlistedCount}
                   </p>
                 </div>
+                )}
               </div>
 
+              {canCandidates && (
               <div className="charts-grid">
                 <div className="recent-card anim-in">
                   <div className="chart-card__header">
@@ -318,7 +339,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   {candidatesLoading ? (
                     <div className="empty-state">{t("dashboard.loading")}</div>
-                  ) : recentCandidates.length === 0 ? (
+                  ) : summaryErrors.candidates ? <p role="status" className="dashboard-inline-error">{t('auditFlow.unavailable')}</p> : recentCandidates.length === 0 ? (
                     <div className="chart-empty">
                       <PackageOpen size={22} />
                       <p>{t("dashboard.noCandidates")}</p>
@@ -348,7 +369,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   {candidatesLoading ? (
                     <div className="empty-state">{t("dashboard.loading")}</div>
-                  ) : statusBreakdown.length === 0 ? (
+                  ) : summaryErrors.candidates ? <p role="status" className="dashboard-inline-error">{t('auditFlow.unavailable')}</p> : statusBreakdown.length === 0 ? (
                     <div className="chart-empty">
                       <UserSquare2 size={22} />
                       <p>{t("dashboard.addCandidates")}</p>
@@ -364,6 +385,7 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               </div>
+              )}
             </div>
           )}
 
@@ -380,7 +402,7 @@ const Dashboard: React.FC = () => {
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.auditLoadErrorTitle")}</strong>
-                    <p>{auditError || t("dashboard.auditLoadError")}</p>
+                    <p>{auditError || t("dashboard.auditLoadError")}</p><button className="btn-secondary" onClick={()=>setRefreshRevision(v=>v+1)}>{t('common.retry')}</button>
                   </div>
                 </div>
               )}
@@ -401,7 +423,7 @@ const Dashboard: React.FC = () => {
 
                       <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
 
-                      <p className="kpi-card__value">{analytics.overallScore?.toFixed(1) ?? "—"} / 10</p>
+                      <p className="kpi-card__value">{analytics.overallScore == null ? t('auditFlow.notCombined') : `${analytics.overallScore.toFixed(1)} / 10`}</p>
 
                     </div>
 

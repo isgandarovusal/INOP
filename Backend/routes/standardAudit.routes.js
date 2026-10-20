@@ -8,6 +8,7 @@ router.get('/:auditId/action-people',...authorize('audit.action','read'),c.stand
 router.get('/list',...authorize('audit','read'),c.standardOnly,c.list);
 router.get('/options',...authorize('audit','read'),c.standardOnly,c.restaurants);
 router.get('/analytics-options',...authorize('audit.analytics','read'),c.standardOnly,c.restaurants);
+router.get('/analytics-sources',...authorize('audit.analytics','read'),c.standardOnly,c.sources);
 router.get('/sources',...authorize('audit','read'),c.standardOnly,c.sources);
 router.get('/restaurants',...authorize('audit','create'),c.standardOnly,c.restaurants);
 router.post('/templates/:brandId',...authorize('audit.template','create'),...authorize('audit.template','update'),c.standardOnly,c.provision);

@@ -2389,5 +2389,31 @@
       "role": "Role",
       "audit": "Audit"
     }
+  },
+  "auditFlow": {
+    "templateActiveLabel": "Template active",
+    "choose": "Select",
+    "chooseType": "Select an object type.",
+    "chooseBrand": "Select a brand.",
+    "chooseTarget": "Select an object matching the chosen brand or type.",
+    "validDate": "Enter a valid audit date.",
+    "waitForData": "Wait for data to load or retry.",
+    "templateRequired": "A reviewed active template is required to create this audit.",
+    "noTargets": "No permitted objects match this choice. Check the restaurant’s GFC and brand relationship and current assignments.",
+    "templateActive": "Template active — the new draft will pin this approved version.",
+    "sourceAvailable": "Source available, but no active template. An audit manager must activate it.",
+    "creating": "Creating draft…",
+    "unavailable": "Data unavailable",
+    "notCombined": "No combined score",
+    "restaurantNotFound": "Restaurant not found.",
+    "optionsFailed": "Could not load restaurants. Please retry.",
+    "restaurantRequired": "Enter the restaurant name and location.",
+    "unlinkedRestaurant": "No brand assigned. This restaurant will not appear in brand-specific audit choices.",
+    "descriptions": {
+      "hr": "Review employees, personnel documents and HR processes against source criteria.",
+      "service": "Review guest experience and service processes against approved criteria.",
+      "standard": "Review brand standards using Critical, Major, Minor, Compliant and N/A outcomes.",
+      "occupational-safety": "Separate occupational safety methods for restaurants, offices and warehouses."
+    }
   }
 }

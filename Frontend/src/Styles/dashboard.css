@@ -1111,3 +1111,13 @@
 .recent-card .chart-card__header .recent-card__link:active{
   transform:translateY(0) !important;
 }
+/* Compact dashboard composition, using existing HR tokens. */
+.main-dashboard { max-width:1320px; margin-inline:auto; }
+.main-dashboard .kpi-card { min-height:126px; padding:20px; background:var(--surface); border-color:var(--hr-border); }
+.main-dashboard .kpi-card__value { font-size:clamp(19px,2.4vw,30px); line-height:1.35; overflow-wrap:anywhere; }
+.main-dashboard .charts-grid { gap:16px; margin-block:20px; }
+.main-dashboard .charts-grid :is(.recent-card,.chart-card) { min-height:210px; }
+.main-dashboard .charts-grid :is(.chart-empty,.empty-state) { min-height:130px; padding:20px 16px; }
+.main-dashboard .dashboard-inline-error { padding:24px 16px; color:var(--danger); }
+.main-dashboard .dashboard-error { border:1px solid var(--hr-border); border-radius:12px; padding:16px; margin-bottom:16px; background:var(--surface); }
+@media(max-width:680px) { .main-dashboard .kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } .main-dashboard .kpi-card { padding:16px 12px; } }

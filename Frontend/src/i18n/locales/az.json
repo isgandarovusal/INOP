@@ -2413,5 +2413,31 @@
       "role": "Rol",
       "audit": "Audit"
     }
+  },
+  "auditFlow": {
+    "templateActiveLabel": "Şablon aktivdir",
+    "choose": "Seçin",
+    "chooseType": "Obyekt növünü seçin.",
+    "chooseBrand": "Brendi seçin.",
+    "chooseTarget": "Seçilmiş brendə və ya növə uyğun obyekt seçin.",
+    "validDate": "Düzgün audit tarixi daxil edin.",
+    "waitForData": "Məlumatların yüklənməsini gözləyin və ya yenidən cəhd edin.",
+    "templateRequired": "Audit yaratmaq üçün bu istiqamətin nəzərdən keçirilmiş şablonu aktiv olmalıdır.",
+    "noTargets": "Bu seçim üçün icazəli obyekt yoxdur. Restoranın GFC və brend əlaqəsini, aktiv təyinatları yoxlayın.",
+    "templateActive": "Şablon aktivdir — yeni qaralama bu təsdiqlənmiş versiyaya bağlanacaq.",
+    "sourceAvailable": "Mənbə mövcuddur, lakin aktiv şablon yoxdur. Audit meneceri aktivləşdirməlidir.",
+    "creating": "Qaralama yaradılır…",
+    "unavailable": "Məlumat alınmadı",
+    "notCombined": "Vahid bal hesablanmır",
+    "restaurantNotFound": "Restoran tapılmadı.",
+    "optionsFailed": "Restoran siyahısı yüklənmədi. Yenidən cəhd edin.",
+    "restaurantRequired": "Restoranın adını və məkanını daxil edin.",
+    "unlinkedRestaurant": "Brend təyin edilməyib. Bu restoran brend üzrə audit seçimlərində görünməyəcək.",
+    "descriptions": {
+      "hr": "Əməkdaşlar, kadr sənədləri və HR proseslərinin mənbə meyarları üzrə yoxlanması.",
+      "service": "Qonaq təcrübəsi və xidmət proseslərinin təsdiqlənmiş meyarlarla yoxlanması.",
+      "standard": "Brend standartlarının Critical, Major, Minor, Compliant və N/A nəticələri üzrə yoxlanması.",
+      "occupational-safety": "Restoran, ofis və anbar üçün ayrıca əməyin mühafizəsi metodları."
+    }
   }
 }

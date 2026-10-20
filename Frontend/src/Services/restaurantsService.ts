@@ -5,6 +5,8 @@ export interface RestaurantInput {
   name: string;
   location: string;
   status: RestaurantStatus;
+  brandId?: string | null;
+  organizationId?: string | null;
 }
 
 export async function getRestaurants(): Promise<Restaurant[]> {

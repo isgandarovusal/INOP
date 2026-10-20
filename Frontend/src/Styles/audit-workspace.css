@@ -156,3 +156,11 @@
 .audit-workspace .service-section-layout{display:grid;gap:1.25rem;min-width:0}.audit-workspace .service-section-layout>div{min-width:0}@media(min-width:1024px){.audit-workspace .service-section-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px);align-items:start}.audit-workspace .service-section-notes{grid-template-columns:1fr;position:sticky;top:1rem}}
 
 .audit-workspace .search-field input[type="search"] { padding-left:38px; padding-right:38px; min-height:44px; }
+.audit-draft-form { display:grid; gap:16px; }
+.audit-draft-form > .btn-primary { justify-self:start; min-width:200px; }
+.audit-workspace .audit-field-error { color:var(--danger); font-size:13px; line-height:1.5; }
+.audit-workspace [aria-invalid=true] { border-color:var(--danger); }
+.audit-flow-notice { padding:12px 14px; border:1px solid var(--hr-border); border-radius:10px; background:var(--hr-blue-soft); color:var(--hr-navy); line-height:1.6; }
+@media(max-width:680px) { .audit-draft-form > .btn-primary { width:100%; } }
+/* Object grants and audit options keep native checkboxes compact. */
+.audit-workspace .audit-filter-grid input[type="checkbox"], .audit-workspace .audit-control-row input[type="checkbox"] { width:18px; height:18px; min-height:18px; padding:0; flex:0 0 18px; accent-color:var(--hr-navy); }

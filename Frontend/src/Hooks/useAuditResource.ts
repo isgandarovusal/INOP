@@ -14,15 +14,15 @@ export function auditErrorStatus(error: unknown): AuditLoadStatus {
   return "error";
 }
 
-export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>, options: { refreshOnFocus?: boolean; deadlineMs?: number; retainOnReload?: boolean } = {}) {
+export function useAuditResource<T>(id: string | undefined, resource: string, load: (id: string, signal?: AbortSignal, scopeKey?: string) => Promise<T>, options: { refreshOnFocus?: boolean; deadlineMs?: number; retainOnReload?: boolean; action?: string; direction?: string } = {}) {
   const { user, isLoading } = useAuth();
   const [revision, setRevision] = useState(0);
   const reload = useCallback(() => setRevision(value => value + 1), []);
   const authKey = JSON.stringify([user?.id, user?.role, user?.departmentId, user?.auditDirection, user?.auditDirections, user?.hrAccess, user?.permissions]);
-  const scope = getPermissionScope(user, resource, "read");
+  const scope = getPermissionScope(user, resource, options.action || "read", options.direction);
   const blocked: AuditLoadStatus | null = isLoading ? "loading" : !user ? "unauthenticated" : !scope || scope === "none" ? "forbidden" : !id ? "not-found" : null;
-  const contextKey = JSON.stringify([id, authKey]);
-  const key = JSON.stringify([id, authKey, revision]);
+  const contextKey = JSON.stringify([id, resource, options.action, options.direction, authKey]);
+  const key = JSON.stringify([id, resource, options.action, options.direction, authKey, revision]);
   const [result, setResult] = useState<{ key: string; contextKey: string; status: AuditLoadStatus; data?: T }>({ key: "", contextKey: "", status: "loading" });
 
   const deadlineMs = options.deadlineMs ?? (['candidate', 'application', 'recruitment'].includes(resource) ? 15000 : 0);

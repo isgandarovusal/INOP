@@ -25,12 +25,13 @@ export function hasPermission(
   user: PublicUser | null,
   resource: string,
   action: string,
+  direction?: string,
 ): boolean {
   if (!user) {
     return false;
   }
 
-  const scope = getPermissionScope(user, resource, action);
+  const scope = getPermissionScope(user, resource, action, direction);
   return scope !== null && scope !== "none";
 }
 
@@ -38,6 +39,7 @@ export function getPermissionScope(
   user: PublicUser | null,
   resource: string,
   action: string,
+  direction?: string,
 ): Permission["scope"] | null {
   if (!user) {
     return null;
@@ -45,7 +47,7 @@ export function getPermissionScope(
 
   if (['recruitment', 'candidate', 'application'].includes(resource) && !hasHRAccess(user)) return null;
 
-  return permissionScope(user.permissions || [], resource, action);
+  return permissionScope(user.permissions || [], resource, action, direction);
 
 }
 

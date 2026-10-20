@@ -1,3 +1,5 @@
+import AuditDraftForm from '../../../Components/AuditDraftForm';
+import {localAuditDate} from '../../../Utils/auditDate';
 import {hrText} from './hrAuditPresentation';
 import {useCallback,useState} from 'react';
 import {Link,useNavigate} from 'react-router-dom';
@@ -15,23 +17,24 @@ const brands=[['kfc','KFC'],['pizza-hut','Pizza Hut'],['simit-sarayi','Simit Sar
 export default function HRAuditPage({analytics=false,createOnly=false}:{analytics?:boolean;createOnly?:boolean}){
  const{t,i18n}=useTranslation();const{user}=useAuth();const navigate=useNavigate();
  const[filters,setFilters]=useState({brandId:'',restaurantId:'',dateFrom:'',dateTo:'',status:'',auditorId:'',sectionId:''});const[page,setPage]=useState(1);
- const[createInput,setCreateInput]=useState({brandId:'',restaurantId:'',date:new Date().toISOString().slice(0,10)});
+ const[createInput,setCreateInput]=useState({brandId:'',restaurantId:'',date:localAuditDate()});
  const update=(key:keyof typeof filters,value:string)=>{setFilters(p=>({...p,[key]:value,...(key==='brandId'?{restaurantId:''}:{})}));setPage(1);};
  const query=new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([,v])=>v)));query.set('page',String(page));query.set('limit','25');
  const load=useCallback(async(key:string,signal?:AbortSignal,scopeKey?:string)=>{
   const [result,options]=await Promise.all([analytics?hr.readHRAnalytics(key,signal,scopeKey):hr.readHR(key,signal,scopeKey),hr.readHROptions(analytics,signal,scopeKey)]);return{result,options:options.data};
  },[analytics]);
- const resource=useAuditResource(query.toString(),analytics?'audit.analytics':'audit',load,{refreshOnFocus:false,deadlineMs:15000});
- const sourceResource=useAuditResource(analytics?undefined:'sources','audit',hr.sources,{refreshOnFocus:false});
- const create=useAuditAction('hr-create','audit','create');const provision=useAuditAction('hr-source','audit.template','update');
+ const resource=useAuditResource(createOnly?undefined:query.toString(),analytics?'audit.analytics':'audit',load,{refreshOnFocus:false,deadlineMs:15000,direction:'hr'});
+ const sourceResource=useAuditResource(analytics?undefined:'sources','audit',hr.sources,{refreshOnFocus:false,direction:'hr'});
+ const create=useAuditAction('hr-create','audit','create','hr');const provision=useAuditAction('hr-source','audit.template','update');
  const canProvision=['admin','audit_manager'].includes(user?.role||'')&&hasPermission(user,'audit.template','create')&&provision.allowed;
  const data=resource.data;const metrics=data&&'data'in data.result?data.result.data:null;const list=data&&'items'in data.result?data.result:null;
- const [createOptions,setCreateOptions]=useState<hr.HRRestaurant[]>([]);
+ const loadCreateOptions=useCallback((_key:string,signal?:AbortSignal)=>hr.readHRCreateOptions(signal),[]);
+ const createOptions=useAuditResource(createOnly?'create-options':undefined,'audit',loadCreateOptions,{refreshOnFocus:false,deadlineMs:15000,action:'create',direction:'hr'});
  const groups:([keyof Pick<hr.HRMetrics,'brands'|'restaurants'|'sections'|'criteria'|'trend'>,hr.HRGroup[]])[]=metrics?(['brands','restaurants','sections','criteria','trend'] as const).map(k=>[k,metrics[k]]):[];
  const average=(v:number|null)=>v===null?t('hrAudit.notAssessed'):`${v.toFixed(1)}%`;
  return <div className="audit-direction-page audit-hr-page">
   <PageHeader title={t(analytics?'hrAudit.analytics':'hrAudit.title')} subtitle={t('hrAudit.subtitle')} icon={analytics?<BarChart3/>:<ClipboardCheck/>} actions={<Link className="btn-secondary" to="/app/audit">{t('auditFoundation.center')}</Link>}/>
-  <nav className="audit-management-links" aria-label={t('hrAudit.navigation')}>{create.allowed&&<Link to="/app/audit/hr/new">{t('hrAudit.create')}</Link>}{hasPermission(user,'audit','read')&&<Link to="/app/audit/hr" aria-current={!analytics?'page':undefined}>{t('hrAudit.title')}</Link>}{hasPermission(user,'audit.analytics','read')&&<Link to="/app/audit/hr/analytics" aria-current={analytics?'page':undefined}>{t('hrAudit.analytics')}</Link>}</nav>
+  <nav className="audit-management-links" aria-label={t('hrAudit.navigation')}>{create.allowed&&<Link to="/app/audit/hr/new">{t('hrAudit.create')}</Link>}{hasPermission(user,'audit','read')&&<Link to="/app/audit/hr" aria-current={!analytics?'page':undefined}>{t('hrAudit.title')}</Link>}{hasPermission(user,'audit.analytics','read','hr')&&<Link to="/app/audit/hr/analytics" aria-current={analytics?'page':undefined}>{t('hrAudit.analytics')}</Link>}</nav>
   {!createOnly&&<>
   <SectionCard><h2>{t('hrAudit.filters')}</h2><div className="audit-filter-grid">
    <label>{t('auditFoundation.brand')}<select value={filters.brandId} onChange={e=>update('brandId',e.target.value)}><option value="">{t('auditFoundation.allBrands')}</option>{brands.filter(([id])=>!user?.auditDirection||(analytics?data?.options.some(r=>r.brandId===id):sourceResource.data?.data.some(source=>source.brandId===id))).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
@@ -51,13 +54,8 @@ export default function HRAuditPage({analytics=false,createOnly=false}:{analytic
    <nav className="audit-control-row" aria-label={t('auditFoundation.pagination')}><button className="btn-secondary" disabled={page<=1} onClick={()=>setPage(p=>p-1)}>{t('auditFoundation.previous')}</button><span>{page} / {Math.max(1,Math.ceil(list.total/25))}</span><button className="btn-secondary" disabled={page*25>=list.total} onClick={()=>setPage(p=>p+1)}>{t('auditFoundation.next')}</button></nav>
   </SectionCard>:null}
   </>}
-  {createOnly&&create.allowed&&<SectionCard><h2>{t('hrAudit.create')}</h2><form className="audit-filter-grid" onSubmit={e=>{e.preventDefault();void create.run(async signal=>{const result=await hr.createHR(createInput,signal);navigate(`/app/audit/audits/${result.data.id}`);});}}>
-   <label>{t('auditFoundation.brand')}<select required value={createInput.brandId} onChange={e=>{setCreateInput(p=>({...p,brandId:e.target.value,restaurantId:''}));void create.run(async signal=>{setCreateOptions((await hr.readHRCreateOptions(signal)).data);});}}><option value="">{t('hrAudit.choose')}</option>{brands.filter(([id])=>!user?.auditDirection||(analytics?data?.options.some(r=>r.brandId===id):sourceResource.data?.data.some(source=>source.brandId===id))).map(([id,name])=><option value={id} key={id}>{name}</option>)}</select></label>
-   <label>{t('navigation.restaurants')}<select required value={createInput.restaurantId} onChange={e=>setCreateInput(p=>({...p,restaurantId:e.target.value}))}><option value="">{t('hrAudit.choose')}</option>{createOptions.filter(r=>r.brandId===createInput.brandId).map(r=><option value={r.id} key={r.id}>{r.name}</option>)}</select></label>
-   <label>{t('hrAudit.date')}<input required type="date" value={createInput.date} onChange={e=>setCreateInput(p=>({...p,date:e.target.value}))}/></label>
-   <button className="btn-primary" disabled={create.busy||!sourceResource.data?.data.find(s=>s.brandId===createInput.brandId)?.templateId}>{t('hrAudit.create')}</button>
-  </form>{create.status!=='ready'&&<AuditResourceState status={create.status}/>}
-  {sourceResource.status!=='ready'&&<AuditResourceState status={sourceResource.status} retry={sourceResource.reload}/>}<p>{t('hrAudit.provisionHint')}</p>{canProvision&&<div className="audit-control-row">{sourceResource.data?.data.map(s=><button type="button" className="btn-secondary" key={s.brandId} disabled={provision.busy||Boolean(s.templateId)} onClick={()=>void provision.run(signal=>hr.provisionHR(s.brandId,signal),sourceResource.reload)}>{t(s.templateId?'hrAudit.sourceReady':'hrAudit.provision')} · {s.brandName}</button>)}</div>}{provision.status!=='ready'&&<AuditResourceState status={provision.status}/>}
+  {createOnly&&create.allowed&&<SectionCard><h2>{t('hrAudit.create')}</h2><AuditDraftForm value={createInput} onChange={setCreateInput} onSubmit={()=>void create.run(async signal=>{const result=await hr.createHR(createInput,signal);navigate(`/app/audit/audits/${result.data.id}`);})} options={createOptions.data?.data||[]} optionsStatus={createOptions.status} sourceStatus={sourceResource.status} sources={sourceResource.data?.data||[]} busy={create.busy} label={t('hrAudit.create')} retryOptions={createOptions.reload}/>{create.status!=='ready'&&<AuditResourceState status={create.status}/>}
+  {sourceResource.status!=='ready'&&<AuditResourceState status={sourceResource.status} retry={sourceResource.reload}/>}<p>{t('hrAudit.provisionHint')}</p>{canProvision&&<div className="audit-control-row">{sourceResource.data?.data.map(s=><button type="button" className="btn-secondary" key={s.brandId} disabled={provision.busy||Boolean(s.templateId)} onClick={()=>void provision.run(signal=>hr.provisionHR(s.brandId,signal),sourceResource.reload)}>{t(s.templateId?'auditFlow.templateActiveLabel':'hrAudit.provision')} · {s.brandName}</button>)}</div>}{provision.status!=='ready'&&<AuditResourceState status={provision.status}/>}
   </SectionCard>}
  </div>;
 }

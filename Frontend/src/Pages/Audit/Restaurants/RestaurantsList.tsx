@@ -20,6 +20,7 @@ const RestaurantsList: React.FC = () => {
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [brandFilter,setBrandFilter]=useState('');
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | RestaurantStatus>("all");
   const [deleteTarget, setDeleteTarget] = useState<Restaurant | null>(null);
@@ -27,10 +28,10 @@ const RestaurantsList: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const filtersActive =
-    query.trim() !== "" || statusFilter !== "all";
+    query.trim() !== "" || statusFilter !== "all" || Boolean(brandFilter);
 
   const clearFilters = () => {
-    setQuery("");
+    setQuery(""); setBrandFilter('');
     setStatusFilter("all");
   };
 
@@ -53,13 +54,14 @@ const RestaurantsList: React.FC = () => {
 
   const filtered = useMemo(() => {
     return restaurants
+      .filter(r=>!brandFilter || (brandFilter==='unlinked'?!r.brandId:r.brandId===brandFilter))
       .filter((r) => statusFilter === "all" || r.status === statusFilter)
       .filter((r) => {
         if (!query.trim()) return true;
         const q = query.toLowerCase();
         return r.name.toLowerCase().includes(q) || r.location.toLowerCase().includes(q);
       });
-  }, [restaurants, query, statusFilter]);
+  }, [restaurants, query, statusFilter, brandFilter]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -93,7 +95,7 @@ const RestaurantsList: React.FC = () => {
         }
       />
 
-      <div className="filter-bar">
+      <div className="filter-bar"><select className="input-field" aria-label={t('auditFoundation.brand')} value={brandFilter} onChange={e=>setBrandFilter(e.target.value)}><option value="">{t('auditFoundation.allBrands')}</option>{[['kfc','KFC'],['pizza-hut','Pizza Hut'],['simit-sarayi','Simit Sarayı'],['unlinked',t('adminUI.unassigned')]].map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>
         <SearchInput value={query} onChange={setQuery} placeholder={t("audit.restaurants.list.searchPlaceholder")} />
         <select
           className="input-field"
@@ -183,7 +185,7 @@ const RestaurantsList: React.FC = () => {
                     className="cell-title cell-title--clickable"
                     onClick={() => navigate(`/app/audit/restaurants/${restaurant.id}`)}
                   >
-                    {restaurant.name}
+                    {restaurant.name}<div className="cell-muted">{({'kfc':'KFC','pizza-hut':'Pizza Hut','simit-sarayi':'Simit Sarayı'} as Record<string,string>)[restaurant.brandId||'']||t('adminUI.unassigned')}</div>
                   </td>
                   <td className="cell-muted">{restaurant.location}</td>
                   <td>
