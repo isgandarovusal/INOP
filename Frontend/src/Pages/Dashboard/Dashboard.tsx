@@ -13,7 +13,6 @@ import {
   ArrowUpRight,
   PackageOpen,
 } from "lucide-react";
-import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import PageState from "../../Components/PageState";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
@@ -22,44 +21,8 @@ import { getPermissionScope } from "../../Utils/permissions";
 import { getJobsSummary, getCandidatesSummary, getApplicationsSummary, type CountSummary, type CandidateSummary } from "../../Services/dashboardSummaryService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
 import { ACCENT } from "../../Utils/theme";
-import type { CandidateStatus } from "../../Types/recruitment";
 
-const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
-  applied: "#0ea5e9",
-  interview: "#8b5cf6",
-  offer: "#14b8a6",
-
-  new: "#0ea5e9",
-  screening: "#d97706",
-  shortlisted: "#6366f1",
-  rejected: "#ef4444",
-  hired: "#16a34a",
-};
-
-const CandidateStatusDonut = React.memo(function CandidateStatusDonut({ data }: { data: CandidateSummary["statusBreakdown"] }) {
-  return (
-    <ResponsiveContainer width="100%" height={180}>
-      <PieChart>
-        <Pie
-          data={data}
-          dataKey="value"
-          innerRadius={55}
-          outerRadius={75}
-          paddingAngle={2}
-          animationDuration={900}
-        >
-          {data.map((entry) => (
-            <Cell
-              key={entry.status}
-              fill={STATUS_COLORS[entry.status as CandidateStatus]}
-              stroke="none"
-            />
-          ))}
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
-  );
-});
+const CandidateStatusDonut = React.lazy(() => import("./CandidateStatusDonut"));
 
 const KPI_ICON_STYLES = {
   accent: {
@@ -376,7 +339,7 @@ const Dashboard: React.FC = () => {
                     </div>
                   ) : (
                     <div className="donut-wrap">
-                      <CandidateStatusDonut data={statusBreakdown} />
+                      <React.Suspense fallback={<div className="empty-state">{t("dashboard.loading")}</div>}><CandidateStatusDonut data={statusBreakdown} /></React.Suspense>
                       <div className="donut-center">
                         <span className="donut-center__value">{candidates.total}</span>
                         <span className="donut-center__label">{candidates.total === 1 ? t("dashboard.candidate") : t("dashboard.candidates")}</span>

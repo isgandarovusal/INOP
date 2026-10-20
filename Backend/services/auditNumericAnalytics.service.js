@@ -10,7 +10,10 @@ exports.aggregate=async(req,kind,filter)=>{try{
  const blocked=kind==='hr'?{$eq:['$e.hrAssessment.contract','blocked-kfc-denominator']}:false;
  const matchComplete={$match:{complete:true}};
  const base=[{$match:filter},{$lookup:{from:require('../models/auditExecution.model').collection.name,let:{id:'$_id',revision:'$templateRevisionId'},pipeline:[{$match:{$expr:{$and:[{$eq:['$auditId','$$id']},{$eq:['$templateRevisionId','$$revision']},{$eq:['$status','completed']}]},['templateSnapshot.'+source]:{$exists:true}}},{$sort:{updatedAt:-1,_id:-1}},{$limit:1},{$project:{answers:1,templateSnapshot:1,[assessment]:1,overallPercentage:1}}],as:'executions'}},{$set:{e:{$arrayElemAt:['$executions',0]}}},{$set:{complete:{$eq:['$e.'+assessment+'.complete',true]},score:{$cond:[blocked,null,'$e.overallPercentage']},blocked,brand:'$templateSnapshot.brandId'}},{$project:{executions:0,templateSnapshot:0,checks:0,hrDetails:0,serviceDetails:0,standardDetails:0,hseDetails:0}}];
- const answer={$arrayElemAt:[{$filter:{input:{$ifNull:['$e.answers',[]]},as:'a',cond:{$eq:['$$a.questionId','$$q.id']}}},0]};
+ // Read-only lookup optimization: retain first-match semantics and all existing
+ // scoring, exclusion, scope and facet rules. No stored audit is modified.
+ base.push({$set:{answerIds:{$map:{input:{$ifNull:['$e.answers',[]]},as:'a',in:'$$a.questionId'}}}});
+ const answer={$let:{vars:{index:{$indexOfArray:['$answerIds','$$q.id']}},in:{$cond:[{$gte:['$$index',0]},{$arrayElemAt:['$e.answers','$$index']},null]}}};
  const qs={$reduce:{input:{$ifNull:['$e.templateSnapshot.sections',[]]},initialValue:[],in:{$concatArrays:['$$value',{$map:{input:{$ifNull:['$$this.questions',[]]},as:'q',in:{$mergeObjects:['$$q',{answer:answer,sectionId:'$$this.id'}]}}}]}}};
  const excluded=kind==='service'?{$and:[{$eq:['$e.templateSnapshot.brandId','kfc']},{$eq:['$e.templateSnapshot.serviceSource.version','service-source-v1']},{$eq:['$qs.id',service.NEGATIVE_CRITERION]}]}:false;
  const questions=[matchComplete,{$set:{qs}},{$unwind:'$qs'},...(req.query.sectionId?[{$match:{'qs.sectionId':req.query.sectionId}}]:[]),{$set:{excluded,rawNumeric:{$in:['$qs.answer.answer',['0','0.5','1']]}}},{$set:{criterionScore:{$cond:[{$and:[{$not:['$blocked']},'$rawNumeric',{$in:['$qs.answer.score',[0,0.5,1]]}]},{$multiply:['$qs.answer.score',100]},null]}}}];
