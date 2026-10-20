@@ -21,6 +21,7 @@ jobs:
     env:
       INOP_AUDIT_TEST_PORT: '27018'
       INOP_AUDIT_QA_CONTAINER: inop-audit-ci-qa
+      INOP_QA_SCREENSHOTS: ${{ github.workspace }}/work/audit-ci/screenshots
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -89,6 +90,7 @@ jobs:
           path: |
             work/audit-ci/*.log
             work/audit-ci/*.json
+            work/audit-ci/screenshots/*.png
           retention-days: 7
           if-no-files-found: warn
       - name: Report gate result

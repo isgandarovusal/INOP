@@ -40,7 +40,7 @@ export default function RecruitmentLocationFields({ brandId, branchId, onChange 
         onChange(b.brandId, b._id); setCode(''); setName(''); if (branchDetails.current) branchDetails.current.open = false;
       }
       result.reload();
-    } catch (e) { if (mounted.current) setError(getErrorMessage(e, t('somethingWentWrong'))); }
+    } catch (e) { if (mounted.current) setError(getErrorMessage(e, t('auth.somethingWentWrong'))); }
     finally { lock.current = false; if (mounted.current) setSaving(false); }
   };
   return <div className="form-group form-group--full" data-recruitment-locations>

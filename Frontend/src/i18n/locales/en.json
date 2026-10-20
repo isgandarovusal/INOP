@@ -46,7 +46,9 @@
       "closed": "Closed",
       "inProgress": "In Progress",
       "assigned": "Assigned",
-      "resolved": "Resolved"
+      "resolved": "Resolved",
+      "draft": "Draft",
+      "failed": "Failed"
     },
     "labels": {
       "name": "Name",
@@ -67,7 +69,9 @@
       "noData": "No data available.",
       "noResults": "No results found.",
       "required": "This field is required."
-    }
+    },
+    "retry": "Try again",
+    "loading": "Loading…"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -146,6 +150,7 @@
     "totalCandidates": "Total candidates",
     "applications": "Applications",
     "shortlisted": "Shortlisted",
+    "viewAll": "View all",
     "recentCandidates": "Recent candidates",
     "noCandidates": "No candidates yet — add your first one to see it here.",
     "candidatesByStatus": "Candidates by status",
@@ -160,7 +165,11 @@
     "fullAnalytics": "Full analytics",
     "noAudits": "No audits yet",
     "submitAudit": "Submit an audit to see comparisons.",
-    "candidate": "candidate"
+    "candidate": "candidate",
+    "recruitmentLoadErrorTitle": "Recruitment data unavailable",
+    "recruitmentLoadError": "Could not load recruitment data.",
+    "auditLoadErrorTitle": "Audit data unavailable",
+    "auditLoadError": "Could not load audit data."
   },
   "auth": {
     "heroTitle": "One platform for all operations",
@@ -325,7 +334,8 @@
     "justNow": "just now",
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
-    "daysAgo": "{{count}}d ago"
+    "daysAgo": "{{count}}d ago",
+    "noSearchResults": "No matching activity."
   },
   "recruitment": {
     "applications": {
@@ -376,7 +386,9 @@
       "exportPdf": "Export to PDF",
       "exporting": "Exporting...",
       "exportSuccess": "File exported successfully.",
-      "exportError": "An error occurred while exporting the file."
+      "exportError": "An error occurred while exporting the file.",
+      "actions": "Actions",
+      "notProvided": "Not provided"
     },
     "candidateStatus": {
       "new": "New",
@@ -622,7 +634,16 @@
         "title": "Service Audit",
         "status": "Status",
         "type": "Type",
-        "date": "Date"
+        "date": "Date",
+        "allStatuses": "All statuses",
+        "allRestaurants": "All restaurants",
+        "from": "From",
+        "to": "To",
+        "resetFilters": "Reset filters",
+        "empty": "No matching audits.",
+        "overall": "Overall result",
+        "answers": "Answers",
+        "serviceTime": "Service time"
       },
       "analytics": {
         "title": "Service Audit Analytics",
@@ -638,7 +659,8 @@
       }
     },
     "types": {
-      "service": "Service audit"
+      "service": "Service audit",
+      "standard": "Standard Audit"
     },
     "checklist": {
       "builder": {
@@ -804,7 +826,18 @@
         "type": "Type",
         "date": "Date",
         "loading": "Loading…",
-        "noAudits": "No standard audits yet."
+        "noAudits": "No standard audits yet.",
+        "allStatuses": "All statuses",
+        "allRestaurants": "All restaurants",
+        "from": "From",
+        "to": "To",
+        "resetFilters": "Reset filters",
+        "empty": "No matching audits.",
+        "compliance": "Compliance",
+        "findings": "Findings",
+        "result": "Result",
+        "passed": "Passed",
+        "failed": "Failed"
       },
       "analytics": {
         "title": "Standard Audit Analytics",
@@ -886,7 +919,10 @@
         "weak": "Weak",
         "partiallyCompliant": "Partially compliant",
         "good": "Good",
-        "fullyCompliant": "Fully compliant"
+        "fullyCompliant": "Fully compliant",
+        "total": "Total",
+        "score": "Score",
+        "auditorLabel": "Auditor"
       },
       "list": {
         "title": "Occupational Safety Audit",
@@ -902,7 +938,8 @@
         "status": "Status",
         "view": "View",
         "delete": "Delete",
-        "auditType": "Audit Type"
+        "auditType": "Audit Type",
+        "loading": "Loading audits…"
       },
       "analytics": {
         "title": "Occupational Safety Analytics",

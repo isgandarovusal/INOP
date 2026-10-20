@@ -1,6 +1,5 @@
 .audit-workspace .service-audits-page { padding: 28px; }
 .audit-workspace .service-audits-page > h2 { margin: 0 0 22px; font-size: 28px; font-weight: 750; }
-.audit-workspace .service-audits-page .admin-table-container { margin-top: 22px; overflow-x: auto; }
 .audit-workspace .service-audits-page table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 760px; }
 .audit-workspace .service-audits-page thead { background: var(--surface-subtle); }
 .audit-workspace .service-audits-page th { padding: 15px 18px; text-align: left; color: var(--text-muted); font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
@@ -31,49 +30,16 @@
 .audit-workspace .service-audits-page .filter-bar .input-field {
   width: 100% !important;
   min-width: 0 !important;
-  height: 38px !important;
-  min-height: 38px !important;
   margin: 0 !important;
-  padding: 0 11px !important;
-  border: 1px solid #dfe4ec !important;
-  border-radius: 9px !important;
-  background: #ffffff !important;
-  color: #303746 !important;
-  font-size: 11px !important;
-  box-shadow: none !important;
-}
-
-.audit-workspace .service-audits-page .filter-bar .input-field:hover {
-  border-color: #cbd2df !important;
 }
 
 .audit-workspace .service-audits-page .filter-bar .input-field:focus {
-  border-color: #8b8ff0 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, .09) !important;
   outline: none !important;
 }
 
 .audit-workspace .service-audits-page .filter-bar .btn-secondary {
-  height: 38px !important;
-  min-height: 38px !important;
   min-width: 88px !important;
   margin: 0 !important;
-  padding: 0 13px !important;
-  border: 1px solid #f0c7a0 !important;
-  border-radius: 9px !important;
-  background: linear-gradient(180deg, #fffaf5 0%, #fff3e7 100%) !important;
-  color: #b45309 !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 3px 10px rgba(180, 83, 9, .06) !important;
-}
-
-.audit-workspace .service-audits-page .filter-bar .btn-secondary:hover {
-  border-color: #f0b77e !important;
-  background: linear-gradient(180deg, #fff5eb 0%, #ffead8 100%) !important;
-  color: #92400e !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 14px rgba(180, 83, 9, .11) !important;
 }
 
 /* Table surface */
@@ -204,19 +170,6 @@
   opacity: .72;
 }
 
-.audit-workspace .service-audits-page .filter-bar .input-field {
-  transition:
-    border-color .16s ease,
-    box-shadow .16s ease,
-    transform .16s ease,
-    background .16s ease !important;
-}
-
-.audit-workspace .service-audits-page .filter-bar .input-field:hover {
-  background: #fcfcff !important;
-  transform: translateY(-1px);
-}
-
 .audit-workspace .service-audits-page .admin-table-container {
   position: relative !important;
   border-color: #dfe3eb !important;
@@ -322,11 +275,6 @@
 .audit-workspace .service-audits-page .row-actions .btn-secondary,
 .audit-workspace .service-audits-page .row-actions .btn-danger {
   min-width: 32px !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  padding: 0 9px !important;
-  border-radius: 8px !important;
-  font-size: 9px !important;
 }
 
 @media (max-width: 900px) {

@@ -1,5 +1,6 @@
 import "./workspace.css";
 import "../../Styles/administration.css";
+import { useTranslation } from "react-i18next";
 import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -7,6 +8,7 @@ import HRNavigation from "../../Components/HRNavigation";
 import HRResourceState from "../../Components/HRResourceState";
 
 const AppShell: React.FC = () => {
+  const { t } = useTranslation();
   const hr = useLocation().pathname.startsWith("/app/recruitment/");
   return (
     <div className={hr ? "admin-layout hr-shell" : "admin-layout"}>
@@ -24,7 +26,7 @@ const AppShell: React.FC = () => {
                   <div />
                   <div />
                 </div>
-                <span className="route-loading__text">Yüklənir...</span>
+                <span className="route-loading__text">{t("dashboard.loading")}</span>
               </div>
             </div>
           }

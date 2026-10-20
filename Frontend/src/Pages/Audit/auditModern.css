@@ -2092,9 +2092,6 @@
 .audit-workspace .audit-modern-page td{padding:14px 16px;border-bottom:1px solid #edf0f4;color:#343b49;font-size:13px;vertical-align:middle}
 .audit-workspace .audit-modern-page tbody tr{transition:background .16s ease}
 .audit-workspace .audit-modern-page tbody tr:hover{background:#f8faff}
-.audit-workspace .audit-modern-page .btn-primary,
-.audit-workspace .audit-modern-page .btn-secondary,
-.audit-workspace .audit-modern-page .btn-danger{border-radius:9px;font-weight:650}
 @media(max-width:768px){
   .audit-workspace .audit-modern-page{padding-bottom:32px}
   .audit-workspace .audit-modern-header h1{font-size:24px}
@@ -2107,8 +2104,6 @@
 /* INOP — Audits List business surface */
 .audit-workspace .audit-list-page{max-width:1220px;margin:0 auto;padding-bottom:48px}
 .audit-workspace .audit-list-page .filter-bar{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding:12px;background:linear-gradient(180deg,#fff,#f8f9fb);border:1px solid #e4e8ef;border-radius:14px;box-shadow:0 8px 24px rgba(20,28,45,.045)}
-.audit-workspace .audit-list-page .filter-bar .input-field{height:40px;border-radius:9px;background:#fff;border-color:#dfe4eb}
-.audit-workspace .audit-list-page .filter-bar .input-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .audit-workspace .audit-list-page .admin-table-container{border:1px solid #e3e7ee;border-radius:16px;background:#fff;box-shadow:0 12px 32px rgba(20,28,45,.06);overflow:hidden}
 .audit-workspace .audit-list-page .admin-table-container table{min-width:760px}
 .audit-workspace .audit-list-page .admin-table-container th{height:48px;padding:0 18px;background:#f7f8fa;color:#697386;border-bottom:1px solid #e5e8ee;font-size:10px;font-weight:750;letter-spacing:.075em;text-transform:uppercase}
@@ -2122,12 +2117,9 @@
 .audit-workspace .audit-list-page td:nth-child(4){color:#596273;font-weight:600}
 .audit-workspace .audit-list-page td .badge{min-width:70px;justify-content:center;font-weight:750}
 .audit-workspace .audit-list-page .row-actions{display:flex;justify-content:flex-end}
-.audit-workspace .audit-list-page .btn-danger{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px}
+.audit-workspace .audit-list-page .btn-danger{width:34px;display:inline-grid;place-items:center}
 .audit-workspace .audit-list-page .state-page__action{display:flex;justify-content:center;margin-top:14px}
 .audit-workspace .audit-list-page .audit-modern-empty{min-height:150px;display:grid;place-items:center}
-.audit-workspace .audit-list-page .page-header__actions .btn-add{height:40px;border-radius:9px}
-@media(max-width:800px){
-}
 @media(max-width:800px){.audit-workspace .audit-list-page .filter-bar{align-items:stretch;flex-wrap:wrap}.audit-workspace .audit-list-page .filter-bar .input-field{flex:1 1 180px!important;width:auto!important}.audit-workspace .audit-list-page .admin-table-container{overflow-x:auto}}
 
 /* INOP — Standard Audits List business composition */
@@ -2157,25 +2149,10 @@
 .audit-workspace .audit-standard-list-page .filter-bar .input-field{
   width:100%;
   min-width:0;
-  height:40px;
-  padding:0 12px;
-  border-radius:9px;
-  background:#fff;
-  border:1px solid #dfe4eb;
-  color:#303746;
-  font-size:13px;
-}
-
-.audit-workspace .audit-standard-list-page .filter-bar .input-field:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(99,102,241,.1);
 }
 
 .audit-workspace .audit-standard-list-page .filter-bar .btn-secondary{
-  height:40px;
   white-space:nowrap;
-  border-radius:9px;
-  font-weight:650;
 }
 
 .audit-workspace .audit-standard-list-page .admin-table-container{
@@ -2326,25 +2303,10 @@
 .audit-workspace .service-audits-page .filter-bar .input-field{
   width:100%;
   min-width:0;
-  height:40px;
-  padding:0 12px;
-  border-radius:9px;
-  background:#fff;
-  border:1px solid #dfe4eb;
-  color:#303746;
-  font-size:13px;
-}
-
-.audit-workspace .service-audits-page .filter-bar .input-field:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(99,102,241,.1);
 }
 
 .audit-workspace .service-audits-page .filter-bar .btn-secondary{
-  height:40px;
   white-space:nowrap;
-  border-radius:9px;
-  font-weight:650;
 }
 
 .audit-workspace .service-audits-page .admin-table-container{
@@ -2583,8 +2545,6 @@
 /* Module differentiation */
 
 /* Responsive */
-@media (max-width:900px){
-}
 
 
 /* ============================================================
@@ -2835,49 +2795,11 @@
   border-top:1px solid #e8ebf1 !important;
 }
 
-.audit-workspace .audit-modern-page > .audit-modern-card .audit-form-actions .btn-secondary{
-  min-height:40px !important;
-  padding:0 19px !important;
-  border:1px solid #fecaca !important;
-  border-radius:9px !important;
-  background:linear-gradient(180deg,#fff7f7 0%,#fee2e2 100%) !important;
-  color:#b42318 !important;
-  font-size:11px !important;
-  font-weight:700 !important;
-  box-shadow:0 4px 12px rgba(180,35,24,.07) !important;
-}
-
-.audit-workspace .audit-modern-page > .audit-modern-card .audit-form-actions .btn-secondary:hover{
-  border-color:#f87171 !important;
-  background:linear-gradient(180deg,#fee2e2 0%,#fecaca 100%) !important;
-  color:#991b1b !important;
-  transform:translateY(-1px) !important;
-}
-
 .audit-workspace .audit-modern-page > .audit-modern-card .audit-form-actions .btn-primary{
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
   gap:7px !important;
-  min-height:40px !important;
-  padding:0 20px !important;
-  border:1px solid #1e3a8a !important;
-  border-radius:9px !important;
-  background:var(--accent) !important;
-  color:#fff !important;
-  font-size:11px !important;
-  font-weight:750 !important;
-  box-shadow:
-    0 7px 17px rgba(23,37,84,.20),
-    inset 0 1px 0 rgba(255,255,255,.12) !important;
-}
-
-.audit-workspace .audit-modern-page > .audit-modern-card .audit-form-actions .btn-primary:hover:not(:disabled){
-  transform:translateY(-1px) !important;
-  background:var(--accent-hover) !important;
-  box-shadow:
-    0 10px 22px rgba(23,37,84,.27),
-    inset 0 1px 0 rgba(255,255,255,.15) !important;
 }
 
 .audit-workspace .audit-modern-page > .audit-modern-card .audit-form-actions .btn-primary svg,
@@ -3029,18 +2951,6 @@
 }
 
 /* Cancel */
-.audit-workspace .audit-form-page .audit-modern-card .form-actions .btn-secondary,
-.audit-workspace .audit-form-page .audit-modern-card .audit-form-actions .btn-secondary{
-  min-height:40px !important;
-  padding:0 20px !important;
-  border:1px solid #fecaca !important;
-  border-radius:9px !important;
-  background:linear-gradient(180deg,#fff7f7,#fee2e2) !important;
-  color:#b42318 !important;
-  font-size:11px !important;
-  font-weight:700 !important;
-  box-shadow:0 4px 12px rgba(180,35,24,.07) !important;
-}
 
 /* Submit */
 .audit-workspace .audit-form-page .audit-modern-card .form-actions .btn-primary,
@@ -3049,24 +2959,6 @@
   align-items:center !important;
   justify-content:center !important;
   gap:7px !important;
-  min-height:40px !important;
-  padding:0 22px !important;
-  border:1px solid #1e3a8a !important;
-  border-radius:9px !important;
-  background:var(--accent) !important;
-  color:#fff !important;
-  font-size:11px !important;
-  font-weight:750 !important;
-  box-shadow:
-    0 7px 17px rgba(23,37,84,.20),
-    inset 0 1px 0 rgba(255,255,255,.12) !important;
-}
-
-.audit-workspace .audit-form-page .audit-modern-card .form-actions .btn-primary:hover:not(:disabled),
-.audit-workspace .audit-form-page .audit-modern-card .audit-form-actions .btn-primary:hover:not(:disabled){
-  transform:translateY(-1px) !important;
-  background:var(--accent-hover) !important;
-  box-shadow:0 10px 22px rgba(23,37,84,.27) !important;
 }
 
 .audit-workspace .audit-form-page .audit-modern-card .form-actions svg,
@@ -3329,55 +3221,15 @@
 .audit-workspace .audit-standard-list-page > .filter-bar > .input-field{
   width:100%;
   min-width:0;
-  height:40px;
-  min-height:40px;
-  border:1px solid #dce2eb;
-  border-radius:10px;
-  background:#fff;
-  color:#293244;
-  font-size:12px;
-  font-weight:600;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
-  transition:
-    border-color .16s ease,
-    box-shadow .16s ease,
-    background .16s ease;
-}
-
-.audit-workspace .audit-standard-list-page > .filter-bar > .input-field:hover{
-  border-color:#c9d0dc;
-  background:#fcfdff;
 }
 
 .audit-workspace .audit-standard-list-page > .filter-bar > .input-field:focus{
-  border-color:#818cf8;
   outline:none;
-  background:#fff;
-  box-shadow:
-    0 0 0 3px rgba(99,102,241,.10),
-    0 4px 12px rgba(20,28,45,.035);
 }
 
 .audit-workspace .audit-standard-list-page > .filter-bar > .btn-secondary{
   grid-column:4;
   justify-self:end;
-  min-height:38px;
-  padding:0 14px;
-  border:1px solid #d9deea;
-  border-radius:9px;
-  background:linear-gradient(180deg,#ffffff 0%,#f6f7fb 100%);
-  color:#596273;
-  font-size:11px;
-  font-weight:700;
-  box-shadow:0 4px 12px rgba(20,28,45,.045);
-}
-
-.audit-workspace .audit-standard-list-page > .filter-bar > .btn-secondary:hover{
-  border-color:#cfd5e2;
-  background:#f4f5f8;
-  color:#343b49;
-  box-shadow:0 7px 16px rgba(20,28,45,.08);
-  transform:translateY(-1px);
 }
 
 .audit-workspace .audit-standard-list-page > .admin-table-container{
@@ -3490,32 +3342,6 @@
 
 .audit-workspace .audit-standard-state .state-page__action .btn-secondary{
   min-width:108px;
-  min-height:38px;
-  padding:0 16px;
-  border:1px solid #d9deea;
-  border-radius:9px;
-  background:linear-gradient(180deg,#ffffff 0%,#f5f7fb 100%);
-  color:var(--accent);
-  font-size:12px;
-  font-weight:700;
-  box-shadow:0 5px 14px rgba(79,70,229,.09);
-  transition:
-    transform .16s ease,
-    border-color .16s ease,
-    background .16s ease,
-    box-shadow .16s ease;
-}
-
-.audit-workspace .audit-standard-state .state-page__action .btn-secondary:hover{
-  transform:translateY(-2px);
-  border-color:#a5b4fc;
-  background:linear-gradient(180deg,#f5f6ff 0%,#eceeff 100%);
-  color:#3730a3;
-  box-shadow:0 9px 20px rgba(79,70,229,.16);
-}
-
-.audit-workspace .audit-standard-state .state-page__action .btn-secondary:active{
-  transform:translateY(0);
 }
 
 @media (max-width:900px){
@@ -3956,10 +3782,6 @@
 
 /* Actions */
 
-.audit-workspace .standard-audit-form .audit-form-actions .btn-secondary{
-  border-color:#d8dde6;
-}
-
 /* Responsive */
 @media (max-width:1050px){
 
@@ -4276,10 +4098,6 @@
 /* Final actions — now visually prominent */
 .audit-workspace .standard-audit-form .audit-form-actions{
   margin-top:2px;
-}
-
-.audit-workspace .standard-audit-form .audit-form-actions .btn-primary{
-  border-color:var(--accent);
 }
 
 .audit-workspace .standard-audit-form .audit-form-actions .btn-secondary{
@@ -4625,41 +4443,8 @@
   -webkit-backdrop-filter:blur(14px);
 }
 
-.audit-workspace .standard-audit-form .audit-form-actions .btn-secondary,
-.audit-workspace .standard-audit-form .audit-form-actions .btn-primary{
-  min-height:40px;
-  padding:0 17px;
-  border-radius:9px;
-  font-size:11px;
-  font-weight:750;
-}
-
-.audit-workspace .standard-audit-form .audit-form-actions .btn-secondary{
-  border:1px solid #d8dde7;
-  background:#fff;
-  color:#596273;
-}
-
-.audit-workspace .standard-audit-form .audit-form-actions .btn-secondary:hover{
-  border-color:#c5cbd7;
-  background:#f7f8fa;
-}
-
 .audit-workspace .standard-audit-form .audit-form-actions .btn-primary{
   min-width:150px;
-  border:1px solid #554ce5;
-  background:var(--accent);
-  color:#fff;
-  box-shadow:
-    0 8px 18px rgba(79,70,229,.22),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-.audit-workspace .standard-audit-form .audit-form-actions .btn-primary:hover:not(:disabled){
-  transform:translateY(-1px);
-  box-shadow:
-    0 11px 23px rgba(79,70,229,.28),
-    inset 0 1px 0 rgba(255,255,255,.18);
 }
 
 /* Desktop: use the workspace instead of shrinking the content */
@@ -4967,19 +4752,6 @@
   -webkit-backdrop-filter:blur(12px);
 }
 
-.audit-workspace .safety-audit-form .audit-form-actions .btn-secondary,
-.audit-workspace .safety-audit-form .audit-form-actions .btn-primary{
-  min-height:36px;
-  padding:0 14px;
-  border-radius:9px;
-  font-size:11px;
-  font-weight:750;
-}
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-primary{
-  box-shadow:0 7px 16px rgba(79,70,229,.18);
-}
-
 /* Responsive */
 
 @media (max-width:900px){
@@ -5040,62 +4812,12 @@
 
 /* INOP — Safety Audit professional cancel action */
 
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger{
-  min-height:36px;
-  padding:0 15px;
-  border:1px solid #e7b8b4;
-  border-radius:9px;
-  font-size:11px;
-  font-weight:750;
-  line-height:1;
-  transition:
-    background .16s ease,
-    border-color .16s ease,
-    color .16s ease,
-    box-shadow .16s ease,
-    transform .16s ease;
-}
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger:hover:not(:disabled){
-  transform:translateY(-1px);
-}
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger:active:not(:disabled){
-  box-shadow:0 2px 7px rgba(180,35,24,.07);
-}
-
 .audit-workspace .safety-audit-form .audit-form-actions .btn-danger:focus-visible{
   outline:none;
-  box-shadow:
-    0 0 0 3px rgba(180,35,24,.10),
-    0 4px 12px rgba(180,35,24,.08);
 }
 
 
 /* INOP — Safety Audit cancel button: deeper red */
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger{
-  border-color:#991b1b;
-  background:linear-gradient(180deg,#b42318 0%,#991b1b 100%);
-  color:#fff;
-  box-shadow:
-    0 5px 12px rgba(153,27,27,.18),
-    inset 0 1px 0 rgba(255,255,255,.12);
-}
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger:hover:not(:disabled){
-  border-color:#7f1d1d;
-  background:linear-gradient(180deg,#9f1d14 0%,#7f1d1d 100%);
-  color:#fff;
-  box-shadow:
-    0 8px 17px rgba(153,27,27,.24),
-    inset 0 1px 0 rgba(255,255,255,.12);
-}
-
-.audit-workspace .safety-audit-form .audit-form-actions .btn-danger:active:not(:disabled){
-  background:#7f1d1d;
-  transform:translateY(0);
-}
 
 
 /* ============================================================

@@ -1,3 +1,4 @@
+import Modal from "../../Components/Modal";
 import React, { useEffect, useState } from "react";
 import {
   Check,
@@ -90,12 +91,6 @@ const RolesOverview: React.FC = () => {
     loadRoles();
   }, [retryCount]);
 
-  useEffect(() => {
-    if ((!showCreate && !editingRole) || saving) return;
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setEditingRole(null); setShowCreate(false); } };
-    document.addEventListener('keydown', escape);
-    return () => document.removeEventListener('keydown', escape);
-  }, [showCreate, editingRole, saving]);
 
   const openCreate = () => {
     setEditingRole(null);
@@ -467,155 +462,140 @@ const RolesOverview: React.FC = () => {
       )}
 
       {(showCreate || editingRole) && (
-        <div
-          className="modal-backdrop"
-          onClick={() => {
-            if (!saving) {
-              setEditingRole(null); setShowCreate(false);
-            }
-          }}
-        >
-          <div
-            className="modal-card role-modal anim-pop"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="role-form-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="role-modal__header">
-              <div>
-                <h3
-                  id="role-form-title"
-                  className="modal-card__title"
-                  style={{ marginBottom: 4 }}
-                >
-                  {editingRole
-                    ? t("roles.form.editTitle")
-                    : t("roles.form.createTitle")}
-                </h3>
-
-                <p className="modal-card__subtitle">
-                  {t("roles.form.subtitle")}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="btn-icon role-modal__close"
-                onClick={closeForm}
-                disabled={saving}
-                aria-label={t("roles.form.close")}
+        <Modal titleId="role-form-title" className="form-modal role-modal" busy={saving} onClose={closeForm}>
+          <div className="role-modal__header">
+            <div>
+              <h3
+                id="role-form-title"
+                className="modal-card__title"
+                style={{ marginBottom: 4 }}
               >
-                <X size={18} />
-              </button>
+                {editingRole
+                  ? t("roles.form.editTitle")
+                  : t("roles.form.createTitle")}
+              </h3>
+
+              <p className="modal-card__subtitle">
+                {t("roles.form.subtitle")}
+              </p>
             </div>
 
-            <form onSubmit={handleSave} noValidate>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">
-                    {t("roles.form.name")}
-                  </label>
-                  <input aria-label={t('roles.form.name')} autoFocus
-                    className="input-field"
-                    value={form.name}
-                    placeholder="Məsələn: Senior Auditor"
-                    onChange={(event) => {
-                      const name = event.target.value;
+            <button
+              type="button"
+              className="btn-icon role-modal__close"
+              onClick={closeForm}
+              disabled={saving}
+              aria-label={t("roles.form.close")}
+            >
+              <X size={18} />
+            </button>
+          </div>
 
-                      setForm((current) => ({
-                        ...current,
-                        name,
-                        ...(editingRole
-                          ? {}
-                          : { key: slugifyRoleKey(name) }),
-                      }));
-                    }}
-                  />
-                </div>
+          <form onSubmit={handleSave} noValidate>
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  {t("roles.form.name")}
+                </label>
+                <input aria-label={t('roles.form.name')} autoFocus
+                  className="input-field"
+                  value={form.name}
+                  placeholder="Məsələn: Senior Auditor"
+                  onChange={(event) => {
+                    const name = event.target.value;
 
-                <div className="form-group">
-                  <label className="form-label">
-                    {t("roles.form.key")}
-                  </label>
-                  <input
-                    className="input-field role-key-field"
-                    value={form.key}
-                    readOnly={!editingRole}
-                    disabled={Boolean(editingRole?.isSystemRole || editingRole?.userCount)}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        key: event.target.value,
-                      }))
-                    }
-                  />
-                  {!editingRole && (
-                    <p className="role-modal__field-hint">
-                      Rol adından avtomatik yaradılır.
-                    </p>
-                  )}
-                </div>
+                    setForm((current) => ({
+                      ...current,
+                      name,
+                      ...(editingRole
+                        ? {}
+                        : { key: slugifyRoleKey(name) }),
+                    }));
+                  }}
+                />
               </div>
 
               <div className="form-group">
                 <label className="form-label">
-                  {t("roles.form.description")}
+                  {t("roles.form.key")}
                 </label>
-                <textarea
-                  className="input-field"
-                  rows={3}
-                  value={form.description}
+                <input
+                  className="input-field role-key-field"
+                  value={form.key}
+                  readOnly={!editingRole}
+                  disabled={Boolean(editingRole?.isSystemRole || editingRole?.userCount)}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      description: event.target.value,
+                      key: event.target.value,
                     }))
                   }
                 />
+                {!editingRole && (
+                  <p className="role-modal__field-hint">
+                    Rol adından avtomatik yaradılır.
+                  </p>
+                )}
               </div>
+            </div>
 
-              <PermissionEditor value={form.permissions} disabled={saving} onChange={permissions => setForm(current => ({...current, permissions}))} />
+            <div className="form-group">
+              <label className="form-label">
+                {t("roles.form.description")}
+              </label>
+              <textarea
+                className="input-field"
+                rows={3}
+                value={form.description}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    description: event.target.value,
+                  }))
+                }
+              />
+            </div>
 
-              {formError && (
-                <p className="form-error form-error--submit">
-                  <X size={12} />
-                  {formError}
-                </p>
-              )}
+            <PermissionEditor value={form.permissions} disabled={saving} onChange={permissions => setForm(current => ({...current, permissions}))} />
 
-              <div className="modal-card__actions role-modal__actions">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={closeForm}
-                  disabled={saving}
-                >
-                  {t("roles.form.cancel")}
-                </button>
+            {formError && (
+              <p className="form-error form-error--submit">
+                <X size={12} />
+                {formError}
+              </p>
+            )}
 
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 size={15} className="spin" />
-                      {t("roles.form.saving")}
-                    </>
-                  ) : (
-                    <>
-                      {editingRole
-                        ? t("roles.form.save")
-                        : t("roles.form.create")}
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className="modal-card__actions role-modal__actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={closeForm}
+                disabled={saving}
+              >
+                {t("roles.form.cancel")}
+              </button>
+
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 size={15} className="spin" />
+                    {t("roles.form.saving")}
+                  </>
+                ) : (
+                  <>
+                    {editingRole
+                      ? t("roles.form.save")
+                      : t("roles.form.create")}
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {deleteTarget && (

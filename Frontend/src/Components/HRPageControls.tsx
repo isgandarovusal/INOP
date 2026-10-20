@@ -6,7 +6,7 @@ export default function HRPageControls({ data, page, onPage, disabled = false, o
   return <nav className="hr-page-controls" aria-label={t('hrPage.pagination')} data-hr-pagination>
     <span role="status">{t('hrPage.summary', { page, total: data?.total ?? '—', shown: data?.items.length ?? 0 })}</span>
     {onRefresh && <button className="btn-secondary" type="button" aria-label={t('common.actions.refresh')} aria-busy={refreshing || undefined} disabled={disabled || refreshing} onClick={onRefresh}><RefreshCw size={16} className={refreshing ? 'spin' : undefined} aria-hidden="true" />{t('common.actions.refresh')}</button>}
-    <button type="button" disabled={disabled || page <= 1} onClick={() => onPage(page - 1)}>{t('common.actions.previous')}</button>
-    <button type="button" disabled={disabled || !data?.hasMore} onClick={() => onPage(page + 1)}>{t('common.actions.next')}</button>
+    <button className="btn-secondary" type="button" disabled={disabled || page <= 1} onClick={() => onPage(page - 1)}>{t('common.actions.previous')}</button>
+    <button className="btn-secondary" type="button" disabled={disabled || !data?.hasMore} onClick={() => onPage(page + 1)}>{t('common.actions.next')}</button>
   </nav>;
 }

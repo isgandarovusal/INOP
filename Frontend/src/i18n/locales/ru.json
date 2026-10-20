@@ -46,7 +46,9 @@
       "closed": "Закрыто",
       "inProgress": "В процессе",
       "assigned": "Назначено",
-      "resolved": "Решено"
+      "resolved": "Решено",
+      "draft": "Черновик",
+      "failed": "Не пройден"
     },
     "labels": {
       "name": "Название",
@@ -67,7 +69,9 @@
       "noData": "Нет данных.",
       "noResults": "Результаты не найдены.",
       "required": "Это поле обязательно."
-    }
+    },
+    "retry": "Повторить",
+    "loading": "Загрузка…"
   },
   "navigation": {
     "dashboard": "Панель управления",
@@ -146,6 +150,7 @@
     "totalCandidates": "Всего кандидатов",
     "applications": "Заявки",
     "shortlisted": "Отобранные кандидаты",
+    "viewAll": "Посмотреть все",
     "recentCandidates": "Последние кандидаты",
     "noCandidates": "Кандидатов пока нет — добавьте первого кандидата.",
     "candidatesByStatus": "Кандидаты по статусу",
@@ -160,7 +165,11 @@
     "fullAnalytics": "Полная аналитика",
     "noAudits": "Аудитов пока нет",
     "submitAudit": "Отправьте аудит, чтобы увидеть сравнение.",
-    "candidate": "кандидат"
+    "candidate": "кандидат",
+    "recruitmentLoadErrorTitle": "Данные подбора недоступны",
+    "recruitmentLoadError": "Не удалось загрузить данные подбора.",
+    "auditLoadErrorTitle": "Данные аудита недоступны",
+    "auditLoadError": "Не удалось загрузить данные аудита."
   },
   "auth": {
     "heroTitle": "Единая платформа для всех операций",
@@ -319,7 +328,8 @@
     "justNow": "только что",
     "minutesAgo": "{{count}} мин назад",
     "hoursAgo": "{{count}} ч назад",
-    "daysAgo": "{{count}} дн назад"
+    "daysAgo": "{{count}} дн назад",
+    "noSearchResults": "Соответствующих событий нет."
   },
   "recruitment": {
     "applications": {
@@ -370,7 +380,9 @@
       "exportPdf": "Экспорт в PDF",
       "exporting": "Экспорт...",
       "exportSuccess": "Файл успешно экспортирован.",
-      "exportError": "Произошла ошибка при экспорте файла."
+      "exportError": "Произошла ошибка при экспорте файла.",
+      "actions": "Действия",
+      "notProvided": "Не указано"
     },
     "candidateStatus": {
       "new": "Новый",
@@ -616,7 +628,16 @@
         "title": "Сервисный аудит",
         "status": "Статус",
         "type": "Тип",
-        "date": "Дата"
+        "date": "Дата",
+        "allStatuses": "Все статусы",
+        "allRestaurants": "Все рестораны",
+        "from": "С даты",
+        "to": "По дату",
+        "resetFilters": "Сбросить фильтры",
+        "empty": "Соответствующих аудитов нет.",
+        "overall": "Общий результат",
+        "answers": "Ответы",
+        "serviceTime": "Время обслуживания"
       },
       "analytics": {
         "title": "Аналитика сервисных аудитов",
@@ -632,7 +653,8 @@
       }
     },
     "types": {
-      "service": "Сервисный аудит"
+      "service": "Сервисный аудит",
+      "standard": "Аудит стандартов"
     },
     "checklist": {
       "builder": {
@@ -798,7 +820,18 @@
         "type": "Тип",
         "date": "Дата",
         "loading": "Загрузка…",
-        "noAudits": "Стандартных аудитов пока нет."
+        "noAudits": "Стандартных аудитов пока нет.",
+        "allStatuses": "Все статусы",
+        "allRestaurants": "Все рестораны",
+        "from": "С даты",
+        "to": "По дату",
+        "resetFilters": "Сбросить фильтры",
+        "empty": "Соответствующих аудитов нет.",
+        "compliance": "Соответствие",
+        "findings": "Замечания",
+        "result": "Результат",
+        "passed": "Пройден",
+        "failed": "Не пройден"
       },
       "analytics": {
         "title": "Аналитика стандартных аудитов",
@@ -880,7 +913,10 @@
         "weak": "Слабо",
         "partiallyCompliant": "Частично соответствует",
         "good": "Хорошо",
-        "fullyCompliant": "Полностью соответствует"
+        "fullyCompliant": "Полностью соответствует",
+        "total": "Всего",
+        "score": "Оценка",
+        "auditorLabel": "Аудитор"
       },
       "list": {
         "title": "Аудит по охране труда",
@@ -896,7 +932,8 @@
         "status": "Статус",
         "view": "Просмотр",
         "delete": "Удалить",
-        "auditType": "Тип аудита"
+        "auditType": "Тип аудита",
+        "loading": "Загрузка аудитов…"
       },
       "analytics": {
         "title": "Аналитика охраны труда",

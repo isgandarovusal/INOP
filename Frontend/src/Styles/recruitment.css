@@ -10,7 +10,6 @@
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  background: #fafbfd;
   animation: rowFadeIn 0.3s ease both;
 }
 .ranking-row__rank {
@@ -199,13 +198,6 @@
 }
 
 /* Inline status selectors */
-.page-container .admin-table-container select.input-field {
-  min-height: 36px;
-  border-radius: 9px;
-  padding-top: 0;
-  padding-bottom: 0;
-  font-size: 12px;
-}
 
 /* Empty / error states */
 .page-container .admin-table-container .empty-state {
@@ -492,61 +484,8 @@
   border-color: #dfe5ef;
 }
 
-.recruitment-list-page .admin-table-container select.input-field {
-  min-height: 36px;
-  border-radius: 9px;
-  padding-top: 0;
-  padding-bottom: 0;
-  font-size: 12px;
-}
-
 
 /* ── INOP Recruitment action hierarchy ────────────────────────── */
-
-.recruitment-list-page .recruitment-action--create,
-.page-container .recruitment-action--create {
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid rgba(79, 70, 229, 0.78);
-  border-radius: 10px;
-  background: linear-gradient(180deg, #625cf0 0%, #4f46e5 100%);
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  box-shadow:
-    0 6px 14px rgba(79, 70, 229, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.recruitment-list-page .recruitment-action--create:hover,
-.page-container .recruitment-action--create:hover {
-  background: linear-gradient(180deg, #6b65f4 0%, #5148e8 100%);
-  box-shadow:
-    0 9px 20px rgba(79, 70, 229, 0.23),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-.page-container .recruitment-action--export {
-  min-height: 42px;
-  padding: 0 14px;
-  border: 1px solid #d9dfea;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #4c5668;
-  font-size: 12px;
-  font-weight: 650;
-  box-shadow: 0 3px 10px rgba(30, 41, 59, 0.045);
-}
-
-.page-container .recruitment-action--export:hover {
-  border-color: #c8d0df;
-  background: #f8faff;
-  color: #343b46;
-  box-shadow: 0 6px 14px rgba(30, 41, 59, 0.075);
-  transform: translateY(-1px);
-}
 
 /* ── Candidate form composition ──────────────────────────────── */
 
@@ -664,12 +603,6 @@
   font-weight: 650;
 }
 
-.candidate-form-page .input,
-.candidate-form-page .input-field {
-  min-height: 42px;
-  border-radius: 10px;
-}
-
 .candidate-form-actions,
 .recruitment-form-actions {
   display: flex;
@@ -682,15 +615,6 @@
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.88);
   box-shadow: 0 6px 18px rgba(30, 41, 59, 0.035);
-}
-
-.recruitment-form-actions .btn-secondary {
-  min-height: 40px;
-}
-
-.recruitment-form-actions .btn-primary {
-  min-height: 42px;
-  padding-inline: 18px;
 }
 
 /* ── Job form composition ────────────────────────────────────── */
@@ -719,13 +643,7 @@
   font-weight: 650;
 }
 
-.job-form-page .input {
-  min-height: 42px;
-  border-radius: 10px;
-}
-
 .job-form-page textarea.input {
-  min-height: 112px;
   resize: vertical;
 }
 
@@ -736,11 +654,6 @@
   gap: 10px;
   padding-top: 18px;
   border-top: 1px solid #e7eaf0;
-}
-
-.job-form-page .form-actions .btn-primary {
-  min-height: 42px;
-  padding-inline: 20px;
 }
 
 /* ── Recruitment responsive actions ─────────────────────────── */
@@ -792,11 +705,6 @@
 
 .candidate-detail-action:hover:not(:disabled) {
   transform: translateY(-1px);
-}
-
-.candidate-detail-action--export,
-.candidate-detail-action--back {
-  border-color: rgba(148, 163, 184, 0.28);
 }
 
 /* Existing information surfaces */
@@ -1096,34 +1004,6 @@
   height: 16px;
 }
 
-.candidate-detail-action--export,
-.candidate-detail-action--back {
-  color: #344054;
-  border: 1px solid rgba(148, 163, 184, 0.28) !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.035);
-}
-
-.candidate-detail-action--export:hover:not(:disabled),
-.candidate-detail-action--back:hover:not(:disabled) {
-  color: #273142;
-  border-color: rgba(99, 102, 241, 0.24) !important;
-  background: #ffffff !important;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.07);
-}
-
-.candidate-detail-action--edit {
-  color: #ffffff !important;
-  border-color: transparent !important;
-  background: linear-gradient(135deg, #5b55e8, #4942d7) !important;
-  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.18);
-}
-
-.candidate-detail-action--edit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #514bdc, #4039c5) !important;
-  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.23);
-}
-
 .candidate-detail-action--delete {
   border: 1px solid rgba(180, 35, 24, 0.17) !important;
   box-shadow: none;
@@ -1183,11 +1063,6 @@
 }
 
 /* Page header */
-
-.recruitment-list-page > .page-header h1 {
-  color: #202633;
-  letter-spacing: -0.035em;
-}
 
 /* Filter surface */
 
@@ -1307,14 +1182,6 @@
 
 /* Empty state remains intentionally quiet */
 
-.recruitment-list-page .empty-state h3 {
-  color: #344054;
-}
-
-.recruitment-list-page .empty-state p {
-  color: #7b8494;
-}
-
 
 /* ── INOP Recruitment — executive contrast layer ───────────────── */
 
@@ -1336,10 +1203,6 @@
 /* ================================================================
    JOBS + APPLICATIONS — TABLE HEADER
    ================================================================ */
-
-.recruitment-list-page .admin-table-container {
-  border-color: rgba(32, 38, 51, 0.20) !important;
-}
 
 /* Table body gets stronger graphite hierarchy. */
 
@@ -1414,59 +1277,7 @@
 
 /* Export / secondary operational action */
 
-.recruitment-action--export,
-.recruitment-list-page .page-header__actions .btn-secondary,
-.candidate-detail-action--export,
-.candidate-detail-action--back {
-  color: #4338a8 !important;
-  background: #f3f2ff !important;
-  border: 1px solid rgba(79, 70, 229, 0.18) !important;
-  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.055);
-}
-
-.recruitment-action--export:hover:not(:disabled),
-.recruitment-list-page .page-header__actions .btn-secondary:hover:not(:disabled),
-.candidate-detail-action--export:hover:not(:disabled),
-.candidate-detail-action--back:hover:not(:disabled) {
-  color: #3730a3 !important;
-  background: #ebe9ff !important;
-  border-color: rgba(79, 70, 229, 0.28) !important;
-  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.10);
-}
-
 /* Primary recruitment actions */
-
-.recruitment-action--create,
-.recruitment-list-page .page-header__actions .btn-primary,
-.candidate-detail-action--edit {
-  color: #ffffff !important;
-  border: 1px solid transparent !important;
-  background:
-    linear-gradient(
-      135deg,
-      #625bf0 0%,
-      #4f46e5 55%,
-      #4338ca 100%
-    ) !important;
-  box-shadow:
-    0 8px 18px rgba(79, 70, 229, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-}
-
-.recruitment-action--create:hover:not(:disabled),
-.recruitment-list-page .page-header__actions .btn-primary:hover:not(:disabled),
-.candidate-detail-action--edit:hover:not(:disabled) {
-  background:
-    linear-gradient(
-      135deg,
-      #554ee5 0%,
-      #4338ca 55%,
-      #3730a3 100%
-    ) !important;
-  box-shadow:
-    0 10px 22px rgba(79, 70, 229, 0.27),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
 
 /* ================================================================
    FILTER BAR — INDIGO, NOT BLACK
@@ -1482,9 +1293,6 @@
 
 .recruitment-list-page .admin-table-container {
   border-color: rgba(79, 70, 229, 0.13) !important;
-  box-shadow:
-    0 12px 30px rgba(79, 70, 229, 0.045),
-    0 2px 8px rgba(15, 23, 42, 0.025);
 }
 
 /* ================================================================
@@ -1650,24 +1458,6 @@
 }
 
 /* Primary page action */
-
-.recruitment-list-page .page-header__actions .recruitment-action--create {
-  min-height: 44px;
-  padding: 0 17px !important;
-  border-radius: 11px !important;
-  background: linear-gradient(135deg, #5b55e8, #4942d7) !important;
-  box-shadow:
-    0 7px 16px rgba(79, 70, 229, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.recruitment-list-page .page-header__actions .recruitment-action--create:hover:not(:disabled) {
-  background: linear-gradient(135deg, #514bdc, #4039c5) !important;
-  box-shadow:
-    0 9px 20px rgba(79, 70, 229, 0.23),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  transform: translateY(-1px);
-}
 
 /* Empty state */
 
@@ -2132,17 +1922,6 @@
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.16);
 }
 
-.job-detail-page .detail-grid > div:nth-child(2) > .detail-card:last-child .btn-primary {
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.24);
-}
-
-.job-detail-page .detail-grid > div:nth-child(2) > .detail-card:last-child .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.3);
-}
-
 /* Empty ranking state */
 
 .job-detail-page .ranking-list + .empty-state {
@@ -2229,36 +2008,12 @@
   justify-content: center;
   gap: 7px;
   min-width: 128px;
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
   white-space: nowrap;
-}
-
-.job-form-page .recruitment-form-actions .btn-primary {
-  border: 1px solid #4f46e5;
-  background: linear-gradient(135deg, #5b5ce2 0%, #4845c7 100%);
-  color: #ffffff;
-  box-shadow:
-    0 5px 12px rgba(79, 70, 229, 0.18);
-}
-
-.job-form-page .recruitment-form-actions .btn-primary:hover:not(:disabled) {
-  border-color: #4338ca;
-  background: linear-gradient(135deg, #5556d9 0%, #403bb8 100%);
-  box-shadow:
-    0 7px 16px rgba(79, 70, 229, 0.24);
-  transform: translateY(-1px);
 }
 
 .job-form-page .recruitment-form-actions .btn-primary:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-  transform: none;
 }
 
 /* The skills heading and AI action form one deliberate control row. */
@@ -2288,36 +2043,12 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
-  padding: 0 13px;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
   white-space: nowrap;
-}
-
-.job-detail-page .page-header__actions .btn-add {
-  border: 1px solid #4f46e5;
-  background: linear-gradient(135deg, #5b5ce2, #4845c7);
-  color: #ffffff;
-  box-shadow: 0 4px 11px rgba(79, 70, 229, 0.18);
-}
-
-.job-detail-page .page-header__actions .btn-add:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5556d9, #403bb8);
-  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.24);
-  transform: translateY(-1px);
 }
 
 /* Disabled CTA inside the dark candidate-linking panel */
 
 .job-detail-page .detail-grid > div:nth-child(2) > .detail-card:last-child .btn-primary:disabled {
-  border-color: #414b67;
-  background: #3a4380;
-  color: #aeb6d0;
-  box-shadow: none;
   opacity: 0.82;
 }
 
@@ -2349,37 +2080,8 @@
 
 /* JOB DETAIL — BACK */
 
-.job-detail-page .page-header__actions .btn-secondary {
-  border: 1px solid #b9414d;
-  background: linear-gradient(
-    135deg,
-    #b93845 0%,
-    #9f2937 100%
-  );
-  color: #ffffff;
-  box-shadow:
-    0 4px 11px rgba(159, 41, 55, 0.16);
-}
-
-.job-detail-page .page-header__actions .btn-secondary:hover:not(:disabled) {
-  border-color: #a52f3d;
-  background: linear-gradient(
-    135deg,
-    #a92f3d 0%,
-    #8f2431 100%
-  );
-  color: #ffffff;
-  box-shadow:
-    0 7px 16px rgba(159, 41, 55, 0.23);
-  transform: translateY(-1px);
-}
-
 .job-detail-page .page-header__actions .btn-secondary:focus-visible {
   outline: none;
-  border-color: #be4451;
-  box-shadow:
-    0 0 0 3px rgba(185, 65, 77, 0.15),
-    0 4px 11px rgba(159, 41, 55, 0.14);
 }
 
 /* Keep action icons visually aligned */
@@ -2387,18 +2089,6 @@
 .job-form-page .recruitment-form-actions button svg,
 .job-detail-page .page-header__actions button svg {
   flex: 0 0 auto;
-}
-
-@media (max-width: 620px) {
-
-  .job-form-page .recruitment-form-actions .btn-primary {
-    min-height: 42px;
-  }
-
-  .job-detail-page .page-header__actions .btn-secondary,
-  .job-detail-page .page-header__actions .btn-add {
-    min-height: 40px;
-  }
 }
 
 
@@ -2431,27 +2121,6 @@
 }
 
 /* New Job */
-
-.recruitment-list-page > .page-header .recruitment-action--create {
-  min-height: 40px;
-  padding: 0 15px;
-  border: 1px solid #4f46e5;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #5b5ce2 0%, #4845c7 100%);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow:
-    0 5px 13px rgba(79, 70, 229, 0.17);
-}
-
-.recruitment-list-page > .page-header .recruitment-action--create:hover:not(:disabled) {
-  border-color: #4338ca;
-  background: linear-gradient(135deg, #5556d9 0%, #403bb8 100%);
-  box-shadow:
-    0 7px 17px rgba(79, 70, 229, 0.24);
-  transform: translateY(-1px);
-}
 
 /* Filter / command bar */
 
@@ -2511,28 +2180,10 @@
 
 /* Mobile */
 
-@media (max-width: 640px) {
-}
-
 
 /* INOP — recruitment action hierarchy */
 
 /* INOP — filter reset action */
-.applications-list-page .filter-bar .btn-secondary{
-  border:1px solid #fed7aa !important;
-  background:linear-gradient(180deg,#fffaf5,#ffedd5) !important;
-  color:#c2410c !important;
-  font-weight:700;
-  box-shadow:0 4px 12px rgba(234,88,12,.07);
-}
-
-.applications-list-page .filter-bar .btn-secondary:hover{
-  border-color:#fb923c !important;
-  background:linear-gradient(180deg,#ffedd5,#fed7aa) !important;
-  color:#9a3412 !important;
-  box-shadow:0 7px 18px rgba(234,88,12,.14);
-  transform:translateY(-1px);
-}
 
 /* INOP — Candidate Form REAL action hierarchy */
 

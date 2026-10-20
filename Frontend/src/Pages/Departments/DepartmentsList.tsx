@@ -1,3 +1,4 @@
+import Modal from "../../Components/Modal";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   AlertCircle,
@@ -80,23 +81,6 @@ const DepartmentsList: React.FC = () => {
   useEffect(() => {
     void load();
   }, [load]);
-
-  useEffect(() => {
-    if (!showForm || saving) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setShowForm(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [showForm, saving]);
 
   const openCreate = () => {
     setEditing(null);
@@ -285,97 +269,77 @@ const DepartmentsList: React.FC = () => {
       </div>
 
       {showForm && (
-        <div
-          className="modal-backdrop"
-          onClick={() => {
-            if (!saving) {
-              setShowForm(false);
-            }
-          }}
-        >
-          <div
-            className="modal-card department-modal-card anim-pop"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="department-form-title"
-            style={{
-              textAlign: "left",
-              maxWidth: 420,
-            }}
-            onClick={(e) => e.stopPropagation()}
+        <Modal titleId="department-form-title" className="form-modal" busy={saving} onClose={() => setShowForm(false)}>
+          <h3 id="department-form-title" className="modal-card__title">
+            {editing
+              ? t("departments.editDepartment")
+              : t("departments.createDepartment")}
+          </h3>
+
+          <form
+            onSubmit={handleSubmit}
+            noValidate
           >
-            <h3 id="department-form-title" className="modal-card__title">
-              {editing
-                ? t("departments.editDepartment")
-                : t("departments.createDepartment")}
-            </h3>
+            <div className="form-group">
+              <label className="form-label" htmlFor="department-name">
+                {t("departments.name")}
+              </label>
 
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              style={{ marginTop: 16 }}
-            >
-              <div className="form-group">
-                <label className="form-label" htmlFor="department-name">
-                  {t("departments.name")}
-                </label>
+              <input id="department-name" autoFocus
+                className="input-field"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
 
-                <input id="department-name" autoFocus
-                  className="input-field"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="department-description">
+                {t("departments.description")}
+              </label>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="department-description">
-                  {t("departments.description")}
-                </label>
+              <textarea id="department-description"
+                className="input-field input-field--textarea"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
 
-                <textarea id="department-description"
-                  className="input-field input-field--textarea"
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
+            {error && (
+              <p className="form-error form-error--submit">
+                <AlertCircle size={12} /> {error}
+              </p>
+            )}
 
-              {error && (
-                <p className="form-error form-error--submit">
-                  <AlertCircle size={12} /> {error}
-                </p>
-              )}
+            <div className="modal-card__actions">
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 size={16} className="spin" />
+                    {t("departments.saving")}
+                  </>
+                ) : editing ? (
+                  t("departments.saveChanges")
+                ) : (
+                  t("departments.create")
+                )}
+              </button>
 
-              <div className="modal-card__actions">
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 size={16} className="spin" />
-                      {t("departments.saving")}
-                    </>
-                  ) : editing ? (
-                    t("departments.saveChanges")
-                  ) : (
-                    t("departments.create")
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  disabled={saving}
-                  onClick={() => setShowForm(false)}
-                >
-                  {t("departments.cancel")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+              <button
+                type="button"
+                className="btn-cancel"
+                disabled={saving}
+                onClick={() => setShowForm(false)}
+              >
+                {t("departments.cancel")}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {deleteTarget && (

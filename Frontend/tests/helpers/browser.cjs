@@ -21,7 +21,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
           const overlay = options.loadSource(id); if (overlay !== undefined) return overlay;
         }
         const baseline = process.env.INOP_BROWSER_BASELINE;
-        if (baseline && /^[a-f0-9]{40}$/.test(baseline) && id.startsWith(frontend + '/src/')) {
+        if (baseline && /^[a-f0-9]{40}$/.test(baseline) && id.startsWith(frontend + '/src/') && /\.(?:tsx?|css|json)$/.test(id)) {
           const result = spawnSync('git', ['show', `${baseline}:Frontend/${path.relative(frontend, id)}`], { cwd: frontend, encoding: 'utf8' });
           if (result.status === 0) return result.stdout;
         }

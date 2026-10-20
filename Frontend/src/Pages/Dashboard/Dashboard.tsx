@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || t("auth.somethingWentWrong")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -146,7 +146,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || t("auth.somethingWentWrong")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setRecruitmentError(
-              error?.response?.data?.message || t("auth.somethingWentWrong")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -198,7 +198,7 @@ const Dashboard: React.FC = () => {
             if (!mounted) return;
 
             setAuditError(
-              error?.response?.data?.message || t("auth.somethingWentWrong")
+              error?.response?.data?.message || ""
             );
           })
           .finally(() => {
@@ -218,7 +218,7 @@ const Dashboard: React.FC = () => {
       clearTimeout(deadline);
       controller.abort();
     };
-  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications, t]);
+  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications]);
 
   const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
   const statusBreakdown=candidates.statusBreakdown;
@@ -228,11 +228,11 @@ const Dashboard: React.FC = () => {
   if (loadedScopeKey !== dataScopeKey) return <PageState type="loading" message={t("dashboard.loading")} />;
 
   return (
-    <div className="main-dashboard">
+    <div className="main-dashboard hr-workspace">
       <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
 
           {showRecruitment && (
-            <div className="hr-workspace hr-dashboard-summary">
+            <div className="hr-dashboard-summary">
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
 
               {recruitmentError !== null && (
@@ -296,7 +296,7 @@ const Dashboard: React.FC = () => {
                 <div className="recent-card anim-in">
                   <div className="chart-card__header">
                     <h3>{t("dashboard.recentCandidates")}</h3>
-                    <button className="recent-card__link" onClick={() => navigate("/app/recruitment/candidates")}>
+                    <button className="btn-secondary recent-card__link" onClick={() => navigate("/app/recruitment/candidates")}>
                       {t("dashboard.viewAll")} <ArrowUpRight size={13} />
                     </button>
                   </div>
@@ -387,7 +387,7 @@ const Dashboard: React.FC = () => {
 
                       <p className="kpi-card__label">{t("dashboard.overallScore")}</p>
 
-                      <p className="kpi-card__value">{analytics.overallScore == null ? t('auditFlow.notCombined') : `${analytics.overallScore.toFixed(1)} / 10`}</p>
+                      <p className={`kpi-card__value${analytics.overallScore == null ? " kpi-card__value--text" : ""}`}>{analytics.overallScore == null ? t('auditFlow.notCombined') : `${analytics.overallScore.toFixed(1)} / 10`}</p>
 
                     </div>
 
@@ -447,7 +447,7 @@ const Dashboard: React.FC = () => {
 
                       <button
 
-                        className="recent-card__link"
+                        className="btn-secondary recent-card__link"
 
                         onClick={() => navigate("/app/audit/analytics")}
 

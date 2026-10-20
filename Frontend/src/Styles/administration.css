@@ -19,7 +19,7 @@
 .permission-option label { display:flex; align-items:center; gap:10px; min-height:44px; }
 .permission-option input { width:18px; height:18px; accent-color:var(--accent); }
 .permission-option select { max-width:200px; padding:10px; border:1px solid var(--hr-border); border-radius:8px; background:var(--surface); color:var(--hr-ink); }
-.administration-page .role-modal { width:min(880px,calc(100vw - 32px)); max-width:880px; max-height:calc(100dvh - 32px); overflow:auto; }
+.role-modal { width:min(880px,calc(100vw - 32px)); max-width:880px; max-height:calc(100dvh - 32px); overflow:auto; }
 .administration-page .recent-row { padding-block:14px; align-items:flex-start; gap:16px; }
 .administration-page .recent-row__title { line-height:1.5; overflow-wrap:anywhere; }
 .administration-page .recent-row__time { white-space:nowrap; font-size:12px; }
@@ -39,8 +39,4 @@
 }
 /* Dialogs must sit above the fixed navigation (z-index:60). */
 .administration-page .modal-backdrop { z-index:100; }
-.administration-page .btn-cancel { background:var(--hr-subtle); color:var(--hr-navy); border:1px solid var(--hr-border); box-shadow:none; }
 .administration-form .form-grid { gap:0 20px; }
-
-.administration-page .administration-form .form-actions .btn-secondary { background:var(--hr-subtle); border-color:var(--hr-border); color:var(--hr-navy); box-shadow:none; }
-.administration-page .administration-form .form-actions .btn-secondary:hover:not(:disabled) { background:var(--hr-blue-soft); border-color:var(--hr-navy); color:var(--hr-navy); }

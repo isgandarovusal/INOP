@@ -52,6 +52,7 @@ test('Application board pages and manual drag are context-bound and persisted', 
     await h.page.getByRole('alert').filter({hasText:'Müraciət başqa əməliyyatda dəyişib'}).waitFor(); assert.equal((await Application.findById(row._id)).boardOrder,row.boardOrder);
   });
   await t.test('a secondary page 500 retains all primary lanes and supplies retry', async () => {
+    await open();await selectJob(); // Begin after the previous conflict/refetch has settled.
     await h.page.route('**/api/hr/v2/application-board?*', async r => {if(new URL(r.request().url()).searchParams.get('stage'))return r.fulfill({status:500,contentType:'application/json',body:'{"message":"Synthetic lane failure"}'});return r.fallback();});
     await lane('applied').getByRole('button',{name:'Növbəti kartlar',exact:true}).click(); await lane('applied').getByRole('alert').waitFor();
     assert.equal(await lane('applied').locator('[data-application-card]').count(),10); assert.equal(await lane('screening').locator('[data-application-card]').count(),10);

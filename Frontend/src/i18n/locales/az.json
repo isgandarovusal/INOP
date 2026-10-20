@@ -46,7 +46,9 @@
       "closed": "Bağlanıb",
       "inProgress": "İcradadır",
       "assigned": "Təyin edilib",
-      "resolved": "Həll edilib"
+      "resolved": "Həll edilib",
+      "draft": "Qaralama",
+      "failed": "Uyğun deyil"
     },
     "labels": {
       "name": "Ad",
@@ -67,7 +69,9 @@
       "noData": "Məlumat yoxdur.",
       "noResults": "Nəticə tapılmadı.",
       "required": "Bu sahə məcburidir."
-    }
+    },
+    "retry": "Yenidən cəhd et",
+    "loading": "Yüklənir…"
   },
   "navigation": {
     "dashboard": "İdarə paneli",
@@ -337,7 +341,8 @@
     "justNow": "indicə",
     "minutesAgo": "{{count}} dəq əvvəl",
     "hoursAgo": "{{count}} saat əvvəl",
-    "daysAgo": "{{count}} gün əvvəl"
+    "daysAgo": "{{count}} gün əvvəl",
+    "noSearchResults": "Uyğun fəaliyyət tapılmadı."
   },
   "recruitment": {
     "applications": {
@@ -646,7 +651,16 @@
         "title": "Servis Auditi",
         "status": "Status",
         "type": "Tip",
-        "date": "Tarix"
+        "date": "Tarix",
+        "allStatuses": "Bütün statuslar",
+        "allRestaurants": "Bütün restoranlar",
+        "from": "Başlanğıc tarixi",
+        "to": "Son tarix",
+        "resetFilters": "Filtrləri sıfırla",
+        "empty": "Uyğun audit tapılmadı.",
+        "overall": "Ümumi nəticə",
+        "answers": "Cavablar",
+        "serviceTime": "Servis müddəti"
       },
       "analytics": {
         "title": "Servis Auditi Analitikası",
@@ -662,7 +676,8 @@
       }
     },
     "types": {
-      "service": "Servis auditi"
+      "service": "Servis auditi",
+      "standard": "Standart Audit"
     },
     "checklist": {
       "builder": {
@@ -828,7 +843,18 @@
         "type": "Növ",
         "date": "Tarix",
         "loading": "Yüklənir…",
-        "noAudits": "Hələ standart audit yoxdur."
+        "noAudits": "Hələ standart audit yoxdur.",
+        "allStatuses": "Bütün statuslar",
+        "allRestaurants": "Bütün restoranlar",
+        "from": "Başlanğıc tarixi",
+        "to": "Son tarix",
+        "resetFilters": "Filtrləri sıfırla",
+        "empty": "Uyğun audit tapılmadı.",
+        "compliance": "Uyğunluq",
+        "findings": "Tapıntılar",
+        "result": "Nəticə",
+        "passed": "Uyğundur",
+        "failed": "Uyğun deyil"
       },
       "analytics": {
         "title": "Standart Audit Analitikası",
@@ -910,7 +936,10 @@
         "weak": "Zəif",
         "partiallyCompliant": "Qismən uyğun",
         "good": "Yaxşı",
-        "fullyCompliant": "Tam uyğun"
+        "fullyCompliant": "Tam uyğun",
+        "total": "Ümumi",
+        "score": "Bal",
+        "auditorLabel": "Auditor"
       },
       "list": {
         "title": "Əməyin Mühafizəsi Auditi",
@@ -926,7 +955,8 @@
         "status": "Status",
         "view": "Bax",
         "delete": "Sil",
-        "auditType": "Audit növü"
+        "auditType": "Audit növü",
+        "loading": "Auditlər yüklənir…"
       },
       "analytics": {
         "title": "Əməyin Mühafizəsi Analitikası",
