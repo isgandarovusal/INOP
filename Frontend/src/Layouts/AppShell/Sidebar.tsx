@@ -235,9 +235,9 @@ const Sidebar: React.FC = () => {
           menuOpen ? "admin-sidebar--open" : ""
         }`}
       >
-        <h2 className="admin-sidebar__brand">
+        {!mobile && <h2 className="admin-sidebar__brand">
           <INOPLogo compact />
-        </h2>
+        </h2>}
 
         <div className="admin-sidebar__scroll">
         <LanguageSwitcher />
