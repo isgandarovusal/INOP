@@ -260,13 +260,17 @@ test('User and role privilege authorization (isolated local MongoDB)', async (t)
         assert.equal((await request('admin', 'GET', `/roles/${role.id}`)).status, 404);
       } finally { if (role) await Role.deleteOne({ _id: role.id }); }
     });
-    await t.test('Admin same-role profile and self-demotion preserve DB authority', async () => {
+    await t.test('Admin same-role profile and self-demotion with another active Admin preserve DB authority', async () => {
       const before = await userSnapshot(actors.admin._id);
       try {
+        await User.updateOne({ _id: actors.inactive._id }, { isActive: true });
         assert.equal((await request('admin', 'PUT', `/users/${before._id}`, { role: 'admin', position: 'Administrator' })).status, 200);
         assert.equal((await request('admin', 'PUT', `/users/${before._id}`, { role: 'employee' })).status, 200);
         assert.equal((await request('admin', 'GET', '/audits')).status, 403);
-      } finally { await User.collection.replaceOne({ _id: before._id }, before); }
+      } finally {
+        await User.collection.replaceOne({ _id: before._id }, before);
+        await User.updateOne({ _id: actors.inactive._id }, { isActive: false });
+      }
     });
     await t.test('Invalid admin user payloads retain 400/404/409 behavior', async () => {
       assert.equal((await request('admin', 'PUT', '/users/not-an-id', { role: 'employee' })).status, 400);

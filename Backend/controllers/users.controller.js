@@ -332,7 +332,12 @@ exports.updateUser = async (req, res) => {
       user.$inc('credentialVersion', 1);
     }
 
-    await user.save();
+    if (roleChanged) {
+      await require("../services/adminPreservation.service").change(query, () => user.role !== "admin",
+        session => user.save({ session }));
+    } else {
+      await user.save();
+    }
 
     const permissions =
       req.body.role !== undefined
@@ -356,6 +361,7 @@ exports.updateUser = async (req, res) => {
       user: publicUser(user, permissions),
     });
   } catch (error) {
+    if (["LAST_ACTIVE_ADMIN", "ADMIN_AUTHORITY_UNAVAILABLE"].includes(error.code)) return res.status(error.status).json({ code: error.code, message: error.message });
     console.error("Update user error:", error);
 
     if (error.code === 11000) {
@@ -395,15 +401,13 @@ exports.updateUserStatus = async (req, res) => {
     const target = await User.findOne(query).select('_id role').lean();
     if (target && String(target._id) === req.user.id && req.body.isActive === false) return res.status(400).json({ message: 'Öz hesabınızı deaktiv edə bilməzsiniz.' });
     if (target && await getPermissionScope(target.role, 'role', 'update') === 'all' && !(await canManagePrivileges(req))) return denyPrivilegeChange(res);
-    if (target?.role === 'admin' && req.body.isActive === false && await User.countDocuments({ role: 'admin', isActive: true }) <= 1) return res.status(409).json({ message: 'Son aktiv administrator deaktiv edilə bilməz.' });
 
-    const user = await User.findOneAndUpdate(
-      query,
-      { isActive: req.body.isActive },
-      { returnDocument: 'after' }
-    )
-      .select("-password")
-      .lean();
+    const updateStatus = session => User.findOneAndUpdate(
+      query, { isActive: req.body.isActive }, { returnDocument: "after", ...(session ? { session } : {}) }
+    ).select("-password").lean();
+    const user = req.body.isActive
+      ? await updateStatus()
+      : await require("../services/adminPreservation.service").change(query, () => true, updateStatus);
 
     if (!user) {
       return res.status(404).json({
@@ -434,6 +438,7 @@ exports.updateUserStatus = async (req, res) => {
       user: publicUser(user, permissions),
     });
   } catch (error) {
+    if (["LAST_ACTIVE_ADMIN", "ADMIN_AUTHORITY_UNAVAILABLE"].includes(error.code)) return res.status(error.status).json({ code: error.code, message: error.message });
     console.error("Update user status error:", error);
     return res.status(500).json({
       message: "İstifadəçi statusunu dəyişmək mümkün olmadı.",
@@ -463,7 +468,10 @@ exports.deleteUser = async (req, res) => {
       Object.assign(query, req.dataScope);
     }
 
-    const user = await User.findOneAndDelete(query);
+    const target = await User.findOne(query).select("_id role").lean();
+    if (target && await getPermissionScope(target.role, "role", "update") === "all" && !(await canManagePrivileges(req))) return denyPrivilegeChange(res);
+    const user = await require("../services/adminPreservation.service").change(query, () => true,
+      session => User.findOneAndDelete(query, { session }));
 
     if (!user) {
       return res.status(404).json({
@@ -487,6 +495,7 @@ exports.deleteUser = async (req, res) => {
       message: "İstifadəçi uğurla silindi.",
     });
   } catch (error) {
+    if (["LAST_ACTIVE_ADMIN", "ADMIN_AUTHORITY_UNAVAILABLE"].includes(error.code)) return res.status(error.status).json({ code: error.code, message: error.message });
     console.error("Delete user error:", error);
     return res.status(500).json({
       message: "İstifadəçini silmək mümkün olmadı.",
