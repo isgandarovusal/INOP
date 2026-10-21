@@ -1,11 +1,9 @@
 import api from "../api/axios";
+import { downloadBlob } from "../Utils/downloadFile";
 async function downloadAuditFile(auditId: string, format: "pdf" | "excel" | "csv", signal?: AbortSignal) {
  const response=await api.get(`/audit-export/${encodeURIComponent(auditId)}/${format}`,{responseType:"blob",signal});
  if (signal?.aborted) return;
- const url=URL.createObjectURL(response.data);
- const link=document.createElement("a"); link.href=url;
- link.download=`audit-${auditId}.${format === "excel" ? "xlsx" : format}`;
- link.click(); setTimeout(()=>URL.revokeObjectURL(url),0);
+ downloadBlob(response.data, `audit-${auditId}.${format === "excel" ? "xlsx" : format}`);
 }
 export function exportAuditPdf(id:string,signal?:AbortSignal){return downloadAuditFile(id,"pdf",signal);}
 export function exportAuditExcel(id:string,signal?:AbortSignal){return downloadAuditFile(id,"excel",signal);}

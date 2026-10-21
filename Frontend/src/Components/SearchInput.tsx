@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -13,9 +14,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
   placeholder,
 }) => {
   const { t } = useTranslation();
+  const input = useRef<HTMLInputElement>(null);
 
   const clearSearch = () => {
     onChange("");
+    input.current?.focus();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -29,6 +32,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     <div className="search-field">
       <Search size={15} className="search-field__icon" aria-hidden="true" />
       <input
+        ref={input}
         type="search"
         aria-label={placeholder ?? t("components.search.placeholder")}
         placeholder={placeholder ?? t("components.search.placeholder")}
