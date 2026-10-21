@@ -10,7 +10,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { useAuth } from "../../Context/AuthContext";
 import { getRoles, type RoleRecord } from "../../Services/rolesService";
 import Badge from "../../Components/Badge";
-import { getUsers, setUserActive } from "../../Services/usersService";
+import { getUsers, setUserActive, userOperationErrorKey } from "../../Services/usersService";
 import { getDepartments } from "../../Services/departmentsService";
 import type { PublicUser } from "../../Types/auth";
 import type { Department } from "../../Types/core";
@@ -39,7 +39,7 @@ const UsersList: React.FC = () => {
 
   const { data, loading, error: readError, reload: load, setData } = useListResource(loadDirectory, EMPTY_DIRECTORY);
   const { users, departments, roles, lookupError } = data;
-  const error = readError || actionError;
+  const error = readError;
 
 
   const filtered = useMemo(() => {
@@ -51,11 +51,12 @@ const UsersList: React.FC = () => {
   const departmentName = (id: string) => departments.find(d => d.id === id)?.name || (id === 'dep_hr' ? t('departments.humanResources') : id || t('adminUI.unassigned'));
   const toggleActive = async () => {
     if (!statusTarget) return;
+    setError(null);
     setTogglingId(statusTarget.id);
     try {
       const updated = await setUserActive(statusTarget.id, !statusTarget.isActive);
       setData(current => ({ ...current, users: current.users.map(u => u.id === updated.id ? updated : u) })); setStatusTarget(null);
-    } catch { setError(t('auth.somethingWentWrong')); }
+    } catch (error) { setError(userOperationErrorKey(error)); }
     finally { setTogglingId(null); }
   };
 
@@ -192,7 +193,7 @@ const UsersList: React.FC = () => {
                             : t("users.activate")
                         }
                         disabled={togglingId === user.id || currentUser?.id === user.id}
-                        onClick={() => setStatusTarget(user)}
+                        onClick={() => { setError(null); setStatusTarget(user); }}
                       >
                         {togglingId === user.id ? (
                           <Loader2 size={15} className="spin" />
@@ -210,7 +211,7 @@ const UsersList: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {statusTarget && <ConfirmDialog title={statusTarget.isActive ? t('users.deactivate') : t('users.activate')} message={t('adminUI.statusConfirm',{name:statusTarget.name})} loading={Boolean(togglingId)} onCancel={()=>setStatusTarget(null)} onConfirm={()=>void toggleActive()} />}
+      {statusTarget && <ConfirmDialog title={statusTarget.isActive ? t('users.deactivate') : t('users.activate')} confirmLabel={t(statusTarget.isActive ? 'users.deactivate' : 'users.activate')} destructive={statusTarget.isActive} message={t('adminUI.statusConfirm',{name:statusTarget.name})} error={actionError ? t(actionError) : undefined} loading={Boolean(togglingId)} onCancel={()=>{setStatusTarget(null);setError(null);}} onConfirm={()=>void toggleActive()} />}
     </div>
   );
 };

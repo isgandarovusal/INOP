@@ -7,6 +7,7 @@ import {
   createUser,
   getUserById,
   updateUser,
+  userOperationErrorKey,
 } from "../../Services/usersService";
 import { getDepartments } from "../../Services/departmentsService";
 import { getRoles, type RoleRecord } from "../../Services/rolesService";
@@ -132,11 +133,7 @@ const UserFormFields: React.FC<{ id?: string }> = ({ id }) => {
 
       navigate("/app/users");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("auth.somethingWentWrong"),
-      );
+      setError(t(userOperationErrorKey(err)));
     } finally {
       setSaving(false);
     }

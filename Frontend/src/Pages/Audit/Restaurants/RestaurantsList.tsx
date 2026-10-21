@@ -2,7 +2,7 @@ import { useListResource } from "../../../Hooks/useListResource";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Pencil, Plus, Store, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Plus, Store, Archive } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import SearchInput from "../../../Components/SearchInput";
 import EmptyState from "../../../Components/EmptyState";
@@ -192,14 +192,14 @@ const RestaurantsList: React.FC = () => {
                           </button>
                           <button
                             className="btn-danger"
-                            title={t("common.actions.delete")}
+                            title={t("hrArchive.archive")}
                             disabled={deletingId === restaurant.id}
                             onClick={() => setDeleteTarget(restaurant)}
                           >
                             {deletingId === restaurant.id ? (
                               <Loader2 size={15} className="spin" />
                             ) : (
-                              <Trash2 size={15} />
+                              <Archive size={15} />
                             )}
                           </button>
                         </>
@@ -216,7 +216,8 @@ const RestaurantsList: React.FC = () => {
       {deleteTarget && (
         <ConfirmDialog
           title={t("audit.restaurants.list.deleteTitle")}
-          message={`"${deleteTarget.name}" and its history will be permanently removed.`}
+          confirmLabel={t("hrArchive.archive")}
+          message={t("audit.restaurants.list.archiveMessage", { name: deleteTarget.name })}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

@@ -10,5 +10,5 @@ export default function AuditTemplateLifecycle({id,status,reload}:{id:string;sta
  const run=(operation:string)=>void action.run(async signal=>{await api.post(`/audit-templates/${id}/${operation}`,{}, {signal});},()=>{setConfirm(false);reload();});
  if(!action.allowed||!['admin','audit_manager'].includes(user?.role||''))return null;
  return <section className="audit-template-lifecycle"><p>{t('auditFoundation.immutable')}</p><div className="audit-control-row">{(status==='active'?['draft','retire']:status==='draft'?['publish']:[]).map(operation=><button key={operation} type="button" className={operation==='retire'?'btn-danger-solid':'btn-secondary'} disabled={action.busy} onClick={()=>operation==='retire'?setConfirm(true):run(operation)}>{t(`auditFoundation.${operation}`)}</button>)}</div>{action.status!=='ready'&&action.status!=='loading'&&<AuditResourceState status={action.status}/>}
- {confirm&&<ConfirmDialog title={t('auditFoundation.retire')} message={t('auditFoundation.retireConfirm')} loading={action.busy} onCancel={()=>setConfirm(false)} onConfirm={()=>run('retire')}/>}</section>;
+ {confirm&&<ConfirmDialog confirmLabel={t('auditFoundation.retire')} title={t('auditFoundation.retire')} message={t('auditFoundation.retireConfirm')} loading={action.busy} onCancel={()=>setConfirm(false)} onConfirm={()=>run('retire')}/>}</section>;
 }

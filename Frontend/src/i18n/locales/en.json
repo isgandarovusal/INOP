@@ -1014,7 +1014,8 @@
         "score": "Score",
         "actions": "Actions",
         "noAudits": "No audits yet",
-        "deleteTitle": "Delete this audit?"
+        "deleteTitle": "Archive this audit?",
+        "archiveMessage": "The audit will leave the active list. Saved results and history will be retained."
       }
     },
     "restaurants": {
@@ -1055,7 +1056,8 @@
         "location": "Location",
         "status": "Status",
         "actions": "Actions",
-        "deleteTitle": "Delete this restaurant?",
+        "deleteTitle": "Archive this restaurant?",
+        "archiveMessage": "“{{name}}” will leave the active list. Audit history will be retained.",
         "noSearchResults": "No restaurants match your filters",
         "tryDifferentKeyword": "Try a different search or filter.",
         "noRestaurants": "No restaurants yet",
@@ -2338,6 +2340,8 @@
     "section": "Section"
   },
   "adminUI": {
+    "lastActiveAdmin": "The last active administrator cannot be deleted, deactivated or assigned another role.",
+    "adminAuthorityUnavailable": "Administrator authority cannot be verified right now. Please try again.",
     "profile": "Profile and security",
     "changePassword": "Change password",
     "currentPassword": "Current password",

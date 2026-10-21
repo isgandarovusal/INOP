@@ -1031,7 +1031,8 @@
         "score": "Bal",
         "actions": "Əməliyyatlar",
         "noAudits": "Hələ audit yoxdur",
-        "deleteTitle": "Bu audit silinsin?"
+        "deleteTitle": "Bu audit arxivləşdirilsin?",
+        "archiveMessage": "Audit aktiv siyahıdan çıxarılacaq. Saxlanmış nəticələr və tarixçə silinməyəcək."
       }
     },
     "restaurants": {
@@ -1072,7 +1073,8 @@
         "location": "Məkan",
         "status": "Status",
         "actions": "Əməliyyatlar",
-        "deleteTitle": "Bu restoran silinsin?",
+        "deleteTitle": "Bu restoran arxivləşdirilsin?",
+        "archiveMessage": "“{{name}}” aktiv siyahıdan çıxarılacaq. Audit tarixçəsi saxlanılacaq.",
         "noSearchResults": "Filtrlərinizə uyğun restoran tapılmadı",
         "tryDifferentKeyword": "Fərqli axtarış və ya filtr sınayın.",
         "noRestaurants": "Hələ restoran yoxdur",
@@ -2355,6 +2357,8 @@
     "section": "Bölmə"
   },
   "adminUI": {
+    "lastActiveAdmin": "Son aktiv administrator silinə, deaktiv edilə və ya başqa rola keçirilə bilməz.",
+    "adminAuthorityUnavailable": "Administrator səlahiyyətini hazırda yoxlamaq mümkün deyil. Yenidən cəhd edin.",
     "profile": "Profil və təhlükəsizlik",
     "changePassword": "Şifrəni dəyiş",
     "currentPassword": "Cari şifrə",

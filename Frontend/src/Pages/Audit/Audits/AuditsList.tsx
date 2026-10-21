@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ClipboardCheck, Loader2, Plus, Trash2 } from "lucide-react";
+import { ClipboardCheck, Loader2, Plus, Archive } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
 import ConfirmDialog from "../../../Components/ConfirmDialog";
@@ -264,14 +264,14 @@ const AuditsList: React.FC = () => {
                       <div className="row-actions">
                         <button
                           className="btn-danger"
-                          title={t("common.actions.delete")}
+                          title={t("hrArchive.archive")}
                           disabled={deletingId === audit.id}
                           onClick={() => setDeleteTarget(audit)}
                         >
                           {deletingId === audit.id ? (
                             <Loader2 size={15} className="spin" />
                           ) : (
-                            <Trash2 size={15} />
+                            <Archive size={15} />
                           )}
                         </button>
                       </div>
@@ -287,7 +287,8 @@ const AuditsList: React.FC = () => {
       {deleteTarget && (
         <ConfirmDialog
           title={t("audit.generic.list.deleteTitle")}
-          message="This audit record will be permanently removed."
+          confirmLabel={t("hrArchive.archive")}
+          message={t("audit.generic.list.archiveMessage")}
           loading={deletingId === deleteTarget.id}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

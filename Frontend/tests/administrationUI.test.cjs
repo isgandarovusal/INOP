@@ -32,3 +32,69 @@ test('administration: actual forms, membership, granular rights, password valida
  for(const[width,height]of [[1440,900],[768,1024],[390,844]]){await p.setViewportSize({width,height});await p.waitForTimeout(400);await p.screenshot({path:out+'/login-'+width+'.png',fullPage:true});}
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('last-admin rejection remains visible inside the confirmation dialog in all languages and viewport sizes', async () => withBrowserFixture(harness, async h => {
+ const p=h.page;
+ await h.models.Role.create({key:'ui_privilege_operator',name:'UI privilege operator',permissions:[{resource:'user',action:'*',scope:'all'},{resource:'role',action:'*',scope:'all'},{resource:'department',action:'read',scope:'all'}]});
+ await h.models.User.updateOne({_id:h.actors.own._id},{role:'ui_privilege_operator'});
+ await h.models.User.updateOne({_id:h.actors.peer._id},{isActive:false});
+ await h.open('own','/app/users');
+ const row=p.getByRole('row').filter({has:p.getByText('admin@example.invalid',{exact:true})});
+ await row.waitFor();await p.waitForLoadState('networkidle');
+ for(const language of ['az','en','ru']) {
+  const readsBeforeLocale=h.wire.filter(r=>r.method==='GET').length;
+  await p.evaluate(async l=>(await import('/src/i18n/index.ts')).changeLanguage(l),language);
+  const labels=await p.evaluate(async()=>{const t=(await import('/src/i18n/index.ts')).default.t;return{deactivate:t('users.deactivate'),confirm:t('users.deactivate'),error:t('adminUI.lastActiveAdmin')}});
+  await row.getByRole('button',{name:labels.deactivate,exact:true}).click();
+  const dialog=p.getByRole('dialog');
+  await dialog.getByRole('button',{name:labels.confirm,exact:true}).click();
+  await dialog.getByRole('alert').waitFor();
+  assert.equal(await dialog.getByRole('alert').textContent(),labels.error);
+  assert.ok(await row.isVisible(),'Rejected status mutation must not replace the loaded user list');
+  const reads=h.wire.filter(r=>r.method==='GET').length;
+  assert.equal(reads,readsBeforeLocale,'Language change and refused mutation must not refetch the directory');
+  for(const width of [1440,768,390,320]) {
+   await p.setViewportSize({width,height:900});
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   if(process.env.INOP_QA_SCREENSHOTS) await p.screenshot({path:path.join(process.env.INOP_QA_SCREENSHOTS,`last-admin-dialog-${language}-${width}.png`),fullPage:false,animations:'disabled'});
+  }
+  assert.equal(h.wire.filter(r=>r.method==='GET').length,reads,'Dialog rendering must not refetch the directory');
+  if(language==='ru') {
+   const pattern='**/api/users/*/status';
+   await p.route(pattern,route=>route.fulfill({status:429,json:{message:'Untrusted response text'}}));
+   try {
+    await dialog.getByRole('button',{name:labels.confirm,exact:true}).click();
+    const limited=await p.evaluate(async()=> (await import('/src/i18n/index.ts')).default.t('adminUI.rateLimited'));
+    await dialog.getByRole('alert').filter({hasText:limited}).waitFor();
+    assert.equal(await p.getByText('Untrusted response text',{exact:true}).count(),0);
+    if(process.env.INOP_QA_SCREENSHOTS)await p.screenshot({path:path.join(process.env.INOP_QA_SCREENSHOTS,'rate-limit-dialog-ru-320.png'),fullPage:false,animations:'disabled'});
+   } finally {await p.unroute(pattern);}
+  }
+  await p.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
+  assert.ok(await row.getByRole('button',{name:labels.deactivate,exact:true}).evaluate(e=>e===document.activeElement),'Escape restores focus to the trigger');
+ }
+ const activate=await p.evaluate(async()=> (await import('/src/i18n/index.ts')).default.t('users.activate'));
+ const peer=p.getByRole('row').filter({has:p.getByText('peer@example.invalid',{exact:true})});
+ await peer.getByRole('button',{name:activate,exact:true}).click();
+ assert.ok(await p.getByRole('dialog').getByRole('button',{name:activate,exact:true}).evaluate(e=>e.classList.contains('btn-primary')));
+ if(process.env.INOP_QA_SCREENSHOTS)await p.screenshot({path:path.join(process.env.INOP_QA_SCREENSHOTS,'activation-dialog-ru-320.png'),fullPage:false,animations:'disabled'});
+ await p.keyboard.press('Escape');
+ await h.audit('admin');
+ for(const [route,part] of [['/app/audit/audits','generic'],['/app/audit/restaurants','restaurants']]) {
+  await h.open('admin',route);
+  for(const language of ['az','en','ru']) {
+   await p.evaluate(async l=>(await import('/src/i18n/index.ts')).changeLanguage(l),language);
+   const labels=await p.evaluate(async key=>{const t=(await import('/src/i18n/index.ts')).default.t;return{archive:t('hrArchive.archive'),title:t(`audit.${key}.list.deleteTitle`)}},part);
+   await p.getByRole('button',{name:labels.archive,exact:true}).first().click();
+   const dialog=p.getByRole('dialog');await dialog.getByRole('heading',{name:labels.title,exact:true}).waitFor();
+   assert.ok(await dialog.getByRole('button',{name:labels.archive,exact:true}).isVisible());
+   assert.ok(!/permanently removed|archiveMessage/.test(await dialog.textContent()));
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   if(process.env.INOP_QA_SCREENSHOTS)await p.screenshot({path:path.join(process.env.INOP_QA_SCREENSHOTS,`archive-${part}-${language}-320.png`),fullPage:false,animations:'disabled'});
+   await p.keyboard.press('Escape');
+  }
+ }
+ console.log(JSON.stringify({scenario:'localized recoverable admin error',languages:3,viewports:[1440,768,390,320],directoryRefetchOnLanguageOrError:0,loadedListPreserved:true}));
+ assert.equal(await h.models.User.countDocuments({role:'admin',isActive:true}),1);
+ assert.deepEqual(h.pageErrors,[]);
+}));
