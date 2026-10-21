@@ -8,6 +8,7 @@ test('last active administrator survives delete, demotion and deactivation, incl
     { resource: 'user', action: '*', scope: 'all' }, { resource: 'role', action: 'update', scope: 'all' },
   ] });
   await User.updateOne({ _id: h.actors.own._id }, { role: 'preservation_operator' });
+  const roleBefore = await Role.findOne({ key: "admin" }).select("updatedAt").lean();
   const id = String(h.actors.admin._id);
   const before = await User.findById(id).lean();
   for (const [method, endpoint, body] of [
@@ -38,4 +39,5 @@ test('last active administrator survives delete, demotion and deactivation, incl
     assert.deepEqual(results.map(r => r.status).sort(), [200, 409]);
     assert.equal(await User.countDocuments({ role: 'admin', isActive: true }), 1);
   }
+  assert.deepEqual((await Role.findOne({ key: "admin" }).select("updatedAt").lean()).updatedAt, roleBefore.updatedAt, "Internal serialization must not masquerade as a role permission edit");
 }, { canonicalHR: true }));
