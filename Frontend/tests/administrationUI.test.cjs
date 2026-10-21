@@ -28,7 +28,7 @@ test('administration: actual forms, membership, granular rights, password valida
  await p.clock.runFor(100);await p.clock.fastForward(16000);await p.getByText(await p.evaluate(async()=> (await import('/src/i18n/index.ts')).default.t('dashboard.recruitmentLoadError')),{exact:true}).first().waitFor();
  await p.unroute('**/api/jobs/dashboard-summary');await p.clock.resume();
  await h.open('admin','/app/profile');await p.locator('#current-password').fill('Synthetic-old-456');await p.locator('#new-password').fill('short');await p.locator('#confirm-password').fill('different');const before=h.wire.length;await p.locator('form button').click();await p.getByRole('alert').waitFor();assert.equal(h.wire.length,before,'invalid password must not be sent');
- await p.setViewportSize({width:1440,height:900});await p.waitForTimeout(400);await p.getByRole('button',{name:'Çıxış',exact:true}).click();await p.locator('.auth-shell').waitFor();
+ await p.setViewportSize({width:1440,height:900});await p.waitForTimeout(400);await p.locator('.admin-sidebar__profile-toggle').click();await p.getByRole('menuitem',{name:'Çıxış',exact:true}).click();await p.locator('.auth-shell').waitFor();
  for(const[width,height]of [[1440,900],[768,1024],[390,844]]){await p.setViewportSize({width,height});await p.waitForTimeout(400);await p.screenshot({path:out+'/login-'+width+'.png',fullPage:true});}
  assert.deepEqual(h.pageErrors,[]);
 }));

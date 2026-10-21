@@ -9,18 +9,33 @@
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 100dvh;
   z-index: 60;
-  overflow-y: auto;
+  overflow: hidden;
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  width: var(--admin-sidebar-width);
+  padding: 24px 14px 16px;
+  gap: 2px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfcfe 100%
+    );
+  border-right: 1px solid rgba(23, 54, 93, 0.085);
+  box-shadow:
+    4px 0 18px rgba(15, 23, 42, 0.018);
 }
 
 .admin-sidebar__nav {
   display: flex;
   flex-direction: column;
+
+  gap: 2px;
 }
 
-.admin-sidebar a {
+.admin-sidebar__nav a {
   display: flex;
   align-items: center;
   text-decoration: none;
@@ -30,55 +45,48 @@
     background-color var(--transition-fast),
     border-color var(--transition-fast),
     color var(--transition-fast);
+
+  min-height: 38px;
+  padding: 0 10px;
+  gap: 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #68717e;
+  font-size: 12.5px;
+  font-weight: 590;
+  letter-spacing: -0.005em;
 }
 
-.admin-sidebar a.active::before {
+.admin-sidebar__nav a.active::before {
   content: "";
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+
+  left: -14px;
+  width: 3px;
+  height: 20px;
+  background: #4f46e5;
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.18);
 }
 
 .admin-sidebar__icon {
   flex-shrink: 0;
+
+  width: 16px;
+  color: currentColor;
+  opacity: 0.88;
 }
 
-.admin-sidebar__user {
-  display: flex;
-  align-items: center;
-}
 
 .admin-sidebar__user-info {
   flex: 1;
   min-width: 0;
 }
 
-.admin-sidebar__user-name {
-  margin: 0;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
-.admin-sidebar__user-role {
-  margin: 2px 0 0;
-  line-height: 1.4;
-}
 
-.admin-sidebar__logout {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-subtle);
-  cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-}
 
 .admin-main {
   flex: 1;
@@ -103,7 +111,7 @@
     left: 0;
     right: 0;
     width: 100%;
-    z-index: 40;
+    z-index: 70;
     padding: 0.9rem 1.25rem;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
@@ -363,20 +371,7 @@
     #f7f8fb;
 }
 
-.admin-sidebar {
-  width: var(--admin-sidebar-width);
-  padding: 24px 14px 16px;
-  gap: 2px;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #fbfcfe 100%
-    );
-  border-right: 1px solid rgba(23, 54, 93, 0.085);
-  box-shadow:
-    4px 0 18px rgba(15, 23, 42, 0.018);
-}
+
 
 .admin-sidebar__brand {
   display: flex;
@@ -406,29 +401,17 @@
   text-transform: uppercase;
 }
 
-.admin-sidebar__nav {
-  gap: 2px;
-}
 
-.admin-sidebar a {
-  min-height: 38px;
-  padding: 0 10px;
-  gap: 11px;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  color: #68717e;
-  font-size: 12.5px;
-  font-weight: 590;
-  letter-spacing: -0.005em;
-}
 
-.admin-sidebar a:hover {
+
+
+.admin-sidebar__nav a:hover {
   color: #343b46;
   background: rgba(23, 54, 93, 0.035);
   border-color: rgba(23, 54, 93, 0.055);
 }
 
-.admin-sidebar a.active {
+.admin-sidebar__nav a.active {
   color: #4540a5;
   background:
     linear-gradient(
@@ -440,53 +423,14 @@
   font-weight: 680;
 }
 
-.admin-sidebar a.active::before {
-  left: -14px;
-  width: 3px;
-  height: 20px;
-  background: #4f46e5;
-  box-shadow: 0 0 8px rgba(79, 70, 229, 0.18);
-}
 
-.admin-sidebar__icon {
-  width: 16px;
-  color: currentColor;
-  opacity: 0.88;
-}
 
-.admin-sidebar__user {
-  margin-top: auto;
-  padding: 14px 8px 0;
-  border-top: 1px solid rgba(23, 54, 93, 0.075);
-  gap: 10px;
-}
 
-.admin-sidebar__user-name {
-  color: #343b46;
-  font-size: 12px;
-  font-weight: 680;
-}
 
-.admin-sidebar__user-role {
-  margin-top: 3px;
-  color: #8a929e;
-  font-size: 10.5px;
-}
 
-.admin-sidebar__logout {
-  width: 32px;
-  height: 32px;
-  border-color: rgba(23, 54, 93, 0.09);
-  border-radius: 9px;
-  background: #ffffff;
-  color: #7b8491;
-}
 
-.admin-sidebar__logout:hover {
-  color: #c24141;
-  border-color: rgba(194, 65, 65, 0.18);
-  background: rgba(194, 65, 65, 0.045);
-}
+
+
 
 .admin-main {
   padding: 30px 34px 40px;
@@ -518,8 +462,8 @@
 /* One language control for the shell and login; replaces legacy variants. */
 .language-switcher { width: fit-content; display: flex; align-items: center; gap: 2px; padding: 3px; margin: 0 8px 20px; border: 1px solid #e0e5ec; border-radius: 9px; background: #f6f8fa; }
 .language-switcher button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 7px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #556378; font-size: 11px; font-weight: 550; cursor: pointer; box-shadow: none; }
-.admin-sidebar > .language-switcher { width: auto; align-self: stretch; min-width: 0; }
-.admin-sidebar > .language-switcher button { flex: 1; min-width: 0; padding-inline: 6px; }
+.admin-sidebar__scroll > .language-switcher { width: auto; align-self: stretch; min-width: 0; }
+.admin-sidebar__scroll > .language-switcher button { flex: 1; min-width: 0; padding-inline: 6px; }
 .language-switcher button[aria-pressed=true] { background: #fff; border-color: #d6dde7; color: #253b61; }
 .language-switcher button:hover { background: #edf1f5; }
 .language-switcher button:focus-visible { outline: 2px solid #253b61; outline-offset: 2px; }
@@ -528,5 +472,13 @@
 .admin-sidebar__brand .inop-logo { width: 131px; border-radius: 8px; }
 .admin-topbar__brand .inop-logo { width: 112px; border-radius: 6px; }
 
-.admin-sidebar .admin-sidebar__account-link { display:block; margin:8px 14px; padding:10px 12px; border:1px solid var(--control-border); border-radius:var(--radius-md); background:var(--hr-blue-soft); color:var(--hr-navy); font-size:12px; line-height:1.5; text-decoration:none; }
-.admin-sidebar__user .admin-sidebar__account-link { margin:4px 0 0; padding:0; border:0; background:none; }
+
+.admin-sidebar__scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.admin-sidebar__user { position: relative; flex-shrink: 0; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+.admin-sidebar__profile-toggle { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 8px; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--hr-blue-soft); color: var(--hr-navy); text-align: left; cursor: pointer; }
+.admin-sidebar__user-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 680; line-height: 1.4; }
+.admin-sidebar__user-role { display: block; margin-top: 3px; color: var(--hr-slate); font-size: 10.5px; line-height: 1.4; }
+.admin-sidebar__profile-menu { position: absolute; bottom: calc(100% + 8px); inset-inline: 0; padding: 4px; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: white; box-shadow: var(--shadow-md); }
+.admin-sidebar__profile-menu :is(a, button) { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--hr-navy); font: inherit; font-size: 12px; text-decoration: none; cursor: pointer; }
+.admin-sidebar__profile-menu :is(a, button):hover { background: var(--hr-blue-soft); }
+.admin-sidebar__profile-toggle:focus-visible, .admin-sidebar__profile-menu :is(a, button):focus-visible { outline: 2px solid var(--hr-navy); outline-offset: 2px; }

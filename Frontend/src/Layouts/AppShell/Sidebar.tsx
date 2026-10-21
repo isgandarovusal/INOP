@@ -1,5 +1,5 @@
 import { preloadHRRoute } from '../../Routes/hrRouteModules';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -15,6 +15,8 @@ import {
   ShieldCheck,
   History,
   LogOut,
+  KeyRound,
+  ChevronUp,
   Menu,
   X,
 } from "lucide-react";
@@ -128,6 +130,37 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 const Sidebar: React.FC = () => {
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileId = useId();
+  const profileRef = useRef<HTMLDivElement>(null);
+  const navigationToggle = useRef<HTMLButtonElement>(null);
+  const profileToggle = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!profileOpen) return;
+    const items = () => Array.from(profileRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') || []);
+    items()[0]?.focus();
+    const outside = (event: PointerEvent) => {
+      if (!profileRef.current?.contains(event.target as Node)) setProfileOpen(false);
+    };
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setProfileOpen(false);
+        profileToggle.current?.focus();
+      } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        const options = items(), index = options.indexOf(document.activeElement as HTMLElement);
+        options[event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length]?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', keyboard, true);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', keyboard, true);
+    };
+  }, [profileOpen]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
   const location = useLocation();
@@ -141,7 +174,7 @@ const Sidebar: React.FC = () => {
   }, []);
   useEffect(() => {
     if (!menuOpen) return;
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setMenuOpen(false); navigationToggle.current?.focus(); } };
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
   }, [menuOpen]);
@@ -176,6 +209,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         <button
+          ref={navigationToggle}
           className="admin-topbar__toggle"
           onClick={() => setMenuOpen((value) => !value)}
           aria-label={t("navigation.toggleMenu")}
@@ -190,7 +224,7 @@ const Sidebar: React.FC = () => {
       {menuOpen && (
         <div
           className="admin-overlay"
-          onClick={() => setMenuOpen(false)}
+          onClick={() => { setMenuOpen(false); navigationToggle.current?.focus(); }}
         />
       )}
 
@@ -205,8 +239,8 @@ const Sidebar: React.FC = () => {
           <INOPLogo compact />
         </h2>
 
+        <div className="admin-sidebar__scroll">
         <LanguageSwitcher />
-        <NavLink to="/app/profile" className="admin-sidebar__account-link">{t("adminUI.profile")} · {t("adminUI.changePassword")}</NavLink>
 
         {visibleGroups.map((group) => (
           <div className="admin-sidebar__group" key={group.titleKey}>
@@ -225,23 +259,24 @@ const Sidebar: React.FC = () => {
           </div>
         ))}
 
-        <div className="admin-sidebar__user">
-          <div className="admin-sidebar__user-info">
-            <NavLink to="/app/profile" className="admin-sidebar__user-name" title={t("adminUI.profile")}>{user.name}</NavLink>
-            <NavLink to="/app/profile" className="admin-sidebar__account-link">{t("adminUI.changePassword")}</NavLink>
-            <p className="admin-sidebar__user-role">
-              {ROLE_LABELS[user.role] || user.role}
-            </p>
-          </div>
-
-          <button
-            className="admin-sidebar__logout"
-            onClick={() => logout()}
-            title={t("navigation.logout")}
-            aria-label={t("navigation.logout")}
-          >
-            <LogOut size={16} />
+        </div>
+        <div className="admin-sidebar__user" ref={profileRef} onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node)) setProfileOpen(false);
+        }}>
+          <button ref={profileToggle} type="button" className="admin-sidebar__profile-toggle"
+            aria-expanded={profileOpen} aria-haspopup="menu" aria-controls={profileId}
+            onClick={() => setProfileOpen(value => !value)}
+            onKeyDown={event => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setProfileOpen(true); } }}>
+            <span className="admin-sidebar__user-info">
+              <span className="admin-sidebar__user-name">{user.name}</span>
+              <span className="admin-sidebar__user-role">{ROLE_LABELS[user.role] || user.role}</span>
+            </span>
+            <ChevronUp size={16} aria-hidden="true" />
           </button>
+          {profileOpen && <div id={profileId} role="menu" aria-label={t("adminUI.profile")} className="admin-sidebar__profile-menu">
+            <NavLink role="menuitem" to="/app/profile" onClick={() => setProfileOpen(false)}><KeyRound size={16} aria-hidden="true" />{t("adminUI.changePassword")}</NavLink>
+            <button type="button" role="menuitem" onClick={() => { setProfileOpen(false); logout(); }}><LogOut size={16} aria-hidden="true" />{t("navigation.logout")}</button>
+          </div>}
         </div>
       </aside>
     </>
