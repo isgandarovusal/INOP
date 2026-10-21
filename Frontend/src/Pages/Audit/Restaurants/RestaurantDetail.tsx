@@ -1,6 +1,7 @@
+import {auditScore} from '../../../Utils/auditScore';
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, Pencil, Plus, Store } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import Badge from "../../../Components/Badge";
@@ -13,7 +14,7 @@ import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
 const RestaurantDetail: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -69,18 +70,14 @@ const RestaurantDetail: React.FC = () => {
 
   const history = useMemo(
     () =>
-      audits.map((a) => ({
-        ...a,
-        overall:
-          (a.overallPercentage ?? 0) > 0
-            ? (a.overallPercentage ?? 0) / 10
-            : (
-                a.scores.cleanliness +
-                a.scores.service +
-                a.scores.food +
-                a.scores.staff
-              ) / 4,
-      })),
+      audits.map((a) => {
+        const versioned = Boolean(a.hrAssessment || a.serviceAssessment || a.standardAssessment || a.hseAssessment);
+        const percent = a.overallPercentage;
+        // Display the published source result; never replace all-N/A or a real
+        // zero with a legacy category average. No assessment is recomputed here.
+        const source = (!a.assessmentStatus || a.assessmentStatus === 'scored') && typeof percent === 'number' && Number.isFinite(percent) && percent >= 0 && percent <= 100 ? percent / 10 : null;
+        return { ...a, overall: versioned ? source : auditScore(a) };
+      }),
     [audits]
   );
 
@@ -145,7 +142,7 @@ const RestaurantDetail: React.FC = () => {
       <div className="audit-modern-card">
         <h3>{t("audit.restaurants.detail.status")}</h3>
         <Badge tone={restaurant.status === "active" ? "success" : "neutral"}>
-          {restaurant.status}
+          {t(`common.status.${restaurant.status}`)}
         </Badge>
       </div>
 
@@ -155,7 +152,7 @@ const RestaurantDetail: React.FC = () => {
           <EmptyState
             icon={<ClipboardCheck size={26} />}
             title={t("audit.restaurants.detail.noAudits")}
-            hint="Audits conducted at this restaurant will appear here."
+            hint={t("audit.restaurants.detail.historyHint")}
           />
         ) : (
           <>
@@ -164,21 +161,21 @@ const RestaurantDetail: React.FC = () => {
                 <div
                   key={a.id}
                   className="audit-trend-mini__bar"
-                  style={{ height: `${(a.overall / maxScore) * 100}%` }}
-                  title={`${a.date}: ${a.overall.toFixed(1)}`}
+                  style={{ height: `${((a.overall ?? 0) / maxScore) * 100}%` }}
+                  title={`${a.date}: ${a.overall?.toFixed(1) ?? t("hrAudit.notAssessed")}`}
                 />
               ))}
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 6, marginBottom: 20 }}>
               {history.map((a) => (
                 <span key={a.id} className="audit-trend-mini__label" style={{ flex: 1 }}>
-                  {new Date(a.date).toLocaleDateString(undefined, { month: "short" })}
+                  {new Date(a.date).toLocaleDateString(i18n.language, { month: "short" })}
                 </span>
               ))}
             </div>
 
             <div className="admin-table-container">
-              <table>
+              <table className="admin-table">
                 <thead>
                   <tr>
                     <th>{t("audit.restaurants.detail.date")}</th>
@@ -190,13 +187,11 @@ const RestaurantDetail: React.FC = () => {
                   {[...history].reverse().map((a) => (
                     <tr
                       key={a.id}
-                      className="cell-title--clickable"
-                      onClick={() => navigate(`/app/audit/audits/${a.id}`)}
                     >
-                      <td>{a.date}</td>
-                      <td>{a.auditType}</td>
+                      <th scope="row"><Link to={`/app/audit/audits/${a.id}`}>{a.date}</Link></th>
+                      <td>{t(`auditFoundation.directions.${a.auditType==='safety'?'occupational-safety':a.auditType}`,{defaultValue:a.auditType})}</td>
                       <td>
-                        <strong>{a.overall.toFixed(1)}</strong> / 10
+                        <strong>{a.overall===null?t("hrAudit.notAssessed"):`${a.overall.toFixed(1)} / 10`}</strong>
                       </td>
                     </tr>
                   ))}

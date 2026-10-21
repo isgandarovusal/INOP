@@ -1,4 +1,5 @@
 import API from "../api/axios";
+import {readJson} from "../api/readRequest";
 import type { Restaurant, RestaurantStatus } from "../Types/audit";
 
 export interface RestaurantInput {
@@ -14,15 +15,13 @@ export async function getRestaurants(): Promise<Restaurant[]> {
   return res.data;
 }
 
-export async function getRestaurantById(
-  id: string
-): Promise<Restaurant> {
-  const res = await API.get(`/restaurants/${id}`);
-  return res.data;
+export function getRestaurantById(id:string,signal?:AbortSignal,scopeKey?:string):Promise<Restaurant>{
+  return readJson<Restaurant>(`/restaurants/${encodeURIComponent(id)}`,{signal,scopeKey,suppressErrorToast:true});
 }
 
 export async function createRestaurant(
-  input: RestaurantInput
+  input: RestaurantInput,
+  signal?:AbortSignal
 ): Promise<Restaurant> {
 
   const payload = {
@@ -31,19 +30,21 @@ export async function createRestaurant(
     ...input,
   };
 
-  const res = await API.post("/restaurants", payload);
+  const res = await API.post("/restaurants", payload,{signal,suppressErrorToast:true});
 
   return res.data;
 }
 
 export async function updateRestaurant(
   id: string,
-  input: Partial<RestaurantInput>
+  input: Partial<RestaurantInput>,
+  signal?:AbortSignal
 ): Promise<Restaurant> {
 
   const res = await API.put(
     `/restaurants/${id}`,
-    input
+    input,
+    {signal,suppressErrorToast:true}
   );
 
   return res.data;

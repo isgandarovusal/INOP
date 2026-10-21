@@ -1038,7 +1038,8 @@
         "deletedHint": "The restaurant was deleted or is no longer available.",
         "back": "Back",
         "edit": "Edit",
-        "newAudit": "New audit"
+        "newAudit": "New audit",
+        "historyHint": "Audits conducted at this restaurant will appear here."
       },
       "form": {
         "restaurantName": "Restaurant name",

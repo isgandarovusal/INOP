@@ -2,7 +2,7 @@ import "../auditModern.css";
 import { useTranslation } from "react-i18next";
 import { useAuditResource } from "../../../Hooks/useAuditResource";
 import AuditResourceState from "../../../Components/AuditResourceState";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import {
   AlertCircle,
   ArrowLeft,
@@ -38,6 +38,8 @@ export default function StandardAuditDetail() {
       />
     );
   }
+
+  if(['hrAssessment','serviceAssessment','standardAssessment','hseAssessment'].some(key=>key in audit))return <Navigate to={`/app/audit/audits/${audit.id}`} replace/>;
 
   const compliantCount = audit.results.filter(
     (item) => item.result === "compliant"

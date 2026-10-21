@@ -32,7 +32,7 @@ export default function SafetyAuditDetail() {
     );
   }
 
-  if('hseAssessment' in audit)return <Navigate to={`/app/audit/audits/${audit.id}`} replace/>;
+  if(['hrAssessment','serviceAssessment','standardAssessment','hseAssessment'].some(key=>key in audit))return <Navigate to={`/app/audit/audits/${audit.id}`} replace/>;
   const answered = audit.checks.filter(
     (item) => item.score !== null
   ).length;

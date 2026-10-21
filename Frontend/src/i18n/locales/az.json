@@ -1055,7 +1055,8 @@
         "deletedHint": "Restoran silinmiş və ya artıq mövcud deyil.",
         "back": "Geri",
         "edit": "Redaktə et",
-        "newAudit": "Yeni audit"
+        "newAudit": "Yeni audit",
+        "historyHint": "Bu restoranda aparılmış auditlər burada göstəriləcək."
       },
       "form": {
         "restaurantName": "Restoran adı",
