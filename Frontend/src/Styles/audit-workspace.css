@@ -1,7 +1,6 @@
 @import "../Pages/Audit/auditModern.css";
 /* Audit-only composition; shared HR tokens and primitives remain unchanged. */
 .audit-workspace { min-width: 0; max-width: 100%; color: var(--text-primary); overflow-wrap: anywhere; }
-.audit-workspace button:disabled { cursor: not-allowed; color: var(--text-disabled); background: var(--control-disabled-bg); border-color: var(--control-disabled-border); box-shadow: none; }
 .audit-workspace .hr-section { min-width: 0; margin-bottom: var(--space-5); padding: var(--space-5); background: var(--hr-subtle); border: 1px solid var(--hr-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
 .audit-workspace .hr-section > legend { padding: 0 var(--space-2); font-weight: var(--weight-semibold); }
 .audit-workspace .hr-section > h3 { margin: 0 0 var(--space-4); font-size: 17px; }
@@ -51,7 +50,7 @@
 .audit-workspace.audit-workspace :is(.audit-modern-card-label,.audit-kpi-card > span,.audit-foundation-kpis span) { font-size: 13px; color: var(--hr-slate); text-transform: none; letter-spacing: 0; }
 .audit-workspace.audit-workspace :is(.audit-modern-card-value,.audit-kpi-card > strong,.audit-foundation-kpis strong) { color: var(--hr-navy); font-size: 30px; font-variant-numeric: tabular-nums; }
 .audit-workspace.audit-workspace :is(.btn,.btn-primary,.btn-add,.btn-secondary,.btn-cancel,.btn-danger) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; max-width: 100%; white-space: normal; text-align: center; }
-.audit-workspace.audit-workspace button:disabled { color: var(--text-disabled); background: var(--control-disabled-bg); border-color: var(--control-disabled-border); box-shadow: none; transform: none; }
+.audit-workspace.audit-workspace button:disabled { cursor: not-allowed; color: var(--text-disabled); background: var(--control-disabled-bg); border-color: var(--control-disabled-border); box-shadow: none; transform: none; }
 .audit-workspace.audit-workspace :is(button,a,input,select,textarea,[tabindex]):focus-visible { outline: 2px solid var(--hr-navy); outline-offset: 3px; }
 .audit-workspace.audit-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=search]),select,textarea) { min-width: 0; max-width: 100%; }
 .audit-workspace.audit-workspace textarea { min-height: 100px; resize: vertical; }
@@ -135,9 +134,24 @@
 .audit-hr-page .hr-dialog .modal-card { max-height: calc(100dvh - 32px); overflow-y: auto; }
 @media(max-width:600px) { .audit-hr-page .audit-filter-grid { grid-template-columns: 1fr; } .audit-hr-page .audit-control-row > button { flex: 1 1 140px; } .audit-hr-page .audit-foundation-kpis { grid-template-columns: 1fr 1fr; } .audit-hr-page .audit-foundation-kpis article { padding: 12px; } }
 
-.audit-workspace .service-section-notes{border-top:1px solid var(--hr-border,#e2e8f0);padding-top:1rem;display:grid;gap:1rem}.audit-workspace .service-photo{min-width:0}.audit-workspace .service-photo input{max-width:100%}@media(min-width:1024px){.audit-workspace .service-section-notes{grid-template-columns:1fr 1fr}}
-
-.audit-workspace .service-section-layout{display:grid;gap:1.25rem;min-width:0}.audit-workspace .service-section-layout>div{min-width:0}@media(min-width:1024px){.audit-workspace .service-section-layout{grid-template-columns:minmax(0,1fr) minmax(240px,300px);align-items:start}.audit-workspace .service-section-notes{grid-template-columns:1fr;position:sticky;top:1rem}}
+.service-section-layout { display:grid; gap:var(--space-5); min-width:0; }
+.service-section-layout > div, .service-section-notes, .service-photo { min-width:0; }
+.service-section-notes { border-top:1px solid var(--hr-border); padding-top:var(--space-4); display:grid; gap:var(--space-4); align-content:start; }
+.service-photo { display:grid; gap:var(--space-3); }
+/* Question controls share the available width; no intrinsic auto column can
+   push a file picker or evidence selector outside its question. */
+.audit-hr-question .audit-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+.audit-hr-question .service-photo { grid-column:1 / -1; }
+.audit-hr-question .audit-filter-grid textarea { width:100%; }
+.audit-hr-final-evidence { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+.audit-hr-final-evidence > div { min-width:0; display:grid; gap:var(--space-3); }
+.audit-file-picker { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:var(--space-2); min-width:0; padding:var(--space-3); border:1px dashed var(--hr-border); border-radius:var(--radius-md); background:var(--hr-white); }
+.audit-file-picker__label { grid-column:1 / -1; font-size:13px; font-weight:var(--weight-medium); }
+.audit-file-picker .btn-secondary { justify-self:start; }
+.audit-file-picker__name { overflow-wrap:anywhere; font-size:13px; }
+.audit-file-picker :is(small,p) { grid-column:1 / -1; color:var(--hr-slate); }
+@media(min-width:1200px) { .service-section-layout { grid-template-columns:minmax(0,1fr) minmax(220px,260px); align-items:start; } }
+@media(max-width:600px) { .audit-hr-question .audit-filter-grid, .audit-hr-final-evidence { grid-template-columns:minmax(0,1fr); } }
 
 .audit-workspace .search-field input[type="search"] { padding-left:38px; padding-right:38px; min-height:44px; }
 .audit-draft-form { display:grid; gap:16px; }

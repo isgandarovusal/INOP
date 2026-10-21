@@ -2626,13 +2626,6 @@
 }
 
 /* Upload sections */
-.audit-workspace .audit-modern-page > .audit-modern-card input[type="file"]{
-  min-height:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
 
 .audit-workspace .audit-modern-page > .audit-modern-card [class*="upload"],
 .audit-workspace .audit-modern-page > .audit-modern-card [class*="dropzone"]{
@@ -2801,11 +2794,6 @@
 }
 
 /* File upload areas — target common audit upload containers */
-.audit-workspace .audit-form-page .audit-modern-card input[type="file"]{
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
 
 /* Action row */
 .audit-workspace .audit-form-page .audit-modern-card .form-actions,

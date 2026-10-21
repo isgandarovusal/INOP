@@ -1,3 +1,4 @@
+import AuditFilePicker from '../../../Components/AuditFilePicker';
 import type { FormEvent, SetStateAction } from "react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -494,14 +495,9 @@ function AuditTemplateEditor() {
           </div>
 
           <div className="audit-form-grid">
-            <label>
-              {t("audit.checklist.builder.uploadDocument")}
-              <input
-                type="file"
-                onChange={handleDocumentUpload}
-                disabled={uploading || !canUpload} accept=".pdf,.docx,.doc,.xlsx,.xls,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
-              />
-            </label>
+            <AuditFilePicker translate={t} key={JSON.stringify([id, source.status, documents.map(document=>document.id)])} label={t("audit.checklist.builder.uploadDocument")}
+              onChange={handleDocumentUpload} busy={uploading} status={upload.status} disabled={!canUpload}
+            />
           </div>
 
           <div data-source-state={source.status}>
@@ -555,7 +551,7 @@ function AuditTemplateEditor() {
                   }}
                   className="btn-danger" disabled={removal.busy || !canDeleteDocument}
                 >
-                  Sil
+                  {t("audit.checklist.builder.removeDocument")}
                 </button>
 
 
