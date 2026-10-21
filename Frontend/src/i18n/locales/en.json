@@ -981,7 +981,15 @@
         "details": "Details"
       },
       "edit": {
-        "title": "Edit audit"
+        "title": "Edit audit",
+        "scoreLabels": {
+          "cleanliness": "Cleanliness",
+          "service": "Service",
+          "food": "Food",
+          "staff": "Staff"
+        },
+        "save": "Save changes",
+        "saving": "Saving…"
       },
       "form": {
         "title": "New audit",
@@ -1094,7 +1102,8 @@
     "department": "Department",
     "location": "Location",
     "type": "Job type",
-    "preferredSkills": "Preferred skills"
+    "preferredSkills": "Preferred skills",
+    "rate-limited": "Request limit reached. Try again later."
   },
   "cvReview": {
     "year": "year",
@@ -1791,7 +1800,8 @@
       "forbidden": "You do not have permission to view this audit data.",
       "server-error": "The server could not load this audit data. Please retry.",
       "error": "Audit data could not be loaded. Please retry.",
-      "timeout": "The request timed out. Please retry."
+      "timeout": "The request timed out. Please retry.",
+      "rate-limited": "Request limit reached. Try again later."
     }
   },
   "hrAudit": {
@@ -2457,6 +2467,16 @@
       "service": "Review guest experience and service processes against approved criteria.",
       "standard": "Review brand standards using Critical, Major, Minor, Compliant and N/A outcomes.",
       "occupational-safety": "Separate occupational safety methods for restaurants, offices and warehouses."
-    }
+    },
+    "templateNextStep": "An audit manager must review and activate the version. A draft requires an active template."
+  },
+  "auditFiles": {
+    "choose": "Choose file",
+    "uploading": "Uploading…",
+    "none": "No file selected",
+    "limit": "Maximum 5 MB. Supported image and document formats.",
+    "invalid": "The file is empty, exceeds 5 MB or has an unsupported format.",
+    "retry": "Select the file again to retry.",
+    "imageLimit": "PNG, JPG, GIF and WebP. Maximum 5 MB."
   }
 }

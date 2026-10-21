@@ -23,6 +23,7 @@ const RestaurantDetail: React.FC = () => {
   const [audits, setAudits] = useState<Audit[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -64,7 +65,7 @@ const RestaurantDetail: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, revision]);
 
   const history = useMemo(
     () =>
@@ -98,7 +99,7 @@ const RestaurantDetail: React.FC = () => {
           <button
             type="button"
             className="btn-secondary"
-            onClick={() => window.location.reload()}
+            onClick={() => setRevision(value => value + 1)}
           >
             {t("common.retry")}
           </button>

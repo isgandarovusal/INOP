@@ -169,7 +169,7 @@ const AuditDetail: React.FC = () => {
   const { user } = useAuth();
   const canManage = user ? canManageAudit(user) : false;
 
-  const { data: audit, status, reload } = useAuditResource(id, "audit", getAuditById);
+  const { data: audit, status, reload } = useAuditResource(id, "audit", getAuditById, {retainOnReload:true});
   const relationsKey = JSON.stringify([
     audit?.restaurantId, audit?.auditorId,
     hasPermission(user, 'restaurant', 'read'), hasPermission(user, 'user', 'read'),

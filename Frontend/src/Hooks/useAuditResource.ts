@@ -3,12 +3,13 @@ import { isAxiosError } from "axios";
 import { useAuth } from "../Context/useAuth";
 import { getPermissionScope } from "../Utils/permissions";
 
-export type AuditLoadStatus = "loading" | "ready" | "not-found" | "unauthenticated" | "forbidden" | "server-error" | "error" | "timeout";
+export type AuditLoadStatus = "loading" | "ready" | "not-found" | "unauthenticated" | "forbidden" | "server-error" | "rate-limited" | "error" | "timeout";
 
 export function auditErrorStatus(error: unknown): AuditLoadStatus {
   const status = isAxiosError(error) ? error.response?.status : undefined;
   if (status === 401) return "unauthenticated";
   if (status === 403) return "forbidden";
+  if (status === 429) return "rate-limited";
   if (status === 404) return "not-found";
   if (status && status >= 500) return "server-error";
   return "error";

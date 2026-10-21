@@ -45,9 +45,10 @@ export async function createAudit(
 
 export async function updateAudit(
   id: string,
-  input: Partial<AuditInput>
+  input: Partial<AuditInput>,
+  signal?: AbortSignal
 ) {
-  const res = await API.put(`/audits/${id}`, input);
+  const res = await API.put(`/audits/${id}`, input, {signal,suppressErrorToast:true});
   return res.data;
 }
 
