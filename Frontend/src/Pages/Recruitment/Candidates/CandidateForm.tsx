@@ -82,6 +82,7 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
   const [existingCvName, setExistingCvName] = useState<string | null>(initial?.cvOriginal?.originalName ?? initial?.cvUrl?.split("/").pop() ?? source?.original.originalName ?? null);
   
   const parsing = useRef<{ sequence: number; controller?: AbortController }>({ sequence: 0 });
+  const extractedDraft = useRef<{ text: Record<string, string>; lists: Record<string, string[]>; experience: number | null; histories: Record<string, CvHistoryEntry[]> } | null>(null);
   const [sourceChanged, setSourceChanged] = useState(false), [sourceEpoch, setSourceEpoch] = useState(0);
   const [accessDenied, setAccessDenied] = useState<"unauthenticated" | "forbidden" | "not-found" | null>(null);
   const [saving, setSaving] = useState(false);
@@ -111,6 +112,22 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
     // A rejected selection does not replace the current source or its approval.
     if (file && !validateCvFile(file)) return;
     if (!file && !cvFile) return;
+    // A replacement must not inherit another CV's extracted facts. Keep HR
+    // edits: only clear values still equal to the previous automatic fill.
+    const previous = extractedDraft.current;
+    if (previous) {
+      for (const [field, setter] of [["name", setName], ["role", setRole], ["email", setEmail], ["phone", setPhone], ["education", setEducation]] as const) {
+        if (previous.text[field]) setter(current => current === previous.text[field] ? "" : current);
+      }
+      for (const [field, setter] of [["skills", setSkills], ["languages", setLanguages], ["certificates", setCertificates]] as const) {
+        if (previous.lists[field]?.length) setter(current => JSON.stringify(current) === JSON.stringify(previous.lists[field]) ? [] : current);
+      }
+      setExperience(current => current === previous.experience ? null : current);
+      for (const [field, setter] of [["employmentHistory", setEmploymentHistory], ["educationHistory", setEducationHistory], ["certificationHistory", setCertificationHistory]] as const) {
+        if (previous.histories[field]?.length) setter(current => JSON.stringify(current) === JSON.stringify(previous.histories[field]) ? [] : current);
+      }
+      extractedDraft.current = null;
+    }
     setProcessingApproval(undefined);setConfirmReview(false);setIntakeSource(undefined);
     setDocumentError('');retrySourceCommand.current=null;
     setSourceEpoch(value => value + 1);
@@ -159,6 +176,12 @@ const CandidateFormFields: React.FC<{ initial?: Candidate; job?: Job; processing
       if (parsed.skills?.length) setSkills(parsed.skills);
       if (parsed.languages?.length) setLanguages(parsed.languages);
       if (parsed.certificates?.length) setCertificates(parsed.certificates);
+      extractedDraft.current = {
+        text: { name: parsed.name || "", role: parsed.role || "", email: parsed.email || "", phone: parsed.phoneRaw || parsed.phone || "", education: parsed.education || "" },
+        lists: { skills: parsed.skills ?? [], languages: parsed.languages ?? [], certificates: parsed.certificates ?? [] },
+        experience: parsed.experience ?? null,
+        histories: { employmentHistory: parsed.employmentHistory ?? [], educationHistory: parsed.educationHistory ?? [], certificationHistory: parsed.certificationHistory ?? [] },
+      };
 
       toast.success(t("cvReview.extracted"));
     } catch (err: unknown) {

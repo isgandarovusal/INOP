@@ -29,7 +29,32 @@ test('Full HR shell uses real scoped data and a consistent responsive keyboard-a
   await h.page.locator('.hr-dashboard-summary').getByRole('heading',{name:'Recruitment',exact:true}).waitFor();assert.equal(h.wire.length,count);
   await h.page.evaluate(()=>window.changeLanguage('az'));assert.equal(h.wire.length,count);
  });
- await t.test('Actual sidebar removes all HR links when department changes, without dropping Audit links',async()=>{
+  await t.test('replacing a CV clears only prior extracted facts, including failed replacement, and preserves HR edits',async()=>{
+    const {docx}=require('../../Backend/tests/helpers/cvDocuments.cjs');
+    await h.open('admin','/app/recruitment/candidates/new');await h.page.locator('input[name=name]').waitFor();
+    const select=async(name,text)=>{
+      const response=h.page.waitForResponse(r=>r.url().includes('/candidates/parse-cv'));
+      await h.page.locator('input[type=file]').setInputFiles({name:name+'.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:docx(text)});
+      const result=await response;assert.equal(result.status(),200);await result.json();
+      await h.page.waitForFunction(value=>document.querySelector('input[name=name]').value===value,name);
+    };
+    await select('Synthetic First','Name: Synthetic First\nEmail: first@example.invalid\nPhone: +994 50 123 45 67\nSkills\nHACCP\nExperience\n2 years');
+    assert.equal(await h.page.locator('input[name=email]').inputValue(),'first@example.invalid');
+    await select('Synthetic Second','Name: Synthetic Second');
+    assert.equal(await h.page.locator('input[name=email]').inputValue(),'');assert.equal(await h.page.locator('input[name=phone]').inputValue(),'');
+    assert.equal(await h.page.getByRole('button',{name:/Sil HACCP/}).count(),0);
+    await select('Synthetic Third','Name: Synthetic Third\nEmail: third@example.invalid\nPhone: +994 50 123 45 67');
+    await h.page.locator('input[name=email]').fill('hr-reviewed@example.invalid');
+    const failure=h.page.waitForResponse(r=>r.url().includes('/candidates/parse-cv'));
+    await h.page.route('**/api/candidates/parse-cv',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({code:'DOCUMENT_BUSY',processingStatus:'failed'})}));
+    try{
+      await h.page.locator('input[type=file]').setInputFiles({name:'failed.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:docx('Synthetic failed replacement')});
+      assert.equal((await failure).status(),503);
+      assert.equal(await h.page.locator('input[name=email]').inputValue(),'hr-reviewed@example.invalid');
+      assert.equal(await h.page.locator('input[name=phone]').inputValue(),'');assert.equal(await h.page.locator('input[name=name]').inputValue(),'');
+    }finally{await h.page.unroute('**/api/candidates/parse-cv');}
+  });
+  await t.test('Actual sidebar removes all HR links when department changes, without dropping Audit links',async()=>{
   await h.page.setViewportSize({width:1280,height:900});await h.open('admin','/app/recruitment/jobs');await h.page.locator('.admin-table-container').waitFor();
   assert.ok(await h.page.locator('.admin-layout a[href^="/app/recruitment/"]').count()>=3);
   const profile=await h.profile('admin');profile.role='auditor';profile.departmentId='dep_audit';profile.hrAccess=false;profile.auditDirection='hr';profile.auditDirections=['hr'];profile.permissions=[{resource:'audit',action:'read',scope:'all'},{resource:'audit.hr',action:'read',scope:'all'}];
