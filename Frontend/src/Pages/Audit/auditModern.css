@@ -785,12 +785,11 @@
 .audit-workspace .audit-severity-label span,
 .audit-workspace .audit-safety-score-label span,
 .audit-workspace .audit-service-time-row > span {
-  overflow: hidden;
+  min-width: 0;
   color: #737d8a;
   font-size: 11.5px;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .audit-workspace .audit-severity-label strong,
@@ -1198,9 +1197,13 @@
     grid-template-columns: 1fr;
   }
 
-  .audit-workspace .audit-severity-row,
-.audit-workspace .audit-service-time-row,
-.audit-workspace .audit-safety-score-row {
+  .audit-workspace .audit-severity-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .audit-workspace .audit-service-time-row,
+  .audit-workspace .audit-safety-score-row {
     grid-template-columns: minmax(95px, 0.42fr) minmax(100px, 1fr) auto;
     gap: 9px;
   }

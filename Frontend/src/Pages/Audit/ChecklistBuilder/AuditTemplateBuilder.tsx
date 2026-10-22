@@ -106,7 +106,7 @@ function AuditTemplateEditor() {
 
   const { user, isLoading } = useAuth();
   const catalog = useAuditResource('catalog', 'restaurant', getAuditCatalog);
-  const primary = useAuditResource(id, "audit.template", getAuditTemplate);
+  const primary = useAuditResource(id, "audit.template", getAuditTemplate, {retainOnReload:true});
   const source = useAuditResource(id || "__new__", "audit.source_document", loadDocuments);
   const [draft, setDraft] = useState<Partial<AuditTemplate> | null>(null);
   const template = draft || primary.data || emptyTemplate();
@@ -115,6 +115,9 @@ function AuditTemplateEditor() {
   const upload = useAuditAction(id || "__new__", "audit.source_document", "create");
   const removal = useAuditAction(id || "__new__", "audit.source_document", "delete");
   const preview = usePrivateFile(JSON.stringify([id, user?.id, user?.role, user?.permissions, source.status]));
+  // A native chooser returns focus before its change event. Refetch status
+  // must not remount that input; explicit removal still clears its local name.
+  const [pickerRevision, setPickerRevision] = useState(0);
   const [previewName, setPreviewName] = useState("");
   const [previewDocumentId, setPreviewDocumentId] = useState("");
   const download = useAuditAction(id || "__new__", "audit.source_document", "read");
@@ -136,13 +139,14 @@ function AuditTemplateEditor() {
           brandId: template.brandId || "", auditType: template.auditType || "service",
         }, signal);
         if (!signal.aborted) setTemplate(current => ({ ...current, sourceDocumentIds: [...(current.sourceDocumentIds || []), uploaded.id] }));
-      }, source.reload);
+      }, () => { setPickerRevision(revision => revision + 1); source.reload(); });
     } finally { input.value = ""; }
   }
 
   async function removeSourceDocument(documentId: string) {
     await removal.run(signal => deleteAuditSourceDocument(documentId, signal), () => {
       preview.close();
+      setPickerRevision(revision => revision + 1);
       setTemplate(current => ({ ...current, sourceDocumentIds: (current.sourceDocumentIds || []).filter(item => item !== documentId) }));
       source.reload();
     });
@@ -495,7 +499,7 @@ function AuditTemplateEditor() {
           </div>
 
           <div className="audit-form-grid">
-            <AuditFilePicker translate={t} key={JSON.stringify([id, source.status, documents.map(document=>document.id)])} label={t("audit.checklist.builder.uploadDocument")}
+            <AuditFilePicker translate={t} key={JSON.stringify([id, pickerRevision, source.status === "loading" ? "ready" : source.status])} label={t("audit.checklist.builder.uploadDocument")}
               onChange={handleDocumentUpload} busy={uploading} status={upload.status} disabled={!canUpload}
             />
           </div>

@@ -62,28 +62,28 @@ export default function StandardAuditDetail() {
   const severityData = [
     {
       key: "critical",
-      label: "CRITICAL",
+      label: t(resultLabelKeys.critical),
       value: audit.foundCritical,
       icon: <ShieldAlert size={18} />,
       className: "critical",
     },
     {
       key: "major",
-      label: "MAJOR",
+      label: t(resultLabelKeys.major),
       value: audit.foundMajor,
       icon: <CircleAlert size={18} />,
       className: "major",
     },
     {
       key: "minor",
-      label: "MINOR",
+      label: t(resultLabelKeys.minor),
       value: audit.foundMinor,
       icon: <AlertCircle size={18} />,
       className: "minor",
     },
     {
       key: "compliant",
-      label: "COMPLIANT",
+      label: t(resultLabelKeys.compliant),
       value: compliantCount,
       icon: <CheckCircle2 size={18} />,
       className: "compliant",
@@ -322,7 +322,7 @@ export default function StandardAuditDetail() {
 
           <div>
             <span>{t("audit.standard.detail.status")}</span>
-            <strong>{audit.status}</strong>
+            <strong>{t(`auditFoundation.statusLabels.${audit.status}`, { defaultValue: audit.status })}</strong>
           </div>
         </div>
       </section>
