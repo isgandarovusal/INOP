@@ -24,7 +24,7 @@ function LegacyAuditEditor({audit}:{audit:Audit}){
     <textarea id="audit-edit-comments" className="input-field" value={comments} onChange={e=>setComments(e.target.value)}/>
    </FormSection>
    {action.status!=='ready'&&action.status!=='loading'&&<AuditResourceState status={action.status}/>}
-   <div className="audit-control-row"><Link className="btn-cancel" to={`/app/audit/audits/${audit.id}`}>{t('common.cancel')}</Link><button type="submit" className="btn-primary" disabled={!action.allowed||action.busy}>{t(action.busy?'audit.generic.edit.saving':'audit.generic.edit.save')}</button></div>
+   <div className="audit-control-row"><Link className="btn-cancel" to={`/app/audit/audits/${audit.id}`}>{t('common.actions.cancel')}</Link><button type="submit" className="btn-primary" disabled={!action.allowed||action.busy}>{t(action.busy?'audit.generic.edit.saving':'audit.generic.edit.save')}</button></div>
   </form>
  </div>;
 }

@@ -32,7 +32,7 @@ function RestaurantEditor({restaurant}:{restaurant?:Restaurant}){
    </FormSection>
    {error&&<p id="restaurant-form-error" className="form-error form-error--submit" role="alert">{t(error)}</p>}
    {action.status!=='ready'&&action.status!=='loading'&&<AuditResourceState status={action.status}/>}
-   <div className="form-actions"><button type="button" className="btn-cancel" disabled={action.busy} onClick={()=>navigate('/app/audit/restaurants')}>{t('common.cancel')}</button><button type="submit" className="btn-primary" disabled={!action.allowed||action.busy}>{t(action.busy?'audit.restaurants.form.saving':isEdit?'audit.restaurants.form.save':'adminUI.addRestaurant')}</button></div>
+   <div className="form-actions"><button type="button" className="btn-cancel" disabled={action.busy} onClick={()=>navigate('/app/audit/restaurants')}>{t('common.actions.cancel')}</button><button type="submit" className="btn-primary" disabled={!action.allowed||action.busy}>{t(action.busy?'audit.restaurants.form.saving':isEdit?'audit.restaurants.form.save':'adminUI.addRestaurant')}</button></div>
   </form>
  </div>;
 }
