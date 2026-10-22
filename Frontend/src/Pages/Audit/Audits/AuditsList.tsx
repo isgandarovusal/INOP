@@ -150,6 +150,7 @@ const AuditsListContent: React.FC = () => {
         <select
           className="input-field"
           style={{ width: 200 }}
+          aria-label={t("audit.generic.list.allRestaurants")}
           value={restaurantFilter}
           onChange={(e) => setRestaurantFilter(e.target.value)}
         >
@@ -163,6 +164,7 @@ const AuditsListContent: React.FC = () => {
         <select
           className="input-field"
           style={{ width: 180 }}
+          aria-label={t("audit.generic.list.allAuditors")}
           value={auditorFilter}
           onChange={(e) => setAuditorFilter(e.target.value)}
         >
@@ -179,6 +181,8 @@ const AuditsListContent: React.FC = () => {
           max={10}
           className="input-field"
           style={{ width: 140 }}
+          aria-label={t("audit.generic.list.minScore")}
+          title={t("audit.generic.list.minScore")}
           placeholder={t("audit.generic.list.minScore")}
           value={minScore}
           onChange={(e) => setMinScore(e.target.value)}
@@ -198,7 +202,7 @@ const AuditsListContent: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>{t("audit.generic.list.restaurant")}</th>
+              <th>{t("hseAudit.object")}</th>
               <th>{t("audit.generic.list.auditor")}</th>
               <th>{t("audit.generic.list.date")}</th>
               <th>{t("audit.generic.list.type")}</th>
@@ -248,7 +252,7 @@ const AuditsListContent: React.FC = () => {
               rows.map(({ audit, restaurant, auditor, overall }) => (
                 <tr key={audit.id} className={deletingId === audit.id ? "row--removing" : ""}>
                   <td className="cell-title">
-                    <Link className="cell-title--clickable" to={`/app/audit/audits/${audit.id}`}>{restaurant?.name ?? t("auditPresentation.unknown")}</Link>
+                    <Link className="cell-title--clickable" to={`/app/audit/audits/${audit.id}`}>{restaurant?.name ?? audit.hseObjectSnapshot?.name ?? t("auditPresentation.unknown")}</Link>
                   </td>
                   <td className="cell-muted">{auditor?.name ?? t("auditPresentation.unknown")}</td>
                   <td>{audit.date}</td>
