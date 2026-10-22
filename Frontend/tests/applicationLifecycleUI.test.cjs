@@ -111,7 +111,7 @@ test('Application UI persists scoped workflow, handles conflicts and discards st
   await t.test('Candidate cards no longer perform a candidate-global recruitment workflow', async () => {
     await h.open('admin', '/app/recruitment/candidates'); await h.page.getByText('Workflow applicant', { exact: true }).waitFor();
     await h.page.getByTitle('Namizəd kartları', { exact: true }).click(); await h.page.locator('.hr-candidate-grid').waitFor();
-    assert.equal(await h.page.locator('[data-rfd-drag-handle-draggable-id]').count(), 0); await h.page.getByRole('button', { name: 'Application Kanban', exact: true }).click();
+    assert.equal(await h.page.locator('[data-rfd-drag-handle-draggable-id]').count(), 0); await h.page.getByRole('button', { name: 'Müraciət mərhələləri', exact: true }).click();
     await h.page.waitForURL('**/applications?view=board'); await card(first._id).waitFor();
   });
   for (const [status, state] of [[401, 'unauthenticated'], [403, 'forbidden'], [404, 'not-found'], [500, 'server-error']]) await t.test(`primary ${status} has a distinct state`, async () => {
