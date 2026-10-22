@@ -21,6 +21,18 @@ test('Scanned private Source uses real local OCR, preserves original and require
     const approval = await queue.approve(req, item.id, input), candidate = await Candidate.findById(approval.candidateId);
     assert.equal(candidate.cvReview.version, 'ocr-rules-1'); assert.equal(candidate.cvReview.reviewStatus, 'confirmed'); assert.equal(candidate.status, 'new'); assert.equal(candidate.phone, '+994501234567');
   });
+  await t.test('default multilingual OCR maps literal RU HACCP homographs through the actual Source pipeline with HR-only review', async () => {
+    const bytes = await scanned('Имя: Синтетический Кандидат\nТелефон: +994 50 123 45 67\nНавыки\nПищевая безопасность\nHACCP');
+    const engine = createOcrEngine({enabled:true,dataDirectory:directory});
+    const queue = createIntake({...options,ocrEngine:engine});
+    const item = await queue.enqueue(req,{buffer:bytes,originalname:'synthetic-ru.pdf',mimetype:'application/pdf'},crypto.randomUUID());
+    await queue.runOnce(1);const source=await queue.get(req,item.id);
+    assert.equal(source.state,'ready');assert.ok(source.result.parsed.skills.includes('HACCP'));assert.ok(source.result.parsed.skills.includes('Food safety'));
+    assert.equal(source.result.requiresApproval,true);assert.equal(source.result.review.reviewStatus,'pending');
+    assert.ok(Object.values(source.result.review.fields).every(field=>field.confidence===null));
+    assert.ok(source.result.review.fields.skills.evidence.some(value=>/HACCP|НАССР|ХАССП/.test(value)));
+    assert.deepEqual((await queue.original(req,item.id)).bytes,bytes);
+  });
   await t.test('malformed OCR output and quarantine never become ready facts', async () => {
     const queue = createIntake({ ...options, ocrEngine: { extract: async () => ({ text: 'fabricated', pages: 1, engine: { provider: 'mock' } }) } });
     const item = await queue.enqueue(req, file, crypto.randomUUID()); await queue.runOnce(1); const source = await queue.get(req, item.id);

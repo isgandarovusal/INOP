@@ -1,4 +1,8 @@
 const SECTION_ALIASES = {
+  additional: [
+    "additional information", "additional professional information",
+    "əlavə məlumat", "əlavə məlumatlar", "дополнительная информация", "дополнительные сведения",
+  ],
   summary: [
     "summary",
     "profile",

@@ -3,6 +3,13 @@ const {DocumentWorkerPool,MAX_BYTES}=require('../services/documentWorkerPool.ser
 const {extractCvTextFromBuffer,extractCvResultFromBuffer,parseCvResultFromBuffer}=require('../services/cvParser.service');
 const docs=require('./helpers/cvDocuments.cjs');
 const workerFile=path.join(__dirname,'helpers/documentTestWorker.cjs');
+test('Education ends at exact additional-information headings across AZ/EN/RU without truncating school text',async()=>{
+ for(const [heading,school,next]of [['Education','Secondary school','Additional professional information'],['Təhsil','Tam orta təhsil','Əlavə məlumatlar'],['Образование','Среднее образование','Дополнительная информация']]){
+  const text='Name: Synthetic Education\n'+heading+'\n'+school+'\n'+next+'\nAvailable on weekends';
+  const out=await parseCvResultFromBuffer(docs.docx(text),'synthetic.docx');assert.equal(out.parsed.education,school);assert.equal(out.parsed.sections.additional,'Available on weekends');
+ }
+ const out=await parseCvResultFromBuffer(docs.docx('Name: Synthetic Education\nEducation\nUniversity — Additional information studies\nGraduate degree'),'school.docx');assert.equal(out.parsed.education,'University — Additional information studies\nGraduate degree');
+});
 test('Document workers bound CPU, queues, diagnostics, inputs and cancellation',async t=>{
  await t.test('CPU-bound worker leaves the parent responsive and queue is bounded',async()=>{
   const p=new DocumentWorkerPool({workerFile,concurrency:1,maxQueue:1});let ticks=0;const timer=setInterval(()=>ticks++,5);
