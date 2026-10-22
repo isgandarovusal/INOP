@@ -74,7 +74,7 @@ export default function SafetyAuditDetail() {
             className="btn-secondary"
           >
             <ArrowLeft size={15} />
-            Geri
+            {t("common.actions.back")}
           </Link>
         }
       />
@@ -310,7 +310,7 @@ export default function SafetyAuditDetail() {
 
           <div>
             <span>{t("audit.safety.detail.status")}</span>
-            <strong>{audit.status}</strong>
+            <strong>{t(`auditFoundation.statusLabels.${audit.status}`, { defaultValue: audit.status })}</strong>
           </div>
         </div>
       </section>

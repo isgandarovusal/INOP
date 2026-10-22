@@ -390,7 +390,7 @@ function AuditTemplateEditor() {
           form="audit-template-form"
           type="submit"
           className="btn-primary"
-          disabled={saving || (id != null && template.status !== "draft")}
+          disabled={saving || getPermissionScope(user, "audit.template", id ? "update" : "create") !== "all" || (id != null && template.status !== "draft")}
         >
           {saving ? t("audit.checklist.builder.saving") : t("audit.checklist.builder.save")}
         </button>
@@ -824,7 +824,7 @@ function QuestionEditor({
         {question.answerType==='hr-score'&&<option value="hr-score">HR: 0 / 0.5 / 1 / N/A</option>}
         <option value="yes-no-na">{t("audit.checklist.builder.yesNoNa")}</option>
         <option value="severity">
-          Compliant / Minor / Major / Critical
+          {t("audit.checklist.builder.severity")}
         </option>
         <option value="score">{t("audit.checklist.builder.score")}</option>
         <option value="text">{t("audit.checklist.builder.text")}</option>

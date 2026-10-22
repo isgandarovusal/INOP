@@ -1,5 +1,4 @@
 import "../auditModern.css";
-import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ClipboardList,
@@ -11,34 +10,30 @@ import {
   getAuditTemplates,
   deleteAuditTemplate,
 } from "../../../Services/auditTemplatesService";
-import type { AuditTemplate } from "../../../Types/Audit";
 import { useTranslation } from "react-i18next";
+
+import {useAuth} from "../../../Context/useAuth";
+import {useAuditResource} from "../../../Hooks/useAuditResource";
+import {useAuditAction} from "../../../Hooks/useAuditAction";
+import {getPermissionScope} from "../../../Utils/permissions";
+import AuditResourceState from "../../../Components/AuditResourceState";
+
+const loadTemplates = (_id:string, signal?:AbortSignal, scopeKey?:string) => getAuditTemplates(undefined,signal,scopeKey);
 
 export default function AuditTemplatesList() {
   const { t } = useTranslation();
   const location = useLocation();
   const message = location.state?.message;
-  const [templates, setTemplates] = useState<AuditTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  async function load() {
-    try {
-      setLoading(true);
-      setTemplates(await getAuditTemplates());
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    void load();
-  }, []);
-
-  async function removeTemplate(id: string) {
-    if (!window.confirm(t("audit.checklist.list.deleteConfirm"))) return;
-
-    await deleteAuditTemplate(id);
-    await load();
+  const {user}=useAuth();
+  const resource=useAuditResource('directory','audit.template',loadTemplates,{refreshOnFocus:false,deadlineMs:15000});
+  const templates=resource.data||[];
+  const removal=useAuditAction('directory','audit.template','delete');
+  const canCreate=getPermissionScope(user,'audit.template','create')==='all';
+  const canUpdate=getPermissionScope(user,'audit.template','update')==='all';
+  const canDelete=getPermissionScope(user,'audit.template','delete')==='all';
+  function removeTemplate(id:string){
+    if(!canDelete||!window.confirm(t("auditFoundation.retireConfirm")))return;
+    void removal.run(signal=>deleteAuditTemplate(id,signal),resource.reload);
   }
 
   return (
@@ -56,26 +51,18 @@ export default function AuditTemplatesList() {
           </p>
         </div>
 
-        <Link
+        {canCreate&&<Link
           to="/app/audit/checklists/new"
           className="btn-primary checklist-create-action"
         >
           <Plus size={18} />
           {t("audit.checklist.list.create")}
-        </Link>
+        </Link>}
       </div>
 
-      {message && (
-        <div className="audit-success-message">
-          {message}
-        </div>
-      )}
 
-      {loading ? (
-        <div className="audit-card">
-          {t("audit.checklist.list.loading")}
-        </div>
-      ) : templates.length === 0 ? (
+      {canDelete&&removal.status!=="ready"&&removal.status!=="loading"&&<AuditResourceState status={removal.status}/>}
+      {resource.status!=="ready" ? <AuditResourceState status={resource.status} retry={resource.reload}/> : templates.length === 0 ? (
         <div className="audit-modern-empty checklist-empty-state">
           <div className="audit-empty-icon">
             <ClipboardList size={30} />
@@ -97,7 +84,7 @@ export default function AuditTemplatesList() {
                 </div>
 
                 <span
-                  className={`audit-status-badge ${t(`audit.checklist.status.${template.status}`, { defaultValue: template.status })}`}
+                  className={`audit-status-badge ${template.status}`}
                 >
                   {t(`audit.checklist.status.${template.status}`, { defaultValue: template.status })}
                 </span>
@@ -108,7 +95,7 @@ export default function AuditTemplatesList() {
               <div className="audit-template-meta">
                 <strong>{template.brandName}</strong>
                 <span>
-                  {t(`audit.checklist.types.${template.auditType === "occupational-safety" ? "occupationalSafety" : template.auditType}`)}
+                  {template.auditType==='hr'?t('hrAudit.title'):t(`audit.checklist.types.${template.auditType === "occupational-safety" ? "occupationalSafety" : template.auditType}`)}
                 </span>
                 <span>v{template.version}</span>
               </div>
@@ -139,17 +126,18 @@ export default function AuditTemplatesList() {
                   to={`/app/audit/checklists/${template.id}`}
                   className="btn-secondary"
                 >
-                  İdarə et
+                  {t(canUpdate?"audit.checklist.list.manage":"common.actions.view")}
                   <ChevronRight size={16} />
                 </Link>
 
-                <button
+                {canDelete&&<button
                   type="button"
                   className="btn-danger"
+                  disabled={removal.busy||template.status==='archived'}
                   onClick={() => void removeTemplate(template.id)}
                 >
-                  Sil
-                </button>
+                  {t("auditFoundation.retire")}
+                </button>}
               </div>
             </article>
           ))}

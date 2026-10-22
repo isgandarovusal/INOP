@@ -6,7 +6,7 @@ export async function getAuditTemplates(params?: {
   brandId?: string;
   auditType?: string;
   status?: string;
-}): Promise<AuditTemplate[]> {
+}, signal?: AbortSignal, scopeKey?: string): Promise<AuditTemplate[]> {
   const query = new URLSearchParams();
 
   if (params?.brandId) query.set("brandId", params.brandId);
@@ -16,7 +16,7 @@ export async function getAuditTemplates(params?: {
   const suffix = query.toString() ? `?${query}` : "";
 
   return readJson<AuditTemplate[]>(
-    `/audit-templates${suffix}`
+    `/audit-templates${suffix}`, {signal, scopeKey, suppressErrorToast:Boolean(scopeKey)}
   );
 }
 
@@ -40,7 +40,7 @@ export async function updateAuditTemplate(
 }
 
 export async function deleteAuditTemplate(
-  id: string
+  id: string, signal?: AbortSignal
 ): Promise<void> {
-  await api.delete(`/audit-templates/${encodeURIComponent(id)}`);
+  await api.delete(`/audit-templates/${encodeURIComponent(id)}`, {signal, suppressErrorToast:Boolean(signal)});
 }

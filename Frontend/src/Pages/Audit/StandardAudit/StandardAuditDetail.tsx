@@ -98,7 +98,7 @@ export default function StandardAuditDetail() {
         actions={
           <Link to="/app/audit/standard" className="btn-secondary">
             <ArrowLeft size={15} />
-            Geri
+            {t("common.actions.back")}
           </Link>
         }
       />

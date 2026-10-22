@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ClipboardCheck, Loader2, Plus, Archive } from "lucide-react";
 import PageHeader from "../../../Components/PageHeader";
 import EmptyState from "../../../Components/EmptyState";
@@ -18,7 +18,7 @@ import { auditScore } from "../../../Utils/auditScore";
 
 const scoreTone = (score: number) => (score >= 8 ? "success" : score >= 6 ? "warning" : "danger");
 
-const AuditsList: React.FC = () => {
+const AuditsListContent: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -247,15 +247,12 @@ const AuditsList: React.FC = () => {
             ) : (
               rows.map(({ audit, restaurant, auditor, overall }) => (
                 <tr key={audit.id} className={deletingId === audit.id ? "row--removing" : ""}>
-                  <td
-                    className="cell-title cell-title--clickable"
-                    onClick={() => navigate(`/app/audit/audits/${audit.id}`)}
-                  >
-                    {restaurant?.name ?? "Unknown"}
+                  <td className="cell-title">
+                    <Link className="cell-title--clickable" to={`/app/audit/audits/${audit.id}`}>{restaurant?.name ?? t("auditPresentation.unknown")}</Link>
                   </td>
-                  <td className="cell-muted">{auditor?.name ?? "Unknown"}</td>
+                  <td className="cell-muted">{auditor?.name ?? t("auditPresentation.unknown")}</td>
                   <td>{audit.date}</td>
-                  <td>{audit.auditType}</td>
+                  <td>{t(`auditFoundation.directions.${audit.auditType}`,{defaultValue:audit.auditType})}</td>
                   <td>
                     <Badge tone={overall === null ? "neutral" : scoreTone(overall)}>{overall?.toFixed(1) ?? "—"} / 10</Badge>
                   </td>
@@ -298,4 +295,8 @@ const AuditsList: React.FC = () => {
   );
 };
 
-export default AuditsList;
+// Authority changes invalidate cached rows before the next effect can run.
+export default function AuditsList(){
+ const {user}=useAuth();
+ return <AuditsListContent key={JSON.stringify([user?.id,user?.role,user?.departmentId,user?.auditDirection,user?.auditDirections,user?.hrAccess,user?.permissions])}/>;
+}

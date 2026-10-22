@@ -13,7 +13,7 @@ import type { Restaurant, Audit } from "../../../Types/audit";
 import { useAuth } from "../../../Context/AuthContext";
 import { canManageAudit } from "../../../Utils/permissions";
 
-const RestaurantDetail: React.FC = () => {
+const RestaurantDetailContent: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -205,4 +205,8 @@ const RestaurantDetail: React.FC = () => {
   );
 };
 
-export default RestaurantDetail;
+// Authority changes invalidate cached rows before the next effect can run.
+export default function RestaurantDetail(){
+ const {user}=useAuth();const {id}=useParams();
+ return <RestaurantDetailContent key={JSON.stringify([id,user?.id,user?.role,user?.departmentId,user?.auditDirection,user?.auditDirections,user?.hrAccess,user?.permissions])}/>;
+}
