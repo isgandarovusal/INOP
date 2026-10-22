@@ -49,6 +49,7 @@ export interface Job {
 }
 
 export type CandidateStatus =
+  | "unknown"
   | "new"
   | "applied"
   | "screening"

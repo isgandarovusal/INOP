@@ -398,7 +398,8 @@
       "screening": "Screening",
       "shortlisted": "Shortlisted",
       "rejected": "Rejected",
-      "hired": "Hired"
+      "hired": "Hired",
+      "unknown": "Unknown profile status"
     },
     "candidateDetail": {
       "notFound": "Candidate not found",
@@ -2479,5 +2480,19 @@
     "invalid": "The file is empty, exceeds 5 MB or has an unsupported format.",
     "retry": "Select the file again to retry.",
     "imageLimit": "PNG, JPG, GIF and WebP. Maximum 5 MB."
+  },
+  "recruitmentSemantics": {
+    "activeProfilesJobs": "Vacancies · unarchived",
+    "activeProfiles": "Active candidate profiles",
+    "applicationTotal": "Applications to accessible vacancies",
+    "shortlistedApplications": "Shortlisted applications",
+    "profileStatus": "Profile status",
+    "profileStatuses": "Candidate profile statuses",
+    "allProfileStatuses": "All profile statuses",
+    "profileHelp": "Profile status is not an application stage. Track each vacancy’s stage in Applications.",
+    "applicationStages": "Application stages",
+    "applicationHelp": "This list follows your application permissions. Dashboard and analytics count applications to visible vacancies; archived profiles retain application history.",
+    "dashboardHelp": "Application history includes archived profiles and vacancies. Profiles and applications are counted separately.",
+    "unknownStages": "{{count}} applications have an unknown stage and remain included in the total."
   }
 }

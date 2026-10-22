@@ -415,7 +415,8 @@
       "interview": "Müsahibə",
       "offer": "Təklif verilib",
       "hired": "İşə qəbul edilib",
-      "rejected": "Rədd edilib"
+      "rejected": "Rədd edilib",
+      "unknown": "Məlum olmayan profil statusu"
     },
     "candidateDetail": {
       "notFound": "Namizəd tapılmadı",
@@ -2496,5 +2497,19 @@
     "invalid": "Fayl boşdur, 5 MB həddini aşır və ya formatı dəstəklənmir.",
     "retry": "Yenidən cəhd üçün faylı təkrar seçin.",
     "imageLimit": "PNG, JPG, GIF və WebP. Maksimum 5 MB."
+  },
+  "recruitmentSemantics": {
+    "activeProfilesJobs": "Vakansiyalar · arxiv xaric",
+    "activeProfiles": "Aktiv namizəd profilləri",
+    "applicationTotal": "İcazəli vakansiyalara müraciətlər",
+    "shortlistedApplications": "Seçim siyahısındakı müraciətlər",
+    "profileStatus": "Profil statusu",
+    "profileStatuses": "Namizəd profillərinin statusları",
+    "allProfileStatuses": "Bütün profil statusları",
+    "profileHelp": "Profil statusu müraciət mərhələsi deyil. Hər vakansiya üzrə mərhələni Müraciətlər bölməsində izləyin.",
+    "applicationStages": "Müraciət mərhələləri",
+    "applicationHelp": "Bu siyahı müraciət icazələriniz üzrədir. Dashboard və analitika yalnız görünən vakansiyalara aid müraciətləri sayır; arxivləşdirilmiş profillərin müraciət tarixçəsi saxlanır.",
+    "dashboardHelp": "Arxiv profil və vakansiyalarının müraciət tarixçəsi daxildir. Profillər və müraciətlər ayrıca sayılır.",
+    "unknownStages": "{{count}} müraciətin mərhələsi məlum deyil; ümumi saya daxildir."
   }
 }

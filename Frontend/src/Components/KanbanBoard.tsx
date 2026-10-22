@@ -68,6 +68,7 @@ const KanbanCandidateCard = React.memo(
 KanbanCandidateCard.displayName = "KanbanCandidateCard";
 
 const COLUMNS: CandidateStatus[] = [
+  "unknown",
   "new",
   "applied",
   "screening",
@@ -86,7 +87,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const { t } = useTranslation();
 
   const columnTitle = (status: CandidateStatus) =>
-    t(`components.kanban.${status}`);
+    status === 'unknown' ? t('recruitment.candidateStatus.unknown') : t(`components.kanban.${status}`);
 
   const candidatesByStatus = useMemo(
     () =>
@@ -101,6 +102,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           return columns;
         },
         {
+          unknown: [],
           new: [],
           applied: [],
           screening: [],
@@ -118,7 +120,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     async (result: DropResult) => {
       const { destination, source, draggableId } = result;
 
-      if (!destination || !canChangeStatus) return;
+      if (!destination || !canChangeStatus || destination.droppableId === 'unknown' || source.droppableId === 'unknown') return;
 
       if (
         destination.droppableId === source.droppableId &&
@@ -168,7 +170,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         key={candidate.id || candidate._id || `${candidate.name}-${index}`}
                         candidate={candidate}
                         index={index}
-                        canChangeStatus={canChangeStatus}
+                        canChangeStatus={canChangeStatus && status !== 'unknown'}
                         yearsExperienceLabel={yearsExperienceLabel}
                       />
                     ))}

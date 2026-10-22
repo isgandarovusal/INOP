@@ -211,12 +211,13 @@ const CandidatesList: React.FC = () => {
         <article><List size={22} aria-hidden="true" /><div><p>{t('hrCandidateUI.pageShown')}</p><strong data-candidate-shown>{result.status === 'ready' ? candidates.length.toLocaleString(i18n.language) : '—'}</strong><small>{t('hrCandidateUI.page', { page: result.page })}</small></div></article>
       </div>
 
+      <p className="form-hint">{t("recruitmentSemantics.profileHelp")}</p>
       <div className="filter-bar hr-primary-controls">
         <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder={t("recruitment.candidates.searchPlaceholder")} />
         <select className="input-field" aria-label={t("hrArchive.visibility")} value={String(archived)} onChange={e=>setArchived(e.target.value==='true')}><option value="false">{t("hrArchive.active")}</option><option value="true">{t("hrArchive.archiveList")}</option></select>
-        <select className="input-field" aria-label={t("hrPage.statusFilter")} value={statusFilter} onChange={e=>setStatusFilter(e.target.value as CandidateStatus | "all")}><option value="all">{t("recruitment.applications.allStatuses")}</option>{["new","applied","screening","shortlisted","interview","offer","hired","rejected"].map(value=><option key={value} value={value}>{t(`recruitment.candidateStatus.${value}`)}</option>)}</select>
+        <select className="input-field" aria-label={t("recruitmentSemantics.profileStatus")} value={statusFilter} onChange={e=>setStatusFilter(e.target.value as CandidateStatus | "all")}><option value="all">{t("recruitmentSemantics.allProfileStatuses")}</option>{["new","applied","screening","shortlisted","interview","offer","hired","rejected"].map(value=><option key={value} value={value}>{t(`recruitment.candidateStatus.${value}`)}</option>)}</select>
         {import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button className="btn-secondary" type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}
-        {hasPermission(user, "application", "read") && <button className="btn-secondary" type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("hrMatch.board")}</button>}
+        {hasPermission(user, "application", "read") && <button className="btn-secondary" type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("recruitmentSemantics.applicationStages")}</button>}
 
         {(searchQuery || archived || statusFilter !== 'all') && <button type="button" className="btn-secondary" onClick={() => { setSearchQuery(''); setArchived(false); setStatusFilter('all'); }}>{t('common.actions.clear')}</button>}
         <div className="view-switcher" role="group" aria-label={t("recruitment.candidates.title")}>
@@ -268,7 +269,7 @@ const CandidatesList: React.FC = () => {
                 <th>{t("recruitment.candidates.position")}</th>
                 <th>{t("recruitment.candidates.experience")}</th>
                 <th>{t("recruitment.candidates.skills")}</th>
-                <th>{t("recruitment.candidates.status")}</th>
+                <th>{t("recruitmentSemantics.profileStatus")}</th>
                 {(canRead || canAct) && (
                   <th className="hr-candidate-actions-cell">{t("recruitment.candidates.actions")}</th>
                 )}

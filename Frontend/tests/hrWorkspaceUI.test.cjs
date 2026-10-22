@@ -29,6 +29,29 @@ test('Full HR shell uses real scoped data and a consistent responsive keyboard-a
   await h.page.locator('.hr-dashboard-summary').getByRole('heading',{name:'Recruitment',exact:true}).waitFor();assert.equal(h.wire.length,count);
   await h.page.evaluate(()=>window.changeLanguage('az'));assert.equal(h.wire.length,count);
  });
+  await t.test('Dashboard counts shortlisted Applications while Candidate filters explicitly remain profile status',async()=>{
+    const app=await Application.findOne().lean();const moved=await h.request('admin','PATCH','/applications/'+app._id+'/status',{status:'Shortlisted',expectedRevision:app.__v,reason:'Synthetic HR selection'});assert.equal(moved.status,200);
+    await h.open('admin','/app/dashboard');await h.page.waitForFunction(()=>Array.from(document.querySelectorAll('.hr-dashboard-summary .kpi-card__value')).map(e=>e.textContent.trim()).join(',')==='3,1,3,1');
+    for(const [locale,label]of [['az','Seçim siyahısındakı müraciətlər'],['en','Shortlisted applications'],['ru','Отобранные заявки']]){
+      const before=h.wire.length;await h.page.evaluate(l=>window.changeLanguage(l),locale);await h.page.getByText(label,{exact:true}).waitFor();assert.equal(h.wire.length,before);assert.equal(await h.page.locator('.hr-dashboard-summary .kpi-card__value').last().textContent(),'1');
+    }
+    await h.page.evaluate(()=>window.changeLanguage('az'));await h.open('admin','/app/recruitment/candidates');await h.page.getByRole('combobox',{name:'Profil statusu',exact:true}).selectOption('shortlisted');
+    await h.page.waitForFunction(()=>document.querySelector('[data-candidate-total]')?.textContent==='0');
+    const summary=await h.request('admin','GET','/applications/dashboard-summary');assert.equal(summary.data.pipeline.shortlistedCount,1);
+    const analytics=await h.request('admin','GET','/hr/analytics');assert.equal(analytics.data.funnel.find(x=>x.status==='Shortlisted').count,1);
+  });
+  await t.test('missing stage metadata and API failure never invent zero; explicit retry restores the authoritative KPI',async()=>{
+    const unavailable=require('../src/i18n/locales/az.json').auditFlow.unavailable;
+    await h.page.route('**/api/applications/dashboard-summary',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({total:3})}));
+    await h.open('admin','/app/dashboard');await h.page.waitForFunction(text=>document.querySelectorAll('.hr-dashboard-summary .kpi-card__value')[3]?.textContent===text,unavailable);
+    await h.page.unroute('**/api/applications/dashboard-summary');
+    await h.page.route('**/api/applications/dashboard-summary',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Synthetic unavailable'})}));
+    await h.open('admin','/app/dashboard');await h.page.locator('.hr-dashboard-summary .dashboard-error').waitFor();
+    assert.equal(await h.page.locator('.hr-dashboard-summary .kpi-card__value').last().textContent(),unavailable);
+    await h.page.unroute('**/api/applications/dashboard-summary');
+    await h.page.locator('.hr-dashboard-summary .dashboard-error button').click();
+    await h.page.waitForFunction(()=>document.querySelectorAll('.hr-dashboard-summary .kpi-card__value')[3]?.textContent==='1');
+  });
   await t.test('replacing a CV clears only prior extracted facts, including failed replacement, and preserves HR edits',async()=>{
     const {docx}=require('../../Backend/tests/helpers/cvDocuments.cjs');
     await h.open('admin','/app/recruitment/candidates/new');await h.page.locator('input[name=name]').waitFor();

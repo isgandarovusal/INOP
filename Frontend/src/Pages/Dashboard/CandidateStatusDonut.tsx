@@ -4,6 +4,7 @@ import type {CandidateSummary} from "../../Services/dashboardSummaryService";
 import type {CandidateStatus} from "../../Types/recruitment";
 
 const STATUS_COLORS: Partial<Record<CandidateStatus, string>> = {
+  unknown: "#64748b",
   applied: "#0ea5e9",
   interview: "#8b5cf6",
   offer: "#14b8a6",

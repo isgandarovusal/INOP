@@ -18,7 +18,7 @@ import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
 import { useAuth } from "../../Context/useAuth";
 import { getPermissionScope } from "../../Utils/permissions";
-import { getJobsSummary, getCandidatesSummary, getApplicationsSummary, type CountSummary, type CandidateSummary } from "../../Services/dashboardSummaryService";
+import { getJobsSummary, getCandidatesSummary, getApplicationsSummary, type CountSummary, type CandidateSummary, type ApplicationSummary } from "../../Services/dashboardSummaryService";
 import { getAuditAnalytics, type AuditAnalytics } from "../../Services/analyticsService";
 import { ACCENT } from "../../Utils/theme";
 
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
   const [refreshRevision, setRefreshRevision] = useState(0);
   const [jobs, setJobs] = useState<CountSummary>({total:0});
   const [candidates, setCandidates] = useState<CandidateSummary>({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
-  const [applications, setApplications] = useState<CountSummary>({total:0});
+  const [applications, setApplications] = useState<ApplicationSummary>({total:0,pipeline:null});
   const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
       setAuditError(null);
       setJobs({total:0});
       setCandidates({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
-      setApplications({total:0});
+      setApplications({total:0,pipeline:null});
       setAnalytics(null);
 
       if (showRecruitment) {
@@ -220,8 +220,7 @@ const Dashboard: React.FC = () => {
     };
   }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications]);
 
-  const candidateStatusStats = {shortlistedCount:candidates.shortlistedCount};
-  const statusBreakdown=candidates.statusBreakdown;
+  const statusBreakdown=candidates.profileStatusBreakdown ?? candidates.statusBreakdown;
   const recentCandidates=candidates.recentCandidates;
 
   if (!user) return null;
@@ -234,6 +233,8 @@ const Dashboard: React.FC = () => {
           {showRecruitment && (
             <div className="hr-dashboard-summary">
               <h3 className="dashboard-section-title">{t("dashboard.recruitment")}</h3>
+              <p className="form-hint">{t("recruitmentSemantics.dashboardHelp")}</p>
+              {!applicationsLoading && !summaryErrors.applications && Boolean(applications.pipeline?.unknownCount) && <p role="status" className="dashboard-inline-error">{t("recruitmentSemantics.unknownStages", {count: applications.pipeline!.unknownCount})}</p>}
 
               {recruitmentError !== null && (
                 <div className="dashboard-error">
@@ -250,7 +251,7 @@ const Dashboard: React.FC = () => {
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.accent.background }}>
                     <Briefcase size={18} color={ACCENT} />
                   </div>
-                  <p className="kpi-card__label">{t("dashboard.totalJobs")}</p>
+                  <p className="kpi-card__label">{t("recruitmentSemantics.activeProfilesJobs")}</p>
                   <p className="kpi-card__value">
                     {jobsLoading ? t("dashboard.loading") : summaryErrors.jobs ? t("auditFlow.unavailable") : jobs.total}
                   </p>
@@ -261,7 +262,7 @@ const Dashboard: React.FC = () => {
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.info.background }}>
                     <UserSquare2 size={18} color={KPI_ICON_STYLES.info.color} />
                   </div>
-                  <p className="kpi-card__label">{t("dashboard.totalCandidates")}</p>
+                  <p className="kpi-card__label">{t("recruitmentSemantics.activeProfiles")}</p>
                   <p className="kpi-card__value">
                     {candidatesLoading ? t("dashboard.loading") : summaryErrors.candidates ? t("auditFlow.unavailable") : candidates.total}
                   </p>
@@ -272,20 +273,20 @@ const Dashboard: React.FC = () => {
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.success.background }}>
                     <ClipboardList size={18} color={KPI_ICON_STYLES.success.color} />
                   </div>
-                  <p className="kpi-card__label">{t("dashboard.applications")}</p>
+                  <p className="kpi-card__label">{t("recruitmentSemantics.applicationTotal")}</p>
                   <p className="kpi-card__value">
-                    {applicationsLoading ? t("dashboard.loading") : summaryErrors.applications ? t("auditFlow.unavailable") : applications.total}
+                    {applicationsLoading ? t("dashboard.loading") : summaryErrors.applications || !applications.pipeline ? t("auditFlow.unavailable") : applications.pipeline.total}
                   </p>
                 </div>
                 )}
-                {canCandidates && (
+                {canApplications && (
                 <div className="kpi-card anim-in" style={{ animationDelay: "0.15s" }}>
                   <div className="kpi-card__icon" style={{ background: KPI_ICON_STYLES.warning.background }}>
                     <Star size={18} color={KPI_ICON_STYLES.warning.color} />
                   </div>
-                  <p className="kpi-card__label">{t("dashboard.shortlisted")}</p>
+                  <p className="kpi-card__label">{t("recruitmentSemantics.shortlistedApplications")}</p>
                   <p className="kpi-card__value">
-                    {candidatesLoading ? t("dashboard.loading") : summaryErrors.candidates ? t("auditFlow.unavailable") : candidateStatusStats.shortlistedCount}
+                    {applicationsLoading ? t("dashboard.loading") : summaryErrors.applications || !applications.pipeline ? t("auditFlow.unavailable") : applications.pipeline.shortlistedCount}
                   </p>
                 </div>
                 )}
@@ -328,7 +329,7 @@ const Dashboard: React.FC = () => {
 
                 <div className="chart-card anim-in" style={{ animationDelay: "0.06s" }}>
                   <div className="chart-card__header">
-                    <h3>{t("dashboard.candidatesByStatus")}</h3>
+                    <h3>{t("recruitmentSemantics.profileStatuses")}</h3>
                   </div>
                   {candidatesLoading ? (
                     <div className="empty-state">{t("dashboard.loading")}</div>

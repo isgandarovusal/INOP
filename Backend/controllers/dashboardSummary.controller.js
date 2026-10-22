@@ -12,15 +12,26 @@ const wrap = operation => async (req, res) => {
     if (req.dataScope == null || !req.user?.id) return res.status(403).json({ message: 'Dashboard scope icazəsi yoxdur.' });
     return res.json(await operation(req));
   } catch (error) {
-    console.error('Dashboard summary error:', error);
-    return res.status(500).json({ message: 'Dashboard summary yüklənmədi.' });
+    require('../services/safeErrorLog.service').logFailure(error);
+    return res.status(Number.isInteger(error.status) && error.status >= 400 && error.status < 600 ? error.status : 500).json({ message: 'Dashboard summary yüklənmədi.' });
   }
 };
 // Aggregation does not perform Mongoose query casting. Reuse the list query's
 // ObjectId casting so own/assigned references cannot silently miss their rows.
 const filter = (model, req) => model.find(req.dataScope).cast(model);
 exports.jobs = wrap(async req => ({ total: await Job.countDocuments({ $and: [filter(Job, req), { archivedAt: null }] }) }));
-exports.applications = wrap(async req => ({ total: await Application.countDocuments(filter(Application, req)) }));
+exports.applications = wrap(async req => {
+  // Preserve the legacy total contract. New UI uses the explicit analytics
+  // cohort; absent parent permission is unavailable, never a fabricated zero.
+  const authority = require('../services/hrCreateRecovery.service');
+  const signature = authority.identity(req);
+  const [total, pipeline] = await Promise.all([
+    Application.countDocuments(filter(Application, req)),
+    require('../services/applicationStageSummary.service').summarize(req),
+  ]);
+  if (authority.identity(await authority.current(req)) !== signature) throw Object.assign(new Error('Permissions changed.'), { status: 409 });
+  return { total, pipeline };
+});
 exports.candidates = wrap(async req => {
   const [data] = await Candidate.aggregate([
     { $match: { $and: [filter(Candidate, req), { archivedAt: null }] } },
@@ -28,7 +39,7 @@ exports.candidates = wrap(async req => {
       total: [{ $count: 'value' }],
       statuses: [
         { $addFields: { normalizedStatus: { $toLower: { $convert: { input: '$status', to: 'string', onError: '', onNull: '' } } } } },
-        { $project: { status: { $cond: [{ $in: ['$normalizedStatus', ['new', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected']] }, '$normalizedStatus', 'applied'] } } },
+        { $project: { status: { $cond: [{ $in: ['$normalizedStatus', ['new', 'applied', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected']] }, '$normalizedStatus', 'unknown'] } } },
         { $group: { _id: '$status', value: { $sum: 1 } } }, { $sort: { _id: 1 } },
       ],
       recent: [
@@ -37,8 +48,11 @@ exports.candidates = wrap(async req => {
       ],
     } },
   ]);
+  const legacy = new Map();
+  for (const item of data.statuses) { const key = item._id === 'unknown' ? 'applied' : item._id; legacy.set(key, (legacy.get(key) || 0) + item.value); }
   return { total: data.total[0]?.value || 0, shortlistedCount: data.statuses.find(item => item._id === 'shortlisted')?.value || 0,
-    statusBreakdown: data.statuses.map(item => ({ status: item._id, value: item.value })),
+    statusBreakdown: [...legacy].sort(([a], [b]) => a.localeCompare(b)).map(([status, value]) => ({ status, value })),
+    profileStatusBreakdown: data.statuses.map(item => ({ status: item._id, value: item.value })),
     recentCandidates: data.recent.map(item => ({ id: String(item._id), name: item.name, skills: item.skills, createdAt: item.createdAt })),
   };
 });

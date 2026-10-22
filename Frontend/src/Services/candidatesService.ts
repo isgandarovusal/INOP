@@ -47,7 +47,8 @@ function normalizeCandidateStatus(
   if (value === "hired") return "hired";
   if (value === "rejected") return "rejected";
 
-  return "applied";
+  if (value === "applied") return "applied";
+  return "unknown";
 }
 
 export function normalizeCandidate(raw: unknown): Candidate {
@@ -79,7 +80,7 @@ export function normalizeCandidate(raw: unknown): Candidate {
     status:
       typeof data.status === "string"
         ? normalizeCandidateStatus(data.status as CandidateStatus)
-        : "applied",
+        : "unknown",
 
     skills: stringArray(data.skills),
     skillsCount: typeof data.skillsCount === "number" && Number.isInteger(data.skillsCount) && data.skillsCount >= 0 ? data.skillsCount : undefined,

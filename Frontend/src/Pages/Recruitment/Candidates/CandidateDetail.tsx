@@ -239,7 +239,7 @@ const CandidateDetail: React.FC = () => {
 
         <p>
           <strong>
-            {t("recruitment.candidateDetail.currentAtsStatus")}:
+            {t("recruitmentSemantics.profileStatus")}:
           </strong>{" "}
           <Badge tone="info">
             {t(
@@ -248,6 +248,7 @@ const CandidateDetail: React.FC = () => {
           </Badge>
         </p>
 
+        <p className="form-hint">{t("recruitmentSemantics.profileHelp")}</p>
         {cvUrl && (
           <p>
             <strong>

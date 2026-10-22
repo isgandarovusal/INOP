@@ -182,6 +182,7 @@ const ApplicationsList: React.FC = () => {
       />
 
       {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
+      <p className="form-hint">{t("recruitmentSemantics.applicationHelp")}</p>
       <div className="filter-bar hr-primary-controls">
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
         <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrPage.sortNewestAll' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
