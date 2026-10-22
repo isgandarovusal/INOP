@@ -357,11 +357,12 @@ export async function updateCandidate(
 
 export async function updateCandidateStatus(
   id: string,
-  status: CandidateStatus
+  status: CandidateStatus,
+  expectedRevision?: number
 ): Promise<Candidate> {
   const response = await API.patch(
     `/candidates/${id}`,
-    { status }
+    { status, expectedRevision }
   );
 
   return normalizeCandidate(response.data);

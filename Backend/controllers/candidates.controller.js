@@ -464,11 +464,16 @@ exports.updateCandidateStatus = async (req, res) => {
     }
 
     if (existing.archivedAt) return res.status(409).json({code:'CANDIDATE_ARCHIVED',message:'Restore the archived Candidate before editing.'});
+    // Keep the legacy optional revision contract, but never bypass the main
+    // editor's optimistic lock or let a stale status write keep the same version.
+    const expected = req.body.expectedRevision;
+    if (expected !== undefined && (!Number.isInteger(Number(expected)) || Number(expected) < 0)) return res.status(400).json({ message: 'Revision düzgün deyil.' });
+    if (expected !== undefined && Number(expected) !== (existing.__v ?? 0)) return res.status(409).json({ code: 'REVISION_CONFLICT', message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.' });
     const updated = await Candidate.findOneAndUpdate(
       buildScopedQuery(req, {
-        _id: id, archivedAt: null,
+        _id: id, archivedAt: null, __v: existing.__v === undefined ? { $exists: false } : existing.__v,
       }),
-      { status },
+      { $set: { status }, $inc: { __v: 1 } },
       {
         returnDocument: 'after',
         runValidators: true,
@@ -476,6 +481,7 @@ exports.updateCandidateStatus = async (req, res) => {
     );
 
     if (!updated) {
+      if (await Candidate.exists(buildScopedQuery(req, { _id: id }))) return res.status(409).json({ code: 'REVISION_CONFLICT', message: 'Namizəd başqa əməliyyatda dəyişib. Son məlumatı yenidən yükləyin.' });
       return res.status(404).json({
         message:
           "Namizəd tapılmadı və ya bu namizədi dəyişmək üçün icazəniz yoxdur.",

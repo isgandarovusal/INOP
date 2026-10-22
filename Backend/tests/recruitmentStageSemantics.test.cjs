@@ -52,4 +52,15 @@ test('Profile status and Application-stage summaries preserve separate units, sc
  await t.test('two HR writes with one revision give one winner; summary reflects the authoritative stage, never profile mutation',async()=>{
   const race=await Promise.all(['Screening','Interview'].map(status=>h.request('admin','PATCH','/applications/'+a1._id+'/status',{status,expectedRevision:a1.__v,reason:'Synthetic HR'})));assert.deepEqual(race.map(x=>x.status).sort(),[200,409]);const s=await read('admin');assert.equal(s.pipeline.shortlistedCount,1);assert.equal((await Candidate.findById(c2._id)).status,'shortlisted');
  });
+ await t.test('legacy profile-status writes share edit revisions, reject stale HR writes, and never change vacancy stages',async()=>{
+  const c=await Candidate.create({name:'Synthetic status revision',role:'Cashier',status:'new'}),url='/candidates/'+c._id;
+  const first=await h.request('admin','PATCH',url,{status:'shortlisted',expectedRevision:0});assert.equal(first.status,200);assert.equal(first.data.__v,1);
+  const stale=await h.request('admin','PATCH',url,{status:'interview',expectedRevision:0});assert.equal(stale.status,409);assert.equal(stale.data.code,'REVISION_CONFLICT');
+  assert.equal((await h.request('admin','PUT',url,{name:'Stale draft',expectedRevision:0})).status,409,'a profile status change invalidates an old full edit');
+  const race=await Promise.all(['interview','offer'].map(status=>h.request('admin','PATCH',url,{status,expectedRevision:1})));assert.deepEqual(race.map(x=>x.status).sort(),[200,409]);assert.equal((await Candidate.findById(c._id)).__v,2);
+  assert.equal((await h.request('admin','PATCH',url,{status:'hired',expectedRevision:-1})).status,400);
+  const compatible=await h.request('admin','PATCH',url,{status:'hired'});assert.equal(compatible.status,200);assert.equal(compatible.data.__v,3,'legacy clients without revision remain compatible');
+  const legacy=await Candidate.create({name:'Synthetic legacy version',role:'Cashier'});await Candidate.collection.updateOne({_id:legacy._id},{$unset:{__v:''}});const migrated=await h.request('admin','PATCH','/candidates/'+legacy._id,{status:'screening',expectedRevision:0});assert.equal(migrated.status,200);assert.equal(migrated.data.__v,1);
+  assert.equal((await Candidate.findById(c._id)).status,'hired');assert.equal((await Application.findById(a2._id)).status,'Interview');
+ });
 }));
