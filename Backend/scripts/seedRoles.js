@@ -85,6 +85,10 @@ const roles = [
     ],
   },
 
+  // Additive presets only. No existing role or User assignment is narrowed.
+  {name:'HR Recruitment Manager',key:'recruitment_manager',description:'Recruitment-only department oversight. Requires canonical HR membership.',isSystemRole:true,permissions:['recruitment','candidate','application'].flatMap(resource=>['read','create','update','delete'].map(action=>permission(resource,action,'department')))},
+  {name:'HR Recruitment Employee',key:'recruitment_employee',description:'Assigned Recruitment records; own intake. Requires canonical HR membership.',isSystemRole:true,permissions:[permission('recruitment','read','assigned'),...['candidate','application'].flatMap(resource=>[permission(resource,'read','assigned'),permission(resource,'create','own'),permission(resource,'update','assigned')])]},
+
   {
     name: "Employee",
     key: "employee",

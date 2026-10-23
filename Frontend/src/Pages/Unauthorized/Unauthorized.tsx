@@ -10,7 +10,7 @@ const Unauthorized: React.FC = () => {
       <ShieldAlert size={40} />
       <h2>{t("unauthorized.title")}</h2>
       <p>{t("unauthorized.message")}</p>
-      <Link to="/app/dashboard" className="btn-primary">
+      <Link to="/app" className="btn-primary">
         {t("unauthorized.backToDashboard")}
       </Link>
     </div>

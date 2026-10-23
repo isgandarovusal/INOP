@@ -3,6 +3,8 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../../../Context/useAuth";
 import { useTranslation } from "react-i18next";
+import {workspaceHome} from "../../../Utils/workspaceHome";
+import {canAccessSection} from "../../../Utils/permissions";
 import INOPLogo from "../../../Components/INOPLogo";
 import LanguageSwitcher from "../../../Components/LanguageSwitcher";
 import "../../../Styles/auth.css";
@@ -24,7 +26,7 @@ const Login: React.FC = () => {
 
   if (!isLoading && user) {
     const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
-    return <Navigate to={from ?? "/app/dashboard"} replace />;
+    return <Navigate to={from && !(from === "/app/dashboard" && !canAccessSection(user,"dashboard")) ? from : workspaceHome(user)} replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +46,7 @@ const Login: React.FC = () => {
 
     try {
       await login(email.trim(), password);
-      navigate("/app/dashboard", { replace: true });
+      navigate("/app", { replace: true });
     } catch (err) {
       setError(
         err instanceof Error

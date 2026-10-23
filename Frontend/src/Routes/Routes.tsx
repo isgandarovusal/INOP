@@ -1,9 +1,10 @@
 import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import HRRoute from "./HRRoute";
+import WorkspaceLanding from "./WorkspaceLanding";
 const AppShell = lazy(() => import("../Layouts/AppShell/AppShell"));
 const Login = lazy(() => import("../Pages/Auth/Login/Login"));
 const Profile = lazy(() => import("../Pages/Profile/Profile"));
@@ -51,7 +52,7 @@ const NotFound = lazy(() => import("../Pages/NotFound/NotFound"));
 const Unauthorized = lazy(() => import("../Pages/Unauthorized/Unauthorized"));
 
 const ROUTES: RouteObject[] = [
-  { path: "/", element: <Navigate to="/app/dashboard" replace /> },
+  { path: "/", element: <WorkspaceLanding /> },
   { path: "/login", element: <Login /> },
   { path: "/unauthorized", element: <Unauthorized /> },
   {
@@ -61,8 +62,8 @@ const ROUTES: RouteObject[] = [
         path: "/app",
         element: <AppShell />,
         children: [
-          { index: true, element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <Dashboard /> },
+          { index: true, element: <WorkspaceLanding /> },
+          { element: <RoleRoute section="dashboard" />, children: [{ path: "dashboard", element: <Dashboard /> }] },
           { path: "profile", element: <Profile /> },
           { element: <HRRoute resource="recruitment" action="read" />, children: [
             { path: "recruitment/jobs", element: <JobsList /> },

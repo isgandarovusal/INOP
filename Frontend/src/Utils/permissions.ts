@@ -108,6 +108,8 @@ export function canManageCore(
 export const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",
   hr_manager: "HR Manager",
+  recruitment_manager: "HR Recruitment Manager",
+  recruitment_employee: "HR Recruitment Employee",
   assistant_hr: "Assistant HR",
   employee: "Employee",
   auditor: "Auditor",
