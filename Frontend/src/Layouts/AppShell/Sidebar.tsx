@@ -63,6 +63,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "navigation.groups.recruitment",
     items: [
+      {to:"/app/recruitment/cv-intake",resource:"candidate",labelKey:"hrIntake.queue",icon:ClipboardList,section:"recruitment"},
       {
         to: "/app/recruitment/analytics", resource: "application", labelKey: "hrAnalytics.title", icon: BarChart3, section: "recruitment",
       },
@@ -269,7 +270,7 @@ const Sidebar: React.FC = () => {
             onKeyDown={event => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setProfileOpen(true); } }}>
             <span className="admin-sidebar__user-info">
               <span className="admin-sidebar__user-name">{user.name}</span>
-              <span className="admin-sidebar__user-role">{ROLE_LABELS[user.role] || user.role}</span>
+              <span className="admin-sidebar__user-role">{t('hrUniversal.roles.'+user.role,{defaultValue:ROLE_LABELS[user.role]||user.role})}</span>
             </span>
             <ChevronUp size={16} aria-hidden="true" />
           </button>

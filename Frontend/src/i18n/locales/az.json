@@ -1357,7 +1357,8 @@
       "pizzahut": "Pizza Hut sayt kanalı",
       "jobsearch": "JobSearch",
       "external_form": "Təsdiqlənmiş xarici forma",
-      "unknown": "Mənbə məlum deyil"
+      "unknown": "Mənbə məlum deyil",
+      "simit": "Simit Sarayı"
     },
     "reviewState": {
       "pending": "HR təsdiqi gözləyir",
@@ -2511,5 +2512,61 @@
     "applicationHelp": "Bu siyahı müraciət icazələriniz üzrədir. Dashboard və analitika yalnız görünən vakansiyalara aid müraciətləri sayır; arxivləşdirilmiş profillərin müraciət tarixçəsi saxlanır.",
     "dashboardHelp": "Arxiv profil və vakansiyalarının müraciət tarixçəsi daxildir. Profillər və müraciətlər ayrıca sayılır.",
     "unknownStages": "{{count}} müraciətin mərhələsi məlum deyil; ümumi saya daxildir."
+  },
+  "hrUniversal": {
+    "allSources": "Bütün mənbələr",
+    "declared": "HR tərəfindən göstərilib. Xarici mənbə ilə bağlantı təsdiqlənməyib.",
+    "brand": "Brend",
+    "sources": {
+      "manual": "Manual qəbul",
+      "kfc": "KFC.az",
+      "pizzahut": "PizzaHut.az",
+      "simit": "Simit Sarayı",
+      "jobsearch": "JobSearch.az",
+      "outlook": "Outlook / e-poçt",
+      "external_form": "Digər icazəli mənbə",
+      "unknown": "Göstərilməyib"
+    },
+    "roles": {
+      "recruitment_manager": "Recruitment rəhbəri",
+      "recruitment_employee": "Recruitment əməkdaşı"
+    }
+  },
+  "hrImport": {
+    "title": "CV idxalı",
+    "limits": "PDF/DOCX · fayl üzrə 5 MB · partiyada 10 fayl · cəmi 25 MB. Fayl adları fərqli olmalıdır.",
+    "unassigned": "Təyin edilməyib — HR yoxlamalıdır",
+    "vacancy": "Vakansiya",
+    "files": "CV fayllarını seç",
+    "preview": "Fayllara önbaxış",
+    "possibleDuplicate": "Partiyada eyni sənəd var — yoxlanmalıdır",
+    "retry": "Qəbul edilməyənləri təkrar yoxla",
+    "admit": "Faylları qəbul et",
+    "new": "Yeni idxal",
+    "invalid": "Fərqli adlı 1–10 fayl seçin; ümumi ölçü 25 MB-dan çox olmamalıdır.",
+    "result": "İdxal qəbzi",
+    "reviewNotice": "Faylın qəbulu işə qəbul təsdiqi deyil. Uğursuz və qeyri-müəyyən faylları yoxlayın; davam etmək üçün orijinal faylları yenidən seçin. Tarixçə hər səhifədə 20 partiya göstərir.",
+    "history": "İdxal tarixçəsini yüklə",
+    "admission": {
+      "pending": "Yükləmə gözlənilir",
+      "accepted": "Orijinal qəbul edilib",
+      "failed": "Fayl və ya əlaqələndirmə yanlışdır",
+      "uncertain": "Qəbul təsdiqlənməyib — yoxlayın"
+    },
+    "counts": {
+      "accepted": "Qəbul edilmiş orijinallar",
+      "pending": "Yükləmə gözlənilir",
+      "uncertain": "Təsdiqlənməyib",
+      "failed": "Önbaxışda rədd edilib",
+      "processing": "Emal olunur",
+      "processingFailed": "Emal bloklanıb/uğursuzdur",
+      "reviewRequired": "HR yoxlaması gözlənilir",
+      "completed": "HR tərəfindən təsdiqlənmiş profillər"
+    },
+    "routing": "JSON əlaqələndirmə faylı",
+    "routingHint": "Yalnız hr-import-routing-v1 JSON: rows daxilində filename və context. CSV/XLSX/ZIP və uzaq URL-lər dəstəklənmir.",
+    "allBrands": "Bütün brendlər",
+    "allVacancies": "Bütün vakansiyalar",
+    "routingInvalid": "JSON əlaqələndirmə faylı yanlışdır. hr-import-routing-v1 formatında filename/context sətirlərindən istifadə edin."
   }
 }

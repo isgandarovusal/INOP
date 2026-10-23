@@ -1,0 +1,27 @@
+import API from '../api/axios';
+import {validIntakeContext,type CvIntakeContext} from './cvIntakeService';
+export interface CvImportRow {id:string;commandId:string;originalName:string;mimeType:string;size:number;sha256:string;context?:CvIntakeContext;state:'pending'|'accepted'|'failed'|'uncertain';code:string;attempts:number;source?:{id:string;state:string;evidenceMode:'test'|'provider';approvalState?:string;candidateId?:string}}
+export interface CvImportManifest {version:'hr-import-v1';batchId:string;rows:{id:string;commandId:string;originalName:string;mimeType:string;size:number;sha256:string;context?:Omit<CvIntakeContext,'declaredByHR'>}[]}
+export interface CvImportReceipt {version:'hr-import-v1';batchId:string;createdAt:string;rows:CvImportRow[];summary:Record<'files'|'accepted'|'failed'|'uncertain'|'pending'|'processing'|'reviewRequired'|'processingFailed'|'completed',number>}
+const uuid=(s:string)=>typeof s==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(s);
+function checked(r:CvImportReceipt){
+ if(!r||r.version!=='hr-import-v1'||!uuid(r.batchId)||!Number.isFinite(Date.parse(r.createdAt))||!Array.isArray(r.rows)||!r.rows.length||r.rows.length>10||!r.summary||Object.values(r.summary).some(v=>!Number.isInteger(v)||v<0||v>r.rows.length)||['files','accepted','failed','uncertain','pending','processing','reviewRequired','processingFailed','completed'].some(k=>!Number.isInteger(r.summary[k as 'files']))||r.summary.files!==r.rows.length||r.summary.accepted+r.summary.failed+r.summary.uncertain+r.summary.pending!==r.rows.length)throw Error('Invalid import receipt.');
+ for(const row of r.rows)if(!uuid(row.id)||!uuid(row.commandId)||typeof row.originalName!=='string'||row.originalName.length>255||typeof row.mimeType!=='string'||row.mimeType.length>120||!Number.isInteger(row.size)||row.size<0||row.size>25*1024*1024||row.size>5*1024*1024&&(row.state!=='failed'||row.code!=='INTAKE_DOCUMENT')||!/^[a-f0-9]{64}$/.test(row.sha256)||!['pending','accepted','failed','uncertain'].includes(row.state)||typeof row.code!=='string'||row.code.length>80||!Number.isInteger(row.attempts)||row.attempts<0||row.context!==undefined&&!validIntakeContext(row.context)||row.source&&(!['test','provider'].includes(row.source.evidenceMode)||!/^[a-f0-9]{24}$/.test(row.source.id)||!['reserved','queued','running','retry','ready','blocked','quarantined','failed','cancelled'].includes(row.source.state)))throw Error('Invalid import row.');
+ for(const state of ['accepted','failed','uncertain','pending'] as const)if(r.summary[state]!==r.rows.filter(x=>x.state===state).length)throw Error('Inconsistent import counts.');
+ if(r.rows.some(x=>x.state==='accepted'&&!x.source)||new Set(r.rows.flatMap(x=>x.source?[x.source.id]:[])).size!==r.rows.filter(x=>x.source).length)throw Error('Invalid source linkage.');
+ if(new Set(r.rows.map(x=>x.id)).size!==r.rows.length)throw Error('Duplicate receipt rows.');return r;
+}
+export async function prepareCvImport(manifest:CvImportManifest,signal?:AbortSignal){return checked((await API.post<CvImportReceipt>('/hr/cv-intake/imports',manifest,{signal,suppressErrorToast:true})).data);}
+export async function getCvImport(id:string,signal?:AbortSignal){if(!uuid(id))throw Error('Invalid import id.');return checked((await API.get<CvImportReceipt>('/hr/cv-intake/imports/'+id,{signal,suppressErrorToast:true})).data);}
+export async function uploadCvImport(id:string,row:string,file:File,signal?:AbortSignal){if(!uuid(id)||!uuid(row))throw Error('Invalid import id.');const body=new FormData();body.append('cv',file);return checked((await API.post<CvImportReceipt>(`/hr/cv-intake/imports/${id}/${row}`,body,{signal,suppressErrorToast:true})).data);}
+export interface CvImportHistory {items:{batchId:string;createdAt:string}[];page:number;hasMore:boolean}
+export async function getCvImportHistory(signal?:AbortSignal,page=1):Promise<CvImportHistory>{if(!Number.isInteger(page)||page<1||page>2000)throw Error('Invalid history page.');const r=(await API.get<{version:string;items:{batchId:string;createdAt:string}[];limit:number;page:number;hasMore:boolean}>('/hr/cv-intake/imports',{params:{page},signal,suppressErrorToast:true})).data;if(!r||r.version!=='hr-import-history-v1'||r.limit!==20||r.page!==page||typeof r.hasMore!=='boolean'||!Array.isArray(r.items)||r.items.length>20||r.items.some(x=>!uuid(x.batchId)||!Number.isFinite(Date.parse(x.createdAt))))throw Error('Invalid import history.');return r;}
+
+// Deliberately narrow routing-only export format; never fetch paths/URLs from it.
+export async function readCvImportRouting(file:File):Promise<Record<string,Omit<CvIntakeContext,'declaredByHR'>>> {
+ if(file.size>32768||!file.name.toLowerCase().endsWith('.json'))throw Error('Invalid routing file.');
+ const value=JSON.parse(await file.text());if(!value||value.version!=='hr-import-routing-v1'||Object.keys(value).some(k=>!['version','rows'].includes(k))||!Array.isArray(value.rows)||!value.rows.length||value.rows.length>10)throw Error('Invalid routing file.');
+ const result:Record<string,Omit<CvIntakeContext,'declaredByHR'>>=Object.create(null);
+ for(const r of value.rows){if(!r||Object.keys(r).some(k=>!['filename','context'].includes(k))||typeof r.filename!=='string'||!r.filename||r.filename.length>255||Object.hasOwn(result,r.filename)||!r.context||Object.hasOwn(r.context,'declaredByHR')||Object.hasOwn(r.context,'batchId')||!validIntakeContext({...r.context,declaredByHR:true}))throw Error('Invalid routing row.');result[r.filename]=r.context;}
+ return result;
+}

@@ -1340,7 +1340,8 @@
       "pizzahut": "Pizza Hut website channel",
       "jobsearch": "JobSearch",
       "external_form": "Approved external form",
-      "unknown": "Unknown source"
+      "unknown": "Unknown source",
+      "simit": "Simit Sarayı"
     },
     "reviewState": {
       "pending": "Awaiting HR approval",
@@ -2494,5 +2495,61 @@
     "applicationHelp": "This list follows your application permissions. Dashboard and analytics count applications to visible vacancies; archived profiles retain application history.",
     "dashboardHelp": "Application history includes archived profiles and vacancies. Profiles and applications are counted separately.",
     "unknownStages": "{{count}} applications have an unknown stage and remain included in the total."
+  },
+  "hrUniversal": {
+    "allSources": "All sources",
+    "declared": "Declared by HR. A connection to this external source has not been verified.",
+    "brand": "Brand",
+    "sources": {
+      "manual": "Manual intake",
+      "kfc": "KFC.az",
+      "pizzahut": "PizzaHut.az",
+      "simit": "Simit Sarayı",
+      "jobsearch": "JobSearch.az",
+      "outlook": "Outlook / email",
+      "external_form": "Other authorized source",
+      "unknown": "Unspecified"
+    },
+    "roles": {
+      "recruitment_manager": "Recruitment manager",
+      "recruitment_employee": "Recruitment employee"
+    }
+  },
+  "hrImport": {
+    "title": "CV import",
+    "limits": "PDF/DOCX · 5 MB/file · 10 files/batch · 25 MB/batch. Filenames must be unique.",
+    "unassigned": "Not assigned — HR review required",
+    "vacancy": "Vacancy",
+    "files": "Select CV files",
+    "preview": "Preview files",
+    "possibleDuplicate": "Same document in this batch — review required",
+    "retry": "Retry unaccepted files",
+    "admit": "Accept files",
+    "new": "New import",
+    "invalid": "Select 1–10 files with unique names, up to 25 MB in total.",
+    "result": "Import receipt",
+    "reviewNotice": "Acceptance is not hiring approval. Check failed or uncertain files; select originals again to resume. History is paged in batches of 20.",
+    "history": "Load import history",
+    "admission": {
+      "pending": "Awaiting upload",
+      "accepted": "Original accepted",
+      "failed": "Invalid file or routing",
+      "uncertain": "Acceptance unconfirmed — check/retry"
+    },
+    "counts": {
+      "accepted": "Originals accepted",
+      "pending": "Awaiting upload",
+      "uncertain": "Unconfirmed",
+      "failed": "Rejected at preview",
+      "processing": "Processing",
+      "processingFailed": "Processing blocked/failed",
+      "reviewRequired": "Awaiting HR review",
+      "completed": "HR-approved profiles"
+    },
+    "routing": "JSON routing file",
+    "routingHint": "Only hr-import-routing-v1 JSON: rows contain filename and context. CSV/XLSX/ZIP and remote URLs are not supported.",
+    "allBrands": "All brands",
+    "allVacancies": "All vacancies",
+    "routingInvalid": "Invalid routing JSON. Use hr-import-routing-v1 with filename/context rows."
   }
 }

@@ -7,6 +7,7 @@ import { hasPermission } from '../Utils/permissions';
 const sections = [
   { path: 'analytics', resource: 'application', label: 'hrAnalytics.title', Icon: BarChart3 },
   { path: 'jobs', resource: 'recruitment', label: 'navigation.jobs', Icon: BriefcaseBusiness },
+  { path: 'cv-intake', resource: 'candidate', label: 'hrIntake.queue', Icon: Layers3 },
   { path: 'candidates', resource: 'candidate', label: 'navigation.candidates', Icon: UsersRound },
   { path: 'applications', resource: 'application', label: 'navigation.applications', Icon: Layers3 },
 ];

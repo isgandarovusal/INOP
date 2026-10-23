@@ -2,7 +2,7 @@ const Source=require('../models/hrCvIntake.model'),Candidate=require('../models/
 const authority=require('./hrCreateRecovery.service'),{aggregateResourceFilter,resourceFilter}=require('./hrResourceScope.service');
 const fail=(code,status=400)=>Object.assign(new Error('Private source queue is unavailable.'),{code,status});
 const states=new Set(['reserved','queued','running','retry','ready','blocked','quarantined','failed','cancelled']);
-const pick={original:1,taskVersion:1,state:1,code:1,attempts:1,uploadAttempts:1,updatedAt:1,createdAt:1,evidenceMode:1,intakeContext:1,'approval.completedAt':1,'approval.candidateId':1};
+const pick={original:1,taskVersion:1,state:1,code:1,attempts:1,uploadAttempts:1,updatedAt:1,createdAt:1,evidenceMode:1,intakeContext:1,'origin.key':1,'approval.completedAt':1,'approval.candidateId':1};
 function candidateScoped(req,filter={}){
  const scope=aggregateResourceFilter(req,'candidate');
  // Unattached sources have no parent to authorize. Avoid 50k null-id lookups;
@@ -19,7 +19,7 @@ function scoped(req,filter={}){
  }
  return[...base,{$unionWith:{coll:Source.collection.name,pipeline:bound}}];
 }
-function metadata(row){return{id:String(row._id),taskVersion:row.taskVersion,state:row.state,code:row.code,attempts:row.attempts,uploadAttempts:row.uploadAttempts,original:row.original,...(row.intakeContext?{intakeContext:row.intakeContext}:{}),updatedAt:row.updatedAt,evidenceMode:row.evidenceMode,requiresApproval:true,...(row.approval?{approvalState:row.approval.completedAt?'completed':'reserved'}:{})};}
+function metadata(row){return{id:String(row._id),receivedAt:row.createdAt,sourceType:row.intakeContext?.sourceType||row.origin?.key||'unknown',taskVersion:row.taskVersion,state:row.state,code:row.code,attempts:row.attempts,uploadAttempts:row.uploadAttempts,original:row.original,...(row.intakeContext?{intakeContext:row.intakeContext}:{}),updatedAt:row.updatedAt,evidenceMode:row.evidenceMode,requiresApproval:true,...(row.approval?{approvalState:row.approval.completedAt?'completed':'reserved'}:{})};}
 function createList({available,ddl,evidenceMode}){
  return async function list(req,query={}){
   available();if(!query||typeof query!=='object'||Array.isArray(query)||Object.keys(query).some(k=>!['page','pageSize','status','q','sourceType','brandId','jobId','batchId'].includes(k)))throw fail('INTAKE_LIST_INPUT');
@@ -27,9 +27,11 @@ function createList({available,ddl,evidenceMode}){
   const page=integer(query.page,1,2000),pageSize=integer(query.pageSize,30,30),status=query.status||'',q=query.q||'';
   if(typeof status!=='string'||status&&!states.has(status)||typeof q!=='string'||q.length>80)throw fail('INTAKE_LIST_INPUT');
   for(const key of ['sourceType','brandId','jobId','batchId'])if(query[key]!==undefined&&(typeof query[key]!=='string'||query[key].length>120||/[\x00-\x1f]/.test(query[key])))throw fail('INTAKE_LIST_INPUT');
+  if(query.sourceType&&![...require('./hrCvIntakeContext.service').types,'unknown'].includes(query.sourceType)||query.jobId&&!require('mongoose').isObjectIdOrHexString(query.jobId)||query.batchId&&!require('./hrCvIntakeContext.service').uuid(query.batchId))throw fail('INTAKE_LIST_INPUT');
   const fresh=await authority.current(req),signature=authority.identity(fresh);if(resourceFilter(fresh,'candidate')._id?.$in?.length===0)throw fail('INTAKE_AUTH_REVOKED',403);await ddl();
-  const contextFilters=Object.fromEntries(['sourceType','brandId','jobId','batchId'].filter(k=>query[k]).map(k=>['intakeContext.'+k,query[k]]));
-  const match={...contextFilters,...(status?{state:status}:{}),...(q.trim()?{'original.originalName':{$regex:q.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),$options:'i'}}:{})};
+  const contextFilters=Object.fromEntries(['brandId','jobId','batchId'].filter(k=>query[k]).map(k=>['intakeContext.'+k,query[k]]));
+  const sourceFilter=query.sourceType==='unknown'?{'intakeContext.sourceType':{$exists:false},'origin.key':{$exists:false}}:query.sourceType?{$or:[{'intakeContext.sourceType':query.sourceType},{'intakeContext.sourceType':{$exists:false},'origin.key':query.sourceType}]}:{};
+  const match={...contextFilters,...sourceFilter,...(status?{state:status}:{}),...(q.trim()?{'original.originalName':{$regex:q.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),$options:'i'}}:{})};
   const pipeline=[...scoped(fresh,match),{$facet:{items:[{$sort:{createdAt:-1,_id:-1}},{$skip:(page-1)*pageSize},{$limit:pageSize},{$project:pick}],total:[{$count:'value'}],states:[{$group:{_id:'$state',count:{$sum:1},pendingReview:{$sum:{$cond:[{$and:[{$eq:['$state','ready']},{$eq:[{$type:'$approval'},'missing']}]},1,0]}},recoveryPending:{$sum:{$cond:[{$and:[{$ne:[{$type:'$approval'},'missing']},{$eq:[{$type:'$approval.completedAt'},'missing']}]},1,0]}}}}]}}];
   const [rows]=await Source.aggregate(pipeline).option({maxTimeMS:2000,allowDiskUse:false});
   const after=await authority.current(req);if(authority.identity(after)!==signature)throw fail('INTAKE_AUTH_REVOKED',403);

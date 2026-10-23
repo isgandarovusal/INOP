@@ -11,6 +11,11 @@ function endpoint(action){return async(req,res,next)=>{
   return res.status(action==='enqueue'?202:200).json(result);
  }catch(error){if(error.code?.startsWith('INTAKE_')||error.code?.startsWith('HR_')||error.code==='JOB_NOT_OPEN')return res.status(error.status||503).json({code:error.code,message:'Private CV intake is unavailable.'});next(error);}
 };}
+function imports(action){return async(req,res,next)=>{res.set('Cache-Control','private, no-store');try{const service=require('../services/hrCvImport.service').createImport(req.cvIntakeQueue||require('../services/hrCvIntakeProfiles.service').profile());const result=action==='prepare'?await service.prepare(req,req.body):action==='upload'?await service.upload(req,req.params.batchId,req.params.rowId,req.file):action==='list'?await service.list(req,req.query):await service.get(req,req.params.batchId);res.status(action==='prepare'?201:200).json(result);}catch(e){if(e.code?.startsWith('INTAKE_'))return res.status(e.status||503).json({code:e.code,message:'CV import is unavailable.'});next(e);}};}
+router.post('/imports',...authorize('candidate','create'),...authorize('candidate','read'),available,imports('prepare'));
+router.get('/imports',...authorize('candidate','read'),available,imports('list'));
+router.get('/imports/:batchId',...authorize('candidate','read'),available,imports('get'));
+router.post('/imports/:batchId/:rowId',...authorize('candidate','create'),...authorize('candidate','read'),available,upload,imports('upload'));
 router.post('/',...authorize('candidate','create'),...authorize('candidate','read'),available,upload,endpoint('enqueue'));
 router.get('/',...authorize('candidate','read'),endpoint('list'));
 router.get('/:id/duplicates',...authorize('candidate','read'),endpoint('duplicates'));
