@@ -37,6 +37,7 @@ function Badge({ application, onUpdated }: { application: Application; onUpdated
     <strong>{valid ? `${resolved.score}%` : t(`hrMatch.${resolved?.scoreStatus ?? (requested ? 'pending' : application.scoreStatus)}`)}</strong>
     {application.matching && <details onToggle={open}><summary>{t('hrMatch.explanation')}</summary>
       {wanted && (requested && detail.status !== 'ready' ? <HRResourceState status={detail.status} retry={detail.reload} /> : matching && <>
+        {matching.version==='ats-v2'&&<p data-match-method>{t('hrMatch.deterministic')}</p>}
         <p>{t('hrMatch.coverage')}: {Math.round(matching.dataCoverage * 100)}% · {matching.version}</p>
         <p>{t('hrMatch.calculatedAt')}: {matching.calculatedAt}</p>
         {matching.criteria.map(c => <p key={c.key}>{t(`hrMatch.${c.key}`)} · {Math.round(c.weight * 100)}% · {c.known ? c.value ?? c.matched?.join(', ') ?? '' : t('cvReview.unknown')}

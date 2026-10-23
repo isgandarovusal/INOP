@@ -98,7 +98,7 @@ export default function ApplicationDetail() {
     </>} />
     <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
     <MatchScoreBadge application={app} onUpdated={resource.reload} />
-    {hasPermission(user, 'application', 'update') && <WorkflowForm key={context.key + ':' + app.revision} app={app} reload={resource.reload} />}
-    <History key={context.key + ':' + app.revision} app={app} reload={resource.reload} />
+    {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />}
+    <History key={'history:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />
   </div>;
 }
