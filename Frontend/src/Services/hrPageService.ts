@@ -6,7 +6,7 @@ import type { RecruitmentBrand, RecruitmentBranch } from './recruitmentCatalogSe
 import type { Job, Candidate, Application } from '../Types/recruitment';
 export interface HRPage<T> { version: 'hr-page-v1'; items: T[]; page: number; pageSize: number; total: number; hasMore: boolean; nextCursor: string | null }
 export interface HRPageQuery {
-  archived?: string; page?: number; pageSize?: number; q?: string; status?: string; sort?: 'newest' | 'name'; brandId?: string; branchId?: string; jobId?: string; candidateId?: string; excludeJobId?: string; after?: string }
+  sourceType?:string; batchId?:string; archived?: string; page?: number; pageSize?: number; q?: string; status?: string; sort?: 'newest' | 'name'; brandId?: string; branchId?: string; jobId?: string; candidateId?: string; excludeJobId?: string; after?: string }
 async function page<T extends { id: string }>(resource: string, query: HRPageQuery, normalize: (raw: unknown) => T, signal?: AbortSignal, scopeKey?: string): Promise<HRPage<T>> {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) if (value !== undefined && value !== '') params.set(key, String(value));

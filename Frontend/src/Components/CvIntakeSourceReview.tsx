@@ -11,6 +11,7 @@ export default function CvIntakeSourceReview({source,linkedJob=false,recovering=
  const review=useAuditResource(JSON.stringify([source.id,source.updatedAt]),'candidate',load,{refreshOnFocus:false});
  return <section data-intake-source-review>
   {source.origin&&<div data-intake-origin><p>{t('hrIntake.source')}: {source.origin.key}</p><p>{t('hrIntake.matches.'+source.origin.matchReason)}</p>{source.origin.suggestedJobId&&!linkedJob&&!recovering&&<Link data-intake-job-suggestion to={'/app/recruitment/candidates/new?'+new URLSearchParams({intakeId:source.id,jobId:source.origin.suggestedJobId})}>{t('hrIntake.chooseSuggestedJob')}</Link>}</div>}
+  {source.intakeContext&&<div data-intake-context><p>{t('hrIntake.source')}: {t('hrUniversal.sources.'+source.intakeContext.sourceType)}</p><p>{t('hrUniversal.declared')}</p>{source.intakeContext.brandId&&<p>{t('hrUniversal.brand')}: {source.intakeContext.brandId}</p>}</div>}
   <h3>{t('hrIntake.duplicates')}</h3><p>{t('hrIntake.noAutomaticMerge')}</p>
   {review.status!=='ready'?<HRResourceState status={review.status} retry={review.reload}/>:review.data?.items.length?<ul>{review.data.items.map(item=><li key={item.candidateId}><Link to={'/app/recruitment/candidates/'+item.candidateId}>{t('hrIntake.reviewExisting')}</Link> — {item.reasons.map(r=>t('hrIntake.duplicateReasons.'+r)).join(', ')}</li>)}</ul>:<p>{t('hrIntake.noVisibleDuplicate')}</p>}
  </section>;

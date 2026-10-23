@@ -52,7 +52,7 @@ export default function HRAnalyticsPage() {
       <label>{t('hrAnalytics.from')}<input type="date" aria-invalid={invalidRange} aria-describedby={invalidRange ? 'hr-analytics-date-error' : undefined} aria-label={t('hrAnalytics.from')} value={filters.from || ''} onChange={e => update('from', e.target.value)} /></label>
       <label>{t('hrAnalytics.to')}<input type="date" aria-invalid={invalidRange} aria-describedby={invalidRange ? 'hr-analytics-date-error' : undefined} aria-label={t('hrAnalytics.to')} value={filters.to || ''} onChange={e => update('to', e.target.value)} /></label>
       <label>{t('hrAnalytics.source')}<select aria-label={t('hrAnalytics.source')} value={filters.source || ''} onChange={e => update('source', e.target.value)}>
-        <option value="">{t('hrAnalytics.allSources')}</option>{['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form', 'unknown'].map(s => <option key={s} value={s}>{t(`hrAnalytics.sources.${s}`)}</option>)}
+        <option value="">{t('hrAnalytics.allSources')}</option>{['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'simit', 'jobsearch', 'external_form', 'unknown'].map(s => <option key={s} value={s}>{t(`hrAnalytics.sources.${s}`)}</option>)}
       </select></label>
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={filters.status || ''} onChange={e => update('status', e.target.value)}>
         <option value="">{t('recruitment.applications.allStatuses')}</option>{statuses.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s.toLowerCase()}`)}</option>)}

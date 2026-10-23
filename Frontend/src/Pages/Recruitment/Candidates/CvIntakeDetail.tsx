@@ -6,7 +6,7 @@ import {hasPermission} from '../../../Utils/permissions';
 import {useHRActionContext} from '../../../Hooks/useHRActionContext';
 import {useAuditResource,auditErrorStatus} from '../../../Hooks/useAuditResource';
 import type {AuditLoadStatus} from '../../../Hooks/useAuditResource';
-import {getCvIntake,downloadCvIntake} from '../../../Services/cvIntakeService';
+import {getCvIntake,downloadCvIntake,intakeReviewUrl} from '../../../Services/cvIntakeService';
 import CvReviewEvidence from '../../../Components/CvReviewEvidence';
 import CvIntakeSourceReview from '../../../Components/CvIntakeSourceReview';
 import HRResourceState from '../../../Components/HRResourceState';
@@ -28,11 +28,11 @@ export default function CvIntakeDetail(){
  const source=result.data,readable=source.state==='ready'||source.state==='blocked'&&source.code==='OCR_REQUIRED';
  return <main className='hr-workspace hr-page' data-source-detail><PageHeader title={source.original.originalName} subtitle={t('hrIntake.queueNotice')}/>
   <p>{t('hrIntake.states.'+source.state)} · {t(source.evidenceMode==='test'?'hrIntake.test':'hrIntake.notice')}</p>
-  <button type='button' onClick={result.reload}>{t('hrIntake.check')}</button>
-  {readable&&<button data-source-download type='button' disabled={action.key===context.key&&action.busy} onClick={()=>void download()}>{t('hrIntake.original')}</button>}
+  <button className='btn-secondary' type='button' onClick={result.reload}>{t('hrIntake.check')}</button>
+  {readable&&<button className='btn-secondary' data-source-download type='button' disabled={action.key===context.key&&action.busy} onClick={()=>void download()}>{t('hrIntake.original')}</button>}
   {action.key===context.key&&action.status!=='ready'&&<HRResourceState status={action.status}/>}
   {source.candidateId&&<Link to={'/app/recruitment/candidates/'+source.candidateId}>{t('hrIntake.reviewExisting')}</Link>}
-  {hasPermission(user,'candidate','create')&&(!source.approvalState||source.approvalState==='reserved')&&<Link data-source-resume to={'/app/recruitment/candidates/new?intakeId='+source.id}>{t('hrIntake.resume')}</Link>}
+  {hasPermission(user,'candidate','create')&&(!source.approvalState||source.approvalState==='reserved')&&<Link data-source-resume to={intakeReviewUrl(source)}>{t('hrIntake.resume')}</Link>}
   <CvReviewEvidence review={source.result?.review}/>
   <CvIntakeSourceReview source={source} recovering/>
  </main>;

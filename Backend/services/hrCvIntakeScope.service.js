@@ -5,6 +5,7 @@ const fail=()=>Object.assign(new Error('Private CV source parent is unavailable.
 // their immutable uploader/assignment is never a substitute for current parent
 // authority. Completed-but-deleted parents are not recreated through replay.
 async function checkLinked(req,row,write=false){
+ await require('./hrCvIntakeContext.service').check(req,row.intakeContext);
  if(!row.approval)return;
  const id=row.approval.candidateId;
  if(!await Candidate.exists({_id:id}).maxTimeMS(1000)){if(row.approval.completedAt)throw fail();return;}

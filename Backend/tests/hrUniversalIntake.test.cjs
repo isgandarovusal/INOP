@@ -1,0 +1,24 @@
+const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('crypto');const{withAuditFixture}=require('./helpers/auditFixture.cjs');const{createIntake}=require('../services/hrCvIntake.service'),Source=require('../models/hrCvIntake.model'),Job=require('../models/job.model'),{docx}=require('./helpers/cvDocuments.cjs');
+test('Universal HR-declared context is immutable, scoped, filterable and separate from trusted origin and hiring stage',async t=>withAuditFixture(async h=>{
+ await Source.createIndexes();const objects=new Map(),store={put:async(k,b)=>objects.set(k.key,Buffer.from(b)),get:async k=>{if(!objects.has(k.key))throw Object.assign(Error(),{code:'STORAGE_NOT_FOUND'});return objects.get(k.key);}};
+ const queue=createIntake({enabled:true,evidenceMode:'test',store,scanner:{scan:async(_b,{sha256})=>({verdict:'clean',sha256,engine:'synthetic',version:'1'})}});
+ const req={headers:{authorization:'Bearer '+h.tokens.admin},user:{id:String(h.actors.admin._id),role:'admin',departmentId:'dep_A'}},job=await Job.create({title:'Synthetic',department:'HR',brandId:'kfc',status:'Open',description:'Synthetic'}),bytes=docx('Name: Synthetic CV\nSkills\nHACCP'),file={originalname:'synthetic.docx',mimetype:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:bytes},batchId=crypto.randomUUID();
+ await t.test('same command/context replays exactly and changed context never overwrites an original',async()=>{
+ const command=crypto.randomUUID(),ctx={sourceType:'kfc',jobId:String(job._id),brandId:'kfc',batchId,externalApplicationId:'synthetic-application-1'};
+ const first=await queue.enqueue(req,file,command,ctx),again=await queue.enqueue(req,file,command,ctx);assert.equal(first.id,again.id);assert.equal(first.intakeContext.declaredByHR,true);assert.equal(first.intakeContext.sourceType,'kfc');assert.equal(first.origin,undefined);
+ await assert.rejects(queue.enqueue(req,file,command,{...ctx,sourceType:'outlook'}),{code:'INTAKE_COMMAND_CONFLICT'});await queue.runOnce(1);
+ const ready=await queue.get(req,first.id);assert.equal(ready.state,'ready');const accepted=await queue.approve(req,first.id,{confirmed:true,expectedHash:ready.original.sha256,expectedUpdatedAt:ready.updatedAt.toISOString(),profile:{name:'Synthetic CV',role:'Cashier',skills:['HACCP']},jobId:String(job._id)});
+ const app=await require('../models/application.model').findById(accepted.applicationId);assert.equal(app.source.key,'kfc');assert.equal(app.source.verification,'hr_declared');assert.equal(app.status,'Applied');assert.deepEqual((await queue.original(req,first.id)).bytes,bytes);
+ assert.equal((await queue.list(req,{sourceType:'kfc',batchId})).total,1);assert.equal((await queue.list(req,{sourceType:'outlook'})).total,0);
+ });
+ await t.test('vacancy and branch narrowing revoke both list metadata and original/detail access',async()=>{
+ await h.models.Role.updateOne({key:'test_own'},{permissions:['candidate','recruitment','application'].map(resource=>({resource,action:'*',scope:'own'}))});
+ const Branch=require('../models/recruitmentBranch.model'),branch=await Branch.create({code:'SYNTHETIC',name:'Synthetic branch',brandId:'kfc',kind:'restaurant',createdBy:h.actors.own._id}),ownReq={headers:{authorization:'Bearer '+h.tokens.own}};
+ const ownJob=await Job.create({title:'Synthetic scoped job',department:'HR',brandId:'kfc',branchId:branch._id,status:'Open',description:'Synthetic',createdBy:h.actors.own._id}),bound=await queue.enqueue(ownReq,file,crypto.randomUUID(),{sourceType:'manual',jobId:String(ownJob._id)}),branchOnly=await queue.enqueue(ownReq,file,crypto.randomUUID(),{sourceType:'manual',brandId:'kfc',branchId:String(branch._id)});
+ assert.equal((await queue.list(ownReq)).total,2);await Branch.updateOne({_id:branch._id},{createdBy:h.actors.foreign._id});assert.equal((await queue.list(ownReq)).total,0);for(const row of [bound,branchOnly])await assert.rejects(queue.get(ownReq,row.id),{code:'INTAKE_SOURCE_UNAVAILABLE'});
+ await Branch.updateOne({_id:branch._id},{createdBy:h.actors.own._id});await Job.updateOne({_id:ownJob._id},{createdBy:h.actors.foreign._id});assert.equal((await queue.list(ownReq)).total,1);await assert.rejects(queue.get(ownReq,bound.id),{code:'INTAKE_SOURCE_UNAVAILABLE'});assert.equal((await queue.get(ownReq,branchOnly.id)).id,branchOnly.id);
+ });
+ await t.test('invalid source/brand/vacancy input is rejected before reservation',async()=>{
+ const count=await Source.countDocuments();for(const c of [{sourceType:'scraped'},{sourceType:'manual',jobId:String(job._id),brandId:'pizza-hut'},{sourceType:'manual',batchId:'invalid'},{sourceType:'manual',externalApplicationId:'bad\nvalue'}])await assert.rejects(queue.enqueue(req,file,crypto.randomUUID(),c),{code:'INTAKE_CONTEXT_INPUT'});assert.equal(await Source.countDocuments(),count);
+ });
+}));

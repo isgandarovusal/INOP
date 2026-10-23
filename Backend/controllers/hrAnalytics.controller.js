@@ -10,7 +10,7 @@ const { brands: getBrands } = require('../services/recruitmentCatalog.service');
 const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
 const { setImmediate: yieldEventLoop } = require('node:timers/promises');
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
-const SOURCES = ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form', 'unknown'];
+const SOURCES = ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'simit', 'jobsearch', 'external_form', 'unknown'];
 function filters(query) {
   const jobs = {}, apps = {};
   for (const [key, value] of Object.entries(query)) if (!['brandId', 'branchId', 'jobId', 'from', 'to', 'source', 'status'].includes(key) || typeof value !== 'string' || value.length > 80) throw Error('Invalid analytics filter.');

@@ -580,10 +580,11 @@ import { getJobById } from "../../../Services/jobsService";
 
 const CandidateForm: React.FC = () => {
   const { id } = useParams(); const { user } = useAuth();
-  const [search] = useSearchParams(); const jobId = id ? undefined : search.get("jobId") ?? undefined;
-  const job = useAuditResource(jobId, "recruitment", getJobById, { refreshOnFocus: false });
+  const [search] = useSearchParams();
   const intakeId=!id&&import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'?search.get('intakeId')??undefined:undefined;
   const intake=useAuditResource(intakeId,'candidate',getCvIntake,{refreshOnFocus:false});
+  const jobId=id?undefined:search.get("jobId")??intake.data?.intakeContext?.jobId;
+  const job = useAuditResource(jobId, "recruitment", getJobById, { refreshOnFocus: false });
   const result = useAuditResource(id, "candidate", getCandidateById, { refreshOnFocus: false });
   const processingJobId=id ? search.get("processingJobId") ?? undefined : undefined;
   const key = JSON.stringify([id, jobId, intakeId, intake.data?.id, processingJobId, result.data?.revision, result.data?.updatedAt, user?.id, user?.role, user?.departmentId, user?.permissions]);

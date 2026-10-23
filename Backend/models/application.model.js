@@ -41,7 +41,8 @@ const applicationSchema = new mongoose.Schema(
     // No legacy backfill: the board uses an equivalent id-derived fallback.
     boardOrder: { type: String, default: function () { return `a0${this._id}V`; }, maxlength: 512, match: /^[A-Za-z][0-9A-Za-z]+$/ },
     source: { type: new mongoose.Schema({
-      key: { type: String, enum: ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'jobsearch', 'external_form'] },
+      verification:{type:String,enum:['approved_source','hr_declared']},
+      key: { type: String, enum: ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'simit', 'jobsearch', 'external_form'] },
       receivedAt: Date,
     }, { _id: false }), default: null },
     interview: { type: mongoose.Schema.Types.Mixed, default: null },
