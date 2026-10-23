@@ -20,9 +20,10 @@ function scoped(req,filter={}){
  return[...base,{$unionWith:{coll:Source.collection.name,pipeline:bound}}];
 }
 function metadata(row){return{id:String(row._id),receivedAt:row.createdAt,sourceType:row.intakeContext?.sourceType||row.origin?.key||'unknown',taskVersion:row.taskVersion,state:row.state,code:row.code,attempts:row.attempts,uploadAttempts:row.uploadAttempts,original:row.original,...(row.intakeContext?{intakeContext:row.intakeContext}:{}),updatedAt:row.updatedAt,evidenceMode:row.evidenceMode,requiresApproval:true,...(row.approval?{approvalState:row.approval.completedAt?'completed':'reserved'}:{})};}
-function createList({available,ddl,evidenceMode}){
+// Metadata reads retain DDL and current parent/role checks even with processing off.
+function createList({ddl,evidenceMode}){
  return async function list(req,query={}){
-  available();if(!query||typeof query!=='object'||Array.isArray(query)||Object.keys(query).some(k=>!['page','pageSize','status','q','sourceType','brandId','jobId','batchId'].includes(k)))throw fail('INTAKE_LIST_INPUT');
+  if(!query||typeof query!=='object'||Array.isArray(query)||Object.keys(query).some(k=>!['page','pageSize','status','q','sourceType','brandId','jobId','batchId'].includes(k)))throw fail('INTAKE_LIST_INPUT');
   const integer=(value,fallback,max)=>{if(value===undefined)return fallback;if(!((typeof value==='string'&&/^[1-9]\d{0,3}$/.test(value))||typeof value==='number'&&Number.isInteger(value))||Number(value)<1||Number(value)>max)throw fail('INTAKE_LIST_INPUT');return Number(value);};
   const page=integer(query.page,1,2000),pageSize=integer(query.pageSize,30,30),status=query.status||'',q=query.q||'';
   if(typeof status!=='string'||status&&!states.has(status)||typeof q!=='string'||q.length>80)throw fail('INTAKE_LIST_INPUT');

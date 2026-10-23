@@ -1190,6 +1190,7 @@
     "allBranches": "Bütün filiallar"
   },
   "hrMatch": {
+    "deterministic": "Qayda əsaslı uyğunluq (ATS-v2); canlı AI qiymətləndirməsi deyil. Son qərarı HR verir.",
     "pending": "Qiymətləndirmə gözləyir",
     "incomplete": "Məlumat natamamdır",
     "calculated": "Hesablanıb",
@@ -1592,6 +1593,7 @@
     "retryProcessing": "Emalı yenidən başlat",
     "retryUncertain": "Yenidən başlatma nəticəsi təsdiqlənmədi. Eyni əmri təhlükəsiz təkrar edin; CV-ni yenidən yükləməyin.",
     "queue": "Gələn CV-lər",
+    "processingDisabled": "Yeni CV qəbulu və emalı aktiv deyil. Mövcud qeydlərə baxa bilərsiniz; yükləmə və emal əməliyyatları bağlıdır.",
     "queueNotice": "Faylların emalını və HR yoxlamasını izləyin. Namizəd profili yalnız məlumatlar yoxlanıb təsdiqləndikdən sonra yaranır.",
     "allStates": "Bütün vəziyyətlər",
     "pendingReview": "HR yoxlamasını gözləyir",

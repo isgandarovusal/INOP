@@ -1173,6 +1173,7 @@
     "allBranches": "All branches"
   },
   "hrMatch": {
+    "deterministic": "Rule-based matching (ATS-v2), not a live AI assessment. HR makes the final decision.",
     "pending": "Awaiting evaluation",
     "incomplete": "Incomplete information",
     "calculated": "Calculated",
@@ -1575,6 +1576,7 @@
     "retryProcessing": "Retry processing",
     "retryUncertain": "Retry outcome is unconfirmed. Repeat the same command safely; do not reupload the CV.",
     "queue": "Incoming CVs",
+    "processingDisabled": "New CV intake and processing are disabled. Existing records remain readable; upload and processing actions are unavailable.",
     "queueNotice": "Track document processing and HR review. A candidate profile is created only after the extracted information is reviewed and confirmed.",
     "allStates": "All states",
     "pendingReview": "Pending HR review",
