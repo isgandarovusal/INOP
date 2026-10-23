@@ -17,7 +17,9 @@ import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<PublicUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Anonymous navigation has no session to hydrate and must not wait for API
+  // availability (including a cold backend) before showing the login form.
+  const [isLoading, setIsLoading] = useState(() => Boolean(getAuthToken()));
   const requestRevision = useRef(0);
 
   useEffect(() => {

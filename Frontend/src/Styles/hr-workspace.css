@@ -15,7 +15,9 @@
 .hr-workspace :is(input, textarea)::placeholder { color: var(--hr-slate); }
 .hr-workspace textarea { min-height: 112px; resize: vertical; }
 .hr-workspace :is(.form-group > label, fieldset label, .hr-list-controls label) { font-size: 13px; font-weight: 600; color: #364b6b; }
-.hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) { display: flex; flex-wrap: wrap; align-items: center; background: var(--hr-white); border: 1px solid var(--border-color); box-shadow: none; padding: 12px; margin-bottom: 16px; border-radius: 10px; gap: 10px; }
+.hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) { display: flex; flex-wrap: wrap; background: var(--hr-white); border: 1px solid var(--border-color); box-shadow: none; padding: 12px; margin-bottom: 16px; border-radius: 10px; gap: 10px; }
+.hr-workspace :is(.filter-bar, .table-toolbar) { align-items: center; }
+.hr-workspace .hr-list-controls { align-items: flex-end; }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) > :first-child { min-width: 0; }
 .hr-workspace :is(.filter-bar, .table-toolbar, .hr-list-controls) :is(input, select) { min-width: 0; font-size: 13px; min-height: 38px; padding-top: 8px; padding-bottom: 8px; }
 .hr-workspace :is(.filter-bar, .hr-list-controls) label { display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; min-width: 0; }
