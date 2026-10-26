@@ -53,6 +53,10 @@ const MONGO_URI = runtime.mongoUri;
 mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
   .then(() => {
     console.log('db connected');
+    if (process.env.HR_CV_INTAKE_WORKER_ENABLED === 'true' && process.env.HR_CV_DURABLE_INTAKE_ENABLED === 'true') {
+      const worker = require('./services/hrCvIntakeWorker.service').createWorker({ enabled: true });
+      worker.start();
+    }
     if (process.env.HR_NOTIFICATION_WORKER_ENABLED === 'true') {
       require('./services/applicationNotificationWorker.service').createNotificationWorker().start();
     }

@@ -1,0 +1,54 @@
+# Existing Render backend: CV runtime activation boundary
+
+Repository start: `npm start` -> `node server.js`; Mongo connects before HTTP
+listen and worker startup. No Render blueprint is committed. Live Render runtime,
+build/start settings and instance RAM have not been inspected through a hosting API.
+The backend Dockerfile installs npm dependencies only, not ClamAV/Tesseract/models.
+
+## Required configuration (names only)
+
+- `HR_CV_STORAGE_PROVIDER=s3`; HTTPS `HR_CV_STORAGE_ENDPOINT`, private
+  `HR_CV_STORAGE_BUCKET`, `HR_CV_STORAGE_REGION`.
+- Hosting-secret-store values: `HR_CV_STORAGE_ACCESS_KEY_ID`,
+  `HR_CV_STORAGE_SECRET_ACCESS_KEY`, optional `HR_CV_STORAGE_SESSION_TOKEN`.
+- Bucket must reject public reads and support the adapter's signed GET/conditional
+  PUT, immutable key/readback contract. Credentials need only scoped object access;
+  no public ACL or bucket administration. Recovery/retention approval is separate.
+- `HR_CV_SCAN_ENABLED`, absolute `HR_CV_SCAN_BINARY` ending in `clamscan`;
+  working executable and trusted definitions no older than 24h. Provisioning and
+  signature updates are operator responsibilities, never runtime auto-installation.
+- Optional `HR_CV_OCR_ENABLED`, `HR_CV_OCR_DATA_DIRECTORY`: Tesseract and
+  AZ/EN/RU models must be available. OCR opt-in also starts the existing OCR worker.
+- `HR_CV_DURABLE_INTAKE_ENABLED` and separately
+  `HR_CV_INTAKE_WORKER_ENABLED`: both must be exactly `true` for the intake scheduler.
+  All opt-ins remain false in the example. Frontend upload visibility is separately
+  controlled by the existing `VITE_HR_DURABLE_INTAKE_ENABLED` build setting.
+
+## In-process scheduling
+
+The worker uses the existing profile `runOnce(1)` and Mongo leases/retry history.
+It waits 10s after completion, 60s after failure; no overlapping tick or second
+queue. Unavailable profiles cannot claim work. Errors are reduced to a safe health
+state without raw logs. Normal process termination remains unchanged; abandoned
+claims recover using existing leases. No work while Render is asleep/stopped.
+`HR_CV_PROCESSING_ENABLED` is a separate Candidate worker, not an intake scheduler.
+
+## Hosting blockers and next operator check
+
+Render Free sleeps after 15 minutes without inbound traffic and loses runtime
+filesystem changes on restart/redeploy/spindown. A timer is not a keep-alive.
+Local CV persistence is unsuitable. Fresh signature updates also need a durable
+or reproducible provisioning strategy. Official ClamAV recommends at least 3 GiB
+RAM for standard definitions, plus headroom for other applications; a 512 MB
+instance is unsuitable for this local scanner plan. Per-upload clamscan startup
+must also fit the existing 10s scanner deadline under representative load; do not
+increase deadlines or trim security signatures to hide an incompatible runtime.
+
+Operator's next read-only action: Render Settings -> report runtime (Native/Docker),
+build/start commands and instance RAM/tier, without environment/credential values.
+Do not enable any gate. Existing service resizing/runtime packaging requires
+separate approval; an extra service is not inherently required if this service
+has adequate resources. No production readiness is claimed until synthetic scan,
+storage and full intake E2E are verified in the approved runtime.
+
+Sources: https://render.com/docs/free ; https://docs.clamav.net/ .
