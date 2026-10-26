@@ -9,6 +9,30 @@ const bytes = Buffer.from('%PDF-SYNTHETIC private object adapter fixture'), mime
 const response = (status, value = []) => ({ status, body: Readable.from(value) });
 const rejects = (operation, code) => assert.rejects(operation, error => error.code === code && error.message === 'Private storage operation is unavailable.' && !error.cause);
 function store(transport, options = {}) { return storage.createStore(config, { transport, now: () => new Date('2026-10-11T08:00:00Z'), ...options }); }
+test('R2 uses existing private S3 contract with provider-managed encryption and immutable signed writes', async () => {
+  const docs = require('./helpers/cvDocuments.cjs');
+  const endpoint = 'https://' + 'a'.repeat(32) + '.r2.cloudflarestorage.com';
+  for (const [bytes, mimeType] of [[await docs.pdf('Synthetic CV'), 'application/pdf'], [docs.docx('Synthetic CV'), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']]) {
+    const ref = storage.prepare(bytes, mimeType), requests = [];
+    const adapter = storage.createStore({ ...config, endpoint, region: 'auto' }, { transport: async request => {
+      requests.push(request);
+      if (request.headers['x-amz-server-side-encryption']) return response(501);
+      return response(200, request.method === 'GET' ? [bytes] : []);
+    } });
+    await adapter.put(ref, bytes); assert.deepEqual(await adapter.get(ref), bytes);
+    const put = requests[0]; assert.equal(put.headers['if-none-match'], '*');
+    assert.equal(put.headers['cache-control'], 'private, no-store'); assert.equal(put.headers['x-amz-meta-sha256'], ref.sha256);
+    assert.equal(put.headers['x-amz-content-sha256'], ref.sha256); assert.equal(put.headers['x-amz-server-side-encryption'], undefined);
+    assert.match(put.headers.authorization, /\/auto\/s3\/aws4_request/); assert.match(put.headers.authorization, /SignedHeaders=[^,]*if-none-match/);
+    assert.equal(ref.provider, 's3'); assert.equal('url' in ref, false); assert.equal('delete' in adapter, false);
+  }
+  for (const host of ['r2.dev', 'public-bucket.r2.dev']) assert.throws(() => storage.createStore({ ...config, endpoint: 'https://' + host }), { code: 'STORAGE_INVALID_CONFIG' });
+  const blob = storage.prepare(bytes, mime);
+  for (const host of ['a'.repeat(32) + '.r2.cloudflarestorage.com.example.com', 'custom.example.com']) {
+    const sent = storage.protocol.sign({ ...config, endpoint: 'https://' + host }, 'PUT', blob, new Date(), bytes);
+    assert.equal(sent.headers['x-amz-server-side-encryption'], 'AES256');
+  }
+});
 test('Private object storage foundation is bounded, immutable, private and disabled until configured', async t => {
   await t.test('no binding is unavailable; no mock/config/legacy provider can enable a store', async () => {
     for (const env of [{}, { HR_CV_STORAGE_PROVIDER: 'disabled' }, { HR_CV_STORAGE_PROVIDER: 'mock' }]) assert.throws(() => storage.fromEnvironment(env), error => ['STORAGE_NOT_CONFIGURED','STORAGE_INVALID_CONFIG'].includes(error.code));

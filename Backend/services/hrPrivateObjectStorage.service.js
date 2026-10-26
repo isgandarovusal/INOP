@@ -32,7 +32,7 @@ function configValue(input) {
   try { endpoint = new URL(input.endpoint); } catch { throw fail('STORAGE_INVALID_CONFIG'); }
   const host = endpoint.hostname;
   if (input.provider !== 's3' || endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || endpoint.pathname !== '/' || endpoint.port ||
-      host.length > 253 || !host.includes('.') || net.isIP(host) || !host.split('.').every(label => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) || /(^|\.)(localhost|local|internal|test|invalid)$/.test(host) ||
+      host.length > 253 || !host.includes('.') || net.isIP(host) || !host.split('.').every(label => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) || /(^|\.)(localhost|local|internal|test|invalid)$/.test(host) || /(^|\.)r2\.dev$/.test(host) ||
       !/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(input.bucket || '') || !/^[a-z0-9-]{1,40}$/.test(input.region || '') ||
       !/^[A-Za-z0-9_-]{3,128}$/.test(input.accessKeyId || '') || typeof input.secretAccessKey !== 'string' || input.secretAccessKey.length < 8 || input.secretAccessKey.length > 256 ||
       // eslint-disable-next-line no-control-regex -- Reject credential header injection; intentional control-character validation.
@@ -48,7 +48,13 @@ function sign(config, method, blob, at, body, options = {}) {
   url.search = query;
   const headers = { host: url.host, 'x-amz-date': timestamp, 'x-amz-content-sha256': digest(body || Buffer.alloc(0)) };
   if (config.sessionToken) headers['x-amz-security-token'] = config.sessionToken;
-  if (method === 'PUT') Object.assign(headers, { 'content-type': blob.mimeType, 'cache-control': 'private, no-store', 'if-none-match': '*', 'x-amz-meta-sha256': blob.sha256, 'x-amz-server-side-encryption': 'AES256' });
+  if (method === 'PUT') {
+    Object.assign(headers, { 'content-type': blob.mimeType, 'cache-control': 'private, no-store', 'if-none-match': '*', 'x-amz-meta-sha256': blob.sha256 });
+    // R2 encrypts every object at rest but rejects the S3 SSE-S3 request header.
+    // Limit this compatibility exception to the official account API endpoint;
+    // generic/custom S3 endpoints retain the existing explicit AES256 request.
+    if (!/^[a-f0-9]{32}\.r2\.cloudflarestorage\.com$/.test(url.hostname)) headers['x-amz-server-side-encryption'] = 'AES256';
+  }
   Object.assign(headers, options.headers || {});
   const names = Object.keys(headers).sort(), signed = names.join(';');
   const canonical = [method,url.pathname,query, names.map(k => k + ':' + headers[k].trim() + '\n').join(''), signed,headers['x-amz-content-sha256']].join('\n');

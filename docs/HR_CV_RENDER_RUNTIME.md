@@ -53,6 +53,47 @@ storage and full intake E2E are verified in the approved runtime.
 
 Sources: https://render.com/docs/free ; https://docs.clamav.net/ .
 
+## R2 compatibility of the existing Recruitment S3 adapter
+
+Use provider `s3`, the standard `https://<32-hex-account-id>.r2.cloudflarestorage.com`
+account API endpoint and region `auto`. The existing bucket/key references and
+SigV4 GET/conditional PUT contract remain unchanged; no new provider registry or
+pipeline is introduced. R2 rejects the SSE-S3 request header, so it is omitted
+only for this exact official endpoint pattern. R2 automatically encrypts objects
+and metadata at rest with AES-256. Other S3 hosts retain the AES256 header.
+Public r2.dev endpoints are rejected. A valid API endpoint alone does not prove
+the bucket is private: the operator must confirm BOTH public-development access
+and public custom domains are disabled. Only server-authorized download routes
+may return file bytes; no public/presigned URL is put into the reference/DTO.
+
+SHA-256 payload signing, metadata, hash/size readback and If-None-Match remain
+mandatory. ETag is not treated as the CV checksum. The adapter does not delete
+objects or provision retention policies. Existing bucket lifecycle/lock settings
+and recovery arrangements must be inspected before activation; durability and
+an immutable client write are not a backup. Do not assume S3 versioned restore
+or the separate Audit storage contract is available on R2.
+
+Scope an existing R2 token to the intended bucket. R2 Object Read & Write tokens
+can include object deletion; the application's lack of a delete method does not
+remove that token capability. Retention/lock and recovery controls need explicit
+owner approval; no automatic expiration policy is proposed or installed here.
+Existing account/bucket/token availability is UNKNOWN without an authorized
+Cloudflare read-only channel or operator metadata. Never print credential values.
+
+Standard R2 free allowances: 10 GB-month storage, 1 million Class A operations and
+10 million Class B operations monthly, free Internet egress. This is not a billing
+cap: excess usage can incur charges. No paid subscription or account was created.
+
+Compatibility was tested with synthetic PDF/DOCX and a local injected protocol
+transport, not a live bucket. Scanner and intake gates remain off. R2 does not
+solve the Render Free ClamAV resource blocker.
+
+Sources: https://developers.cloudflare.com/r2/api/s3/api/ ;
+https://developers.cloudflare.com/r2/reference/data-security/ ;
+https://developers.cloudflare.com/r2/buckets/public-buckets/ ;
+https://developers.cloudflare.com/r2/api/tokens/ ;
+https://developers.cloudflare.com/r2/pricing/ .
+
 ## Free-tier scanner alternatives reviewed (26 October 2026)
 
 No replacement is activated. YARA/YARA-X are rule-driven pattern engines, not
