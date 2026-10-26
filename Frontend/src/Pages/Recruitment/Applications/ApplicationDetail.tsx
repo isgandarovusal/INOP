@@ -16,6 +16,7 @@ import type { Application, ApplicationStatus, ApplicationInterview, ApplicationN
 import PageHeader from '../../../Components/PageHeader';
 import HRResourceState from '../../../Components/HRResourceState';
 import MatchScoreBadge from '../../../Components/MatchScoreBadge';
+import {applicationWorkflowKey} from '../../../Utils/applicationWorkflowKey';
 
 const historyLoad = (key: string, signal?: AbortSignal, scopeKey?: string) => { const [id, offset] = JSON.parse(key) as [string, number]; return getApplicationHistory(id, offset, signal, scopeKey); };
 function History({ app, reload }: { app: Application; reload: () => void }) {
@@ -98,7 +99,7 @@ export default function ApplicationDetail() {
     </>} />
     <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
     <MatchScoreBadge application={app} onUpdated={resource.reload} />
-    {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />}
+    {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} reload={resource.reload} />}
     <History key={'history:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />
   </div>;
 }
