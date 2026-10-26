@@ -52,3 +52,33 @@ has adequate resources. No production readiness is claimed until synthetic scan,
 storage and full intake E2E are verified in the approved runtime.
 
 Sources: https://render.com/docs/free ; https://docs.clamav.net/ .
+
+## Free-tier scanner alternatives reviewed (26 October 2026)
+
+No replacement is activated. YARA/YARA-X are rule-driven pattern engines, not
+evidence of equivalent maintained PDF/DOCX malware coverage. Hash lookups and
+MIME/content validation do not substitute for scanning the submitted bytes.
+
+VirusTotal Public: 500 requests/day, 4/minute, no commercial product/service use;
+standard uploads enter the community dataset and must not include PII. Standard
+upload endpoint accepts up to 32MB; the size allowance does not solve privacy.
+Private Scanning is paid, typically retains content 24h (configurable), and does
+not include partner multi-antivirus verdicts. Not selected.
+
+Cloudmersive advertises 600 free calls/month, 1 call/second, one concurrent call,
+3.5MB maximum file size and evaluation/lower-availability service. The virus API
+page claims stateless in-memory processing without payload retention; this is a
+vendor statement, not an approved INOP data-processing arrangement. It introduces
+a new account/provider, CV transfer and credentials, and does not cover this
+pipeline's 5MiB maximum. No client/account is created or integrated.
+
+Sources: https://docs.virustotal.com/reference/public-vs-premium-api ;
+https://docs.virustotal.com/reference/files-scan ;
+https://docs.virustotal.com/docs/private-scanning ;
+https://cloudmersive.com/pricing-small-business ;
+https://cloudmersive.com/faq ; https://cloudmersive.com/virus-api ;
+https://virustotal.github.io/yara-x/docs/intro/getting-started/ .
+
+Under the fixed Free/no-new-provider/no-extra-service constraints, safe automatic
+CV admission remains blocked. Do not enable upload, discard signatures to reduce
+RAM, trust a user-supplied scan assertion or return a fabricated clean verdict.

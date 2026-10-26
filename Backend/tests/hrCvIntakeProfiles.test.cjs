@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
-const {docx}=require('./helpers/cvDocuments.cjs');
+const {docx,pdf}=require('./helpers/cvDocuments.cjs');
 function load(name,dependencies,env={}){
  const module={exports:{}};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../services',name),'utf8'),{module,exports:module.exports,require:id=>{if(id in dependencies)return dependencies[id];if(id.startsWith('node:'))return require(id);throw Error('Unexpected dependency '+id);},process:{env},Buffer,AbortController,setTimeout,clearTimeout});
@@ -23,21 +23,30 @@ test('Intake profile remains default-off, preserves metadata on bad config and r
  env.HR_CV_DURABLE_INTAKE_ENABLED='false';assert.equal(profile(),disabled);
 });
 test('Configured intake never reserves or persists an original before a successful scanner verdict',async()=>{
- let indexReads=0,scans=0;const bytes=docx('Name: Synthetic Applicant\nSkills\nHACCP');
+ let indexReads=0,scans=0;
  const deps={
   mongoose:{},'../models/hrCvIntake.model':{collection:{indexes:async()=>{indexReads++;throw Error('Stop before any database write');}}},'../models/user.model':{},'../models/role.model':{},
   './hrCreateRecovery.service':{current:async()=>({user:{id:'synthetic'}}),identity:()=> 'synthetic'},'./hrResourceScope.service':{resourceFilter:()=>({})},
-  './hrPrivateObjectStorage.service':{MAX_BYTES:5*1024*1024},'./documentWorkerPool.service':{pool:{run:async()=>true}},'./uploadContent.service':{types:{'.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}},'./cvParser.service':{},
+  './hrPrivateObjectStorage.service':{MAX_BYTES:5*1024*1024},'./documentWorkerPool.service':{pool:{run:async()=>true}},'./uploadContent.service':{types:{'.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','.pdf':'application/pdf'}},'./cvParser.service':{},
   './hrCvIntakeContext.service':{validate:async()=>undefined},'./hrCvSourceReview.service':{createDuplicates:()=>()=>{}},'./hrCvIntakeList.service':{createList:()=>()=>{}},'./hrCvIntakeRetry.service':{createRetry:()=>()=>{}},'./hrCvIntakeApproval.service':{createApproval:()=>({})},
  };
  const {createIntake}=load('hrCvIntake.service.js',deps);
- const file={buffer:bytes,originalname:'synthetic.docx',mimetype:deps['./uploadContent.service'].types['.docx']};
  const store={get:()=>{throw Error('Forbidden storage');},put:()=>{throw Error('Forbidden persistence');}};
- for(const verdict of ['unavailable','infected','wrong-hash','clean']){
-  const service=createIntake({enabled:true,store,scanBeforePersistence:true,scanner:{scan:async(input,context)=>{scans++;assert.deepEqual(input,bytes);assert.equal(context.sha256,crypto.createHash('sha256').update(bytes).digest('hex'));if(verdict==='unavailable')throw Error('private scanner error');return{verdict:verdict==='infected'?'infected':'clean',sha256:verdict==='wrong-hash'?'0'.repeat(64):context.sha256,engine:'clamav',version:'1'};}}});
+ for(const [ext,bytes] of [['.docx',docx('Name: Synthetic Applicant\nSkills\nHACCP')],['.pdf',await pdf('Synthetic CV: HACCP')]]){
+ const file={buffer:bytes,originalname:'synthetic'+ext,mimetype:deps['./uploadContent.service'].types[ext]};
+ for(const verdict of ['unavailable','timeout','inconclusive','infected','wrong-hash','clean']){
+  indexReads=0;
+  const service=createIntake({enabled:true,store,scanBeforePersistence:true,scanner:{scan:async(input,context)=>{scans++;assert.deepEqual(input,bytes);assert.equal(context.sha256,crypto.createHash('sha256').update(bytes).digest('hex'));if(['unavailable','timeout'].includes(verdict))throw Object.assign(Error('private scanner error'),{code:verdict==='timeout'?'AV_TIMEOUT':'AV_UNAVAILABLE'});return{verdict:verdict==='infected'?'infected':verdict==='inconclusive'?'unknown':'clean',sha256:verdict==='wrong-hash'?'0'.repeat(64):context.sha256,engine:'clamav',version:'1'};}}});
   await assert.rejects(service.enqueue({},file,crypto.randomUUID()),{code:verdict==='infected'?'INTAKE_QUARANTINED':verdict==='clean'?'INTAKE_DDL_REQUIRED':'INTAKE_SCAN_REQUIRED'});
   assert.equal(indexReads,verdict==='clean'?1:0);
  }
- assert.equal(scans,4);
+ }
+ assert.equal(scans,12);
+ const neverScan=createIntake({enabled:true,store,scanBeforePersistence:true,scanner:{scan:async()=>{throw Error('Scanner must not run for invalid input');}}});
+ for(const file of [
+  {buffer:Buffer.from('invalid'),originalname:'invalid.docx',mimetype:'application/pdf'},
+  {buffer:Buffer.from('invalid'),originalname:'invalid.exe',mimetype:'application/pdf'},
+  {buffer:Buffer.alloc(5*1024*1024+1),originalname:'large.pdf',mimetype:'application/pdf'},
+ ])await assert.rejects(neverScan.enqueue({},file,crypto.randomUUID()),{code:'INTAKE_INPUT'});
  assert.throws(()=>createIntake({enabled:true,store,scanBeforePersistence:true}).assertAvailable(),{code:'INTAKE_SCAN_REQUIRED'});
 });
