@@ -12,7 +12,10 @@ async function validate(req,input){
  if(input.batchId!==undefined){if(!uuid(input.batchId))throw fail();out.batchId=input.batchId;}
  if(input.brandId!==undefined){if(typeof input.brandId!=='string'||!(await require('./recruitmentCatalog.service').brands()).some(b=>b.id===input.brandId&&b.active))throw fail();out.brandId=input.brandId;}
  if(input.jobId!==undefined){if(!mongoose.isObjectIdOrHexString(input.jobId))throw fail();const job=await Job.findOne({$and:[{_id:input.jobId,archivedAt:null,status:'Open'},resourceFilter(req,'recruitment')]}).select('_id brandId branchId').maxTimeMS(1000).lean();if(!job||out.brandId&&out.brandId!==job.brandId)throw fail();out.jobId=String(job._id);if(job.brandId)out.brandId=job.brandId;if(job.branchId)out.branchId=String(job.branchId);}
- if(input.branchId!==undefined){if(!mongoose.isObjectIdOrHexString(input.branchId)||out.branchId&&out.branchId!==input.branchId||await require('./recruitmentCatalog.service').validateLocation(req,{brandId:out.brandId??null,branchId:input.branchId}))throw fail();out.branchId=String(input.branchId);}
+ if(input.branchId!==undefined){if(!mongoose.isObjectIdOrHexString(input.branchId)||out.branchId&&out.branchId!==input.branchId)throw fail();out.branchId=String(input.branchId);}
+ // Inherited Job links need the same current catalog/location authority as
+ // explicitly selected links: a visible Job can reference a stale/foreign branch.
+ if((out.brandId||out.branchId)&&await require('./recruitmentCatalog.service').validateLocation(req,{brandId:out.brandId??null,branchId:out.branchId??null}))throw fail();
  return out;
 }
 async function check(req,context){
