@@ -69,6 +69,10 @@ mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
     if (process.env.HR_CV_AI_PROCESSING_ENABLED === 'true') {
       require('./services/hrCvTaskProfiles.service').profile('ai-review').start();
     }
-    app.listen(PORT, "0.0.0.0", () => console.log(`Port is listening in ${PORT}`));
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Port is listening in ${PORT}`);
+      // One optional read-only HEAD; never delays readiness or enables intake.
+      void require('./services/hrR2StartupVerification.service').createVerification().run();
+    });
   })
   .catch((err) => { require('./services/safeErrorLog.service').logFailure(err);process.exitCode=1; });

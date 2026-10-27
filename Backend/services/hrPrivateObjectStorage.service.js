@@ -123,8 +123,28 @@ function createStore(input, { transport = nativeTransport, now = () => new Date(
       throw fail(method === 'PUT' ? 'STORAGE_WRITE_UNCERTAIN' : 'STORAGE_UNAVAILABLE');
     } finally { active--; clearTimeout(timer); signal?.removeEventListener('abort',abort); try { response?.body?.destroy?.(); } catch { /* Cleanup must not echo provider error objects. */ } }
   }
+  // Signed HeadBucket only: no object key, listing, body reads, writes or retries.
+  async function checkConnection() {
+    if (active >= 2) throw fail('STORAGE_BUSY');
+    active++;
+    const controller = new AbortController();
+    let timer;
+    try {
+      const work = async () => {
+        const response = await transport({ ...sign(config,'HEAD',{key:''},now()), signal:controller.signal });
+        try {
+          if (controller.signal.aborted || response?.status !== 200) throw fail('STORAGE_UNAVAILABLE');
+          return true;
+        } finally { try { response?.body?.destroy?.(); } catch { /* Never echo provider metadata. */ } }
+      };
+      return await Promise.race([work(), new Promise((_,reject) => {
+        timer=setTimeout(() => { controller.abort();reject(fail('STORAGE_TIMEOUT')); },timeoutMs);
+      })]);
+    } catch { throw fail('STORAGE_UNAVAILABLE'); }
+    finally { active--;clearTimeout(timer); }
+  }
   // Resource authorization must occur in the server caller, never from a key.
-  return Object.freeze({ put: (blob, bytes, options = {}) => operation('PUT',blob,bytes,options.signal), get: (blob,options = {}) => operation('GET',blob,undefined,options.signal) });
+  return Object.freeze({ put: (blob, bytes, options = {}) => operation('PUT',blob,bytes,options.signal), get: (blob,options = {}) => operation('GET',blob,undefined,options.signal), checkConnection });
 }
 function fromEnvironment(env = process.env) {
   if (!env.HR_CV_STORAGE_PROVIDER || env.HR_CV_STORAGE_PROVIDER === 'disabled') throw fail('STORAGE_NOT_CONFIGURED');

@@ -123,3 +123,58 @@ https://virustotal.github.io/yara-x/docs/intro/getting-started/ .
 Under the fixed Free/no-new-provider/no-extra-service constraints, safe automatic
 CV admission remains blocked. Do not enable upload, discard signatures to reduce
 RAM, trust a user-supplied scan assertion or return a fabricated clean verdict.
+
+## Simplified R2 verification: read-only startup check
+
+The previous diagnostic's HTTP 401 with a placeholder Bearer value is an
+application authentication rejection, not evidence of an R2 failure. Keep its
+`HR_R2_DIAGNOSTIC_ENABLED=false`; no Admin token/challenge workflow is needed for
+this startup check. Existing temporary endpoint controls remain intact/disabled.
+
+After separately approved push, the shortest activation is one opt-in:
+`HR_R2_VERIFY_ON_START=read-only` on existing `inop-backend`, **Save only**, then
+one separately approved deployment of the new commit. It will use the new env.
+If the new code is already Live, **Save and deploy** instead reuses that build
+with the new env; do not use that option on an old build lacking this check.
+**Save only** does not affect a running deployment. Keep Auto-Deploy OFF.
+No Shell/SSH, extra plan, new service, API token extraction or new credential is
+needed. This document does not authorize any production change or deployment.
+
+On server listening, the check validates the existing configuration, then sends
+exactly one signed S3 **HeadBucket** request to the configured official R2 account
+endpoint and `inop-private-cv`, region `auto`. It reuses the existing adapter's
+SigV4, TLS, public-DNS validation/pinning, two-operation concurrency budget and
+8-second timeout. No listing, object key, object read, write, DELETE, redirect
+following or retry occurs. It does not alter server readiness or HTTP responses.
+All CV intake/scanner/OCR/processing/worker gates must remain false or unset;
+otherwise it reports CONFIG_INVALID without contacting storage.
+
+Look only in existing Render application logs:
+- `CONFIG_MISSING` / `CONFIG_INVALID`: stop, configuration/gate precondition failed.
+- `CONFIG_OK`, followed by `R2_CONNECTION_OK`: configured credentials received
+  HTTP 200 for signed HeadBucket from Render. This establishes only bucket HEAD
+  access/connectivity. It does NOT prove object read/write permission, integrity,
+  conditional writes, public-access policy, retention/recovery or scanner health.
+- `CONFIG_OK`, followed by `R2_CONNECTION_FAILED`: signed bucket HEAD did not
+  succeed (e.g. access denied, missing bucket, network/DNS/TLS or timeout). Raw
+  provider status/body/headers/account/key/credentials are deliberately not logged.
+  Do not automatically widen token permissions: a HEAD permission denial is not
+  proof that object GET/PUT are broken. Review the existing bucket-scoped token
+  and endpoint privately with the owner before any change/retry.
+
+Only these codes are emitted by this check. No bearer secret or additional
+activation digest/expiry is needed. At most one check runs per process; **Render
+sleep/restart/redeploy can run another HEAD if the flag is left on**. After
+capturing the result, set `HR_R2_VERIFY_ON_START=disabled` and **Save and deploy**
+to prevent checks on later starts. This is read-only and bounded even if left on;
+it is not a globally durable once-only job or a periodic health probe.
+
+Real WRITE_OK / READBACK_OK / SHA256_MATCH / WRITE_CONFLICT_CONFIRMED still require
+explicit owner approval of exactly one synthetic `hr/cv/<UUID>` object, two
+conditional PUT attempts of identical bytes and one verified GET. Without DELETE
+that object remains retained; do not silently create or clean it up. This startup
+check deliberately contains **no write mode**. No real CV is needed or permitted.
+Production write approval and a minimal future execution change remain separate.
+
+References: https://developers.cloudflare.com/r2/api/s3/api/ (HeadBucket support);
+https://render.com/docs/configure-environment-variables (Save options).
