@@ -11,6 +11,17 @@ test('Native QA is default-disabled and cannot run on Render or with any CV gate
 test('Generated PDF/DOCX and harmless EICAR fixtures contain no external file/data input',async()=>{
  const f=await syntheticFixtures();assert.deepEqual(f.map(x=>x.label),['clean_pdf','clean_docx','eicar_raw','eicar_docx']);assert.equal(f[2].bytes.length,68);
  const {validContent}=require('../services/uploadContent.service');assert.equal(validContent(f[0].bytes,'.pdf'),true);assert.equal(validContent(f[1].bytes,'.docx'),true);assert.equal(validContent(f[3].bytes,'.docx'),true);
+ // EICAR must be an exact standalone archive member, not XML-wrapped text.
+ const zlib=require('node:zlib'),entries=new Map();let offset=0;
+ while(f[3].bytes.readUInt32LE(offset)===0x04034b50){
+  const b=f[3].bytes,size=b.readUInt32LE(offset+18),nameLength=b.readUInt16LE(offset+26),extraLength=b.readUInt16LE(offset+28);
+  const start=offset+30+nameLength+extraLength,name=b.subarray(offset+30,offset+30+nameLength).toString();
+  const raw=zlib.inflateRawSync(b.subarray(start,start+size));assert.equal(zlib.crc32(raw),b.readUInt32LE(offset+14));
+  entries.set(name,raw);offset=start+size;
+ }
+ assert.equal(entries.size,3);assert.deepEqual(entries.get('word/embeddings/eicar.com'),f[2].bytes);
+ assert.ok(!entries.get('word/document.xml').includes(f[2].bytes));
+ assert.equal(f[3].bytes.readUInt16LE(f[3].bytes.length-22+10),3);
  assert.ok(f.every(x=>x.bytes.length<5*1024*1024));
 });
 test('Mock QA orchestration is explicitly not evidence of real engine execution',async()=>{

@@ -11,7 +11,7 @@ async function syntheticFixtures() {
     {label:'clean_docx',bytes:docx('INOP synthetic scanner fixture. No personal data.'),mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',expected:'clean'},
     // Raw EICAR tests the engine, not PDF format validation.
     {label:'eicar_raw',bytes:eicar,mimeType:'application/pdf',expected:'infected'},
-    {label:'eicar_docx',bytes:docx(eicar.toString('ascii')),mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',expected:'infected'},
+    {label:'eicar_docx',bytes:docx('INOP synthetic antivirus container fixture.', [['word/embeddings/eicar.com',eicar]]),mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',expected:'infected'},
   ];
 }
 function createQa({env=process.env,scannerFactory=createScanner,fixtures=syntheticFixtures,emit=record=>console.log(JSON.stringify(record)),clock=()=>performance.now()}={}) {
