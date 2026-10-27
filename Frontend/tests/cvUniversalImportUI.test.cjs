@@ -15,7 +15,17 @@ test('Real AuthProvider bulk intake: partial rejection, original persistence, hu
  await h.page.locator('[data-cv-import] input[type=file]:not([multiple])').setInputFiles({name:'routing.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:'hr-import-routing-v1',rows:[{filename:'synthetic.docx',context:{sourceType:'kfc',brandId:'kfc',jobId:String(job._id)}}]}))});
  await h.page.locator('[data-cv-import] button').filter({hasText:/Önbaxış|önbaxış|Preview/}).click();await h.page.locator('[data-import-preview]').waitFor();assert.equal(await Source.countDocuments(),0);
  await h.page.locator('[data-cv-import] .btn-primary').click();await h.page.locator('[data-import-count=accepted]').filter({hasText:'1'}).waitFor();assert.equal(await h.page.locator('[data-import-count=failed]').textContent(),'1');assert.equal(await h.page.locator('[data-import-count=completed]').textContent(),'0');assert.equal(await Source.countDocuments(),1);
- await queue.runOnce(1);await h.page.locator('[data-import-receipt] button').click();await h.page.locator('[data-import-count=reviewRequired]').filter({hasText:'1'}).waitFor();
+ await queue.runOnce(1);
+ // Receipt rendering precedes onAccepted's list effect. Exercise delayed delivery
+ // and finish that explicit refresh before starting the zero-request idle window.
+ const listPattern='**/api/hr/cv-intake?*';
+ const delayedList=async route=>{await new Promise(resolve=>setTimeout(resolve,300));await route.fallback();};
+ await h.page.route(listPattern,delayedList);
+ const refreshedList=h.page.waitForResponse(r=>new URL(r.url()).pathname==='/api/hr/cv-intake'&&r.request().method()==='GET'&&r.status()===200);
+ await h.page.locator('[data-import-receipt] button').click();await h.page.locator('[data-import-count=reviewRequired]').filter({hasText:'1'}).waitFor();
+ assert.equal((await (await refreshedList).json()).summary.pendingReview,1);
+ await h.page.locator('[data-source-summary]').filter({hasText:': 1 ·'}).waitFor();
+ await h.page.unroute(listPattern,delayedList);
  const before=h.wire.filter(x=>x.path.startsWith('/api/hr/')).length,navs=await h.page.evaluate(()=>performance.getEntriesByType('navigation').length);await h.page.waitForTimeout(31000);assert.equal(h.wire.filter(x=>x.path.startsWith('/api/hr/')).length,before);assert.equal(await h.page.evaluate(()=>performance.getEntriesByType('navigation').length),navs);assert.equal(await h.page.locator('[data-import-count=accepted]').textContent(),'1');
  for(const lng of ['az','en','ru']){const n=h.wire.filter(x=>x.path.startsWith('/api/hr/')).length;await h.page.evaluate(l=>window.changeLocale(l),lng);for(const width of [1440,768,390,320]){await h.page.setViewportSize({width,height:900});await h.page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getTiming().iterations??1)).map(a=>a.finished.catch(()=>{})));window.scrollTo(0,0);});assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${lng}/${width} overflow`);if(out)await h.page.screenshot({path:path.join(out,`intake-${lng}-${width}.png`),fullPage:true});}assert.equal(h.wire.filter(x=>x.path.startsWith('/api/hr/')).length,n,'locale must not refetch');}
  const r=await Batch.findOne().lean(),source=await Source.findById(r.rows[0].sourceId).select('+blob').lean();assert.deepEqual(objects.get(source.blob.key),bytes);assert.equal(r.rows[0].state,'accepted');
