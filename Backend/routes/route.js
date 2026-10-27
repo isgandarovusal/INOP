@@ -56,6 +56,8 @@ router.use('/auth', authRoutes);
 // Authentication is therefore secure by default.
 router.use(verifyToken);
 
+router.use('/hr/storage-diagnostic',require('./hrStorageDiagnostic.routes'));
+
 router.use('/hr/cv-intake',require('./hrCvIntake.routes'));
 router.use('/users', userRoutes);
 router.use('/departments', departmentRoutes);
