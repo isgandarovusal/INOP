@@ -1,0 +1,47 @@
+name: Manual ClamAV synthetic QA (no CV or storage)
+on:
+  workflow_dispatch:
+    inputs:
+      run_native_qa:
+        description: 'Run real ClamAV on generated synthetic documents/EICAR only; no production access'
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: clamav-synthetic-qa-single
+  cancel-in-progress: false
+jobs:
+  native-qa:
+    if: github.repository == 'isgandarovusal/INOP' && github.ref == 'refs/heads/inop-main' && github.actor == 'isgandarovusal' && github.event_name == 'workflow_dispatch' && inputs.run_native_qa == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      HR_CV_DURABLE_INTAKE_ENABLED: 'false'
+      HR_CV_SCAN_ENABLED: 'false'
+      HR_CV_INTAKE_WORKER_ENABLED: 'false'
+      HR_CV_OCR_ENABLED: 'false'
+      HR_CV_PROCESSING_ENABLED: 'false'
+      HR_CV_AI_PROCESSING_ENABLED: 'false'
+      INOP_NATIVE_AV_QA_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install existing locked fixture dependencies without lifecycle scripts
+        run: npm ci --prefix Backend --ignore-scripts --no-audit --no-fund
+      - name: Install distro ClamAV and fetch current official signatures (ephemeral QA runner only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clamav clamav-freshclam time
+          sudo systemctl stop clamav-freshclam
+          sudo timeout 300 freshclam --stdout --checks=1
+          clamscan --version
+      - name: Existing native adapter, unchanged scan deadline, sequential synthetic fixtures
+        run: /usr/bin/time -f 'QA_PROCESS_TREE_PEAK_RSS_KB=%M QA_ELAPSED_SECONDS=%e' node Backend/scripts/verifyNativeClamav.cjs --synthetic-only
