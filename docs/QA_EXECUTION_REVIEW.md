@@ -116,3 +116,33 @@ implemented or measured. Parallel tests remain unsafe without verified isolation
   diff. No push, CI dispatch, deployment or production interaction performed.
 - Historical CI approval/navigation timeout remains unresolved. No production
   correction, assertion change or increased deadline is justified by current evidence.
+
+## Follow-up: completed run 40641016028 (a972751)
+
+Job 122658917178 failed only browser group 2 (status 1; signal/errorCode null).
+The same source-review subtest timed out waiting for [data-existing], but the new
+sanitized diagnostic establishes one approval request and HTTP 422 before timeout
+(elapsed 10044 ms). This was an approval rejection, not evidence of slow successful
+navigation. The final visual group was not the cause.
+
+In the approval call graph, HTTP 422 is emitted by required profile name/role
+validation. Which field was absent in the historical request, and why, were not
+recorded; do not claim a proven product regression or a proven remount race.
+Unmodified source review passed locally with CPU throttling rates 4, 8, 12, 16.
+
+The previous readiness predicate (prefilled name alone) also holds before the
+suggested Job is selected. The test now requires the resume link to reflect both
+the intended Job and source before editing the form. The navigation assertion,
+10-second timeout and DB assertions are unchanged. Failure diagnostics add only
+required-name/role presence booleans, never field values or request bodies.
+
+Validation: hardened source-review test passed three consecutive runs (8/8 each);
+adjacent queue/recovery tests 16/16 PASS; approval/security regressions 21/21 PASS.
+A temporary synthetic empty-role negative control produced HTTP 422 and retained
+the original navigation timeout, reporting namePresent=true/rolePresent=false.
+That deliberate failure validates diagnostics; it is not a historical reproduction.
+The temporary invalid input was removed; final valid rerun passed 8/8. Syntax/diff
+checks passed. No full CI, push or deployment was performed. No production code,
+CV gates, storage, scanner, real CV, DB, policy or workflow changes were made.
+Historical trigger remains unconfirmed; the local change is test hardening rather
+than a claim that the full CI issue has been conclusively resolved.
