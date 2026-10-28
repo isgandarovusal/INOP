@@ -1,0 +1,104 @@
+name: Manual Cloudflare fictional AI evaluation
+on:
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: 'Exact reviewed 40-character SHA at inop-main HEAD'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type RUN UP TO 36 FICTIONAL AI REQUESTS'
+        required: true
+        type: string
+      approve_synthetic_transfer:
+        description: 'Approve only the fixed fictional fixtures and one-day restricted result retention'
+        required: true
+        default: false
+        type: boolean
+      quota_confirmed:
+        description: 'Confirm Workers Free, model access and at least 6100 unused daily neurons; no billing changes'
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: cf-ai-synthetic-evaluation-single
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CF_AI_SYNTHETIC_ENABLED: ${{ vars.CF_AI_SYNTHETIC_ENABLED }}
+      CF_AI_APPROVED_SHA: ${{ inputs.approved_sha }}
+      CF_AI_APPROVAL: ${{ inputs.confirmation }}
+      CF_AI_TRANSFER_APPROVED: ${{ inputs.approve_synthetic_transfer }}
+      CF_AI_QUOTA_CONFIRMED: ${{ inputs.quota_confirmed }}
+      HR_CV_DURABLE_INTAKE_ENABLED: 'false'
+      HR_CV_SCAN_ENABLED: 'false'
+      HR_CV_INTAKE_WORKER_ENABLED: 'false'
+      HR_CV_OCR_ENABLED: 'false'
+      HR_CV_PROCESSING_ENABLED: 'false'
+      HR_CV_AI_PROCESSING_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Verify owner, reviewed SHA and protected environment without inference credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node Backend/scripts/verifyCloudflareAiSynthetic.cjs --preflight
+  evaluate:
+    needs: preflight
+    if: needs.preflight.result == 'success' && github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    environment: cf-ai-synthetic-evaluation
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Fixed fictional cases only, sequential, no retries
+        id: evaluate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CF_AI_SYNTHETIC_ENABLED: ${{ vars.CF_AI_SYNTHETIC_ENABLED }}
+          CF_AI_APPROVED_SHA: ${{ inputs.approved_sha }}
+          CF_AI_APPROVAL: ${{ inputs.confirmation }}
+          CF_AI_TRANSFER_APPROVED: ${{ inputs.approve_synthetic_transfer }}
+          CF_AI_QUOTA_CONFIRMED: ${{ inputs.quota_confirmed }}
+          CF_AI_EVAL_ACCOUNT_ID: ${{ secrets.CF_AI_EVAL_ACCOUNT_ID }}
+          CF_AI_EVAL_API_TOKEN: ${{ secrets.CF_AI_EVAL_API_TOKEN }}
+          HR_CV_DURABLE_INTAKE_ENABLED: 'false'
+          HR_CV_SCAN_ENABLED: 'false'
+          HR_CV_INTAKE_WORKER_ENABLED: 'false'
+          HR_CV_OCR_ENABLED: 'false'
+          HR_CV_PROCESSING_ENABLED: 'false'
+          HR_CV_AI_PROCESSING_ENABLED: 'false'
+        run: node Backend/scripts/verifyCloudflareAiSynthetic.cjs --execute
+      - name: Fictional results only, one-day retention
+        if: always() && steps.evaluate.outcome != 'skipped'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: cf-ai-fictional-results-${{ github.run_id }}
+          path: work/cf-ai-synthetic/report.json
+          retention-days: 1
+          if-no-files-found: ignore
