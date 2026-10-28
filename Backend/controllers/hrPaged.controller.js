@@ -93,7 +93,7 @@ exports.list = kind => async (req, res, next) => {
       if (p.search) pipeline.push({ $match: { $or: [{ 'jobMeta.title': p.search }, { 'candidateMeta.name': p.search }, { 'candidateMeta.role': p.search }] } });
       const [data] = await Application.aggregate([...pipeline, { $facet: { total: [{ $count: 'count' }], items: [...(p.after ? [{ $match: p.after }] : []), { $sort: sort }, { $skip: (p.page - 1) * p.pageSize }, { $limit: p.pageSize + 1 }, { $project: { _id: 1 } }] } }]).option({ maxTimeMS: 5000 });
       total = data.total[0]?.count || 0;
-      const ids = data.items.map(r => r._id), rows = await Application.find({ $and: [scope, { _id: { $in: ids } }] }).select(fields.applications).lean();
+      const ids = data.items.map(r => r._id), rows = ids.length ? await Application.find({ $and: [scope, { _id: { $in: ids } }] }).select(fields.applications).lean() : [];
       const byId = new Map(rows.map(r => [String(r._id), r])); items = ids.map(id => byId.get(String(id))).filter(Boolean);
     } else {
       [items, total] = await Promise.all([Model.find({ $and: [...baseQuery.$and, ...(p.after ? [p.after] : [])] }).select(fields[kind]).sort(sort).skip((p.page - 1) * p.pageSize).limit(p.pageSize + 1).maxTimeMS(5000).lean(), Model.countDocuments(baseQuery).maxTimeMS(5000)]);
@@ -101,7 +101,7 @@ exports.list = kind => async (req, res, next) => {
     const hasMore = items.length > p.pageSize; items = items.slice(0, p.pageSize); const last = items.at(-1);
     const nextCursor = hasMore && p.sort === 'newest' && last?.createdAt ? Buffer.from(JSON.stringify({ at: new Date(last.createdAt).toISOString(), id: String(last._id), scope: p.fingerprint })).toString('base64url') : null;
     if (kind === 'jobs') items = await decorateJobs(req, items);
-    if (kind === 'applications') {
+    if (kind === 'applications' && items.length) {
       const parents = applicationParents(req); parents[0].select = 'name role'; parents[1].select = 'title status brandId branchId';
       items = await Application.populate(items, parents.map(parent => ({ ...parent, options: { lean: true } }))); items = await decorateApplications(req, await scoreResponses(req, items));
     }
