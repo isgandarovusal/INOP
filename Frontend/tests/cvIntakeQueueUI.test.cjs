@@ -13,6 +13,21 @@ test('Private source queue is bounded, metadata-only, current-scope and translat
  for(const [status,state]of [[401,'unauthenticated'],[403,'forbidden'],[404,'not-found'],[500,'server-error'],[503,'server-error']])await t.test(status+' uses distinct translated primary state and no raw message',async()=>{reply=async route=>{await route.fulfill({status,contentType:'application/json',body:JSON.stringify({message:'PRIVATE_PROVIDER_DETAIL'})});return null;};await h.open('admin','/queue');await h.page.locator('[data-hr-state="'+state+'"]').waitFor();assert.equal(await h.page.locator('[data-source-id]').count(),0);assert.ok(!(await h.page.locator('body').textContent()).includes('PRIVATE_PROVIDER_DETAIL'));});
  await t.test('private facts accidentally supplied by API are rejected, never rendered',async()=>{reply=()=>payload([{...source(1),result:{parsed:{name:'PRIVATE_PERSON'}}}]);await h.open('admin','/queue');await h.page.locator('[data-hr-state="error"]').waitFor();assert.ok(!(await h.page.locator('body').textContent()).includes('PRIVATE_PERSON'));});
  await t.test('permission loss removes prior data and denies resume; a late reply cannot restore it',async()=>{reply=()=>payload([source(1)]);await h.open('admin','/queue');await h.page.locator('[data-source-id]').waitFor();let release;reply=()=>new Promise(resolve=>{release=()=>resolve(payload([source(2)]));});await h.page.locator('.hr-list-controls button').click();await h.page.waitForTimeout(80);await h.page.evaluate(()=>window.changeUser({...window.testUser,permissions:[{resource:'candidate',action:'*',scope:'none'}]}));await h.page.locator('[data-hr-state="forbidden"]').waitFor();release?.();await h.page.waitForTimeout(100);assert.equal(await h.page.locator('[data-source-id]').count(),0);});
+ for(const [catalog,status,state]of [['brands',503,'server-error'],['jobs',403,'forbidden']])await t.test(catalog+' outage keeps authorized metadata visible and retries only the failed catalog',async()=>{
+  const pattern='**/api/hr/v2/'+catalog+'?*';reply=()=>payload([source(1)]);
+  await h.page.route(pattern,r=>r.fulfill({status,contentType:'application/json',body:JSON.stringify({message:'PRIVATE_CATALOG_DETAIL'})}));
+  try{
+   await h.open('admin','/queue');await h.page.locator('[data-source-id]').waitFor();
+   const error=h.page.locator('[data-intake-catalog-error="'+catalog+'"]');
+   await error.locator('[data-hr-state="'+state+'"]').waitFor();
+   assert.equal(await h.page.locator('[data-source-id]').count(),1);
+   assert.ok(!(await h.page.locator('body').textContent()).includes('PRIVATE_CATALOG_DETAIL'));
+   const count=requests.length;await h.page.unroute(pattern);
+   await error.getByRole('button').click();await error.waitFor({state:'detached'});
+   assert.equal(requests.length,count,'Catalog retry must not reload intake metadata');
+   assert.equal(await h.page.locator('[data-source-id]').count(),1);
+  }finally{await h.page.unroute(pattern);}
+ });
  assert.deepEqual(h.pageErrors,[]);
 },enabled));
 test('Processing disabled leaves filters and scoped metadata readable without upload or false success',async()=>withBrowserFixture(harness,async h=>{
