@@ -36,11 +36,64 @@ async function preflight(env, fetcher) {
 function bodyFor(item, schema) {
   return { model: MODEL, messages: [{ role: 'system', content: item.system }, { role: 'user', content: JSON.stringify(item.input) }], response_format: { type: 'json_schema', json_schema: { name: 'synthetic_match', strict: true, schema } }, max_tokens: 512, temperature: 0, stream: false, options: { rejectIfBusy: true } };
 }
+// Defense in depth for JSON strings/keys and their bounded decoded forms.
+// Publication never includes model prose, regardless of its encoding.
+function assertNoReflections(value, secrets) {
+  let nodes = 0;
+  const visit = (item, depth = 0) => {
+    if (++nodes > 4096 || depth > 16) throw deny('AI_RESPONSE_INVALID');
+    if (typeof item === 'string') {
+      if (secrets.some(secret => secret && (item.includes(secret) || item.normalize('NFKC').includes(secret)))) throw deny('AI_RESPONSE_INVALID');
+      const decoded = item.replace(/\\u([a-f0-9]{4})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16))).replace(/\\\\/g, '\\');
+      if (decoded !== item) visit(decoded, depth + 1);
+      let nested; try { if (/^[\s]*[\[{"]/.test(item)) nested = JSON.parse(item); } catch { /* Not nested JSON. No content is published. */ }
+      if (nested !== undefined && nested !== item) visit(nested, depth + 1);
+    } else if (Array.isArray(item)) for (const child of item) visit(child, depth + 1);
+    else if (item && typeof item === 'object') for (const [key, child] of Object.entries(item)) { visit(key, depth + 1); visit(child, depth + 1); }
+  };
+  visit(value);
+}
+function publicArtifact(report) {
+  const assessment = report.assessment;
+  return {
+    version: 'cf-ai-synthetic-metrics-v1', model: MODEL, execution: report.execution,
+    productionReady: false, complete: true, attempted: report.attempted,
+    explanationQuality: 'NOT_PUBLISHED_NOT_ASSESSED', billingUsageVerified: false,
+    cases: assessment.cases.map(c => ({ caseId: c.caseId, repeat: c.repeat, verdict: c.verdict, schemaValid: c.schemaValid, relationCorrect: c.relationCorrect, evidenceCorrect: c.evidenceCorrect, latencyMs: c.latencyMs, inputTokens: c.inputTokens, outputTokens: c.outputTokens })),
+    baseline: report.baseline.cases.map(c => ({ caseId: c.caseId, score: c.score, status: c.status })),
+  };
+}
+function serializeArtifact(artifact, secrets) {
+  const only = (o, keys) => o && !Array.isArray(o) && typeof o === 'object' && Object.keys(o).length === keys.length && keys.every(k => Object.hasOwn(o, k));
+  const number = (v, max) => Number.isFinite(v) && v >= 0 && v <= max;
+  const fixtures = new Map(benchmark.fixtures.map(f => [f.id, f])), seen = new Set();
+  if (!only(artifact, ['version','model','execution','productionReady','complete','attempted','explanationQuality','billingUsageVerified','cases','baseline']) || artifact.version !== 'cf-ai-synthetic-metrics-v1' || artifact.model !== MODEL || !['REAL_PROVIDER_REQUESTS','SIMULATED_TEST_TRANSPORT'].includes(artifact.execution) || artifact.productionReady !== false || artifact.complete !== true || artifact.attempted !== 36 || artifact.explanationQuality !== 'NOT_PUBLISHED_NOT_ASSESSED' || artifact.billingUsageVerified !== false || !Array.isArray(artifact.cases) || artifact.cases.length !== 36 || !Array.isArray(artifact.baseline) || artifact.baseline.length !== 12) throw deny('AI_RESPONSE_INVALID');
+  for (const row of artifact.cases) {
+    const f = fixtures.get(row?.caseId), key = row?.caseId + ':' + row?.repeat;
+    if (!only(row, ['caseId','repeat','verdict','schemaValid','relationCorrect','evidenceCorrect','latencyMs','inputTokens','outputTokens']) || !f || !Number.isInteger(row.repeat) || row.repeat < 1 || row.repeat > 3 || seen.has(key) || !['supported','missing','unknown','contradicted'].includes(row.verdict) || row.schemaValid !== true || row.relationCorrect !== true || row.evidenceCorrect !== true || !number(row.latencyMs, 300000) || !Number.isInteger(row.inputTokens) || !number(row.inputTokens, 32768) || !Number.isInteger(row.outputTokens) || !number(row.outputTokens, 512)) throw deny('AI_RESPONSE_INVALID');
+    seen.add(key);
+  }
+  seen.clear();
+  for (const row of artifact.baseline) {
+    const f = fixtures.get(row?.caseId);
+    if (!only(row, ['caseId','score','status']) || !f || seen.has(row.caseId) || row.score !== f.gold.atsScore || row.status !== f.gold.atsStatus) throw deny('AI_RESPONSE_INVALID');
+    seen.add(row.caseId);
+  }
+  assertNoReflections(artifact, secrets);
+  const text = JSON.stringify(artifact, null, 2);
+  if (Buffer.byteLength(text) > 32768) throw deny('AI_RESPONSE_INVALID');
+  assertNoReflections(text, secrets);
+  return text;
+}
 function outputStore() {
   const dir = path.resolve('work/cf-ai-synthetic');
   return {
     claim() { fs.mkdirSync(dir, { recursive: true, mode: 0o700 }); try { fs.closeSync(fs.openSync(path.join(dir, '.attempt'), 'wx', 0o600)); } catch { throw deny('AI_ALREADY_ATTEMPTED'); } },
-    save(report) { fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify(report, null, 2), { flag: 'wx', mode: 0o600 }); },
+    save(text) {
+      const temp = path.join(dir, 'report.tmp');
+      fs.writeFileSync(temp, text, { flag: 'wx', mode: 0o600 });
+      fs.renameSync(temp, path.join(dir, 'report.json'));
+    },
   };
 }
 function createRunner({ env = process.env, fetcher = fetch, emit = code => console.log(code), store = outputStore(), deadlineMs = 8000 } = {}) {
@@ -53,6 +106,7 @@ function createRunner({ env = process.env, fetcher = fetch, emit = code => conso
     if (mode === '--preflight') { emit('AI_PREFLIGHT_OK'); return true; }
     const report = { execution: fetcher === fetch ? 'REAL_PROVIDER_REQUESTS' : 'SIMULATED_TEST_TRANSPORT', model: MODEL, productionReady: false, attempted: 0, failures: [], syntheticResults: [], baseline: benchmark.baseline() };
     const envelope = { version: 'recruitment-ai-eval-v1', source: fetcher === fetch ? 'operator_reported' : 'simulated', provider: 'cloudflare', model: MODEL, runs: [] };
+    const secrets = [env.CF_AI_EVAL_ACCOUNT_ID, env.CF_AI_EVAL_API_TOKEN, env.GH_TOKEN].filter(Boolean);
     let neurons = 0, claimed = false;
     try {
       if (!/^[a-f0-9]{32}$/.test(env.CF_AI_EVAL_ACCOUNT_ID || '') || !/^[\x21-\x7e]{20,512}$/.test(env.CF_AI_EVAL_API_TOKEN || '')) throw deny('AI_CONFIG_INVALID');
@@ -64,11 +118,10 @@ function createRunner({ env = process.env, fetcher = fetch, emit = code => conso
         report.attempted++; const started = performance.now();
         const result = await request('https://api.cloudflare.com/client/v4/accounts/' + env.CF_AI_EVAL_ACCOUNT_ID + '/ai/v1/chat/completions', { method: 'POST', headers: { Authorization: 'Bearer ' + env.CF_AI_EVAL_API_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(bodyFor(item, plan.schema)) }, fetcher, 32768, deadline);
         if (result.status !== 200) throw deny([401, 403].includes(result.status) ? 'AI_AUTH_DENIED' : result.status === 429 ? 'AI_RATE_LIMITED' : result.status === 400 ? 'AI_REQUEST_REJECTED' : 'AI_PROVIDER_FAILED');
-        const serialized = JSON.stringify(result.data);
-        if ([env.CF_AI_EVAL_ACCOUNT_ID, env.CF_AI_EVAL_API_TOKEN, env.GH_TOKEN].some(secret => serialized.includes(secret))) throw deny('AI_RESPONSE_INVALID');
+        assertNoReflections(result.data, secrets);
         const choice = result.data.choices?.[0];
         if (choice?.finish_reason !== 'stop' || typeof choice.message?.content !== 'string') throw deny('AI_OUTPUT_REJECTED');
-        let output; try { output = JSON.parse(choice.message.content); benchmark.validateOutput(output, fixtureMap.get(item.caseId)); } catch { throw deny('AI_OUTPUT_REJECTED'); }
+        let output; try { output = JSON.parse(choice.message.content); assertNoReflections(output, secrets); benchmark.validateOutput(output, fixtureMap.get(item.caseId)); } catch { throw deny('AI_OUTPUT_REJECTED'); }
         const usage = result.data.usage, reasoning = usage?.completion_tokens_details?.reasoning_tokens ?? 0;
         if (!Number.isInteger(usage?.prompt_tokens) || usage.prompt_tokens < 0 || usage.prompt_tokens > 32768 || !Number.isInteger(usage?.completion_tokens) || usage.completion_tokens < 0 || usage.completion_tokens > 512 || !Number.isInteger(reasoning) || reasoning < 0 || reasoning > usage.completion_tokens) throw deny('AI_USAGE_UNVERIFIED');
         neurons += (usage.prompt_tokens * 4625 + usage.completion_tokens * 30475) / 1e6;
@@ -84,10 +137,11 @@ function createRunner({ env = process.env, fetcher = fetch, emit = code => conso
     report.billingUsageVerified = false;
     report.complete = report.attempted === 36 && envelope.runs.length === 36 && !report.failures.length;
     report.semanticErrors = report.assessment ? report.assessment.cases.filter(c => !c.relationCorrect || !c.evidenceCorrect).length : null;
-    if (claimed) { try { store.save(report); } catch { emit('AI_REPORT_FAILED'); return false; } }
     const ok = report.complete && report.semanticErrors === 0;
-    emit(ok ? 'AI_SYNTHETIC_QA_COMPLETE' : 'AI_SYNTHETIC_QA_FAILED'); return ok;
+    if (!ok || !claimed) { if (report.complete && report.semanticErrors > 0) emit('AI_SEMANTIC_MISMATCH'); emit('AI_SYNTHETIC_QA_FAILED'); return false; }
+    try { store.save(serializeArtifact(publicArtifact(report), secrets)); } catch { emit('AI_REPORT_FAILED'); return false; }
+    emit('AI_SYNTHETIC_QA_COMPLETE'); return true;
   } };
 }
-if (require.main === module) { const args = process.argv.slice(2); createRunner().run(args.length === 1 ? args[0] : '').then(ok => { process.exitCode = ok ? 0 : 1; }).catch(() => { console.log('AI_SYNTHETIC_QA_FAILED'); process.exitCode = 1; }); }
-module.exports = { createRunner, context, bodyFor, preflight, MODEL, ENVIRONMENT, APPROVAL, GATES };
+if (require.main === module) { const args = process.argv.slice(2); createRunner().run(args.length === 1 ? args[0] : '').then(ok => { if (ok && args[0] === '--execute') fs.appendFileSync(process.env.GITHUB_OUTPUT, 'artifact_safe=true\n'); process.exitCode = ok ? 0 : 1; }).catch(() => { console.log('AI_SYNTHETIC_QA_FAILED'); process.exitCode = 1; }); }
+module.exports = { createRunner, context, bodyFor, preflight, MODEL, ENVIRONMENT, APPROVAL, GATES, assertNoReflections, serializeArtifact };

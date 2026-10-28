@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       approve_synthetic_transfer:
-        description: 'Approve only the fixed fictional fixtures and one-day restricted result retention'
+        description: 'Approve only the fixed fictional fixtures and one-day public-safe metrics retention'
         required: true
         default: false
         type: boolean
@@ -94,11 +94,11 @@ jobs:
           HR_CV_PROCESSING_ENABLED: 'false'
           HR_CV_AI_PROCESSING_ENABLED: 'false'
         run: node Backend/scripts/verifyCloudflareAiSynthetic.cjs --execute
-      - name: Fictional results only, one-day retention
-        if: always() && steps.evaluate.outcome != 'skipped'
+      - name: Allowlisted metrics only after successful safe publication
+        if: success() && steps.evaluate.outcome == 'success' && steps.evaluate.outputs.artifact_safe == 'true'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: cf-ai-fictional-results-${{ github.run_id }}
           path: work/cf-ai-synthetic/report.json
           retention-days: 1
-          if-no-files-found: ignore
+          if-no-files-found: error
