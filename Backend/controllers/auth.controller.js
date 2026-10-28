@@ -15,8 +15,12 @@ function getJwtSecret() {
   return secret;
 }
 
-async function publicUser(user, permissions = []) {
-  const auditProfile=await require('../models/auditorProfile.model').findById(user._id).select('direction directions active organizationId').lean();
+async function publicUser(user) {
+  // Independent fresh reads share one wait; neither is cached or skipped.
+  const [permissions, auditProfile] = await Promise.all([
+    getUserPermissions(user.role),
+    require('../models/auditorProfile.model').findById(user._id).select('direction directions active organizationId').lean(),
+  ]);
   return {
     id: String(user._id),
     name: user.name,
@@ -95,12 +99,11 @@ exports.login = async (req, res) => {
     }
 
     const token = createToken(user);
-    const permissions = await getUserPermissions(user.role);
 
     return res.status(200).json({
       message: "Login uğurludur.",
       token,
-      user: await publicUser(user, permissions),
+      user: await publicUser(user),
     });
   } catch (error) {
     require('../services/safeErrorLog.service').logFailure(error);
@@ -121,10 +124,8 @@ exports.me = async (req, res) => {
       });
     }
 
-    const permissions = await getUserPermissions(user.role);
-
     return res.status(200).json({
-      user: await publicUser(user, permissions),
+      user: await publicUser(user),
     });
   } catch (error) {
     require('../services/safeErrorLog.service').logFailure(error);
