@@ -1,14 +1,22 @@
 // Server-only opt-in. No installation, external AI or automatic worker startup.
 // Recovery/retention approval and a verified scanner runtime precede activation.
-let activeProfile, activeScanner, scannerBinary;
+let activeProfile, activeScanner, scannerConfiguration;
 // Shared native instance preserves the adapter's concurrency/deadline controls.
 // Read-only legacy parsing needs scanning, not activation of durable intake/storage.
 exports.scanner=()=>{
  if(process.env.HR_CV_SCAN_ENABLED!=='true')throw Error('Scanner disabled');
- const binary=process.env.HR_CV_SCAN_BINARY;
- if(!activeScanner||scannerBinary!==binary){
-  activeScanner=require('./hrClamScan.service').createScanner({enabled:true,binary});
-  scannerBinary=binary;
+ const transport=process.env.HR_CV_SCAN_TRANSPORT||'clamscan';
+ let options;
+ if(transport==='clamscan')options={enabled:true,binary:process.env.HR_CV_SCAN_BINARY};
+ else if(transport==='clamd-unix'){
+  const uid=process.env.HR_CV_SCAN_SOCKET_UID;
+  if(uid!==undefined&&!/^(0|[1-9][0-9]{0,9})$/.test(uid))throw Error('Invalid socket owner');
+  options={enabled:true,transport,socketPath:process.env.HR_CV_SCAN_SOCKET_PATH,daemonConfigPath:process.env.HR_CV_SCAN_DAEMON_CONFIG,...(uid!==undefined?{socketUid:Number(uid)}:{})};
+ }else throw Error('Unsupported scanner transport');
+ const configuration=JSON.stringify(options);
+ if(!activeScanner||scannerConfiguration!==configuration){
+  activeScanner=require('./hrClamScan.service').createScanner(options);
+  scannerConfiguration=configuration;
  }
  return activeScanner;
 };

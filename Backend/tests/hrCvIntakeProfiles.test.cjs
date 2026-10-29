@@ -52,3 +52,11 @@ test('Configured intake never reserves or persists an original before a successf
  ])await assert.rejects(neverScan.enqueue({},file,crypto.randomUUID()),{code:'INTAKE_INPUT'});
  assert.throws(()=>createIntake({enabled:true,store,scanBeforePersistence:true}).assertAvailable(),{code:'INTAKE_SCAN_REQUIRED'});
 });
+
+test('Unix transport is opt-in under the same closed scan gate, never a native fallback',()=>{
+ const env={HR_CV_SCAN_ENABLED:'true',HR_CV_SCAN_TRANSPORT:'clamd-unix',HR_CV_SCAN_SOCKET_PATH:'/run/inop/clamd.sock',HR_CV_SCAN_DAEMON_CONFIG:'/etc/inop/clamd.conf',HR_CV_SCAN_SOCKET_UID:'100'};let calls=0;
+ const expected={scan:()=>{}};
+ const {scanner}=load('hrCvIntakeProfiles.service.js',{'./hrClamScan.service':{createScanner:options=>{calls++;assert.equal(options.transport,'clamd-unix');assert.equal(options.enabled,true);assert.equal(options.socketPath,env.HR_CV_SCAN_SOCKET_PATH);assert.equal(options.daemonConfigPath,env.HR_CV_SCAN_DAEMON_CONFIG);assert.equal(options.socketUid,100);return expected;}}},env);
+ assert.equal(scanner(),expected);assert.equal(scanner(),expected);assert.equal(calls,1);
+ env.HR_CV_SCAN_ENABLED='false';assert.throws(()=>scanner());env.HR_CV_SCAN_ENABLED='true';env.HR_CV_SCAN_SOCKET_UID='-1';assert.throws(()=>scanner());env.HR_CV_SCAN_SOCKET_UID='100';env.HR_CV_SCAN_TRANSPORT='tcp';assert.throws(()=>scanner());assert.equal(calls,1);
+});
