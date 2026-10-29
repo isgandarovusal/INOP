@@ -83,7 +83,7 @@ exports.list = kind => async (req, res, next) => {
         { $lookup: { from: Application.collection.name, localField: '_id', foreignField: 'candidateId', pipeline: [{ $match: { $and: [aggregateResourceFilter(req, 'application'), { jobId: new mongoose.Types.ObjectId(req.query.excludeJobId) }] } }, { $project: { _id: 1 } }, { $limit: 1 }], as: 'linked' } }, { $match: { 'linked.0': { $exists: false } } },
         { $facet: { total: [{ $count: 'count' }], items: [...(p.after ? [{ $match: p.after }] : []), { $sort: sort }, { $skip: (p.page - 1) * p.pageSize }, { $limit: p.pageSize + 1 }, { $project: { _id: 1 } }] } }];
       const [data] = await Candidate.aggregate(pipeline).option({ maxTimeMS: 5000 }); total = data.total[0]?.count || 0;
-      const ids = data.items.map(r => r._id), rows = await Candidate.find({ $and: [scope, { _id: { $in: ids } }] }).select(fields.candidates).lean();
+      const ids = data.items.map(r => r._id), rows = ids.length ? await Candidate.find({ $and: [scope, { _id: { $in: ids } }] }).select(fields.candidates).lean() : [];
       const byId = new Map(rows.map(r => [String(r._id), r])); items = ids.map(id => byId.get(String(id))).filter(Boolean);
     } else if (kind === 'applications' && (p.search || req.query.brandId || req.query.branchId)) {
       const appExtra = { ...p.extra }; delete appExtra.branchId;
