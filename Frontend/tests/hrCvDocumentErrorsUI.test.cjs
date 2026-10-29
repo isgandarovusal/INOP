@@ -3,6 +3,17 @@ const {withBrowserFixture}=require('./helpers/browser.cjs'),{docx}=require('../.
 const harness=`import React from 'react';import {createRoot} from 'react-dom/client';import {BrowserRouter,Routes,Route,useNavigate} from 'react-router-dom';import {AuthContext} from '/src/Context/AuthContext.ts';import i18n from '/src/i18n/index.ts';import Form from '/src/Pages/Recruitment/Candidates/CandidateForm.tsx';import api from '/src/api/axios.ts';api.defaults.baseURL='/api';function Navigation(){window.navigateTest=useNavigate();return null;}window.changeLanguage=l=>i18n.changeLanguage(l);window.translateTest=k=>i18n.t(k);createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(AuthContext.Provider,{value:{user:window.testUser,isLoading:false}},React.createElement(BrowserRouter,null,React.createElement(Navigation),React.createElement(Routes,null,React.createElement(Route,{path:'/app/recruitment/candidates/:id/edit',element:React.createElement(Form)}))))));`;
 test('CV parsing failures are localized stable states, preserve drafts and never display raw provider/request detail',async t=>withBrowserFixture(harness,async h=>{
  const c=await Candidate.create({name:'Preserved primary Candidate',role:'Cashier',status:'new',createdBy:h.actors.admin._id}),bytes=docx('Name: Synthetic upload\nSkills\nFood safety'),pattern='**/api/candidates/parse-cv';
+ await t.test('real default-off scanner rejects legacy parsing once, preserving the HR draft',async()=>{
+  await h.open('admin',`/app/recruitment/candidates/${c._id}/edit`);await h.page.locator('input[name=name]').waitFor();await h.page.locator('input[name=name]').fill('Retained editable draft');
+  const response=h.page.waitForResponse(r=>r.url().endsWith('/api/candidates/parse-cv'));
+  const before=h.wire.filter(r=>r.path==='/api/candidates/parse-cv').length;
+  await h.page.locator('input[type=file]').setInputFiles({name:'synthetic.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:bytes});
+  const rejected=await response;assert.equal(rejected.status(),503);assert.equal((await rejected.json()).code,'INTAKE_SCAN_REQUIRED');
+  await h.page.locator('[data-hr-document-error="hrDocuments.unavailable"]').waitFor();
+  assert.equal(await h.page.locator('input[name=name]').inputValue(),'Retained editable draft');
+  assert.equal(h.wire.filter(r=>r.path==='/api/candidates/parse-cv').length,before+1);
+  assert.equal((await Candidate.findById(c._id)).name,c.name);
+ });
  const scenarios=[
   [422,{code:'OCR_REQUIRED',processingStatus:'unsupported_ocr'},'cvReview.unsupported_ocr'],
   [413,{code:'LIMIT_FILE_SIZE'},'recruitment.candidateForm.cvSizeError'],

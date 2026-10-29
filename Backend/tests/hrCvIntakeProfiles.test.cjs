@@ -13,13 +13,15 @@ test('Intake profile remains default-off, preserves metadata on bad config and r
   './hrClamScan.service':{createScanner:options=>{assert.equal(options.enabled,true);assert.equal(options.binary,'/usr/bin/clamscan');return scanner;}},
   './hrCvOcrEngine.service':{createOcrEngine:options=>{assert.equal(options.enabled,false);return ocr;}},
  };
- const {profile}=load('hrCvIntakeProfiles.service.js',deps,env);
+ const {profile,scanner:scannerProfile}=load('hrCvIntakeProfiles.service.js',deps,env);
+ assert.throws(()=>scannerProfile());
  assert.equal(profile(),disabled);assert.equal(calls.length,1);
  env.HR_CV_DURABLE_INTAKE_ENABLED='true';assert.equal(profile().list(),'metadata');
  env.HR_CV_SCAN_ENABLED='true';assert.equal(profile(),disabled);
  env.storageReady=true;env.HR_CV_SCAN_BINARY='/usr/bin/clamscan';
  const configured=profile();assert.equal(configured.options.store,store);assert.equal(configured.options.scanner,scanner);assert.equal(configured.options.ocrEngine,ocr);assert.equal(configured.options.scanBeforePersistence,true);assert.equal(configured.options.enabled,true);
- assert.equal(profile(),configured);
+ assert.equal(profile(),configured);assert.equal(scannerProfile(),scanner);
+ env.HR_CV_SCAN_ENABLED='false';assert.throws(()=>scannerProfile());env.HR_CV_SCAN_ENABLED='true';
  env.HR_CV_DURABLE_INTAKE_ENABLED='false';assert.equal(profile(),disabled);
 });
 test('Configured intake never reserves or persists an original before a successful scanner verdict',async()=>{

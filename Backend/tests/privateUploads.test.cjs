@@ -1,6 +1,6 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs/promises'), path = require('node:path'), crypto = require('node:crypto'), os = require('node:os');
-const { withAuditFixture } = require('./helpers/auditFixture.cjs');
+const { withScannedCvFixture: withAuditFixture } = require('./helpers/syntheticLegacyScanner.cjs');
 const { uploadsDir } = require('../middleware/privateUpload.middleware');
 const Candidate = require('../models/candidate.model'), Source = require('../models/auditSourceDocument.model');
 

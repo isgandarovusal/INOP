@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const {
   parseCvResultFromBuffer,
 } = require("../services/cvParser.service");
@@ -12,8 +13,23 @@ exports.parseCv = async (req, res) => {
       });
     }
 
+    // Multipart/type/size validation precedes this controller; no original is
+    // persisted by the legacy preview. Never extract unscanned document text.
+    const bytes = Buffer.from(req.file.buffer);
+    const sha256 = crypto.createHash('sha256').update(bytes).digest('hex');
+    let scan;
+    try {
+      const scanner = require('../services/hrCvIntakeProfiles.service').scanner();
+      scan = await scanner.scan(Buffer.from(bytes), { sha256, mimeType: req.file.mimetype });
+    } catch {
+      return res.status(503).json({ message: 'CV scanning is unavailable. Retry later.', code: 'INTAKE_SCAN_REQUIRED', processingStatus: 'failed' });
+    }
+    if (scan?.verdict === 'infected') return res.status(422).json({ message: 'CV scanning rejected this document.', code: 'INTAKE_QUARANTINED', processingStatus: 'failed' });
+    if (scan?.verdict !== 'clean' || scan.sha256 !== sha256 || !/^[a-zA-Z0-9_.-]{1,64}$/.test(scan.engine || '') || !/^[a-zA-Z0-9_.-]{1,64}$/.test(scan.version || '')) {
+      return res.status(503).json({ message: 'CV scanning is unavailable. Retry later.', code: 'INTAKE_SCAN_REQUIRED', processingStatus: 'failed' });
+    }
     const { text, parsed } = await parseCvResultFromBuffer(
-      req.file.buffer,
+      bytes,
       req.file.originalname
     );
 
