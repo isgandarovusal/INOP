@@ -32,7 +32,10 @@ function validateOutput(output, f) {
   const row = output.criteria[0], ids = new Set(review.buildContext(f.candidate).facts.map(v => v.id));
   if (!exact(row, ['requirementId', 'relation', 'evidenceIds', 'explanation']) || row.requirementId !== 'r1' || !['supported', 'missing', 'unknown', 'contradicted'].includes(row.relation) || !Array.isArray(row.evidenceIds) || row.evidenceIds.length > 2 || new Set(row.evidenceIds).size !== row.evidenceIds.length || row.evidenceIds.some(id => !ids.has(id)) || !safe(row.explanation)) fail();
   if (['supported', 'contradicted'].includes(row.relation) && !row.evidenceIds.length || row.relation === 'unknown' && row.evidenceIds.length) fail();
-  return { schemaValid: true, relationCorrect: row.relation === f.gold.relation, evidenceCorrect: JSON.stringify([...row.evidenceIds].sort()) === JSON.stringify([...f.gold.evidenceIds].sort()), verdict: row.relation, evidenceIds: row.evidenceIds, explanationRequiresHumanReview: true };
+  // Categorical correctness is not a factuality or locale check of free prose.
+  // Do not guess with keyword/language heuristics or turn schema success into quality PASS.
+  const qualityStatus = row.relation === f.gold.relation && JSON.stringify([...row.evidenceIds].sort()) === JSON.stringify([...f.gold.evidenceIds].sort()) ? 'MANUAL_REVIEW_REQUIRED' : 'FAILED';
+  return { qualityStatus, explanationGrounding: 'MANUAL_REVIEW_REQUIRED', explanationLanguage: 'MANUAL_REVIEW_REQUIRED', schemaValid: true, relationCorrect: row.relation === f.gold.relation, evidenceCorrect: JSON.stringify([...row.evidenceIds].sort()) === JSON.stringify([...f.gold.evidenceIds].sort()), verdict: row.relation, evidenceIds: row.evidenceIds, explanationRequiresHumanReview: true };
 }
 function evaluate(input) {
   if (Buffer.byteLength(JSON.stringify(input)) > MAX_BYTES || !exact(input, ['version', 'source', 'provider', 'model', 'runs']) || input.version !== 'recruitment-ai-eval-v1' || !['simulated', 'operator_reported'].includes(input.source) || !/^[\w/-]{1,100}$/.test(input.provider) || !/^[\w/.:@-]{1,120}$/.test(input.model) || !Array.isArray(input.runs) || !input.runs.length || input.runs.length > fixtures.length * REPEATS) fail();
@@ -42,7 +45,7 @@ function evaluate(input) {
     seen.add(`${run.caseId}:${run.repeat}`);
     for (const key of ['latencyMs', 'inputTokens', 'outputTokens']) if (run[key] !== null && (!Number.isFinite(run[key]) || run[key] < 0 || run[key] > (key === 'latencyMs' ? 300000 : 100000))) fail();
     let assessment;
-    try { assessment = validateOutput(run.output, cases.get(run.caseId)); } catch { assessment = { schemaValid: false, code: 'BENCHMARK_OUTPUT_REJECTED' }; }
+    try { assessment = validateOutput(run.output, cases.get(run.caseId)); } catch { assessment = { qualityStatus: 'FAILED', schemaValid: false, code: 'BENCHMARK_OUTPUT_REJECTED' }; }
     return { caseId: run.caseId, repeat: run.repeat, latencyMs: run.latencyMs, inputTokens: run.inputTokens, outputTokens: run.outputTokens, ...assessment };
   });
   const groups = fixtures.map(f => {
@@ -52,7 +55,8 @@ function evaluate(input) {
   const times = rows.map(r => r.latencyMs).filter(v => v !== null).sort((a, b) => a - b);
   const percentile = p => times.length ? times[Math.ceil(times.length * p) - 1] : null;
   const summary = { runs: rows.length, schemaValid: rows.filter(r => r.schemaValid).length, relationCorrect: rows.filter(r => r.relationCorrect).length, evidenceCorrect: rows.filter(r => r.evidenceCorrect).length, reportedLatency: { samples: times.length, p50Ms: percentile(.5), p95Ms: percentile(.95) } };
-  return { summary, version: input.version, execution: input.source === 'simulated' ? 'SIMULATED_NOT_MODEL_EVIDENCE' : 'OPERATOR_REPORTED_NOT_INDEPENDENTLY_VERIFIED', provider: input.provider, model: input.model, complete: rows.length === fixtures.length * REPEATS, cases: rows, consistency: groups, explanationQuality: 'MANUAL_REVIEW_REQUIRED', resourceUsage: 'OPERATOR_REPORTED_OR_UNKNOWN', productionReady: false };
+  const qualityStatus = rows.some(row => row.qualityStatus === 'FAILED') ? 'FAILED' : 'MANUAL_REVIEW_REQUIRED';
+  return { qualityStatus, summary, version: input.version, execution: input.source === 'simulated' ? 'SIMULATED_NOT_MODEL_EVIDENCE' : 'OPERATOR_REPORTED_NOT_INDEPENDENTLY_VERIFIED', provider: input.provider, model: input.model, complete: rows.length === fixtures.length * REPEATS, cases: rows, consistency: groups, explanationQuality: 'MANUAL_REVIEW_REQUIRED', resourceUsage: 'OPERATOR_REPORTED_OR_UNKNOWN', productionReady: false };
 }
 function readInput(path) {
   const fd = fs.openSync(path, 'r');

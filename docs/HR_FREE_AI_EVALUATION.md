@@ -159,3 +159,44 @@ Local measurement of the existing fictional messages+schema wrapper: maximum 1,7
 Approve transmission of only these fictional fixtures to Cloudflare, the bounded 36-request/512-output-token experiment and result retention; approve a dedicated account-scoped Workers AI Read/Edit token in a supported secret store. Since Codex lacks access, separately approve preparation/review of the minimal protected manual Actions runner/workflow and its eventual delivery/execution. No code for a live transport/workflow was added or activated in this step. Do not treat an evaluation approval as production-provider/privacy approval.
 
 Sources: [REST permissions](https://developers.cloudflare.com/workers-ai/get-started/rest-api/), [account chat endpoint](https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/), [model and context](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), [quota and neuron rates](https://developers.cloudflare.com/workers-ai/platform/pricing/), [privacy](https://developers.cloudflare.com/workers-ai/platform/data-usage/). Standard stateless inputs/outputs are not used for training or retained beyond processing except documented legal/security conditions; stateful/Gateway features have different retention. No real CV disclosure is authorized.
+
+### Step 5A — Offline quality labels and proposed failure diagnostics
+
+Schema, gold relation and evidence-ID correctness are separate from free-text
+explanation quality. Each accepted offline assessment now explicitly labels
+`explanationGrounding` and `explanationLanguage` as `MANUAL_REVIEW_REQUIRED`.
+`qualityStatus` is `FAILED` for rejected/categorically incorrect output and
+`MANUAL_REVIEW_REQUIRED` otherwise, including incomplete or simulated results.
+There is no automatic full-quality PASS. These labels do not detect factual
+claims or language reliably: unsupported experience/certifications, reversed
+negative evidence, wrong-language prose and unverifiable explanations still
+need human review. Literal/keyword checks cannot establish their truth.
+
+Focused fictional AZ/EN/RU regressions include conflicting positive/negative
+HACCP evidence with an unknown gold relation. They do not add live cases or
+change the existing twelve-case, three-repeat benchmark or ATS-v2 baseline.
+This coverage tests conservative evaluation; it is not model execution evidence.
+
+Failure artifact proposal — NOT IMPLEMENTED; separate approval required:
+
+- Keep the existing runner failure exit code, attempt/token/deadline limits,
+  secret-reflection checks and protected manual approval flow unchanged.
+- After assessment, allow only a separately validated metrics schema: fixed
+  case IDs, repeat integer 1–3, attempted integer 0–36, bounded latency/token
+  numbers, booleans, predefined failure/quality categories, and an explicit
+  incomplete flag. No prompts, model text, arbitrary keys/strings or explanations.
+- Reject secret reflections in parsed and final serialized metrics; publish
+  nothing on unsafe output, sanitization failure or uncertain report provenance.
+- Write atomically and emit a separate safe-failure-report marker only after
+  full validation. A workflow change would permit upload after a failed
+  evaluation step solely when that marker and the safe artifact exist. Do not
+  use an unconditional `always()` upload or `continue-on-error` to hide failure.
+- Risk: broadening upload conditions could publish stale/partial reports or
+  conceal failures. Before approval, require tests for failed-step propagation,
+  missing/stale markers, injected fields, encoded reflections and partial writes.
+  Retain the one-day public-artifact limit and metrics-only contract.
+
+Current behavior remains unchanged: any failed benchmark publishes no artifact;
+public success artifacts still exclude explanations and do not assess them.
+A full explanation/language benchmark remains PARTIAL until an explicitly
+approved human-review procedure exists. No real CV transfer is authorized.

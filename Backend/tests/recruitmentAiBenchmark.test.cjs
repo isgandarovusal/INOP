@@ -80,3 +80,45 @@ test('Reported latency percentiles exclude unknown measurements and never simula
   input.runs[0].latencyMs = 100; input.runs[1].latencyMs = 300;
   assert.deepEqual(bench.evaluate(input).summary.reportedLatency, { samples: 2, p50Ms: 100, p95Ms: 300 });
 });
+
+
+test('Correct categorical metrics never certify unsupported or wrong-language explanation prose', () => {
+  for (const locale of ['az', 'en', 'ru']) {
+    const input = envelope(); input.runs = input.runs.filter(r => r.caseId === locale + '-exact').slice(0, 1);
+    input.runs[0].output.criteria[0].explanation = 'The candidate has ten years of experience and a HACCP certificate.';
+    const report = bench.evaluate(input), row = report.cases[0];
+    assert.equal(row.schemaValid, true); assert.equal(row.relationCorrect, true); assert.equal(row.evidenceCorrect, true);
+    assert.equal(row.qualityStatus, 'MANUAL_REVIEW_REQUIRED');
+    assert.equal(row.explanationGrounding, 'MANUAL_REVIEW_REQUIRED');
+    assert.equal(row.explanationLanguage, 'MANUAL_REVIEW_REQUIRED');
+    assert.equal(report.qualityStatus, 'MANUAL_REVIEW_REQUIRED');
+    assert.ok(!JSON.stringify(report).includes('ten years'));
+  }
+});
+test('Conflicting fictional qualification evidence cannot be treated as established support', () => {
+  const quotes = {az:['HACCP sertifikatı var', 'HACCP sertifikatı yoxdur'], en:['Holds a HACCP certificate', 'Does not hold a HACCP certificate'], ru:['Есть сертификат HACCP', 'Сертификат HACCP отсутствует']};
+  for (const locale of ['az', 'en', 'ru']) {
+    const fixture = structuredClone(bench.fixtures.find(f => f.id === locale + '-negative-injection'));
+    fixture.candidate.cvReview.fields.certificates.evidence = quotes[locale];
+    // Conflicting facts have no established truth. This focused fixture does not
+    // alter the twelve-case / thirty-six-attempt live benchmark contract.
+    fixture.gold = {...fixture.gold, relation:'unknown', evidenceIds:[]};
+    const uncertain = {criteria:[{requirementId:'r1',relation:'unknown',evidenceIds:[],explanation:'Conflicting qualification evidence requires human review.'}]};
+    const assessment = bench.validateOutput(uncertain, fixture);
+    assert.equal(assessment.relationCorrect, true);
+    assert.equal(assessment.qualityStatus, 'MANUAL_REVIEW_REQUIRED');
+    const asserted = structuredClone(uncertain); asserted.criteria[0].relation='supported'; asserted.criteria[0].evidenceIds=['e1'];
+    assert.equal(bench.validateOutput(asserted,fixture).relationCorrect,false);
+  }
+  assert.equal(bench.fixtures.length,12); assert.equal(bench.exportCases().repeats,3);
+});
+test('Rejected or incorrect output reports failed quality while safe output always requires human review', () => {
+  for (const malformed of [false,true]) {
+    const input=envelope();
+    if(malformed) input.runs[0].output.criteria[0].explanation='token=NEVER_PUBLISH';
+    else input.runs[0].output.criteria[0].relation='contradicted';
+    const result=bench.evaluate(input);
+    assert.equal(result.qualityStatus,'FAILED'); assert.equal(result.cases[0].qualityStatus,'FAILED');
+    assert.ok(!JSON.stringify(result).includes('NEVER_PUBLISH'));
+  }
+});
