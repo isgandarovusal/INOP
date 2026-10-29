@@ -2,12 +2,21 @@ name: Manual Cloudflare fictional AI evaluation
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: 'Explicit execution scope; DISABLED never executes'
+        required: true
+        type: choice
+        default: DISABLED
+        options:
+          - DISABLED
+          - CANARY
+          - BENCHMARK
       approved_sha:
         description: 'Exact reviewed 40-character SHA at inop-main HEAD'
         required: true
         type: string
       confirmation:
-        description: 'Type RUN UP TO 36 FICTIONAL AI REQUESTS'
+        description: 'CANARY: RUN ONE FICTIONAL AI CANARY; BENCHMARK: RUN UP TO 36 FICTIONAL AI REQUESTS'
         required: true
         type: string
       approve_synthetic_transfer:
@@ -16,7 +25,12 @@ on:
         default: false
         type: boolean
       quota_confirmed:
-        description: 'Confirm Workers Free, model access and at least 6100 unused daily neurons; no billing changes'
+        description: 'BENCHMARK only: confirm Workers Free, model access and 6100 unused daily neurons'
+        required: true
+        default: false
+        type: boolean
+      canary_budget_approved:
+        description: 'CANARY only: confirm Free plan; approve one bounded attempt with remaining quota UNKNOWN, no billing changes'
         required: true
         default: false
         type: boolean
@@ -27,7 +41,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight:
-    if: github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true'
+    if: github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true' && (inputs.mode == 'CANARY' || inputs.mode == 'BENCHMARK')
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     permissions:
@@ -35,6 +49,8 @@ jobs:
       actions: read
     env:
       CF_AI_SYNTHETIC_ENABLED: ${{ vars.CF_AI_SYNTHETIC_ENABLED }}
+      CF_AI_MODE: ${{ inputs.mode }}
+      CF_AI_CANARY_APPROVED: ${{ inputs.canary_budget_approved }}
       CF_AI_APPROVED_SHA: ${{ inputs.approved_sha }}
       CF_AI_APPROVAL: ${{ inputs.confirmation }}
       CF_AI_TRANSFER_APPROVED: ${{ inputs.approve_synthetic_transfer }}
@@ -60,7 +76,7 @@ jobs:
         run: node Backend/scripts/verifyCloudflareAiSynthetic.cjs --preflight
   evaluate:
     needs: preflight
-    if: needs.preflight.result == 'success' && github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true'
+    if: needs.preflight.result == 'success' && github.repository == 'isgandarovusal/INOP' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/inop-main' && github.run_attempt == 1 && vars.CF_AI_SYNTHETIC_ENABLED == 'true' && (inputs.mode == 'CANARY' || inputs.mode == 'BENCHMARK')
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     environment: cf-ai-synthetic-evaluation
@@ -81,6 +97,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           CF_AI_SYNTHETIC_ENABLED: ${{ vars.CF_AI_SYNTHETIC_ENABLED }}
+          CF_AI_MODE: ${{ inputs.mode }}
+          CF_AI_CANARY_APPROVED: ${{ inputs.canary_budget_approved }}
           CF_AI_APPROVED_SHA: ${{ inputs.approved_sha }}
           CF_AI_APPROVAL: ${{ inputs.confirmation }}
           CF_AI_TRANSFER_APPROVED: ${{ inputs.approve_synthetic_transfer }}

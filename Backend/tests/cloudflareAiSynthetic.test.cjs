@@ -1,9 +1,9 @@
 const test = require('node:test'), assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
 const { Readable } = require('node:stream');
-const { createRunner, MODEL, ENVIRONMENT, APPROVAL, GATES, assertNoReflections, serializeArtifact } = require('../scripts/verifyCloudflareAiSynthetic.cjs');
+const { createRunner, MODEL, ENVIRONMENT, APPROVAL, CANARY_APPROVAL, GATES, assertNoReflections, serializeArtifact } = require('../scripts/verifyCloudflareAiSynthetic.cjs');
 const benchmark = require('../scripts/evaluateRecruitmentAi.cjs');
 const SHA = 'a'.repeat(40);
-const env = () => ({ GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REPOSITORY: 'isgandarovusal/INOP', GITHUB_REF: 'refs/heads/inop-main', GITHUB_ACTOR: 'isgandarovusal', GITHUB_TRIGGERING_ACTOR: 'isgandarovusal', GITHUB_RUN_ATTEMPT: '1', GITHUB_RUN_ID: '123', GITHUB_SHA: SHA, GITHUB_WORKFLOW_SHA: SHA, GITHUB_WORKFLOW_REF: 'isgandarovusal/INOP/.github/workflows/cf-ai-synthetic-evaluation.yml@refs/heads/inop-main', CF_AI_APPROVED_SHA: SHA, CF_AI_APPROVAL: APPROVAL, CF_AI_TRANSFER_APPROVED: 'true', CF_AI_QUOTA_CONFIRMED: 'true', CF_AI_SYNTHETIC_ENABLED: 'true', GH_TOKEN: 'github-synthetic-secret-only', CF_AI_EVAL_ACCOUNT_ID: 'c'.repeat(32), CF_AI_EVAL_API_TOKEN: 'cloudflare-synthetic-secret-only', ...Object.fromEntries(GATES.map(k => [k, 'false'])) });
+const env = () => ({ GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REPOSITORY: 'isgandarovusal/INOP', GITHUB_REF: 'refs/heads/inop-main', GITHUB_ACTOR: 'isgandarovusal', GITHUB_TRIGGERING_ACTOR: 'isgandarovusal', GITHUB_RUN_ATTEMPT: '1', GITHUB_RUN_ID: '123', GITHUB_SHA: SHA, GITHUB_WORKFLOW_SHA: SHA, GITHUB_WORKFLOW_REF: 'isgandarovusal/INOP/.github/workflows/cf-ai-synthetic-evaluation.yml@refs/heads/inop-main', CF_AI_APPROVED_SHA: SHA, CF_AI_MODE: 'BENCHMARK', CF_AI_APPROVAL: APPROVAL, CF_AI_TRANSFER_APPROVED: 'true', CF_AI_QUOTA_CONFIRMED: 'true', CF_AI_SYNTHETIC_ENABLED: 'true', GH_TOKEN: 'github-synthetic-secret-only', CF_AI_EVAL_ACCOUNT_ID: 'c'.repeat(32), CF_AI_EVAL_API_TOKEN: 'cloudflare-synthetic-secret-only', ...Object.fromEntries(GATES.map(k => [k, 'false'])) });
 const policy = () => ({ name: ENVIRONMENT, can_admins_bypass: false, protection_rules: [{ type: 'required_reviewers', reviewers: [{ type: 'User', reviewer: { login: 'isgandarovusal' } }] }], deployment_branch_policy: { custom_branch_policies: true, protected_branches: false } });
 const branches = () => ({ total_count: 1, branch_policies: [{ name: 'inop-main', type: 'branch' }] });
 const response = (data, status = 200) => ({ status, body: Readable.from([JSON.stringify(data)]) });
@@ -184,4 +184,61 @@ test('A safe first response cannot produce a partial artifact after a later unsa
   const h = harness({ ai: async (d, n) => { if (n === 2) d.untrusted = [{ secret: env().GH_TOKEN }]; return response(d); } });
   assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 2); assert.equal(h.records.length, 0);
   assert.ok(h.codes.every(code => /^[A-Z_]+$/.test(code)));
+});
+
+const canary = { CF_AI_MODE: 'CANARY', CF_AI_APPROVAL: CANARY_APPROVAL, CF_AI_CANARY_APPROVED: 'true', CF_AI_QUOTA_CONFIRMED: 'false' };
+test('CANARY succeeds with exactly one inference, cannot fall through or execute again', async () => {
+  const h = harness({ change: canary });
+  assert.equal(await h.runner.run('--execute'), true); assert.equal(h.count(), 1); assert.equal(h.records.length, 1);
+  const r = h.records[0]; assert.equal(r.mode, 'CANARY'); assert.equal(r.attempted, 1); assert.equal(r.authentication, 'CONFIRMED'); assert.equal(r.modelAccepted, true); assert.equal(r.httpCategory, '2XX'); assert.equal(r.schemaValid, true); assert.equal(r.withinDeadline, true); assert.equal(r.benchmarkCompleted, false); assert.equal(r.quotaRemaining, 'UNKNOWN'); assert.equal(r.productionReady, false);
+  assert.ok(r.latencyMs <= 8000); assert.equal(r.execution, 'SIMULATED_TEST_TRANSPORT');
+  assert.ok(!JSON.stringify(r).includes('explanation')); assert.ok(!h.codes.includes('AI_CASE_VALID')); assert.ok(!h.codes.includes('AI_SYNTHETIC_QA_COMPLETE'));
+  assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 1);
+});
+test('Mode is explicit, DISABLED/absent never runs; benchmark cannot inherit canary approval', async () => {
+  for (const change of [{ CF_AI_MODE: undefined }, { CF_AI_MODE: 'DISABLED' }, { CF_AI_MODE: 'other' }, { ...canary, CF_AI_CANARY_APPROVED: 'false' }, { ...canary, CF_AI_APPROVAL: APPROVAL }, { ...canary, CF_AI_MODE: 'BENCHMARK', CF_AI_APPROVAL: APPROVAL }]) {
+    const h = harness({ change }); assert.equal(await h.runner.run('--execute'), false); assert.equal(h.calls.length, 0);
+  }
+});
+test('CANARY default-off, owner/branch/SHA/reviewer guards remain mandatory', async () => {
+  for (const change of [{ CF_AI_SYNTHETIC_ENABLED: 'false' }, { GITHUB_ACTOR: 'other' }, { GITHUB_REF: 'refs/heads/other' }, { CF_AI_APPROVED_SHA: 'b'.repeat(40) }]) {
+    const h = harness({ change: { ...canary, ...change } }); assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 0);
+  }
+  const h = harness({ change: canary, protection: { ...policy(), can_admins_bypass: true } }); assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 0);
+});
+test('Failed CANARY HTTP/schema/timeout/config stops immediately, never retries or publishes partial data', async () => {
+  for (const ai of [async () => response({}, 401), async () => response({}, 429), async () => response({}, 500), async d => { d.choices[0].message.content = '{}'; return response(d); }, async () => new Promise(() => {})]) {
+    const h = harness({ change: canary, ai, deadlineMs: 15 }); assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 1); assert.equal(h.records.length, 0); assert.ok(h.codes.includes('AI_CANARY_FAILED'));
+  }
+  const h = harness({ change: { ...canary, CF_AI_EVAL_API_TOKEN: '' } }); assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 0); assert.equal(h.records.length, 0);
+});
+test('CANARY keeps encoded-secret rejection and final artifact allowlist', async () => {
+  const h = harness({ change: canary, ai: async d => {
+    const value = JSON.parse(d.choices[0].message.content); value.criteria[0].explanation = env().CF_AI_EVAL_API_TOKEN;
+    d.choices[0].message.content = JSON.stringify(value).replace('cloudflare-', '\\u0063loudflare-'); return response(d);
+  } });
+  assert.equal(await h.runner.run('--execute'), false); assert.equal(h.count(), 1); assert.equal(h.records.length, 0);
+  const good = harness({ change: canary }); assert.equal(await good.runner.run('--execute'), true);
+  for (const mutate of [r => r.raw = 'unsafe', r => r.attempted = 2, r => r.schemaValid = false, r => r.httpCategory = 'arbitrary', r => r.benchmarkCompleted = true, r => r.latencyMs = 8001]) {
+    const r = structuredClone(good.records[0]); mutate(r); assert.throws(() => serializeArtifact(r, []));
+  }
+  assert.throws(() => serializeArtifact(good.records[0], [MODEL]));
+});
+test('CANARY establishes protocol only, never claims semantic matching or remaining batch quota', async () => {
+  const h = harness({ change: canary, ai: async d => { const value = JSON.parse(d.choices[0].message.content); value.criteria[0].relation = 'contradicted'; d.choices[0].message.content = JSON.stringify(value); return response(d); } });
+  assert.equal(await h.runner.run('--execute'), true); assert.equal(h.count(), 1);
+  assert.equal(h.records[0].quotaRemaining, 'UNKNOWN'); assert.equal(h.records[0].productionReady, false); assert.equal(h.records[0].benchmarkCompleted, false);
+});
+test('Workflow default is non-executing; same protected jobs explicitly receive selected mode', () => {
+  const text = fs.readFileSync(path.resolve(__dirname, '../../.github/workflows/cf-ai-synthetic-evaluation.yml'), 'utf8');
+  assert.match(text, /default: DISABLED/); assert.equal((text.match(/CF_AI_MODE: \$\{\{ inputs.mode \}\}/g) || []).length, 2);
+  assert.ok(text.includes("inputs.mode == 'CANARY' || inputs.mode == 'BENCHMARK'"));
+  assert.equal((text.match(/CF_AI_CANARY_APPROVED:/g) || []).length, 2); assert.ok(!text.includes('npm ci'));
+});
+
+test('CANARY distinguishes network failure from unsafe artifact publication without retry', async () => {
+  const network = harness({ change: canary, ai: async () => { throw Error('PRIVATE NETWORK DETAILS'); } });
+  assert.equal(await network.runner.run('--execute'), false); assert.equal(network.count(), 1); assert.ok(network.codes.includes('AI_PROVIDER_FAILED')); assert.equal(network.records.length, 0);
+  const storage = harness({ change: canary, save() { throw Error('PRIVATE PATH'); } });
+  assert.equal(await storage.runner.run('--execute'), false); assert.equal(storage.count(), 1); assert.ok(storage.codes.includes('AI_REPORT_FAILED')); assert.equal(storage.records.length, 0);
 });

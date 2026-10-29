@@ -1,8 +1,40 @@
 # Cloudflare Workers AI synthetic QA — prepared, NOT authorized to run
 
-Preparation approval only. No token created, secret/variable/environment configured, workflow dispatched, inference sent, push or deployment performed. Existing Applications/offline-benchmark/planning commits remain separate ancestors. This package does not enable a production AI provider and does not import/modify the existing OpenAI adapter, ATS-v2, intake, R2, scanner or MongoDB.
+Code delivery approval is separate from inference approval. No token created, secret/variable/environment configured, workflow dispatched, inference sent or manual deployment performed during this package. Existing Applications/offline-benchmark/planning commits remain separate ancestors. This package does not enable a production AI provider and does not import/modify the existing OpenAI adapter, ATS-v2, intake, R2, scanner or MongoDB.
 
-## Fixed scope
+## Current explicit execution modes
+
+One existing workflow/runner, two explicit execution modes, no new provider or pipeline. Workflow input `mode` defaults to **DISABLED** (no jobs/inference). The repository variable must still explicitly be true for any execution. Absent/invalid mode also fails closed; no compatibility fallback to BENCHMARK.
+
+| Input / control | CANARY | BENCHMARK |
+|---|---|---|
+| mode | CANARY | BENCHMARK |
+| confirmation | RUN ONE FICTIONAL AI CANARY | RUN UP TO 36 FICTIONAL AI REQUESTS |
+| approve_synthetic_transfer | true, after separate approval | true, after separate approval |
+| canary_budget_approved | true: confirm Free plan and approve one bounded attempt even if remaining quota UNKNOWN | not a substitute for quota_confirmed |
+| quota_confirmed | false if remaining quota is unknown; not required for CANARY | true: existing Free/model/6100-unused-neuron confirmation |
+| approved_sha | exact reviewed current remote HEAD | exact reviewed current remote HEAD |
+| Maximum inference attempts | **1**, even after success | existing **36**, first schema canary included |
+
+CANARY has a separate return boundary before the benchmark loop. It uses only the existing first `az-exact` fictional fixture, model, request builder, schema/reflection checks and shared bounded transport. Every success/failure/timeout terminates after at most one attempt; no second diagnostic/model request, fallback or retry. Eight-second deadline and 512 output-token limit unchanged. The request is never sent without owner/SHA/branch/environment approvals and closed QA CV gates.
+
+CANARY success artifact has a distinct strict `cf-ai-single-canary-v1` allowlist: mode/model/execution provenance, attempted=1, authentication=CONFIRMED, modelAccepted=true, httpCategory=2XX, schemaValid=true, withinDeadline=true, bounded latency, productionReady=false, benchmarkCompleted=false, quotaRemaining=UNKNOWN. No prompt, output text, score, inferred qualification, identifier or credential is retained. This proves protocol access only, NOT semantic accuracy, available batch quota or production readiness. Schema-valid incorrect semantics does not falsely become matching evidence.
+
+CANARY failures emit only fixed sanitized HTTP/auth/schema/timeout/error categories and publish no artifact; thus unsafe/partial reports cannot upload. Any successful publication still requires final serialization/reflection checks, atomic write and artifact_safe=true plus successful workflow/step. Encoded secret protection is unchanged. Public successful canary artifact retention is one day.
+
+One request's planning cost at 4096 input/512 output tokens is about34.55 neurons; the loose full-context allowance is about167.16 neurons. These are estimates/bounds under the documented rates, not verified account usage; quota can still be exhausted and return429. Free plan must be confirmed. Do not enable billing or claim unknown remaining quota is6100. CANARY approval never authorizes the BENCHMARK.
+
+### First CANARY operator sequence — only AFTER separate execution approval
+
+1. Code delivery and CI are separate from activation; keep CF_AI_SYNTHETIC_ENABLED=false until specifically authorized. No new token/secret/environment changes are required by this code change.
+2. Obtain explicit approval to temporarily enable the repository variable and send **one** fictional request, with the512-token/8s limits and one-day public-safe artifact retention. Confirm the account is on Free; acknowledge remaining quota may be UNKNOWN. Do not expose secrets in chat.
+3. Only after that approval, enable the variable and open Actions → Manual Cloudflare fictional AI evaluation → Run workflow, branch inop-main. Choose mode=CANARY, approved_sha=the exact separately reviewed current remote HEAD, confirmation=RUN ONE FICTIONAL AI CANARY, approve_synthetic_transfer=true, canary_budget_approved=true. Leave quota_confirmed=false when remaining quota is unknown. Do not select BENCHMARK.
+4. Manual dispatch is a distinct approved action. Secrets-free preflight runs first; the protected environment then requires its reviewer approval before the inference step receives secrets. Do not bypass it. If HEAD moved or any guard fails, stop; no automatic retry.
+5. Inspect sanitized codes/success metrics. A successful CANARY stops at one request and does not launch the batch. Return the enable variable to false with operator authority. A full BENCHMARK requires a separate approval and its original quota confirmation/phrase/explicit mode.
+
+No inference, activation, dispatch, secrets/settings change or manual deployment was performed while implementing this mode.
+
+## BENCHMARK scope and common protections
 
 - Existing `evaluateRecruitmentAi.cjs` exporter/evaluator and 12 AZ/EN/RU fictional fixtures reused unchanged. Gemini can later use the same provider-neutral result envelope; no Gemini implementation here.
 - Fixed `@cf/qwen/qwen3-30b-a3b-fp8`, fixed account REST Chat Completions path, no deployed Worker/public endpoint.
@@ -82,3 +114,5 @@ Root cause in a6ee832: secret substring check preceded JSON.parse(message.conten
 All original request/approval/deadline controls remain unchanged. No production file or offline evaluator changes. This fix only hardens the synthetic runner/publication workflow, tests and this document. Original commits preserved; no push.
 
 Security-fix QA: runner/evaluator **40/40 PASS**; unchanged adjacent security/matching/protected-Actions **56/56 PASS**, 0 failed/skipped. Encoded-reflection regression: original runner FAIL (1 failing targeted test), corrected runner PASS. Workflow YAML/upload conditions, syntax, build and lint PASS. Existing build chunk-size advisory unchanged. No full CI, external inference or real credentials. This metrics-only publication contract supersedes the earlier execution-plan suggestion to retain fictional explanation prose; earlier reports remain preserved as historical evidence.
+
+Single-canary package local QA: **104/104 PASS**, 0 failed/skipped, using mocked GitHub/Cloudflare transports and existing synthetic matching/evidence regressions. Existing BENCHMARK/encoded-reflection/publication tests preserved. New checks cover one-request success/failure/no-fallthrough, explicit disabled mode, separate approval phrases/budgets, missing config, owner/branch/SHA/environment rejection, schema/HTTP/timeout/no-retry, safe single-canary artifact and report-write failure. YAML, syntax, build and lint PASS. No full CI manually dispatched and no real model executed.

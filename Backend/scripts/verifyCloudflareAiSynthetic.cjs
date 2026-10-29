@@ -3,13 +3,13 @@ const fs = require('node:fs'), path = require('node:path');
 const benchmark = require('./evaluateRecruitmentAi.cjs');
 const REPO = 'isgandarovusal/INOP', OWNER = 'isgandarovusal', BRANCH = 'refs/heads/inop-main';
 const ENVIRONMENT = 'cf-ai-synthetic-evaluation', MODEL = '@cf/qwen/qwen3-30b-a3b-fp8';
-const APPROVAL = 'RUN UP TO 36 FICTIONAL AI REQUESTS';
+const APPROVAL = 'RUN UP TO 36 FICTIONAL AI REQUESTS', CANARY_APPROVAL = 'RUN ONE FICTIONAL AI CANARY';
 const GATES = ['HR_CV_DURABLE_INTAKE_ENABLED', 'HR_CV_SCAN_ENABLED', 'HR_CV_INTAKE_WORKER_ENABLED', 'HR_CV_OCR_ENABLED', 'HR_CV_PROCESSING_ENABLED', 'HR_CV_AI_PROCESSING_ENABLED'];
 const deny = code => Object.assign(Error('Synthetic evaluation unavailable.'), { code });
-const CODES = new Set(['AI_CONTEXT_REJECTED', 'AI_APPROVAL_REQUIRED', 'AI_ENVIRONMENT_UNPROTECTED', 'AI_PREFLIGHT_FAILED', 'AI_CONFIG_INVALID', 'AI_TIMEOUT', 'AI_RESPONSE_INVALID', 'AI_AUTH_DENIED', 'AI_RATE_LIMITED', 'AI_REQUEST_REJECTED', 'AI_PROVIDER_FAILED', 'AI_OUTPUT_REJECTED', 'AI_USAGE_UNVERIFIED', 'AI_QUOTA_BOUND', 'AI_ALREADY_ATTEMPTED']);
+const CODES = new Set(['AI_REPORT_FAILED','AI_CONTEXT_REJECTED', 'AI_APPROVAL_REQUIRED', 'AI_ENVIRONMENT_UNPROTECTED', 'AI_PREFLIGHT_FAILED', 'AI_CONFIG_INVALID', 'AI_TIMEOUT', 'AI_RESPONSE_INVALID', 'AI_AUTH_DENIED', 'AI_RATE_LIMITED', 'AI_REQUEST_REJECTED', 'AI_PROVIDER_FAILED', 'AI_OUTPUT_REJECTED', 'AI_USAGE_UNVERIFIED', 'AI_QUOTA_BOUND', 'AI_ALREADY_ATTEMPTED']);
 function context(env) {
   if (env.GITHUB_ACTIONS !== 'true' || env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || env.GITHUB_REPOSITORY !== REPO || env.GITHUB_REF !== BRANCH || env.GITHUB_ACTOR !== OWNER || env.GITHUB_TRIGGERING_ACTOR !== OWNER || env.GITHUB_RUN_ATTEMPT !== '1' || !/^\d+$/.test(env.GITHUB_RUN_ID || '') || env.GITHUB_WORKFLOW_REF !== REPO + '/.github/workflows/cf-ai-synthetic-evaluation.yml@' + BRANCH) throw deny('AI_CONTEXT_REJECTED');
-  if (env.CF_AI_SYNTHETIC_ENABLED !== 'true' || env.CF_AI_APPROVAL !== APPROVAL || env.CF_AI_TRANSFER_APPROVED !== 'true' || env.CF_AI_QUOTA_CONFIRMED !== 'true' || !/^[a-f0-9]{40}$/.test(env.CF_AI_APPROVED_SHA || '') || env.CF_AI_APPROVED_SHA !== env.GITHUB_SHA || env.GITHUB_WORKFLOW_SHA !== env.GITHUB_SHA || GATES.some(k => env[k] !== 'false')) throw deny('AI_APPROVAL_REQUIRED');
+  if (env.CF_AI_SYNTHETIC_ENABLED !== 'true' || !['CANARY','BENCHMARK'].includes(env.CF_AI_MODE) || env.CF_AI_APPROVAL !== (env.CF_AI_MODE === 'CANARY' ? CANARY_APPROVAL : APPROVAL) || env.CF_AI_TRANSFER_APPROVED !== 'true' || (env.CF_AI_MODE === 'BENCHMARK' ? env.CF_AI_QUOTA_CONFIRMED !== 'true' : env.CF_AI_CANARY_APPROVED !== 'true') || !/^[a-f0-9]{40}$/.test(env.CF_AI_APPROVED_SHA || '') || env.CF_AI_APPROVED_SHA !== env.GITHUB_SHA || env.GITHUB_WORKFLOW_SHA !== env.GITHUB_SHA || GATES.some(k => env[k] !== 'false')) throw deny('AI_APPROVAL_REQUIRED');
 }
 async function request(url, options, fetcher, limit = 65536, timeout = 8000) {
   const controller = new AbortController(); let timer;
@@ -67,6 +67,11 @@ function serializeArtifact(artifact, secrets) {
   const only = (o, keys) => o && !Array.isArray(o) && typeof o === 'object' && Object.keys(o).length === keys.length && keys.every(k => Object.hasOwn(o, k));
   const number = (v, max) => Number.isFinite(v) && v >= 0 && v <= max;
   const fixtures = new Map(benchmark.fixtures.map(f => [f.id, f])), seen = new Set();
+  if (artifact?.version === 'cf-ai-single-canary-v1') {
+    if (!only(artifact, ['version','mode','model','execution','productionReady','attempted','authentication','modelAccepted','httpCategory','schemaValid','withinDeadline','latencyMs','benchmarkCompleted','quotaRemaining']) || artifact.mode !== 'CANARY' || artifact.model !== MODEL || !['REAL_PROVIDER_REQUESTS','SIMULATED_TEST_TRANSPORT'].includes(artifact.execution) || artifact.productionReady !== false || artifact.attempted !== 1 || artifact.authentication !== 'CONFIRMED' || artifact.modelAccepted !== true || artifact.httpCategory !== '2XX' || artifact.schemaValid !== true || artifact.withinDeadline !== true || !number(artifact.latencyMs, 8000) || artifact.benchmarkCompleted !== false || artifact.quotaRemaining !== 'UNKNOWN') throw deny('AI_RESPONSE_INVALID');
+    assertNoReflections(artifact, secrets);
+    const text = JSON.stringify(artifact, null, 2); assertNoReflections(text, secrets); return text;
+  }
   if (!only(artifact, ['version','model','execution','productionReady','complete','attempted','explanationQuality','billingUsageVerified','cases','baseline']) || artifact.version !== 'cf-ai-synthetic-metrics-v1' || artifact.model !== MODEL || !['REAL_PROVIDER_REQUESTS','SIMULATED_TEST_TRANSPORT'].includes(artifact.execution) || artifact.productionReady !== false || artifact.complete !== true || artifact.attempted !== 36 || artifact.explanationQuality !== 'NOT_PUBLISHED_NOT_ASSESSED' || artifact.billingUsageVerified !== false || !Array.isArray(artifact.cases) || artifact.cases.length !== 36 || !Array.isArray(artifact.baseline) || artifact.baseline.length !== 12) throw deny('AI_RESPONSE_INVALID');
   for (const row of artifact.cases) {
     const f = fixtures.get(row?.caseId), key = row?.caseId + ':' + row?.repeat;
@@ -84,6 +89,24 @@ function serializeArtifact(artifact, secrets) {
   if (Buffer.byteLength(text) > 32768) throw deny('AI_RESPONSE_INVALID');
   assertNoReflections(text, secrets);
   return text;
+}
+async function evaluateOne(item, schema, fixture, env, fetcher, deadline, secrets, emitStatus = () => {}) {
+  const started = performance.now();
+  const result = await request('https://api.cloudflare.com/client/v4/accounts/' + env.CF_AI_EVAL_ACCOUNT_ID + '/ai/v1/chat/completions', { method: 'POST', headers: { Authorization: 'Bearer ' + env.CF_AI_EVAL_API_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(bodyFor(item, schema)) }, fetcher, 32768, deadline);
+  emitStatus(result.status === 200 ? 'AI_CANARY_HTTP_2XX' : result.status >= 400 && result.status < 500 ? 'AI_CANARY_HTTP_4XX' : result.status >= 500 && result.status < 600 ? 'AI_CANARY_HTTP_5XX' : 'AI_CANARY_HTTP_OTHER');
+  if (result.status !== 200) throw deny([401, 403].includes(result.status) ? 'AI_AUTH_DENIED' : result.status === 429 ? 'AI_RATE_LIMITED' : result.status === 400 ? 'AI_REQUEST_REJECTED' : 'AI_PROVIDER_FAILED');
+  emitStatus('AI_CANARY_AUTH_CONFIRMED'); emitStatus('AI_CANARY_MODEL_ACCEPTED');
+  assertNoReflections(result.data, secrets);
+  const choice = result.data.choices?.[0];
+  if (choice?.finish_reason !== 'stop' || typeof choice.message?.content !== 'string') { emitStatus('AI_CANARY_SCHEMA_INVALID'); throw deny('AI_OUTPUT_REJECTED'); }
+  let output; try { output = JSON.parse(choice.message.content); assertNoReflections(output, secrets); benchmark.validateOutput(output, fixture); } catch { emitStatus('AI_CANARY_SCHEMA_INVALID'); throw deny('AI_OUTPUT_REJECTED'); }
+  emitStatus('AI_CANARY_SCHEMA_VALID');
+  const usage = result.data.usage, reasoning = usage?.completion_tokens_details?.reasoning_tokens ?? 0;
+  if (!Number.isInteger(usage?.prompt_tokens) || usage.prompt_tokens < 0 || usage.prompt_tokens > 32768 || !Number.isInteger(usage?.completion_tokens) || usage.completion_tokens < 0 || usage.completion_tokens > 512 || !Number.isInteger(reasoning) || reasoning < 0 || reasoning > usage.completion_tokens) throw deny('AI_USAGE_UNVERIFIED');
+  const latencyMs = performance.now() - started;
+  if (latencyMs > deadline) throw deny('AI_TIMEOUT');
+  emitStatus('AI_CANARY_WITHIN_DEADLINE');
+  return { output, usage, latencyMs };
 }
 function outputStore() {
   const dir = path.resolve('work/cf-ai-synthetic');
@@ -113,19 +136,22 @@ function createRunner({ env = process.env, fetcher = fetch, emit = code => conso
       store.claim(); claimed = true;
       const plan = benchmark.exportCases(); if (plan.cases.length !== 12 || plan.repeats !== 3 || !report.baseline.cases.every(c => c.matchesExpected)) throw deny('AI_OUTPUT_REJECTED');
       const fixtureMap = new Map(benchmark.fixtures.map(f => [f.id, f]));
+      if (env.CF_AI_MODE === 'CANARY') {
+        // A separate return boundary: success and every failure stop before the batch loop.
+        try {
+          const item = plan.cases[0]; report.attempted = 1;
+          const result = await evaluateOne(item, plan.schema, fixtureMap.get(item.caseId), env, fetcher, deadline, secrets, emit);
+          const artifact = { version: 'cf-ai-single-canary-v1', mode: 'CANARY', model: MODEL, execution: report.execution, productionReady: false, attempted: 1, authentication: 'CONFIRMED', modelAccepted: true, httpCategory: '2XX', schemaValid: true, withinDeadline: true, latencyMs: result.latencyMs, benchmarkCompleted: false, quotaRemaining: 'UNKNOWN' };
+          try { store.save(serializeArtifact(artifact, secrets)); } catch { throw deny('AI_REPORT_FAILED'); }
+          emit('AI_CANARY_COMPLETE'); return true;
+        } catch (e) { emit(CODES.has(e?.code) ? e.code : 'AI_PROVIDER_FAILED'); emit('AI_CANARY_FAILED'); return false; }
+      }
       for (const item of plan.cases) for (let repeat = 1; repeat <= 3; repeat++) {
         if (report.attempted >= 36 || neurons + 167.1552 > 6100) throw deny('AI_QUOTA_BOUND');
-        report.attempted++; const started = performance.now();
-        const result = await request('https://api.cloudflare.com/client/v4/accounts/' + env.CF_AI_EVAL_ACCOUNT_ID + '/ai/v1/chat/completions', { method: 'POST', headers: { Authorization: 'Bearer ' + env.CF_AI_EVAL_API_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(bodyFor(item, plan.schema)) }, fetcher, 32768, deadline);
-        if (result.status !== 200) throw deny([401, 403].includes(result.status) ? 'AI_AUTH_DENIED' : result.status === 429 ? 'AI_RATE_LIMITED' : result.status === 400 ? 'AI_REQUEST_REJECTED' : 'AI_PROVIDER_FAILED');
-        assertNoReflections(result.data, secrets);
-        const choice = result.data.choices?.[0];
-        if (choice?.finish_reason !== 'stop' || typeof choice.message?.content !== 'string') throw deny('AI_OUTPUT_REJECTED');
-        let output; try { output = JSON.parse(choice.message.content); assertNoReflections(output, secrets); benchmark.validateOutput(output, fixtureMap.get(item.caseId)); } catch { throw deny('AI_OUTPUT_REJECTED'); }
-        const usage = result.data.usage, reasoning = usage?.completion_tokens_details?.reasoning_tokens ?? 0;
-        if (!Number.isInteger(usage?.prompt_tokens) || usage.prompt_tokens < 0 || usage.prompt_tokens > 32768 || !Number.isInteger(usage?.completion_tokens) || usage.completion_tokens < 0 || usage.completion_tokens > 512 || !Number.isInteger(reasoning) || reasoning < 0 || reasoning > usage.completion_tokens) throw deny('AI_USAGE_UNVERIFIED');
+        report.attempted++;
+        const { output, usage, latencyMs } = await evaluateOne(item, plan.schema, fixtureMap.get(item.caseId), env, fetcher, deadline, secrets);
         neurons += (usage.prompt_tokens * 4625 + usage.completion_tokens * 30475) / 1e6;
-        envelope.runs.push({ caseId: item.caseId, repeat, latencyMs: performance.now() - started, inputTokens: usage.prompt_tokens, outputTokens: usage.completion_tokens, output });
+        envelope.runs.push({ caseId: item.caseId, repeat, latencyMs, inputTokens: usage.prompt_tokens, outputTokens: usage.completion_tokens, output });
         if (Buffer.byteLength(JSON.stringify(envelope)) > benchmark.MAX_BYTES) throw deny('AI_RESPONSE_INVALID');
         emit('AI_CASE_VALID'); // No response, account, credential or header logging.
       }
@@ -144,4 +170,4 @@ function createRunner({ env = process.env, fetcher = fetch, emit = code => conso
   } };
 }
 if (require.main === module) { const args = process.argv.slice(2); createRunner().run(args.length === 1 ? args[0] : '').then(ok => { if (ok && args[0] === '--execute') fs.appendFileSync(process.env.GITHUB_OUTPUT, 'artifact_safe=true\n'); process.exitCode = ok ? 0 : 1; }).catch(() => { console.log('AI_SYNTHETIC_QA_FAILED'); process.exitCode = 1; }); }
-module.exports = { createRunner, context, bodyFor, preflight, MODEL, ENVIRONMENT, APPROVAL, GATES, assertNoReflections, serializeArtifact };
+module.exports = { createRunner, context, bodyFor, preflight, MODEL, ENVIRONMENT, APPROVAL, CANARY_APPROVAL, GATES, assertNoReflections, serializeArtifact };
