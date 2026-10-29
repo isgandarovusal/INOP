@@ -7,6 +7,17 @@ on:
         required: true
         default: false
         type: boolean
+      mode:
+        description: 'Explicit QA transport; never production activation'
+        type: choice
+        options: [native, persistent-unix]
+        default: native
+        required: true
+      reviewed_sha:
+        description: 'Persistent mode only: exact reviewed 40-character commit SHA'
+        type: string
+        default: ''
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -14,7 +25,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   native-qa:
-    if: github.repository == 'isgandarovusal/INOP' && github.ref == 'refs/heads/inop-main' && github.actor == 'isgandarovusal' && github.event_name == 'workflow_dispatch' && inputs.run_native_qa == true
+    if: github.repository == 'isgandarovusal/INOP' && github.ref == 'refs/heads/inop-main' && github.actor == 'isgandarovusal' && github.event_name == 'workflow_dispatch' && inputs.run_native_qa == true && inputs.mode != 'persistent-unix'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -45,3 +56,91 @@ jobs:
           clamscan --version
       - name: Existing native adapter, unchanged scan deadline, sequential synthetic fixtures
         run: /usr/bin/time -f 'QA_PROCESS_TREE_PEAK_RSS_KB=%M QA_ELAPSED_SECONDS=%e' node Backend/scripts/verifyNativeClamav.cjs --synthetic-only
+
+  persistent-unix-qa:
+    if: github.repository == 'isgandarovusal/INOP' && github.ref == 'refs/heads/inop-main' && github.actor == 'isgandarovusal' && github.triggering_actor == 'isgandarovusal' && github.event_name == 'workflow_dispatch' && inputs.run_native_qa == true && inputs.mode == 'persistent-unix' && vars.INOP_CLAMD_UNIX_QA_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HR_CV_DURABLE_INTAKE_ENABLED: 'false'
+      HR_CV_SCAN_ENABLED: 'false'
+      HR_CV_INTAKE_WORKER_ENABLED: 'false'
+      HR_CV_OCR_ENABLED: 'false'
+      HR_CV_PROCESSING_ENABLED: 'false'
+      HR_CV_AI_PROCESSING_ENABLED: 'false'
+    steps:
+      - name: Exact reviewed SHA and first attempt only
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+          EXECUTION_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REVIEWED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$REVIEWED_SHA" == "$EXECUTION_SHA" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == '1' ]]
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Build isolated QA image (no production configuration)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! docker build --label "inop.qa.run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -t "inop-clamd-qa:$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" -f Backend/scripts/clamdQa/Dockerfile . > "$RUNNER_TEMP/clamd-build.log" 2>&1; then
+            echo 'CLAMD_QA_IMAGE_BUILD_FAILED'
+            exit 1
+          fi
+      - name: FreshClam and Node plus clamd in one shared resource budget
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! docker run --name "inop-clamd-qa-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --label "inop.qa.run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --memory=4g --memory-swap=4g --cpus=2 --pids-limit=128 \
+            --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+            --tmpfs /qa:rw,noexec,nosuid,nodev,size=2g,uid=1000,gid=1000,mode=700 \
+            --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m,uid=1000,gid=1000,mode=700 \
+            --entrypoint /usr/bin/env "inop-clamd-qa:$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            -i PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin LANG=C LC_ALL=C TZ=UTC HOME=/qa \
+            GITHUB_ACTIONS=true INOP_CLAMD_UNIX_QA_ENABLED=true \
+            HR_CV_DURABLE_INTAKE_ENABLED=false HR_CV_SCAN_ENABLED=false HR_CV_INTAKE_WORKER_ENABLED=false \
+            HR_CV_OCR_ENABLED=false HR_CV_PROCESSING_ENABLED=false HR_CV_AI_PROCESSING_ENABLED=false \
+            node Backend/scripts/verifyPersistentClamav.cjs --synthetic-only \
+            > "$RUNNER_TEMP/clamd-report.pending" 2> "$RUNNER_TEMP/clamd-runtime.log"; then
+            echo 'CLAMD_QA_FAILED'
+            node Backend/scripts/verifyPersistentClamav.cjs --failure-summary "$RUNNER_TEMP/clamd-report.pending"
+            exit 1
+          fi
+          node Backend/scripts/verifyPersistentClamav.cjs --validate-report "$RUNNER_TEMP/clamd-report.pending"
+          mv "$RUNNER_TEMP/clamd-report.pending" "$RUNNER_TEMP/clamd-report.json"
+          echo 'CLAMD_QA_PASS_PRODUCTION_NOT_APPROVED'
+      - name: Publish allowlisted numeric synthetic results only
+        if: success()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: clamd-unix-synthetic-${{ github.run_id }}
+          path: ${{ runner.temp }}/clamd-report.json
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: false
+      - name: Clean only this invocation's resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="inop-clamd-qa-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          image="inop-clamd-qa:$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          if docker container inspect "$name" > /dev/null 2>&1; then
+            [[ "$(docker inspect --format '{{ index .Config.Labels "inop.qa.run" }}' "$name")" == "$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" ]]
+            docker rm -f "$name" > /dev/null
+          fi
+          if docker image inspect "$image" > /dev/null 2>&1; then
+            [[ "$(docker image inspect --format '{{ index .Config.Labels "inop.qa.run" }}' "$image")" == "$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" ]]
+            docker image rm "$image" > /dev/null
+          fi
+          rm -f "$RUNNER_TEMP/clamd-build.log" "$RUNNER_TEMP/clamd-runtime.log" "$RUNNER_TEMP/clamd-report.pending" "$RUNNER_TEMP/clamd-report.json"

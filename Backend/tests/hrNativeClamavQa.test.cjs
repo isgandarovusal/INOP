@@ -46,7 +46,7 @@ test('Real-scanner QA workflow is manual-only, no secrets/storage/database/produ
  const source=fs.readFileSync(path.join(root,'.github/workflows/clamav-synthetic-qa.yml'),'utf8'),w=yaml.load(source);
  assert.deepEqual(Object.keys(w.on),['workflow_dispatch']);assert.equal(w.on.workflow_dispatch.inputs.run_native_qa.default,false);assert.deepEqual(w.permissions,{contents:'read'});assert.equal(w.concurrency['cancel-in-progress'],false);
  const job=w.jobs['native-qa'];assert.equal(job['runs-on'],'ubuntu-24.04');assert.equal(job['timeout-minutes'],15);assert.ok(job.if.includes('inputs.run_native_qa == true'));
- assert.ok(!/secrets\.|environment:|upload-artifact|HR_CV_STORAGE_|MONGO_URI|curl.*\|.*sh/.test(source));assert.ok(source.includes('freshclam'));assert.ok(source.includes('--ignore-scripts'));assert.ok(!source.includes('|| true'));
+ assert.ok(!/secrets\.|environment:|upload-artifact|HR_CV_STORAGE_|MONGO_URI|curl.*\|.*sh/.test(source.split('  persistent-unix-qa:')[0]));assert.ok(!/secrets\.|environment:|HR_CV_STORAGE_|MONGO_URI|curl.*\|.*sh/.test(source));assert.ok(source.includes('freshclam'));assert.ok(source.includes('--ignore-scripts'));assert.ok(!source.includes('|| true'));
  for(const step of job.steps)if(step.uses)assert.match(step.uses,/@[a-f0-9]{40}$/);
  for(const key of ['DURABLE_INTAKE','SCAN','INTAKE_WORKER','OCR','PROCESSING','AI_PROCESSING'])assert.equal(job.env['HR_CV_'+key+'_ENABLED'],'false');
  for(const p of ['Backend/server.js','Backend/package.json','Backend/routes/route.js','Backend/services/hrCvIntakeWorker.service.js'])assert.ok(!fs.readFileSync(path.join(root,p),'utf8').includes('verifyNativeClamav'));
