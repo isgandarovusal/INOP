@@ -118,3 +118,21 @@ No real-engine run, workflow dispatch, token/configuration change, scanner/CV
 activation or deployment is authorized by preparation. Production hosting,
 updates, supervision, privacy/retention and target-host load testing still need
 separate review even if this QA succeeds.
+
+## Hosted failure 40882757615 — offline fixture correction
+
+The reported failing stage was offline_protocol_regression. The same selected
+36-test group reproduced 35 PASS / 1 FAIL with a read-only root and noexec /tmp:
+the native subprocess smoke test attempted to execute its generated shell fixture
+from document scratch. AV_UNAVAILABLE was the expected fail-closed result of
+that environment restriction, not evidence of a malware-detection regression.
+The smoke executable is now immutable, tracked test code in the read-only image;
+its environment-stripping, stdin and hash assertions remain unchanged. Both /tmp
+and /qa remain noexec, and the production scanner is unchanged.
+
+At the reviewed original SHA, reaching this stage required the earlier FreshClam,
+integrity/freshness, real fixture, restart, timeout, concurrent scan and synthetic
+worker checks to return successfully. This is control-flow evidence, not a saved
+metrics artifact: exact engine/signature/resource measurements were not retained,
+and final resource/report validation was not reached. A separately approved new
+hosted run must still complete successfully; productionReady remains false.

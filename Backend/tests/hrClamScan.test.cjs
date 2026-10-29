@@ -1,6 +1,6 @@
 const test = require('node:test'), assert = require('node:assert/strict'), crypto = require('node:crypto');
 const { createScanner } = require('../services/hrClamScan.service');
-const fs = require('node:fs/promises'), path = require('node:path'), os = require('node:os');
+const path = require('node:path');
 const bytes = Buffer.from('%PDF-SYNTHETIC-SCANNER-INPUT'), now = () => new Date('2026-10-11T12:00:00Z');
 const context = () => ({ sha256: crypto.createHash('sha256').update(bytes).digest('hex'), mimeType: 'application/pdf' });
 const version = { code: 0, output: 'ClamAV 1.4.2/27950/Sun Oct 11 08:00:00 2026\n' };
@@ -30,11 +30,10 @@ test('Input SHA/MIME/size/cancel and noncooperative worker capacity fail closed'
   assert.equal(scanner.health().active, 2); await assert.rejects(scanner.scan(bytes, context()), { code: 'AV_BUSY' });
 });
 test('Native subprocess adapter strips inherited secrets and sends original only over stdin; synthetic executable is not real AV', async () => {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'inop-owned-av-adapter-'));
-  const binary = path.join(directory, 'clamscan'), old = process.env.SYNTHETIC_AV_SECRET;
+  // Immutable test code remains executable when document scratch is noexec.
+  const binary = path.join(__dirname, 'helpers/nativeAvFixture/clamscan'), old = process.env.SYNTHETIC_AV_SECRET;
   try {
     process.env.SYNTHETIC_AV_SECRET = 'synthetic-not-real';
-    await fs.writeFile(binary, '#!/bin/sh\n[ -z "$SYNTHETIC_AV_SECRET" ] || exit 2\nif [ "$1" = "--version" ]; then printf "ClamAV 1.4.2/27950/Sun Oct 11 08:00:00 2026\\n"; else cat >/dev/null; printf "stdin: OK\\n"; fi\n', { mode: 0o700 });
     const r = await createScanner({ ...options, binary, timeoutMs: 1000 }).scan(bytes, context()); assert.equal(r.verdict, 'clean'); assert.equal(r.sha256, context().sha256);
-  } finally { if (old === undefined) delete process.env.SYNTHETIC_AV_SECRET; else process.env.SYNTHETIC_AV_SECRET = old; await fs.rm(directory, { recursive: true }); }
+  } finally { if (old === undefined) delete process.env.SYNTHETIC_AV_SECRET; else process.env.SYNTHETIC_AV_SECRET = old; }
 });

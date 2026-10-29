@@ -18,3 +18,5 @@
 !Backend/tests/helpers/
 !Backend/tests/helpers/cvDocuments.cjs
 !Backend/tests/helpers/clamdWorkerContract.cjs
+!Backend/tests/helpers/nativeAvFixture/
+!Backend/tests/helpers/nativeAvFixture/clamscan

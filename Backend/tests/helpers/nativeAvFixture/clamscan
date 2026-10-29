@@ -1,0 +1,9 @@
+#!/bin/sh
+# Synthetic subprocess-contract fixture only. This is NOT an antivirus engine.
+[ -z "$SYNTHETIC_AV_SECRET" ] || exit 2
+if [ "$1" = "--version" ]; then
+  printf 'ClamAV 1.4.2/27950/Sun Oct 11 08:00:00 2026\n'
+else
+  cat >/dev/null
+  printf 'stdin: OK\n'
+fi

@@ -56,3 +56,13 @@ test('QA subprocesses use fixed secret-free environment and bound/sanitize faile
  finally{delete process.env.INOP_SYNTHETIC_PRIVATE_CANARY;}
  for(const args of [['-e',"console.error('PRIVATE_TEST_ONLY');process.exit(1)"],['-e',"process.stdout.write('x'.repeat(1100000))"],['-e','setTimeout(()=>{},10000)']])await assert.rejects(command(process.execPath,args,100),e=>e.message==='QA command failed'&&!e.message.includes('PRIVATE_TEST_ONLY'));
 });
+
+test('Native subprocess smoke fixture works without writable or executable temporary storage and is packaged read-only',()=>{
+ const binary=path.join(__dirname,'helpers/nativeAvFixture/clamscan');
+ assert.ok(fs.statSync(binary).mode & 0o111);
+ const ignore=fs.readFileSync(path.join(root,'Backend/scripts/clamdQa/Dockerfile.dockerignore'),'utf8');
+ assert.ok(ignore.includes('!Backend/tests/helpers/nativeAvFixture/\n!Backend/tests/helpers/nativeAvFixture/clamscan\n'));
+ assert.ok(source.includes('--tmpfs /tmp:rw,noexec,nosuid,nodev'));
+ const result=cp.spawnSync(process.execPath,['--test','--test-name-pattern=Native subprocess adapter strips',path.join(__dirname,'hrClamScan.test.cjs')],{env:{PATH:process.env.PATH,TMPDIR:path.join(require('node:os').tmpdir(),'inop-nonexistent-'+require('node:crypto').randomUUID())},encoding:'utf8'});
+ assert.equal(result.status,0,'Native subprocess smoke must use packaged code, not temporary executable files');
+});
