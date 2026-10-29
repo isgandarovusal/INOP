@@ -3,7 +3,7 @@ const authority=require('./hrCreateRecovery.service'),{resourceFilter}=require('
 const fail=(code,status=409)=>Object.assign(new Error('Private source review is unavailable.'),{code,status});
 async function originHint(req,origin){
  if(!origin)return undefined;const value={key:origin.key,receivedAt:origin.receivedAt,matchReason:origin.matchReason,requiresJobReview:true};
- if(origin.jobId){const job=await Job.findOne({$and:[{_id:origin.jobId,status:'Open',archivedAt:null},resourceFilter(req,'recruitment')]}).select('_id').maxTimeMS(1000).lean();if(job)return{...value,suggestedJobId:String(job._id)};value.matchReason='unavailable';}
+ if(origin.jobId){const job=await Job.findOne({$and:[{_id:origin.jobId,status:'Open',archivedAt:null,...require('./hrCvSourceOrigin.service').jobBrandFilter(origin.key)},resourceFilter(req,'recruitment')]}).select('_id').maxTimeMS(1000).lean();if(job)return{...value,suggestedJobId:String(job._id)};value.matchReason='unavailable';}
  return value;
 }
 function createDuplicates({get,available}){return async function duplicates(req,id){
