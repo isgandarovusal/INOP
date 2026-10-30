@@ -24,7 +24,7 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     await h.page.locator('[data-hr-score-bucket="80"]').waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/scores').length,1);assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/operations').length,0);const tabReads=h.wire.length;await h.page.getByRole('tab',{name:'Əməliyyatlar',exact:true}).click();await h.page.locator('[data-hr-hire-time]').waitFor();assert.equal(h.wire.filter(r=>r.path==='/api/hr/analytics/operations').length,1);assert.equal(h.wire.length,tabReads+1);assert.ok((await h.page.locator('[data-hr-hire-time]').textContent()).includes('0 gün')); assert.equal(h.wire.filter(r => r.path === '/api/hr/analytics/overview').length, 1);
     assert.equal(h.wire.filter(r => ['/api/candidates', '/api/jobs', '/api/applications'].includes(r.path)).length, 0);
     const body = await h.page.locator('body').textContent(); assert.ok(!body.includes('Analytics_PRIVATE_PROFILE')); assert.ok(!body.includes('analytics@private.invalid'));
-    assert.ok(body.includes('İnteqrasiya edilməyib')); assert.ok(body.includes('davamlı storage təsdiqlənməyib'));
+    assert.ok(body.includes('İnteqrasiya edilməyib')); assert.equal(await h.page.locator('li').filter({hasText:'Private CV storage'}).textContent(), 'Private CV storage: Konfiqurasiya yoxdur');
   });
   await t.test('each brand is filtered on the server, including branch and vacancy selection', async () => {
     for (const brand of ['KFC', 'Pizza Hut', 'Simit Sarayı']) {
@@ -122,4 +122,50 @@ test('GFC analytics UI uses real scoped envelopes without PII, fake providers or
     assert.equal(await h.page.locator('[data-hr-histogram]').count(),1);
   });
   assert.deepEqual(h.pageErrors, []);
+}));
+
+test('Operations shows configuration-only private storage status for existing HR presets in AZ/EN/RU without probes or locale refetch', async () => withBrowserFixture(harness, async h => {
+  const env = {
+    HR_CV_STORAGE_PROVIDER: 's3', HR_CV_STORAGE_ENDPOINT: 'https://' + 'a'.repeat(32) + '.r2.cloudflarestorage.com',
+    HR_CV_STORAGE_BUCKET: 'synthetic-private-cv', HR_CV_STORAGE_REGION: 'auto',
+    HR_CV_STORAGE_ACCESS_KEY_ID: 'synthetic_ui_key_canary', HR_CV_STORAGE_SECRET_ACCESS_KEY: 'synthetic_ui_secret_canary',
+    HR_CV_DURABLE_INTAKE_ENABLED: 'false', HR_CV_SCAN_ENABLED: 'false', HR_CV_INTAKE_WORKER_ENABLED: 'false',
+  };
+  const keys = [...Object.keys(env), 'HR_CV_STORAGE_SESSION_TOKEN'], before = Object.fromEntries(keys.map(k => [k, process.env[k]]));
+  const https = require('node:https'), request = https.request; let probes = 0;
+  try {
+    Object.assign(process.env, env); delete process.env.HR_CV_STORAGE_SESSION_TOKEN;
+    https.request = () => { probes++; throw Error('Storage probing forbidden'); };
+    await h.models.User.updateOne({ _id: h.actors.own._id }, { $set: { role: 'recruitment_manager', departmentId: 'dep_hr' } });
+    await h.models.User.updateOne({ _id: h.actors.peer._id }, { $set: { role: 'recruitment_employee', departmentId: 'dep_hr' } });
+    for (const actor of ['admin', 'own', 'peer']) {
+      const initialReads = h.wire.length;
+      await h.open(actor, '/app/recruitment/analytics'); await h.page.locator('[data-hr-kpi=applications]').waitFor();
+      const response = h.page.waitForResponse(r => new URL(r.url()).pathname === '/api/hr/analytics/operations');
+      await h.page.getByRole('tab').last().click();
+      assert.equal((await response).status(), 200);
+      const pane = h.page.locator('[data-hr-analytics-pane=operations]');
+      // The API verdict is fixed; only existing translations may change with locale.
+      await h.page.waitForLoadState('networkidle');
+      const reads = h.wire.length;
+      assert.equal(reads - initialReads, 3, 'Only overview, scores and explicit operations reads are expected');
+      for (const lang of ['az', 'en', 'ru']) {
+        await h.page.evaluate(l => window.changeLanguage(l), lang);
+        const messages = require('../src/i18n/locales/' + lang + '.json');
+        assert.ok((await pane.textContent()).includes(messages.hrAnalytics.healthState.configured_not_verified));
+        assert.ok(!(await pane.textContent()).includes(messages.hrAnalytics.healthState.local_file_system));
+        for (const width of [1440, 768, 390, 320]) {
+          await h.page.setViewportSize({ width, height: 1000 });
+          assert.equal(await h.page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+        }
+        assert.equal(h.wire.length, reads, 'Locale/layout must not refetch operations');
+      }
+      const text = await h.page.locator('body').textContent();
+      for (const key of ['HR_CV_STORAGE_ENDPOINT', 'HR_CV_STORAGE_BUCKET', 'HR_CV_STORAGE_ACCESS_KEY_ID', 'HR_CV_STORAGE_SECRET_ACCESS_KEY']) assert.ok(!text.includes(env[key]));
+    }
+    assert.equal(probes, 0); assert.equal(h.wire.some(r => r.method !== 'GET'), false); assert.deepEqual(h.pageErrors, []);
+  } finally {
+    https.request = request;
+    for (const [key, value] of Object.entries(before)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
+  }
 }));

@@ -9,6 +9,14 @@ const { getSmtpConfig } = require('../services/email.service');
 const { brands: getBrands } = require('../services/recruitmentCatalog.service');
 const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
 const { setImmediate: yieldEventLoop } = require('node:timers/promises');
+function storageState() {
+  if (!process.env.HR_CV_STORAGE_PROVIDER || process.env.HR_CV_STORAGE_PROVIDER === 'disabled') return 'not_configured';
+  try {
+    // Configuration validation only: never probe storage or imply live readiness.
+    require('../services/hrPrivateObjectStorage.service').fromEnvironment();
+    return 'configured_not_verified';
+  } catch { return 'configuration_required'; }
+}
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected'];
 const SOURCES = ['manual', 'cv_upload', 'outlook', 'kfc', 'pizzahut', 'simit', 'jobsearch', 'external_form', 'unknown'];
 function filters(query) {
@@ -180,7 +188,7 @@ function handler(mode) { return async (req, res, next) => {
       timeToHire: { samples: number(metrics.hireTimes, 'count'), averageDays: dailyAverage(number(metrics.hireTimes, 'sumMs'), number(metrics.hireTimes, 'count')) },
       scores: scores?.checked === total ? { states: scores.states, buckets: scores.buckets } : null,
       deliveryQueue: (metrics.deliveries || []).map(r => ({ state: r._id, count: r.count })),
-      integrations: { ai: require('../services/hrAiProvider.service').health().state, outlook: 'not_integrated', externalSites: 'not_connected', storage: 'local_file_system', smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
+      integrations: { ai: require('../services/hrAiProvider.service').health().state, outlook: 'not_integrated', externalSites: 'not_connected', storage: mode === 'overview' ? undefined : storageState(), smtp: getSmtpConfig() ? 'configured_not_verified' : 'not_configured' },
       options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
     };
     if(mode==='overview') { delete response.coverage.restrictedCandidateApplications; delete response.coverage.scoreScanConsistent; }
