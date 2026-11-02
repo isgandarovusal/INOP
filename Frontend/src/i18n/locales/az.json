@@ -1255,6 +1255,7 @@
     "conflict": "Müraciət başqa əməliyyatda dəyişib. Son məlumatı yükləyib yenidən yoxlayın.",
     "substatus": "Alt-status",
     "timezone": "Saat qurşağı (IANA)",
+    "timezoneHelp": "IANA saat qurşağı daxil edin (məsələn, Asia/Baku, Europe/Istanbul və ya Europe/London). Daxil etdiyiniz yerli tarix və saat bu saat qurşağına aiddir.",
     "interviewStart": "Müsahibə vaxtı",
     "duration": "Müddət (dəqiqə)",
     "interviewer": "Müsahibəni aparan",

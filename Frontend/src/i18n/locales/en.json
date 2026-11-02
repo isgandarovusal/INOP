@@ -1238,6 +1238,7 @@
     "conflict": "Application changed in another operation. Reload and review the latest data.",
     "substatus": "Substatus",
     "timezone": "Timezone (IANA)",
+    "timezoneHelp": "Use an IANA timezone, e.g. Asia/Baku, Europe/Istanbul or Europe/London. Local dates and times are interpreted in this timezone.",
     "interviewStart": "Interview time",
     "duration": "Duration (minutes)",
     "interviewer": "Interviewer",

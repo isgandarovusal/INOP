@@ -1,7 +1,7 @@
 import { FormSection, SectionCard } from '../../../Components/HRSection';
 import { ClipboardList } from "lucide-react";
 import ApplicationDelivery from '../../../Components/ApplicationDelivery';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { isAxiosError } from 'axios';
@@ -86,6 +86,7 @@ function History({ app, reload }: { app: Application; reload: () => void }) {
   </section>;
 }
 function WorkflowForm({ app, reload }: { app: Application; reload: () => void }) {
+  const timezoneHelpId = useId();
   const { t } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(app.id);
   const roster = useAuditResource(app.id, 'application', getApplicationInterviewers, { refreshOnFocus: false });
   const [status, setStatus] = useState(app.status), [substatus, setSubstatus] = useState(app.substatus || '');
@@ -120,7 +121,7 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={status} onChange={e => { setStatus(e.target.value as ApplicationStatus); setSubstatus(''); }}>{choices.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s}`)}</option>)}</select></label>
       <label>{t('hrWorkflow.substatus')}<select aria-label={t('hrWorkflow.substatus')} value={substatus} onChange={e => setSubstatus(e.target.value)}>{applicationSubstatuses[status].map(s => <option key={s} value={s}>{s ? t(`hrWorkflow.sub.${s}`) : t('hrCatalog.unset')}</option>)}</select></label>
       {canAssign && <label>{t("hrWorkflow.assignee")}<select aria-label={t("hrWorkflow.assignee")} value={assignee} onChange={e => setAssignee(e.target.value)}>{!people.some(p => p.id === assignee) && <option value={assignee}>{t("hrWorkflow.existingInterviewer")}</option>}{people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
-      <label>{t('hrWorkflow.timezone')}<input aria-label={t('hrWorkflow.timezone')} value={timezone} maxLength={80} onChange={e => setTimezone(e.target.value)} required /></label>
+      <label>{t('hrWorkflow.timezone')}<input aria-label={t('hrWorkflow.timezone')} aria-describedby={timezoneHelpId} value={timezone} maxLength={80} onChange={e => setTimezone(e.target.value)} required /><small id={timezoneHelpId} className="form-hint">{t('hrWorkflow.timezoneHelp')}</small></label>
       {status === 'interview' && <>
         <label>{t('hrWorkflow.interviewStart')}<input aria-label={t('hrWorkflow.interviewStart')} type="datetime-local" value={start} onChange={e => setStart(e.target.value)} /></label>
         <label>{t('hrWorkflow.duration')}<input aria-label={t('hrWorkflow.duration')} type="number" min={5} max={480} value={duration} onChange={e => setDuration(Number(e.target.value))} /></label>

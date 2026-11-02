@@ -206,3 +206,75 @@ test('Notification escalation guidance is read-only, scope-aware and truthful fo
  });
  await t.test('four viewports retain readable guidance with no layout or locale requests',async()=>{await open('own',{state:'skipped',code:'PARENT_SCOPE_REVOKED',attempts:0});const start=requests.length;for(const language of['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),language);await box().getByText(labels[language].hrDelivery.code.PARENT_SCOPE_REVOKED,{exact:true}).waitFor();for(const width of[1440,768,390,320]){await h.page.setViewportSize({width,height:1000});assert.equal(await guide().count(),1);const d=await h.page.evaluate(()=>({viewport:innerWidth,width:document.documentElement.scrollWidth}));assert.ok(d.width<=d.viewport+1);}}assert.equal(requests.length,start);assert.deepEqual(h.pageErrors,[]);});
 }));
+
+const timezoneHarness=`import React from'react';import{createRoot}from'react-dom/client';import App from'/src/App.tsx';import api from'/src/api/axios.ts';import i18n from'/src/i18n/index.ts';api.defaults.baseURL='/api';window.navigateTest=()=>{};window.changeLanguage=l=>i18n.changeLanguage(l);createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(App)));`;
+test('Interview timezone guidance preserves scheduling, rescheduling and server validation',async t=>withBrowserFixture(timezoneHarness,async h=>{
+  const locales=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+  const candidate=(await h.request('admin','POST','/candidates',{name:'Synthetic timezone applicant',role:'Cashier'})).data;
+  const job=(await h.request('admin','POST','/jobs',{title:'Synthetic timezone vacancy',department:'HR',description:'Synthetic duties'})).data;
+  const app=(await h.request('admin','POST','/applications',{candidateId:candidate._id,jobId:job._id})).data;
+  const form=h.page.locator('[data-application-workflow]'),requests=[];
+  h.page.on('request',r=>{const u=new URL(r.url());if(u.pathname.startsWith('/api/'))requests.push({method:r.method(),path:u.pathname});});
+  const url='/app/recruitment/applications/'+app._id;
+  const text=(l,k)=>locales[l].hrWorkflow[k];
+  async function capture(name,lang,width){
+    if(!process.env.INOP_TIMEZONE_SCREENSHOTS)return;
+    require('node:fs').mkdirSync(process.env.INOP_TIMEZONE_SCREENSHOTS,{recursive:true});
+    await h.page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});
+    await h.page.screenshot({animations:'disabled',path:require('node:path').join(process.env.INOP_TIMEZONE_SCREENSHOTS,`${name}-${lang}-${width}.png`),fullPage:true});
+  }
+  async function submit(){const response=h.page.waitForResponse(r=>r.url().endsWith('/applications/'+app._id+'/workflow')&&r.request().method()==='PATCH');await form.locator('button[type=submit]').click();return response;}
+  await h.open('admin',url);await form.waitFor();await h.page.waitForLoadState('networkidle');
+  assert.equal(requests.length,4,'Auth, Application, history and interviewers only');
+  await t.test('localized accessible help, examples and responsive layout preserve the entered timezone without requests',async()=>{
+    const zone=form.getByLabel(text('az','timezone'),{exact:true});assert.equal(await zone.inputValue(),'Asia/Baku');
+    await form.getByLabel('Status',{exact:true}).selectOption('interview');
+    await form.getByLabel(text('az','interviewStart'),{exact:true}).fill('2026-11-10T10:30');await zone.fill('Europe/London');
+    const count=requests.length;
+    for(const lang of ['az','en','ru']){
+      await h.page.evaluate(l=>window.changeLanguage(l),lang);
+      const field=form.getByLabel(text(lang,'timezone'),{exact:true});const hintId=await field.getAttribute('aria-describedby');assert.ok(hintId,'Timezone must have associated guidance');
+      const hint=h.page.locator('[id='+JSON.stringify(hintId)+']');assert.equal(await hint.textContent(),text(lang,'timezoneHelp'));
+      for(const example of ['Asia/Baku','Europe/Istanbul','Europe/London'])assert.ok((await hint.textContent()).includes(example));
+      for(const width of [1440,768,390,320]){
+        await h.page.setViewportSize({width,height:1000});assert.equal(await field.inputValue(),'Europe/London');
+        assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,lang+'/'+width);
+        await capture('schedule',lang,width);
+      }
+    }
+    assert.equal(requests.length,count,'Locale, viewport and guidance add no requests');
+  });
+  await t.test('invalid timezone and DST gap/fold retain values and drafts; existing errors remain localized',async()=>{
+    const before=await Application.findById(app._id).lean();
+    for(const lang of ['az','en','ru'])for(const [kind,zone,start]of [['invalid','Invented/Zone','2026-11-10T10:30'],['gap','America/New_York','2026-03-08T02:30'],['fold','America/New_York','2026-11-01T01:30']]){
+      await h.page.evaluate(l=>window.changeLanguage(l),lang);await form.getByLabel(locales[lang].recruitment.applications.status,{exact:true}).selectOption('interview');
+      await form.getByLabel(text(lang,'timezone'),{exact:true}).fill(zone);await form.getByLabel(text(lang,'interviewStart'),{exact:true}).fill(start);
+      await form.getByLabel(text(lang,'notes'),{exact:true}).fill('Synthetic interview draft');
+      const count=requests.length,r=await submit();assert.equal(r.status(),400);await form.getByRole('alert').waitFor();
+      assert.ok((await form.getByRole('alert').textContent()).includes(locales[lang].hrErrors.invalid));
+      assert.equal(await form.getByLabel(text(lang,'timezone'),{exact:true}).inputValue(),zone);assert.equal(await form.getByLabel(text(lang,'interviewStart'),{exact:true}).inputValue(),start);
+      assert.equal(await form.getByLabel(text(lang,'notes'),{exact:true}).inputValue(),'Synthetic interview draft');
+      await h.page.waitForLoadState('networkidle');assert.equal(requests.length,count+1,'One explicit PATCH, no retry/refetch on rejection');
+      await h.page.setViewportSize({width:320,height:1000});await capture(kind,lang,320);
+      assert.equal((await Application.findById(app._id).lean()).__v,before.__v);
+    }
+  });
+  await t.test('valid scheduling and rescheduling preserve conversion, duration and interviewer',async()=>{
+    await h.page.evaluate(()=>window.changeLanguage('az'));
+    for(const [zone,start,expected,substatus]of [['Asia/Baku','2026-11-10T10:30','2026-11-10T06:30:00.000Z','scheduled'],['Europe/London','2026-11-11T11:00','2026-11-11T11:00:00.000Z','rescheduled']]){
+      await form.getByLabel(text('az','timezone'),{exact:true}).fill(zone);await form.getByLabel(text('az','interviewStart'),{exact:true}).fill(start);
+      await form.getByLabel(text('az','substatus'),{exact:true}).selectOption(substatus);await form.getByLabel(text('az','duration'),{exact:true}).fill('45');
+      const r=await submit();assert.equal(r.status(),200);await h.page.waitForLoadState('networkidle');
+      const stored=await Application.findById(app._id).lean();assert.equal(stored.interview.startsAt.toISOString(),expected);assert.equal(stored.interview.timezone,zone);assert.equal(stored.interview.durationMinutes,45);assert.equal(String(stored.interview.interviewerId),String(h.actors.admin._id));
+      await h.open('admin',url);await form.waitFor();assert.equal(await form.getByLabel(text('az','timezone'),{exact:true}).inputValue(),zone);assert.equal(await form.getByLabel(text('az','interviewStart'),{exact:true}).inputValue(),start);
+    }
+    for(const lang of ['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),lang);for(const width of [1440,320]){await h.page.setViewportSize({width,height:1000});await capture('reschedule',lang,width);}}
+  });
+  await t.test('read-only Application permission gains no scheduling controls',async()=>{
+    await h.models.Role.updateOne({key:'recruitment_employee'},{$set:{permissions:[{resource:'application',action:'read',scope:'all'}]}});
+    await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});
+    await h.open('peer',url);await h.page.locator('.hr-application-detail').waitFor();assert.equal(await form.count(),0);assert.equal(await h.page.locator('input,textarea,button[type=submit]').count(),0);
+    await capture('read-only','az',320);
+  });
+  assert.deepEqual(h.pageErrors,[]);
+}));
