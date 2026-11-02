@@ -1173,6 +1173,20 @@
     "allBranches": "All branches"
   },
   "hrMatch": {
+    "candidateExperience": "Candidate: {{value}}",
+    "requiredExperience": "Required: {{value}}",
+    "years_one": "{{value}} year",
+    "years_other": "{{value}} years",
+    "sources": {
+      "skills": "Candidate skills",
+      "certificates": "Candidate certificates",
+      "education": "Candidate education",
+      "review": "HR-reviewed experience",
+      "role": "Experience in a matching role",
+      "historyUnknown": "Employment history — experience unverified",
+      "historyDated": "Dated employment in a matching role",
+      "unknown": "Unknown evidence source"
+    },
     "deterministic": "Rule-based matching (ATS-v2), not a live AI assessment. HR makes the final decision.",
     "pending": "Awaiting evaluation",
     "incomplete": "Incomplete information",

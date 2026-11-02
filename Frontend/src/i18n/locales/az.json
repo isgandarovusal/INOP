@@ -1190,6 +1190,20 @@
     "allBranches": "Bütün filiallar"
   },
   "hrMatch": {
+    "candidateExperience": "Namizəd: {{value}}",
+    "requiredExperience": "Tələb: {{value}}",
+    "years_one": "{{value}} il",
+    "years_other": "{{value}} il",
+    "sources": {
+      "skills": "Namizədin bacarıqları",
+      "certificates": "Namizədin sertifikatları",
+      "education": "Namizədin təhsili",
+      "review": "HR tərəfindən yoxlanılmış təcrübə",
+      "role": "Uyğun vəzifə üzrə təcrübə",
+      "historyUnknown": "İş tarixçəsi — təcrübə təsdiqlənməyib",
+      "historyDated": "Uyğun vəzifə üzrə tarixli iş qeydləri",
+      "unknown": "Məlumat mənbəyi məlum deyil"
+    },
     "deterministic": "Qayda əsaslı uyğunluq (ATS-v2); canlı AI qiymətləndirməsi deyil. Son qərarı HR verir.",
     "pending": "Qiymətləndirmə gözləyir",
     "incomplete": "Məlumat natamamdır",

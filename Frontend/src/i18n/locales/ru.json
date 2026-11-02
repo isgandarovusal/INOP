@@ -1167,6 +1167,22 @@
     "allBranches": "Все филиалы"
   },
   "hrMatch": {
+    "candidateExperience": "Кандидат: {{value}}",
+    "requiredExperience": "Требуется: {{value}}",
+    "years_one": "{{value}} год",
+    "years_few": "{{value}} года",
+    "years_many": "{{value}} лет",
+    "years_other": "{{value}} года",
+    "sources": {
+      "skills": "Навыки кандидата",
+      "certificates": "Сертификаты кандидата",
+      "education": "Образование кандидата",
+      "review": "Опыт, проверенный HR",
+      "role": "Опыт на соответствующей должности",
+      "historyUnknown": "Трудовая история — опыт не подтверждён",
+      "historyDated": "Датированные записи на соответствующей должности",
+      "unknown": "Источник данных неизвестен"
+    },
     "deterministic": "Сопоставление по правилам (ATS-v2), без оценки внешнего ИИ. Окончательное решение принимает HR.",
     "pending": "Ожидает оценки",
     "incomplete": "Недостаточно данных",

@@ -65,3 +65,61 @@ test('Trusted Application matching is consistent across vacancy, profile, table 
   });
   assert.deepEqual(h.pageErrors, []);
 }));
+
+const detailHarness=`import React from'react';import{createRoot}from'react-dom/client';import App from'/src/App.tsx';import api from'/src/api/axios.ts';import i18n from'/src/i18n/index.ts';api.defaults.baseURL='/api';window.navigateTest=()=>{};window.localeTest=l=>i18n.changeLanguage(l);createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(App)));`;
+test('Experience and evidence explanations are localized, factual and request-neutral in Application Detail', async t => withBrowserFixture(detailHarness, async h => {
+  const rows=[];h.page.on('request',r=>{const u=new URL(r.url());if(u.pathname.startsWith('/api/'))rows.push({method:r.method(),path:u.pathname});});
+  const job=(await h.request('admin','POST','/jobs',{title:'Synthetic matching vacancy',department:'HR',description:'Synthetic duties',requiredSkills:['Cash handling'],experienceYears:5})).data;
+  const candidate=(await h.request('admin','POST','/candidates',{name:'Synthetic matching person',role:'Cashier',skills:['Cash handling'],experience:3})).data;
+  const app=(await h.request('admin','POST','/applications',{jobId:job._id,candidateId:candidate._id})).data;
+  const response=(await h.request('admin','GET','/applications/'+app._id)).data;
+  const pattern='**/api/applications/'+app._id;
+  const badge=h.page.locator('[data-application-score="'+app._id+'"]');
+  const sourceLabels={az:'Uyğun vəzifə üzrə təcrübə',en:'Experience in a matching role',ru:'Опыт на соответствующей должности'};
+  const expected={az:['Namizəd: 3 il','Tələb: 5 il'],en:['Candidate: 3 years','Required: 5 years'],ru:['Кандидат: 3 года','Требуется: 5 лет']};
+  for(const [name,value,required,known,source,status] of [
+    ['below',3,5,true,'candidate.experience:matching-role','calculated'],
+    ['meeting',5,5,true,'application.hr-review','calculated'],
+    ['fraction',1.5,2,true,'candidate.employmentHistory:dated-matching-role','calculated'],
+    ['zero',0,5,true,'candidate.skills','calculated'],
+    ['unknown-zero',0,5,false,'__proto__','incomplete'],
+    ['unknown',null,5,false,'UNTRUSTED_SOURCE_KEY','incomplete'],
+    ['missing-required',3,null,true,'candidate.education','calculated'],
+    ['invalid',-1,5,true,'candidate.certificates','incomplete'],
+    ['stale',3,5,true,'candidate.employmentHistory:unknown','stale']]) await t.test(name,async()=>{
+      const body=structuredClone(response);body.score=60;body.scoreStatus=status;
+      // Keep the server score fixed: presentation must never recompute it from experience.
+      body.matching={...body.matching,summary:false,version:'ats-v2',reason:status==='incomplete'?'facts_missing':null,criteria:[{key:'experience',weight:1,known,value,required,ratio:0.6,source}]};
+      await h.page.route(pattern,r=>r.fulfill({contentType:'application/json',body:JSON.stringify(body)}));
+      try {
+        rows.length=0;await h.open('admin','/app/recruitment/applications/'+app._id);await badge.waitFor();await badge.locator('details summary').first().click();
+        await badge.locator('[data-match-method]').waitFor();await h.page.waitForLoadState('networkidle');
+        const count=rows.length;assert.equal(count,4,'Auth, detail, history and interviewers only');
+        for(const lang of ['az','en','ru']) {
+          await h.page.evaluate(l=>window.localeTest(l),lang);
+          const line=badge.locator('details[open] p').filter({hasText:/100%/});await line.waitFor();
+          const text=(await line.textContent()).replaceAll('\u00a0',' ');assert.ok(!text.includes(source),'No raw evidence key');assert.ok(!text.includes('hrMatch.'));
+          if(name==='below'){for(const part of expected[lang])assert.ok(text.includes(part),text);assert.ok(text.includes(sourceLabels[lang]));}
+          if(name==='fraction')assert.match(text,{az:/1[.,]5 il/,en:/1\.5 years/,ru:/1,5 года/}[lang]);
+          if(name==='zero')assert.ok(text.includes({az:'Namizəd: 0 il',en:'Candidate: 0 years',ru:'Кандидат: 0 лет'}[lang]),text);
+          if(name==='meeting')assert.ok(text.includes({az:'Namizəd: 5 il · Tələb: 5 il',en:'Candidate: 5 years · Required: 5 years',ru:'Кандидат: 5 лет · Требуется: 5 лет'}[lang]),text);
+          if(name==='unknown'||name==='unknown-zero'||name==='invalid'){
+            assert.ok(!text.includes('-1'));assert.ok(!text.includes(lang==='en'?'Candidate: 0':lang==='az'?'Namizəd: 0':'Кандидат: 0'));
+            assert.ok(text.includes({az:'Namizəd: Məlum deyil',en:'Candidate: Unknown',ru:'Кандидат: Неизвестно'}[lang]),text);
+          }
+          if(name==='missing-required')assert.ok(text.includes({az:'Tələb: Məlum deyil',en:'Required: Unknown',ru:'Требуется: Неизвестно'}[lang]),text);
+          assert.equal(await badge.locator('strong').textContent(),status==='calculated'?'60%':{az:{stale:'Yenidən qiymətləndirmə gözləyir',incomplete:'Məlumat natamamdır'},en:{stale:'Awaiting recalculation',incomplete:'Incomplete information'},ru:{stale:'Ожидает пересчёта',incomplete:'Недостаточно данных'}}[lang][status]);
+          for(const width of [1440,768,390,320]){
+            await h.page.setViewportSize({width,height:1000});
+            assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,lang+'/'+width);
+            if(process.env.INOP_MATCH_SCREENSHOTS&&['below','meeting','fraction','unknown','stale'].includes(name)&&[1440,320].includes(width)){
+              const fs=require('node:fs');fs.mkdirSync(process.env.INOP_MATCH_SCREENSHOTS,{recursive:true});
+              await h.page.screenshot({animations:'disabled',path:require('node:path').join(process.env.INOP_MATCH_SCREENSHOTS,`${name}-${lang}-${width}.png`),fullPage:true});
+            }
+          }
+        }
+        assert.equal(rows.length,count,'Locale, layout and explanation add no requests');assert.ok(rows.every(r=>r.method==='GET'));
+      }finally{await h.page.unroute(pattern);}
+    });
+  assert.deepEqual(h.pageErrors,[]);
+}));

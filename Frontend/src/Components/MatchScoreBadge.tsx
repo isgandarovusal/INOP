@@ -10,8 +10,18 @@ import HRResourceState from './HRResourceState';
 import type { Application, ApplicationMatch } from '../Types/recruitment';
 
 type ScoreApplication = Pick<Application, 'id' | 'revision' | 'score' | 'scoreStatus'> & { matching?: Omit<ApplicationMatch, 'jobHash' | 'candidateHash'> | null };
+const evidenceSources: Readonly<Record<string, string>> = {
+  'candidate.skills': 'skills',
+  'candidate.certificates': 'certificates',
+  'candidate.education': 'education',
+  'application.hr-review': 'review',
+  'candidate.experience:matching-role': 'role',
+  'candidate.employmentHistory:unknown': 'historyUnknown',
+  'candidate.employmentHistory:dated-matching-role': 'historyDated',
+};
+const validYears = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 function Badge({ application, onUpdated }: { application: ScoreApplication; onUpdated?: () => void }) {
-  const { t } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(application.id);
+  const { t, i18n } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(application.id);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [experience, setExperience] = useState(''), [reason, setReason] = useState('');
   const [wanted, setWanted] = useState(false);
@@ -34,6 +44,9 @@ function Badge({ application, onUpdated }: { application: ScoreApplication; onUp
   };
   const open = (event: React.SyntheticEvent<HTMLDetailsElement>) => { if (event.currentTarget.open) setWanted(true); };
   const matching = resolved?.matching;
+  const years = (value: unknown) => validYears(value)
+    ? t('hrMatch.years', { count: value, value: new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 20 }).format(value) })
+    : t('cvReview.unknown');
   return <div data-application-score={application.id} data-score-status={resolved?.scoreStatus ?? (requested ? 'pending' : application.scoreStatus)} onClick={e => e.stopPropagation()}>
     <strong>{valid ? `${resolved.score}%` : t(`hrMatch.${resolved?.scoreStatus ?? (requested ? 'pending' : application.scoreStatus)}`)}</strong>
     {application.matching && <details onToggle={open}><summary>{t('hrMatch.explanation')}</summary>
@@ -41,8 +54,10 @@ function Badge({ application, onUpdated }: { application: ScoreApplication; onUp
         {matching.version==='ats-v2'&&<p data-match-method>{t('hrMatch.deterministic')}</p>}
         <p>{t('hrMatch.coverage')}: {Math.round(matching.dataCoverage * 100)}% · {matching.version}</p>
         <p>{t('hrMatch.calculatedAt')}: {matching.calculatedAt}</p>
-        {matching.criteria.map(c => <p key={c.key}>{t(`hrMatch.${c.key}`)} · {Math.round(c.weight * 100)}% · {c.known ? c.value ?? c.matched?.join(', ') ?? '' : t('cvReview.unknown')}
-          {c.missing?.length ? ` · ${t('hrMatch.missing')}: ${c.missing.join(', ')}` : ''} · {c.source}</p>)}
+        {matching.criteria.map(c => <p key={c.key}>{t(`hrMatch.${c.key}`)} · {Math.round(c.weight * 100)}% · {c.key === 'experience'
+          ? <>{t('hrMatch.candidateExperience', { value: years(c.known ? c.value : null) })} · {t('hrMatch.requiredExperience', { value: years(c.required) })}</>
+          : c.known ? c.value ?? c.matched?.join(', ') ?? '' : t('cvReview.unknown')}
+          {c.missing?.length ? ` · ${t('hrMatch.missing')}: ${c.missing.join(', ')}` : ''} · {t(`hrMatch.sources.${Object.hasOwn(evidenceSources, c.source) ? evidenceSources[c.source] : 'unknown'}`)}</p>)}
         {matching.reason && <p>{t(`hrMatch.reason.${matching.reason}`)}</p>}
       </>)}
     </details>}
