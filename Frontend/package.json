@@ -40,5 +40,16 @@
   },
   "engines": {
     "node": ">=24.0.0 <25"
+  },
+  "overrides": {
+    "@eslint/config-array@0.23.5": {
+      "minimatch": "11.0.4"
+    },
+    "@typescript-eslint/typescript-estree@8.66.0": {
+      "minimatch": "11.0.4"
+    },
+    "eslint": {
+      "minimatch": "11.0.4"
+    }
   }
 }

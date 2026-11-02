@@ -1,0 +1,9 @@
+{
+  "name": "@inop/minimatch-glob7-compat",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.cjs",
+  "description": "Local glob 7 matcher representation adapter; delegates matching to patched minimatch",
+  "engines": { "node": ">=24.0.0 <25" },
+  "dependencies": { "minimatch-modern": "npm:minimatch@11.0.4" }
+}
