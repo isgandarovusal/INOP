@@ -1189,6 +1189,22 @@
     "allBrands": "Bütün brendlər",
     "allBranches": "Bütün filiallar"
   },
+  "hrCandidateFilters": {
+    "clear": "Bütün filtrləri təmizlə",
+    "empty": "Bu filtrlərə uyğun namizəd tapılmadı",
+    "emptyHint": "Digər icazəli namizədləri görmək üçün filtrləri dəyişin və ya təmizləyin.",
+    "title": "Ətraflı filtrlər",
+    "active": "Aktiv qruplar: {{count}}",
+    "help": "Tam etiket daxil edib Enter basın. Yalnız HR tərəfindən daxil edilmiş və ya sahə üzrə yoxlanılmış məlumatlar axtarılır. Naməlum məlumat uyğun nəticə sayılmır.",
+    "skills": "Bacarıqlar",
+    "mode": "Bacarıqların uyğunluğu",
+    "and": "Hamısı (AND)",
+    "or": "Ən azı biri (OR)",
+    "certificates": "Sertifikatlar — hamısı tələb olunur",
+    "certHelp": "Sertifikat adına uyğunluq emitentin yoxlanılması və ya sertifikatın qüvvədə olması demək deyil.",
+    "add": "Etiket daxil edin və Enter basın",
+    "limit": "Hər qrupda ən çox 10 etiket, hər etiketdə 120 simvol və cəmi 2 KiB həddi var. Boş və idarəetmə simvollu etiketlər qəbul edilmir."
+  },
   "hrMatch": {
     "candidateExperience": "Namizəd: {{value}}",
     "requiredExperience": "Tələb: {{value}}",

@@ -16,11 +16,36 @@ const fields = {
   applications: 'jobId candidateId boardOrder status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
 };
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Existing HR create/update and durable approval write reviewedFields atomically
+// with the professional values. Presence or a profile-wide review is not proof.
+function candidateStructuredFilters(q, kind) {
+  const keys = ['skills', 'certificates', 'skillsMode'];
+  if (!keys.some(key => q[key] !== undefined)) return [];
+  if (kind !== 'candidates' || keys.some(key => q[key] !== undefined && typeof q[key] !== 'string') ||
+      keys.reduce((bytes, key) => bytes + Buffer.byteLength(q[key] || '', 'utf8'), 0) > 2048 ||
+      q.skillsMode !== undefined && !['and', 'or'].includes(q.skillsMode)) throw Error('Invalid structured filter.');
+  const clauses = [];
+  for (const field of ['skills', 'certificates']) {
+    if (q[field] === undefined) continue;
+    let values; try { values = JSON.parse(q[field]); } catch { throw Error('Invalid structured filter.'); }
+    if (!Array.isArray(values) || values.length > 10 || values.some(v => typeof v !== 'string' || !v.trim() || v.length > 120 || /[\u0000-\u001f\u007f]/.test(v))) throw Error('Invalid structured filter.');
+    values = [...new Set(values.map(v => v.trim()))];
+    if (!values.length) continue;
+    const patterns = values.map(v => new RegExp('^' + escape(v) + '$', 'i'));
+    clauses.push(
+      { $expr: { $allElementsTrue: [{ $map: { input: { $cond: [{ $isArray: '$' + field }, '$' + field, []] }, as: 'value', in: { $eq: [{ $type: '$$value' }, 'string'] } } }] } },
+      { reviewedFields: { $type: 'array', $all: [field] } },
+      { [field]: { $type: 'array', [field === 'skills' && q.skillsMode === 'or' ? '$in' : '$all']: patterns } });
+  }
+  return clauses;
+}
 function parameters(req, kind) {
   const q = req.query, extra = {}, resource = resources[kind];
+  const structured = candidateStructuredFilters(q, kind);
+  if (structured.length) extra.$and = structured;
   if (q.archived !== undefined && (!['candidates','jobs'].includes(kind) || !['true','false'].includes(q.archived))) throw Error('Invalid archive filter.');
   if (['candidates','jobs'].includes(kind)) extra.archivedAt = q.archived === 'true' ? { $ne: null } : null;
-  for (const [key, value] of Object.entries(q)) if (!['q', 'page', 'pageSize', 'sort', 'status', 'brandId', 'branchId', 'jobId', 'candidateId', 'after', 'excludeJobId', 'archived'].includes(key) || typeof value !== 'string' || value.length > (key === 'after' ? 320 : 80)) throw Error('Invalid page filter.');
+  for (const [key, value] of Object.entries(q)) if (!['skills', 'certificates', 'skillsMode'].includes(key) && (!['q', 'page', 'pageSize', 'sort', 'status', 'brandId', 'branchId', 'jobId', 'candidateId', 'after', 'excludeJobId', 'archived'].includes(key) || typeof value !== 'string' || value.length > (key === 'after' ? 320 : 80))) throw Error('Invalid page filter.');
   const page = q.page === undefined ? 1 : Number(q.page), pageSize = q.pageSize === undefined ? 30 : Number(q.pageSize), sort = q.sort || 'newest';
   if (!Number.isInteger(page) || page < 1 || page > 10000 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100 || !['newest', 'name'].includes(sort) || kind === 'applications' && sort !== 'newest') throw Error('Invalid pagination or sort.');
   for (const key of ['branchId', 'jobId', 'candidateId', 'excludeJobId']) if (q[key]) { if (!mongoose.isObjectIdOrHexString(q[key])) throw Error('Invalid resource filter.'); if (key !== 'excludeJobId') extra[key] = new mongoose.Types.ObjectId(q[key]); }

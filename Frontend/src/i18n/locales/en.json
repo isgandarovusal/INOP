@@ -1172,6 +1172,22 @@
     "allBrands": "All brands",
     "allBranches": "All branches"
   },
+  "hrCandidateFilters": {
+    "clear": "Clear all filters",
+    "empty": "No candidates match these filters",
+    "emptyHint": "Change or clear the filters to see other authorized candidates.",
+    "title": "Advanced filters",
+    "active": "Active groups: {{count}}",
+    "help": "Enter a complete label and press Enter. Only HR-entered or field-reviewed values are searched. Unknown data does not count as a match.",
+    "skills": "Skills",
+    "mode": "Skill matching",
+    "and": "All selected (AND)",
+    "or": "Any selected (OR)",
+    "certificates": "Certifications — all required",
+    "certHelp": "Matching a certificate name does not verify its issuer or validity.",
+    "add": "Enter a label and press Enter",
+    "limit": "Maximum 10 labels per group, 120 characters per label and 2 KiB combined. Blank labels and control characters are not accepted."
+  },
   "hrMatch": {
     "candidateExperience": "Candidate: {{value}}",
     "requiredExperience": "Required: {{value}}",

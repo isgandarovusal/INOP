@@ -101,3 +101,68 @@ test('Versioned HR pages are bounded, independently scoped and cursor-safe', asy
     assert.equal(plan.executionStats.nReturned, 2); assert.equal(plan.executionStats.totalDocsExamined, 2);
   });
 }));
+
+test('Candidate structured filters are bounded, reviewed, scoped and applied before pagination', async t => withAuditFixture(async h => {
+  const query = params => '/hr/v2/candidates?' + new URLSearchParams(Object.fromEntries(Object.entries(params).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v])));
+  const manual=(await h.request('admin','POST','/candidates',{name:'Manual synthetic',role:'Cashier',skills:['Cash handling','C++'],certificates:['HACCP','ISO 22000']})).data;
+  assert.ok(manual.reviewedFields.includes('skills'));assert.ok(manual.reviewedFields.includes('certificates'));
+  const base={role:'Cashier',departmentId:'dep_hr',createdBy:h.actors.admin._id,assignedTo:h.actors.own._id};
+  await Candidate.create([{...base,name:'Reviewed A',skills:['cash handling'],certificates:['HACCP'],reviewedFields:['skills','certificates']},{...base,name:'Legacy',skills:['Cash handling','C++'],certificates:['HACCP'],cvReview:{reviewStatus:'confirmed',version:'rules-2'}},{...base,name:'Empty reviewed',skills:[],certificates:[],reviewedFields:['skills','certificates']},{...base,name:'Partial review',skills:['C++'],certificates:['HACCP'],reviewedFields:['skills']}]);
+  const all=(await h.request('admin','GET',query({}))).data.total;
+  const count=async(params,n,actor='admin')=>{const r=await h.request(actor,'GET',query(params));assert.equal(r.status,200,JSON.stringify(r.data));assert.equal(r.data.total,n);return r.data;};
+  await t.test('positive field provenance, AND/OR, certificates AND and combined groups',async()=>{
+    await count({skills:['Cash handling']},2);await count({skills:['Cash handling','C++']},1);await count({skills:['Cash handling','C++'],skillsMode:'or'},3);
+    await count({certificates:['HACCP','ISO 22000']},1);await count({skills:['C++'],certificates:['HACCP']},1);
+    await count({skills:[],certificates:[]},all);await count({skills:['cash']},0);await count({skills:['C++']},2);await count({skills:['.*']},0);
+    await count({skills:['  CASH HANDLING  ']},2);await count({skills:['kassa']},0);
+    const edited=await h.request('admin','PUT','/candidates/'+manual._id,{skills:['Müştəri xidməti'],certificates:['HACCP']});assert.equal(edited.status,200);
+    await count({skills:['Müştəri xidməti']},1);await count({skills:['C++'],certificates:['HACCP']},0);
+  });
+  await t.test('ambiguous legacy shapes and receipts alone do not establish field review',async()=>{
+    for (const row of [
+      {name:'Scalar value',skills:'ReceiptSkill',reviewedFields:['skills']},
+      {name:'Scalar review',skills:['ReceiptSkill'],reviewedFields:'skills'},
+      {name:'Nested values',skills:[['ReceiptSkill']],reviewedFields:['skills']},
+      {name:'Mixed values',skills:['ReceiptSkill',42],reviewedFields:['skills']},
+      {name:'Receipt only',skills:['ReceiptSkill'],reviewedFields:[],cvReview:{reviewStatus:'confirmed',processingApproval:{approvedFields:['skills']}}},
+    ]) await Candidate.collection.insertOne({...base,role:'Cashier',...row});
+    await count({skills:['ReceiptSkill']},0);
+  });
+  await t.test('filtering adds no DB round trips and does not mutate Candidate values or review provenance',async()=>{
+    const projection='skills certificates reviewedFields status __v';const before=await Candidate.findById(manual._id).select(projection).lean();let ops=[];
+    h.mongoose.set('debug',(collection,method)=>ops.push(collection+'.'+method));
+    try {
+      await h.request('admin','GET',query({}));const baseline=[...ops];ops=[];
+      await count({skills:['Müştəri xidməti']},1);const filtered=[...ops];
+      assert.equal(filtered.length,baseline.length);assert.equal(baseline.filter(x=>x.startsWith('candidates.')).length,2);assert.equal(filtered.filter(x=>x.startsWith('candidates.')).length,2);
+      t.diagnostic(JSON.stringify({unfilteredDB:baseline.length,filteredDB:filtered.length,candidateOperations:filtered.filter(x=>x.startsWith('candidates.'))}));
+    }finally{h.mongoose.set('debug',false);}
+    assert.deepEqual(await Candidate.findById(manual._id).select(projection).lean(),before);
+  });
+  await t.test('filters share q/status/archive and the same count/sort/page/cursor predicate',async()=>{
+    await Candidate.insertMany(Array.from({length:32},(_,i)=>({...base,name:`Page synthetic ${String(i).padStart(2,'0')}`,skills:['PageSkill'],reviewedFields:['skills'],status:'screening'})));
+    const first=await count({skills:['PageSkill'],status:'screening',q:'Page synthetic',pageSize:30},32);assert.equal(first.items.length,30);assert.equal(first.hasMore,true);
+    const second=await count({skills:['PageSkill'],status:'screening',q:'Page synthetic',page:2,pageSize:30},32);assert.equal(second.items.length,2);assert.equal(new Set([...first.items,...second.items].map(x=>String(x._id))).size,32);
+    const cursor=await count({skills:['PageSkill'],status:'screening',q:'Page synthetic',after:first.nextCursor,pageSize:30},32);assert.equal(cursor.items.length,2);
+    assert.equal((await h.request('admin','GET',query({skills:['Different'],after:first.nextCursor}))).status,400);
+    const sorted=await count({skills:['PageSkill'],sort:'name',pageSize:2},32);assert.equal(sorted.items[0].name,'Page synthetic 00');
+    await Candidate.updateOne({_id:first.items[0]._id},{$set:{archivedAt:new Date()}});await count({skills:['PageSkill']},31);await count({skills:['PageSkill'],archived:'true'},1);
+  });
+  await t.test('assigned/department/no-grant and revocation never widen visibility or totals',async()=>{
+    await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});
+    await h.models.User.updateOne({_id:h.actors.department._id},{$set:{role:'recruitment_manager',departmentId:'dep_hr'}});
+    await count({skills:['cash handling']},1,'own');await count({skills:['cash handling']},1,'department');
+    await h.models.User.updateOne({_id:h.actors.own._id},{$set:{departmentId:'outside_hr'}});assert.equal((await h.request('own','GET',query({skills:['cash handling']}))).status,403);
+    assert.equal((await h.request('anonymous','GET',query({skills:['cash handling']}))).status,401);assert.equal((await h.request('none','GET',query({skills:['cash handling']}))).status,403);
+  });
+  await t.test('invalid input and regex/operator payloads are rejected without accepting query operators',async()=>{
+    for(const params of [{skills:'{'},{skills:'{}'},{skills:'[1]'},{skills:'[["x"]]'},{skills:'[{"$ne":null}]'},{skills:['']},{skills:['x'.repeat(121)]},{skills:Array(11).fill('x')},{skillsMode:'xor'},{skills:['x\n']},{skills:Array(9).fill('ə'.repeat(120))},{skills:Array.from({length:10},(_,i)=>i+'a'.repeat(119)),certificates:Array.from({length:10},(_,i)=>i+'b'.repeat(119))}])assert.equal((await h.request('admin','GET',query(params))).status,400,JSON.stringify(params));
+    for(const suffix of ['skills=x&skills=y','skills[$ne]=x','certificatesMode=or'])assert.equal((await h.request('admin','GET','/hr/v2/candidates?'+suffix)).status,400);
+    assert.equal((await h.request('admin','GET','/hr/v2/jobs?skills=%5B%22x%22%5D')).status,400);
+  });
+  await t.test('excludeJobId applies structured filters before its scoped facet',async()=>{
+    const job=await Job.create({title:'Filter anti-join',department:'HR',description:'Synthetic'});
+    const candidates=await Candidate.find({name:/^Page synthetic/,archivedAt:null});await Application.create({candidateId:candidates[0]._id,jobId:job._id,createdBy:h.actors.admin._id});
+    const r=await count({skills:['PageSkill'],excludeJobId:String(job._id)},30);assert.equal(r.items.some(x=>String(x._id)===String(candidates[0]._id)),false);
+  });
+}));

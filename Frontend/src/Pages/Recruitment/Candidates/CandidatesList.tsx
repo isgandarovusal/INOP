@@ -1,3 +1,4 @@
+import TagInput from '../../../Components/TagInput';
 import Badge from '../../../Components/Badge';
 import HRConfirmDialog from '../../../Components/HRConfirmDialog';
 import { hrCrudErrorKey } from "../../../Utils/hrCrudError";
@@ -62,13 +63,29 @@ const CandidatesList: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
-  const search = useDebouncedSearch(searchQuery);
+  const settledSearch = useDebouncedSearch(searchQuery);
+  // Clear all filters in one effective query, including pending search text.
+  const search = searchQuery.trim() ? settledSearch : '';
+  const [skills, setSkills] = useState<string[]>([]);
+  const [certificates, setCertificates] = useState<string[]>([]);
+  const [skillsMode, setSkillsMode] = useState<'and' | 'or'>('and');
+  const [filterError, setFilterError] = useState(false);
+  const structured = { skills: skills.length ? JSON.stringify(skills) : undefined,
+    certificates: certificates.length ? JSON.stringify(certificates) : undefined,
+    skillsMode: skills.length ? skillsMode : undefined };
+  const activeGroups = Number(skills.length > 0) + Number(certificates.length > 0);
+  const setTerms = (field: 'skills' | 'certificates', values: string[]) => {
+    const nextSkills = field === 'skills' ? values : skills, nextCertificates = field === 'certificates' ? values : certificates;
+    if (values.length > 10 || values.some(v => !v.trim() || v.length > 120 || [...v].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127)) ||
+        new TextEncoder().encode(JSON.stringify(nextSkills) + JSON.stringify(nextCertificates) + skillsMode).length > 2048) { setFilterError(true); return; }
+    setFilterError(false); result.setPage(1); if (field === 'skills') setSkills(values); else setCertificates(values);
+  };
   const [archived, setArchived] = useState(false);
   const [statusFilter, setStatusFilter] = useState<CandidateStatus | "all">("all");
-  const result = useHRPage("candidate", { q: search, archived: String(archived), status: statusFilter === "all" ? undefined : statusFilter }, getCandidatePage);
+  const result = useHRPage("candidate", { q: search, archived: String(archived), status: statusFilter === "all" ? undefined : statusFilter, ...structured }, getCandidatePage);
   const [confirmation, setConfirmation] = useState<{key:string;candidate:Candidate}|null>(null);
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
-  const context = useHRActionContext(JSON.stringify([search, archived, statusFilter, result.page]));
+  const context = useHRActionContext(JSON.stringify([search, archived, statusFilter, structured, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
   const candidates = useMemo(() => result.data?.items ?? [], [result.data]);
@@ -164,6 +181,8 @@ const CandidatesList: React.FC = () => {
     </div>
   );
   const filteredCandidates = candidates;
+  const hasFilters = Boolean(searchQuery || archived || statusFilter !== 'all' || activeGroups);
+  const clearFilters = () => { result.setPage(1); setSearchQuery(''); setArchived(false); setStatusFilter('all'); setSkills([]); setCertificates([]); setSkillsMode('and'); setFilterError(false); };
 
   if (["forbidden", "unauthenticated"].includes(result.status)) return <HRResourceState status={result.status} retry={fetchCandidates} />;
 
@@ -219,7 +238,7 @@ const CandidatesList: React.FC = () => {
         {import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true'&&<button className="btn-secondary" type="button" onClick={()=>navigate("/app/recruitment/cv-intake")}>{t("hrIntake.queue")}</button>}
         {hasPermission(user, "application", "read") && <button className="btn-secondary" type="button" onClick={() => navigate("/app/recruitment/applications?view=board")}>{t("recruitmentSemantics.applicationStages")}</button>}
 
-        {(searchQuery || archived || statusFilter !== 'all') && <button type="button" className="btn-secondary" onClick={() => { setSearchQuery(''); setArchived(false); setStatusFilter('all'); }}>{t('common.actions.clear')}</button>}
+        {hasFilters && <button type="button" className="btn-secondary" onClick={clearFilters}>{t('hrCandidateFilters.clear')}</button>}
         <div className="view-switcher" role="group" aria-label={t("recruitment.candidates.title")}>
           <button
             className={
@@ -249,9 +268,23 @@ const CandidatesList: React.FC = () => {
         </div>
       </div>
 
+      <details className="detail-card" data-candidate-filters>
+        <summary>{t('hrCandidateFilters.title')}{activeGroups > 0 ? ` · ${t('hrCandidateFilters.active', { count: activeGroups })}` : ''}</summary>
+        <p className="form-hint">{t('hrCandidateFilters.help')}</p>
+        <div className="form-grid">
+          <TagInput label={t('hrCandidateFilters.skills')} values={skills} onChange={values => setTerms('skills', values)} placeholder={t('hrCandidateFilters.add')} />
+          <label>{t('hrCandidateFilters.mode')}<select className="input-field" aria-label={t('hrCandidateFilters.mode')} value={skillsMode} disabled={!skills.length} onChange={e => { result.setPage(1); setSkillsMode(e.target.value as 'and' | 'or'); }}>
+            <option value="and">{t('hrCandidateFilters.and')}</option><option value="or">{t('hrCandidateFilters.or')}</option>
+          </select></label>
+          <TagInput label={t('hrCandidateFilters.certificates')} values={certificates} onChange={values => setTerms('certificates', values)} placeholder={t('hrCandidateFilters.add')} />
+          <p className="form-hint">{t('hrCandidateFilters.certHelp')}</p>
+        </div>
+        {filterError && <p role="alert">{t('hrCandidateFilters.limit')}</p>}
+      </details>
+
       {error && <p role="alert">{t(error)} <button type="button" onClick={fetchCandidates}>{t("hrStates.retry")}</button></p>}
       {result.status !== "ready" ? <HRResourceState status={result.status} retry={fetchCandidates} /> : filteredCandidates.length === 0 ? (
-        <EmptyState icon={<Search size={28} />} title={t(searchQuery ? "recruitment.candidates.noSearchResults" : "recruitment.candidates.empty")} hint={t(searchQuery ? "recruitment.candidates.noSearchResultsDescription" : "recruitment.candidates.emptyDescription")} />
+        <EmptyState icon={<Search size={28} />} title={t(hasFilters ? "hrCandidateFilters.empty" : "recruitment.candidates.empty")} hint={t(hasFilters ? "hrCandidateFilters.emptyHint" : "recruitment.candidates.emptyDescription")} />
       ) : viewMode === "grid" ? (
         <div className="hr-candidate-grid">{filteredCandidates.map(c => <article key={c.id} className="recruitment-kanban__card">
           <div className="hr-person-card-heading"><span className="hr-person-avatar" aria-hidden="true">{c.name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toLocaleUpperCase()}</span><div><button className="hr-row-title" type="button" disabled={!canRead} onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}>{c.name}</button><p>{c.role || t('cvReview.unknown')}</p></div></div>
