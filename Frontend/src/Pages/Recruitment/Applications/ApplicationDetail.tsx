@@ -12,23 +12,71 @@ import { hasPermission, getPermissionScope } from '../../../Utils/permissions';
 import { applicationTransitions, applicationSubstatuses, localDateTime } from '../../../Utils/applicationWorkflow';
 import { hrCrudErrorKey } from '../../../Utils/hrCrudError';
 import { getApplicationById, getApplicationHistory, getApplicationInterviewers, updateApplicationWorkflow } from '../../../Services/applicationsService';
-import type { Application, ApplicationStatus, ApplicationInterview, ApplicationNextAction } from '../../../Types/recruitment';
+import type { Application, ApplicationStatus, ApplicationInterview, ApplicationNextAction, ApplicationEvent } from '../../../Types/recruitment';
 import PageHeader from '../../../Components/PageHeader';
 import HRResourceState from '../../../Components/HRResourceState';
 import MatchScoreBadge from '../../../Components/MatchScoreBadge';
 import { brandLabel } from '../../../Services/recruitmentCatalogService';
 import {applicationWorkflowKey} from '../../../Utils/applicationWorkflowKey';
 
+// Only explicitly supported fields from the already-authorized history response.
+const historyRecord = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+const historyId = (value: unknown): string | undefined => typeof value === 'string' && value.trim() ? value : typeof historyRecord(value)._id === 'string' ? historyRecord(value)._id as string : undefined;
+function HistoryEvent({ event }: { event: ApplicationEvent }) {
+  const { t, i18n } = useTranslation();
+  const before = historyRecord(event.before), after = historyRecord(event.after);
+  const actions = ['none', 'review', 'call', 'interview', 'offer', 'follow_up'];
+  const unavailable = t('hrHistory.unavailable');
+  const text = (value: unknown) => typeof value === 'string' ? value : unavailable;
+  const time = (value: unknown, zone: unknown = 'UTC') => {
+    if (typeof value !== 'string' || !value) return unavailable;
+    // Do not infer a timezone for legacy timestamps without an explicit offset.
+    if (!/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) || !Number.isFinite(Date.parse(value))) return <time>{value}</time>;
+    const timezone = typeof zone === 'string' && zone ? zone : 'UTC';
+    try { return <time dateTime={value} title={value}>{new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'medium', timeZone: timezone }).format(new Date(value))} ({timezone})</time>; }
+    catch { return <time dateTime={value} title={value}>{value} ({timezone})</time>; }
+  };
+  const status = (value: unknown) => typeof value === 'string' && Object.hasOwn(applicationTransitions, value.toLowerCase()) ? t(`recruitment.applications.${value.toLowerCase()}`) : unavailable;
+  const assignee = (value: unknown) => value === null ? t('hrHistory.unassigned') : historyId(value) || unavailable;
+  const nextAction = (value: unknown) => {
+    if (value === null) return t('hrWorkflow.action.none');
+    const row = historyRecord(value);
+    return <>{typeof row.kind === 'string' && actions.includes(row.kind) ? t(`hrWorkflow.action.${row.kind}`) : unavailable}
+      {typeof row.dueAt === 'string' && row.dueAt ? <> · {time(row.dueAt, row.timezone)}</> : typeof row.timezone === 'string' && row.timezone ? <> · {t('hrWorkflow.timezone')}: {row.timezone}</> : null}
+      {typeof row.notes === 'string' && row.notes && <> · {t('hrWorkflow.actionNotes')}: {row.notes}</>}</>;
+  };
+  const signature = (row: Record<string, unknown>, key: string) => {
+    if (!Object.hasOwn(row, key)) return ['missing'];
+    const value = row[key];
+    if (value === null) return ['null'];
+    if (key === 'assignedTo') return ['id', historyId(value)];
+    if (key === 'nextAction') { const action = historyRecord(value); return ['action', ...['kind','dueAt','timezone','notes'].map(k => [Object.hasOwn(action, k), typeof action[k] === 'string' ? action[k] : null])]; }
+    return ['text', typeof value === 'string' ? value : null];
+  };
+  const changed = (key: string) => JSON.stringify(signature(before, key)) !== JSON.stringify(signature(after, key));
+  const hasDetails = ['status','assignedTo','nextAction','notes'].some(changed);
+  const eventKey = ['create','status','workflow','score','reorder','notification_retry'].includes(event.type) ? `hrWorkflow.event.${event.type}` : 'hrHistory.otherEvent';
+  return <>
+    <p>{time(event.at)} · {t(eventKey)} · {t('hrWorkflow.actor')}: {historyId(event.actor) || unavailable}</p>
+    {changed('status') && <p data-history-field="stage"><strong>{t('recruitment.applications.status')}: </strong>{status(before.status)} → {status(after.status)}</p>}
+    {changed('assignedTo') && <p data-history-field="assignment"><strong>{t('hrWorkflow.assignee')}: </strong>{assignee(before.assignedTo)} → {assignee(after.assignedTo)}</p>}
+    {changed('nextAction') && <p data-history-field="next-action"><strong>{t('hrWorkflow.nextAction')}: </strong>{nextAction(before.nextAction)} → {nextAction(after.nextAction)}</p>}
+    {changed('notes') && <p data-history-field="notes"><strong>{t('hrWorkflow.notes')}: </strong>{text(before.notes)} → {text(after.notes)}</p>}
+    {!hasDetails && <p>{t('hrHistory.noDetails')}</p>}
+    {typeof event.reason === 'string' && event.reason && <p><strong>{t('hrWorkflow.reason')}: </strong>{event.reason}</p>}
+  </>;
+}
+
 const historyLoad = (key: string, signal?: AbortSignal, scopeKey?: string) => { const [id, offset] = JSON.parse(key) as [string, number]; return getApplicationHistory(id, offset, signal, scopeKey); };
 function History({ app, reload }: { app: Application; reload: () => void }) {
   const { t } = useTranslation(); const [offset, setOffset] = useState(0);
   const id = app.id, revision = app.revision;
   const result = useAuditResource(JSON.stringify([id, offset]), 'application', historyLoad, { retainOnReload: true });
-  const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(e.after.status || '').toLowerCase() === app.status) : undefined;
-  return <section><h3>{t('hrWorkflow.history')}</h3>
+  const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(historyRecord(e.after).status || '').toLowerCase() === app.status) : undefined;
+  return <section data-application-history><h3>{t('hrWorkflow.history')}</h3>
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
-      {result.data?.items.length === 0 && <p>{t("hrWorkflow.historyEmpty")}</p>}<ol>{result.data?.items.map(e => <li key={e.id}><time>{e.at}</time> · {t(`hrWorkflow.event.${e.type}`)} · {t('hrWorkflow.actor')}: {e.actor}
-        <p>{e.before?.status ? t(`recruitment.applications.${String(e.before.status).toLowerCase()}`) : ''}{e.after.status ? ` → ${t(`recruitment.applications.${String(e.after.status).toLowerCase()}`)}` : ''} {e.reason}</p>
+      {result.data?.items.length === 0 && <p>{t("hrWorkflow.historyEmpty")}</p>}<ol>{result.data?.items.map(e => <li key={e.id} style={{ overflowWrap: 'anywhere' }}>
+        <HistoryEvent event={e} />
         {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
       </li>)}</ol>
       {offset > 0 && <button type="button" onClick={() => setOffset(Math.max(0, offset - 50))}>{t('common.actions.previous')}</button>}

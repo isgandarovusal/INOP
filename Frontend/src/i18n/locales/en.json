@@ -1208,6 +1208,12 @@
       "protected_criteria_forbidden": "Protected personal traits are never evaluated"
     }
   },
+  "hrHistory": {
+    "unavailable": "Not available",
+    "unassigned": "Unassigned",
+    "otherEvent": "Other event",
+    "noDetails": "Change details are not available for this event."
+  },
   "hrWorkflow": {
     "historyEmpty": "No events for this application yet.",
     "application": "Manage application",

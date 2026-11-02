@@ -1225,6 +1225,12 @@
       "protected_criteria_forbidden": "Qorunan şəxsi xüsusiyyətlər qiymətləndirilmir"
     }
   },
+  "hrHistory": {
+    "unavailable": "Məlumat yoxdur",
+    "unassigned": "Təyin edilməyib",
+    "otherEvent": "Digər hadisə",
+    "noDetails": "Bu hadisə üçün dəyişiklik təfərrüatları yoxdur."
+  },
   "hrWorkflow": {
     "historyEmpty": "Bu müraciət üçün hələ tarixçə yoxdur.",
     "application": "Müraciətin idarə edilməsi",

@@ -1202,6 +1202,12 @@
       "protected_criteria_forbidden": "Защищённые личные признаки не оцениваются"
     }
   },
+  "hrHistory": {
+    "unavailable": "Нет данных",
+    "unassigned": "Не назначен",
+    "otherEvent": "Другое событие",
+    "noDetails": "Подробности изменений для этого события отсутствуют."
+  },
   "hrWorkflow": {
     "historyEmpty": "История этой заявки пока пуста.",
     "application": "Управление заявкой",
