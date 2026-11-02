@@ -137,6 +137,7 @@ export interface Application {
   id: string;
   _id?: string;
   boardOrder?: string;
+  handoffContext?: ApplicationHandoffContext;
 
   jobId: string | Job | null;
   candidateId: string | Candidate | null;
@@ -177,3 +178,11 @@ export interface ApplicationInterview { startsAt: string; timezone: string; dura
 export interface ApplicationNextAction { kind: 'review' | 'call' | 'interview' | 'offer' | 'follow_up' | 'none'; dueAt: string | null; timezone?: string | null; notes: string }
 export interface ApplicationEvent { id: string; type: string; actor: string; at: string; revision: number; reason: string;
   before: Record<string, unknown> | null; after: Record<string, unknown>; delivery?: { state: string; attempts: number; code?: string; priorAttempts?: number; retryCount?: number; at?: string; sentAt?: string; nextAttemptAt?: string } }
+
+// Detail-only data authority; never normalize this as a Candidate or Job resource.
+export interface ApplicationHandoffContext {
+  version: 'application-context-v1'; mode: 'assigned-read-only'; applicationId: string; revision: number;
+  candidate: { name: string; role: string; email: string; phone: string; skills: string[]; experience: number | null; education: string; languages: string[]; certificates: string[] };
+  job: { title: string; department: string; location: string; type: string; status: string; brandId: string | null; requiredSkills: string[]; preferredSkills: string[]; experienceYears: number; requiredEducation: string[]; requiredCertificates: string[] };
+  score: number | null; scoreStatus: Application['scoreStatus']; matching: Omit<ApplicationMatch, 'jobHash' | 'candidateHash'> | null;
+}

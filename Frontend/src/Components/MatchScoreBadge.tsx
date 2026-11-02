@@ -7,9 +7,10 @@ import { hasPermission } from '../Utils/permissions';
 import { getErrorMessage } from '../Utils/getErrorMessage';
 import { getApplicationById, recalculateApplicationMatch } from '../Services/applicationsService';
 import HRResourceState from './HRResourceState';
-import type { Application } from '../Types/recruitment';
+import type { Application, ApplicationMatch } from '../Types/recruitment';
 
-function Badge({ application, onUpdated }: { application: Application; onUpdated?: () => void }) {
+type ScoreApplication = Pick<Application, 'id' | 'revision' | 'score' | 'scoreStatus'> & { matching?: Omit<ApplicationMatch, 'jobHash' | 'candidateHash'> | null };
+function Badge({ application, onUpdated }: { application: ScoreApplication; onUpdated?: () => void }) {
   const { t } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(application.id);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [experience, setExperience] = useState(''), [reason, setReason] = useState('');
@@ -58,7 +59,7 @@ function Badge({ application, onUpdated }: { application: Application; onUpdated
     {error && <span role="alert">{error}</span>}
   </div>;
 }
-const MatchScoreBadge = memo(function MatchScoreBadge(props: { application: Application; onUpdated?: () => void }) {
+const MatchScoreBadge = memo(function MatchScoreBadge(props: { application: ScoreApplication; onUpdated?: () => void }) {
   const context = useHRActionContext(props.application.id);
   return <Badge key={JSON.stringify([context.key, props.application.revision, props.application.scoreStatus, props.application.matching?.calculatedAt])} {...props} />;
 });

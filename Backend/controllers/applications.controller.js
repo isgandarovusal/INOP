@@ -49,6 +49,7 @@ exports.getApplications = async (req, res) => {
 };
 
 exports.getApplicationById = async (req, res) => {
+  res.set("Cache-Control", "private, no-store");
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({
@@ -56,24 +57,27 @@ exports.getApplicationById = async (req, res) => {
       });
     }
 
-    const application = await Application.findOne(
+    const raw = await Application.findOne(
       buildScopedQuery(req, {
         _id: req.params.id,
       })
     )
       .select("-events")
-      .populate(applicationParents(req))
       .lean();
 
-    if (!application) {
+    if (!raw) {
       return res.status(404).json({
         message:
           "Müraciət tapılmadı və ya bu müraciətə giriş icazəniz yoxdur.",
       });
     }
 
-    return res.status(200).json((await decorateApplications(req, await scoreResponses(req, [application])))[0]);
+    const application = await Application.populate({ ...raw }, applicationParents(req));
+    const result = (await decorateApplications(req, await scoreResponses(req, [application])))[0];
+    const context = await require('../services/applicationHandoffContext.service').handoffContext(req, raw, application);
+    return res.status(200).json({ ...result, ...(context ? { handoffContext: context } : {}) });
   } catch (error) {
+    if (['HANDOFF_CONTEXT_CHANGED','HR_AUTH_REQUIRED','HR_PERMISSION_CHANGED'].includes(error.code)) return res.status(error.status || 503).json({ code: error.code, message: 'Application context is unavailable.' });
     logFailure(error);
 
     return res.status(500).json({

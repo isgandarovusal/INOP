@@ -4,7 +4,7 @@ import { readJson } from "../api/readRequest";
 import { normalizeJob } from "./jobsService";
 import { normalizeCandidate } from "./candidatesService";
 import type {
-  Application,
+  Application, ApplicationHandoffContext,
   ApplicationStatus, ApplicationMatch, ApplicationInterview, ApplicationNextAction, ApplicationEvent,
 } from "../Types/recruitment";
 
@@ -63,6 +63,29 @@ function frontendStatus(
   }
 }
 
+function handoffContext(raw: unknown, id: string, revision: number): ApplicationHandoffContext | undefined {
+  if (raw === undefined) return undefined;
+  const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+  const keys = (v: unknown, allowed: string[], required = allowed): v is Record<string, unknown> => object(v) && Object.keys(v).every(k => allowed.includes(k)) && required.every(k => Object.hasOwn(v, k));
+  const text = (v: unknown) => typeof v === 'string' && v.length <= 500;
+  const list = (v: unknown) => Array.isArray(v) && v.length <= 100 && v.every(text);
+  const number = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+  const invalid = () => { throw Error('Invalid Application context.'); };
+  if (!keys(raw, ['version','mode','applicationId','revision','candidate','job','score','scoreStatus','matching']) || raw.version !== 'application-context-v1' || raw.mode !== 'assigned-read-only' || raw.applicationId !== id || raw.revision !== revision || !Number.isInteger(raw.revision) || revision < 0) return invalid();
+  const c = raw.candidate, j = raw.job;
+  if (!keys(c, ['name','role','email','phone','skills','experience','education','languages','certificates']) || !['name','role','email','phone','education'].every(k => text(c[k])) || !['skills','languages','certificates'].every(k => list(c[k])) || c.experience !== null && !number(c.experience)) return invalid();
+  if (!keys(j, ['title','department','location','type','status','brandId','requiredSkills','preferredSkills','experienceYears','requiredEducation','requiredCertificates']) || !['title','department','location','type','status'].every(k => text(j[k])) || j.brandId !== null && !text(j.brandId) || !['requiredSkills','preferredSkills','requiredEducation','requiredCertificates'].every(k => list(j[k])) || !number(j.experienceYears)) return invalid();
+  if (!['pending','incomplete','calculated','stale','legacy','restricted'].includes(String(raw.scoreStatus)) || (raw.score !== null && (!number(raw.score) || raw.score > 100)) || (raw.scoreStatus === 'calculated' ? raw.score === null || raw.matching === null : raw.score !== null)) return invalid();
+  const m = raw.matching;
+  if (m !== null) {
+    if (!keys(m, ['version','calculatedAt','dataCoverage','reason','criteria']) || m.version !== 'ats-v2' || typeof m.calculatedAt !== 'string' || !Number.isFinite(Date.parse(m.calculatedAt)) || !number(m.dataCoverage) || m.dataCoverage > 1 || m.reason !== null && !['requirements_missing','application_context_required','protected_criteria_forbidden','hr_review_required','facts_missing'].includes(String(m.reason)) || !Array.isArray(m.criteria) || m.criteria.length > 5) return invalid();
+    for (const v of m.criteria) {
+      if (!keys(v, ['key','known','weight','ratio','source','matched','missing','value','required'], ['key','known','weight','ratio','source']) || !['skills','preferred','experience','education','certificates'].includes(String(v.key)) || typeof v.known !== 'boolean' || !number(v.weight) || v.weight > 1 || v.ratio !== null && (!number(v.ratio) || v.ratio > 1) || !['candidate.skills','candidate.certificates','candidate.education','application.hr-review','candidate.experience:matching-role','candidate.employmentHistory:unknown','candidate.employmentHistory:dated-matching-role'].includes(String(v.source)) || ['matched','missing'].some(k => v[k] !== undefined && !list(v[k])) || ['value','required'].some(k => v[k] !== undefined && v[k] !== null && !number(v[k]))) return invalid();
+    }
+  } else if (raw.scoreStatus === 'calculated') return invalid();
+  return raw as unknown as ApplicationHandoffContext;
+}
+
 export function normalizeApplication(raw: unknown): Application {
   const data =
     typeof raw === "object" && raw !== null
@@ -82,13 +105,11 @@ export function normalizeApplication(raw: unknown): Application {
       ? data.status as ApplicationStatus
       : "applied";
 
+  const id = typeof data.id === 'string' ? data.id : typeof data._id === 'string' ? data._id : '';
+  const revision = typeof data.__v === 'number' ? data.__v : 0;
   return {
-    id:
-      typeof data.id === "string"
-        ? data.id
-        : typeof data._id === "string"
-          ? data._id
-          : "",
+    id,
+    handoffContext: handoffContext(data.handoffContext, id, revision),
     _id: typeof data._id === "string" ? data._id : undefined,
 
     jobId,
@@ -132,7 +153,9 @@ export async function getApplicationById(
   id: string, signal?: AbortSignal, scopeKey?: string
 ): Promise<Application | null> {
   try {
-    return normalizeApplication(await readJson(`/applications/${id}`, { signal, scopeKey }));
+    const application = normalizeApplication(await readJson(`/applications/${id}`, { signal, scopeKey }));
+    if (application.handoffContext && application.id.toLowerCase() !== id.toLowerCase()) throw Error('Invalid Application context binding.');
+    return application;
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.status === 404) {
       return null;

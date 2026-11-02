@@ -1,4 +1,4 @@
-import { FormSection } from '../../../Components/HRSection';
+import { FormSection, SectionCard } from '../../../Components/HRSection';
 import { ClipboardList } from "lucide-react";
 import ApplicationDelivery from '../../../Components/ApplicationDelivery';
 import { useMemo, useState } from 'react';
@@ -16,6 +16,7 @@ import type { Application, ApplicationStatus, ApplicationInterview, ApplicationN
 import PageHeader from '../../../Components/PageHeader';
 import HRResourceState from '../../../Components/HRResourceState';
 import MatchScoreBadge from '../../../Components/MatchScoreBadge';
+import { brandLabel } from '../../../Services/recruitmentCatalogService';
 import {applicationWorkflowKey} from '../../../Utils/applicationWorkflowKey';
 
 const historyLoad = (key: string, signal?: AbortSignal, scopeKey?: string) => { const [id, offset] = JSON.parse(key) as [string, number]; return getApplicationHistory(id, offset, signal, scopeKey); };
@@ -92,13 +93,32 @@ export default function ApplicationDetail() {
   const resource = useAuditResource(id, 'application', getApplicationById, { retainOnReload: true });
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
+  const handoff = resource.refreshing ? undefined : app.handoffContext;
   return <div className="hr-workspace hr-application-detail">
-    <PageHeader icon={<ClipboardList size={26} />} title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : t('hrStates.restricted')} actions={<>
+    <PageHeader icon={<ClipboardList size={26} />} title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : handoff?.candidate.name || t('hrStates.restricted')} actions={<>
       <Link className="btn-secondary" to="/app/recruitment/applications">{t('common.actions.back')}</Link>
       {app.candidateId && typeof app.candidateId === 'object' && <><Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user,'candidate','update')&&<Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}
     </>} />
     <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
-    <MatchScoreBadge application={app} onUpdated={resource.reload} />
+    {app.handoffContext && resource.refreshing && <p role="status" data-handoff-refreshing>{t('hrHandoff.refreshing')}</p>}
+    {handoff && <SectionCard className="detail-card" data-application-handoff>
+      <h2>{t('hrHandoff.title')}</h2><p role="status">{t('hrHandoff.readOnly')}</p>
+      <h3>{t('recruitment.candidateForm.candidateInformation')}</h3>
+      <dl className="hr-profile-facts">
+        {([['recruitment.candidateForm.fullName', handoff.candidate.name], ['recruitment.candidateForm.position', handoff.candidate.role], ['recruitment.candidateDetail.email', handoff.candidate.email], ['recruitment.candidateDetail.phone', handoff.candidate.phone], ['recruitment.candidateDetail.skills', handoff.candidate.skills.join(', ')], ['recruitment.candidateDetail.experience', handoff.candidate.experience == null ? '' : String(handoff.candidate.experience)], ['recruitment.candidateDetail.education', handoff.candidate.education], ['recruitment.candidateDetail.languages', handoff.candidate.languages.join(', ')], ['recruitment.candidateDetail.certificates', handoff.candidate.certificates.join(', ')]] as const).map(([label,value]) => <div key={label}><dt>{t(label)}</dt><dd>{value || t('cvReview.unknown')}</dd></div>)}
+      </dl>
+      <h3>{t('hrHandoff.job')}</h3><p>{handoff.job.title} · {t(`recruitment.jobStatus.${handoff.job.status.toLowerCase()}`)}</p>
+      <p>{[handoff.job.brandId ? brandLabel(handoff.job.brandId) : '', handoff.job.department, handoff.job.location, handoff.job.type].filter(Boolean).join(' · ')}</p>
+      <dl className="hr-profile-facts">
+        <div><dt>{t('recruitment.jobDetail.requiredSkills')}</dt><dd>{handoff.job.requiredSkills.join(', ') || t('recruitment.jobDetail.noneSpecified')}</dd></div>
+        <div><dt>{t('recruitment.jobDetail.preferredSkills')}</dt><dd>{handoff.job.preferredSkills.join(', ') || t('recruitment.jobDetail.noneSpecified')}</dd></div>
+        <div><dt>{t('hrHandoff.requiredExperience')}</dt><dd>{handoff.job.experienceYears}</dd></div>
+        <div><dt>{t('hrHandoff.requiredEducation')}</dt><dd>{handoff.job.requiredEducation.join(', ') || t('recruitment.jobDetail.noneSpecified')}</dd></div>
+        <div><dt>{t('hrHandoff.requiredCertificates')}</dt><dd>{handoff.job.requiredCertificates.join(', ') || t('recruitment.jobDetail.noneSpecified')}</dd></div>
+      </dl>
+      <MatchScoreBadge application={{ ...app, score: handoff.score, scoreStatus: handoff.scoreStatus, matching: handoff.matching }} />
+    </SectionCard>}
+    {!handoff && <MatchScoreBadge application={app} onUpdated={resource.reload} />}
     {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} reload={resource.reload} />}
     <History key={'history:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />
   </div>;

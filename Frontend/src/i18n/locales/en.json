@@ -2553,5 +2553,14 @@
     "allBrands": "All brands",
     "allVacancies": "All vacancies",
     "routingInvalid": "Invalid routing JSON. Use hr-import-routing-v1 with filename/context rows."
+  },
+  "hrHandoff": {
+    "title": "Application context",
+    "readOnly": "Read-only context for this application. No additional profile, editing or CV file access is granted.",
+    "refreshing": "Rechecking access to the application context.",
+    "job": "Linked vacancy",
+    "requiredExperience": "Required experience (years)",
+    "requiredEducation": "Required education",
+    "requiredCertificates": "Required certifications"
   }
 }

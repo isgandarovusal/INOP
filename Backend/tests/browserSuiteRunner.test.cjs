@@ -7,7 +7,7 @@ function run(results={},port='27018'){
 }
 test('Browser runner keeps all serial groups, flags and guarded environment; success is explicit',()=>{
  const {calls,logs,process}=run();assert.equal(calls.length,15);assert.equal(process.exitCode,0);
- const files=calls.flatMap(([,args])=>Array.from(args.slice(2)));assert.equal(files.length,32);assert.equal(new Set(files).size,32);
+ const files=calls.flatMap(([,args])=>Array.from(args.slice(2)));assert.equal(files.length,33);assert.equal(new Set(files).size,33);assert.ok(files.some(f=>f.endsWith('applicationHandoffContextUI.test.cjs')));
  for(const [binary,args,options]of calls){assert.equal(binary,process.execPath);assert.deepEqual(Array.from(args.slice(0,2)),['--test','--test-isolation=none']);assert.equal(options.env,process.env);assert.equal(options.stdio,'inherit');for(const file of args.slice(2))assert.ok(fs.existsSync(file));}
  assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_START').length,15);assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_RESULT').length,15);assert.equal(logs.at(-1).failedGroups.length,0);
 });

@@ -2570,5 +2570,14 @@
     "allBrands": "Bütün brendlər",
     "allVacancies": "Bütün vakansiyalar",
     "routingInvalid": "JSON əlaqələndirmə faylı yanlışdır. hr-import-routing-v1 formatında filename/context sətirlərindən istifadə edin."
+  },
+  "hrHandoff": {
+    "title": "Müraciət üzrə kontekst",
+    "readOnly": "Yalnız bu müraciət üçün oxuma rejimi. Profilə, redaktəyə və CV faylına əlavə giriş verilmir.",
+    "refreshing": "Müraciət kontekstinə giriş yenidən yoxlanılır.",
+    "job": "Bağlı vakansiya",
+    "requiredExperience": "Tələb olunan təcrübə (il)",
+    "requiredEducation": "Tələb olunan təhsil",
+    "requiredCertificates": "Tələb olunan sertifikatlar"
   }
 }
