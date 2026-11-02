@@ -1486,7 +1486,15 @@
     "error": {
       "smtp": "Email xidməti əlçatan deyil. Müraciət və mərhələ dəyişmədi.",
       "conflict": "Bildiriş və ya müraciət dəyişib. Son məlumatı yenidən yükləyin.",
-      "failed": "Təkrar göndəriş növbəyə əlavə edilə bilmədi. Yenidən yoxlayın."
+      "failed": "Təkrar göndəriş növbəyə əlavə edilə bilmədi. Yenidən yoxlayın.",
+      "notRetryable": "Server bu bildirişin təkrar göndərilməsinə icazə vermədi. Bu sorğu ilə təkrar göndəriş növbəyə əlavə edilməyib."
+    },
+    "unknownState": "Bildirişin vəziyyəti məlum deyil.",
+    "escalation": {
+      "parentScope": "Bu göndəriş cəhdi namizəd və ya vakansiyaya giriş təsdiqlənmədiyi üçün dayandırılıb. HR mərhələsi qərarı ayrıca saxlanılır.",
+      "noRetry": "Bu bildiriş üçün buradan əl ilə təkrar göndəriş əlçatan deyil.",
+      "incomplete": "Mövcud məlumatlarla təkrar göndərişin mümkünlüyü təsdiqlənmir.",
+      "admin": "Əlavə yoxlama lazımdırsa, mövcud daxili kanal vasitəsilə səlahiyyətli Admin-ə müraciət edin. Cari Application səhifəsinə və History hadisəsinə istinad edin."
     }
   },
   "hrApproval": {

@@ -72,12 +72,13 @@ function History({ app, reload }: { app: Application; reload: () => void }) {
   const { t } = useTranslation(); const [offset, setOffset] = useState(0);
   const id = app.id, revision = app.revision;
   const result = useAuditResource(JSON.stringify([id, offset]), 'application', historyLoad, { retainOnReload: true });
+  const parentsReadable = !!app.candidateId && typeof app.candidateId === 'object' && !!app.jobId && typeof app.jobId === 'object';
   const latest = offset === 0 ? result.data?.items.find(e => e.delivery && String(historyRecord(e.after).status || '').toLowerCase() === app.status) : undefined;
   return <section data-application-history><h3>{t('hrWorkflow.history')}</h3>
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
       {result.data?.items.length === 0 && <p>{t("hrWorkflow.historyEmpty")}</p>}<ol>{result.data?.items.map(e => <li key={e.id} style={{ overflowWrap: 'anywhere' }}>
         <HistoryEvent event={e} />
-        {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
+        {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={parentsReadable && latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
       </li>)}</ol>
       {offset > 0 && <button type="button" onClick={() => setOffset(Math.max(0, offset - 50))}>{t('common.actions.previous')}</button>}
       {result.data?.hasMore && <button type="button" onClick={() => setOffset(offset + 50)}>{t('common.actions.next')}</button>}

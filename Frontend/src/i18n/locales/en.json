@@ -1469,7 +1469,15 @@
     "error": {
       "smtp": "Email service is unavailable. The application and stage were unchanged.",
       "conflict": "Notification or application changed. Reload the latest information.",
-      "failed": "Notification retry could not be queued. Check and retry."
+      "failed": "Notification retry could not be queued. Check and retry.",
+      "notRetryable": "The server did not allow this notification to be retried. This request did not queue a retry."
+    },
+    "unknownState": "Notification status is unavailable.",
+    "escalation": {
+      "parentScope": "This send attempt was stopped because candidate or vacancy access could not be confirmed. The HR stage decision is recorded separately.",
+      "noRetry": "Manual retry is unavailable for this notification here.",
+      "incomplete": "The available data does not confirm that this notification can be retried.",
+      "admin": "If further review is needed, contact an authorized Admin through your existing internal channel. Refer to the current Application page and History event."
     }
   },
   "hrApproval": {
