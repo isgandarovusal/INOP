@@ -14,6 +14,15 @@ const MAX_ATTEMPTS = 3, LEASE_MS = 90000, SEND_TIMEOUT_MS = 30000;
 // but a crash after acceptance and before acknowledgement can still resend.
 function createNotificationWorker({ send = notifyCandidateStatus, available = () => Boolean(getSmtpConfig()), now = () => new Date(), timeoutMs = SEND_TIMEOUT_MS } = {}) {
   let busy = false, timer;
+  async function authority(actorId) {
+    const actor = await User.findOne({ _id: actorId, isActive: true }).select('_id role departmentId').lean();
+    const role = actor && await Role.findOne({ key: String(actor.role).toLowerCase(), isActive: true }).select('permissions').lean();
+    if (!role) return null;
+    return {
+      req: { user: { id: String(actor._id), departmentId: actor.departmentId || '' }, authRole: role },
+      snapshot: JSON.stringify([actor.role, actor.departmentId || '', role._id, role.permissions]),
+    };
+  }
   async function finish(row, event, token, values) {
     return Application.updateOne({ _id: row._id, events: { $elemMatch: { id: event.id, 'delivery.token': token } } },
       { $set: { 'events.$.delivery': { attempts: event.delivery.attempts || 0, ...Object.fromEntries(['priorAttempts','retryCount','retryActor'].filter(k=>event.delivery[k]!==undefined).map(k=>[k,event.delivery[k]])), ...values } } }, { timestamps: false });
@@ -36,10 +45,9 @@ function createNotificationWorker({ send = notifyCandidateStatus, available = ()
     const actorId = event.delivery.retryActor !== undefined ? event.delivery.retryActor : event.actor;
     if (!['status', 'workflow'].includes(event.type) || !mongoose.isObjectIdOrHexString(actorId) || !['Interview', 'Offered'].includes(event.after?.status)) return stop('INVALID_EVENT');
     if (!isCurrent(row)) return stop('STALE_WORKFLOW');
-    const actor = await User.findOne({ _id: actorId, isActive: true }).select('_id role departmentId').lean();
-    const role = actor && await Role.findOne({ key: String(actor.role).toLowerCase(), isActive: true }).select('permissions').lean();
-    if (!role) return stop('AUTH_REVOKED');
-    const req = { user: { id: String(actor._id), departmentId: actor.departmentId || '' }, authRole: role };
+    const initial = await authority(actorId);
+    if (!initial) return stop('AUTH_REVOKED');
+    const req = initial.req;
     if (!await Application.exists({ $and: [{ _id: row._id }, resourceFilter(req, 'application', 'update')] })) return stop('AUTH_REVOKED');
     const [candidate, job] = await Promise.all([
       Candidate.findOne({ $and: [{ _id: row.candidateId }, resourceFilter(req, 'candidate')] }).select('_id name email').lean(),
@@ -47,19 +55,39 @@ function createNotificationWorker({ send = notifyCandidateStatus, available = ()
     ]);
     if (!candidate || !job) return stop('PARENT_SCOPE_REVOKED');
     if (!candidate.email?.trim()) return stop('MISSING_RECIPIENT');
-    const live = await Application.findOne({ $and: [{ _id: row._id }, resourceFilter(req, 'application', 'update')] }).select('status substatus interview events').lean();
-    if (!live) return stop('AUTH_REVOKED');
-    if (!isCurrent(live)) return stop('STALE_WORKFLOW');
-    if (!available()) return finish(row, event, token, { state: 'blocked', code: 'SMTP_NOT_CONFIGURED', at: now() });
-    const attempts = (event.delivery.attempts || 0) + 1;
-    if (attempts > MAX_ATTEMPTS) return finish(row, event, token, { state: 'failed', code: 'ATTEMPTS_EXHAUSTED', at: now() });
+    const canSend = available(), attempts = (event.delivery.attempts || 0) + 1;
+    if (!canSend || attempts > MAX_ATTEMPTS) {
+      // Preserve existing stale/access skip priority on paths that cannot send.
+      const live = await Application.findOne({ $and: [{ _id: row._id }, resourceFilter(req, 'application', 'update')] }).select('status substatus interview events').lean();
+      if (!live) return stop('AUTH_REVOKED');
+      if (!isCurrent(live)) return stop('STALE_WORKFLOW');
+      if (!canSend) return finish(row, event, token, { state: 'blocked', code: 'SMTP_NOT_CONFIGURED', at: now() });
+      return finish(row, event, token, { state: 'failed', code: 'ATTEMPTS_EXHAUSTED', at: now() });
+    }
     const counted = await Application.updateOne({ _id: row._id, events: { $elemMatch: { id: event.id, 'delivery.token': token } } }, { $set: { 'events.$.delivery.attempts': attempts } }, { timestamps: false });
     if (!counted.modifiedCount) return;
+    // Resource reads are provisional until the actor/role is reloaded AFTER
+    // every parent read and the attempt reservation. No stale grant may release
+    // data to the sender. A denied reservation is restored by token-bound finish.
+    const [live, currentCandidate, currentJob] = await Promise.all([
+      Application.findOne({ $and: [{ _id: row._id, events: { $elemMatch: { id: event.id, 'delivery.token': token, 'delivery.state': 'running' } } }, resourceFilter(req, 'application', 'update')] }).select('status substatus interview events candidateId jobId').lean(),
+      Candidate.findOne({ $and: [{ _id: row.candidateId }, resourceFilter(req, 'candidate')] }).select('_id name email').lean(),
+      Job.findOne({ $and: [{ _id: row.jobId }, resourceFilter(req, 'recruitment')] }).select('_id title').lean(),
+    ]);
+    const current = await authority(actorId);
+    // Equality verifies that the fresh resource filters used the same authority
+    // as the current server record. Any in-flight grant change fails closed.
+    if (!current || current.snapshot !== initial.snapshot || !live) return stop('AUTH_REVOKED');
+    if (!isCurrent(live) || String(live.candidateId) !== String(row.candidateId) || String(live.jobId) !== String(row.jobId)) return stop('STALE_WORKFLOW');
+    if (!currentCandidate || !currentJob) return stop('PARENT_SCOPE_REVOKED');
+    if (!currentCandidate.email?.trim()) return stop('MISSING_RECIPIENT');
+    // No more DB awaits before invoking send. This remains a checkpoint, not an
+    // atomic transaction with SMTP; later revocation cannot retract accepted mail.
     event.delivery.attempts = attempts;
     const controller = new AbortController(); let deadline;
     try {
       const result = await Promise.race([
-        send({ application: { ...row, candidateId: candidate, jobId: job }, actor: req.user, signal: controller.signal, messageId: `<inop-${event.id}@notifications.invalid>` }),
+        send({ application: { ...row, candidateId: currentCandidate, jobId: currentJob }, actor: current.req.user, signal: controller.signal, messageId: `<inop-${event.id}@notifications.invalid>` }),
         new Promise((_, reject) => { deadline = setTimeout(() => { controller.abort(); reject(Error('SEND_TIMEOUT')); }, timeoutMs); }),
       ]);
       if (result.sent) return finish(row, event, token, { state: 'sent', code: 'DELIVERED', sentAt: now() });
