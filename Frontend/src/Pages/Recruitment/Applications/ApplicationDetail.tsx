@@ -71,11 +71,20 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
   const interviewChanged = (key: keyof typeof oldInterview) => oldInterview[key] !== newInterview[key];
   const interviewTimeChanged = interviewChanged('startsAt') || interviewChanged('timezone');
   const interviewTime = (row: typeof oldInterview) => !row.startsAt ? unavailable : row.timezone ? time(row.startsAt, row.timezone) : <time dateTime={row.startsAt} title={row.startsAt}>{row.startsAt}</time>;
-  const hasDetails = ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer');
+  const substatusValue = (row: Record<string, unknown>): string | undefined => {
+    // Empty is an explicit unset value; missing or invalid legacy data is unknown.
+    if (row.substatus === '') return '';
+    const stage = typeof row.status === 'string' ? row.status.toLowerCase() : '';
+    return Object.hasOwn(applicationSubstatuses, stage) && typeof row.substatus === 'string' && applicationSubstatuses[stage as ApplicationStatus].includes(row.substatus) ? row.substatus : undefined;
+  };
+  const substatus = (row: Record<string, unknown>) => { const value = substatusValue(row); return value === undefined ? unavailable : value === '' ? t('hrCatalog.unset') : t(`hrWorkflow.sub.${value}`); };
+  const substatusChanged = substatusValue(before) !== substatusValue(after);
+  const hasDetails = substatusChanged || ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer');
   const eventKey = ['create','status','workflow','score','reorder','notification_retry'].includes(event.type) ? `hrWorkflow.event.${event.type}` : 'hrHistory.otherEvent';
   return <>
     <p>{time(event.at)} · {t(eventKey)} · {t('hrWorkflow.actor')}: {historyId(event.actor) || unavailable}</p>
     {changed('status') && <p data-history-field="stage"><strong>{t('recruitment.applications.status')}: </strong>{status(before.status)} → {status(after.status)}</p>}
+    {substatusChanged && <p data-history-field="substatus"><strong>{t('hrWorkflow.substatus')}: </strong>{substatus(before)} → {substatus(after)}</p>}
     {changed('assignedTo') && <p data-history-field="assignment"><strong>{t('hrWorkflow.assignee')}: </strong>{assignee(before.assignedTo)} → {assignee(after.assignedTo)}</p>}
     {changed('nextAction') && <p data-history-field="next-action"><strong>{t('hrWorkflow.nextAction')}: </strong>{nextAction(before.nextAction)} → {nextAction(after.nextAction)}</p>}
     {changed('notes') && <p data-history-field="notes"><strong>{t('hrWorkflow.notes')}: </strong>{text(before.notes)} → {text(after.notes)}</p>}

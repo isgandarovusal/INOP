@@ -343,3 +343,48 @@ test('Interview reschedule history explains only authorized snapshot fields with
   });
   assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Application substatus History shows stage-valid authorized before and after values',async t=>withBrowserFixture(timezoneHarness,async h=>{
+ const locales=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic Substatus Applicant',role:'Cashier'})).data,j=(await h.request('admin','POST','/jobs',{title:'Synthetic Substatus Vacancy',department:'HR',description:'Synthetic'})).data;
+ const app=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data,url='/app/recruitment/applications/'+app._id,history=h.page.locator('[data-application-history]');
+ const update=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:0,substatus:'review-required',reason:'Synthetic review handoff'});assert.equal(update.status,200);
+ await t.test('actual same-stage substatus-only event has localized detail',async()=>{
+  await h.open('admin',url);await history.locator('li').first().waitFor();await h.page.waitForLoadState('networkidle');const row=history.locator('li').first();
+  assert.equal(await row.locator('[data-history-field=substatus]').count(),1);
+  assert.ok((await row.textContent()).includes(locales.az.hrCatalog.unset+' → '+locales.az.hrWorkflow.sub['review-required']));
+  assert.ok((await row.textContent()).includes('Synthetic review handoff'));assert.equal(await row.locator('[data-history-field=stage]').count(),0);
+ });
+ await t.test('stage-specific, empty, missing and malformed legacy values are distinguished safely',async()=>{
+  const event=(id,before,after)=>({id,type:'workflow',actor:String(h.actors.admin._id),at:'2026-11-03T08:00:00Z',revision:1,before,after});
+  const events=[event('reschedule',{status:'Interview',substatus:'scheduled'},{status:'Interview',substatus:'rescheduled'}),event('clear',{status:'Offered',substatus:'sent'},{status:'Offered',substatus:''}),event('missing',{status:'Applied'},{status:'Applied',substatus:''}),event('wrong-stage',{status:'Applied',substatus:'scheduled'},{status:'Applied',substatus:'new'}),event('malformed',{status:'Interview',substatus:{name:'NEVER_RENDER'}},{status:'Interview',substatus:'PRIVATE_UNKNOWN'}),event('no-op',{status:'Screening',substatus:'selected'},{status:'Screening',substatus:'selected'}),event('unknown-stage',{status:'UNKNOWN',substatus:'new'},{substatus:'new'}),event('stage-change',{status:'Applied',substatus:'new'},{status:'Screening',substatus:'in-review'})];
+  await Application.updateOne({_id:app._id},{$set:{events:events.reverse()}});await h.open('admin',url);await history.locator('li').nth(7).waitFor();await h.page.waitForLoadState('networkidle');
+  const rows=history.locator('li');assert.equal(await rows.count(),8);
+  const value=index=>rows.nth(index).locator('[data-history-field=substatus]');
+  assert.ok((await value(0).textContent()).includes(locales.az.hrWorkflow.sub.scheduled+' → '+locales.az.hrWorkflow.sub.rescheduled));
+  assert.ok((await value(1).textContent()).includes(locales.az.hrWorkflow.sub.sent+' → '+locales.az.hrCatalog.unset));
+  assert.ok((await value(2).textContent()).includes(locales.az.hrHistory.unavailable+' → '+locales.az.hrCatalog.unset));
+  assert.ok((await value(3).textContent()).includes(locales.az.hrHistory.unavailable+' → '+locales.az.hrWorkflow.sub.new));
+  for(const index of [4,5,6])assert.equal(await value(index).count(),0);
+  assert.ok((await value(7).textContent()).includes(locales.az.hrWorkflow.sub.new+' → '+locales.az.hrWorkflow.sub['in-review']));assert.equal(await rows.nth(7).locator('[data-history-field=stage]').count(),1);
+  assert.ok(!(await history.textContent()).includes('NEVER_RENDER'));assert.ok(!(await history.textContent()).includes('PRIVATE_UNKNOWN'));
+  assert.equal(await rows.nth(0).locator('time').first().getAttribute('datetime'),'2026-11-03T08:00:00Z');
+ });
+ await t.test('AZ EN RU four-width presentation is read-only and produces no requests',async()=>{
+  const count=h.wire.length;
+  for(const language of ['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),language);await history.getByRole('heading',{name:locales[language].hrWorkflow.history,exact:true}).waitFor();
+   assert.ok((await history.locator('[data-history-field=substatus]').first().textContent()).includes(locales[language].hrWorkflow.substatus));
+   for(const width of [1440,768,390,320]){await h.page.setViewportSize({width,height:1000});await h.page.evaluate(()=>document.fonts.ready);assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,language+'/'+width);
+    if(process.env.INOP_SUBSTATUS_SCREENSHOTS&&[['az',1440],['en',768],['ru',390],['az',320]].some(([l,w])=>l===language&&w===width)){require('node:fs').mkdirSync(process.env.INOP_SUBSTATUS_SCREENSHOTS,{recursive:true});await history.screenshot({path:require('node:path').join(process.env.INOP_SUBSTATUS_SCREENSHOTS,`substatus-${language}-${width}.png`)});}
+   }
+  }
+  assert.equal(h.wire.length,count);assert.equal(await history.locator('a,input,select,textarea').count(),0);
+ });
+ await t.test('Employee history remains scoped and reassignment removes access',async()=>{
+  await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});await Application.updateOne({_id:app._id},{$set:{departmentId:'dep_hr',assignedTo:h.actors.own._id}});
+  const count=h.wire.length;await h.open('own',url);await history.locator('[data-history-field=substatus]').first().waitFor();await h.page.waitForLoadState('networkidle');assert.equal(h.wire.length-count,4);
+  assert.equal(await history.locator('a,input,select,textarea').count(),0);assert.equal((await h.request('own','GET','/candidates/'+c._id)).status,404);assert.equal((await h.request('own','GET','/jobs/'+j._id)).status,404);
+  await Application.updateOne({_id:app._id},{$set:{assignedTo:h.actors.peer._id},$inc:{__v:1}});await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.locator('[data-hr-state=not-found]').waitFor();assert.equal(await history.count(),0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
