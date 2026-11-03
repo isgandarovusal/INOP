@@ -278,3 +278,68 @@ test('Interview timezone guidance preserves scheduling, rescheduling and server 
   });
   assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Interview reschedule history explains only authorized snapshot fields without extra reads',async t=>withBrowserFixture(timezoneHarness,async h=>{
+  const labels=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+  const candidate=(await h.request('admin','POST','/candidates',{name:'Synthetic History Applicant',role:'Cashier'})).data;
+  const job=(await h.request('admin','POST','/jobs',{title:'Synthetic History Vacancy',department:'HR',description:'Synthetic'})).data;
+  const app=(await h.request('admin','POST','/applications',{candidateId:candidate._id,jobId:job._id})).data;
+  const first=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:0,status:'Interview',interview:{localStart:'2026-11-10T10:30',timezone:'Asia/Baku',durationMinutes:30,interviewerId:String(h.actors.admin._id)}});assert.equal(first.status,200);
+  const second=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:first.data.__v,interview:{localStart:'2026-11-11T11:00',timezone:'Europe/London',durationMinutes:45,interviewerId:String(h.actors.peer._id)},reason:'Synthetic same-stage reschedule'});assert.equal(second.status,200);
+  const response=await h.request('admin','GET','/applications/'+app._id+'/history');assert.equal(response.status,200);
+  const reschedule=response.data.items[0];assert.equal(reschedule.before.status,'Interview');assert.equal(reschedule.after.status,'Interview');
+  assert.equal(reschedule.before.interview.startsAt,'2026-11-10T06:30:00.000Z');assert.equal(reschedule.after.interview.startsAt,'2026-11-11T11:00:00.000Z');
+  const history=h.page.locator('[data-application-history]'),url='/app/recruitment/applications/'+app._id;
+  await t.test('actual same-stage backend event shows date/time, timezone, duration and opaque interviewer IDs',async()=>{
+    await h.open('admin',url);await history.locator('li').first().waitFor();await h.page.waitForLoadState('networkidle');
+    const row=history.locator('li').first();assert.equal(await row.locator('[data-history-field=interview-time]').count(),1);
+    assert.equal(await row.locator('[data-history-field=interview-time] time').nth(0).getAttribute('datetime'),reschedule.before.interview.startsAt);
+    assert.equal(await row.locator('[data-history-field=interview-time] time').nth(1).getAttribute('datetime'),reschedule.after.interview.startsAt);
+    assert.ok((await row.textContent()).includes('Asia/Baku'));assert.ok((await row.textContent()).includes('Europe/London'));assert.ok((await row.textContent()).includes('30 → 45'));
+    assert.ok((await row.textContent()).includes(String(h.actors.admin._id)+' → '+String(h.actors.peer._id)));
+    assert.ok((await row.textContent()).includes('Synthetic same-stage reschedule'));assert.equal(await row.locator('[data-history-field=stage]').count(),0);
+    assert.equal(await history.locator('a,input,select,textarea').count(),0);
+  });
+  await t.test('localized responsive history preserves snapshots and adds no requests',async()=>{
+    const count=h.wire.length;
+    for(const language of ['az','en','ru']){
+      await h.page.evaluate(l=>window.changeLanguage(l),language);
+      await history.getByRole('heading',{name:labels[language].hrWorkflow.history,exact:true}).waitFor();
+      for(const width of [1440,768,390,320]){
+        await h.page.setViewportSize({width,height:1000});await h.page.evaluate(()=>document.fonts.ready);
+        assert.ok((await history.textContent()).includes(labels[language].hrWorkflow.duration));
+        assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,language+'/'+width);
+        if(process.env.INOP_HISTORY_SCREENSHOTS){require('node:fs').mkdirSync(process.env.INOP_HISTORY_SCREENSHOTS,{recursive:true});await history.scrollIntoViewIfNeeded();await h.page.screenshot({animations:'disabled',path:require('node:path').join(process.env.INOP_HISTORY_SCREENSHOTS,`history-${language}-${width}.png`),fullPage:true});}
+      }
+    }
+    assert.equal(h.wire.length,count,'locale and viewport changes do not fetch');
+  });
+  await t.test('only changed allowlisted fields render; legacy unknown values remain neutral',async()=>{
+    const base={startsAt:'2026-11-10T06:30:00.000Z',timezone:'Asia/Baku',durationMinutes:30,interviewerId:String(h.actors.admin._id)};
+    const event=(id,before,after)=>({id,type:'workflow',actor:String(h.actors.admin._id),at:'2026-11-03T08:00:00Z',revision:3,before:{interview:before},after:{interview:after}});
+    const events=[event('date',base,{...base,startsAt:'2026-11-11T06:30:00Z'}),event('zone',base,{...base,timezone:'America/Argentina/Buenos_Aires'}),event('duration',base,{...base,durationMinutes:45}),event('interviewer',base,{...base,interviewerId:String(h.actors.peer._id)}),event('noop',base,{...base,startsAt:'2026-11-10T10:30:00+04:00',name:'NEVER_RENDER',cvUrl:'NEVER_RENDER'}),event('legacy',null,{startsAt:'2026-11-11T11:00',timezone:'invalid',durationMinutes:999,interviewerId:{name:'NEVER_RENDER'}}),event('unknown-zone',{}, {startsAt:'2026-11-11T11:00:00Z'}),event('missing',base,null)];
+    await Application.updateOne({_id:app._id},{$set:{events:events.reverse()}});await h.open('admin',url);await history.locator('li').nth(7).waitFor();await h.page.waitForLoadState('networkidle');
+    const rows=history.locator('li');assert.equal(await rows.count(),8);
+    assert.equal(await rows.nth(0).locator('[data-history-field=interview-time]').count(),1);
+    assert.equal(await rows.nth(1).locator('[data-history-field=interview-timezone]').count(),1);
+    assert.equal(await rows.nth(2).locator('[data-history-field=interview-duration]').count(),1);
+    assert.equal(await rows.nth(2).locator('[data-history-field=interview-time]').count(),0);
+    assert.equal(await rows.nth(3).locator('[data-history-field=interview-interviewer]').count(),1);
+    for(const index of [4,5])assert.equal(await rows.nth(index).locator('[data-history-field]').count(),0);
+    assert.equal(await rows.nth(6).locator('[data-history-field=interview-time] time').textContent(),'2026-11-11T11:00:00.000Z');
+    assert.ok((await rows.nth(7).textContent()).includes(labels.az.hrHistory.unavailable));
+    assert.ok(!(await history.textContent()).includes('NEVER_RENDER'));assert.equal(await history.locator('a,input,select,textarea').count(),0);
+    if(process.env.INOP_HISTORY_SCREENSHOTS){await h.page.setViewportSize({width:320,height:1000});await history.screenshot({path:require('node:path').join(process.env.INOP_HISTORY_SCREENSHOTS,'history-legacy-long-zone-320.png')});}
+  });
+  await t.test('assigned Employee sees read-only history without parent authority; reassignment removes access',async()=>{
+    await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});
+    await Application.updateOne({_id:app._id},{$set:{departmentId:'dep_hr',assignedTo:h.actors.own._id,events:[reschedule]}});
+    const count=h.wire.length;await h.open('own',url);await history.locator('[data-history-field=interview-time]').waitFor();await h.page.waitForLoadState('networkidle');
+    assert.equal(h.wire.length-count,4);assert.equal(await history.locator('a,input,select,textarea').count(),0);
+    if(process.env.INOP_HISTORY_SCREENSHOTS)await history.screenshot({path:require('node:path').join(process.env.INOP_HISTORY_SCREENSHOTS,'history-employee-320.png')});
+    assert.equal((await h.request('own','GET','/candidates/'+candidate._id)).status,404);assert.equal((await h.request('own','GET','/jobs/'+job._id)).status,404);
+    await Application.updateOne({_id:app._id},{$set:{assignedTo:h.actors.peer._id},$inc:{__v:1}});
+    await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.locator('[data-hr-state=not-found]').waitFor();assert.equal(await history.count(),0);
+  });
+  assert.deepEqual(h.pageErrors,[]);
+}));

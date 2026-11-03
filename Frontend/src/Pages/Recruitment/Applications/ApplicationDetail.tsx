@@ -54,7 +54,24 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
     return ['text', typeof value === 'string' ? value : null];
   };
   const changed = (key: string) => JSON.stringify(signature(before, key)) !== JSON.stringify(signature(after, key));
-  const hasDetails = ['status','assignedTo','nextAction','notes'].some(changed);
+  // Interview snapshots are already authorized with this Application. Never expand
+  // them into parent profiles or render arbitrary legacy/nested properties.
+  const interview = (value: unknown) => {
+    const row = historyRecord(value);
+    const startsAt = typeof row.startsAt === 'string' && row.startsAt.length <= 64 && /(?:Z|[+-]\d{2}:\d{2})$/i.test(row.startsAt) && Number.isFinite(Date.parse(row.startsAt)) ? new Date(row.startsAt).toISOString() : undefined;
+    let timezone: string | undefined;
+    if (typeof row.timezone === 'string' && row.timezone.length <= 120) {
+      try { new Intl.DateTimeFormat('en', { timeZone: row.timezone }).format(); timezone = row.timezone; } catch { /* Unknown legacy zone stays unknown. */ }
+    }
+    return { startsAt, timezone,
+      duration: typeof row.durationMinutes === 'number' && Number.isInteger(row.durationMinutes) && row.durationMinutes >= 5 && row.durationMinutes <= 480 ? row.durationMinutes : undefined,
+      interviewer: typeof row.interviewerId === 'string' && /^[a-f0-9]{24}$/i.test(row.interviewerId) ? row.interviewerId : undefined };
+  };
+  const oldInterview = interview(before.interview), newInterview = interview(after.interview);
+  const interviewChanged = (key: keyof typeof oldInterview) => oldInterview[key] !== newInterview[key];
+  const interviewTimeChanged = interviewChanged('startsAt') || interviewChanged('timezone');
+  const interviewTime = (row: typeof oldInterview) => !row.startsAt ? unavailable : row.timezone ? time(row.startsAt, row.timezone) : <time dateTime={row.startsAt} title={row.startsAt}>{row.startsAt}</time>;
+  const hasDetails = ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer');
   const eventKey = ['create','status','workflow','score','reorder','notification_retry'].includes(event.type) ? `hrWorkflow.event.${event.type}` : 'hrHistory.otherEvent';
   return <>
     <p>{time(event.at)} · {t(eventKey)} · {t('hrWorkflow.actor')}: {historyId(event.actor) || unavailable}</p>
@@ -62,6 +79,10 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
     {changed('assignedTo') && <p data-history-field="assignment"><strong>{t('hrWorkflow.assignee')}: </strong>{assignee(before.assignedTo)} → {assignee(after.assignedTo)}</p>}
     {changed('nextAction') && <p data-history-field="next-action"><strong>{t('hrWorkflow.nextAction')}: </strong>{nextAction(before.nextAction)} → {nextAction(after.nextAction)}</p>}
     {changed('notes') && <p data-history-field="notes"><strong>{t('hrWorkflow.notes')}: </strong>{text(before.notes)} → {text(after.notes)}</p>}
+    {interviewTimeChanged && <p data-history-field="interview-time"><strong>{t('hrWorkflow.interviewStart')}: </strong>{interviewTime(oldInterview)} → {interviewTime(newInterview)}</p>}
+    {interviewChanged('timezone') && <p data-history-field="interview-timezone"><strong>{t('hrWorkflow.timezone')}: </strong>{oldInterview.timezone || unavailable} → {newInterview.timezone || unavailable}</p>}
+    {interviewChanged('duration') && <p data-history-field="interview-duration"><strong>{t('hrWorkflow.duration')}: </strong>{oldInterview.duration ?? unavailable} → {newInterview.duration ?? unavailable}</p>}
+    {interviewChanged('interviewer') && <p data-history-field="interview-interviewer"><strong>{t('hrWorkflow.interviewer')}: </strong>{oldInterview.interviewer || unavailable} → {newInterview.interviewer || unavailable}</p>}
     {!hasDetails && <p>{t('hrHistory.noDetails')}</p>}
     {typeof event.reason === 'string' && event.reason && <p><strong>{t('hrWorkflow.reason')}: </strong>{event.reason}</p>}
   </>;
