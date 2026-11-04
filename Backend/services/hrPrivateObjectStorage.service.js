@@ -90,7 +90,8 @@ function createStore(input, { transport = nativeTransport, now = () => new Date(
     active++;
     const controller = new AbortController(), abort = () => controller.abort();
     signal?.addEventListener('abort', abort, { once: true });
-    let timer, response, timedOut = false;
+    let timer, response, cleanedResponse, timedOut = false;
+    const cleanup=()=>{if(!response||cleanedResponse===response)return;cleanedResponse=response;try{response.body?.destroy?.();}catch{/* Never echo provider metadata. */}};
     try {
       const work = async () => {
         response = await transport({ ...sign(config,method,blob,now(),bytes), signal: controller.signal });
@@ -114,14 +115,17 @@ function createStore(input, { transport = nativeTransport, now = () => new Date(
         if (size !== blob.size || digest(result) !== blob.sha256) throw fail('STORAGE_IDENTITY_MISMATCH', 409);
         return result;
       };
-      return await Promise.race([work(), new Promise((_, reject) => {
+      // A caller deadline is not transport settlement. Keep both shared slots
+      // bounded and clean responses that arrive after the caller has returned.
+      const pending=work().finally(()=>{cleanup();active--;});
+      return await Promise.race([pending, new Promise((_, reject) => {
         timer = setTimeout(() => { timedOut = true; controller.abort(); reject(fail(method === 'PUT' ? 'STORAGE_WRITE_UNCERTAIN' : 'STORAGE_TIMEOUT')); },timeoutMs);
         controller.signal.addEventListener('abort', () => reject(fail(timedOut && method === 'PUT' ? 'STORAGE_WRITE_UNCERTAIN' : timedOut ? 'STORAGE_TIMEOUT' : 'STORAGE_ABORTED', timedOut ? 503 : 499)), { once: true });
       })]);
     } catch (error) {
       if (safeCodes.has(error?.code)) throw fail(error.code, error.code === 'STORAGE_NOT_FOUND' ? 404 : error.code === 'STORAGE_WRITE_CONFLICT' || error.code === 'STORAGE_IDENTITY_MISMATCH' ? 409 : error.code === 'STORAGE_ABORTED' ? 499 : 503);
       throw fail(method === 'PUT' ? 'STORAGE_WRITE_UNCERTAIN' : 'STORAGE_UNAVAILABLE');
-    } finally { active--; clearTimeout(timer); signal?.removeEventListener('abort',abort); try { response?.body?.destroy?.(); } catch { /* Cleanup must not echo provider error objects. */ } }
+    } finally { clearTimeout(timer); signal?.removeEventListener('abort',abort); cleanup(); }
   }
   // Signed HeadBucket only: no object key, listing, body reads, writes or retries.
   async function checkConnection() {
@@ -137,11 +141,12 @@ function createStore(input, { transport = nativeTransport, now = () => new Date(
           return true;
         } finally { try { response?.body?.destroy?.(); } catch { /* Never echo provider metadata. */ } }
       };
-      return await Promise.race([work(), new Promise((_,reject) => {
+      const pending=work().finally(()=>{active--;});
+      return await Promise.race([pending, new Promise((_,reject) => {
         timer=setTimeout(() => { controller.abort();reject(fail('STORAGE_TIMEOUT')); },timeoutMs);
       })]);
     } catch { throw fail('STORAGE_UNAVAILABLE'); }
-    finally { active--;clearTimeout(timer); }
+    finally { clearTimeout(timer); }
   }
   // Resource authorization must occur in the server caller, never from a key.
   return Object.freeze({ put: (blob, bytes, options = {}) => operation('PUT',blob,bytes,options.signal), get: (blob,options = {}) => operation('GET',blob,undefined,options.signal), checkConnection });

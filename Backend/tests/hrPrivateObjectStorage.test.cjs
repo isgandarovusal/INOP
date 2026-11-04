@@ -95,20 +95,20 @@ test('Private object storage foundation is bounded, immutable, private and disab
     for (const error of [new Error('SYNTHETIC_PROVIDER_SECRET'),Object.assign(new Error('SYNTHETIC_PROVIDER_SECRET'),{code:'STORAGE_UNAVAILABLE',cause:{token:'SYNTHETIC_PROVIDER_SECRET'}})]) await rejects(store(async()=>{throw error;}).get(ref),'STORAGE_UNAVAILABLE');
   });
   await t.test('timeout is bounded even if transport ignores abort; PUT is uncertain and must reconcile', async () => {
-    const ref=storage.prepare(bytes,mime), started=Date.now();const ignored=store(()=>new Promise(()=>{}),{timeoutMs:20});
-    await rejects(ignored.get(ref),'STORAGE_TIMEOUT');await rejects(ignored.put(ref,bytes),'STORAGE_WRITE_UNCERTAIN');assert.ok(Date.now()-started<1000);
+    const ref=storage.prepare(bytes,mime), started=Date.now(),release=[];const ignored=store(()=>new Promise(resolve=>release.push(()=>resolve(response(200,[bytes])))),{timeoutMs:20});
+    try{await rejects(ignored.get(ref),'STORAGE_TIMEOUT');await rejects(ignored.put(ref,bytes),'STORAGE_WRITE_UNCERTAIN');assert.ok(Date.now()-started<1000);await rejects(ignored.get(ref),'STORAGE_BUSY');}finally{release.forEach(done=>done());await new Promise(r=>setImmediate(r));}
   });
-  await t.test('request/response cancellation never returns bytes and releases bounded slots', async () => {
+  await t.test('request/response cancellation never returns bytes and releases slots after actual settlement', async () => {
     const ref=storage.prepare(bytes,mime),abort=new AbortController();abort.abort();let calls=0;
     await rejects(store(async()=>{calls++;}).get(ref,{signal:abort.signal}),'STORAGE_ABORTED');assert.equal(calls,0);
-    const current=new AbortController(),pending=store(()=>new Promise(()=>{})).get(ref,{signal:current.signal});current.abort();await rejects(pending,'STORAGE_ABORTED');
+    let release;const current=new AbortController(),pending=store(()=>new Promise(resolve=>release=()=>resolve(response(200,[bytes])))).get(ref,{signal:current.signal});current.abort();await rejects(pending,'STORAGE_ABORTED');release();await new Promise(r=>setImmediate(r));
     const during=new AbortController();await rejects(store(async()=>response(200,(async function*(){yield bytes.subarray(0,2);during.abort();yield bytes.subarray(2);})())).get(ref,{signal:during.signal}),'STORAGE_ABORTED');
     assert.deepEqual(await store(async()=>response(200,[bytes])).get(ref),bytes);
   });
   await t.test('two shared process slots have no unbounded queue and recover after failure', async () => {
-    const ref=storage.prepare(bytes,mime),a=new AbortController(),b=new AbortController(),adapter=store(()=>new Promise(()=>{}));
-    const one=adapter.get(ref,{signal:a.signal}),two=store(()=>new Promise(()=>{})).get(ref,{signal:b.signal});
-    await rejects(adapter.get(ref),'STORAGE_BUSY');a.abort();b.abort();await rejects(one,'STORAGE_ABORTED');await rejects(two,'STORAGE_ABORTED');assert.deepEqual(await store(async()=>response(200,[bytes])).get(ref),bytes);
+    const ref=storage.prepare(bytes,mime),a=new AbortController(),b=new AbortController(),release=[],transport=()=>new Promise(resolve=>release.push(()=>resolve(response(200,[bytes])))),adapter=store(transport);
+    const one=adapter.get(ref,{signal:a.signal}),two=store(transport).get(ref,{signal:b.signal});
+    await rejects(adapter.get(ref),'STORAGE_BUSY');a.abort();b.abort();await rejects(one,'STORAGE_ABORTED');await rejects(two,'STORAGE_ABORTED');await rejects(adapter.get(ref),'STORAGE_BUSY');release.forEach(done=>done());await new Promise(r=>setImmediate(r));assert.deepEqual(await store(async()=>response(200,[bytes])).get(ref),bytes);
   });
   await t.test('private/reserved/rebound/mapped DNS addresses are rejected; only validated address is pinned', async () => {
     for(const ip of ['127.0.0.1','10.1.2.3','169.254.169.254','172.16.0.2','192.168.0.1','100.64.1.1','0.0.0.0','224.1.2.3','::1','::','fc00::1','fe80::1','::ffff:127.0.0.1','0:0:0:0:0:ffff:7f00:1','2002:a00:1::1','64:ff9b::a00:1']) assert.equal(storage.publicAddress(ip),false,ip);
@@ -129,4 +129,15 @@ test('Private object storage foundation is bounded, immutable, private and disab
       assert.deepEqual(await storage.createStore(config).get(ref),bytes);assert.equal(dnsCalls,1);assert.equal(calls,1);
     }finally{dns.lookup=lookup;https.request=request;}
   });
+});
+
+test('Storage deadlines retain shared capacity through actual late transport settlement and cleanup',async t=>{
+ for(const method of ['GET','PUT','HEAD'])await t.test(method+' timeout cannot admit a third transport or leak late response bodies',async()=>{
+  const ref=storage.prepare(bytes,mime),release=[];let calls=0,destroyed=0;
+  const adapter=store(()=>{calls++;return new Promise(resolve=>release.push(()=>resolve({status:200,body:{destroy(){destroyed++;}}})));},{timeoutMs:20});
+  const invoke=()=>method==='HEAD'?adapter.checkConnection():method==='PUT'?adapter.put(ref,bytes):adapter.get(ref);
+  const pending=[invoke(),invoke()],code=method==='HEAD'?'STORAGE_UNAVAILABLE':method==='PUT'?'STORAGE_WRITE_UNCERTAIN':'STORAGE_TIMEOUT';
+  try{await Promise.all(pending.map(p=>rejects(p,code)));await rejects(adapter.checkConnection(),'STORAGE_BUSY');assert.equal(calls,2);}finally{release.forEach(done=>done());await new Promise(r=>setImmediate(r));}
+  assert.equal(destroyed,2,'Late responses must be cleaned exactly once even after caller timeout');assert.deepEqual(await store(async()=>response(200,[bytes])).get(ref),bytes);
+ });
 });

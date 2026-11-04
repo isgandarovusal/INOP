@@ -53,16 +53,16 @@ test('Invalid credentials, access denial, missing bucket, collision and network 
  const h=harness({transport:async()=>{throw Error('SYNTHETIC_PROVIDER_SECRET');}});await h.verifier.run({execute:true});assert.deepEqual(h.codes,['CONFIG_OK','WRITE_FAILED']);
 });
 test('Uncertain PUT timeout is never retried and can leave at most one retained object',async()=>{
- const h=harness({timeoutMs:10,transport:(r,objects)=>{objects.set(new URL(r.url).pathname,Buffer.from(r.body));return new Promise(()=>{});}});
- assert.equal(await h.verifier.run({execute:true}),false);assert.deepEqual(h.codes,['CONFIG_OK','WRITE_FAILED']);assert.equal(h.objects.size,1);assert.equal(h.requests.length,1);assert.equal(h.requests[0].signal.aborted,true);
+ let settle;const h=harness({timeoutMs:10,transport:(r,objects)=>{objects.set(new URL(r.url).pathname,Buffer.from(r.body));return new Promise(resolve=>settle=()=>resolve({status:200}));}});
+ try{assert.equal(await h.verifier.run({execute:true}),false);assert.deepEqual(h.codes,['CONFIG_OK','WRITE_FAILED']);assert.equal(h.objects.size,1);assert.equal(h.requests.length,1);assert.equal(h.requests[0].signal.aborted,true);}finally{settle?.();await new Promise(r=>setImmediate(r));}
 });
 test('Failed GET/timeout and hash mismatch never claim success or attempt second PUT',async()=>{
  for(const type of ['denied','timeout','corrupt']){
-  const h=harness({timeoutMs:10,transport:async(r,objects)=>{
+  let settle;const h=harness({timeoutMs:10,transport:async(r,objects)=>{
    if(r.method==='PUT'){objects.set(r.url,Buffer.from(r.body));return{status:200};}
-   if(type==='timeout')return new Promise(()=>{});
+   if(type==='timeout')return new Promise(resolve=>settle=()=>resolve({status:200}));
    return type==='denied'?{status:403,body:[Buffer.from('PRIVATE')]}:{status:200,body:[Buffer.alloc(64)]};
-  }});assert.equal(await h.verifier.run({execute:true}),false);assert.ok(h.codes.includes('READBACK_FAILED'));assert.equal(h.codes.includes('SHA256_MISMATCH'),type==='corrupt');assert.deepEqual(h.requests.map(r=>r.method),['PUT','GET']);
+  }});try{assert.equal(await h.verifier.run({execute:true}),false);assert.ok(h.codes.includes('READBACK_FAILED'));assert.equal(h.codes.includes('SHA256_MISMATCH'),type==='corrupt');assert.deepEqual(h.requests.map(r=>r.method),['PUT','GET']);}finally{settle?.();await new Promise(r=>setImmediate(r));}
  }
 });
 test('Unexpected second PUT success or provider error fails conditional protection without retry',async()=>{
