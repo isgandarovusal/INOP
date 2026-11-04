@@ -13,7 +13,7 @@ const fields = {
   branches: 'code name brandId kind location status createdAt updatedAt',
   jobs: 'archivedAt archivedBy __v requiredSkills title department location type status brandId branchId experienceYears createdAt updatedAt',
   candidates: 'archivedAt archivedBy __v experience name role status email phone skills cvUrl cvOriginal cvReview.version cvReview.processingStatus cvReview.reviewStatus createdAt updatedAt',
-  applications: 'jobId candidateId boardOrder status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
+  applications: 'createdBy departmentId jobId candidateId boardOrder status substatus processingState interview nextAction assignedTo source score scoreStatus matching.version matching.calculatedAt matching.dataCoverage matching.reason matching.score matching.scoreStatus matching.jobHash matching.candidateHash __v createdAt updatedAt',
 };
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Existing HR create/update and durable approval write reviewedFields atomically
@@ -77,6 +77,8 @@ function clip(record, kind) {
   if (Array.isArray(row.requiredSkills)) { row.requiredSkillsCount = row.requiredSkills.length; row.requiredSkills = row.requiredSkills.slice(0, 12).map(s => String(s).slice(0, 120)); }
   if (Array.isArray(row.skills)) { row.skillsCount = row.skills.length; row.skills = row.skills.slice(0, 12).map(s => String(s).slice(0, 120)); }
   if (kind === 'applications') {
+    // Private query fields are used only for server-derived action eligibility.
+    delete row.createdBy; delete row.departmentId;
     if (row.matching) row.matching = { version: row.matching.version, calculatedAt: row.matching.calculatedAt, dataCoverage: row.matching.dataCoverage, reason: row.matching.reason, criteria: [], summary: true };
     if (row.jobId && typeof row.jobId === 'object') row.jobId = clip(row.jobId, 'jobs');
     if (row.candidateId && typeof row.candidateId === 'object') row.candidateId = clip(row.candidateId, 'candidates');

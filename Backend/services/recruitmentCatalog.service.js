@@ -38,6 +38,6 @@ async function decorateJobs(req, records) {
 async function decorateApplications(req, records) {
   const jobs = await decorateJobs(req, records.map(a => a.jobId).filter(j => j && typeof j === 'object' && j.title !== undefined));
   const map = new Map(jobs.map(j => [String(j._id), j]));
-  return records.map(a => ({ ...a, jobId: a.jobId && typeof a.jobId === 'object' && a.jobId.title !== undefined ? map.get(String(a.jobId._id)) : a.jobId }));
+  return records.map(a => ({ ...a, actionEligibility: require('./applicationActionEligibility.service').actionEligibility(req, a), jobId: a.jobId && typeof a.jobId === 'object' && a.jobId.title !== undefined ? map.get(String(a.jobId._id)) : a.jobId }));
 }
 module.exports = { brands, defaultBrands, validateLocation, decorateJobs, decorateApplications };

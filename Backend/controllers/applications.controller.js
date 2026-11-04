@@ -75,7 +75,7 @@ exports.getApplicationById = async (req, res) => {
     const application = await Application.populate({ ...raw }, applicationParents(req));
     const result = (await decorateApplications(req, await scoreResponses(req, [application])))[0];
     const context = await require('../services/applicationHandoffContext.service').handoffContext(req, raw, application);
-    return res.status(200).json({ ...result, ...(context ? { handoffContext: context } : {}) });
+    return res.status(200).json({ ...result, actionEligibility: require('../services/applicationActionEligibility.service').actionEligibility(req, raw), ...(context ? { handoffContext: context } : {}) });
   } catch (error) {
     if (['HANDOFF_CONTEXT_CHANGED','HR_AUTH_REQUIRED','HR_PERMISSION_CHANGED'].includes(error.code)) return res.status(error.status || 503).json({ code: error.code, message: 'Application context is unavailable.' });
     logFailure(error);
