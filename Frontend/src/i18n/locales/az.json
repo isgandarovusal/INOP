@@ -1262,6 +1262,7 @@
     "noDetails": "Bu hadisə üçün dəyişiklik təfərrüatları yoxdur."
   },
   "hrWorkflow": {
+    "currentReadOnly": "Cari iş axını (yalnız baxış)",
     "historyEmpty": "Bu müraciət üçün hələ tarixçə yoxdur.",
     "application": "Müraciətin idarə edilməsi",
     "history": "Müraciət tarixçəsi",

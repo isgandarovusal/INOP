@@ -1245,6 +1245,7 @@
     "noDetails": "Change details are not available for this event."
   },
   "hrWorkflow": {
+    "currentReadOnly": "Current workflow (read-only)",
     "historyEmpty": "No events for this application yet.",
     "application": "Manage application",
     "history": "Application history",

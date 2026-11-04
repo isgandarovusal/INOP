@@ -117,6 +117,36 @@ function History({ app, reload }: { app: Application; reload: () => void }) {
     </>}
   </section>;
 }
+function CurrentWorkflowSummary({ app }: { app: Application }) {
+  const { t, i18n } = useTranslation();
+  const unavailable = t('hrHistory.unavailable');
+  // The existing decoder accepts legacy objects: validate each displayed value.
+  const interview = historyRecord(app.interview), action = historyRecord(app.nextAction);
+  const zone = (value: unknown) => {
+    if (typeof value !== 'string' || !value || value.length > 120) return undefined;
+    try { new Intl.DateTimeFormat('en', { timeZone: value }).format(); return value; } catch { return undefined; }
+  };
+  const time = (value: unknown, timezone: unknown) => {
+    if (typeof value !== 'string' || value.length > 64 || !/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) || !Number.isFinite(Date.parse(value))) return unavailable;
+    const iso = new Date(value).toISOString(), validZone = zone(timezone);
+    return <time dateTime={iso} title={iso}>{validZone ? `${new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'medium', timeZone: validZone }).format(new Date(iso))} (${validZone})` : iso}</time>;
+  };
+  const result = typeof interview.result === 'string' && ['pending', 'passed', 'failed', 'no_show', 'cancelled'].includes(interview.result) ? t(`hrWorkflow.resultState.${interview.result}`) : unavailable;
+  const kind = typeof action.kind === 'string' && ['none', 'review', 'call', 'interview', 'offer', 'follow_up'].includes(action.kind) ? t(`hrWorkflow.action.${action.kind}`) : unavailable;
+  const duration = typeof interview.durationMinutes === 'number' && Number.isInteger(interview.durationMinutes) && interview.durationMinutes >= 5 && interview.durationMinutes <= 480 ? interview.durationMinutes : unavailable;
+  return <SectionCard className="detail-card" data-application-current-workflow>
+    <h2>{t('hrWorkflow.currentReadOnly')}</h2>
+    <dl className="hr-profile-facts">
+      <div><dt>{t('hrWorkflow.interviewStart')}</dt><dd>{time(interview.startsAt, interview.timezone)}</dd></div>
+      <div><dt>{t('hrWorkflow.timezone')}</dt><dd>{zone(interview.timezone) || unavailable}</dd></div>
+      <div><dt>{t('hrWorkflow.duration')}</dt><dd>{duration}</dd></div>
+      <div><dt>{t('hrWorkflow.result')}</dt><dd>{result}</dd></div>
+      <div><dt>{t('hrWorkflow.nextAction')}</dt><dd>{kind}</dd></div>
+      <div><dt>{t('hrWorkflow.due')}</dt><dd>{time(action.dueAt, action.timezone)}</dd></div>
+    </dl>
+  </SectionCard>;
+}
+
 function WorkflowForm({ app, reload }: { app: Application; reload: () => void }) {
   const timezoneHelpId = useId();
   const { t } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(app.id);
@@ -202,6 +232,7 @@ export default function ApplicationDetail() {
     </SectionCard>}
     {!handoff && <MatchScoreBadge application={app} onUpdated={resource.reload} />}
     {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} reload={resource.reload} />}
+    {!hasPermission(user, 'application', 'update') && !resource.refreshing && <CurrentWorkflowSummary app={app} />}
     <History key={'history:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />
   </div>;
 }

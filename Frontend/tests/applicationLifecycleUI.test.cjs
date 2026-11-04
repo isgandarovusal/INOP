@@ -429,3 +429,50 @@ test('Interview result History uses authorized snapshots without inferring a hir
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Read-only Application current workflow summary uses current authorized detail without reconstructing History',async t=>withBrowserFixture(timezoneHarness,async h=>{
+ const observed=[];h.page.on('request',r=>{const u=new URL(r.url());if(u.pathname.startsWith('/api/'))observed.push(u.pathname);});
+ const locales=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+ await h.models.Role.create({key:'summary_reader',name:'Synthetic assigned reader',permissions:[{resource:'application',action:'read',scope:'assigned'},{resource:'recruitment',action:'read',scope:'assigned'}]});await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'summary_reader',departmentId:'dep_hr'}});
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic Summary Applicant',role:'Cashier'})).data,j=(await h.request('admin','POST','/jobs',{title:'Synthetic Summary Vacancy',department:'HR',description:'Synthetic'})).data;
+ const app=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data,url='/app/recruitment/applications/'+app._id,panel=h.page.locator('[data-application-current-workflow]');
+ await Application.updateOne({_id:app._id},{$set:{departmentId:'dep_hr',assignedTo:h.actors.own._id,status:'Interview',substatus:'completed',interview:{startsAt:new Date('2026-11-10T06:30:00Z'),timezone:'Asia/Baku',durationMinutes:30,interviewerId:h.actors.admin._id,result:'passed'},nextAction:{kind:'follow_up',dueAt:new Date('2026-11-11T07:00:00Z'),timezone:'Asia/Baku'},events:[]}});
+ await t.test('authorized read-only user sees current interview and action despite empty History',async()=>{
+  const count=h.wire.length;await h.open('own',url);await h.page.locator('[data-application-history]').waitFor();await h.page.waitForLoadState('networkidle');assert.equal(h.wire.length-count,3);assert.equal(await h.page.locator('[data-application-workflow]').count(),0);assert.equal(await panel.count(),1);
+  assert.ok((await panel.textContent()).includes(locales.az.hrWorkflow.resultState.passed));assert.ok((await panel.textContent()).includes(locales.az.hrWorkflow.action.follow_up));assert.ok((await panel.textContent()).includes('Asia/Baku'));assert.equal(await panel.locator('a,input,button,select,textarea').count(),0);
+ });
+ await t.test('summary values are localized, responsive, readonly and add no requests',async()=>{
+  assert.equal((await h.request('own','GET','/candidates/'+c._id)).status,403);assert.equal((await h.request('own','GET','/jobs/'+j._id)).status,404);
+  assert.equal(await panel.locator('time').first().getAttribute('datetime'),'2026-11-10T06:30:00.000Z');
+  const count=h.wire.length;
+  for(const language of ['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),language);await panel.getByRole('heading',{name:locales[language].hrWorkflow.currentReadOnly,exact:true}).waitFor();
+   for(const width of [1440,768,390,320]){await h.page.setViewportSize({width,height:1000});await h.page.evaluate(()=>document.fonts.ready);assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,language+'/'+width);
+    if(process.env.INOP_SUMMARY_SCREENSHOTS&&[['az',1440],['en',768],['ru',390],['az',320]].some(([l,w])=>l===language&&w===width)){require('node:fs').mkdirSync(process.env.INOP_SUMMARY_SCREENSHOTS,{recursive:true});await panel.screenshot({path:require('node:path').join(process.env.INOP_SUMMARY_SCREENSHOTS,`summary-${language}-${width}.png`)});}
+   }
+  }
+  assert.equal(h.wire.length,count);assert.equal(await panel.locator('a,button,input,select,textarea').count(),0);assert.ok(!(await panel.textContent()).includes(String(h.actors.admin._id)));
+ });
+ await t.test('malformed legacy values are neutral; missing result is not pending and explicit none stays none',async()=>{
+  const base=(await h.request('own','GET','/applications/'+app._id)).data,pattern='**/api/applications/'+app._id;
+  for(const values of [{interview:null,nextAction:null},{interview:{startsAt:{raw:'NEVER_RENDER'},timezone:'PRIVATE_UNKNOWN',durationMinutes:{value:30},result:'PRIVATE_UNKNOWN',interviewerId:'NEVER_RENDER',cvUrl:'NEVER_RENDER',rawExtraction:'NEVER_RENDER'},nextAction:{kind:{name:'NEVER_RENDER'},dueAt:'2026-11-11T10:00',notes:'NEVER_RENDER'}},{interview:{startsAt:'2026-11-10T06:30:00Z',timezone:'PRIVATE_UNKNOWN'},nextAction:{kind:'none'}}]){
+   await h.page.route(pattern,r=>r.fulfill({contentType:'application/json',body:JSON.stringify({...base,...values})}));try{await h.open('own',url);await panel.waitFor();const text=await panel.textContent();assert.ok(!text.includes('PRIVATE_UNKNOWN'));assert.ok(!text.includes('NEVER_RENDER'));assert.ok(!text.includes(locales.az.hrWorkflow.resultState.pending));assert.ok(text.includes(locales.az.hrHistory.unavailable));if(values.nextAction?.kind==='none'){assert.ok(text.includes(locales.az.hrWorkflow.action.none));assert.equal(await panel.locator('time').textContent(),'2026-11-10T06:30:00.000Z');}}finally{await h.page.unroute(pattern);}
+  }
+ });
+ await t.test('focus refresh hides stale summary until new authorized metadata arrives',async()=>{
+  await h.open('own',url);await panel.waitFor();await h.page.waitForLoadState('networkidle');let release;const blocked=new Promise(r=>{release=r;}),pattern='**/api/applications/'+app._id;
+  await Application.updateOne({_id:app._id},{$set:{'nextAction.kind':'call','interview.timezone':'America/Argentina/Buenos_Aires'}});
+  await h.page.route(pattern,async r=>{await blocked;const response=await h.request('own','GET','/applications/'+app._id);await r.fulfill({status:response.status,contentType:'application/json',body:JSON.stringify(response.data)});});
+  const count=observed.length,seen=h.page.waitForRequest(r=>r.url().endsWith('/applications/'+app._id)),done=h.page.waitForResponse(r=>r.url().endsWith('/applications/'+app._id));
+  try{await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await seen;await panel.waitFor({state:'detached'});release();await done;await panel.waitFor();await h.page.waitForLoadState('networkidle');assert.ok((await panel.textContent()).includes(locales.az.hrWorkflow.action.call));assert.ok((await panel.textContent()).includes('America/Argentina/Buenos_Aires'));assert.deepEqual(observed.slice(count).sort(),['/api/auth/me','/api/applications/'+app._id,'/api/applications/'+app._id+'/history'].sort());t.diagnostic('Existing focus HTTP paths: '+observed.slice(count).map(p=>p.replace(app._id,':id')).join(', '));assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);if(process.env.INOP_SUMMARY_SCREENSHOTS)await panel.screenshot({path:require('node:path').join(process.env.INOP_SUMMARY_SCREENSHOTS,'summary-long-zone-320.png')});}finally{release();await done;await h.page.unroute(pattern);}
+ });
+ for(const status of [401,403,404])await t.test(status+' removes summary and its metadata',async()=>{
+  const pattern='**/api/applications/'+app._id;await h.page.route(pattern,r=>r.fulfill({status,contentType:'application/json',body:'{}'}));try{await h.open('own',url);if(status===401){await h.page.waitForURL('**/login');await h.page.locator('#email').waitFor();}else await h.page.locator('[data-hr-state='+ (status===403?'forbidden':'not-found')+']').waitFor();assert.equal(await panel.count(),0);assert.ok(!(await h.page.locator('body').textContent()).includes('America/Argentina/Buenos_Aires'));}finally{await h.page.unroute(pattern);}
+ });
+ await t.test('assignment revocation removes the current summary on existing focus revalidation',async()=>{
+  await h.open('own',url);await panel.waitFor();await h.page.waitForLoadState('networkidle');await Application.updateOne({_id:app._id},{$set:{assignedTo:h.actors.peer._id},$inc:{__v:1}});await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.locator('[data-hr-state=not-found]').waitFor();assert.equal(await panel.count(),0);
+ });
+ await t.test('update-capable user keeps existing editor and draft without duplicate summary',async()=>{
+  await h.open('admin',url);const form=h.page.locator('[data-application-workflow]');await form.waitFor();await h.page.waitForLoadState('networkidle');assert.equal(await panel.count(),0);await form.locator('textarea').last().fill('Synthetic retained draft');await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.waitForLoadState('networkidle');assert.equal(await form.locator('textarea').last().inputValue(),'Synthetic retained draft');assert.equal(await panel.count(),0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
