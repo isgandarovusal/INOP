@@ -1,3 +1,5 @@
+import { isAxiosError } from 'axios';
+import { applicationActionAllowed } from '../Utils/applicationActions';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../Context/useAuth';
@@ -9,7 +11,7 @@ import { getApplicationById, recalculateApplicationMatch } from '../Services/app
 import HRResourceState from './HRResourceState';
 import type { Application, ApplicationMatch } from '../Types/recruitment';
 
-type ScoreApplication = Pick<Application, 'id' | 'revision' | 'score' | 'scoreStatus'> & { matching?: Omit<ApplicationMatch, 'jobHash' | 'candidateHash'> | null };
+type ScoreApplication = Pick<Application, 'id' | 'revision' | 'score' | 'scoreStatus' | 'actionEligibility'> & { matching?: Omit<ApplicationMatch, 'jobHash' | 'candidateHash'> | null };
 const evidenceSources: Readonly<Record<string, string>> = {
   'candidate.skills': 'skills',
   'candidate.certificates': 'certificates',
@@ -23,6 +25,7 @@ const validYears = (value: unknown): value is number => typeof value === 'number
 function Badge({ application, onUpdated }: { application: ScoreApplication; onUpdated?: () => void }) {
   const { t, i18n } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(application.id);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
+  const [accessDenied, setAccessDenied] = useState(false);
   const [experience, setExperience] = useState(''), [reason, setReason] = useState('');
   const [wanted, setWanted] = useState(false);
   const lazy = application.matching?.summary === true;
@@ -31,15 +34,15 @@ function Badge({ application, onUpdated }: { application: ScoreApplication; onUp
   const requested = wanted && (lazy || !application.matching);
   const resolved = requested && detail.status === 'ready' ? detail.data : requested ? undefined : application;
   const valid = resolved?.scoreStatus === 'calculated' && resolved.score !== null && !!resolved.matching;
-  const canRecalculate = hasPermission(user, 'application', 'update') && application.scoreStatus !== 'restricted';
+  const canRecalculate = !accessDenied && applicationActionAllowed(application, 'update') && (!requested || detail.status === 'loading' || detail.status === 'ready' && !!detail.data && applicationActionAllowed(detail.data, 'update')) && hasPermission(user, 'application', 'update') && application.scoreStatus !== 'restricted';
   const recalculate = async () => {
-    if (busy || requested && detail.status !== 'ready') return;
+    if (!canRecalculate || busy || requested && detail.status !== 'ready') return;
     const key = context.key; setBusy(true); setError('');
     try {
       await recalculateApplicationMatch(application.id, { expectedRevision: resolved?.revision ?? application.revision,
         ...(experience !== '' ? { relevantExperienceYears: Number(experience), reason } : {}) });
       if (context.current.current === key) onUpdated?.();
-    } catch (e) { if (context.current.current === key) setError(getErrorMessage(e, t('hrMatch.retryError'))); }
+    } catch (e) { if (context.current.current === key) { if (isAxiosError(e) && [401,403,404].includes(e.response?.status || 0)) { setAccessDenied(true); onUpdated?.(); } setError(getErrorMessage(e, t('hrMatch.retryError'))); } }
     finally { if (context.current.current === key) setBusy(false); }
   };
   const open = (event: React.SyntheticEvent<HTMLDetailsElement>) => { if (event.currentTarget.open) setWanted(true); };

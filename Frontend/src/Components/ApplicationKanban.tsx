@@ -1,3 +1,4 @@
+import { applicationActionAllowed } from '../Utils/applicationActions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -24,7 +25,7 @@ export default function ApplicationKanban({ applications, reload, canChangeStatu
   const dropped = async ({ destination, source, draggableId }: DropResult) => {
     if (!destination || !canChangeStatus || !onStatusChange || destination.droppableId === 'processing' || source.droppableId === destination.droppableId && (!manualOrder || source.index === destination.index)) return;
     const app = applications.find(a => a.id === draggableId), status = destination.droppableId as ApplicationStatus;
-    if (!app || pendingIds.includes(app.id) || status !== app.status && !applicationTransitions[app.status].includes(status)) return;
+    if (!app || !applicationActionAllowed(app, 'update') || pendingIds.includes(app.id) || status !== app.status && !applicationTransitions[app.status].includes(status)) return;
     if (!manualOrder) { await onStatusChange(app.id, status); return; }
     const destinationCards = columns[status].filter(row => row.id !== app.id), index = Math.min(destination.index, destinationCards.length);
     const anchor = (row: Application | undefined) => row ? { id: row.id, expectedRevision: row.revision || 0 } : null;
@@ -39,7 +40,7 @@ export default function ApplicationKanban({ applications, reload, canChangeStatu
         <h3><span>{t(stage === 'processing' ? 'hrWorkflow.processing' : `recruitment.applications.${stage}`)}</span><span className="hr-lane-count">{pages[stage]?.total ?? columns[stage].length}</span></h3>
         {laneState[stage]?.error && <p role="alert">{t('hrBoard.changed')} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
         {!columns[stage].length && <p>{t('hrBoard.empty')}</p>}
-        {columns[stage].map((a, index) => <Draggable key={a.id} draggableId={a.id} index={index} isDragDisabled={!canChangeStatus || !!pendingIds.length || !!laneState[stage]?.loading || !(manualOrder && stage !== 'processing') && !applicationTransitions[a.status].length}>
+        {columns[stage].map((a, index) => <Draggable key={a.id} draggableId={a.id} index={index} isDragDisabled={!canChangeStatus || !applicationActionAllowed(a, 'update') || !!pendingIds.length || !!laneState[stage]?.loading || !(manualOrder && stage !== 'processing') && !applicationTransitions[a.status].length}>
           {drag => <article ref={drag.innerRef} {...drag.draggableProps} style={drag.draggableProps.style} className="recruitment-kanban__card" data-application-card={a.id}>
             <div className="hr-board-card-title" {...drag.dragHandleProps} aria-label={`${t('hrWorkflow.move')} ${a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}`}>
               {a.candidateId && typeof a.candidateId === 'object' ? a.candidateId.name : t('hrStates.restricted')}

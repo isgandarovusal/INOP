@@ -1,3 +1,4 @@
+import { applicationActionAllowed } from '../../../Utils/applicationActions';
 import { FormSection, SectionCard } from '../../../Components/HRSection';
 import { ClipboardList } from "lucide-react";
 import ApplicationDelivery from '../../../Components/ApplicationDelivery';
@@ -110,7 +111,7 @@ function History({ app, reload }: { app: Application; reload: () => void }) {
     {result.status !== 'ready' ? <HRResourceState status={result.status} retry={result.reload} /> : <>
       {result.data?.items.length === 0 && <p>{t("hrWorkflow.historyEmpty")}</p>}<ol>{result.data?.items.map(e => <li key={e.id} style={{ overflowWrap: 'anywhere' }}>
         <HistoryEvent event={e} />
-        {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={parentsReadable && latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
+        {e.delivery && <ApplicationDelivery key={e.id + ':' + revision} id={id} event={e} revision={revision} retryEligible={applicationActionAllowed(app, 'update') && parentsReadable && latest?.id === e.id && !['cancelled','declined'].includes(app.substatus || '') && !(app.status === 'interview' && app.interview?.result === 'cancelled')} onUpdated={reload} onAccessDenied={reload} />}
       </li>)}</ol>
       {offset > 0 && <button type="button" onClick={() => setOffset(Math.max(0, offset - 50))}>{t('common.actions.previous')}</button>}
       {result.data?.hasMore && <button type="button" onClick={() => setOffset(offset + 50)}>{t('common.actions.next')}</button>}
@@ -147,7 +148,7 @@ function CurrentWorkflowSummary({ app }: { app: Application }) {
   </SectionCard>;
 }
 
-function WorkflowForm({ app, reload }: { app: Application; reload: () => void }) {
+function WorkflowForm({ app, reload, disabled = false }: { app: Application; reload: () => void; disabled?: boolean }) {
   const timezoneHelpId = useId();
   const { t } = useTranslation(); const { user } = useAuth(); const context = useHRActionContext(app.id);
   const roster = useAuditResource(app.id, 'application', getApplicationInterviewers, { refreshOnFocus: false });
@@ -167,18 +168,18 @@ function WorkflowForm({ app, reload }: { app: Application; reload: () => void })
   const choices = reopen ? ['applied', 'screening', 'shortlisted', 'interview', 'offered'] as ApplicationStatus[] : [app.status, ...applicationTransitions[app.status]];
   const people = useMemo(() => [...new Map([...(user ? [{ id: user.id, name: user.name }] : []), ...(roster.data || [])].map(u => [u.id, u])).values()], [user, roster.data]);
   return <form className="form-grid" data-application-workflow onSubmit={async e => {
-    e.preventDefault(); if (busy) return; const key = context.key; setBusy(true); setError('');
+    e.preventDefault(); if (busy || disabled || !applicationActionAllowed(app, 'update')) return; const key = context.key; setBusy(true); setError('');
     try {
       await updateApplicationWorkflow(app.id, { expectedRevision: app.revision, status, substatus, reason, reopen, notes,
         ...(canAssign && assignee !== (app.assignedTo || '') ? { assignedTo: assignee } : {}),
         ...(status === 'interview' && start ? { interview: { localStart: start, timezone, durationMinutes: duration, interviewerId: interviewer, result: interviewResult } } : {}),
         nextAction: { kind: action, ...(due ? { localDueAt: due } : {}), timezone, notes: actionNotes } });
       if (context.current.current === key) reload();
-    } catch (err) { if (context.current.current === key) { setError(isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err)); } }
+    } catch (err) { if (context.current.current === key) { if (isAxiosError(err) && [401,403,404].includes(err.response?.status || 0)) reload(); setError(isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err)); } }
     finally { if (context.current.current === key) setBusy(false); }
   }}>
     {error && <p role="alert" className="form-group--full">{t(error)} <button type="button" onClick={reload}>{t('hrStates.retry')}</button></p>}
-    <FormSection disabled={busy} className="form-group--full">
+    <FormSection disabled={busy || disabled} className="form-group--full">
       {canReopen && <label><input type="checkbox" checked={reopen} onChange={e => { setReopen(e.target.checked); setStatus(e.target.checked ? 'screening' : app.status); setSubstatus(''); }} />{t('hrWorkflow.reopen')}</label>}
       <label>{t('recruitment.applications.status')}<select aria-label={t('recruitment.applications.status')} value={status} onChange={e => { setStatus(e.target.value as ApplicationStatus); setSubstatus(''); }}>{choices.map(s => <option key={s} value={s}>{t(`recruitment.applications.${s}`)}</option>)}</select></label>
       <label>{t('hrWorkflow.substatus')}<select aria-label={t('hrWorkflow.substatus')} value={substatus} onChange={e => setSubstatus(e.target.value)}>{applicationSubstatuses[status].map(s => <option key={s} value={s}>{s ? t(`hrWorkflow.sub.${s}`) : t('hrCatalog.unset')}</option>)}</select></label>
@@ -232,9 +233,9 @@ export default function ApplicationDetail() {
       </dl>
       <MatchScoreBadge application={{ ...app, score: handoff.score, scoreStatus: handoff.scoreStatus, matching: handoff.matching }} />
     </SectionCard>}
-    {!handoff && <MatchScoreBadge application={app} onUpdated={resource.reload} />}
-    {hasPermission(user, 'application', 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} reload={resource.reload} />}
-    {!hasPermission(user, 'application', 'update') && !resource.refreshing && <CurrentWorkflowSummary app={app} />}
-    <History key={'history:' + context.key + ':' + app.revision} app={app} reload={resource.reload} />
+    {!handoff && <MatchScoreBadge application={resource.refreshing ? { ...app, actionEligibility: undefined } : app} onUpdated={resource.reload} />}
+    {hasPermission(user, 'application', 'update') && applicationActionAllowed(app, 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} disabled={resource.refreshing} reload={resource.reload} />}
+    {(!hasPermission(user, 'application', 'update') || !applicationActionAllowed(app, 'update')) && !resource.refreshing && <CurrentWorkflowSummary app={app} />}
+    <History key={'history:' + context.key + ':' + app.revision} app={resource.refreshing ? { ...app, actionEligibility: undefined } : app} reload={resource.reload} />
   </div>;
 }

@@ -1,3 +1,4 @@
+import { applicationActionAllowed } from '../../../Utils/applicationActions';
 import { Layers3 } from "lucide-react";
 import HRScopeFilters from "../../../Components/HRScopeFilters";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
@@ -96,7 +97,10 @@ const ApplicationsList: React.FC = () => {
   const applications = useMemo(() => view === 'board' ? Object.values(board.columns).flatMap(column => column?.items || []) : table.data?.items || [], [view, board.columns, table.data]);
   const jobs = useMemo(() => Array.from(new Map(applications.flatMap(a => a.jobId && typeof a.jobId === "object" ? [[a.jobId.id, a.jobId] as const] : [])).values()), [applications]);
   const loading = result.status === "loading";
-  const visibleApplications = useMemo(() => (optimistic.key === context.key && optimistic.cards || applications).map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key]);
+  const eligibilityRefreshing = result.refreshing || view === 'board' && Object.values(board.laneState).some(lane => lane?.loading || lane?.error);
+  const visibleApplications = useMemo(() => (optimistic.key === context.key && optimistic.cards || applications)
+    .map(a => eligibilityRefreshing ? { ...a, actionEligibility: undefined } : a)
+    .map(a => optimistic.key === context.key && optimistic.statuses[a.id] ? { ...a, status: optimistic.statuses[a.id] } : a), [applications, optimistic, context.key, eligibilityRefreshing]);
   const [selection, setSelection] = useState<{ key: string; target: Application } | null>(null);
   const deleteTarget = selection?.key === context.key ? selection.target : null;
   const setDeleteTarget = (target: Application | null) => setSelection(target ? { key: context.key, target } : null);
@@ -130,7 +134,7 @@ const ApplicationsList: React.FC = () => {
   }, [visibleApplications, jobs, sort]);
 
   const handleDelete = async () => {
-    if (!deleteTarget || !canDelete) return;
+    if (!deleteTarget || !canDelete || result.refreshing || !applications.some(a => a.id === deleteTarget.id && applicationActionAllowed(a, 'delete'))) return;
 
     const key = context.key;
     setDeletingId(deleteTarget.id);
@@ -139,7 +143,7 @@ const ApplicationsList: React.FC = () => {
       await deleteApplication(deleteTarget.id);
       if (context.current.current === key) { load(); setDeleteTarget(null); }
     } catch (deleteError) {
-      if (context.current.current === key) setMutation({ key, error: hrCrudErrorKey(deleteError) });
+      if (context.current.current === key) { setMutation({ key, error: hrCrudErrorKey(deleteError) }); if (isAxiosError(deleteError) && [401,403,404].includes(deleteError.response?.status || 0)) load(); }
     } finally {
       if (context.current.current === key) setDeletingId(null);
     }
@@ -152,7 +156,7 @@ const ApplicationsList: React.FC = () => {
     ordered?: Application[],
   ) => {
     if (!canUpdate || optimistic.key === context.key && optimistic.statuses[appId]) return;
-    const app = applications.find(a => a.id === appId); if (!app) return;
+    const app = applications.find(a => a.id === appId); if (!app || eligibilityRefreshing || !applicationActionAllowed(app, 'update')) return;
     const key = context.key;
     const controller = new AbortController(); controllers.current.add(controller);
     setOptimistic(previous => ({ key, statuses: { ...(previous.key === key ? previous.statuses : {}), [appId]: status }, ...(ordered ? { cards: ordered } : {}) }));
@@ -219,7 +223,7 @@ const ApplicationsList: React.FC = () => {
       </div>
 
       <p className="hr-toolbar-note" role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
-      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
+      {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate && !result.refreshing} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
         {rows.length === 0 ? <EmptyState icon={<ClipboardList size={28} />} title={t(filtersActive ? "recruitment.applications.noFilteredApplications" : "recruitment.applications.noApplications")} hint={t(filtersActive ? "recruitment.applications.noFilteredApplicationsHint" : "recruitment.applications.noApplicationsHint")} /> : <table>
           <thead>
             <tr>
@@ -269,7 +273,7 @@ const ApplicationsList: React.FC = () => {
                   </td>
                   <td><MatchScoreBadge application={app} onUpdated={load} /><button type="button" onClick={() => navigate(`/app/recruitment/applications/${app.id}`)}>{t("hrWorkflow.details")}</button></td>
                   <td>
-                    {canUpdate ? (
+                    {canUpdate && !result.refreshing && applicationActionAllowed(app, 'update') ? (
                       <select
                         className="input-field"
                         style={{ width: 150, padding: "6px 10px" }}
@@ -292,7 +296,7 @@ const ApplicationsList: React.FC = () => {
                         <button
                           className="icon-btn icon-btn--danger"
                           title={t("recruitment.applications.delete")}
-                          disabled={deletingId === app.id}
+                          disabled={deletingId === app.id || result.refreshing || !applicationActionAllowed(app, 'delete')}
                           onClick={() => setDeleteTarget(app)}
                         >
                           {deletingId === app.id ? (
@@ -312,7 +316,7 @@ const ApplicationsList: React.FC = () => {
       </div>}
 
       {view === 'table' && <HRPageControls data={table.data} page={table.page} onPage={table.setPage} onRefresh={table.reload} refreshing={table.refreshing} disabled={table.status !== "ready"} />}
-      {deleteTarget && (
+      {deleteTarget && !result.refreshing && applications.some(a => a.id === deleteTarget.id && applicationActionAllowed(a, 'delete')) && (
         <ConfirmDialog
           title={t("recruitment.applications.removeTitle")}
           message={t("recruitment.applications.removeMessage")}

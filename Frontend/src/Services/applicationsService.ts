@@ -4,7 +4,7 @@ import { readJson } from "../api/readRequest";
 import { normalizeJob } from "./jobsService";
 import { normalizeCandidate } from "./candidatesService";
 import type {
-  Application, ApplicationHandoffContext,
+  Application, ApplicationHandoffContext, ApplicationActionEligibility,
   ApplicationStatus, ApplicationMatch, ApplicationInterview, ApplicationNextAction, ApplicationEvent,
 } from "../Types/recruitment";
 
@@ -86,6 +86,13 @@ function handoffContext(raw: unknown, id: string, revision: number): Application
   return raw as unknown as ApplicationHandoffContext;
 }
 
+function actionEligibility(raw: unknown, id: string, revision: number): ApplicationActionEligibility | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const value = raw as Record<string, unknown>;
+  if (Object.keys(value).length !== 5 || value.version !== 'application-actions-v1' || value.applicationId !== id || value.revision !== revision || !Number.isInteger(revision) || revision < 0 || typeof value.update !== 'boolean' || typeof value.delete !== 'boolean') return undefined;
+  return { version: 'application-actions-v1', applicationId: id, revision, update: value.update, delete: value.delete };
+}
+
 export function normalizeApplication(raw: unknown): Application {
   const data =
     typeof raw === "object" && raw !== null
@@ -110,6 +117,7 @@ export function normalizeApplication(raw: unknown): Application {
   return {
     id,
     handoffContext: handoffContext(data.handoffContext, id, revision),
+    actionEligibility: actionEligibility(data.actionEligibility, id, revision),
     _id: typeof data._id === "string" ? data._id : undefined,
 
     jobId,

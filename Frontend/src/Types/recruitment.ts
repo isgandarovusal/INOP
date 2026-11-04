@@ -133,7 +133,13 @@ export type ApplicationStatus =
   | "shortlisted"
   | "hired";
 
+export interface ApplicationActionEligibility {
+  version: 'application-actions-v1'; applicationId: string; revision: number;
+  /** Scope eligibility only; stage, parent and command rules remain separate. */
+  update: boolean; delete: boolean;
+}
 export interface Application {
+  actionEligibility?: ApplicationActionEligibility;
   id: string;
   _id?: string;
   boardOrder?: string;

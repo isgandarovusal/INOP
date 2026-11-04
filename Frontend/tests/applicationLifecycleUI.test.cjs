@@ -512,3 +512,70 @@ test('Application Job navigation requires independent populated parent authoriza
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('record eligibility gates controls, revocation, refresh and malformed legacy responses',async t=>withBrowserFixture(harness,async h=>{
+ await h.models.Role.create({key:'eligibility_ui',name:'Synthetic mixed scopes',permissions:[{resource:'candidate',action:'read',scope:'all'},{resource:'recruitment',action:'read',scope:'all'},{resource:'application',action:'read',scope:'all'},{resource:'application',action:'update',scope:'assigned'}]});
+ await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'eligibility_ui',departmentId:'dep_hr'}});
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic action eligibility',role:'Cashier'})).data;
+ const j=(await h.request('admin','POST','/jobs',{title:'Synthetic scoped vacancy',department:'HR',description:'Synthetic'})).data;
+ const a=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data;
+ const detail='/app/recruitment/applications/'+a._id;
+ const row=()=>h.page.locator('tbody tr').filter({hasText:c.name});
+ const form=()=>h.page.locator('[data-application-workflow]');
+ let writes=0;h.page.on('request',r=>{if(['PATCH','POST','DELETE'].includes(r.method())&&r.url().includes('/api/applications/'))writes++});
+ await t.test('read-all/update-assigned: unavailable status and workflow never initiate mutations',async()=>{
+   await h.open('peer','/app/recruitment/applications');await row().waitFor();assert.equal(await row().locator('select').count(),0);assert.equal(writes,0);
+   await h.open('peer',detail);await h.page.locator('.hr-application-detail').waitFor();assert.equal(await form().count(),0);
+ });
+ await t.test('assigned update works; refresh disables retained draft then reassignment removes editing',async()=>{
+   await Application.updateOne({_id:a._id},{$set:{assignedTo:h.actors.peer._id}});
+   await h.open('peer',detail);await form().waitFor();await form().getByLabel('HR qeydləri',{exact:true}).fill('Synthetic preserved draft');
+   let release;const hold=new Promise(r=>release=r);let seen;const started=new Promise(r=>seen=r);
+   await h.page.route('**/api/applications/'+a._id,async route=>{seen();await hold;await route.fallback()});
+   const focusedAt=await h.page.evaluate(()=>{window.dispatchEvent(new Event('focus'));return performance.now()});await started;assert.equal(await form().getByRole('button',{name:'Yadda saxla',exact:true}).isEnabled(),false);
+   release();await h.page.unroute('**/api/applications/'+a._id);await form().getByRole('button',{name:'Yadda saxla',exact:true}).waitFor();
+   await h.page.waitForFunction(()=>!document.querySelector('[data-application-workflow] fieldset')?.disabled);
+   assert.equal(await form().getByLabel('HR qeydləri',{exact:true}).inputValue(),'Synthetic preserved draft');
+   await Application.updateOne({_id:a._id},{$set:{assignedTo:h.actors.admin._id}});
+   // Respect the existing 250ms focus-event coalescing window; do not change app timeouts.
+   await h.page.waitForFunction(at=>performance.now()-at>=250,focusedAt);
+   await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await form().waitFor({state:'detached'});assert.equal(writes,0);
+ });
+ await t.test('missing, unknown and wrong-revision flags fail closed',async()=>{
+   for(const flags of [undefined,{version:'unknown',update:true},{version:'application-actions-v1',applicationId:a._id,revision:999,update:true,delete:true}]){
+     await h.page.route('**/api/hr/v2/applications?*',async route=>{const u=new URL(route.request().url());const data=(await h.request('peer','GET',u.pathname.slice(4)+u.search)).data;for(const item of data.items)item.actionEligibility=flags;await route.fulfill({json:data})});
+     await h.open('peer','/app/recruitment/applications');await row().waitFor();assert.equal(await row().locator('select').count(),0);await h.page.unroute('**/api/hr/v2/applications?*');
+   }
+ });
+ await t.test('late response from a superseded permission context cannot restore editing',async()=>{
+   await Application.updateOne({_id:a._id},{$set:{assignedTo:h.actors.peer._id}});
+   await h.open('peer',detail);await form().waitFor();
+   let finish;const gate=new Promise(r=>finish=r);let observed;const started=new Promise(r=>observed=r);let oldBody;
+   await h.page.route('**/api/applications/'+a._id,async route=>{
+     if(!oldBody){oldBody=(await h.request('peer','GET','/applications/'+a._id)).data;observed();await gate;try{await route.fulfill({json:oldBody})}catch{/* Aborted superseded request is expected. */}}
+     else await route.fallback();
+   });
+   await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await started;
+   const current=await h.profile('peer');current.permissions=current.permissions.filter(p=>p.resource!=='application'||p.action!=='update');
+   await h.models.Role.updateOne({key:'eligibility_ui'},{$set:{permissions:current.permissions}});
+   await h.page.evaluate(u=>window.setTestUser(u),current);await form().waitFor({state:'detached'});
+   finish();await h.page.unroute('**/api/applications/'+a._id);
+   await h.page.locator('[data-application-current-workflow]').waitFor();assert.equal(await form().count(),0);assert.equal(writes,0);
+   const original=[...current.permissions,{resource:'application',action:'update',scope:'assigned'}];await h.models.Role.updateOne({key:'eligibility_ui'},{$set:{permissions:original}});
+ });
+ await t.test('401/403/404 refresh clears prior editing eligibility',async()=>{
+   for(const status of [401,403,404]){
+     await h.open('peer',detail);await form().waitFor();
+     await h.page.route('**/api/applications/'+a._id,r=>r.fulfill({status,json:{message:'Synthetic denied'}}));
+     // visibility/focus coalescing is per mounted resource, so a fresh document has no previous focus event.
+     await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await form().waitFor({state:'detached'});assert.equal(writes,0);
+     await h.page.unroute('**/api/applications/'+a._id);
+   }
+ });
+ await t.test('authorized status control saves once and never sends eligibility metadata',async()=>{
+   await Application.updateOne({_id:a._id},{$set:{assignedTo:h.actors.peer._id}});
+   await h.open('peer','/app/recruitment/applications');await row().locator('select').waitFor();
+   const response=h.page.waitForResponse(r=>r.url().endsWith('/applications/'+a._id+'/status')&&r.request().method()==='PATCH');await row().locator('select').selectOption('screening');const saved=await response;assert.equal(saved.status(),200);assert.equal(Object.hasOwn(saved.request().postDataJSON(),'actionEligibility'),false);assert.equal(writes,1);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
