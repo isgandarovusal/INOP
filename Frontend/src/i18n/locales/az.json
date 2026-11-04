@@ -1550,6 +1550,7 @@
     "invalid": "CV sorğusu düzgün deyil. Faylı və sahələri yoxlayın."
   },
   "hrProcessing": {
+    "retryScan": "Yalnız antivirus hazır olduqdan sonra yenidən cəhd et",
     "aiProfile": "Peşəkar faktların AI yoxlaması",
     "startAi": "AI yoxlamasını növbəyə al",
     "aiNotice": "Yalnız peşəkar sübutlar ayrıca icazəli AI provider-ə göndərilir; nəticələr HR təsdiqi tələb edir.",
@@ -1596,6 +1597,8 @@
       "unavailable": "Emal xidməti hazırda əlçatan deyil; əsas profil saxlanılır."
     },
     "code": {
+      "SCAN_REQUIRED": "Antivirus yoxlaması tamamlanmadı və ya imzalar aktual deyil. CV emal edilmədi.",
+      "SOURCE_QUARANTINED": "Antivirus zərərli məzmun aşkarladı. CV emalı bloklandı.",
       "AI_NOT_CONFIGURED": "AI konfiqurasiya edilməyib",
       "AI_REVIEW_CONTEXT_REQUIRED": "Uyğun peşəkar sübut kifayət deyil",
       "AI_REVIEW_REQUIRED": "AI təklifləri HR təsdiqi gözləyir",

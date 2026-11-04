@@ -9,7 +9,7 @@ import {useHRActionContext} from '../Hooks/useHRActionContext';
 import {getCvProcessing,listCvProcessing,startCvProcessing,retryCvProcessing} from '../Services/cvProcessingService';
 import type {CvProcessingJob} from '../Services/cvProcessingService';
 import type {Candidate} from '../Types/recruitment';
-const codes=new Set(['AI_NOT_CONFIGURED','AI_REVIEW_CONTEXT_REQUIRED','AI_REVIEW_REQUIRED','OCR_REVIEW_REQUIRED','OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED','OCR_PDF_REQUIRED','OCR_NO_TEXT','OCR_INPUT_LIMIT','OCR_INVALID_DOCUMENT','QUEUED','PROCESSING','REVIEW_REQUIRED','OCR_REQUIRED','AUTH_REVOKED','SOURCE_CHANGED','SOURCE_MISSING','RESULT_LIMIT','INPUT_LIMIT','STORAGE_NOT_CONFIGURED','PROCESSING_TIMEOUT','PROCESSING_FAILED','ATTEMPTS_EXHAUSTED']);
+const codes=new Set(['SCAN_REQUIRED','SOURCE_QUARANTINED','AI_NOT_CONFIGURED','AI_REVIEW_CONTEXT_REQUIRED','AI_REVIEW_REQUIRED','OCR_REVIEW_REQUIRED','OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED','OCR_PDF_REQUIRED','OCR_NO_TEXT','OCR_INPUT_LIMIT','OCR_INVALID_DOCUMENT','QUEUED','PROCESSING','REVIEW_REQUIRED','OCR_REQUIRED','AUTH_REVOKED','SOURCE_CHANGED','SOURCE_MISSING','RESULT_LIMIT','INPUT_LIMIT','STORAGE_NOT_CONFIGURED','PROCESSING_TIMEOUT','PROCESSING_FAILED','ATTEMPTS_EXHAUSTED']);
 const fields=['name','email','phone','phoneRaw','role','education','skills','experience','languages','certificates'];
 function facts(value:unknown):string { if(value==null||value==='')return '';if(typeof value==='string'||typeof value==='number')return String(value).slice(0,500);if(Array.isArray(value))return value.filter(v=>typeof v==='string').slice(0,20).join(', ').slice(0,1000);return ''; }
 export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:Candidate;onAccessDenied:()=>void}) {
@@ -52,7 +52,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
    setError(code==='PROCESSING_DISABLED'?'disabled':code==='PROCESSING_QUEUE_NOT_READY'?'setup':status===409?'changed':status===429?'busy':status===404?'missing':'unavailable');
   }finally{if(!controller.signal.aborted&&context.current.current===key&&active.current.sequence===sequence)setBusy(false);}
  }
- function retryable(job:CvProcessingJob){return job.currentSource&&job.state==='blocked'&&['SOURCE_MISSING','STORAGE_NOT_CONFIGURED',...(job.kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:job.kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)&&job.attempts>=1&&job.attempts<3&&job.manualRetries<2&&job.source.sha256===candidate.cvOriginal?.sha256&&job.source.revision===candidate.revision;}
+ function retryable(job:CvProcessingJob){return job.currentSource&&job.state==='blocked'&&['SOURCE_MISSING','STORAGE_NOT_CONFIGURED','SCAN_REQUIRED',...(job.kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:job.kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)&&job.attempts>=1&&job.attempts<3&&job.manualRetries<2&&job.source.sha256===candidate.cvOriginal?.sha256&&job.source.revision===candidate.revision;}
  if(!hasPermission(user,'candidate','read'))return null;
  return <section data-cv-processing><h3>{t('hrProcessing.title')}</h3><p>{t(kind==='ocr'?'hrProcessing.ocrNotice':kind==='ai-review'?'hrProcessing.aiNotice':'hrProcessing.notice')}</p>
   {open && kind === 'ai-review' && <AIAvailability cv />}
@@ -67,7 +67,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
     <p>{t('hrProcessing.retries')}: {job.manualRetries}</p>
     {!job.currentSource&&<p>{t('hrProcessing.obsolete')}</p>}
     <button type="button" disabled={busy} onClick={()=>void run('get',job.id)}>{t('hrProcessing.inspect')}</button>
-    {canStart&&retryable(job)&&<button type="button" disabled={busy} onClick={()=>void run('retry',job.id)}>{t(job.kind==='ocr'?'hrProcessing.retryOcr':job.kind==='ai-review'?'hrProcessing.retryAi':'hrProcessing.retry')}</button>}
+    {canStart&&retryable(job)&&<button type="button" disabled={busy} onClick={()=>void run('retry',job.id)}>{t(job.code==='SCAN_REQUIRED'?'hrProcessing.retryScan':job.kind==='ocr'?'hrProcessing.retryOcr':job.kind==='ai-review'?'hrProcessing.retryAi':'hrProcessing.retry')}</button>}
    </li>)}</ul>
    {selected?.result&&selected.currentSource&&<div data-processing-result><h4>{t('hrProcessing.review')}</h4>{selected.result.review.provenance&&<p>{t(selected.result.review.provenance.mode==='mock_test_only'?'hrAi.mock':'hrAi.proposal')}</p>}<p>{t(kind==='ocr'?'hrProcessing.ocrManual':kind==='ai-review'?'hrProcessing.aiManual':'hrProcessing.manual')}</p><dl>{fields.map(field=>{const value=facts(selected.result!.parsed[field]);return value?<div key={field}><dt>{t(`hrProcessing.field.${field}`)}</dt><dd>{value}</dd></div>:null;})}</dl>{canStart&&<Link to={`/app/recruitment/candidates/${candidate.id}/edit?processingJobId=${selected.id}`}>{t("hrApproval.open")}</Link>}</div>}
   </>}

@@ -1533,6 +1533,7 @@
     "invalid": "The CV request is invalid. Check the file and fields."
   },
   "hrProcessing": {
+    "retryScan": "Retry only after the antivirus scanner is ready",
     "aiProfile": "Professional AI fact review",
     "startAi": "Queue AI review",
     "aiNotice": "Only professional evidence is sent to a separately approved AI provider; HR approval is required.",
@@ -1579,6 +1580,8 @@
       "unavailable": "Processing is unavailable; the primary profile is retained."
     },
     "code": {
+      "SCAN_REQUIRED": "Antivirus could not provide an available, fresh and complete scan. The CV was not processed.",
+      "SOURCE_QUARANTINED": "Antivirus detected malicious content. CV processing is blocked.",
       "AI_NOT_CONFIGURED": "AI is not configured",
       "AI_REVIEW_CONTEXT_REQUIRED": "Insufficient professional evidence",
       "AI_REVIEW_REQUIRED": "AI proposals await HR review",
