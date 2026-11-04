@@ -33,9 +33,12 @@ export function scheduleChanges(app: Application, draft: ScheduleDraft, currentU
   const initialZone = app.interview?.timezone || app.nextAction?.timezone || 'Asia/Baku';
   const zoneChanged = draft.timezone !== initialZone;
   const change: Pick<ApplicationWorkflowInput, 'interview' | 'nextAction'> = {};
-  if (draft.status === 'interview' && draft.start) {
+  const initialStart = localDateTime(app.interview?.startsAt, app.interview?.timezone);
+  // An explicit empty edit must reach existing date validation, not silently
+  // retain the old schedule or erase the whole interview/result envelope.
+  if (draft.status === 'interview' && (draft.start || initialStart)) {
     const interview: NonNullable<ApplicationWorkflowInput['interview']> = {};
-    if (zoneChanged || draft.start !== localDateTime(app.interview?.startsAt, app.interview?.timezone)) {
+    if (zoneChanged || draft.start !== initialStart) {
       interview.localStart = draft.start; interview.timezone = draft.timezone;
     }
     if (draft.duration !== (app.interview?.durationMinutes || 30)) interview.durationMinutes = draft.duration;

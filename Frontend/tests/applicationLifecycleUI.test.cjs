@@ -654,3 +654,20 @@ test('Metadata-only workflow edits preserve independent schedule instants, timez
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Clearing an existing interview date never reports a successful unchanged schedule',async t=>withBrowserFixture(harness,async h=>{
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic date-clear applicant',role:'Cashier'})).data;
+ const j=(await h.request('admin','POST','/jobs',{title:'Synthetic date-clear vacancy',description:'Synthetic only',department:'HR'})).data;
+ const a=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data;
+ const original={startsAt:new Date('2026-11-10T06:30:47.123Z'),timezone:'Asia/Baku',durationMinutes:30,interviewerId:h.actors.admin._id,result:'passed'};
+ for(const substatus of ['scheduled','cancelled'])await t.test(substatus+': invalid empty edit is rejected without erasing metadata or drafts',async()=>{
+  await Application.updateOne({_id:a._id},{$set:{status:'Interview',substatus,interview:original,notes:'Synthetic original note',events:[]}});
+  await h.open('admin','/app/recruitment/applications/'+a._id);const form=h.page.locator('[data-application-workflow]');await form.waitFor();
+  await form.getByLabel('Müsahibə vaxtı',{exact:true}).fill('');await form.getByLabel('HR qeydləri',{exact:true}).fill('Synthetic unsaved date-clear draft');
+  const pending=h.page.waitForResponse(r=>r.url().endsWith('/applications/'+a._id+'/workflow')&&r.request().method()==='PATCH');await form.locator('button[type=submit]').click();const response=await pending;
+  assert.equal(response.status(),400,'An unsupported empty date edit must not silently save the old date');
+  await form.getByRole('alert').waitFor();assert.equal(await form.getByLabel('Müsahibə vaxtı',{exact:true}).inputValue(),'');assert.equal(await form.getByLabel('HR qeydləri',{exact:true}).inputValue(),'Synthetic unsaved date-clear draft');
+  assert.equal(response.request().postDataJSON().interview.localStart,'');const stored=await Application.findById(a._id);assert.equal(stored.interview.startsAt.toISOString(),original.startsAt.toISOString());assert.equal(stored.interview.result,'passed');assert.equal(stored.notes,'Synthetic original note');assert.equal(stored.events.length,0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
