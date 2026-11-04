@@ -64,6 +64,7 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
       try { new Intl.DateTimeFormat('en', { timeZone: row.timezone }).format(); timezone = row.timezone; } catch { /* Unknown legacy zone stays unknown. */ }
     }
     return { startsAt, timezone,
+      result: typeof row.result === 'string' && ['pending', 'passed', 'failed', 'no_show', 'cancelled'].includes(row.result) ? row.result : undefined,
       duration: typeof row.durationMinutes === 'number' && Number.isInteger(row.durationMinutes) && row.durationMinutes >= 5 && row.durationMinutes <= 480 ? row.durationMinutes : undefined,
       interviewer: typeof row.interviewerId === 'string' && /^[a-f0-9]{24}$/i.test(row.interviewerId) ? row.interviewerId : undefined };
   };
@@ -79,7 +80,7 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
   };
   const substatus = (row: Record<string, unknown>) => { const value = substatusValue(row); return value === undefined ? unavailable : value === '' ? t('hrCatalog.unset') : t(`hrWorkflow.sub.${value}`); };
   const substatusChanged = substatusValue(before) !== substatusValue(after);
-  const hasDetails = substatusChanged || ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer');
+  const hasDetails = substatusChanged || ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer') || interviewChanged('result');
   const eventKey = ['create','status','workflow','score','reorder','notification_retry'].includes(event.type) ? `hrWorkflow.event.${event.type}` : 'hrHistory.otherEvent';
   return <>
     <p>{time(event.at)} · {t(eventKey)} · {t('hrWorkflow.actor')}: {historyId(event.actor) || unavailable}</p>
@@ -92,6 +93,7 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
     {interviewChanged('timezone') && <p data-history-field="interview-timezone"><strong>{t('hrWorkflow.timezone')}: </strong>{oldInterview.timezone || unavailable} → {newInterview.timezone || unavailable}</p>}
     {interviewChanged('duration') && <p data-history-field="interview-duration"><strong>{t('hrWorkflow.duration')}: </strong>{oldInterview.duration ?? unavailable} → {newInterview.duration ?? unavailable}</p>}
     {interviewChanged('interviewer') && <p data-history-field="interview-interviewer"><strong>{t('hrWorkflow.interviewer')}: </strong>{oldInterview.interviewer || unavailable} → {newInterview.interviewer || unavailable}</p>}
+    {interviewChanged('result') && <p data-history-field="interview-result"><strong>{t('hrWorkflow.result')}: </strong>{oldInterview.result ? t(`hrWorkflow.resultState.${oldInterview.result}`) : unavailable} → {newInterview.result ? t(`hrWorkflow.resultState.${newInterview.result}`) : unavailable}</p>}
     {!hasDetails && <p>{t('hrHistory.noDetails')}</p>}
     {typeof event.reason === 'string' && event.reason && <p><strong>{t('hrWorkflow.reason')}: </strong>{event.reason}</p>}
   </>;

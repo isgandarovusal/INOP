@@ -388,3 +388,44 @@ test('Application substatus History shows stage-valid authorized before and afte
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Interview result History uses authorized snapshots without inferring a hiring decision',async t=>withBrowserFixture(timezoneHarness,async h=>{
+ const locales=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic Result Applicant',role:'Cashier'})).data,j=(await h.request('admin','POST','/jobs',{title:'Synthetic Result Vacancy',department:'HR',description:'Synthetic'})).data;
+ const app=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data,url='/app/recruitment/applications/'+app._id,history=h.page.locator('[data-application-history]');
+ const interview={localStart:'2026-11-10T10:30',timezone:'Asia/Baku',durationMinutes:30,interviewerId:String(h.actors.admin._id),result:'pending'};
+ const scheduled=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:0,status:'Interview',interview});assert.equal(scheduled.status,200);
+ const result=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:scheduled.data.__v,interview:{...interview,result:'passed'},reason:'Synthetic interview outcome'});assert.equal(result.status,200);
+ await t.test('real result-only event renders pending to passed while Application stage stays Interview',async()=>{
+  await h.open('admin',url);await history.locator('li').first().waitFor();await h.page.waitForLoadState('networkidle');const row=history.locator('li').first();assert.equal(await row.locator('[data-history-field=interview-result]').count(),1);
+  assert.ok((await row.textContent()).includes(locales.az.hrWorkflow.resultState.pending+' → '+locales.az.hrWorkflow.resultState.passed));assert.equal(await row.locator('[data-history-field=stage]').count(),0);assert.ok((await row.textContent()).includes('Synthetic interview outcome'));
+ });
+ await t.test('five outcomes and neutral legacy values survive later Application stages without raw leaks',async()=>{
+  const event=(id,before,after)=>({id,type:'workflow',actor:String(h.actors.admin._id),at:'2026-11-03T08:00:00Z',revision:1,before,after,reason:'Synthetic outcome history'});
+  const values=['passed','failed','no_show','cancelled'];
+  const events=values.map(value=>event(value,{status:'Interview',interview:{result:'pending'}},{status:'Interview',interview:{result:value}}));
+  events.push(event('missing',{interview:{}},{interview:{result:'pending'}}),event('null',{interview:{result:'passed'}},{interview:null}),event('unknown',{interview:{result:{name:'NEVER_RENDER'}}},{interview:{result:'PRIVATE_UNKNOWN'}}),event('noop',{interview:{result:'passed'}},{interview:{result:'passed'}}),event('combined',{status:'Interview',substatus:'scheduled',interview:{result:'pending',startsAt:'2026-11-10T06:30:00Z',timezone:'Asia/Baku'}},{status:'Interview',substatus:'completed',interview:{result:'passed',startsAt:'2026-11-11T06:30:00Z',timezone:'Asia/Baku'}}));
+  await Application.updateOne({_id:app._id},{$set:{status:'Offered',events:events.reverse()}});await h.open('admin',url);await history.locator('li').nth(8).waitFor();await h.page.waitForLoadState('networkidle');const rows=history.locator('li');assert.equal(await rows.count(),9);
+  for(let i=0;i<4;i++)assert.ok((await rows.nth(i).locator('[data-history-field=interview-result]').textContent()).includes(locales.az.hrWorkflow.resultState.pending+' → '+locales.az.hrWorkflow.resultState[values[i]]));
+  assert.ok((await rows.nth(4).textContent()).includes(locales.az.hrHistory.unavailable+' → '+locales.az.hrWorkflow.resultState.pending));assert.ok((await rows.nth(5).textContent()).includes(locales.az.hrWorkflow.resultState.passed+' → '+locales.az.hrHistory.unavailable));
+  for(const i of [6,7])assert.equal(await rows.nth(i).locator('[data-history-field=interview-result]').count(),0);
+  for(const field of ['interview-result','interview-time','substatus'])assert.equal(await rows.nth(8).locator('[data-history-field='+field+']').count(),1);
+  assert.equal(await rows.nth(0).locator('time').first().getAttribute('datetime'),'2026-11-03T08:00:00Z');assert.ok((await rows.nth(0).textContent()).includes(String(h.actors.admin._id)));
+  assert.ok(!(await history.textContent()).includes('NEVER_RENDER'));assert.ok(!(await history.textContent()).includes('PRIVATE_UNKNOWN'));
+ });
+ await t.test('localized responsive result history stays read-only and creates no requests',async()=>{
+  const count=h.wire.length;
+  for(const language of ['az','en','ru']){await h.page.evaluate(l=>window.changeLanguage(l),language);await history.getByRole('heading',{name:locales[language].hrWorkflow.history,exact:true}).waitFor();assert.ok((await history.locator('[data-history-field=interview-result]').first().textContent()).includes(locales[language].hrWorkflow.result));
+   for(const width of [1440,768,390,320]){await h.page.setViewportSize({width,height:1000});await h.page.evaluate(()=>document.fonts.ready);assert.equal(await h.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,language+'/'+width);
+    if(process.env.INOP_RESULT_SCREENSHOTS&&[['az',1440],['en',768],['ru',390],['az',320]].some(([l,w])=>l===language&&w===width)){require('node:fs').mkdirSync(process.env.INOP_RESULT_SCREENSHOTS,{recursive:true});await history.screenshot({path:require('node:path').join(process.env.INOP_RESULT_SCREENSHOTS,`result-${language}-${width}.png`)});}
+   }
+  }
+  assert.equal(h.wire.length,count);assert.equal(await history.locator('a,input,select,textarea').count(),0);
+ });
+ await t.test('Employee result history does not grant parent access and disappears on reassignment',async()=>{
+  await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});await Application.updateOne({_id:app._id},{$set:{departmentId:'dep_hr',assignedTo:h.actors.own._id}});const count=h.wire.length;await h.open('own',url);await history.locator('[data-history-field=interview-result]').first().waitFor();await h.page.waitForLoadState('networkidle');assert.equal(h.wire.length-count,4);assert.equal(await history.locator('a,input,select,textarea').count(),0);
+  assert.equal((await h.request('own','GET','/candidates/'+c._id)).status,404);assert.equal((await h.request('own','GET','/jobs/'+j._id)).status,404);
+  await Application.updateOne({_id:app._id},{$set:{assignedTo:h.actors.peer._id},$inc:{__v:1}});await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.locator('[data-hr-state=not-found]').waitFor();assert.equal(await history.count(),0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
