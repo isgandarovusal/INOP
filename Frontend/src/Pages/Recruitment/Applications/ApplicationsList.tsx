@@ -83,7 +83,9 @@ const ApplicationsList: React.FC = () => {
   const [branchFilter, setBranchFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | ApplicationStatus>("all");
-  const debouncedSearch = useDebouncedSearch(search);
+  const settledSearch = useDebouncedSearch(search);
+  // Clear all filters in one scoped table/board query, including pending text.
+  const debouncedSearch = search.trim() ? settledSearch : '';
   const filters = { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter };
   const table = useHRPage("application", filters, getApplicationPage, { enabled: view === 'table' });
   const board = useHRBoard(filters, view === 'board');

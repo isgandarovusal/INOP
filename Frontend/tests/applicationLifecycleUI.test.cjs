@@ -579,3 +579,34 @@ test('record eligibility gates controls, revocation, refresh and malformed legac
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Application clear-all replaces search and status atomically on scoped table and board',async t=>withBrowserFixture(harness,async h=>{
+  await h.models.Role.create({key:'app_clear_reader',name:'Synthetic scoped workflow reader',permissions:[{resource:'candidate',action:'read',scope:'all'},{resource:'recruitment',action:'read',scope:'all'},{resource:'application',action:'read',scope:'assigned'}]});
+  await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'app_clear_reader',departmentId:'dep_hr'}});
+  const c=(await h.request('admin','POST','/candidates',{name:'Synthetic reset applicant',role:'Cashier'})).data;
+  for(const [name,status,owner] of [['Alpha','Screening','peer'],['Beta','Applied','peer'],['Hidden','Screening','admin']]){
+    const j=(await h.request('admin','POST','/jobs',{title:'Synthetic '+name+' workflow vacancy',department:'HR',description:'Synthetic only'})).data;
+    await Application.create({candidateId:c._id,jobId:j._id,status,assignedTo:h.actors[owner]._id,createdBy:h.actors.admin._id,departmentId:'dep_hr'});
+  }
+  let requests=[];
+  h.page.on('request',r=>{const u=new URL(r.url());if(['/api/hr/v2/applications','/api/hr/v2/application-board'].includes(u.pathname))requests.push({path:u.pathname,q:u.searchParams.get('q')||'',status:u.searchParams.get('status')});});
+  for(const [view,pending] of [['table',false],['table',true],['board',false],['board',true]])await t.test(`${view}: ${pending?'pending':'settled'} search clear is one current scoped query`,async()=>{
+    const path=view==='board'?'/api/hr/v2/application-board':'/api/hr/v2/applications';
+    const response=predicate=>h.page.waitForResponse(r=>{const u=new URL(r.url());return u.pathname===path&&r.status()===200&&predicate(u.searchParams)});
+    const beta=()=>view==='board'?h.page.locator('.hr-board-card-job').filter({hasText:'Synthetic Beta workflow vacancy'}):h.page.locator('tbody tr').filter({hasText:'Synthetic Beta workflow vacancy'});
+    await h.open('peer','/app/recruitment/applications'+(view==='board'?'?view=board':''));await beta().waitFor();
+    let done=response(q=>q.get('status')==='Screening');await h.page.locator('select').filter({has:h.page.locator('option[value="processing"]')}).selectOption('screening');await done;
+    done=response(q=>q.get('q')==='Alpha'&&q.get('status')==='Screening');await h.page.getByRole('searchbox').fill('Alpha');await done;
+    if(pending)await h.page.getByRole('searchbox').fill('Beta');
+    requests=[];done=response(q=>!q.get('q')&&!q.get('status'));
+    await h.page.getByRole('button',{name:require('../src/i18n/locales/az.json').common.actions.clear,exact:true}).and(h.page.locator('.btn-secondary')).click();await done;await beta().waitFor();
+    console.log(JSON.stringify({view,pending,clearRequests:requests}));
+    assert.deepEqual(requests,[{path,q:'',status:null}]);
+    assert.equal(await h.page.getByRole('searchbox').inputValue(),'');
+    assert.equal(await h.page.getByText('Synthetic Hidden workflow vacancy',{exact:false}).count(),0);
+    assert.equal(await h.page.locator(view==='board'?'[data-application-card]':'tbody tr').count(),2);
+    assert.equal(await h.page.locator('[data-rfd-drag-handle-draggable-id]').count(),0);
+    assert.equal(await h.page.locator('[data-application-workflow]').count(),0);
+  });
+  assert.deepEqual(h.pageErrors,[]);
+}));
