@@ -19,8 +19,8 @@ test('Two first-party sources resolve only their canonical brands and keep every
   {reference:'AMBIGUOUS',jobId:String(kfc._id)},{reference:'AMBIGUOUS',jobId:String(pizza._id)},
   {reference:'MISSING',jobId:String(new h.mongoose.Types.ObjectId())},{reference:'FOREIGN',jobId:String(foreign._id)},
  ]}));
- const objects=new Map(),bytes=docx('Name: Synthetic branded applicant\nSkills\nFood safety');let puts=0,scanUnavailable=false,ip=0;
- const scanner={scan:async(_b,c)=>{if(scanUnavailable)throw Error('Synthetic unavailable');return{verdict:'clean',sha256:c.sha256,engine:'synthetic-only',version:'1'};}};
+ const objects=new Map(),bytes=docx('Name: Synthetic branded applicant\nSkills\nFood safety');let puts=0,scans=0,scanUnavailable=false,ip=0;
+ const scanner={scan:async(_b,c)=>{scans++;assert.equal(crypto.createHash('sha256').update(_b).digest('hex'),c.sha256);if(scanUnavailable)throw Error('Synthetic unavailable');return{verdict:'clean',sha256:c.sha256,engine:'synthetic-only',version:'1'};}};
  const intake=createIntake({enabled:true,evidenceMode:'test',scanner,scanBeforePersistence:true,store:{
   get:async b=>{if(!objects.has(b.key))throw Object.assign(Error('Synthetic absent'),{code:'STORAGE_NOT_FOUND'});return Buffer.from(objects.get(b.key));},
   put:async(b,v)=>{puts++;objects.set(b.key,Buffer.from(v));},
@@ -40,10 +40,10 @@ test('Two first-party sources resolve only their canonical brands and keep every
   ['kfc','UNBRANDED',null,'unavailable'],['pizzahut','SHARED',null,'unavailable'],
   ['kfc','AMBIGUOUS',null,'ambiguous'],['pizzahut','AMBIGUOUS',null,'ambiguous'],['kfc','FOREIGN',null,'unavailable'],
  ])await t.test(key+' '+reference,async()=>{
-  const e=envelope(sources.find(s=>s.key===key),reference);let jobsRead=0;h.mongoose.set('debug',(c,m)=>{if(c==='jobs'&&m==='findOne')jobsRead++;});
+  const e=envelope(sources.find(s=>s.key===key),reference),scansBefore=scans;let jobsRead=0;h.mongoose.set('debug',(c,m)=>{if(c==='jobs'&&m==='findOne')jobsRead++;});
   try {assert.equal((await receive(e)).accepted,true);}finally{h.mongoose.set('debug',false);}
   assert.equal(jobsRead,['UNKNOWN','AMBIGUOUS'].includes(reference)?0:1,'Mapping keeps its existing single scoped Job read');
-  const r=await receipt(e);await intake.runOnce(1);assert.equal(r.origin.key,key);assert.equal(r.origin.matchReason,reason);assert.equal(r.origin.jobId,job?String(job._id):undefined);
+  const r=await receipt(e);await intake.runOnce(1);assert.equal(scans-scansBefore,3,'Relay, pre-storage admission and durable worker each require a hash-bound scan');assert.equal(r.origin.key,key);assert.equal(r.origin.matchReason,reason);assert.equal(r.origin.jobId,job?String(job._id):undefined);
   const row=await intake.get(context.request(),r.sourceId);assert.equal(row.state,'ready');assert.equal(row.origin.requiresJobReview,true);assert.equal(row.origin.suggestedJobId,job?String(job._id):undefined);
   assert.equal(await Candidate.countDocuments(),0);assert.equal(await Application.countDocuments(),0);saved.push({e,r,row});
  });
@@ -67,10 +67,40 @@ test('Two first-party sources resolve only their canonical brands and keep every
   try{const row=await intake.get(context.request(),saved[0].r.sourceId);assert.equal(row.origin.suggestedJobId,undefined);assert.equal(row.origin.matchReason,'unavailable');const r=await receipt(saved[0].e);assert.equal(r.origin.jobId,String(kfc._id));}
   finally{await Job.updateOne({_id:kfc._id},{brandId:'kfc'});}
  });
- await t.test('Only explicit HR approval creates Candidate/Application; deterministic matching and stages remain intact',async()=>{
-  const row=await intake.get(context.request(),saved[0].r.sourceId);
-  const accepted=await intake.approve(context.request(),row.id,{confirmed:true,expectedHash:row.original.sha256,expectedUpdatedAt:row.updatedAt.toISOString(),profile:{name:'Synthetic approved applicant',role:'Cashier',skills:['Food safety']},jobId:String(kfc._id)});
-  assert.equal(await Candidate.countDocuments(),1);assert.equal(await Application.countDocuments(),1);
-  const app=await Application.findById(accepted.applicationId);assert.equal(String(app.jobId),String(kfc._id));assert.equal(app.source.key,'kfc');assert.equal(app.source.verification,'approved_source');assert.equal(app.status,'Applied');assert.ok(app.matching.version);
+ await t.test('Both signed brands complete explicit approval, deterministic matching, human stages and scoped analytics',async()=>{
+  const approved=[],measurements=[];
+  const measured=async(label,work)=>{const operations={};h.mongoose.set('debug',(collection,method)=>{const key=collection+'.'+method;operations[key]=(operations[key]||0)+1;});const start=performance.now();try{return await work();}finally{h.mongoose.set('debug',false);measurements.push({label,elapsedMs:Math.round((performance.now()-start)*100)/100,operations});}};
+  for(const [index,job,key]of [[0,kfc,'kfc'],[1,pizza,'pizzahut']]){
+   await Job.updateOne({_id:job._id},{$set:{requiredSkills:['Food safety']}});
+   const row=await intake.get(context.request(),saved[index].r.sourceId),input={confirmed:true,expectedHash:row.original.sha256,expectedUpdatedAt:row.updatedAt.toISOString(),profile:{name:'Synthetic approved '+key+' applicant',role:'Cashier',skills:['Food safety'],certificates:['Synthetic food safety certificate']},jobId:String(job._id)};
+   await assert.rejects(intake.approve(context.request(),row.id,{...input,confirmed:false}),{status:400});
+   assert.equal(await Candidate.countDocuments(),approved.length);assert.equal(await Application.countDocuments(),approved.length);
+   const result=await intake.approve(context.request(),row.id,input);assert.deepEqual(await intake.approve(context.request(),row.id,input),result);
+   const candidate=await Candidate.findById(result.candidateId),app=await Application.findById(result.applicationId);
+   assert.equal(String(app.jobId),String(job._id));assert.equal(app.source.key,key);assert.equal(app.source.verification,'approved_source');assert.equal(app.status,'Applied');assert.equal(candidate.status,'new');assert.equal(candidate.cvReview.reviewStatus,'confirmed');
+   assert.equal(app.matching.version,'ats-v2');assert.equal(app.scoreStatus,'calculated');assert.equal(app.score,100);
+   const again=require('../services/applicationMatch.service').calculateApplicationMatch(await Job.findById(job._id).lean(),candidate.toObject(),{application:app.toObject()});assert.equal(again.score,app.score);assert.equal(again.jobHash,app.matching.jobHash);assert.equal(again.candidateHash,app.matching.candidateHash);
+   const search=await measured(key+' reviewed search',()=>h.request('own','GET','/hr/v2/candidates?'+new URLSearchParams({skills:JSON.stringify(['Food safety']),certificates:JSON.stringify(['Synthetic food safety certificate']),q:key,pageSize:'1'})));
+   assert.equal(search.status,200);assert.equal(search.data.total,1);assert.equal(search.data.items.length,1);assert.equal(String(search.data.items[0]._id),result.candidateId);
+   let revision=app.__v;
+   for(const status of ['Screening','Shortlisted','Interview','Offered','Hired']){
+    const update=await h.request('own','PATCH','/applications/'+app._id+'/status',{status,expectedRevision:revision,reason:'Synthetic explicit HR decision'});assert.equal(update.status,200);revision=update.data.__v;
+    if(status==='Interview'){
+     let workflow=await h.request('own','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:revision,substatus:'scheduled',interview:{localStart:'2026-11-10T10:30',timezone:'Asia/Baku',durationMinutes:30,interviewerId:String(h.actors.own._id),result:'pending'},reason:'Synthetic explicit HR scheduling'});assert.equal(workflow.status,200);revision=workflow.data.__v;assert.equal(workflow.data.interview.startsAt,'2026-11-10T06:30:00.000Z');
+     workflow=await h.request('own','PATCH','/applications/'+app._id+'/workflow',{expectedRevision:revision,substatus:'completed',interview:{result:'passed'},reason:'Synthetic explicit HR interview result'});assert.equal(workflow.status,200);revision=workflow.data.__v;assert.equal(workflow.data.interview.result,'passed');assert.equal(workflow.data.interview.startsAt,'2026-11-10T06:30:00.000Z');
+    }
+   }
+   const history=await h.request('own','GET','/applications/'+app._id+'/history');assert.equal(history.status,200);assert.equal(history.data.total,8);assert.ok(history.data.items.every(e=>e.actor===String(h.actors.own._id)));
+   assert.equal((await Candidate.findById(candidate._id)).status,'new','Candidate status remains independent of Application hiring stage');
+   assert.equal((await h.request('foreign','GET','/applications/'+app._id)).status,404);assert.equal((await h.request('foreign','GET','/candidates/'+candidate._id)).status,404);
+   assert.equal((await receive(saved[index].e)).replayed,true);assert.deepEqual(await intake.approve(context.request(),row.id,input),result);assert.equal((await Application.findById(app._id)).status,'Hired','Approval replay cannot overwrite later HR decisions');approved.push(result);
+  }
+  assert.notEqual(approved[0].candidateId,approved[1].candidateId);assert.notEqual(approved[0].applicationId,approved[1].applicationId);
+  assert.equal(await Candidate.countDocuments(),2);assert.equal(await Application.countDocuments(),2);
+  for(const [actor,brand,count]of [['own','kfc',1],['own','pizza-hut',1],['own','',2],['foreign','',0]]){
+   const response=await measured(actor+' analytics '+(brand||'all'),()=>h.request(actor,'GET','/hr/analytics/overview'+(brand?'?brandId='+brand:'')));assert.equal(response.status,200);assert.equal(response.data.totals.applications,count);assert.equal(response.data.funnel.find(v=>v.status==='Hired').count,count);
+   assert.ok(!JSON.stringify(response.data).includes('Synthetic approved'));
+  }
+  console.log(JSON.stringify({syntheticOnly:true,measurements}));
  });
 }));
