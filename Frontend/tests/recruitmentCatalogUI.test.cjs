@@ -41,3 +41,32 @@ test('Brand and workplace selectors persist create/edit and filter scoped vacanc
   });
   assert.deepEqual(h.pageErrors, []);
 }));
+
+test('Job clear-all uses one effective scoped query instead of a stale debounced search',async t=>withBrowserFixture(harness,async h=>{
+  await h.models.Role.create({key:'job_clear_reader',name:'Synthetic scoped job reader',permissions:[{resource:'recruitment',action:'read',scope:'assigned'}]});
+  await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'job_clear_reader',departmentId:'dep_hr'}});
+  const visible={description:'Synthetic vacancy only',department:'HR',departmentId:'dep_hr',assignedTo:h.actors.peer._id};
+  await Job.create({title:'Synthetic Alpha scope vacancy',status:'Open',...visible});
+  await Job.create({title:'Synthetic Beta scope vacancy',status:'Closed',...visible});
+  await Job.create({title:'Synthetic hidden scope vacancy',status:'Open',...visible,assignedTo:h.actors.admin._id});
+  let requests=[];
+  h.page.on('request',r=>{const url=new URL(r.url());if(url.pathname==='/api/hr/v2/jobs')requests.push({q:url.searchParams.get('q')||'',status:url.searchParams.get('status'),page:url.searchParams.get('page')});});
+  const listResponse=predicate=>h.page.waitForResponse(r=>{const u=new URL(r.url());return u.pathname==='/api/hr/v2/jobs'&&predicate(u.searchParams)&&r.status()===200});
+  for(const pending of [false,true])await t.test(pending?'clear cancels pending replacement search without transient queries':'clear settled search and status together without an intermediate request',async()=>{
+    await h.open('peer','/app/recruitment/jobs');await h.page.getByText('Synthetic Beta scope vacancy',{exact:true}).waitFor();
+    let response=listResponse(q=>q.get('status')==='Open');await h.page.locator('select').filter({has:h.page.locator('option[value="open"]')}).selectOption('open');await response;
+    response=listResponse(q=>q.get('q')==='Alpha'&&q.get('status')==='Open');await h.page.getByRole('searchbox').fill('Alpha');await response;
+    await h.page.getByText('Synthetic Alpha scope vacancy',{exact:true}).waitFor();
+    if(pending)await h.page.getByRole('searchbox').fill('Beta');
+    requests=[];response=listResponse(q=>!q.get('q')&&!q.get('status'));
+    await h.page.getByRole('button',{name:require('../src/i18n/locales/az.json').common.actions.clear,exact:true}).and(h.page.locator('.btn-secondary')).click();await response;
+    await h.page.getByText('Synthetic Beta scope vacancy',{exact:true}).waitFor();
+    console.log(JSON.stringify({pendingSearch:pending,clearRequests:requests}));
+    assert.deepEqual(requests,[{q:'',status:null,page:'1'}]);
+    assert.equal(await h.page.getByRole('searchbox').inputValue(),'');
+    assert.equal(await h.page.locator('tbody tr').count(),2);
+    assert.equal(await h.page.getByText('Synthetic hidden scope vacancy',{exact:true}).count(),0);
+    assert.equal(await h.page.locator('.icon-btn--danger').count(),0);
+  });
+  assert.deepEqual(h.pageErrors,[]);
+}));

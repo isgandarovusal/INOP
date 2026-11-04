@@ -44,7 +44,10 @@ const JobsList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
   const [mutation, setMutation] = useState({ key: '', error: '' });
-  const search = useDebouncedSearch(query);
+  const settledSearch = useDebouncedSearch(query);
+  // Clearing filters is one effective query; do not retain the old search while
+  // status/brand reset. Nonempty typing keeps the existing debounce behavior.
+  const search = query.trim() ? settledSearch : '';
   const result = useHRPage('recruitment', { archived, q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage);
   const context = useHRActionContext(JSON.stringify([archived, search, brandFilter, branchFilter, statusFilter, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
