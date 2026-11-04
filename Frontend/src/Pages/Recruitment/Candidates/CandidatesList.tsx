@@ -56,6 +56,14 @@ import { useHRActionContext } from "../../../Hooks/useHRActionContext";
 import HRPageControls from "../../../Components/HRPageControls";
 import { getCandidatePage } from "../../../Services/hrPageService";
 
+// Serialize exactly the optional fields sent by hrPageService. Validation and
+// the effective query must count the same UTF-8 bytes, including a mode change.
+function structuredQuery(skills: string[], certificates: string[], mode: 'and' | 'or') {
+  return { skills: skills.length ? JSON.stringify(skills) : undefined,
+    certificates: certificates.length ? JSON.stringify(certificates) : undefined,
+    skillsMode: skills.length ? mode : undefined };
+}
+
 const CandidatesList: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -70,15 +78,13 @@ const CandidatesList: React.FC = () => {
   const [certificates, setCertificates] = useState<string[]>([]);
   const [skillsMode, setSkillsMode] = useState<'and' | 'or'>('and');
   const [filterError, setFilterError] = useState(false);
-  const structured = { skills: skills.length ? JSON.stringify(skills) : undefined,
-    certificates: certificates.length ? JSON.stringify(certificates) : undefined,
-    skillsMode: skills.length ? skillsMode : undefined };
+  const structured = structuredQuery(skills, certificates, skillsMode);
   const activeGroups = Number(skills.length > 0) + Number(certificates.length > 0);
-  const setTerms = (field: 'skills' | 'certificates', values: string[]) => {
+  const setTerms = (field: 'skills' | 'certificates', values: string[], mode: 'and' | 'or' = skillsMode) => {
     const nextSkills = field === 'skills' ? values : skills, nextCertificates = field === 'certificates' ? values : certificates;
-    if (values.length > 10 || values.some(v => !v.trim() || v.length > 120 || [...v].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127)) ||
-        new TextEncoder().encode(JSON.stringify(nextSkills) + JSON.stringify(nextCertificates) + skillsMode).length > 2048) { setFilterError(true); return; }
-    setFilterError(false); result.setPage(1); if (field === 'skills') setSkills(values); else setCertificates(values);
+    if (!['and','or'].includes(mode) || values.length > 10 || values.some(v => !v.trim() || v.length > 120 || [...v].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127)) ||
+        new TextEncoder().encode(Object.values(structuredQuery(nextSkills, nextCertificates, mode)).join('')).length > 2048) { setFilterError(true); return; }
+    setFilterError(false); result.setPage(1); setSkillsMode(mode); if (field === 'skills') setSkills(values); else setCertificates(values);
   };
   const [archived, setArchived] = useState(false);
   const [statusFilter, setStatusFilter] = useState<CandidateStatus | "all">("all");
@@ -273,7 +279,7 @@ const CandidatesList: React.FC = () => {
         <p className="form-hint">{t('hrCandidateFilters.help')}</p>
         <div className="form-grid">
           <TagInput label={t('hrCandidateFilters.skills')} values={skills} onChange={values => setTerms('skills', values)} placeholder={t('hrCandidateFilters.add')} />
-          <label>{t('hrCandidateFilters.mode')}<select className="input-field" aria-label={t('hrCandidateFilters.mode')} value={skillsMode} disabled={!skills.length} onChange={e => { result.setPage(1); setSkillsMode(e.target.value as 'and' | 'or'); }}>
+          <label>{t('hrCandidateFilters.mode')}<select className="input-field" aria-label={t('hrCandidateFilters.mode')} value={skillsMode} disabled={!skills.length} onChange={e => setTerms('skills', skills, e.target.value as 'and' | 'or')}>
             <option value="and">{t('hrCandidateFilters.and')}</option><option value="or">{t('hrCandidateFilters.or')}</option>
           </select></label>
           <TagInput label={t('hrCandidateFilters.certificates')} values={certificates} onChange={values => setTerms('certificates', values)} placeholder={t('hrCandidateFilters.add')} />

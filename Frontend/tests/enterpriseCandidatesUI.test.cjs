@@ -71,3 +71,54 @@ test('Structured Candidate filters remain scoped, responsive, paginated and requ
  });
  assert.deepEqual(h.pageErrors,[]);assert.ok(rows.every(r=>r.method==='GET'),'Filtering must never write Candidate or ATS data');
 }));
+
+test('Candidate skill-mode changes respect the combined UTF-8 filter budget',async t=>withBrowserFixture(filterShell,async h=>{
+ const Candidate=require('../../Backend/models/candidate.model');
+ const skills=Array.from({length:5},(_,i)=>'S'+i+'Ж'.repeat(i===0?97:100));
+ const certificates=Array.from({length:5},(_,i)=>'C'+i+'Ж'.repeat(100));
+ const bytes=mode=>Buffer.byteLength(JSON.stringify(skills)+JSON.stringify(certificates)+mode,'utf8');
+ assert.equal(bytes('or'),2048);assert.equal(bytes('and'),2049);
+ await h.models.Role.create({key:'filter_budget_reader',name:'Synthetic scoped reader',permissions:[{resource:'candidate',action:'read',scope:'assigned'}]});
+ await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'filter_budget_reader',departmentId:'dep_hr'}});
+ const values={role:'Cashier',skills,certificates,reviewedFields:['skills','certificates'],departmentId:'dep_hr'};
+ await Candidate.create({name:'Synthetic UTF8 budget candidate',assignedTo:h.actors.peer._id,...values});
+ await Candidate.create({name:'Synthetic hidden UTF8 candidate',assignedTo:h.actors.admin._id,...values});
+ const queries=[],responses=[];h.page.on('request',r=>{const u=new URL(r.url());if(u.pathname==='/api/hr/v2/candidates')queries.push(u.searchParams)});h.page.on('response',r=>{if(new URL(r.url()).pathname==='/api/hr/v2/candidates')responses.push(r.status())});
+ const done=predicate=>h.page.waitForResponse(r=>{const u=new URL(r.url());return u.pathname==='/api/hr/v2/candidates'&&r.status()===200&&predicate(u.searchParams)});
+ const panel=h.page.locator('[data-candidate-filters]'),locales=Object.fromEntries(['az','en','ru'].map(l=>[l,require('../src/i18n/locales/'+l+'.json')]));
+ await h.open('peer','/app/recruitment/candidates');await h.page.locator('.hr-candidates-table').waitFor();await panel.locator('summary').click();
+ const add=async(field,value)=>{const input=panel.getByRole('textbox',{name:locales.az.hrCandidateFilters[field],exact:true});const response=done(q=>JSON.parse(q.get(field)||'[]').includes(value));await input.fill(value);await input.press('Enter');await response;};
+ await add('skills',skills[0]);let pending=done(q=>q.get('skillsMode')==='or');await panel.getByRole('combobox').selectOption('or');await pending;
+ for(const value of skills.slice(1))await add('skills',value);for(const value of certificates)await add('certificates',value);
+ await t.test('oversized AND keeps the last valid OR query, scoped results and localized guidance',async()=>{
+   const reads=queries.length;await panel.getByRole('combobox').selectOption('and');
+   if(await panel.getByRole('combobox').inputValue()==='and'){
+     await h.page.locator('[data-hr-state=error]').waitFor();console.log(JSON.stringify({orBytes:bytes('or'),andBytes:bytes('and'),oversizedResponse:responses.at(-1)}));
+   }
+   assert.equal(await panel.getByRole('combobox').inputValue(),'or');await panel.getByRole('alert').waitFor();assert.equal(queries.length,reads);assert.ok(responses.every(status=>status===200));
+   for(const [width,lang] of [[1440,'az'],[768,'en'],[390,'ru'],[320,'az']]){
+     await h.page.setViewportSize({width,height:1000});await h.page.evaluate(l=>window.localeTest(l),lang);assert.ok((await panel.getByRole('alert').textContent()).includes(locales[lang].hrCandidateFilters.limit));assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+     if(process.env.INOP_FILTER_BUDGET_SCREENSHOTS){await h.page.evaluate(()=>{document.activeElement?.blur();scrollTo({top:0,behavior:'instant'});});await h.page.waitForFunction(()=>scrollY===0);await fs.mkdir(process.env.INOP_FILTER_BUDGET_SCREENSHOTS,{recursive:true});await h.page.screenshot({path:path.join(process.env.INOP_FILTER_BUDGET_SCREENSHOTS,`budget-${width}-${lang}.png`),fullPage:true,animations:'disabled'});}
+   }
+   assert.equal(queries.length,reads);assert.equal(await h.page.locator('[data-candidate-total]').textContent(),'1');assert.equal(await h.page.getByText('Synthetic hidden UTF8 candidate',{exact:true}).count(),0);
+ });
+ await t.test('removing a label allows AND again with one valid request and unchanged Candidate values',async()=>{
+   await h.page.evaluate(()=>window.localeTest('az'));pending=done(q=>JSON.parse(q.get('skills')||'[]').length===4);await panel.locator('.tag-chip button').first().click();await pending;
+   if(await panel.getByRole('combobox').inputValue()!=='or'){pending=done(q=>q.get('skillsMode')==='or');await panel.getByRole('combobox').selectOption('or');await pending;}
+   const was=queries.length;pending=done(q=>q.get('skillsMode')==='and');await panel.getByRole('combobox').selectOption('and');await pending;
+   assert.equal(queries.length,was+1);assert.equal(await panel.getByRole('alert').count(),0);assert.equal(await panel.getByRole('combobox').inputValue(),'and');
+   const stored=await Candidate.findOne({name:'Synthetic UTF8 budget candidate'}).lean();assert.deepEqual(stored.skills,skills);assert.deepEqual(stored.certificates,certificates);assert.equal(await h.page.getByText('Synthetic hidden UTF8 candidate',{exact:true}).count(),0);
+ });
+ await t.test('certification-only payload uses the exact budget without charging absent skills or mode',async()=>{
+   let response=done(q=>!q.has('skills')&&!q.has('certificates'));await h.page.getByRole('button',{name:locales.az.hrCandidateFilters.clear,exact:true}).click();await response;
+   const only=Array.from({length:10},(_,i)=>i===0?'C'+'Ж'.repeat(99):'C'+i+'Ж'.repeat(100));assert.equal(Buffer.byteLength(JSON.stringify(only)),2048);
+   const input=panel.getByRole('textbox',{name:locales.az.hrCandidateFilters.certificates,exact:true});
+   for(const [index,value] of only.entries()){
+     if(index<9)response=done(q=>JSON.parse(q.get('certificates')||'[]').includes(value));
+     await input.fill(value);await input.press('Enter');if(index<9)await response;
+   }
+   assert.equal(await panel.locator('.tag-chip').count(),10);await h.page.waitForLoadState('networkidle');
+   assert.equal(await panel.getByRole('alert').count(),0);assert.equal(Buffer.byteLength(queries.at(-1).get('certificates')),2048);assert.equal(queries.at(-1).has('skillsMode'),false);assert.equal(queries.at(-1).has('skills'),false);assert.ok(responses.every(code=>code===200));
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));
