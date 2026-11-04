@@ -41,8 +41,7 @@ function createOcrEngine({enabled=false,binary='/usr/bin/tesseract',languages=['
   if(signal?.aborted)throw fail('OCR_CANCELLED',499);if(active>=1)throw fail('OCR_BUSY',503);active++;
   bytes=Buffer.from(bytes);const controller=new AbortController(),combined=signal?AbortSignal.any([signal,controller.signal]):controller.signal;let timer,dir,file;
   const cleanup=async()=>{let failed=false;if(file)try{await fs.unlink(file);}catch(error){if(error.code!=='ENOENT')failed=true;}if(dir)try{await fs.rmdir(dir);}catch(error){if(error.code!=='ENOENT')failed=true;}if(failed)throw fail('OCR_TEMP_CLEANUP_FAILED',503);};
-  try{
-   return await Promise.race([(async()=>{
+  const work=(async()=>{
     try{const engine=await available(combined);if(combined.aborted)throw fail('OCR_CANCELLED',499);
     const pages=await render(bytes,combined);if(!Array.isArray(pages)||!pages.length||pages.length>3||pages.some(p=>!(p.data instanceof Uint8Array)||!p.data.length||p.data.length>4*1024*1024))throw fail('OCR_LIMIT');if(combined.aborted)throw fail('OCR_CANCELLED',499);
     dir=await fs.mkdtemp(path.join(os.tmpdir(),'inop-ocr-'));if(combined.aborted)throw fail('OCR_CANCELLED',499);
@@ -50,9 +49,14 @@ function createOcrEngine({enabled=false,binary='/usr/bin/tesseract',languages=['
     for(const page of pages){if(combined.aborted)throw fail('OCR_CANCELLED',499);await fs.writeFile(file,Buffer.from(page.data),{flag:'wx',mode:0o600});const text=await run(binary,[file,'stdout','-l',languages.join('+'),...dataArgs,'--psm','6'],{signal:combined,maxBytes:100000-size});if(combined.aborted)throw fail('OCR_CANCELLED',499);size+=Buffer.byteLength(text)+2;if(size>100000)throw fail('OCR_LIMIT');chunks.push(text.trim());await fs.unlink(file);}
     return{text:chunks.join('\n\n').trim(),engine,pages:pages.length};
     }finally{await cleanup();}
-   })(),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(fail('OCR_TIMEOUT',503));},timeoutMs);})]);
+   })();
+  // A deadline settles the caller, not an abort-ignoring collaborator. Hold the
+  // sole shared slot through actual work and its one private cleanup.
+  work.finally(()=>{active--;}).catch(()=>{});
+  try{
+   return await Promise.race([work,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(fail('OCR_TIMEOUT',503));},timeoutMs);})]);
   }catch(error){if(controller.signal.aborted&&!signal?.aborted)throw fail('OCR_TIMEOUT',503);if(error?.code?.startsWith('OCR_'))throw error;throw fail('OCR_FAILED');}
-  finally{clearTimeout(timer);controller.abort();try{await cleanup();}finally{active--;}}
+  finally{clearTimeout(timer);controller.abort();}
  }
  return Object.freeze({extract});
 }

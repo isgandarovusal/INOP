@@ -85,3 +85,26 @@ test('Durable OCR profile keeps current source/scope, review-only provenance and
   });
  }finally{for(const file of owned)await fs.unlink(file);}
 }));
+
+test('OCR timeout retains actual work capacity and completes one private cleanup before recovery',async t=>{
+ const bytes=Buffer.from('%PDF-synthetic-collaborator-only'),page=[{pageNumber:1,data:new Uint8Array([1])}];
+ const run=async(_binary,args)=>args.includes('--list-langs')?'eng\n':args.includes('--version')?'tesseract 5.3.0':'Synthetic recognition';
+ const next=()=>createOcrEngine({enabled:true,languages:['eng'],run,render:async()=>page}).extract(bytes);
+ const probe=()=>createOcrEngine({enabled:true,languages:['eng'],run,render:async()=>{throw Error('Synthetic capacity over-admission');}}).extract(bytes);
+ await t.test('an abort-ignoring renderer keeps the cross-instance slot after caller timeout',async()=>{
+  let enter,release;const entered=new Promise(r=>enter=r),gate=new Promise(r=>release=r);let imageRuns=0;
+  const engine=createOcrEngine({enabled:true,languages:['eng'],timeoutMs:50,run:async(b,args)=>{if(!args.includes('--list-langs')&&!args.includes('--version'))imageRuns++;return run(b,args);},render:async()=>{enter();await gate;return page;}});
+  const pending=engine.extract(bytes);await entered;
+  try{await assert.rejects(pending,{code:'OCR_TIMEOUT'});await assert.rejects(probe(),{code:'OCR_BUSY'});assert.equal(imageRuns,0);}finally{release();await new Promise(r=>setImmediate(r));}
+  assert.equal((await next()).text,'Synthetic recognition');assert.equal(imageRuns,0);
+ });
+ await t.test('a delayed private directory creation remains bounded and is cleaned once after timeout',async()=>{
+  const mkdtemp=fs.mkdtemp,rmdir=fs.rmdir;let enter,release,cleaned,ownedDir,removals=0;
+  const entered=new Promise(r=>enter=r),gate=new Promise(r=>release=r),cleanup=new Promise(r=>cleaned=r);
+  fs.mkdtemp=async(...args)=>{enter();await gate;ownedDir=await mkdtemp(...args);return ownedDir;};
+  fs.rmdir=async dir=>{const result=await rmdir(dir);if(dir===ownedDir){removals++;cleaned();}return result;};
+  const engine=createOcrEngine({enabled:true,languages:['eng'],timeoutMs:50,run,render:async()=>page}),pending=engine.extract(bytes);await entered;
+  try{await assert.rejects(pending,{code:'OCR_TIMEOUT'});await assert.rejects(probe(),{code:'OCR_BUSY'});}finally{release();await cleanup;await new Promise(r=>setImmediate(r));fs.mkdtemp=mkdtemp;fs.rmdir=rmdir;}
+  assert.equal(removals,1);await assert.rejects(fs.stat(ownedDir),{code:'ENOENT'});assert.equal((await next()).text,'Synthetic recognition');
+ });
+});
