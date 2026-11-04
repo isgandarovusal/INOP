@@ -2,6 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const{withBrowserFixture}=require('./helpers/browser.cjs'),az=require('../src/i18n/locales/az.json');
 const harness=()=>fs.readFile(path.join(__dirname,'hrNavigationPerformance.test.cjs'),'utf8').then(s=>s.match(/const harness=`([\s\S]*?)`;/)[1]);
 test('Candidate premium counts, long text, sticky actions, grid permissions and real Excel export',async()=>withBrowserFixture(await harness(),async h=>{
+ const screenshotDir=process.env.INOP_PREMIUM_SCREENSHOT_DIR||'/workspace/work/premium/screens';
  const c=(await h.request('admin','POST','/candidates',{name:'Synthetic Premium Candidate',role:'Long senior job title '.repeat(7),email:'long-synthetic-candidate-email@example.invalid',skills:['Cash handling','LongUnbrokenSkill'.repeat(7)],reviewedFields:['skills']})).data;
  const job=(await h.request('admin','POST','/jobs',{title:'Synthetic Premium Vacancy',department:'HR',description:'Synthetic vacancy for scoped UI validation',requiredSkills:['Cash handling']})).data;
  assert.ok(c._id);assert.ok(job._id);const app=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:job._id})).data;assert.ok(app._id);
@@ -9,11 +10,11 @@ test('Candidate premium counts, long text, sticky actions, grid permissions and 
   await h.page.setViewportSize({width,height:1000});await h.open('admin','/app/recruitment/candidates');await h.page.locator('.hr-candidates-table').waitFor();assert.equal(await h.page.locator('[data-candidate-total]').textContent(),'1');assert.equal(await h.page.locator('[data-candidate-shown]').textContent(),'1');
   assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.equal(await h.page.locator('.hr-candidate-hero .page-header__subtitle').evaluate(e=>getComputedStyle(e).color),'rgb(196, 211, 235)');const region=h.page.locator('.admin-table-container');await region.evaluate(e=>e.scrollLeft=e.scrollWidth);
   assert.equal(await region.evaluate(e=>{const a=e.querySelector('tbody .hr-candidate-actions-cell').getBoundingClientRect(),s=e.querySelector('tbody td:nth-child(5)').getBoundingClientRect();return s.right<=a.left+1}),true);
-  await h.page.getByRole('button',{name:az.hrArchive.archive+' '+c.name,exact:true}).focus();await h.page.keyboard.press('Enter');await h.page.getByRole('dialog').waitFor();await h.page.keyboard.press('Escape');await h.page.evaluate(()=>scrollTo(0,0));await fs.mkdir('/workspace/work/premium/screens',{recursive:true});await h.page.screenshot({path:`/workspace/work/premium/screens/candidates-${width}.png`,fullPage:true});
-  await h.page.getByRole('button',{name:az.hrWorkflow.candidateCards,exact:true}).click();assert.equal(await h.page.locator('.hr-candidate-grid .hr-candidate-actions button').count(),2);await h.page.screenshot({path:`/workspace/work/premium/screens/candidate-grid-${width}.png`,fullPage:true});
-  await h.open('admin','/app/recruitment/applications?view=board');await h.page.locator('[data-application-card]').waitFor();await h.page.screenshot({path:`/workspace/work/premium/screens/kanban-${width}.png`,fullPage:true});
+  await h.page.getByRole('button',{name:az.hrArchive.archive+' '+c.name,exact:true}).focus();await h.page.keyboard.press('Enter');await h.page.getByRole('dialog').waitFor();await h.page.keyboard.press('Escape');await h.page.evaluate(()=>scrollTo(0,0));await fs.mkdir(screenshotDir,{recursive:true});await h.page.screenshot({path:path.join(screenshotDir,`candidates-${width}.png`),fullPage:true});
+  await h.page.getByRole('button',{name:az.hrWorkflow.candidateCards,exact:true}).click();assert.equal(await h.page.locator('.hr-candidate-grid .hr-candidate-actions button').count(),2);await h.page.screenshot({path:path.join(screenshotDir,`candidate-grid-${width}.png`),fullPage:true});
+  await h.open('admin','/app/recruitment/applications?view=board');await h.page.locator('[data-application-card]').waitFor();await h.page.screenshot({path:path.join(screenshotDir,`kanban-${width}.png`),fullPage:true});
  }
- await h.open('admin','/app/recruitment/candidates');await h.page.locator('.hr-candidates-table').waitFor();await h.page.locator('.hr-cell-disclosure summary').press('Enter');assert.equal(await h.page.locator('.hr-cell-disclosure').evaluate(e=>e.open),true);assert.ok(h.page.url().endsWith('/candidates'));
+ await h.open('admin','/app/recruitment/candidates');await h.page.locator('.hr-candidates-table').waitFor();await h.page.locator('tbody td:nth-child(2) .hr-cell-disclosure summary').press('Enter');assert.equal(await h.page.locator('tbody td:nth-child(2) .hr-cell-disclosure').evaluate(e=>e.open),true);assert.ok(h.page.url().endsWith('/candidates'));
  const download=h.page.waitForEvent('download');await h.page.locator('.recruitment-action--export').click();const file=await download;const bytes=await fs.readFile(await file.path());assert.equal(bytes.subarray(0,2).toString(),'PK');
  await h.page.getByRole('searchbox').fill('No matching synthetic person');await h.page.locator('.empty-state').waitFor();assert.equal(await h.page.locator('[data-candidate-total]').textContent(),'0');await h.page.getByRole('button',{name:require('../src/i18n/locales/az.json').hrCandidateFilters.clear,exact:true}).click();await h.page.locator('.hr-candidates-table').waitFor();
  await h.page.evaluate(()=>window.setTestUser({...window.testUser,permissions:[{resource:'candidate',action:'read',scope:'all'},{resource:'recruitment',action:'read',scope:'all'}]}));await h.page.locator('.hr-candidates-table').waitFor();assert.equal(await h.page.getByRole('button',{name:az.hrArchive.archive+' '+c.name,exact:true}).count(),0);assert.equal(await h.page.getByRole('button',{name:az.common.actions.viewDetails+' '+c.name,exact:true}).count(),1);assert.deepEqual(h.pageErrors,[]);
@@ -140,4 +141,37 @@ test('Candidate table keeps its existing readable minimum width within a scoped 
  }
  console.log(JSON.stringify({candidateTableGeometry:measurements,resizeApiRequests:h.wire.length-reads}));assert.equal(h.wire.length,reads);
  assert.ok(measurements.every(m=>m.minWidth==='860px'&&m.tableWidth>=860),'Recruitment generic table rules must not override the existing Candidate-specific 860px minimum');assert.deepEqual(h.pageErrors,[]);
+}));
+
+test('Long Candidate skill previews stay compact with keyboard-readable full text and no extra reads',async t=>withBrowserFixture(filterShell,async h=>{
+ const Candidate=require('../../Backend/models/candidate.model');
+ const skills=['A'+'Ж'.repeat(100),'Synthetic professional qualification '.repeat(3),'C'+'Ж'.repeat(100)],name='Synthetic compact candidate';
+ await h.models.Role.create({key:'skills_preview_reader',name:'Synthetic scoped reader',permissions:[{resource:'candidate',action:'read',scope:'assigned'}]});
+ await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'skills_preview_reader',departmentId:'dep_hr'}});
+ await Candidate.create({name,role:'Cashier',skills,reviewedFields:['skills'],departmentId:'dep_hr',assignedTo:h.actors.peer._id});
+ await Candidate.create({name:'Synthetic short skills',role:'Cashier',skills:['Cash handling','Food safety'],departmentId:'dep_hr',assignedTo:h.actors.peer._id});
+ await Candidate.create({name:'Synthetic hidden skills',role:'Cashier',skills:['Hidden qualification'],departmentId:'dep_hr',assignedTo:h.actors.admin._id});
+ await h.open('peer','/app/recruitment/candidates');const row=()=>h.page.locator('tbody tr').filter({hasText:name});await row().waitFor();
+ const baselineReads=h.wire.length,heights=[],preview=()=>row().locator('[data-candidate-skills-preview]');
+ await t.test('closed long-skill rows fit a small part of the viewport while short chips stay unchanged',async()=>{
+   for(const width of [1440,768,390,320]){await h.page.setViewportSize({width,height:1000});heights.push({width,height:await row().evaluate(e=>e.getBoundingClientRect().height)});assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
+   console.log(JSON.stringify({closedSkillRowHeights:heights}));assert.ok(heights.every(r=>r.height<=300),'Collapsed skill previews must not create 500–1000px rows');
+   const short=h.page.locator('tbody tr').filter({hasText:'Synthetic short skills'});assert.equal(await short.locator('[data-candidate-skills-preview]').count(),0);assert.deepEqual(await short.locator('td:nth-child(4) .tag-chip').allTextContents(),['Cash handling','Food safety']);
+ });
+ await t.test('native disclosure reveals exact existing values without navigating or requesting data',async()=>{
+   await h.page.setViewportSize({width:1440,height:1000});assert.equal(await preview().count(),1);const summary=preview().locator('summary');await summary.focus();await summary.press('Enter');
+   assert.equal(await preview().evaluate(e=>e.open),true);assert.equal(await summary.textContent(),skills.join(' · '));assert.ok((await summary.ariaSnapshot()).includes('Synthetic professional qualification'));assert.equal(await preview().locator('p').count(),0);assert.ok(h.page.url().endsWith('/app/recruitment/candidates'));
+   if(process.env.INOP_CANDIDATE_SKILL_SCREENSHOTS){await fs.mkdir(process.env.INOP_CANDIDATE_SKILL_SCREENSHOTS,{recursive:true});await h.page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await h.page.screenshot({path:path.join(process.env.INOP_CANDIDATE_SKILL_SCREENSHOTS,'skills-open-1440.png'),fullPage:true,animations:'disabled'});}
+   await summary.press('Space');assert.equal(await preview().evaluate(e=>e.open),false);assert.equal(h.wire.length,baselineReads);
+ });
+ await t.test('localized responsive read-only previews preserve scope, records and request counts',async()=>{
+   for(const [width,lang] of [[1440,'az'],[768,'en'],[390,'ru'],[320,'az']]){
+     await h.page.setViewportSize({width,height:1000});await h.page.evaluate(l=>window.localeTest(l),lang);
+     assert.equal(await h.page.locator('tbody tr').count(),2);assert.equal(await h.page.getByText('Synthetic hidden skills',{exact:true}).count(),0);assert.equal(await row().locator('.hr-candidate-actions button').count(),1);assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+     if(process.env.INOP_CANDIDATE_SKILL_SCREENSHOTS){await h.page.locator('.admin-table-container').evaluate(e=>e.scrollLeft=0);await h.page.evaluate(()=>{document.activeElement?.blur();scrollTo({top:0,behavior:'instant'});});await h.page.screenshot({path:path.join(process.env.INOP_CANDIDATE_SKILL_SCREENSHOTS,`skills-closed-${width}-${lang}.png`),fullPage:true,animations:'disabled'});}
+   }
+   assert.equal(h.wire.length,baselineReads);const stored=await Candidate.findOne({name}).lean();assert.deepEqual(stored.skills,skills);
+   await h.models.Role.updateOne({key:'skills_preview_reader'},{$set:{permissions:[]}});await h.open('peer','/app/recruitment/candidates');await h.page.locator('[data-hr-state=forbidden]').waitFor();assert.equal(await h.page.locator('[data-candidate-skills-preview]').count(),0);
+ });
+ assert.deepEqual(h.pageErrors,[]);
 }));

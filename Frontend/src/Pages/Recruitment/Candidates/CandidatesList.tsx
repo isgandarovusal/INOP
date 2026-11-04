@@ -317,6 +317,8 @@ const CandidatesList: React.FC = () => {
 
             <tbody>
               {filteredCandidates.map((candidate) => {
+                const previewSkills = candidate.skills?.slice(0, 3) || [];
+                const skillText = previewSkills.join(' · ');
                 return (
                   <tr
                     key={candidate.id}
@@ -339,14 +341,16 @@ const CandidatesList: React.FC = () => {
                     </td>
 
                     <td>
-                      <div
+                      {skillText.length > 80 ? <details className="hr-cell-disclosure" data-candidate-skills-preview onClick={event => event.stopPropagation()}>
+                        <summary><span>{skillText}</span></summary>
+                      </details> : <div
                         style={{
                           display: "flex",
                           gap: "4px",
                           flexWrap: "wrap",
                         }}
                       >
-                        {candidate.skills?.slice(0, 3).map(
+                        {previewSkills.map(
                           (skill, index) => (
                             <span
                               key={`${candidate.id}-${index}`}
@@ -356,7 +360,7 @@ const CandidatesList: React.FC = () => {
                             </span>
                           ),
                         )}
-                      </div>
+                      </div>}
                     </td>
 
                     <td>
