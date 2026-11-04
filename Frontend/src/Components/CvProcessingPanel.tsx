@@ -16,6 +16,7 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
  const {t}=useTranslation(),{user}=useAuth(),context=useHRActionContext(candidate.id);
  const [kind,setKind]=useState<'parse'|'ocr'|'ai-review'>('parse');
  const [open,setOpen]=useState(false),[jobs,setJobs]=useState<CvProcessingJob[]>([]),[selected,setSelected]=useState<CvProcessingJob|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const retryCommands=useRef(new Map<string,{key:string;commandId:string}>());
  const active=useRef<{sequence:number;controller:AbortController|null}>({sequence:0,controller:null});
  useEffect(()=>()=>{active.current.controller?.abort();active.current.sequence++;},[]);
  const canStart=hasPermission(user,'candidate','update')&&typeof candidate.revision==='number'&&Number.isInteger(candidate.revision)&&/^[a-f0-9]{64}$/.test(candidate.cvOriginal?.sha256||'');
@@ -24,15 +25,29 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
   if(action==='start'&&(!canStart||typeof expectedHash!=='string'||typeof expectedRevision!=='number'))return;
   const retryJob=action==='retry'?jobs.find(job=>job.id===jobId):undefined;
   if(action==='retry'&&(!canStart||!retryJob||!retryable(retryJob)))return;
+  let retryCommand:string|undefined;
+  if(retryJob){
+   const key=JSON.stringify([context.key,retryJob.id,retryJob.kind,retryJob.updatedAt,retryJob.source]);
+   let command=retryCommands.current.get(retryJob.id);
+   if(command?.key!==key){
+    // Match the bounded history size; retain exact uncertain commands per job,
+    // never reuse them for a changed source, revision or authority context.
+    if(!command&&retryCommands.current.size>=20)retryCommands.current.delete(retryCommands.current.keys().next().value!);
+    command={key,commandId:crypto.randomUUID()};retryCommands.current.set(retryJob.id,command);
+   }
+   retryCommand=command.commandId;
+  }
   const key=context.key,sequence=++active.current.sequence,controller=new AbortController();active.current.controller?.abort();active.current.controller=controller;setBusy(true);setError('');
   try {
-   const result=action==='list'?await listCvProcessing(candidate.id,controller.signal,requestedKind):action==='start'?await startCvProcessing(candidate.id,{expectedHash:expectedHash!,expectedRevision:expectedRevision!},controller.signal,requestedKind):action==='retry'?await retryCvProcessing(candidate.id,retryJob!,controller.signal):await getCvProcessing(candidate.id,jobId!,controller.signal);
+   const result=action==='list'?await listCvProcessing(candidate.id,controller.signal,requestedKind):action==='start'?await startCvProcessing(candidate.id,{expectedHash:expectedHash!,expectedRevision:expectedRevision!},controller.signal,requestedKind):action==='retry'?await retryCvProcessing(candidate.id,retryJob!,controller.signal,retryCommand):await getCvProcessing(candidate.id,jobId!,controller.signal);
    if(controller.signal.aborted||context.current.current!==key||active.current.sequence!==sequence)return;
+   if(action==='retry'&&jobId)retryCommands.current.delete(jobId);
    if(Array.isArray(result)){setJobs(result);setSelected(null);}else{setSelected(result);setJobs(old=>[result,...old.filter(j=>j.id!==result.id)].slice(0,20));}
   }catch(failure){
    if(controller.signal.aborted||context.current.current!==key||active.current.sequence!==sequence)return;
    const status=isAxiosError(failure)?failure.response?.status:undefined,code=isAxiosError(failure)?failure.response?.data?.code:undefined;
    if(status===401||status===403||(status===404&&code==='PROCESSING_PARENT_UNAVAILABLE')){onAccessDenied();return;}
+   if(status===409&&jobId)retryCommands.current.delete(jobId);
    if(action==='get'||status===409)setSelected(null);
    setError(code==='PROCESSING_DISABLED'?'disabled':code==='PROCESSING_QUEUE_NOT_READY'?'setup':status===409?'changed':status===429?'busy':status===404?'missing':'unavailable');
   }finally{if(!controller.signal.aborted&&context.current.current===key&&active.current.sequence===sequence)setBusy(false);}
