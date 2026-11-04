@@ -28,7 +28,7 @@ async function indexes() {
  const required=[['hr_processing_context_unique',{contextKey:1},null],['hr_processing_queue_slot',{queueSlot:1},{queueSlot:{$type:'number'}}],['hr_processing_actor_slot',{actorId:1,actorSlot:1},{actorSlot:{$type:'number'}}]];
  if(required.some(([name,key,partial])=>!values.some(i=>i.name===name&&i.unique===true&&JSON.stringify(i.key)===JSON.stringify(key)&&(!partial||JSON.stringify(i.partialFilterExpression)===JSON.stringify(partial)))))throw fail('PROCESSING_QUEUE_NOT_READY');
 }
-function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true',now=()=>new Date(),timeoutMs=30000,parse=parser.parseCvResultFromBuffer,read=readCandidateOriginal,slot=()=>crypto.randomInt(64),kind='parse',taskVersion,task}={}) {
+function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true',now=()=>new Date(),timeoutMs=30000,parse=parser.parseCvResultFromBuffer,read=readCandidateOriginal,slot=()=>crypto.randomInt(64),kind='parse',taskVersion,task,scanner}={}) {
  if(!['parse','ai-review','ocr'].includes(kind)||(kind!=='parse'&&(typeof task!=='function'||typeof taskVersion!=='string'||!/^[a-z0-9-]{1,64}$/.test(taskVersion))))throw fail('PROCESSING_INVALID_CONFIG',400);
  const scopedCandidate=(req,id,update=true)=>candidate(req,id,update,kind==='parse'?'cvReview.version':'name cvReview');
  if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>30000)throw fail('PROCESSING_INVALID_CONFIG',400);
@@ -93,7 +93,7 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
   const commandHash=hash(JSON.stringify([req.user.id,input.commandId])),replay=row=>({...dto(row),replayed:true});
   if(job.retryCommandHash===commandHash)return replay(job);
   const count=job.manualRetries??0;
-  if(job.state!=='blocked'||!['SOURCE_MISSING','STORAGE_NOT_CONFIGURED',...(kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)||!Number.isInteger(job.attempts)||job.attempts<1||job.attempts>=3||!Number.isInteger(count)||count<0||count>=2||job.updatedAt?.toISOString()!==input.expectedUpdatedAt)throw fail('PROCESSING_RETRY_CONFLICT',409);
+  if(job.state!=='blocked'||!['SOURCE_MISSING','STORAGE_NOT_CONFIGURED','SCAN_REQUIRED',...(kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)||!Number.isInteger(job.attempts)||job.attempts<1||job.attempts>=3||!Number.isInteger(count)||count<0||count>=2||job.updatedAt?.toISOString()!==input.expectedUpdatedAt)throw fail('PROCESSING_RETRY_CONFLICT',409);
   for(let i=0;i<8;i++) {
    const queueSlot=slot();if(!Number.isInteger(queueSlot)||queueSlot<0||queueSlot>63)throw fail('PROCESSING_INVALID_CONFIG',400);
    try {
@@ -118,9 +118,20 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
     const retryActor=job.retryActorId?await actor(job.retryActorId):null,retryAuth=retryActor?identity(retryActor):null;
     if(retryActor&&!await scopedCandidate(retryActor,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);
     if(fingerprint(row)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
-    const bytes=await read(row,{signal:controller.signal});if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');if(!bytes)throw fail('PROCESSING_SOURCE_MISSING',404);
+    const original=await read(row,{signal:controller.signal});if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');if(!original)throw fail('PROCESSING_SOURCE_MISSING',404);
+    if(!Buffer.isBuffer(original))throw fail('PROCESSING_SOURCE_CHANGED',409);const bytes=Buffer.from(original);
     if(hash(bytes)!==job.sourceHash)throw fail('PROCESSING_SOURCE_CHANGED',409);
     if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
+    // Stored/archive scan receipts are provenance, not a fresh verdict for this
+    // attempt. Reuse the shared native adapter (24h definitions, 10s, two scans).
+    let scan;
+    const mimeType=row.cvOriginal?.mimeType||({'.pdf':'application/pdf','.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})[path.extname(row.cvUrl||'').toLowerCase()];
+    try{scan=await (scanner||require('./hrCvIntakeProfiles.service').scanner()).scan(Buffer.from(bytes),{sha256:job.sourceHash,mimeType,signal:controller.signal});}
+    catch{if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');throw fail('PROCESSING_SCAN_REQUIRED');}
+    if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
+    if(scan?.verdict==='infected')throw fail('PROCESSING_SOURCE_QUARANTINED',422);
+    if(scan?.verdict!=='clean'||scan.sha256!==job.sourceHash||!(/^[A-Za-z0-9_.-]{1,64}$/).test(scan.engine||'')||!(/^[A-Za-z0-9_.-]{1,64}$/).test(scan.version||''))throw fail('PROCESSING_SCAN_REQUIRED');
+    // Refresh original/retry actor and source after BOTH original IO and scan.
     // A source/role change during original IO must stop an external task before sending facts.
     const beforeTask=await actor(job.actorId),beforeParent=await scopedCandidate(beforeTask,job.candidateId);
     if(identity(beforeTask)!==auth||!beforeParent)throw fail('PROCESSING_AUTH_REVOKED',403);
@@ -147,8 +158,8 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
    const result=await Promise.race([execute(),new Promise((_,reject)=>{deadline=setTimeout(()=>{timedOut=true;controller.abort();reject(fail('PROCESSING_TIMEOUT'));},timeoutMs);})]);
    await finish(job,token,result.state,result.code,result.result);
   }catch(error){
-   const code=error.code==='PROCESSING_AUTH_REVOKED'?'AUTH_REVOKED':['PROCESSING_SOURCE_CHANGED','STORAGE_IDENTITY_MISMATCH'].includes(error.code)?'SOURCE_CHANGED':error.code==='PROCESSING_SOURCE_MISSING'||['ENOENT','ENOTDIR','STORAGE_NOT_FOUND'].includes(error.code)?'SOURCE_MISSING':error.code==='STORAGE_NOT_CONFIGURED'?'STORAGE_NOT_CONFIGURED':error.code==='DOCUMENT_LIMIT'?'INPUT_LIMIT':error.code==='PROCESSING_RESULT_LIMIT'?'RESULT_LIMIT':error.code==='PROCESSING_INVALID_RESULT'?'RESULT_INVALID':timedOut?'PROCESSING_TIMEOUT':'PROCESSING_FAILED';
-   const state=['AUTH_REVOKED','SOURCE_CHANGED'].includes(code)?'cancelled':['SOURCE_MISSING','RESULT_LIMIT','RESULT_INVALID','STORAGE_NOT_CONFIGURED','INPUT_LIMIT'].includes(code)?'blocked':job.attempts>=3?'failed':'retry';
+   const code=error.code==='PROCESSING_SCAN_REQUIRED'?'SCAN_REQUIRED':error.code==='PROCESSING_SOURCE_QUARANTINED'?'SOURCE_QUARANTINED':error.code==='PROCESSING_AUTH_REVOKED'?'AUTH_REVOKED':['PROCESSING_SOURCE_CHANGED','STORAGE_IDENTITY_MISMATCH'].includes(error.code)?'SOURCE_CHANGED':error.code==='PROCESSING_SOURCE_MISSING'||['ENOENT','ENOTDIR','STORAGE_NOT_FOUND'].includes(error.code)?'SOURCE_MISSING':error.code==='STORAGE_NOT_CONFIGURED'?'STORAGE_NOT_CONFIGURED':error.code==='DOCUMENT_LIMIT'?'INPUT_LIMIT':error.code==='PROCESSING_RESULT_LIMIT'?'RESULT_LIMIT':error.code==='PROCESSING_INVALID_RESULT'?'RESULT_INVALID':timedOut?'PROCESSING_TIMEOUT':'PROCESSING_FAILED';
+   const state=['AUTH_REVOKED','SOURCE_CHANGED'].includes(code)?'cancelled':['SOURCE_MISSING','RESULT_LIMIT','RESULT_INVALID','STORAGE_NOT_CONFIGURED','INPUT_LIMIT','SCAN_REQUIRED','SOURCE_QUARANTINED'].includes(code)?'blocked':job.attempts>=3?'failed':'retry';
    await finish(job,token,state,code);
   }finally{clearTimeout(deadline);controller.abort();}
  }

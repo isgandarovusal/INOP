@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs/promises'),path=require('node:path');
 const PDFDocument=require('pdfkit'),{PDFParse}=require('pdf-parse');
-const {withAuditFixture}=require('./helpers/auditFixture.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
+const {withScannedCvFixture:withAuditFixture}=require('./helpers/syntheticLegacyScanner.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
 const {createOcrEngine}=require('../services/hrCvOcrEngine.service'),{createOcrProcessing,parseOcrCv}=require('../services/hrCvOcrProcessing.service'),{createProcessing}=require('../services/hrCvProcessing.service');
 const {extractCvResult}=require('../services/cvTextExtraction.service');
 const Candidate=require('../models/candidate.model'),Jobs=require('../models/hrCvProcessingJob.model'),{directory,versions}=require('../scripts/prepareOcrTestModels.cjs');

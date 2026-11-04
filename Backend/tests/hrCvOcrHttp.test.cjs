@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs/promises'),path=require('node:path');
-const {withAuditFixture}=require('./helpers/auditFixture.cjs'),{scanned}=require('./helpers/scannedCv.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
+const {withScannedCvFixture:withAuditFixture}=require('./helpers/syntheticLegacyScanner.cjs'),{scanned}=require('./helpers/scannedCv.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
 const Candidate=require('../models/candidate.model'),Jobs=require('../models/hrCvProcessingJob.model'),ocr=require('../services/hrCvOcrProcessing.service'),processing=require('../services/hrCvProcessing.service'),{createOcrEngine}=require('../services/hrCvOcrEngine.service'),{directory}=require('../scripts/prepareOcrTestModels.cjs');
 test('OCR HTTP status/start and explicit HR approval retain exact source and current independent scope',async t=>withAuditFixture(async h=>{
  const factory=ocr.createOcrProcessing,old=process.env.HR_CV_OCR_ENABLED,files=[],bytes=await scanned('Name: Synthetic Applicant\nPhone: +994 50 123 45 67\nSkills\nFood safety\nHACCP\nExperience\n0 years');delete process.env.HR_CV_OCR_ENABLED;

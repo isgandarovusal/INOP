@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs/promises'),path=require('node:path');
-const {withAuditFixture}=require('./helpers/auditFixture.cjs'),{docx}=require('./helpers/cvDocuments.cjs');
+const {withScannedCvFixture:withAuditFixture}=require('./helpers/syntheticLegacyScanner.cjs'),{docx}=require('./helpers/cvDocuments.cjs');
 const Candidate=require('../models/candidate.model'),Jobs=require('../models/hrCvProcessingJob.model');
 const {createProcessing}=require('../services/hrCvProcessing.service'),{createAiProcessing}=require('../services/hrCvAiProcessing.service');
 const {createProvider}=require('../services/hrAiProvider.service'),{uploadsDir}=require('../middleware/privateUpload.middleware');

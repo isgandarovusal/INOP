@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs/promises'),path=require('node:path');
-const {withAuditFixture}=require('./helpers/auditFixture.cjs'),{docx,pdf}=require('./helpers/cvDocuments.cjs');
+const {withScannedCvFixture:withAuditFixture}=require('./helpers/syntheticLegacyScanner.cjs'),{docx,pdf}=require('./helpers/cvDocuments.cjs');
 const Candidate=require('../models/candidate.model'),Jobs=require('../models/hrCvProcessingJob.model'),{createProcessing}=require('../services/hrCvProcessing.service'),{uploadsDir}=require('../middleware/privateUpload.middleware');
 test('Durable CV parse queue has current scope, source identity, unique bounded reservations and recovery without silent Candidate writes',async t=>withAuditFixture(async h=>{
  const owned=[];await fs.mkdir(uploadsDir,{recursive:true});const bytes=docx('Name: Synthetic Applicant\nPhone: +994 (50) 123-45-67\nSkills\nFood safety\nExperience\n0 years');

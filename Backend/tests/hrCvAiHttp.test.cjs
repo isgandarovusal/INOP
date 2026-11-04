@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs/promises'),path=require('node:path');
-const {withAuditFixture}=require('./helpers/auditFixture.cjs'),{docx}=require('./helpers/cvDocuments.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
+const {withScannedCvFixture:withAuditFixture}=require('./helpers/syntheticLegacyScanner.cjs'),{docx}=require('./helpers/cvDocuments.cjs'),{uploadsDir}=require('../middleware/privateUpload.middleware');
 const Candidate=require('../models/candidate.model'),Jobs=require('../models/hrCvProcessingJob.model'),ai=require('../services/hrCvAiProcessing.service'),{createProvider}=require('../services/hrAiProvider.service');
 const env={HR_AI_PROVIDER:'openai',HR_AI_MODEL:'synthetic-model',OPENAI_API_KEY:'synthetic-test-only-not-a-real-key',HR_AI_CV_REVIEW_APPROVED:'true',HR_AI_DAILY_BUDGET_USD:'1',HR_AI_INPUT_USD_PER_MILLION:'1',HR_AI_OUTPUT_USD_PER_MILLION:'1'};
 const proposal={status:'suggested',proposals:[{field:'skills',value:'Food safety',evidenceIds:['e1'],reason:'Literal original professional evidence.',confidence:0.7}],uncertainty:[]};
