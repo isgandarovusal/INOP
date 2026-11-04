@@ -206,12 +206,14 @@ export default function ApplicationDetail() {
   const context = useHRActionContext(id); const app = resource.data;
   if (resource.status !== 'ready' || !app) return <HRResourceState status={resource.status} retry={resource.reload} />;
   const handoff = resource.refreshing ? undefined : app.handoffContext;
+  const job = app.jobId && typeof app.jobId === 'object' ? app.jobId : undefined;
+  const jobProfile = !resource.refreshing && hasPermission(user, 'recruitment', 'read') && job && /^[a-f0-9]{24}$/i.test(job.id) ? job : undefined;
   return <div className="hr-workspace hr-application-detail">
     <PageHeader icon={<ClipboardList size={26} />} title={t('hrWorkflow.application')} subtitle={app.candidateId && typeof app.candidateId === 'object' ? app.candidateId.name : handoff?.candidate.name || t('hrStates.restricted')} actions={<>
       <Link className="btn-secondary" to="/app/recruitment/applications">{t('common.actions.back')}</Link>
       {app.candidateId && typeof app.candidateId === 'object' && <><Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}`}>{app.candidateId.name}</Link>{hasPermission(user,'candidate','update')&&<Link className="btn-secondary" to={`/app/recruitment/candidates/${app.candidateId.id}/edit`}>{t('common.actions.edit')}</Link>}</>}
     </>} />
-    <p>{typeof app.jobId === 'object' && app.jobId ? app.jobId.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
+    <p>{jobProfile ? <Link data-application-job-link to={`/app/recruitment/jobs/${jobProfile.id}`}>{jobProfile.position}</Link> : job ? job.position : t('hrStates.restricted')} · {t(`recruitment.applications.${app.status}`)}</p>
     {app.handoffContext && resource.refreshing && <p role="status" data-handoff-refreshing>{t('hrHandoff.refreshing')}</p>}
     {handoff && <SectionCard className="detail-card" data-application-handoff>
       <h2>{t('hrHandoff.title')}</h2><p role="status">{t('hrHandoff.readOnly')}</p>
