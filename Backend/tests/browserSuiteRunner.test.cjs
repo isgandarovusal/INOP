@@ -7,7 +7,7 @@ function run(results={},port='27018'){
 }
 test('Browser runner keeps all serial groups, flags and guarded environment; success is explicit',()=>{
  const {calls,logs,process}=run();assert.equal(calls.length,15);assert.equal(process.exitCode,0);
- const files=calls.flatMap(([,args])=>Array.from(args.slice(2)));assert.equal(files.length,33);assert.equal(new Set(files).size,33);assert.ok(files.some(f=>f.endsWith('applicationHandoffContextUI.test.cjs')));
+ const files=calls.flatMap(([,args])=>Array.from(args.slice(2)));assert.equal(files.length,34);assert.equal(new Set(files).size,34);assert.ok(files.some(f=>f.endsWith('applicationHandoffContextUI.test.cjs')));
  for(const [binary,args,options]of calls){assert.equal(binary,process.execPath);assert.deepEqual(Array.from(args.slice(0,2)),['--test','--test-isolation=none']);assert.equal(options.env,process.env);assert.equal(options.stdio,'inherit');for(const file of args.slice(2))assert.ok(fs.existsSync(file));}
  assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_START').length,15);assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_RESULT').length,15);assert.equal(logs.at(-1).failedGroups.length,0);
 });
@@ -20,4 +20,20 @@ test('Signal termination and spawn errors fail closed without logging raw diagno
 });
 test('Browser runner still refuses a missing owned QA port before spawning tests',()=>{
  assert.throws(()=>run({},''),/loopback QA port/);
+});
+
+test('Matching authorization and navigation regressions run exactly once in FULL and Recruitment coverage',()=>{
+ const matching='applicationMatchingUI.test.cjs';
+ const full=run(),fullFiles=full.calls.flatMap(([,args])=>Array.from(args.slice(2)));
+ assert.equal(fullFiles.filter(f=>path.basename(f)===matching).length,1,'FULL must execute matching UI regression');
+ const {groups,runBrowser}=require('../../scripts/qaScope.cjs');
+ const selectedFiles=groups.flatMap(g=>g.files);
+ assert.equal(selectedFiles.length,29);assert.equal(new Set(selectedFiles).size,29);
+ assert.equal(selectedFiles.filter(f=>f===matching).length,1);
+ const previous=process.env.INOP_AUDIT_TEST_PORT;process.env.INOP_AUDIT_TEST_PORT='27018';
+ try{const calls=[];assert.equal(runBrowser({scope:'recruitment-frontend'},{spawn:(_exe,args)=>{calls.push(args);return{status:0};}}),0);
+ assert.equal(calls.flat().filter(f=>f.endsWith('/'+matching)).length,1);
+ }finally{if(previous===undefined)delete process.env.INOP_AUDIT_TEST_PORT;else process.env.INOP_AUDIT_TEST_PORT=previous;}
+ const failed=run({12:{status:1}});assert.equal(failed.process.exitCode,1);
+ assert.ok(failed.logs.at(-1).failedGroups[0].files.includes(matching));
 });

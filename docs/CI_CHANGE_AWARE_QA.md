@@ -90,3 +90,15 @@ so the scheduled full run targets the existing default-branch workflow.
 Rollback: revert this one CI commit to restore the exact original unconditional
 browser invocation and trigger configuration. Full manual QA remains immediately
 available without enabling a separate variable or changing security settings.
+
+## Matching coverage closure (Step 9P)
+
+FULL now retains the original 15 groups and 33 files and adds
+`applicationMatchingUI.test.cjs` to group 12, for 34 distinct files.
+Recruitment selection remains 7 groups / 29 distinct files. Each mode runs
+the matching file exactly once; FULL and Recruitment have different manifests,
+so FULL is not claimed to include every selective-only test. No selector,
+workflow, required check, timeout, assertion or fallback rule changes.
+The runner regression verifies actual child arguments and failure propagation
+without launching the expensive browser suites. Hosted FULL CI must succeed
+before this closure is treated as delivered and verified.
