@@ -128,6 +128,7 @@ export function normalizeApplication(raw: unknown): Application {
     matching: data.matching && typeof data.matching === 'object' && 'version' in data.matching && 'criteria' in data.matching && Array.isArray(data.matching.criteria) ? data.matching as ApplicationMatch : null,
 
     status: frontendStatus(status),
+    statusKnown: typeof data.status === "string" && ["applied", "screening", "shortlisted", "interview", "offered", "hired", "rejected"].includes(data.status.toLowerCase()),
 
     notes: typeof data.notes === "string" ? data.notes : "",
     createdAt: typeof data.createdAt === "string" ? data.createdAt : undefined,

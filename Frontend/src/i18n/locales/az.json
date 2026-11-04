@@ -1206,6 +1206,7 @@
     "limit": "Hər qrupda ən çox 10 etiket, hər etiketdə 120 simvol və cəmi 2 KiB həddi var. Boş və idarəetmə simvollu etiketlər qəbul edilmir."
   },
   "hrMatch": {
+    "applicationStage": "Müraciətin işə qəbul mərhələsi",
     "candidateExperience": "Namizəd: {{value}}",
     "requiredExperience": "Tələb: {{value}}",
     "years_one": "{{value}} il",

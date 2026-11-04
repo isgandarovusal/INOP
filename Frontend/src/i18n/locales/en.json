@@ -1189,6 +1189,7 @@
     "limit": "Maximum 10 labels per group, 120 characters per label and 2 KiB combined. Blank labels and control characters are not accepted."
   },
   "hrMatch": {
+    "applicationStage": "Application hiring stage",
     "candidateExperience": "Candidate: {{value}}",
     "requiredExperience": "Required: {{value}}",
     "years_one": "{{value}} year",

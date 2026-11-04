@@ -156,6 +156,8 @@ export interface Application {
   scoreStatus: "pending" | "incomplete" | "calculated" | "stale" | "legacy" | "restricted";
   matching?: ApplicationMatch | null;
   status: ApplicationStatus;
+  /** Frontend-derived provenance; never inferred from the legacy status fallback. */
+  statusKnown?: boolean;
   notes?: string;
 
   appliedAt?: string;
