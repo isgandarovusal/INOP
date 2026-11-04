@@ -1,4 +1,5 @@
-import type { ApplicationStatus } from '../Types/recruitment';
+import type { Application, ApplicationStatus, ApplicationInterview, ApplicationNextAction } from '../Types/recruitment';
+import type { ApplicationWorkflowInput } from '../Services/applicationsService';
 export const applicationTransitions: Record<ApplicationStatus, ApplicationStatus[]> = {
   applied: ['screening', 'shortlisted', 'interview', 'offered', 'rejected'],
   screening: ['applied', 'shortlisted', 'interview', 'offered', 'rejected'],
@@ -16,4 +17,39 @@ export function localDateTime(value?: string | null, timezone?: string | null): 
     const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(date).map(part => [part.type, part.value]));
     return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
   } catch { return ''; }
+}
+
+
+interface ScheduleDraft {
+  status: ApplicationStatus; timezone: string; start: string; duration: number;
+  interviewer: string; interviewResult: ApplicationInterview['result'];
+  action: ApplicationNextAction['kind']; due: string; actionNotes: string;
+}
+
+// The endpoint already supports partial workflow/interview updates. Do not
+// reinterpret untouched instants through minute-only wall-time inputs: that can
+// lose precision, move a different-zone deadline or reject an existing DST fold.
+export function scheduleChanges(app: Application, draft: ScheduleDraft, currentUserId: string): Pick<ApplicationWorkflowInput, 'interview' | 'nextAction'> {
+  const initialZone = app.interview?.timezone || app.nextAction?.timezone || 'Asia/Baku';
+  const zoneChanged = draft.timezone !== initialZone;
+  const change: Pick<ApplicationWorkflowInput, 'interview' | 'nextAction'> = {};
+  if (draft.status === 'interview' && draft.start) {
+    const interview: NonNullable<ApplicationWorkflowInput['interview']> = {};
+    if (zoneChanged || draft.start !== localDateTime(app.interview?.startsAt, app.interview?.timezone)) {
+      interview.localStart = draft.start; interview.timezone = draft.timezone;
+    }
+    if (draft.duration !== (app.interview?.durationMinutes || 30)) interview.durationMinutes = draft.duration;
+    if (draft.interviewer !== (app.interview?.interviewerId || currentUserId || '')) interview.interviewerId = draft.interviewer;
+    if (draft.interviewResult !== (app.interview?.result || 'pending')) interview.result = draft.interviewResult;
+    // Entering Interview explicitly still validates the existing/new schedule.
+    if (Object.keys(interview).length || draft.status !== app.status) change.interview = interview;
+  }
+  const dueChanged = draft.due !== localDateTime(app.nextAction?.dueAt, initialZone);
+  if (draft.action !== (app.nextAction?.kind || 'none') || draft.actionNotes !== (app.nextAction?.notes || '') || dueChanged || zoneChanged && !!app.nextAction) {
+    change.nextAction = { kind: draft.action, notes: draft.actionNotes,
+      ...(dueChanged || zoneChanged
+        ? { timezone: draft.timezone, ...(draft.due ? { localDueAt: draft.due } : { dueAt: null }) }
+        : { timezone: app.nextAction?.timezone || undefined, dueAt: app.nextAction?.dueAt || null }) };
+  }
+  return change;
 }

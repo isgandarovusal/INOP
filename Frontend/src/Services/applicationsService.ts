@@ -218,7 +218,7 @@ export async function recalculateApplicationMatch(id: string, input: { expectedR
 export interface ApplicationWorkflowInput {
   placement?: ApplicationPlacement;
   expectedRevision?: number; status?: ApplicationStatus; assignedTo?: string; substatus?: string; notes?: string; reason?: string; reopen?: boolean;
-  interview?: { localStart?: string; startsAt?: string; timezone: string; durationMinutes: number; interviewerId: string; result: ApplicationInterview['result'] } | null;
+  interview?: { localStart?: string; startsAt?: string; timezone?: string; durationMinutes?: number; interviewerId?: string; result?: ApplicationInterview['result'] } | null;
   nextAction?: { kind: ApplicationNextAction['kind']; localDueAt?: string; dueAt?: string | null; timezone?: string; notes?: string } | null;
 }
 export interface ApplicationAnchor { id: string; expectedRevision: number }

@@ -610,3 +610,47 @@ test('Application clear-all replaces search and status atomically on scoped tabl
   });
   assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Metadata-only workflow edits preserve independent schedule instants, timezone and precision',async t=>withBrowserFixture(harness,async h=>{
+ const c=(await h.request('admin','POST','/candidates',{name:'Synthetic scheduling applicant',role:'Cashier'})).data;
+ const j=(await h.request('admin','POST','/jobs',{title:'Synthetic scheduling vacancy',description:'Synthetic only',department:'HR'})).data;
+ const app=(await h.request('admin','POST','/applications',{candidateId:c._id,jobId:j._id})).data;
+ const url='/app/recruitment/applications/'+app._id,form=()=>h.page.locator('[data-application-workflow]');
+ const normal={startsAt:new Date('2026-11-10T06:30:47.123Z'),timezone:'Asia/Baku',durationMinutes:30,interviewerId:h.actors.admin._id,result:'pending'};
+ const nextAction={kind:'call',dueAt:new Date('2026-11-11T11:15:39.456Z'),timezone:'Europe/London',notes:'Synthetic existing action'};
+ const reset=async(interview=normal,action=nextAction)=>Application.updateOne({_id:app._id},{$set:{status:'Interview',substatus:'scheduled',interview,nextAction:action,notes:'Synthetic original HR note',assignedTo:h.actors.admin._id,events:[]}});
+ const open=async(actor='admin')=>{await h.open(actor,url);await form().waitFor();};
+ const save=async()=>{const response=h.page.waitForResponse(r=>r.url().endsWith('/applications/'+app._id+'/workflow')&&r.request().method()==='PATCH');await form().locator('button[type=submit]').click();return response;};
+ await t.test('notes-only save cannot shift a different-zone deadline or truncate interview seconds',async()=>{
+   await reset();await open();await form().getByLabel('HR qeydləri',{exact:true}).fill('Synthetic note only');const response=await save();assert.equal(response.status(),200);
+   const stored=await Application.findById(app._id).lean();console.log(JSON.stringify({case:'notes-only',interviewBefore:normal.startsAt.toISOString(),interviewAfter:stored.interview.startsAt.toISOString(),dueBefore:nextAction.dueAt.toISOString(),dueAfter:stored.nextAction.dueAt.toISOString(),actionZoneAfter:stored.nextAction.timezone}));
+   assert.equal(stored.nextAction.dueAt.toISOString(),nextAction.dueAt.toISOString());assert.equal(stored.nextAction.timezone,nextAction.timezone);assert.equal(stored.interview.startsAt.toISOString(),normal.startsAt.toISOString());assert.equal(stored.notes,'Synthetic note only');assert.equal(stored.events.at(-1).delivery,undefined,'Notes must not queue a rescheduling notification');
+   assert.equal(Object.hasOwn(response.request().postDataJSON(),'interview'),false);assert.equal(Object.hasOwn(response.request().postDataJSON(),'nextAction'),false);
+ });
+ await t.test('explicit-offset DST fold remains editable without rescheduling; result-only patch preserves its instant',async()=>{
+   const fold={...normal,startsAt:new Date('2026-10-25T00:30:47.123Z'),timezone:'Europe/London'};await reset(fold,null);
+   const backend=await h.request('admin','PATCH','/applications/'+app._id+'/workflow',{interview:{startsAt:fold.startsAt.toISOString(),timezone:fold.timezone,durationMinutes:30,interviewerId:String(h.actors.admin._id),result:'pending'}});assert.equal(backend.status,200,'Existing backend must accept explicit-offset fold instants');
+   await open();await form().getByLabel('HR qeydləri',{exact:true}).fill('Synthetic fold note');let response=await save();console.log(JSON.stringify({case:'fold note-only',status:response.status()}));assert.equal(response.status(),200);assert.equal((await Application.findById(app._id)).interview.startsAt.toISOString(),fold.startsAt.toISOString());
+   await open();await form().getByLabel('Müsahibə nəticəsi',{exact:true}).selectOption('passed');response=await save();assert.equal(response.status(),200);const stored=await Application.findById(app._id);assert.equal(stored.interview.startsAt.toISOString(),fold.startsAt.toISOString());assert.equal(stored.interview.result,'passed');assert.deepEqual(response.request().postDataJSON().interview,{result:'passed'});
+ });
+ await t.test('due input agrees with selected timezone; action-note edit preserves original due instant and zone',async()=>{
+   await reset();await open();assert.equal(await form().getByLabel('Son tarix (seçilmiş saat qurşağında)',{exact:true}).inputValue(),'2026-11-11T15:15');
+   await form().getByLabel('Növbəti addımın qeydi',{exact:true}).fill('Synthetic action-note edit');const response=await save();assert.equal(response.status(),200);
+   const stored=await Application.findById(app._id);assert.equal(stored.nextAction.dueAt.toISOString(),nextAction.dueAt.toISOString());assert.equal(stored.nextAction.timezone,nextAction.timezone);assert.equal(stored.nextAction.notes,'Synthetic action-note edit');assert.equal(stored.interview.startsAt.toISOString(),normal.startsAt.toISOString());
+   const payload=response.request().postDataJSON();assert.equal(payload.nextAction.dueAt,nextAction.dueAt.toISOString());assert.equal(Object.hasOwn(payload.nextAction,'localDueAt'),false);
+ });
+ await t.test('explicit date edits still use selected-zone conversion and reject DST gaps/folds',async()=>{
+   await reset();await open();await form().getByLabel('Son tarix (seçilmiş saat qurşağında)',{exact:true}).fill('2026-11-11T16:15');let response=await save();assert.equal(response.status(),200);assert.equal((await Application.findById(app._id)).nextAction.dueAt.toISOString(),'2026-11-11T12:15:00.000Z');
+   for(const local of ['2026-03-29T01:30','2026-10-25T01:30']){
+     await reset({...normal,timezone:'Europe/London'},null);await open();await form().getByLabel('Müsahibə vaxtı',{exact:true}).fill(local);response=await save();assert.equal(response.status(),400);assert.equal(await form().getByLabel('Müsahibə vaxtı',{exact:true}).inputValue(),local);assert.equal((await Application.findById(app._id)).interview.startsAt.toISOString(),normal.startsAt.toISOString());
+   }
+ });
+ await t.test('assigned Employee can save notes while parent resources stay independently protected',async()=>{
+   await reset();await h.models.User.updateOne({_id:h.actors.own._id},{$set:{role:'recruitment_employee',departmentId:'dep_hr'}});await Application.updateOne({_id:app._id},{$set:{assignedTo:h.actors.own._id}});
+   assert.equal((await h.request('own','GET','/candidates/'+c._id)).status,404);assert.equal((await h.request('own','GET','/jobs/'+j._id)).status,404);
+   await open('own');await form().getByLabel('HR qeydləri',{exact:true}).fill('Synthetic assigned HR note');const response=await save();assert.equal(response.status(),200);
+   const stored=await Application.findById(app._id).lean();assert.equal(stored.notes,'Synthetic assigned HR note');assert.equal(stored.interview.startsAt.toISOString(),normal.startsAt.toISOString());assert.equal(stored.nextAction.dueAt.toISOString(),nextAction.dueAt.toISOString());assert.equal(stored.events.at(-1).actor,String(h.actors.own._id));assert.equal(stored.events.at(-1).delivery,undefined);
+   const body=response.request().postDataJSON();assert.equal(Object.hasOwn(body,'interview'),false);assert.equal(Object.hasOwn(body,'nextAction'),false);assert.equal(Object.hasOwn(body,'assignedTo'),false);
+ });
+ assert.deepEqual(h.pageErrors,[]);
+}));

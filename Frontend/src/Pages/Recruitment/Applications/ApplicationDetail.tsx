@@ -10,7 +10,7 @@ import { useAuth } from '../../../Context/useAuth';
 import { useAuditResource } from '../../../Hooks/useAuditResource';
 import { useHRActionContext } from '../../../Hooks/useHRActionContext';
 import { hasPermission, getPermissionScope } from '../../../Utils/permissions';
-import { applicationTransitions, applicationSubstatuses, localDateTime } from '../../../Utils/applicationWorkflow';
+import { applicationTransitions, applicationSubstatuses, localDateTime, scheduleChanges } from '../../../Utils/applicationWorkflow';
 import { hrCrudErrorKey } from '../../../Utils/hrCrudError';
 import { getApplicationById, getApplicationHistory, getApplicationInterviewers, updateApplicationWorkflow } from '../../../Services/applicationsService';
 import type { Application, ApplicationStatus, ApplicationInterview, ApplicationNextAction, ApplicationEvent } from '../../../Types/recruitment';
@@ -159,7 +159,7 @@ function WorkflowForm({ app, reload, disabled = false }: { app: Application; rel
   const [interviewer, setInterviewer] = useState(app.interview?.interviewerId || user?.id || '');
   const [interviewResult, setInterviewResult] = useState<ApplicationInterview['result']>(app.interview?.result || 'pending');
   const [action, setAction] = useState<ApplicationNextAction['kind']>(app.nextAction?.kind || 'none');
-  const [due, setDue] = useState(localDateTime(app.nextAction?.dueAt, app.nextAction?.timezone || timezone));
+  const [due, setDue] = useState(localDateTime(app.nextAction?.dueAt, timezone));
   const [actionNotes, setActionNotes] = useState(app.nextAction?.notes || ''), [notes, setNotes] = useState(app.notes || '');
   const [assignee, setAssignee] = useState(app.assignedTo || '');
   const canAssign = getPermissionScope(user, 'application', 'update') === 'all';
@@ -172,8 +172,7 @@ function WorkflowForm({ app, reload, disabled = false }: { app: Application; rel
     try {
       await updateApplicationWorkflow(app.id, { expectedRevision: app.revision, status, substatus, reason, reopen, notes,
         ...(canAssign && assignee !== (app.assignedTo || '') ? { assignedTo: assignee } : {}),
-        ...(status === 'interview' && start ? { interview: { localStart: start, timezone, durationMinutes: duration, interviewerId: interviewer, result: interviewResult } } : {}),
-        nextAction: { kind: action, ...(due ? { localDueAt: due } : {}), timezone, notes: actionNotes } });
+        ...scheduleChanges(app, { status, timezone, start, duration, interviewer, interviewResult, action, due, actionNotes }, user?.id || '') });
       if (context.current.current === key) reload();
     } catch (err) { if (context.current.current === key) { if (isAxiosError(err) && [401,403,404].includes(err.response?.status || 0)) reload(); setError(isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err)); } }
     finally { if (context.current.current === key) setBusy(false); }
