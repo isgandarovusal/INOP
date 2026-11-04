@@ -345,7 +345,7 @@
  .hr-candidates-page .hr-candidate-metrics article > svg { width: 32px; height: 32px; padding: 7px; flex-shrink: 0; }
  .hr-candidates-page .hr-candidate-metrics strong { font-size: 24px; }
 }
-.hr-candidates-page .hr-candidates-table { table-layout: fixed; min-width: 860px; }
+.hr-candidates-page .admin-table-container .hr-candidates-table { table-layout: fixed; min-width: 860px; }
 .hr-candidates-table .hr-candidate-col-person { width: 24%; }
 .hr-candidates-table .hr-candidate-col-role { width: 22%; }
 .hr-candidates-table .hr-candidate-col-experience { width: 12%; }

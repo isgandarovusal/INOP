@@ -122,3 +122,22 @@ test('Candidate skill-mode changes respect the combined UTF-8 filter budget',asy
  });
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('Candidate table keeps its existing readable minimum width within a scoped scroll region',async()=>withBrowserFixture(filterShell,async h=>{
+ const Candidate=require('../../Backend/models/candidate.model');
+ await h.models.Role.create({key:'table_geometry_reader',name:'Synthetic scoped reader',permissions:[{resource:'candidate',action:'read',scope:'assigned'}]});
+ await h.models.User.updateOne({_id:h.actors.peer._id},{$set:{role:'table_geometry_reader',departmentId:'dep_hr'}});
+ const values={role:'Cashier',skills:['A'+'Ж'.repeat(100),'B'+'Ж'.repeat(100),'C'+'Ж'.repeat(100)],reviewedFields:['skills'],departmentId:'dep_hr'};
+ await Candidate.create({name:'Synthetic readable candidate',assignedTo:h.actors.peer._id,...values});await Candidate.create({name:'Synthetic hidden candidate',assignedTo:h.actors.admin._id,...values});
+ await h.open('peer','/app/recruitment/candidates');await h.page.locator('.hr-candidates-table').waitFor();const reads=h.wire.length,measurements=[];
+ for(const width of [1440,768,390,320]){
+   await h.page.setViewportSize({width,height:1000});const table=h.page.locator('.hr-candidates-table'),region=h.page.locator('.admin-table-container');
+   measurements.push({viewport:width,minWidth:await table.evaluate(e=>getComputedStyle(e).minWidth),tableWidth:await table.evaluate(e=>e.getBoundingClientRect().width)});
+   assert.ok(await h.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await region.evaluate(e=>e.scrollLeft=e.scrollWidth);
+   assert.equal(await region.evaluate(e=>{const a=e.querySelector('.hr-candidate-actions-cell').getBoundingClientRect(),s=e.querySelector('tbody td:nth-child(5)').getBoundingClientRect();return s.right<=a.left+1}),true);
+   assert.equal(await h.page.getByText('Synthetic hidden candidate',{exact:true}).count(),0);
+   if(process.env.INOP_CANDIDATE_TABLE_SCREENSHOTS){await region.evaluate(e=>e.scrollLeft=0);await h.page.evaluate(()=>{document.activeElement?.blur();scrollTo({top:0,behavior:'instant'});});await fs.mkdir(process.env.INOP_CANDIDATE_TABLE_SCREENSHOTS,{recursive:true});await h.page.screenshot({path:path.join(process.env.INOP_CANDIDATE_TABLE_SCREENSHOTS,`table-${width}.png`),fullPage:true,animations:'disabled'});}
+ }
+ console.log(JSON.stringify({candidateTableGeometry:measurements,resizeApiRequests:h.wire.length-reads}));assert.equal(h.wire.length,reads);
+ assert.ok(measurements.every(m=>m.minWidth==='860px'&&m.tableWidth>=860),'Recruitment generic table rules must not override the existing Candidate-specific 860px minimum');assert.deepEqual(h.pageErrors,[]);
+}));
