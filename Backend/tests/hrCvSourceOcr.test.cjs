@@ -11,7 +11,7 @@ test('Scanned private Source uses real local OCR, preserves original and require
     const queue = createIntake(options), item = await queue.enqueue(req, file, crypto.randomUUID()); await queue.runOnce(1); const source = await queue.get(req, item.id);
     assert.equal(source.state, 'blocked'); assert.equal(source.code, 'OCR_REQUIRED'); assert.equal(source.result, undefined); assert.equal(await Candidate.countDocuments(), 0); assert.deepEqual((await queue.original(req, item.id)).bytes, bytes);
   });
-  await t.test('real configured local Tesseract produces pending evidence, not automatic facts/score/hiring', async () => {
+  await t.test('real local OCR requires HR review before scoped matching/search, human stages and analytics', async () => {
     const engine = createOcrEngine({ enabled: true, languages: ['eng'], dataDirectory: directory });
     const queue = createIntake({ ...options, ocrEngine: engine }), item = await queue.enqueue(req, file, crypto.randomUUID()); await queue.runOnce(1); const source = await queue.get(req, item.id);
     assert.equal(source.state, 'ready'); assert.equal(source.result.parserVersion, 'ocr-rules-1'); assert.equal(source.result.review.provider, 'tesseract-rules'); assert.equal(source.result.review.reviewStatus, 'pending'); assert.equal(source.result.parsed.phone, '+994501234567'); assert.ok(source.result.parsed.skills.includes('HACCP')); assert.equal(await Candidate.countDocuments(), 0);
@@ -20,6 +20,17 @@ test('Scanned private Source uses real local OCR, preserves original and require
     await assert.rejects(queue.approve(req, item.id, { ...input, confirmed: false }), { status: 400 });
     const approval = await queue.approve(req, item.id, input), candidate = await Candidate.findById(approval.candidateId);
     assert.equal(candidate.cvReview.version, 'ocr-rules-1'); assert.equal(candidate.cvReview.reviewStatus, 'confirmed'); assert.equal(candidate.status, 'new'); assert.equal(candidate.phone, '+994501234567');
+    const job=await require('../models/job.model').create({title:'Cashier',description:'Synthetic OCR downstream role',department:'HR',brandId:'kfc',status:'Open',requiredSkills:['HACCP','Food safety'],createdBy:h.actors.admin._id,departmentId:h.actors.admin.departmentId});
+    const created=await h.request('admin','POST','/applications',{candidateId:String(candidate._id),jobId:String(job._id)});assert.equal(created.status,201);assert.equal(created.data.status,'Applied');assert.equal(created.data.matching.version,'ats-v2');assert.equal(created.data.scoreStatus,'calculated');assert.equal(created.data.score,100);
+    const replay=await queue.approve(req,item.id,input);assert.equal(replay.candidateId,String(candidate._id));assert.equal(await Candidate.countDocuments(),1);
+    const operations={};h.mongoose.set('debug',(collection,method)=>{const key=collection+'.'+method;operations[key]=(operations[key]||0)+1;});const started=performance.now();let search;
+    try{search=await h.request('admin','GET','/hr/v2/candidates?'+new URLSearchParams({skills:JSON.stringify(['HACCP','Food safety']),skillsMode:'and',pageSize:'1'}));}finally{h.mongoose.set('debug',false);}
+    assert.equal(search.status,200);assert.equal(search.data.total,1);assert.equal(search.data.items.length,1);assert.equal(String(search.data.items[0]._id),String(candidate._id));assert.equal(operations['candidates.find'],1);assert.equal(operations['candidates.countDocuments'],1);console.log(JSON.stringify({case:'reviewed-local-OCR-search',elapsedMs:Math.round((performance.now()-started)*100)/100,operations}));
+    const denied=await h.request('foreign','GET','/candidates/'+candidate._id);assert.equal(denied.status,403);
+    const changed=await h.request('admin','PATCH','/applications/'+created.data._id+'/status',{status:'Screening',expectedRevision:created.data.__v,reason:'Synthetic explicit HR screening after OCR review'});assert.equal(changed.status,200);assert.equal((await Candidate.findById(candidate._id)).status,'new');
+    const history=await h.request('admin','GET','/applications/'+created.data._id+'/history');assert.equal(history.status,200);assert.equal(history.data.total,2);assert.ok(history.data.items.every(event=>event.actor===String(h.actors.admin._id)));
+    const analytics=await h.request('admin','GET','/hr/analytics/overview?brandId=kfc');assert.equal(analytics.status,200);assert.equal(analytics.data.totals.applications,1);assert.equal(analytics.data.funnel.find(row=>row.status==='Screening').count,1);assert.ok(!JSON.stringify(analytics.data).includes(candidate.name));
+
   });
   await t.test('default multilingual OCR maps literal RU HACCP homographs through the actual Source pipeline with HR-only review', async () => {
     const bytes = await scanned('Имя: Синтетический Кандидат\nТелефон: +994 50 123 45 67\nНавыки\nПищевая безопасность\nHACCP');
