@@ -56,6 +56,15 @@ slot through actual work and one cleanup; a second request receives `OCR_BUSY`
 until settlement. Late results cannot become facts. A permanently stuck
 collaborator intentionally keeps the slot unavailable; operational restart may
 be needed. This is fail-closed capacity control, not a stronger timeout guarantee.
+Native cancellation/output-limit handling waits for the child process `close`
+event before deleting its private PNG and releasing capacity. Renderer success
+and cancellation wait for worker termination before continuing or releasing the
+slot. If termination rejects, capacity remains held until an actual exit is
+observed; no successful result is returned. The caller deadline remains bounded
+even when underlying shutdown has not completed. Deterministic lifecycle coverage
+is in `hrCvOcrTermination.test.cjs`; those injected races are not real-engine
+resource measurements.
+
 The OCR deadline is separate from the unchanged 10-second antivirus deadline and
 two-scan limit.
 

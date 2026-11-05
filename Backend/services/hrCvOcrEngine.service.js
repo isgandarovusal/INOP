@@ -3,23 +3,31 @@ const fail=(code,status=422)=>Object.assign(new Error('OCR document processing i
 let active=0;
 function command(binary,args,{signal,maxBytes=100000}={}){
  return new Promise((resolve,reject)=>{
-  if(signal?.aborted)return reject(fail('OCR_CANCELLED',499));let settled=false,size=0,chunks=[];
+  if(signal?.aborted)return reject(fail('OCR_CANCELLED',499));let settled=false,stopping,size=0,chunks=[];
   const child=spawn(binary,args,{shell:false,stdio:['ignore','pipe','ignore'],env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',OMP_THREAD_LIMIT:'1'}});
-  const abort=()=>{child.kill('SIGKILL');finish(fail('OCR_CANCELLED',499));};
+  const stop=error=>{if(settled||stopping)return;stopping=error;child.kill('SIGKILL');};
+  const abort=()=>stop(fail('OCR_CANCELLED',499));
   function finish(error,value){if(settled)return;settled=true;signal?.removeEventListener('abort',abort);error?reject(error):resolve(value);}
   signal?.addEventListener('abort',abort,{once:true});if(signal?.aborted)abort();
-  child.stdout.on('data',chunk=>{size+=chunk.length;if(size>maxBytes){child.kill('SIGKILL');finish(fail('OCR_LIMIT'));}else chunks.push(chunk);});
+  child.stdout.on('data',chunk=>{if(stopping)return;size+=chunk.length;if(size>maxBytes)stop(fail('OCR_LIMIT'));else chunks.push(chunk);});
   child.on('error',error=>finish(fail(error.code==='ENOENT'?'OCR_RUNTIME_REQUIRED':'OCR_FAILED',503)));
-  child.on('close',code=>finish(code===0?null:fail('OCR_FAILED'),Buffer.concat(chunks).toString('utf8')));
+  child.on('close',code=>finish(stopping||(code===0?null:fail('OCR_FAILED')),Buffer.concat(chunks).toString('utf8')));
  });
 }
 function renderPdf(bytes,signal){return new Promise((resolve,reject)=>{
- if(signal.aborted)return reject(fail('OCR_CANCELLED',499));let settled=false;
+ if(signal.aborted)return reject(fail('OCR_CANCELLED',499));let settled=false,exited=false,afterExit;
  const snapshot=Uint8Array.from(bytes),worker=new Worker(path.join(__dirname,'hrCvOcrRender.worker.cjs'),{workerData:{bytes:snapshot.buffer},transferList:[snapshot.buffer],resourceLimits:{maxOldGenerationSizeMb:192,maxYoungGenerationSizeMb:32,stackSizeMb:8},env:{NODE_ENV:'production'},stdout:true,stderr:true});
  worker.stdout.resume();worker.stderr.resume();
- function finish(error,value){if(settled)return;settled=true;signal.removeEventListener('abort',abort);void worker.terminate().catch(()=>{});error?reject(error):resolve(value);}
+ function finish(error,value){
+  if(settled)return;settled=true;signal.removeEventListener('abort',abort);
+  // Work and the OCR slot remain owned until the renderer has actually exited.
+  Promise.resolve().then(()=>worker.terminate()).then(()=>{error?reject(error):resolve(value);},()=>{
+   if(exited||worker.threadId===-1)reject(fail('OCR_FAILED'));
+   else afterExit=()=>reject(fail('OCR_FAILED'));
+  });
+ }
  const abort=()=>finish(fail('OCR_CANCELLED',499));signal.addEventListener('abort',abort,{once:true});if(signal.aborted)abort();
- worker.once('error',()=>finish(fail('OCR_FAILED')));worker.once('exit',()=>{if(!settled)finish(fail('OCR_FAILED'));});worker.once('message',message=>{
+ worker.once('error',()=>finish(fail('OCR_FAILED')));worker.once('exit',()=>{exited=true;if(afterExit)afterExit();else if(!settled)finish(fail('OCR_FAILED'));});worker.once('message',message=>{
   if(!message?.ok)return finish(fail(message?.code==='OCR_LIMIT'?'OCR_LIMIT':'OCR_INVALID_DOCUMENT'));
   if(!Array.isArray(message.pages)||!message.pages.length||message.pages.length>3||message.pages.some((p,i)=>p.pageNumber!==i+1||!(p.data instanceof Uint8Array)||p.data.length>4*1024*1024||!Buffer.from(p.data).subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))))return finish(fail('OCR_FAILED'));
   finish(null,message.pages);
