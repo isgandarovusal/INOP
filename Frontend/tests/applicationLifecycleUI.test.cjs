@@ -134,10 +134,21 @@ test('Application UI persists scoped workflow, handles conflicts and discards st
   });
   await t.test('assignment revocation after focus hides the previously visible Application with the old JWT', async () => {
     await h.models.Role.updateOne({ key: 'test_assigned' }, { $push: { permissions: { resource: 'application', action: '*', scope: 'assigned' } } });
+    // Test actual HR assignment revocation, not a synthetic department shim.
+    // In grouped runs eligibility may retain the preceding fixture's membership
+    // collaborator; canonical HR membership must not depend on fixture order.
+    await h.models.User.updateOne({ _id: h.actors.assigned._id }, { $set: { departmentId: 'dep_hr' } });
     await Application.updateOne({ _id: first._id }, { $set: { assignedTo: h.actors.assigned._id } });
+    const current = await h.request('assigned', 'GET', `/applications/${first._id}`);
+    assert.equal(current.status, 200); assert.equal(current.data.actionEligibility.update, true);
+    assert.equal(current.data.candidateId, null); assert.equal(current.data.jobId, null);
     await h.open('assigned', detail(first._id)); await form().waitFor();
+    const writes = h.wire.filter(r => r.method === 'PATCH').length;
     await Application.updateOne({ _id: first._id }, { $set: { assignedTo: h.actors.admin._id } });
-    await h.page.evaluate(() => window.dispatchEvent(new Event('focus'))); await h.page.locator('[data-hr-state=not-found]').waitFor(); assert.equal(await form().count(), 0);
+    const denied = h.page.waitForResponse(r => r.url().endsWith(`/applications/${first._id}`) && r.status() === 404);
+    await h.page.evaluate(() => window.dispatchEvent(new Event('focus'))); await denied;
+    await h.page.locator('[data-hr-state=not-found]').waitFor(); assert.equal(await form().count(), 0);
+    assert.equal(h.wire.filter(r => r.method === 'PATCH').length, writes);
   });
   await t.test('blocked/failed notification is visible without hiding the successful interview', async () => {
     const { createNotificationWorker } = require('../../Backend/services/applicationNotificationWorker.service');
