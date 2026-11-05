@@ -1,6 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import type { CvReview } from '../Types/recruitment';
 
+const fieldLabels: Record<string, string> = {
+  name: 'hrProcessing.field.name', email: 'hrProcessing.field.email',
+  phone: 'hrProcessing.field.phone', phoneRaw: 'hrProcessing.field.phoneRaw',
+  role: 'hrProcessing.field.role', education: 'hrProcessing.field.education',
+  skills: 'hrProcessing.field.skills', experience: 'hrProcessing.field.experience',
+  languages: 'hrProcessing.field.languages', certificates: 'hrProcessing.field.certificates',
+  employmentHistory: 'cvReview.employmentHistory', educationHistory: 'cvReview.educationHistory',
+  certificationHistory: 'cvReview.certificates',
+};
+
 export default function CvReviewEvidence({ review }: { review?: CvReview }) {
   const { t } = useTranslation();
   if (!review?.version) return null;
@@ -12,7 +22,7 @@ export default function CvReviewEvidence({ review }: { review?: CvReview }) {
     <p>{t(review.provider==='tesseract-rules'?'cvReview.ocrConfidenceExplanation':review.provider==='openai-professional-evidence'?'cvReview.aiConfidenceExplanation':'cvReview.confidenceExplanation')}</p>
     {review.processingApproval && <p data-processing-approval>{t("hrApproval.receipt")} · {review.processingApproval.parserVersion} · {review.processingApproval.sourceHash.slice(0,12)} · {review.processingApproval.sourceRevision}</p>}
     <details><summary>{t('cvReview.evidence')}</summary>{Object.entries(review.fields ?? {}).map(([field, value]) => <div key={field}>
-      <strong>{field}</strong>: {value.confidence == null ? t('cvReview.unknown') : `${Math.round(value.confidence * 100)}/100`}
+      <strong>{Object.hasOwn(fieldLabels, field) ? t(fieldLabels[field], { defaultValue: field }) : field}</strong>: {value.confidence == null ? t('cvReview.unknown') : `${Math.round(value.confidence * 100)}/100`}
       {review.correctedFields?.includes(field) && <span> · {t('cvReview.corrected')}</span>}
       {value.evidence.map((quote, i) => <blockquote key={i}>{quote}</blockquote>)}
     </div>)}</details>
