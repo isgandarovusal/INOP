@@ -1,3 +1,4 @@
+import { useNavigationState } from '../../../Hooks/useNavigationState';
 import TagInput from '../../../Components/TagInput';
 import Badge from '../../../Components/Badge';
 import HRConfirmDialog from '../../../Components/HRConfirmDialog';
@@ -69,14 +70,14 @@ const CandidatesList: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useNavigationState<"grid" | "list">('candidates.viewMode', "list");
+  const [searchQuery, setSearchQuery] = useNavigationState('candidates.searchQuery', "");
   const settledSearch = useDebouncedSearch(searchQuery);
   // Clear all filters in one effective query, including pending search text.
   const search = searchQuery.trim() ? settledSearch : '';
-  const [skills, setSkills] = useState<string[]>([]);
-  const [certificates, setCertificates] = useState<string[]>([]);
-  const [skillsMode, setSkillsMode] = useState<'and' | 'or'>('and');
+  const [skills, setSkills] = useNavigationState<string[]>('candidates.skills', []);
+  const [certificates, setCertificates] = useNavigationState<string[]>('candidates.certificates', []);
+  const [skillsMode, setSkillsMode] = useNavigationState<'and' | 'or'>('candidates.skillsMode', 'and');
   const [filterError, setFilterError] = useState(false);
   const structured = structuredQuery(skills, certificates, skillsMode);
   const activeGroups = Number(skills.length > 0) + Number(certificates.length > 0);
@@ -86,9 +87,9 @@ const CandidatesList: React.FC = () => {
         new TextEncoder().encode(Object.values(structuredQuery(nextSkills, nextCertificates, mode)).join('')).length > 2048) { setFilterError(true); return; }
     setFilterError(false); result.setPage(1); setSkillsMode(mode); if (field === 'skills') setSkills(values); else setCertificates(values);
   };
-  const [archived, setArchived] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<CandidateStatus | "all">("all");
-  const result = useHRPage("candidate", { q: search, archived: String(archived), status: statusFilter === "all" ? undefined : statusFilter, ...structured }, getCandidatePage);
+  const [archived, setArchived] = useNavigationState('candidates.archived', false);
+  const [statusFilter, setStatusFilter] = useNavigationState<CandidateStatus | "all">('candidates.statusFilter', "all");
+  const result = useHRPage("candidate", { q: search, archived: String(archived), status: statusFilter === "all" ? undefined : statusFilter, ...structured }, getCandidatePage, { navigationKey: 'candidates.page' });
   const [confirmation, setConfirmation] = useState<{key:string;candidate:Candidate}|null>(null);
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
   const context = useHRActionContext(JSON.stringify([search, archived, statusFilter, structured, result.page]));

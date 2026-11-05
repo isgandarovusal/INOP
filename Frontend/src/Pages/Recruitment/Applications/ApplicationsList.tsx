@@ -1,3 +1,4 @@
+import { useNavigationState } from '../../../Hooks/useNavigationState';
 import { applicationActionAllowed } from '../../../Utils/applicationActions';
 import { Layers3 } from "lucide-react";
 import HRScopeFilters from "../../../Components/HRScopeFilters";
@@ -77,17 +78,17 @@ const ApplicationsList: React.FC = () => {
   });
   const [optimistic, setOptimistic] = useState<{ key: string; statuses: Record<string, ApplicationStatus>; cards?: Application[] }>({ key: '', statuses: {} });
   const [mutation, setMutation] = useState<{ key: string; error: string }>({ key: '', error: '' });
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<'score' | 'newest' | 'name'>('score');
-  const [brandFilter, setBrandFilter] = useState("all");
-  const [branchFilter, setBranchFilter] = useState("all");
-  const [jobFilter, setJobFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "processing" | ApplicationStatus>("all");
+  const [search, setSearch] = useNavigationState('applications.search', '');
+  const [sort, setSort] = useNavigationState<'score' | 'newest' | 'name'>('applications.sort', 'score');
+  const [brandFilter, setBrandFilter] = useNavigationState('applications.brandFilter', "all");
+  const [branchFilter, setBranchFilter] = useNavigationState('applications.branchFilter', "all");
+  const [jobFilter, setJobFilter] = useNavigationState('applications.jobFilter', "all");
+  const [statusFilter, setStatusFilter] = useNavigationState<"all" | "processing" | ApplicationStatus>('applications.statusFilter', "all");
   const settledSearch = useDebouncedSearch(search);
   // Clear all filters in one scoped table/board query, including pending text.
   const debouncedSearch = search.trim() ? settledSearch : '';
   const filters = { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter };
-  const table = useHRPage("application", filters, getApplicationPage, { enabled: view === 'table' });
+  const table = useHRPage("application", filters, getApplicationPage, { enabled: view === 'table', navigationKey: 'applications.page' });
   const board = useHRBoard(filters, view === 'board');
   const result = view === 'board' ? board : table;
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });

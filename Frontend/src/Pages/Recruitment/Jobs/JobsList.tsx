@@ -1,3 +1,4 @@
+import { useNavigationState } from '../../../Hooks/useNavigationState';
 import { BriefcaseBusiness } from "lucide-react";
 import HRScopeFilters from "../../../Components/HRScopeFilters";
 import { brandLabel } from "../../../Services/recruitmentCatalogService";
@@ -37,18 +38,18 @@ const JobsList: React.FC = () => {
   const canDelete = hasPermission(user, "recruitment", "delete");
   const canManage = canUpdate || canDelete;
 
-  const [archived, setArchived] = useState("false");
-  const [query, setQuery] = useState("");
-  const [brandFilter, setBrandFilter] = useState("all");
-  const [branchFilter, setBranchFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
+  const [archived, setArchived] = useNavigationState('jobs.archived', "false");
+  const [query, setQuery] = useNavigationState('jobs.query', "");
+  const [brandFilter, setBrandFilter] = useNavigationState('jobs.brandFilter', "all");
+  const [branchFilter, setBranchFilter] = useNavigationState('jobs.branchFilter', "all");
+  const [statusFilter, setStatusFilter] = useNavigationState<"all" | JobStatus>('jobs.statusFilter', "all");
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
   const [mutation, setMutation] = useState({ key: '', error: '' });
   const settledSearch = useDebouncedSearch(query);
   // Clearing filters is one effective query; do not retain the old search while
   // status/brand reset. Nonempty typing keeps the existing debounce behavior.
   const search = query.trim() ? settledSearch : '';
-  const result = useHRPage('recruitment', { archived, q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage);
+  const result = useHRPage('recruitment', { archived, q: search, brandId: brandFilter === 'all' ? undefined : brandFilter, branchId: branchFilter === 'all' ? undefined : branchFilter, status: statusFilter === 'all' ? undefined : canonicalHRStatus(statusFilter) }, getJobPage, { navigationKey: 'jobs.page' });
   const context = useHRActionContext(JSON.stringify([archived, search, brandFilter, branchFilter, statusFilter, result.page]));
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
   const setDeletingId = (id: string | null) => setDeleteBusy({ key: context.key, id });
