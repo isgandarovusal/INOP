@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom';
 import AIAvailability from './AIAvailability';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {isAxiosError} from 'axios';
 import {useAuth} from '../Context/useAuth';
@@ -13,7 +13,7 @@ const codes=new Set(['SCAN_REQUIRED','SOURCE_QUARANTINED','AI_NOT_CONFIGURED','A
 const fields=['name','email','phone','phoneRaw','role','education','skills','experience','languages','certificates'];
 function facts(value:unknown):string { if(value==null||value==='')return '';if(typeof value==='string'||typeof value==='number')return String(value).slice(0,500);if(Array.isArray(value))return value.filter(v=>typeof v==='string').slice(0,20).join(', ').slice(0,1000);return ''; }
 export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:Candidate;onAccessDenied:()=>void}) {
- const {t}=useTranslation(),{user}=useAuth(),context=useHRActionContext(candidate.id);
+ const {t}=useTranslation(),{user}=useAuth(),context=useHRActionContext(candidate.id),regionId=useId(),titleId=useId();
  const [kind,setKind]=useState<'parse'|'ocr'|'ai-review'>('parse');
  const [open,setOpen]=useState(false),[jobs,setJobs]=useState<CvProcessingJob[]>([]),[selected,setSelected]=useState<CvProcessingJob|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const retryCommands=useRef(new Map<string,{key:string;commandId:string}>());
@@ -54,9 +54,10 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
  }
  function retryable(job:CvProcessingJob){return job.currentSource&&job.state==='blocked'&&['SOURCE_MISSING','STORAGE_NOT_CONFIGURED','SCAN_REQUIRED',...(job.kind==='ocr'?['OCR_NOT_CONFIGURED','OCR_RUNTIME_REQUIRED','OCR_LANGUAGE_REQUIRED']:job.kind==='ai-review'?['AI_NOT_CONFIGURED']:[])].includes(job.code)&&job.attempts>=1&&job.attempts<3&&job.manualRetries<2&&job.source.sha256===candidate.cvOriginal?.sha256&&job.source.revision===candidate.revision;}
  if(!hasPermission(user,'candidate','read'))return null;
- return <section data-cv-processing><h3>{t('hrProcessing.title')}</h3><p>{t(kind==='ocr'?'hrProcessing.ocrNotice':kind==='ai-review'?'hrProcessing.aiNotice':'hrProcessing.notice')}</p>
+ return <section data-cv-processing><h3 id={titleId}>{t('hrProcessing.title')}</h3><p>{t(kind==='ocr'?'hrProcessing.ocrNotice':kind==='ai-review'?'hrProcessing.aiNotice':'hrProcessing.notice')}</p>
   {open && kind === 'ai-review' && <AIAvailability cv />}
-  {!open?<button type="button" onClick={()=>{setOpen(true);void run('list');}}>{t('hrProcessing.show')}</button>:<>
+  {!open&&<button type="button" aria-controls={regionId} onClick={()=>{setOpen(true);void run('list');}}>{t('hrProcessing.show')}</button>}
+  <div id={regionId} role="region" aria-labelledby={titleId} hidden={!open}>{open&&<>
    <label>{t('hrProcessing.profile')}<select data-processing-kind value={kind} disabled={busy} onChange={e=>{const value=e.target.value==='ocr'?'ocr':e.target.value==='ai-review'?'ai-review':'parse';setKind(value);setSelected(null);setJobs([]);void run('list',undefined,value);}}><option value="parse">{t('hrProcessing.parseProfile')}</option><option value="ocr">{t('hrProcessing.ocrProfile')}</option><option value="ai-review">{t('hrProcessing.aiProfile')}</option></select></label>
    <button type="button" disabled={busy} onClick={()=>void run('list')}>{t('hrProcessing.refresh')}</button>
    {canStart?<button type="button" className={kind==='ai-review'?'btn-ai':'btn-secondary'} data-ai-action={kind==='ai-review'?'cv-professional-review':undefined} disabled={busy} onClick={()=>void run('start')}>{t(kind==='ocr'?'hrProcessing.startOcr':kind==='ai-review'?'hrProcessing.startAi':'hrProcessing.start')}</button>:<p>{t(hasPermission(user,'candidate','update')?'hrProcessing.identityRequired':'hrProcessing.readOnly')}</p>}
@@ -70,6 +71,6 @@ export default function CvProcessingPanel({candidate,onAccessDenied}:{candidate:
     {canStart&&retryable(job)&&<button type="button" disabled={busy} onClick={()=>void run('retry',job.id)}>{t(job.code==='SCAN_REQUIRED'?'hrProcessing.retryScan':job.kind==='ocr'?'hrProcessing.retryOcr':job.kind==='ai-review'?'hrProcessing.retryAi':'hrProcessing.retry')}</button>}
    </li>)}</ul>
    {selected?.result&&selected.currentSource&&<div data-processing-result><h4>{t('hrProcessing.review')}</h4>{selected.result.review.provenance&&<p>{t(selected.result.review.provenance.mode==='mock_test_only'?'hrAi.mock':'hrAi.proposal')}</p>}<p>{t(kind==='ocr'?'hrProcessing.ocrManual':kind==='ai-review'?'hrProcessing.aiManual':'hrProcessing.manual')}</p><dl>{fields.map(field=>{const value=facts(selected.result!.parsed[field]);return value?<div key={field}><dt>{t(`hrProcessing.field.${field}`)}</dt><dd>{value}</dd></div>:null;})}</dl>{canStart&&<Link to={`/app/recruitment/candidates/${candidate.id}/edit?processingJobId=${selected.id}`}>{t("hrApproval.open")}</Link>}</div>}
-  </>}
+  </>}</div>
  </section>;
 }
