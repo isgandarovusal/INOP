@@ -48,10 +48,13 @@ test('Every stored Candidate task attempt requires a new native-policy hash-boun
  await t.test('automatic task retry performs another scan, never reuses the first clean verdict',async()=>{
   let scans=0,calls=0,clock=new Date();const s=await setup({now:()=>clock,scanner:{scan:async(_b,c)=>{scans++;return clean(c);}},parse:async()=>{if(++calls===1)throw Error('Synthetic task outage');return{parsed:{extraction:{version:'rules-2',provider:'rule-based'}}};}});await s.queue.runOnce(1);assert.equal((await stored(s)).state,'retry');clock=new Date(clock.getTime()+61000);await s.queue.runOnce(1);assert.equal(scans,2);assert.equal(s.tasks,2);assert.equal((await stored(s)).state,'succeeded');
  });
- await t.test('ignored late scanner cannot start a task after the existing processing deadline',async()=>{
+ await t.test('ignored late scanner cannot start a task after the existing processing deadline',async context=>{
   let enter,release;const entered=new Promise(r=>enter=r),gate=new Promise(r=>release=r);
-  const s=await setup({timeoutMs:50,scanner:{scan:async(_b,c)=>{enter();await gate;return clean(c);}}}),pending=s.queue.runOnce(1);await entered;
-  try{await pending;assert.equal((await stored(s)).code,'PROCESSING_TIMEOUT');assert.equal(s.tasks,0);}finally{release();await new Promise(r=>setImmediate(r));}
+  const s=await setup({timeoutMs:50,scanner:{scan:async(_b,c)=>{enter();await gate;return clean(c);}}});
+  // Advance only the existing deadline after scanner admission. Real Mongo
+  // preflight latency must not turn this late-scanner test into an endless wait.
+  context.mock.timers.enable({apis:['setTimeout']});const pending=s.queue.runOnce(1);
+  try{await Promise.race([entered,pending.then(()=>{throw Error('Synthetic scanner was not admitted');})]);context.mock.timers.tick(50);await pending;assert.equal((await stored(s)).code,'PROCESSING_TIMEOUT');assert.equal(s.tasks,0);}finally{release();await new Promise(r=>setImmediate(r));context.mock.timers.reset();}
   assert.equal(s.tasks,0);assert.equal((await stored(s)).result,undefined);
   // This owned timeout fixture must not be reclaimed by the later 25h clock
   // jump, which tests another job's antivirus definitions rather than queue order.
