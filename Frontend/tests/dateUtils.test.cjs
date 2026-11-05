@@ -2,7 +2,7 @@
  * Package 2 — Azerbaijani Date Localization Tests
  *
  * Tests the dateUtils.ts formatting functions by transpiling the TypeScript
- * source on-the-fly with esbuild (available as a dev dependency).
+ * source on-the-fly with the existing TypeScript compiler dev dependency.
  *
  * Run: node --test tests/dateUtils.test.cjs
  */
@@ -12,52 +12,22 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const Module = require('node:module');
+const ts = require('typescript');
 const fs = require('node:fs');
 
-// ---------------------------------------------------------------------------
-// Transpile dateUtils.ts → CJS using esbuild (no install needed; esbuild is
-// already present as a Vite transitive dependency).
-// ---------------------------------------------------------------------------
+// Transpile trusted repository source with TypeScript, already a direct dev
+// dependency. Vite 8 uses Rolldown and no longer provides an esbuild binary.
 const srcPath = path.resolve(__dirname, '../src/Utils/dateUtils.ts');
-const tmpOut = path.resolve(__dirname, '../.dateUtils.test.tmp.cjs');
-
-function buildAndRequire() {
-  // Locate esbuild binary (Vite ships it as a node_module binary)
-  const esbuildBin = path.resolve(
-    __dirname,
-    '../node_modules/.bin/esbuild'
-  );
-
-  execFileSync(
-    esbuildBin,
-    [
-      srcPath,
-      '--bundle=false',
-      '--platform=node',
-      '--format=cjs',
-      `--outfile=${tmpOut}`,
-    ],
-    { stdio: 'pipe' }
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require(tmpOut);
-}
-
-let dateUtils;
-try {
-  dateUtils = buildAndRequire();
-} catch (err) {
-  // If esbuild is not reachable, fail descriptively rather than silently skip
-  console.error('dateUtils build failed:', err.message);
-  process.exit(1);
-}
-
-// Cleanup tmp file on exit
-process.on('exit', () => {
-  try { fs.unlinkSync(tmpOut); } catch { /* ignore */ }
-});
+const compiled = ts.transpileModule(fs.readFileSync(srcPath, 'utf8'), {
+  fileName: srcPath,
+  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+}).outputText;
+const dateModule = new Module(srcPath, module);
+dateModule.filename = srcPath;
+dateModule.paths = Module._nodeModulePaths(path.dirname(srcPath));
+dateModule._compile(compiled, srcPath);
+const dateUtils = dateModule.exports;
 
 const { formatDateOnly, formatDateTime, formatAppDate, BAKU_TIMEZONE } = dateUtils;
 

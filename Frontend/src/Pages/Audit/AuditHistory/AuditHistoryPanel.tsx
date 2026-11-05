@@ -21,7 +21,7 @@ export default function AuditHistoryPanel({ auditId }: { auditId: string }) {
       <ol className="audit-event-list">{activities.map(activity => {
         const date = new Date(activity.createdAt);
         return <li key={activity._id}><div className="audit-event-heading"><strong>{activity.action.replace(/[_-]/g, " ")}</strong>
-          <time dateTime={Number.isNaN(date.getTime()) ? undefined : date.toISOString()}>{Number.isNaN(date.getTime()) ? activity.createdAt : formatDateTime(activity.createdAt, i18n.language, { includeTime: true })}</time></div>
+          <time dateTime={Number.isNaN(date.getTime()) ? undefined : date.toISOString()}>{Number.isNaN(date.getTime()) ? activity.createdAt : formatDateTime(activity.createdAt, i18n.language)}</time></div>
           <p>{activity.description || t("auditPresentation.activity", { resource: activity.resource })}</p>
           <small>{t("auditPresentation.by")}: {userName(activity)} · {t("auditPresentation.resource")}: {activity.resource}</small>
         </li>;
