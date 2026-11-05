@@ -13,6 +13,8 @@ import {
   ArrowUpRight,
   PackageOpen,
 } from "lucide-react";
+import { syncClientSession } from "../../api/clientSession";
+import { invalidateAggregates } from "../../api/aggregateCache";
 import PageState from "../../Components/PageState";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
@@ -47,6 +49,7 @@ const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
+  syncClientSession(user);
 
   const recruitmentScope = getPermissionScope(user, "recruitment", "read");
   const canJobs = Boolean(recruitmentScope && recruitmentScope !== 'none');
@@ -61,7 +64,7 @@ const Dashboard: React.FC = () => {
         user.id,
         user.role,
         user.departmentId,
-        user.isActive,
+        user.isActive, user.hrAccess, user.auditDirection, user.auditDirections,
         (user.permissions || []).map(({ resource, action, scope }) => [resource, action, scope]),
       ])
     : null;
@@ -80,14 +83,17 @@ const Dashboard: React.FC = () => {
   const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
 
+  const refreshDashboard = () => { invalidateAggregates(); setRefreshRevision(value=>value+1); };
   useEffect(() => {
-    let lastRefresh = 0;
-    const refresh = () => { const now = Date.now(); if (document.visibilityState !== 'visible' || now - lastRefresh < 1000) return; lastRefresh = now; setRefreshRevision(value => value + 1); };
-    const visible = () => { if (document.visibilityState === "visible") refresh(); };
-    window.addEventListener("focus", refresh);
-    document.addEventListener("visibilitychange", visible);
-    return () => { window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", visible); };
-  }, []);
+    let last = 0;
+    // Candidate names and Audit data remain fresh on focus; eligible numeric
+    // summaries alone reuse their short-lived cache. Session checks are separate.
+    const focus = () => { const now=Date.now(); if(document.visibilityState!=='visible'||now-last<1000)return; last=now;setRefreshRevision(value=>value+1); };
+    const visible = () => { if(document.visibilityState==='visible')focus(); };
+    window.addEventListener('focus',focus);document.addEventListener('visibilitychange',visible);
+    return()=>{window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',visible);};
+  },[]);
+
 
   useEffect(() => {
     let mounted = true;
@@ -111,7 +117,7 @@ const Dashboard: React.FC = () => {
         setApplicationsLoading(true);
 
         if (canJobs) {
-        void getJobsSummary(controller.signal, requestScopeKey)
+        void getJobsSummary(controller.signal, requestScopeKey, recruitmentScope === 'all' ? dataScopeKey ?? undefined : undefined)
           .then((result) => {
             if (!mounted) return;
             setJobs(result);
@@ -157,7 +163,7 @@ const Dashboard: React.FC = () => {
         } else { setCandidatesLoading(false); }
 
         if (canApplications) {
-        void getApplicationsSummary(controller.signal, requestScopeKey)
+        void getApplicationsSummary(controller.signal, requestScopeKey, applicationScope === 'all' && candidateScope === 'all' && recruitmentScope === 'all' ? dataScopeKey ?? undefined : undefined)
           .then((result) => {
             if (!mounted) return;
             setApplications(result);
@@ -218,7 +224,7 @@ const Dashboard: React.FC = () => {
       clearTimeout(deadline);
       controller.abort();
     };
-  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications]);
+  }, [dataScopeKey, refreshRevision, showRecruitment, showAudit, canJobs, canCandidates, canApplications, recruitmentScope, candidateScope, applicationScope]);
 
   const statusBreakdown=candidates.profileStatusBreakdown ?? candidates.statusBreakdown;
   const recentCandidates=candidates.recentCandidates;
@@ -228,7 +234,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="main-dashboard hr-workspace">
-      <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} />
+      <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} actions={<button type="button" className="btn-secondary" disabled={jobsLoading || candidatesLoading || applicationsLoading || auditLoading} onClick={refreshDashboard}>{t("common.actions.refresh")}</button>} />
 
           {showRecruitment && (
             <div className="hr-dashboard-summary">
@@ -241,7 +247,7 @@ const Dashboard: React.FC = () => {
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.recruitmentLoadErrorTitle")}</strong>
-                    <p>{recruitmentError || t("dashboard.recruitmentLoadError")}</p><button className="btn-secondary" onClick={()=>setRefreshRevision(v=>v+1)}>{t('common.retry')}</button>
+                    <p>{recruitmentError || t("dashboard.recruitmentLoadError")}</p><button className="btn-secondary" onClick={refreshDashboard}>{t('common.retry')}</button>
                   </div>
                 </div>
               )}
@@ -367,7 +373,7 @@ const Dashboard: React.FC = () => {
                   <AlertTriangle size={18} />
                   <div>
                     <strong>{t("dashboard.auditLoadErrorTitle")}</strong>
-                    <p>{auditError || t("dashboard.auditLoadError")}</p><button className="btn-secondary" onClick={()=>setRefreshRevision(v=>v+1)}>{t('common.retry')}</button>
+                    <p>{auditError || t("dashboard.auditLoadError")}</p><button className="btn-secondary" onClick={refreshDashboard}>{t('common.retry')}</button>
                   </div>
                 </div>
               )}

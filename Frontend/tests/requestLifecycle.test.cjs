@@ -9,11 +9,12 @@ test('Dashboard and shared GET lifecycles preserve authorization under StrictMod
   const count=h.wire.length;await h.page.evaluate(()=>window.i18nTest.changeLanguage('az'));await h.page.waitForTimeout(200);assert.equal(h.wire.length,count);
   assert.deepEqual(h.pageErrors,[]);
  });
- await t.test('Focus revalidates each summary instead of serving a cached result',async()=>{
+ await t.test('Focus rechecks sensitive summaries; explicit Refresh rechecks every summary',async()=>{
   const before=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
+  const focused=Promise.all(['candidates','audits'].map(resource=>h.page.waitForResponse(r=>r.url().endsWith('/'+resource+'/dashboard-summary'))));await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await focused;await h.page.waitForLoadState('networkidle');assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-before,2);const fresh=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
   const responses=Promise.all(['jobs','candidates','applications','audits'].map(resource=>h.page.waitForResponse(response=>response.url().endsWith(`/${resource}/dashboard-summary`))));
-  await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await responses;await h.page.waitForLoadState('networkidle');
-  assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-before,4);
+  await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await responses;await h.page.waitForLoadState('networkidle');
+  assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-fresh,4);
  });
  await t.test('Old user response is canceled and never replaces a new user summary',async()=>{
   const Candidate=require('../../Backend/models/candidate.model');await Candidate.create({name:'Own scoped candidate',role:'local',createdBy:h.actors.own._id,departmentId:'dep_A'});

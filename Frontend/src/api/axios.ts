@@ -1,5 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
+import { invalidateAggregates, isAggregateMutation } from "./aggregateCache";
+import { clearClientSession } from "./clientSession";
 
 declare module "axios" {
   interface AxiosRequestConfig { suppressErrorToast?: boolean }
@@ -16,6 +18,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (isAggregateMutation(config.method, config.url)) invalidateAggregates();
   const token = localStorage.getItem(TOKEN_KEY);
 
   if (token && config.headers.Authorization === undefined) {
@@ -26,13 +29,19 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (isAggregateMutation(response.config.method, response.config.url)) invalidateAggregates();
+    return response;
+  },
   (error) => {
+    if (isAggregateMutation(error.config?.method, error.config?.url)) invalidateAggregates();
     if (axios.isCancel(error)) return Promise.reject(error);
+    if ([401,403].includes(error.response?.status)) invalidateAggregates();
     if (error.response?.status === 401) {
       const token = localStorage.getItem(TOKEN_KEY);
       if (token && error.config?.headers?.Authorization === `Bearer ${token}`) {
         localStorage.removeItem(TOKEN_KEY);
+        clearClientSession();
         window.dispatchEvent(new CustomEvent("inop:auth-expired"));
       }
 

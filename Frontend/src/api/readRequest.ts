@@ -1,19 +1,24 @@
 import { CanceledError } from "axios";
 import api from "./axios";
+import { aggregateEpoch, takeAggregate, keepAggregate } from "./aggregateCache";
 
 type Consumer = { resolve: (value: unknown) => void; reject: (error: unknown) => void; detach: () => void };
 type Pending = { controller: AbortController; consumers: Set<Consumer>; cancelTimer?: ReturnType<typeof setTimeout> };
 const pending = new Map<string, Pending>();
 
 // Only pending reads with an explicit permission fingerprint are shared.
-// Settled responses are never cached: refresh always rechecks the server.
-export function readJson<T>(url: string, options: { signal?: AbortSignal; scopeKey?: string; suppressErrorToast?:boolean } = {}): Promise<T> {
-  const { signal, scopeKey, suppressErrorToast } = options;
+// Default settled reads remain uncached. Only explicit numeric dashboard reads
+// can use the bounded allowlisted memory cache; never auth/PII/CV documents.
+export function readJson<T>(url: string, options: { signal?: AbortSignal; scopeKey?: string; suppressErrorToast?:boolean; aggregateScopeKey?:string } = {}): Promise<T> {
+  const { signal, scopeKey, suppressErrorToast, aggregateScopeKey } = options;
+  const epoch = aggregateEpoch(), server = String(api.defaults.baseURL || ''), cacheScope = scopeKey ? aggregateScopeKey : undefined;
   const token = localStorage.getItem("inop_auth_token");
   const headers = { Authorization: token ? `Bearer ${token}` : "" };
   if (signal?.aborted) return Promise.reject(new CanceledError());
+  const cached = takeAggregate(url,cacheScope,server);
+  if (cached !== undefined) return Promise.resolve(cached as T);
   if (!scopeKey) return api.get<T>(url, { signal, headers, suppressErrorToast }).then(response => response.data);
-  const key = JSON.stringify([token, scopeKey, url,!!suppressErrorToast]);
+  const key = JSON.stringify([token, scopeKey, url,!!suppressErrorToast,server,cacheScope,cacheScope ? epoch : null]);
   let entry = pending.get(key);
   if (!entry || entry.controller.signal.aborted) {
     entry = { controller: new AbortController(), consumers: new Set() };
@@ -29,7 +34,7 @@ export function readJson<T>(url: string, options: { signal?: AbortSignal; scopeK
       request.consumers.clear();
     };
     void api.get<T>(url, { signal: request.controller.signal, headers, suppressErrorToast }).then(
-      response => settle(true, response.data), error => settle(false, error),
+      response => { keepAggregate(url,cacheScope,token,epoch,response.data,server); settle(true, response.data); }, error => settle(false, error),
     );
   }
   const request = entry;

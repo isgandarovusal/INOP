@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import { clearClientSession } from "../api/clientSession";
 import { readJson } from "../api/readRequest";
 import { isAxiosError } from "axios";
 import type { PublicUser } from "../Types/auth";
@@ -20,10 +21,12 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(token: string): void {
+  clearClientSession();
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearAuthToken(): void {
+  clearClientSession();
   localStorage.removeItem(TOKEN_KEY);
 }
 
@@ -42,6 +45,7 @@ export async function login(
 }
 
 export async function logout(): Promise<void> {
+  clearClientSession();
   const token = getAuthToken();
 
   if (!token) {

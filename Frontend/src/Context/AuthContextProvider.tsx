@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   useCallback,
   useEffect,
   useState,
@@ -14,6 +15,7 @@ import {
   getAuthToken,
 } from "../Services/authService";
 import { AuthContext } from "./AuthContext";
+import { syncClientSession, clearClientSession } from "../api/clientSession";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<PublicUser | null>(null);
@@ -21,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // availability (including a cold backend) before showing the login form.
   const [isLoading, setIsLoading] = useState(() => Boolean(getAuthToken()));
   const requestRevision = useRef(0);
+  useLayoutEffect(() => { syncClientSession(user); },[user]);
 
   useEffect(() => {
     let mounted = true;
@@ -28,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let lastRefresh: { source: string; token: string | null; started: number; pending: boolean } | undefined;
 
     const handleAuthExpired = () => {
+      clearClientSession();
       requestRevision.current += 1;
       if (mounted) {
         setUser(null);
