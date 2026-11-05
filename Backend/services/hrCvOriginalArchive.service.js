@@ -7,6 +7,9 @@ const storage = require('./hrPrivateObjectStorage.service');
 const {readCandidateOriginal} = require('../controllers/privateFiles.controller');
 const fail=(code,status=503)=>Object.assign(new Error('Original CV archive is unavailable.'),{code,status});
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+// A caller deadline does not prove an abort-ignoring native reader has stopped.
+// Share the process budget across archive instances until actual work settles.
+let active=0;
 const selection='cvUrl cvOriginal cvReview.version __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake';
 const signature=req=>JSON.stringify([req.user.id,req.user.role,req.user.departmentId,req.authRole.permissions]);
 async function actor(id){
@@ -58,13 +61,16 @@ function createArchive({enabled=false,read=readCandidateOriginal,store,scanner,e
   await guard();
   if(['verified','blocked','obsolete','failed'].includes(row.state))return dto(row,true);
   if(row.attempts>=3){const updated=await Manifest.findOneAndUpdate({_id:row._id,attempts:{$gte:3},$or:[{state:{$ne:'running'}},{leaseUntil:{$lte:now()}}]},{$set:{state:'failed',code:'ATTEMPTS_EXHAUSTED'},$unset:{slot:1,leaseToken:1,leaseUntil:1}},{returnDocument:'after'}).lean();if(updated)return dto(updated);throw fail('ARCHIVE_BUSY',409);}
+  if(active>=8)throw fail('ARCHIVE_BUSY',409);active++;let held=true;
+  const release=()=>{if(held){held=false;active--;}};
   const lease=crypto.randomUUID();let claimed;
-  for(let i=0;i<16&&!claimed;i++)try{
+  try{for(let i=0;i<16&&!claimed;i++)try{
    const value=slot();if(!Number.isInteger(value)||value<0||value>7)throw fail('ARCHIVE_CONFIG');
    claimed=await Manifest.findOneAndUpdate({_id:row._id,attempts:{$lt:3},$or:[{state:{$in:['reserved','retry']}},{state:'running',leaseUntil:{$lte:now()}}]},
     {$set:{state:'running',code:'RUNNING',leaseToken:lease,leaseUntil:new Date(now().getTime()+60000),slot:value},$inc:{attempts:1}},{returnDocument:'after'}).select('+blob +sourceFingerprint +leaseToken').lean();
   }catch(error){if(error.code!==11000)throw error;}
   if(!claimed)throw fail('ARCHIVE_BUSY',409);row=claimed;
+  }catch(error){release();throw error;}
   const controller=new AbortController();let timer;
   const finish=async(state,code,extra={})=>{
    const saved=await Manifest.findOneAndUpdate({_id:row._id,state:'running',leaseToken:lease},{$set:{state,code,...extra},$unset:{slot:1,leaseToken:1,leaseUntil:1}},{returnDocument:'after'}).lean();
@@ -92,7 +98,8 @@ function createArchive({enabled=false,read=readCandidateOriginal,store,scanner,e
    await guard(controller,lease);
    return finish('verified','HASH_READBACK_VERIFIED',{verifiedAt:now()});
   };
-  try{return await Promise.race([work(),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(fail('ARCHIVE_TIMEOUT'));},timeoutMs);})]);}
+  const running=work();running.finally(release).catch(()=>{});
+  try{return await Promise.race([running,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(fail('ARCHIVE_TIMEOUT'));},timeoutMs);})]);}
   catch(error){controller.abort();const code=error?.code;
    if(['ARCHIVE_AUTH_REVOKED','ARCHIVE_PARENT_UNAVAILABLE','ARCHIVE_SOURCE_CHANGED'].includes(code)){await finish('obsolete',code);throw fail(code,error.status||409);}
    if(code==='ARCHIVE_LEASE_LOST')throw fail(code,409);
