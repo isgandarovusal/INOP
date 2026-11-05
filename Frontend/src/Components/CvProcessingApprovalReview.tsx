@@ -20,7 +20,7 @@ export default function CvProcessingApprovalReview({candidate,jobId,onApply,onAc
    setJob(result);
   }catch(failure){if(controller.signal.aborted)return;const status=isAxiosError(failure)?failure.response?.status:undefined,code=isAxiosError(failure)?failure.response?.data?.code:undefined;
    if(status===401||status===403||(status===404&&code==='PROCESSING_PARENT_UNAVAILABLE'))onAccessDenied(status===401?'unauthenticated':status===403?'forbidden':'not-found');
-   else setError(status===404?'missing':status===503?'disabled':status===500?'unavailable':'changed');
+   else setError(status===404?'missing':status===503?'disabled':status===429?'busy':(status!==undefined&&status>=500)||(status===undefined&&isAxiosError(failure))?'unavailable':'changed');
   }finally{if(!controller.signal.aborted)setBusy(false);}
  }
  return <section data-processing-approval-review><h3>{t('hrApproval.title')}</h3><p>{t('hrApproval.notice')}</p><button type="button" disabled={busy||disabled} onClick={()=>void load()}>{t('hrApproval.load')}</button>{busy&&<p role="status">{t('common.actions.loading')}</p>}{error&&<p role="alert">{t(`hrProcessing.error.${error}`)}</p>}{job?.result&&<><CvReviewEvidence review={job.result.review}/>{job.kind==='ai-review'&&job.result.proposal&&<div data-ai-processing-proposals>{job.result.proposal.proposals.map((row,index)=><p key={index}>{t(`hrCvAi.fields.${row.field}`)}: {row.value} — {row.reason}</p>)}{job.result.proposal.uncertainty.map((note,index)=><p key={index}>{note}</p>)}</div>}<p>{job.result.parserVersion} · {job.source.sha256.slice(0,12)} · {job.source.revision}</p><button type="button" disabled={disabled} onClick={()=>{onApply(job);setJob(null);}}>{t('hrApproval.apply')}</button></>}</section>;
