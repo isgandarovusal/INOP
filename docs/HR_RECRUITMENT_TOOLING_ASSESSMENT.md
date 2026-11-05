@@ -32,13 +32,13 @@ not semantic CV analysis). No replacement or dependency installation was warrant
 Any future parser comparison must preserve exact pre-scanned immutable bytes,
 no-network/no-secret isolation, input/archive/output limits and private cleanup.
 
-## Semantic inference: precise remaining blocker
+## Multilingual semantic inference: precise remaining blocker
 
 Official Hugging Face metadata requests for multilingual E5-small, MiniLM, BGE-M3
 and BGE reranker failed with proxy CONNECT 403. No policy/TLS bypass or alternate
 mirror was used. FastEmbed's latest three GitHub releases had no model assets.
 No reviewed multilingual weight/tokenizer bundle with a verified digest was
-available. Therefore real semantic inference was NOT RUN; mocked remote responses,
+available during that assessment. Multilingual semantic inference was NOT RUN; mocked remote responses,
 deterministic ATS and Tesseract OCR are not embedding inference.
 
 The official FastEmbed registry at f91d9168c0291daeafb0a54cebc7c5b4b83f312f
@@ -63,3 +63,11 @@ retention/recovery verification, controlled index provisioning, worker continuit
 and combined backend+scanner+OCR budget remain production dependencies. KFC and
 Pizza Hut require first-party owner, notice/consent, secret custody, mapping and
 outbox/retry approval. Synthetic local success does not establish production readiness.
+
+## Follow-up: independently distributed English proof
+
+The official Explosion GitHub model release subsequently enabled real local
+English static-vector inference without bypassing Hugging Face policy. See
+[the measured offline experiment](HR_LOCAL_SEMANTIC_EXPERIMENT.md). It is not
+multilingual/contextual readiness: negated evidence ranked above a true paraphrase,
+so no matching, qualification or Candidate-search activation was made.
