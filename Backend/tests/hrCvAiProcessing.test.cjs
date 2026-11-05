@@ -65,6 +65,13 @@ test('Durable professional AI task profile preserves parse contracts, source aut
    for(let i=1;i<=3;i++){await createAiProcessing(options).runOnce();const row=await Jobs.findById(job.id).lean();assert.equal(row.attempts,i);assert.equal(row.state,i===3?'failed':'retry');assert.ok(!JSON.stringify(row).includes('PRIVATE_PROVIDER'));clock=new Date(clock.getTime()+301000);}assert.equal(count,3);assert.equal((await Jobs.findById(job.id).lean()).queueSlot,undefined);
    let release;const ignored=createAiProcessing({enabled:true,timeoutMs:1000,provider:{suggestCv:()=>new Promise(resolve=>release=()=>resolve({}))}}),timeoutJob=await enqueue(await cv(),'own',ignored);await ignored.runOnce();assert.equal((await ignored.get(req('own'),timeoutJob.id)).code,'PROCESSING_TIMEOUT');release();await new Promise(r=>setImmediate(r));
   });
+  await t.test('cached parsed facts must agree with the validated proposal and evidence packet',async()=>{
+   const c=await cv(),job=await enqueue(c);await ai.runOnce();const before=await Candidate.findById(c._id).lean(),stored=await Jobs.findById(job.id).select('+result').lean();assert.equal((await ai.get(req('own'),job.id)).currentSource,true);
+   for(const changes of [{'result.parsed.skills':['Invented qualification']},{'result.review.fields.skills.evidence':['Substituted quote']},{'result.evidence':[...stored.result.evidence,{id:'e2',field:'skills',quote:'Unbound new evidence'}]}]){
+    await Jobs.updateOne({_id:job.id},{$set:changes});const result=await ai.get(req('own'),job.id);assert.equal(result.state,'succeeded');assert.equal(result.currentSource,false,'Corrupt or substituted persisted payload is not an eligible AI result');assert.equal(result.result,undefined);assert.deepEqual(await Candidate.findById(c._id).lean(),before);await Jobs.updateOne({_id:job.id},{$set:{result:stored.result}});
+   }
+   assert.equal((await ai.get(req('own'),job.id)).currentSource,true);
+  });
   await t.test('negated certificate evidence cannot persist a positive AI proposal in AZ EN RU',async()=>{
    for(const quote of ['Does not hold a HACCP certificate','HACCP sertifikatı yoxdur','Сертификата HACCP нет']){
     const original=docx('Name: Synthetic guarded person\nCertificates\n'+quote),filename='test-'+crypto.randomUUID()+'.docx',file=path.join(uploadsDir,filename);await fs.writeFile(file,original,{flag:'wx',mode:0o600});owned.push(file);
