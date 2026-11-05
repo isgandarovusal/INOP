@@ -4,7 +4,7 @@ const { resourceFilter } = require('../services/hrResourceScope.service');
 const { verifyToken, getRolePermissions } = require('../middleware/auth.middleware');
 const evidence = require('../services/hrAiCvReview.service'), ai = require('../services/hrAiProvider.service');
 const { readCandidateOriginal } = require('./privateFiles.controller');
-const query = (req, id) => Candidate.findOne({ $and: [{ _id: id }, resourceFilter(req, 'candidate', 'read'), resourceFilter(req, 'candidate', 'update')] }).select('name cvUrl cvOriginal.sha256 cvOriginal.size cvReview __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
+const query = (req, id) => Candidate.findOne({ $and: [{ _id: id }, resourceFilter(req, 'candidate', 'read'), resourceFilter(req, 'candidate', 'update')] }).select('name cvUrl cvOriginal cvReview __v updatedAt +privateCvBlob +privateCvArchive +privateCvIntake').maxTimeMS(1000).lean();
 const authority = req => JSON.stringify([req.user.id, req.user.role, req.user.departmentId, req.authRole.permissions]);
 const fail = (code, message, status) => Object.assign(new Error(message), { code, status });
 async function original(candidate, hash, signal) {
@@ -30,7 +30,7 @@ exports.get = async (req, res) => {
     const initialAuthority = authority(req), candidate = await query(req, req.params.id);
     if (!candidate) throw fail('AI_PARENT_UNAVAILABLE', 'Candidate not found or unavailable.', 404);
     if (body.expectedHash !== candidate.cvOriginal?.sha256 || body.expectedRevision !== (candidate.__v || 0)) throw fail('AI_CONTEXT_CHANGED', 'Candidate source changed. Reload and review.', 409);
-    const context = evidence.buildContext(candidate), identity = evidence.identity(candidate);
+    const context = await evidence.currentContext(candidate), identity = evidence.identity(candidate);
     const refresh = async () => {
       await verifyToken(req, res, () => {}); if (res.headersSent || controller.signal.aborted) return false;
       req.authRole = { permissions: await getRolePermissions(req.user.role) };
@@ -52,6 +52,8 @@ exports.get = async (req, res) => {
     if (!beforeProvider) throw fail('AI_PARENT_UNAVAILABLE', 'Candidate not found or unavailable.', 404);
     if (!sameSource(beforeProvider)) throw fail('AI_CONTEXT_CHANGED', 'Candidate source changed. Reload and review.', 409);
     if (!await refresh()) return;
+    if(JSON.stringify(await evidence.currentContext(beforeProvider))!==JSON.stringify(context))throw fail('AI_CONTEXT_CHANGED','Professional evidence changed. Reload and review.',409);
+    if(candidate.privateCvIntake&&!candidate.cvReview?.processingApproval&&!await refresh())return;
     const result = await ai.suggestCv(context, { actorId: req.user.id, signal: controller.signal });
     if (!await refresh()) return;
     const current = await query(req, candidate._id);
@@ -62,6 +64,7 @@ exports.get = async (req, res) => {
     const final = await query(req,candidate._id);
     if (!final) throw fail('AI_PARENT_UNAVAILABLE','Candidate not found or unavailable.',404);
     if (!sameSource(final)) throw fail('AI_CONTEXT_CHANGED','Candidate source changed. Reload and review.',409);
+    if(JSON.stringify(await evidence.currentContext(final))!==JSON.stringify(context))throw fail('AI_CONTEXT_CHANGED','Professional evidence changed. Reload and review.',409);
     if (!await refresh()) return;
     return res.json({ ...result, source: { sha256: body.expectedHash, revision: body.expectedRevision, parserVersion: candidate.cvReview.version },
       reviewScope: 'professional_evidence_only', evidence: context.facts, requiresApproval: true });

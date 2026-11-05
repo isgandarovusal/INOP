@@ -73,4 +73,4 @@ function createApproval({original,available}){
  }
  return Object.freeze({approve,reconcile});
 }
-module.exports={createApproval};
+module.exports={createApproval,sourceContextHash:row=>hash(sourceContext(row))};

@@ -11,8 +11,8 @@ const protectedText = /(?<![\p{L}\p{N}_])(?:age|gender|nationality|ethnicity|rel
 // unknown sections are eligible; HR can review excluded material locally.
 const sensitive = /@|https?:|www\.|-----BEGIN|(?:api[ _-]?key|password|secret|token)\s*[:=]|[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|[<>\p{Cc}\p{Cf}]|(?<!\p{Nd})\+?\p{Nd}(?:[ ()-]*\p{Nd}){6,}(?!\p{Nd})/iu;
 function safe(text) { return typeof text === 'string' && text.length > 0 && text.length <= 500 && text.trim() && !sensitive.test(text.normalize('NFKC')) && !protectedText.test(text.normalize('NFKC')); }
-exports.buildContext = candidate => {
-  const ocr=candidate?.cvReview?.version==='ocr-rules-1'&&candidate.cvReview.provider==='tesseract-rules'&&['confirmed','corrected'].includes(candidate.cvReview.reviewStatus)&&candidate.cvReview.processingApproval?.sourceHash===candidate.cvOriginal?.sha256&&candidate.cvReview.processingApproval?.parserVersion==='ocr-rules-1';
+function buildContext(candidate, verifiedSourceOcr = false) {
+  const ocr=verifiedSourceOcr||candidate?.cvReview?.version==='ocr-rules-1'&&candidate.cvReview.provider==='tesseract-rules'&&['confirmed','corrected'].includes(candidate.cvReview.reviewStatus)&&candidate.cvReview.processingApproval?.sourceHash===candidate.cvOriginal?.sha256&&candidate.cvReview.processingApproval?.parserVersion==='ocr-rules-1';
   if (!candidate?.cvReview || candidate.cvReview.processingStatus !== 'extracted' || (!ocr&&(candidate.cvReview.version !== 'rules-2' || candidate.cvReview.provider !== 'rule-based')) || !/^[a-f0-9]{64}$/.test(candidate.cvOriginal?.sha256 || '')) throw fail('AI_NO_REVIEW_CONTEXT', 'Professional extraction evidence is unavailable. Review the original CV manually.', 422);
   const fields = candidate.cvReview.fields, facts = [];
   const names = [candidate.name, ...(Array.isArray(fields?.name?.evidence) ? fields.name.evidence.slice(0, 20) : [])].filter(n => typeof n === 'string' && n.length <= 500).map(n => canonical(n.replace(/^(?:name|full name|ad|ad soyad|adı|имя|фио)\s*[:：]\s*/iu, ''))).filter(Boolean);
@@ -29,6 +29,27 @@ exports.buildContext = candidate => {
   }
   if (!facts.length) throw fail('AI_NO_REVIEW_CONTEXT', 'No eligible professional evidence. Enter facts manually.', 422);
   return { version: 'cv-professional-evidence-v1', facts };
+};
+// The synchronous entry remains fail-closed for Source OCR without a job receipt.
+// Only this server-side lookup can authorize the distinct Source approval path.
+exports.buildContext = candidate => buildContext(candidate);
+exports.currentContext = async candidate => {
+  candidate = candidate?.toObject?.() || candidate;
+  if (!candidate?.privateCvIntake || candidate.cvReview?.processingApproval) return buildContext(candidate);
+  const unavailable = () => { throw fail('AI_NO_REVIEW_CONTEXT', 'Authoritative source evidence is unavailable. Review the original locally.', 422); };
+  if (!/^[a-f0-9]{24}$/.test(String(candidate.privateCvIntake)) || !/^[a-f0-9]{24}$/.test(String(candidate._id))) unavailable();
+  const row = await require('../models/hrCvIntake.model').findOne({_id:candidate.privateCvIntake,'approval.candidateId':candidate._id,state:'ready',taskVersion:'intake-rules-1'}).select('original scan taskVersion state +blob +result +approval +origin +intakeContext').maxTimeMS(1000).lean();
+  const review = candidate.cvReview, sourceReview = row?.result?.review;
+  const equal = require('node:util').isDeepStrictEqual;
+  if (!row?.approval?.completedAt || !row.approval.actor || !['confirmed','corrected'].includes(review?.reviewStatus) ||
+      row.result?.requiresApproval !== true || row.scan?.sha256 !== row.original?.sha256 || row.original?.sha256 !== candidate.cvOriginal?.sha256 ||
+      !equal(row.original,candidate.cvOriginal) || !equal(row.blob,candidate.privateCvBlob) || candidate.cvUrl !== '/uploads/intake-'+row._id+(row.original.mimeType==='application/pdf'?'.pdf':'.docx') ||
+      row.approval.contextHash !== require('./hrCvIntakeApproval.service').sourceContextHash(row) ||
+      sourceReview?.version !== review?.version || sourceReview?.provider !== review?.provider || sourceReview?.processingStatus !== 'extracted' ||
+      row.result.parserVersion !== review.version || !equal(sourceReview.fields,review.fields)) unavailable();
+  const ocr = review.version==='ocr-rules-1' && review.provider==='tesseract-rules';
+  if (!ocr && !(review.version==='rules-2' && review.provider==='rule-based')) unavailable();
+  return buildContext(candidate,ocr);
 };
 exports.context = value => {
   if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k => !['version', 'facts'].includes(k)) || value.version !== 'cv-professional-evidence-v1' || !Array.isArray(value.facts) || !value.facts.length || value.facts.length > 24) throw fail('AI_INVALID_CONTEXT', 'Invalid bounded professional evidence.');

@@ -28,7 +28,7 @@ async function indexes() {
  const required=[['hr_processing_context_unique',{contextKey:1},null],['hr_processing_queue_slot',{queueSlot:1},{queueSlot:{$type:'number'}}],['hr_processing_actor_slot',{actorId:1,actorSlot:1},{actorSlot:{$type:'number'}}]];
  if(required.some(([name,key,partial])=>!values.some(i=>i.name===name&&i.unique===true&&JSON.stringify(i.key)===JSON.stringify(key)&&(!partial||JSON.stringify(i.partialFilterExpression)===JSON.stringify(partial)))))throw fail('PROCESSING_QUEUE_NOT_READY');
 }
-function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true',now=()=>new Date(),timeoutMs=30000,parse=parser.parseCvResultFromBuffer,read=readCandidateOriginal,slot=()=>crypto.randomInt(64),kind='parse',taskVersion,task,scanner}={}) {
+function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true',now=()=>new Date(),timeoutMs=30000,parse=parser.parseCvResultFromBuffer,read=readCandidateOriginal,slot=()=>crypto.randomInt(64),kind='parse',taskVersion,task,scanner,resultCurrent}={}) {
  if(!['parse','ai-review','ocr'].includes(kind)||(kind!=='parse'&&(typeof task!=='function'||typeof taskVersion!=='string'||!/^[a-z0-9-]{1,64}$/.test(taskVersion))))throw fail('PROCESSING_INVALID_CONFIG',400);
  const scopedCandidate=(req,id,update=true)=>candidate(req,id,update,kind==='parse'?'cvReview.version':'name cvReview');
  if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>30000)throw fail('PROCESSING_INVALID_CONFIG',400);
@@ -62,7 +62,16 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
   const fresh=await actor(req.user.id),row=await scopedCandidate(fresh,job.candidateId,false);
   if(identity(fresh)!==auth)throw fail('PROCESSING_AUTH_CHANGED',403);
   if(!row)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
-  const currentSource=fingerprint(row)===job.sourceFingerprint;
+  let currentSource=fingerprint(row)===job.sourceFingerprint;
+  if(currentSource&&job.result&&typeof resultCurrent==='function'){
+   const verified=await resultCurrent(row,job.result);
+   if(verified!==null){
+    const finalActor=await actor(req.user.id),finalParent=await scopedCandidate(finalActor,job.candidateId,false);
+    if(identity(finalActor)!==auth)throw fail('PROCESSING_AUTH_CHANGED',403);
+    if(!finalParent)throw fail('PROCESSING_PARENT_UNAVAILABLE',404);
+    currentSource=verified===true&&fingerprint(finalParent)===job.sourceFingerprint;
+   }
+  }
   return {...dto(job,currentSource?job.result:undefined),currentSource};
  }
  async function list(req,id) {
@@ -137,7 +146,17 @@ function createProcessing({enabled=process.env.HR_CV_PROCESSING_ENABLED==='true'
     if(identity(beforeTask)!==auth||!beforeParent)throw fail('PROCESSING_AUTH_REVOKED',403);
     if(fingerprint(beforeParent)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
     if(retryActor){const beforeRetry=await actor(job.retryActorId);if(identity(beforeRetry)!==retryAuth||!await scopedCandidate(beforeRetry,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);}
-    const output=kind==='parse'?await parse(bytes,path.basename(row.cvUrl),{signal:controller.signal}):await task({candidate:beforeParent,bytes,actorId:String(job.actorId),signal:controller.signal});
+    // Optional task boundary for additional asynchronous provenance lookups.
+    // Existing parse/OCR tasks do not incur these reads unless they call it.
+    const guard=async()=>{
+     if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
+     const currentActor=await actor(job.actorId),currentParent=await scopedCandidate(currentActor,job.candidateId);
+     if(identity(currentActor)!==auth||!currentParent)throw fail('PROCESSING_AUTH_REVOKED',403);
+     if(fingerprint(currentParent)!==job.sourceFingerprint)throw fail('PROCESSING_SOURCE_CHANGED',409);
+     if(retryActor){const currentRetry=await actor(job.retryActorId);if(identity(currentRetry)!==retryAuth||!await scopedCandidate(currentRetry,job.candidateId))throw fail('PROCESSING_AUTH_REVOKED',403);}
+     if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
+    };
+    const output=kind==='parse'?await parse(bytes,path.basename(row.cvUrl),{signal:controller.signal}):await task({candidate:beforeParent,bytes,actorId:String(job.actorId),signal:controller.signal,guard});
     if(controller.signal.aborted)throw fail('PROCESSING_TIMEOUT');
     const latest=await actor(job.actorId),fresh=await scopedCandidate(latest,job.candidateId);
     if(identity(latest)!==auth||!fresh)throw fail('PROCESSING_AUTH_REVOKED',403);

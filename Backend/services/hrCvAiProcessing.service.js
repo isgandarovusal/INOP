@@ -3,6 +3,7 @@ const {createProcessing}=require('./hrCvProcessing.service');
 const evidence=require('./hrAiCvReview.service'),ai=require('./hrAiProvider.service');
 const version='ai-professional-1';
 const fail=()=>Object.assign(new Error('AI review result is unavailable.'),{code:'PROCESSING_INVALID_RESULT',status:422});
+const unavailable=()=>Object.assign(new Error('AI review is temporarily unavailable.'),{code:'AI_PROVIDER_UNAVAILABLE'});
 function checked(value,context){
  if(!value||value.version!=='cv-professional-review-v1'||value.requiresApproval!==true||!value.provenance||
   Object.keys(value).some(k=>!['version','status','proposals','uncertainty','requiresApproval','provenance'].includes(k))||
@@ -23,14 +24,19 @@ function checked(value,context){
 // Trusted profile, disabled by default. Optional HTTP/worker wiring does not
 // imply external-review consent, provider credentials or live E2E verification.
 function createAiProcessing({enabled=false,provider=ai,...queue}={}){
- return createProcessing({...queue,enabled,kind:'ai-review',taskVersion:version,task:async({candidate,actorId,signal})=>{
-  let context;try{context=evidence.buildContext(candidate);}catch(error){if(error.code==='AI_NO_REVIEW_CONTEXT')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};throw fail();}
-  try{const proposal=await provider.suggestCv(context,{actorId,signal});const result=checked(proposal,context);if(proposal.status==='insufficient_context')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};return{state:'succeeded',code:'AI_REVIEW_REQUIRED',result};}
+ return createProcessing({...queue,enabled,kind:'ai-review',taskVersion:version,resultCurrent:async(candidate,result)=>{
+  if(!candidate.privateCvIntake||candidate.cvReview?.processingApproval)return null;
+  try{const context=await evidence.currentContext(candidate);return result.proposal?.provenance?.contextHash===crypto.createHash('sha256').update(JSON.stringify(context)).digest('hex')&&require('node:util').isDeepStrictEqual(result.evidence,context.facts);}catch(error){if(error.code==='AI_NO_REVIEW_CONTEXT')return false;throw unavailable();}
+ },task:async({candidate,actorId,signal,guard})=>{
+  let context;try{context=await evidence.currentContext(candidate);}catch(error){if(error.code==='AI_NO_REVIEW_CONTEXT')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};throw unavailable();}
+  try{if(candidate.privateCvIntake&&!candidate.cvReview?.processingApproval){if(typeof guard!=='function')throw fail();await guard();}const proposal=await provider.suggestCv(context,{actorId,signal});const latest=await evidence.currentContext(candidate);if(JSON.stringify(latest)!==JSON.stringify(context))throw fail();const result=checked(proposal,context);if(proposal.status==='insufficient_context')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};return{state:'succeeded',code:'AI_REVIEW_REQUIRED',result};}
   catch(error){
+   if(['PROCESSING_AUTH_REVOKED','PROCESSING_SOURCE_CHANGED','PROCESSING_TIMEOUT'].includes(error.code))throw error;
+   if(error.code==='AI_NO_REVIEW_CONTEXT')return{state:'blocked',code:'AI_REVIEW_CONTEXT_REQUIRED'};
    if(['AI_UNAVAILABLE','AI_CONFIGURATION_REQUIRED'].includes(error.code))return{state:'blocked',code:'AI_NOT_CONFIGURED'};
    if(error.code==='AI_INVALID_OUTPUT')throw fail();
    // Other provider failures use the existing persisted bounded retry policy.
-   throw error?.code==='PROCESSING_INVALID_RESULT'?fail():Object.assign(new Error('AI review is unavailable.'),{code:'AI_PROVIDER_UNAVAILABLE'});
+   throw error?.code==='PROCESSING_INVALID_RESULT'?fail():unavailable();
   }
  }});
 }

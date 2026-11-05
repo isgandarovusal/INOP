@@ -88,7 +88,8 @@ PYTHONDONTWRITEBYTECODE=1 python3 Backend/tests/localSemanticRunner.test.py
 ```
 
 No scanner/storage/worker activation, source-owner approval, SMTP or production
-access is implied. Source-approved OCR and stored-Candidate OCR have distinct
-provenance receipts: the existing AI guard must not be loosened or supplied a
-fabricated processing-job approval just to accept Source OCR. That integration
-needs a separate authoritative provenance design before activation.
+access is implied. Source-approved OCR and stored-Candidate OCR have distinct provenance receipts.
+The async authoritative Source verifier now supports the existing opt-in durable
+AI path without fabricated processing-job metadata; see
+[Source provenance](HR_SOURCE_AI_PROVENANCE.md). Production gates remain disabled;
+provenance verification does not certify semantic model quality.
