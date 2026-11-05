@@ -17,6 +17,18 @@ Server-only `createSignedSource` accepts **approved backend relay** envelopes (n
 
 Additive `POST /api/hr/career-intake` is **disabled before its octet-stream body parsing** in the committed default profile. It uses its own approved signed-relay authentication; all other non-auth HR endpoints still require JWT. Headers: X-INOP-Source-ID, X-INOP-Command-ID, X-INOP-Timestamp, X-INOP-Signature. Content-Type application/octet-stream preserves exact signed JSON bytes and avoids the existing global JSON parser. It is not an activated public applicant portal, website form integration or real provider E2E. No secret may be placed in website HTML/JS. A first-party backend must forward the applicant's lawful consent/CV using its server secret; actual browser anti-abuse/captcha and first-party privacy notice require owner approval before wiring.
 
+## Durable receipt acknowledgement
+
+A successful signed-relay acknowledgement requires exactly one acceptance write
+matching the current receipt lease, an unexpired lease and a nonterminal
+`reserved`/`retry` state. A lost lease or changed state returns the existing
+`EXTERNAL_CONTEXT_CHANGED` error rather than a false `accepted:true`. Error
+recovery cannot overwrite a terminal/quarantined receipt or another lease.
+After a retryable interruption, the existing command identity recovers the same
+private Source/object; no Candidate is created until explicit HR approval.
+This tightens the existing CAS write without additional reads or requests and
+does not make the preceding external intake write a cross-resource transaction.
+
 ## Controls and setup/release gates
 
 - Default profile has no registry, actor, scanner, storage, env binding or activation. Missing ownership/privacy/scan/context is unavailable, not fake empty/success.

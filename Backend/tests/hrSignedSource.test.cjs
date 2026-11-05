@@ -22,4 +22,26 @@ test('Default-disabled signed career relay accepts no arbitrary actor, CV, sourc
  await t.test('caller mutation after signature/scan begins cannot change reserved command identity or immutable bytes',async()=>{clock=new Date(clock.getTime()+61000);const original=envelope(),snapshot={...original,rawBody:Buffer.from(original.rawBody)};let enter,release;const entered=new Promise(r=>enter=r),gate=new Promise(r=>release=r),recv=createSignedSource({...config,scanner:{scan:async(...args)=>{enter();await gate;return scanner.scan(...args);}}}),before=puts,pending=recv.receive(original,ip());await entered;original.commandId=crypto.randomUUID();original.rawBody.fill(0);release();assert.equal((await pending).accepted,true);assert.equal(puts,before+1);assert.equal((await recv.receive(snapshot,ip())).replayed,true);assert.equal(puts,before+1);await intake.runOnce(2);});
  await t.test('source-wide shared Mongo budget caps distinct-IP traffic across instances, not just one IP',async()=>{const unique=crypto.randomUUID(),nextSources=[{...sources[0],id:unique}],sameConfig={...config,sources:nextSources,intake:{enqueueApproved:async()=>({id:String(new(require('mongoose').Types.ObjectId)()),state:'queued'}),get:async()=>({})}};for(let i=0;i<20;i++){const input=envelope();input.sourceId=unique;input.signature=signature(secret,unique,input.timestamp,input.commandId,input.rawBody);assert.equal((await createSignedSource(sameConfig).receive(input,ip())).accepted,true);}const input=envelope();input.sourceId=unique;input.signature=signature(secret,unique,input.timestamp,input.commandId,input.rawBody);await assert.rejects(createSignedSource(sameConfig).receive(input,ip()),{code:'EXTERNAL_RATE_LIMIT',status:429});});
 
+ await t.test('acceptance commit must still own an unexpired receipt lease; failed commit recovers same source',async()=>{
+  for(const scenario of ['takeover','expired','state-changed']){
+   clock=new Date(clock.getTime()+61000);const command=crypto.randomUUID(),input=envelope(payload(),command),address=ip(),before=puts,sourceCount=await Source.countDocuments(),candidateCount=await Candidate.countDocuments(),update=Receipt.updateOne;let intercepted=0;
+   Receipt.updateOne=async function(filter,change,...rest){
+    if(change.$set?.state==='accepted'&&!intercepted++){
+     if(scenario==='takeover')await update.call(this,{_id:filter._id},{$set:{leaseToken:crypto.randomUUID()}});
+     else if(scenario==='expired')await update.call(this,{_id:filter._id},{$set:{leaseUntil:clock}});
+     else await update.call(this,{_id:filter._id},{$set:{state:'quarantined',code:'EXTERNAL_QUARANTINED'}});
+    }
+    return update.call(this,filter,change,...rest);
+   };
+   try{await assert.rejects(receiver.receive(input,address),{code:'EXTERNAL_CONTEXT_CHANGED',status:409});}finally{Receipt.updateOne=update;}
+   assert.equal(intercepted,1);assert.equal(puts,before+1);assert.equal(await Source.countDocuments(),sourceCount+1);assert.equal(await Candidate.countDocuments(),candidateCount);
+   const receipt=await Receipt.findOne({bodyHash:crypto.createHash('sha256').update(input.rawBody).digest('hex'),state:{$ne:'accepted'}}).select('+sourceId +leaseToken').sort({createdAt:-1}).lean();assert.ok(receipt);assert.equal(receipt.sourceId,undefined);
+   if(scenario==='state-changed'){assert.equal(receipt.state,'quarantined');await assert.rejects(receiver.receive(envelope(payload(),command),ip()),{code:'EXTERNAL_REVIEW_REQUIRED',status:409});}
+   else{
+    clock=new Date(clock.getTime()+61000);const result=await receiver.receive(envelope(payload(),command),ip());assert.equal(result.accepted,true);assert.equal(result.replayed,false);assert.equal((await receiver.receive(envelope(payload(),command),ip())).replayed,true);assert.equal(puts,before+1);assert.equal(await Source.countDocuments(),sourceCount+1);assert.equal(await Candidate.countDocuments(),candidateCount);
+   }
+   await intake.runOnce(2);
+  }
+ });
+
 }));
