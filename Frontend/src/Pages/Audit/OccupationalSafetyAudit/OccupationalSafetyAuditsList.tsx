@@ -1,4 +1,4 @@
-import "../auditModern.css";
+﻿import "../auditModern.css";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -115,8 +115,7 @@ return (
 
 
        <td>
-        {new Date(a.createdAt)
-        .toLocaleDateString(i18n.language)}
+        {formatAppDate(a.createdAt, i18n.language)}
        </td>
 
 

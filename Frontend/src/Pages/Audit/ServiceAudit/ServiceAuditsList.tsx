@@ -1,6 +1,7 @@
-import "../auditModern.css";
+﻿import "../auditModern.css";
 import "./serviceAuditsList.css";
 import { useEffect, useState, useRef } from "react";
+import { formatAppDate } from "../../../Utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
 import PageState from "../../../Components/PageState";
@@ -26,7 +27,7 @@ type ServiceAudit = {
 };
 
 export default function ServiceAuditsList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [audits, setAudits] = useState<ServiceAudit[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -342,10 +343,7 @@ export default function ServiceAuditsList() {
                 </td>
 
                 <td>
-                  {audit.date ||
-                    new Date(
-                      audit.createdAt
-                    ).toLocaleDateString()}
+                  {formatAppDate(audit.date || audit.createdAt, i18n.language)}
                 </td>
 
                 <td>
