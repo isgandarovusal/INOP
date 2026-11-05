@@ -60,6 +60,10 @@ exports.context = value => {
   }
   return { version: value.version, facts: value.facts.map(({ id, field, quote }) => ({ id, field, quote })) };
 };
+// Conservative rejection only, not a multilingual entailment model. An
+// ambiguous same-value negation goes back to manual HR review. Never interpret
+// an unmarked quote as proof of a qualification or certificate validity.
+const adverseLiteral = /(?<![\p{L}\p{N}_])(?:no|not|without|lacks|unknown|unverified|(?:doesn|isn|aren|hasn|haven|hadn|wasn|weren|can|couldn|wouldn|shouldn|didn|don|won)['’]t|yox|yoxdur|deyi\u0307?l|нет|не|без|отсутствует|неизвестно|неподтверждено)(?![\p{L}\p{N}_])/u;
 const row = { type: 'object', additionalProperties: false, required: ['field','value','evidenceIds','reason','confidence'], properties: {
   field: { type: 'string', enum: allowed }, value: { type: 'string' }, evidenceIds: { type: 'array', items: { type: 'string' } }, reason: { type: 'string' }, confidence: { anyOf: [{ type: 'number' }, { type: 'null' }] },
 } };
@@ -69,9 +73,14 @@ exports.schema = { type: 'object', additionalProperties: false, required: ['stat
 exports.validate = (result, input) => {
   const invalid = () => { throw fail('AI_INVALID_OUTPUT', 'CV proposal did not satisfy its evidence contract.', 502); };
   const facts = new Map(input.facts.map(f => [f.id, f])), seen = new Set(), singleton = new Set();
+  const adverse = [...facts.values()].filter(f => typeof f?.quote === 'string' && adverseLiteral.test(canonical(f.quote)));
   if (!result || typeof result !== 'object' || Object.keys(result).some(k => !['status','proposals','uncertainty'].includes(k)) || !['suggested','insufficient_context'].includes(result.status) || !Array.isArray(result.proposals) || result.proposals.length > 20 || !Array.isArray(result.uncertainty) || result.uncertainty.length > 10 || result.uncertainty.some(s => !safe(s))) invalid();
   for (const p of result.proposals) {
     if (!p || Object.keys(p).some(k => !['field','value','evidenceIds','reason','confidence'].includes(k)) || !allowed.includes(p.field) || !safe(p.value) || p.value.length > 200 || !safe(p.reason) || !Array.isArray(p.evidenceIds) || !p.evidenceIds.length || p.evidenceIds.length > 5 || new Set(p.evidenceIds).size !== p.evidenceIds.length || p.confidence !== null && (!Number.isFinite(p.confidence) || p.confidence < 0 || p.confidence > 1)) invalid();
+    // Candidate arrays cannot encode 'does not hold X' as a positive X. Also
+    // inspect uncited same-field counterevidence, so cherry-picked citations do
+    // not hide explicit conflict. Literal factual zero experience stays valid.
+    if (!(p.field === 'experience' && Number(p.value) === 0) && adverse.some(f => f.field === p.field && containsLiteral(f.quote,p.value))) invalid();
     const key = p.field + ':' + canonical(p.value); if (seen.has(key)) invalid(); seen.add(key);
     if (['role','education','experience'].includes(p.field)) { if (singleton.has(p.field)) invalid(); singleton.add(p.field); }
     for (const id of p.evidenceIds) {

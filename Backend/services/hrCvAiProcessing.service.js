@@ -25,6 +25,9 @@ function checked(value,context){
 // imply external-review consent, provider credentials or live E2E verification.
 function createAiProcessing({enabled=false,provider=ai,...queue}={}){
  return createProcessing({...queue,enabled,kind:'ai-review',taskVersion:version,resultCurrent:async(candidate,result)=>{
+  // Apply current output policy to historical successes as well as fresh model
+  // responses. Metadata stays readable; unsafe proposals cannot reach approval.
+  try{checked(result.proposal,evidence.context({version:'cv-professional-evidence-v1',facts:result.evidence}));}catch{return false;}
   if(!candidate.privateCvIntake||candidate.cvReview?.processingApproval)return null;
   try{const context=await evidence.currentContext(candidate);return result.proposal?.provenance?.contextHash===crypto.createHash('sha256').update(JSON.stringify(context)).digest('hex')&&require('node:util').isDeepStrictEqual(result.evidence,context.facts);}catch(error){if(error.code==='AI_NO_REVIEW_CONTEXT')return false;throw unavailable();}
  },task:async({candidate,actorId,signal,guard})=>{
