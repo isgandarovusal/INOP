@@ -1,0 +1,50 @@
+/* Universal Typography Strategy: Self-hosted Inter font with full coverage of
+   Basic Latin, Latin Extended (including Azerbaijani Ə/ə, Ğ/ğ, İ/ı, Ö/ö, Ş/ş, Ç/ç, Ü/ü),
+   and Cyrillic (Russian А-Я, а-я, Ё, ё). Licensed under SIL Open Font License (OFL-1.1). */
+
+/* Modern browsers with variable font support */
+@supports (font-variation-settings: normal) {
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/InterVariable.woff2') format('woff2-variations'),
+         url('/fonts/InterVariable.woff2') format('woff2');
+  }
+}
+
+/* Fallback static fonts for environments without variable font support */
+@supports not (font-variation-settings: normal) {
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/Inter-Medium.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/Inter-Bold.woff2') format('woff2');
+  }
+}
