@@ -1,0 +1,157 @@
+{
+  "syntheticOnly": true,
+  "outputDirectory": "/tmp/inop-converter-benchmark-Njjros",
+  "results": [
+    {
+      "invalidDocxRejected": true,
+      "tool": "inop-rules-2",
+      "results": [
+        {
+          "language": "en",
+          "sourceHash": "3b7d68b9c23a17af13042a24f5a578c328a50363c3a2a79e7c532074cdac6410",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "latencyMs": 688.78,
+          "characters": 76,
+          "structuredTables": false
+        },
+        {
+          "language": "az",
+          "sourceHash": "5138af8d39c371010560f7a05fb6c5999fbe068dc2abd9f68b3557721383ba66",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "latencyMs": 412.96,
+          "characters": 79,
+          "structuredTables": false
+        },
+        {
+          "language": "ru",
+          "sourceHash": "9d9f0ea5030956529c0077143e1a71449a2127c18bff4629ef1cd68173735199",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "latencyMs": 424.39,
+          "characters": 80,
+          "structuredTables": false
+        }
+      ],
+      "peakRssMiB": 132.33203125,
+      "semanticInference": false
+    },
+    {
+      "tool": "docling-slim-2.148.0",
+      "initMs": 1522.2,
+      "peakRssMiB": 149.95,
+      "results": [
+        {
+          "language": "en",
+          "sourceHash": "3b7d68b9c23a17af13042a24f5a578c328a50363c3a2a79e7c532074cdac6410",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 56.78,
+          "characters": 125
+        },
+        {
+          "language": "az",
+          "sourceHash": "5138af8d39c371010560f7a05fb6c5999fbe068dc2abd9f68b3557721383ba66",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 23.53,
+          "characters": 131
+        },
+        {
+          "language": "ru",
+          "sourceHash": "9d9f0ea5030956529c0077143e1a71449a2127c18bff4629ef1cd68173735199",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 21.05,
+          "characters": 129
+        }
+      ],
+      "invalidDocxRejected": true,
+      "networkDisabled": true,
+      "semanticInference": false
+    },
+    {
+      "tool": "markitdown-0.1.9",
+      "initMs": 654.81,
+      "peakRssMiB": 149.67,
+      "results": [
+        {
+          "language": "en",
+          "sourceHash": "3b7d68b9c23a17af13042a24f5a578c328a50363c3a2a79e7c532074cdac6410",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 296.5,
+          "characters": 112
+        },
+        {
+          "language": "az",
+          "sourceHash": "5138af8d39c371010560f7a05fb6c5999fbe068dc2abd9f68b3557721383ba66",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 254.49,
+          "characters": 115
+        },
+        {
+          "language": "ru",
+          "sourceHash": "9d9f0ea5030956529c0077143e1a71449a2127c18bff4629ef1cd68173735199",
+          "tokensPreserved": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "tables": 1,
+          "itemsWithPageProvenance": 0,
+          "latencyMs": 224.65,
+          "characters": 116
+        }
+      ],
+      "invalidDocxRejected": false,
+      "networkDisabled": true,
+      "semanticInference": false
+    }
+  ]
+}

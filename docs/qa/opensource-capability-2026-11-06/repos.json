@@ -1,0 +1,141 @@
+[
+  {
+    "archived": false,
+    "license": "AGPL-3.0",
+    "name": "adamperlis/openats",
+    "pushed_at": "2026-09-26T09:05:12Z",
+    "size": 2290,
+    "stars": 0,
+    "url": "https://github.com/adamperlis/openats"
+  },
+  {
+    "archived": false,
+    "license": "NOASSERTION",
+    "name": "opencats/OpenCATS",
+    "pushed_at": "2026-11-05T16:03:10Z",
+    "size": 39113,
+    "stars": 778,
+    "url": "https://github.com/opencats/OpenCATS"
+  },
+  {
+    "archived": false,
+    "license": "GPL-3.0",
+    "name": "frappe/hrms",
+    "pushed_at": "2026-11-06T08:45:37Z",
+    "size": 98165,
+    "stars": 9024,
+    "url": "https://github.com/frappe/hrms"
+  },
+  {
+    "name": "anirudhnshandilya/auditpilot",
+    "metadata": "unavailable"
+  },
+  {
+    "archived": false,
+    "license": "AGPL-3.0",
+    "name": "coolstartnow/isms-builder",
+    "pushed_at": "2026-11-02T05:13:22Z",
+    "size": 21292,
+    "stars": 259,
+    "url": "https://github.com/coolstartnow/isms-builder"
+  },
+  {
+    "archived": false,
+    "license": "AGPL-3.0",
+    "name": "SUALBA/AuditSym",
+    "pushed_at": "2026-10-22T10:42:20Z",
+    "size": 18392,
+    "stars": 5,
+    "url": "https://github.com/SUALBA/AuditSym"
+  },
+  {
+    "archived": false,
+    "license": "CC-BY-SA-4.0",
+    "name": "jposluns/grc_library",
+    "pushed_at": "2026-11-06T09:54:00Z",
+    "size": 64863,
+    "stars": 3,
+    "url": "https://github.com/jposluns/grc_library"
+  },
+  {
+    "archived": false,
+    "license": "MIT",
+    "name": "docling-project/docling",
+    "pushed_at": "2026-11-06T09:40:38Z",
+    "size": 479913,
+    "stars": 70193,
+    "url": "https://github.com/docling-project/docling"
+  },
+  {
+    "archived": false,
+    "license": "MIT",
+    "name": "microsoft/markitdown",
+    "pushed_at": "2026-10-28T15:33:14Z",
+    "size": 6010,
+    "stars": 194129,
+    "url": "https://github.com/microsoft/markitdown"
+  },
+  {
+    "archived": false,
+    "license": "Apache-2.0",
+    "name": "Unstructured-IO/unstructured",
+    "pushed_at": "2026-11-06T03:02:14Z",
+    "size": 237768,
+    "stars": 15685,
+    "url": "https://github.com/Unstructured-IO/unstructured"
+  },
+  {
+    "archived": false,
+    "license": "MIT",
+    "name": "ollama/ollama",
+    "pushed_at": "2026-11-06T02:08:23Z",
+    "size": 97133,
+    "stars": 186073,
+    "url": "https://github.com/ollama/ollama"
+  },
+  {
+    "archived": false,
+    "license": "Apache-2.0",
+    "name": "huggingface/transformers",
+    "pushed_at": "2026-11-06T11:20:44Z",
+    "size": 556953,
+    "stars": 168583,
+    "url": "https://github.com/huggingface/transformers"
+  },
+  {
+    "archived": false,
+    "license": "Apache-2.0",
+    "name": "srbhr/Resume-Matcher",
+    "pushed_at": "2026-11-02T11:30:49Z",
+    "size": 176177,
+    "stars": 29159,
+    "url": "https://github.com/srbhr/Resume-Matcher"
+  },
+  {
+    "archived": false,
+    "license": null,
+    "name": "anthropics/skills",
+    "pushed_at": "2026-10-28T19:20:39Z",
+    "size": 5488,
+    "stars": 187965,
+    "url": "https://github.com/anthropics/skills"
+  },
+  {
+    "archived": false,
+    "license": "Apache-2.0",
+    "name": "microsoft/playwright",
+    "pushed_at": "2026-11-06T09:20:47Z",
+    "size": 247164,
+    "stars": 99443,
+    "url": "https://github.com/microsoft/playwright"
+  },
+  {
+    "archived": false,
+    "license": "MPL-2.0",
+    "name": "dequelabs/axe-core",
+    "pushed_at": "2026-11-05T16:47:50Z",
+    "size": 23820,
+    "stars": 7768,
+    "url": "https://github.com/dequelabs/axe-core"
+  }
+]

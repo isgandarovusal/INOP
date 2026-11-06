@@ -7,7 +7,7 @@ async function run(results={},port='27018'){
 }
 test('Browser runner keeps all serial groups, flags and guarded environment; success is explicit',async()=>{
  const {calls,logs,process}=await run();assert.equal(calls.length,16);assert.equal(process.exitCode,0);
- const files=calls.flatMap(([,args])=>Array.from(args.slice(3)));assert.equal(files.length,39);assert.equal(new Set(files).size,39);assert.ok(files.some(f=>f.endsWith('applicationHandoffContextUI.test.cjs')));
+ const files=calls.flatMap(([,args])=>Array.from(args.slice(3)));assert.equal(files.length,40);assert.equal(new Set(files).size,40);assert.ok(files.some(f=>f.endsWith('applicationHandoffContextUI.test.cjs')));
  for(const [binary,args,options]of calls){assert.equal(binary,process.execPath);assert.deepEqual(Array.from(args.slice(0,3)),['--test','--test-timeout=300000','--test-isolation=none']);assert.equal(options.env,process.env);assert.equal(options.stdio,'inherit');for(const file of args.slice(3))assert.ok(fs.existsSync(file));}
  assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_START').length,16);assert.equal(logs.filter(x=>x.code==='BROWSER_QA_GROUP_RESULT').length,16);assert.equal(logs.at(-1).failedGroups.length,0);
 });
@@ -28,7 +28,7 @@ test('Matching authorization and navigation regressions run exactly once in FULL
  assert.equal(fullFiles.filter(f=>path.basename(f)===matching).length,1,'FULL must execute matching UI regression');
  const {groups,runBrowser}=require('../../scripts/qaScope.cjs');
  const selectedFiles=groups.flatMap(g=>g.files);
- assert.equal(selectedFiles.length,30);assert.equal(new Set(selectedFiles).size,30);
+ assert.equal(selectedFiles.length,31);assert.equal(new Set(selectedFiles).size,31);
  assert.equal(selectedFiles.filter(f=>f===matching).length,1);
  const previous=process.env.INOP_AUDIT_TEST_PORT;process.env.INOP_AUDIT_TEST_PORT='27018';
  try{const calls=[];assert.equal(await runBrowser({scope:'recruitment-frontend'},{spawn:(_exe,args)=>{calls.push(args);return{status:0};}}),0);
@@ -39,3 +39,5 @@ test('Matching authorization and navigation regressions run exactly once in FULL
 });
 
 test('Product comparison/work-queue acceptance runs exactly once in each selection',async()=>{const full=await run();const files=full.calls.flatMap(([,args])=>Array.from(args.slice(3)).map(p=>path.basename(p)));assert.equal(files.filter(f=>f==='recruitmentProductUI.test.cjs').length,1);assert.equal(require('../../scripts/qaScope.cjs').groups.flatMap(g=>g.files).filter(f=>f==='recruitmentProductUI.test.cjs').length,1);});
+
+test('Feedback/CAPA/axe acceptance runs once in each browser selection',async()=>{const full=await run();assert.equal(full.calls.flatMap(([,args])=>Array.from(args.slice(3))).filter(f=>f.endsWith('/opensourceCapabilityUI.test.cjs')).length,1);assert.equal(require('../../scripts/qaScope.cjs').groups.flatMap(g=>g.files).filter(f=>f==='opensourceCapabilityUI.test.cjs').length,1);});
