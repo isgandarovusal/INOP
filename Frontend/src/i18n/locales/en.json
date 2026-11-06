@@ -9,6 +9,19 @@
     "unavailable": "Stage unavailable",
     "matched": "Matching evidence"
   },
+  "hrQueue": {
+    "my-overdue": "My overdue actions",
+    "my-interviews": "My upcoming interviews",
+
+    "reportHelp": "Open an operational queue within your current permissions. Report date and brand filters do not apply to these links.",
+    "title": "Work queue",
+    "all": "All applications",
+    "overdue": "Overdue follow-ups",
+    "interviews": "Upcoming interviews",
+    "overdueHelp": "Active applications with a next action due before now. Set the next action to None in Application Detail when complete. Dates are displayed in Baku time.",
+    "interviewsHelp": "Active applications with a pending internal interview in the next 7 days. This does not mean an external invitation was sent. Dates are displayed in Baku time.",
+    "tableOnly": "Work queues use the table view."
+  },
   "hrCandidateUI": {
     "metrics": "Candidate metrics",
     "matchingTotal": "Matching candidates",

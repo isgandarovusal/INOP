@@ -45,7 +45,7 @@ function parameters(req, kind) {
   if (structured.length) extra.$and = structured;
   if (q.archived !== undefined && (!['candidates','jobs'].includes(kind) || !['true','false'].includes(q.archived))) throw Error('Invalid archive filter.');
   if (['candidates','jobs'].includes(kind)) extra.archivedAt = q.archived === 'true' ? { $ne: null } : null;
-  for (const [key, value] of Object.entries(q)) if (!['skills', 'certificates', 'skillsMode'].includes(key) && (!['q', 'page', 'pageSize', 'sort', 'status', 'brandId', 'branchId', 'jobId', 'candidateId', 'after', 'excludeJobId', 'archived'].includes(key) || typeof value !== 'string' || value.length > (key === 'after' ? 320 : 80))) throw Error('Invalid page filter.');
+  for (const [key, value] of Object.entries(q)) if (!['skills', 'certificates', 'skillsMode'].includes(key) && (!['q', 'page', 'pageSize', 'sort', 'status', 'brandId', 'branchId', 'jobId', 'candidateId', 'after', 'excludeJobId', 'archived', 'attention', 'assignee'].includes(key) || typeof value !== 'string' || value.length > (key === 'after' ? 320 : 80))) throw Error('Invalid page filter.');
   const page = q.page === undefined ? 1 : Number(q.page), pageSize = q.pageSize === undefined ? 30 : Number(q.pageSize), sort = q.sort || 'newest';
   if (!Number.isInteger(page) || page < 1 || page > 10000 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100 || !['newest', 'name'].includes(sort) || kind === 'applications' && sort !== 'newest') throw Error('Invalid pagination or sort.');
   for (const key of ['branchId', 'jobId', 'candidateId', 'excludeJobId']) if (q[key]) { if (!mongoose.isObjectIdOrHexString(q[key])) throw Error('Invalid resource filter.'); if (key !== 'excludeJobId') extra[key] = new mongoose.Types.ObjectId(q[key]); }
@@ -55,6 +55,14 @@ function parameters(req, kind) {
     const choices = kind === 'branches' ? ['active', 'inactive'] : kind === 'jobs' ? ['Open', 'Closed', 'Draft'] : kind === 'candidates' ? ['new', 'applied', 'screening', 'shortlisted', 'interview', 'offer', 'hired', 'rejected'] : ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Offered', 'Hired', 'Rejected', 'Processing'];
     if (!choices.includes(q.status)) throw Error('Invalid status filter.');
     if (kind === 'applications' && q.status === 'Processing') { extra.status = 'Applied'; extra.processingState = { $in: ['queued', 'running'] }; } else extra.status = q.status;
+  }
+  if (q.assignee !== undefined) { if (kind !== 'applications' || q.assignee !== 'me') throw Error('Invalid assignee filter.'); extra.assignedTo = new mongoose.Types.ObjectId(req.user.id); }
+  if (q.attention !== undefined) {
+    if (kind !== 'applications' || !['overdue','interviews'].includes(q.attention)) throw Error('Invalid attention filter.');
+    const at = new Date();
+    extra.$and = [...(extra.$and || []), { status: { $nin: ['Hired','Rejected'] } }, q.attention === 'overdue'
+      ? { 'nextAction.kind': { $in: ['review','call','interview','offer','follow_up'] }, 'nextAction.dueAt': { $lt: at } }
+      : { 'interview.result': 'pending', 'interview.startsAt': { $gte: at, $lte: new Date(at.getTime() + 7*86400000) } }];
   }
   const search = q.q?.trim() ? new RegExp(escape(q.q.trim()), 'i') : null;
   if (search && kind !== 'applications') extra.$or = (kind === 'brands' ? ['name'] : kind === 'branches' ? ['name', 'code', 'location'] : kind === 'jobs' ? ['title', 'department', 'location', 'requiredSkills'] : ['name', 'role', 'skills']).map(field => ({ [field]: search }));

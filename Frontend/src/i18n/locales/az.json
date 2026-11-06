@@ -9,6 +9,19 @@
     "unavailable": "Mərhələ məlum deyil",
     "matched": "Uyğun sübutlar"
   },
+  "hrQueue": {
+    "my-overdue": "Mənə aid gecikmiş addımlar",
+    "my-interviews": "Mənə aid yaxın müsahibələr",
+
+    "reportHelp": "Cari icazələriniz daxilində iş növbəsini açın. Hesabatın tarix və brend filtrləri bu keçidlərə tətbiq edilmir.",
+    "title": "İş növbəsi",
+    "all": "Bütün müraciətlər",
+    "overdue": "Gecikmiş növbəti addımlar",
+    "interviews": "Yaxın müsahibələr",
+    "overdueHelp": "Növbəti addımın vaxtı keçmiş aktiv müraciətlər. İşi bitirdikdə Müraciət bölməsində növbəti addımı Yoxdur seçin. Tarixlər Bakı vaxtı ilə göstərilir.",
+    "interviewsHelp": "Növbəti 7 gündə daxili müsahibəsi gözlənilən aktiv müraciətlər. Bu, xarici dəvətin göndərildiyini bildirmir. Tarixlər Bakı vaxtı ilə göstərilir.",
+    "tableOnly": "İş növbəsi cədvəl görünüşündə göstərilir."
+  },
   "hrCandidateUI": {
     "metrics": "Namizəd göstəriciləri",
     "matchingTotal": "Filtrə uyğun namizədlər",

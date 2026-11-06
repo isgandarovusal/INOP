@@ -1,3 +1,4 @@
+import { formatDateTime } from '../../../Utils/dateUtils';
 import { useNavigationState } from '../../../Hooks/useNavigationState';
 import { applicationActionAllowed } from '../../../Utils/applicationActions';
 import { Layers3 } from "lucide-react";
@@ -40,7 +41,7 @@ const STATUS_TONE: Partial<Record<ApplicationStatus, BadgeTone>> = {
 import HRResourceState from "../../../Components/HRResourceState";
 import { useHRPage, useDebouncedSearch } from "../../../Hooks/useHRPage";
 import HRPageControls from "../../../Components/HRPageControls";
-import { getApplicationPage, canonicalHRStatus } from "../../../Services/hrPageService";
+import { getApplicationPage, canonicalHRStatus, type HRPageQuery } from "../../../Services/hrPageService";
 import { useHRBoard } from "../../../Hooks/useHRBoard";
 
 const ApplicationsList: React.FC = () => {
@@ -53,7 +54,10 @@ const ApplicationsList: React.FC = () => {
   const [boardCode, setBoardCode] = useState<{ component?: typeof import("../../../Components/ApplicationKanban").default; error?: "error" | "timeout" }>({});
 
   const [params, setParams] = useSearchParams();
-  const view = params.get('view') === 'board' ? 'board' : 'table';
+  const queue = ['overdue','interviews','my-overdue','my-interviews'].includes(params.get('attention') || '') ? params.get('attention')! : 'all';
+  const attention = queue.endsWith('overdue') ? 'overdue' : queue.endsWith('interviews') ? 'interviews' : 'all';
+  const setAttention = (value: string) => setParams(previous => { const next = new URLSearchParams(previous); if (value === 'all') next.delete('attention'); else { next.set('attention',value); next.delete('view'); } return next; });
+  const view = params.get('view') === 'board' && attention === 'all' ? 'board' : 'table';
   useEffect(() => {
     if (view !== "board" || !hasPermission(user, "application", "read") || boardCode.component || boardCode.error) return;
     let current = true;
@@ -87,12 +91,12 @@ const ApplicationsList: React.FC = () => {
   const settledSearch = useDebouncedSearch(search);
   // Clear all filters in one scoped table/board query, including pending text.
   const debouncedSearch = search.trim() ? settledSearch : '';
-  const filters = { q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter };
+  const filters: HRPageQuery = { assignee: queue.startsWith('my-') ? 'me' : undefined, attention: attention === 'all' ? undefined : attention, q: debouncedSearch, jobId: jobFilter === "all" ? undefined : jobFilter, status: statusFilter === "all" ? undefined : canonicalHRStatus(statusFilter), brandId: brandFilter === "all" ? undefined : brandFilter, branchId: branchFilter === "all" ? undefined : branchFilter };
   const table = useHRPage("application", filters, getApplicationPage, { enabled: view === 'table', navigationKey: 'applications.page' });
   const board = useHRBoard(filters, view === 'board');
   const result = view === 'board' ? board : table;
   const [deleteBusy, setDeleteBusy] = useState<{ key: string; id: string | null }>({ key: "", id: null });
-  const context = useHRActionContext(JSON.stringify([debouncedSearch, jobFilter, statusFilter, brandFilter, branchFilter, view, view === 'table' ? table.page : 1]));
+  const context = useHRActionContext(JSON.stringify([queue, debouncedSearch, jobFilter, statusFilter, brandFilter, branchFilter, view, view === 'table' ? table.page : 1]));
   const controllers = useRef(new Set<AbortController>());
   useEffect(() => { const current = controllers.current; return () => { for (const c of current) c.abort(); current.clear(); }; }, [context.key]);
   const deletingId = deleteBusy.key === context.key ? deleteBusy.id : null;
@@ -109,10 +113,10 @@ const ApplicationsList: React.FC = () => {
   const setDeleteTarget = (target: Application | null) => setSelection(target ? { key: context.key, target } : null);
 
   const filtersActive =
-    search.trim() !== "" || jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
+    attention !== "all" || search.trim() !== "" || jobFilter !== "all" || statusFilter !== "all" || brandFilter !== "all" || branchFilter !== "all";
 
   const clearFilters = () => {
-    setJobFilter("all"); setBrandFilter("all"); setBranchFilter("all");
+    setAttention("all"); setJobFilter("all"); setBrandFilter("all"); setBranchFilter("all");
     setStatusFilter("all"); setSearch("");
   };
 
@@ -191,9 +195,10 @@ const ApplicationsList: React.FC = () => {
       {mutation.key === context.key && mutation.error && <p role="alert">{t(mutation.error)} <button type="button" onClick={load}>{t("hrStates.retry")}</button></p>}
       <p className="form-hint">{t("recruitmentSemantics.applicationHelp")}</p>
       <div className="filter-bar hr-primary-controls">
+        <select aria-label={t('hrQueue.title')} value={queue} onChange={e=>setAttention(e.target.value)}>{['all','overdue','interviews','my-overdue','my-interviews'].map(value=><option key={value} value={value}>{t('hrQueue.'+value)}</option>)}</select>
         <SearchInput value={search} onChange={setSearch} placeholder={t("hrWorkflow.search")} />
         <select aria-label={t("hrWorkflow.sort")} value={sort} onChange={e => setSort(e.target.value as typeof sort)}>{["score", "newest", "name"].map(s => <option key={s} value={s}>{t(s === 'newest' ? 'hrPage.sortNewestAll' : `hrPage.sort${s.charAt(0).toUpperCase() + s.slice(1)}Page`)}</option>)}</select>
-        <button className="btn-secondary" type="button" onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
+        <button className="btn-secondary" type="button" disabled={attention !== "all"} title={attention !== "all" ? t("hrQueue.tableOnly") : undefined} onClick={() => setView(view === "table" ? "board" : "table")}>{t(view === "table" ? "hrMatch.board" : "hrMatch.table")}</button>
         <select
           aria-label={t('hrPage.statusFilter')}
           className="input-field"
@@ -225,6 +230,7 @@ const ApplicationsList: React.FC = () => {
         )}
       </div>
 
+      {attention !== "all" && <p role="note">{t("hrQueue."+attention+"Help")}</p>}
       <p className="hr-toolbar-note" role="note">{t(view === 'board' ? board.data?.manualOrder ? 'hrBoard.manualOrder' : 'hrBoard.selectVacancy' : "hrPage.pageSort")}</p>
       {result.status !== "ready" ? <HRResourceState status={result.status} retry={load} /> : view === "board" ? ApplicationKanban ? <ApplicationKanban applications={visibleApplications} pages={board.columns} laneState={board.laneState} onPage={(stage, delta) => { void board.pageLane(stage, delta); }} manualOrder={board.data?.manualOrder} reload={load} canChangeStatus={canUpdate && !result.refreshing} pendingIds={optimistic.key === context.key ? Object.keys(optimistic.statuses) : []} onStatusChange={handleStatusChange} /> : <HRResourceState status={boardCode.error || "loading"} retry={boardCode.error ? () => window.location.reload() : undefined} /> : <div className="admin-table-container" role="region" aria-label={t('recruitment.applications.title')} tabIndex={0}>
         {rows.length === 0 ? <EmptyState icon={<ClipboardList size={28} />} title={t(filtersActive ? "recruitment.applications.noFilteredApplications" : "recruitment.applications.noApplications")} hint={t(filtersActive ? "recruitment.applications.noFilteredApplicationsHint" : "recruitment.applications.noApplicationsHint")} /> : <table>
@@ -274,7 +280,7 @@ const ApplicationsList: React.FC = () => {
                     {job ? <button type="button" className="hr-row-title" onClick={() => navigate(`/app/recruitment/jobs/${job.id}`)}>{job.position}</button> : t("hrStates.restricted")}
                     {job?.brandId && <small style={{ display: "block" }}>{job.brandName || brandLabel(job.brandId)}{job.branchName ? ` · ${job.branchName}` : ""}</small>}
                   </td>
-                  <td><MatchScoreBadge application={app} onUpdated={load} /><button type="button" onClick={() => navigate(`/app/recruitment/applications/${app.id}`)}>{t("hrWorkflow.details")}</button></td>
+                  <td>{attention !== "all" && <p>{attention === "overdue" ? t("hrWorkflow.action."+app.nextAction?.kind) : t("hrQueue.interviews")} · {formatDateTime(attention === "overdue" ? app.nextAction?.dueAt : app.interview?.startsAt)}</p>}<MatchScoreBadge application={app} onUpdated={load} /><button type="button" onClick={() => navigate(`/app/recruitment/applications/${app.id}`)}>{t("hrWorkflow.details")}</button></td>
                   <td>
                     {canUpdate && !result.refreshing && applicationActionAllowed(app, 'update') ? (
                       <select

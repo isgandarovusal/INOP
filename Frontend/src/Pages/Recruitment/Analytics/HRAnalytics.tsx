@@ -72,6 +72,11 @@ export default function HRAnalyticsPage() {
           setPane(next); document.getElementById(`${tabId}-${next}`)?.focus();
         }}>{t(`hrWorkspace.${value}`)}</button>)}
       </div>
+      <section className="detail-card" aria-label={t('hrQueue.title')}>
+        <h2>{t('hrQueue.title')}</h2><p>{t('hrQueue.reportHelp')}</p>
+        <Link className="btn-secondary" to="/app/recruitment/applications?attention=overdue">{t('hrQueue.overdue')}</Link>{' '}
+        <Link className="btn-secondary" to="/app/recruitment/applications?attention=interviews">{t('hrQueue.interviews')}</Link>
+      </section>
       <div className="hr-analytics-sections" role="tabpanel" id={`${tabId}-panel`} aria-labelledby={`${tabId}-${pane}`} data-hr-analytics-pane={pane}>
         {pane === 'overview' ? data.totals.applications === 0 ? null : <>
         <section className="hr-panel hr-panel--funnel"><h2><UsersRound size={18} aria-hidden="true" />{t('hrAnalytics.funnel')}</h2><table aria-label={t('hrAnalytics.funnel')}><thead><tr><th>{t('recruitment.applications.status')}</th><th>{t('hrAnalytics.count')}</th></tr></thead><tbody>{data.funnel.map(r => <tr key={r.status} data-hr-stage={r.status}><th scope="row"><Badge tone={stageTones[r.status] || 'neutral'}>{t(`recruitment.applications.${r.status.toLowerCase()}`)}</Badge></th><td><span className="hr-analytic-number">{r.count}</span><span className="hr-metric-track" aria-hidden="true"><span style={{width:`${data.totals.applications ? Math.min(100,r.count/data.totals.applications*100):0}%`}}/></span></td></tr>)}</tbody></table></section>
