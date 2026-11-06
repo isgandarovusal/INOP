@@ -1,0 +1,41 @@
+{
+  "realTesseract": true,
+  "syntheticFixtureOnly": true,
+  "contextualInference": false,
+  "productionConfigurationChanged": false,
+  "baselineEvidence": "docs/qa/policy-closure-2026-11-06/ocr-confusable.json",
+  "artifactDigests": {
+    "aze": "a365310848aecb739f19369cb3831d4660fcd9345d798e91a3042455f9ccc9f0",
+    "rus": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225",
+    "eng": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+  },
+  "results": [
+    {
+      "psm": "3",
+      "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+      "literalMarkers": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "observedAcronym": "\u041d\u0410\u0421\u0421\u0420",
+      "latencyMs": 914,
+      "originalUnchanged": true
+    },
+    {
+      "psm": "11",
+      "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+      "literalMarkers": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "observedAcronym": null,
+      "latencyMs": 590,
+      "originalUnchanged": true
+    }
+  ],
+  "executedSourceSha256": "ae1ab6373924ce9393bef8117cba0326db812f3d58a25e0278b2a41ec27cd381"
+}

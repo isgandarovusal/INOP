@@ -1,0 +1,16 @@
+{
+  "execution": "REAL_OWNED_LOOPBACK_MONGODB_CLI",
+  "counts": {
+    "tests": 3,
+    "pass": 3,
+    "fail": 0
+  },
+  "defaultInspectReadOnly": true,
+  "absentCollectionRemainedAbsent": true,
+  "seededConflictGroups": 102,
+  "publishedGroups": 100,
+  "truncated": true,
+  "documentsAndIndexesUnchanged": true,
+  "productionDatasetInspected": false,
+  "logSha256": "22329d1454c0a041d6a8509e27cdf5838fc6b15fadbc12ff8c1d5445043840e9"
+}

@@ -1,0 +1,18 @@
+{
+  "checkedDateBaku": "2026-11-06",
+  "tmpFreeApproxGiB": 3.5,
+  "memoryLimitBytes": 8589934592,
+  "localClamscanAvailable": false,
+  "localMinioAvailable": false,
+  "localOllamaAvailable": false,
+  "officialDefinitionsHostAllowed": false,
+  "huggingFaceHostAllowed": false,
+  "managedObservationsCurrent": true,
+  "managedNetworkPolicyState": "enforced",
+  "managedStagingSecretBindings": 0,
+  "managedRuntimeVariables": 0,
+  "managedOutboundIdentities": 0,
+  "productionCredentialsExamined": false,
+  "productionEndpointsContacted": false,
+  "persistentQaVariableRead": "HTTP_403_RESOURCE_NOT_ACCESSIBLE_BY_INTEGRATION"
+}

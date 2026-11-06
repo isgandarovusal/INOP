@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const root='/tmp/inop-approved-recovery/repo',sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+(async()=>{
+ const {directory,versions}=require(root+'/Backend/scripts/prepareOcrTestModels.cjs');for(const[lang,digest]of Object.entries(versions))assert.equal(sha(fs.readFileSync(path.join(directory,lang+'.traineddata'))),digest);
+ const base='/tmp/inop-pdf-acceptance-7MW3K3',rows=JSON.parse(fs.readFileSync(base+'/manifest.json')),source=rows.find(r=>r.language==='ru'&&r.kind==='scan'),bytes=fs.readFileSync(source.file);assert.equal(path.dirname(source.file),base);assert.equal(sha(bytes),source.sha256);
+ const results=[];for(const psm of ['3','11']){
+  const run=async(binary,args,{maxBytes}={})=>{const safe=[...args],at=safe.indexOf('--psm');if(at>=0)safe[at+1]=psm;const child=spawnSync(binary,safe,{encoding:'utf8',timeout:10000,maxBuffer:maxBytes||100000,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',OMP_THREAD_LIMIT:'1'},stdio:['ignore','pipe','ignore']});if(child.error||child.status!==0)throw Error('Bounded experimental OCR failed');return child.stdout;};
+  const start=performance.now(),output=await require(root+'/Backend/services/hrCvOcrEngine.service').createOcrEngine({enabled:true,dataDirectory:directory,run}).extract(bytes);const token=output.text.match(/HACCP|НАССР/u)?.[0];results.push({psm,sourceHash:sha(bytes),literalMarkers:source.expected.map(v=>output.text.includes(v)),observedAcronym:token||null,latencyMs:Math.round(performance.now()-start),originalUnchanged:sha(bytes)===source.sha256});
+ }
+ console.log(JSON.stringify({realTesseract:true,syntheticFixtureOnly:true,contextualInference:false,productionConfigurationChanged:false,baselineEvidence:'docs/qa/policy-closure-2026-11-06/ocr-confusable.json',artifactDigests:versions,results},null,2));
+})().catch(()=>{console.error('Bounded synthetic segmentation experiment failed');process.exitCode=1});

@@ -1,0 +1,53 @@
+{
+  "runId": 42280035394,
+  "url": "https://github.com/isgandarovusal/INOP/actions/runs/42280035394",
+  "headSha": "aaeed86ef6022a4574e2fa7ae305c7fb2647afec",
+  "event": "workflow_dispatch",
+  "conclusion": "success",
+  "nativeJob": {
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install existing locked fixture dependencies without lifecycle scripts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install distro ClamAV and fetch current official signatures (ephemeral QA runner only)",
+        "conclusion": "success"
+      },
+      {
+        "name": "Existing native adapter, unchanged scan deadline, sequential synthetic fixtures",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "persistentUnixExecuted": false,
+  "logAccess": "FORBIDDEN",
+  "engineVersion": "NOT_AVAILABLE_IN_ACCESSIBLE_METADATA",
+  "definitionVersion": "NOT_AVAILABLE_IN_ACCESSIBLE_METADATA",
+  "productionActivation": false
+}
