@@ -23,6 +23,9 @@ import {applicationWorkflowKey} from '../../../Utils/applicationWorkflowKey';
 // Only explicitly supported fields from the already-authorized history response.
 const historyRecord = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const historyId = (value: unknown): string | undefined => typeof value === 'string' && value.trim() ? value : typeof historyRecord(value)._id === 'string' ? historyRecord(value)._id as string : undefined;
+const feedbackFields = ['summary','strengths','concerns'] as const;
+const feedbackValues = (value: unknown) => Object.fromEntries(feedbackFields.map(k=>[k,typeof historyRecord(value)[k]==='string' && (historyRecord(value)[k] as string).length<=1000 ? historyRecord(value)[k] : ''])) as Record<typeof feedbackFields[number],string>;
+function InterviewFeedbackSummary({value}:{value:unknown}){const{t}=useTranslation();const fields=feedbackValues(value);return feedbackFields.some(k=>fields[k])?<SectionCard className="detail-card" data-feedback-summary><h3>{t('hrFeedback.title')}</h3><dl>{feedbackFields.map(k=><div key={k}><dt>{t('hrFeedback.'+k)}</dt><dd>{fields[k]||t('hrHistory.unavailable')}</dd></div>)}</dl></SectionCard>:null;}
 function HistoryEvent({ event }: { event: ApplicationEvent }) {
   const { t, i18n } = useTranslation();
   const before = historyRecord(event.before), after = historyRecord(event.after);
@@ -81,7 +84,9 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
   };
   const substatus = (row: Record<string, unknown>) => { const value = substatusValue(row); return value === undefined ? unavailable : value === '' ? t('hrCatalog.unset') : t(`hrWorkflow.sub.${value}`); };
   const substatusChanged = substatusValue(before) !== substatusValue(after);
-  const hasDetails = substatusChanged || ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer') || interviewChanged('result');
+  const oldFeedback=feedbackValues(historyRecord(before.interview).feedback),newFeedback=feedbackValues(historyRecord(after.interview).feedback);
+  const feedbackChanged=feedbackFields.some(k=>oldFeedback[k]!==newFeedback[k]);
+  const hasDetails = feedbackChanged || substatusChanged || ['status','assignedTo','nextAction','notes'].some(changed) || interviewTimeChanged || interviewChanged('duration') || interviewChanged('interviewer') || interviewChanged('result');
   const eventKey = ['create','status','workflow','score','reorder','notification_retry'].includes(event.type) ? `hrWorkflow.event.${event.type}` : 'hrHistory.otherEvent';
   return <>
     <p>{time(event.at)} · {t(eventKey)} · {t('hrWorkflow.actor')}: {historyId(event.actor) || unavailable}</p>
@@ -95,6 +100,7 @@ function HistoryEvent({ event }: { event: ApplicationEvent }) {
     {interviewChanged('duration') && <p data-history-field="interview-duration"><strong>{t('hrWorkflow.duration')}: </strong>{oldInterview.duration ?? unavailable} → {newInterview.duration ?? unavailable}</p>}
     {interviewChanged('interviewer') && <p data-history-field="interview-interviewer"><strong>{t('hrWorkflow.interviewer')}: </strong>{oldInterview.interviewer || unavailable} → {newInterview.interviewer || unavailable}</p>}
     {interviewChanged('result') && <p data-history-field="interview-result"><strong>{t('hrWorkflow.result')}: </strong>{oldInterview.result ? t(`hrWorkflow.resultState.${oldInterview.result}`) : unavailable} → {newInterview.result ? t(`hrWorkflow.resultState.${newInterview.result}`) : unavailable}</p>}
+    {feedbackFields.filter(k=>oldFeedback[k]!==newFeedback[k]).map(k=><p key={k} data-history-field="interview-feedback"><strong>{t('hrFeedback.'+k)}: </strong>{oldFeedback[k]||unavailable} → {newFeedback[k]||unavailable}</p>)}
     {!hasDetails && <p>{t('hrHistory.noDetails')}</p>}
     {typeof event.reason === 'string' && event.reason && <p><strong>{t('hrWorkflow.reason')}: </strong>{event.reason}</p>}
   </>;
@@ -157,6 +163,7 @@ function WorkflowForm({ app, reload, disabled = false }: { app: Application; rel
   const [start, setStart] = useState(localDateTime(app.interview?.startsAt, app.interview?.timezone));
   const [duration, setDuration] = useState(app.interview?.durationMinutes || 30);
   const [interviewer, setInterviewer] = useState(app.interview?.interviewerId || user?.id || '');
+  const [feedback,setFeedback] = useState(()=>feedbackValues(app.interview?.feedback));
   const [interviewResult, setInterviewResult] = useState<ApplicationInterview['result']>(app.interview?.result || 'pending');
   const [action, setAction] = useState<ApplicationNextAction['kind']>(app.nextAction?.kind || 'none');
   const [due, setDue] = useState(localDateTime(app.nextAction?.dueAt, timezone));
@@ -172,7 +179,7 @@ function WorkflowForm({ app, reload, disabled = false }: { app: Application; rel
     try {
       await updateApplicationWorkflow(app.id, { expectedRevision: app.revision, status, substatus, reason, reopen, notes,
         ...(canAssign && assignee !== (app.assignedTo || '') ? { assignedTo: assignee } : {}),
-        ...scheduleChanges(app, { status, timezone, start, duration, interviewer, interviewResult, action, due, actionNotes }, user?.id || '') });
+        ...scheduleChanges(app, { status, timezone, start, duration, interviewer, interviewResult, feedback, action, due, actionNotes }, user?.id || '') });
       if (context.current.current === key) reload();
     } catch (err) { if (context.current.current === key) { if (isAxiosError(err) && [401,403,404].includes(err.response?.status || 0)) reload(); setError(isAxiosError(err) && err.response?.status === 409 ? 'hrWorkflow.conflict' : hrCrudErrorKey(err)); } }
     finally { if (context.current.current === key) setBusy(false); }
@@ -191,6 +198,7 @@ function WorkflowForm({ app, reload, disabled = false }: { app: Application; rel
         <label>{t('hrWorkflow.result')}<select aria-label={t('hrWorkflow.result')} value={interviewResult} onChange={e => setInterviewResult(e.target.value as typeof interviewResult)}>{['pending', 'passed', 'failed', 'no_show', 'cancelled'].map(r => <option key={r} value={r}>{t(`hrWorkflow.resultState.${r}`)}</option>)}</select></label>
         {roster.status !== 'ready' && roster.status !== 'loading' && <p role="alert">{t('hrStates.secondaryError')}</p>}
       </>}
+      {(status==='interview'||app.status==='interview'&&app.interview)&&<fieldset className="form-group--full" data-interview-feedback><legend>{t('hrFeedback.title')}</legend><p>{t('hrFeedback.help')}</p>{feedbackFields.map(k=><label key={k}>{t('hrFeedback.'+k)}<textarea aria-label={t('hrFeedback.'+k)} maxLength={1000} value={feedback[k]} onChange={e=>setFeedback(old=>({...old,[k]:e.target.value}))}/></label>)}</fieldset>}
       <label>{t('hrWorkflow.nextAction')}<select aria-label={t('hrWorkflow.nextAction')} value={action} onChange={e => setAction(e.target.value as typeof action)}>{['none', 'review', 'call', 'interview', 'offer', 'follow_up'].map(a => <option key={a} value={a}>{t(`hrWorkflow.action.${a}`)}</option>)}</select></label>
       <label>{t('hrWorkflow.due')}<input aria-label={t('hrWorkflow.due')} type="datetime-local" value={due} onChange={e => setDue(e.target.value)} /></label>
       <label>{t('hrWorkflow.actionNotes')}<textarea aria-label={t('hrWorkflow.actionNotes')} maxLength={500} value={actionNotes} onChange={e => setActionNotes(e.target.value)} /></label>
@@ -234,6 +242,7 @@ export default function ApplicationDetail() {
     </SectionCard>}
     {!handoff && <MatchScoreBadge application={resource.refreshing ? { ...app, actionEligibility: undefined } : app} onUpdated={resource.reload} />}
     {hasPermission(user, 'application', 'update') && applicationActionAllowed(app, 'update') && <WorkflowForm key={'workflow:' + context.key + ':' + applicationWorkflowKey(app)} app={app} disabled={resource.refreshing} reload={resource.reload} />}
+    <InterviewFeedbackSummary value={app.interview?.feedback}/>
     {(!hasPermission(user, 'application', 'update') || !applicationActionAllowed(app, 'update')) && !resource.refreshing && <CurrentWorkflowSummary app={app} />}
     <History key={'history:' + context.key + ':' + app.revision} app={resource.refreshing ? { ...app, actionEligibility: undefined } : app} reload={resource.reload} />
   </div>;

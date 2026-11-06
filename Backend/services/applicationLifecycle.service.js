@@ -79,14 +79,19 @@ async function prepareWorkflow(req, current) {
     if (body.interview === null) update.interview = null;
     else {
       const input = body.interview, row = { ...current.interview, ...input };
-      if (status !== 'Interview') throw failure('Interview scheduling requires Interview stage.');
+      if (!input || typeof input !== 'object' || Array.isArray(input)) throw failure('Invalid interview.');
+      const feedbackOnly = input.feedback !== undefined && Object.keys(input).every(k=>k==='feedback') && current.status==='Interview' && current.interview;
+      if (status !== 'Interview' && !feedbackOnly) throw failure('Interview scheduling requires Interview stage.');
       if (typeof row.timezone !== 'string' || row.timezone.length > 80) throw failure('Invalid interview timezone.');
       try { wallAt(Date.now(), row.timezone); } catch { throw failure('Unknown interview timezone.'); }
       let startsAt;
       try { startsAt = input.localStart !== undefined ? localTime(input.localStart, row.timezone) : isoDate(String(row.startsAt instanceof Date ? row.startsAt.toISOString() : row.startsAt)); } catch (e) { throw failure(e.message); }
       const durationMinutes = row.durationMinutes ?? 30;
       if (!Number.isInteger(durationMinutes) || durationMinutes < 5 || durationMinutes > 480 || !['pending', 'passed', 'failed', 'no_show', 'cancelled'].includes(row.result || 'pending')) throw failure('Invalid interview duration or result.');
-      update.interview = { startsAt, timezone: row.timezone, durationMinutes, interviewerId: await interviewer(req, row.interviewerId || req.user.id, current.interview?.interviewerId), result: row.result || 'pending' };
+      const feedback = input.feedback === undefined ? row.feedback : input.feedback;
+      if(input.feedback !== undefined && input.feedback !== null && (!input.feedback || typeof input.feedback !== 'object' || Array.isArray(input.feedback) || Object.keys(input.feedback).some(k=>!['summary','strengths','concerns'].includes(k)) || Object.values(input.feedback).some(v=>typeof v!=='string'||v.length>1000))) throw failure('Invalid interview feedback.');
+      const safeFeedback=feedback && typeof feedback==='object' && !Array.isArray(feedback) && ['summary','strengths','concerns'].every(k=>feedback[k]===undefined||typeof feedback[k]==='string'&&feedback[k].length<=1000) ? Object.fromEntries(['summary','strengths','concerns'].map(k=>[k,(feedback[k]||'').trim()])) : undefined;
+      update.interview = { startsAt, timezone: row.timezone, durationMinutes, interviewerId: await interviewer(req, row.interviewerId || req.user.id, current.interview?.interviewerId), result: row.result || 'pending', ...(safeFeedback?{feedback:safeFeedback}:{}) };
     }
   }
   if (body.assignedTo !== undefined) {

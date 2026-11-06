@@ -1,4 +1,11 @@
 {
+  "hrFeedback": {
+    "title": "Müsahibə rəyi (daxili)",
+    "help": "İcazəli müraciət oxucuları üçün peşəkar müşahidələr; doldurulması könüllüdür. Rəy işə qəbul qərarı vermir və ATS balını dəyişmir.",
+    "summary": "Müsahibənin xülasəsi",
+    "strengths": "Müşahidə olunan güclü tərəflər",
+    "concerns": "Narahatlıqlar / növbəti addımlar"
+  },
   "hrCompare": {
     "title": "Namizədləri müqayisə et",
     "help": "Bu vakansiya səhifəsindən 2–3 namizəd seçin. Ətraflı sübutlar yalnız müqayisəni açdıqda yüklənir.",

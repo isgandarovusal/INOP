@@ -22,7 +22,7 @@ export function localDateTime(value?: string | null, timezone?: string | null): 
 
 interface ScheduleDraft {
   status: ApplicationStatus; timezone: string; start: string; duration: number;
-  interviewer: string; interviewResult: ApplicationInterview['result'];
+  feedback?: ApplicationInterview['feedback']; interviewer: string; interviewResult: ApplicationInterview['result'];
   action: ApplicationNextAction['kind']; due: string; actionNotes: string;
 }
 
@@ -44,9 +44,11 @@ export function scheduleChanges(app: Application, draft: ScheduleDraft, currentU
     if (draft.duration !== (app.interview?.durationMinutes || 30)) interview.durationMinutes = draft.duration;
     if (draft.interviewer !== (app.interview?.interviewerId || currentUserId || '')) interview.interviewerId = draft.interviewer;
     if (draft.interviewResult !== (app.interview?.result || 'pending')) interview.result = draft.interviewResult;
+    if(draft.feedback && ['summary','strengths','concerns'].some(k=>draft.feedback?.[k as keyof typeof draft.feedback] !== (app.interview?.feedback?.[k as keyof NonNullable<ApplicationInterview['feedback']>] || ''))) interview.feedback = draft.feedback;
     // Entering Interview explicitly still validates the existing/new schedule.
     if (Object.keys(interview).length || draft.status !== app.status) change.interview = interview;
   }
+  if(draft.status !== 'interview' && app.status === 'interview' && app.interview && draft.feedback && ['summary','strengths','concerns'].some(k=>draft.feedback?.[k as keyof typeof draft.feedback] !== (app.interview?.feedback?.[k as keyof NonNullable<ApplicationInterview['feedback']>] || ''))) change.interview={feedback:draft.feedback};
   const dueChanged = draft.due !== localDateTime(app.nextAction?.dueAt, initialZone);
   if (draft.action !== (app.nextAction?.kind || 'none') || draft.actionNotes !== (app.nextAction?.notes || '') || dueChanged || zoneChanged && !!app.nextAction) {
     change.nextAction = { kind: draft.action, notes: draft.actionNotes,

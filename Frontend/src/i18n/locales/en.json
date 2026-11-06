@@ -1,4 +1,11 @@
 {
+  "hrFeedback": {
+    "title": "Interview feedback (internal)",
+    "help": "Optional professional observations for authorized Application readers. Feedback does not decide hiring or change ATS scores.",
+    "summary": "Interview summary",
+    "strengths": "Observed strengths",
+    "concerns": "Concerns / follow-up"
+  },
   "hrCompare": {
     "title": "Compare candidates",
     "help": "Select 2–3 candidates from this vacancy page. Full evidence loads only when you compare.",
