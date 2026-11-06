@@ -2690,5 +2690,16 @@
     "requiredExperience": "Required experience (years)",
     "requiredEducation": "Required education",
     "requiredCertificates": "Required certifications"
+  },
+  "duplicatePolicy": {
+    "pending": "Awaiting HR review",
+    "reviewed": "Reviewed for the current candidate revisions",
+    "renewal_required": "Candidate information changed — renewed HR review required",
+    "compare": "Compare authorized profiles",
+    "experience": "Experience (years): {{years}}",
+    "evidenceRecorded": "Evidence and candidate revision references recorded",
+    "legacyEvidence": "Legacy decision: evidence references were not recorded",
+    "evidenceReference": "Evidence reference: {{id}}",
+    "revisionReference": "Profile {{position}} revision: {{revision}}"
   }
 }

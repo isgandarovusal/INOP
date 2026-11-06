@@ -2707,5 +2707,16 @@
     "requiredExperience": "Tələb olunan təcrübə (il)",
     "requiredEducation": "Tələb olunan təhsil",
     "requiredCertificates": "Tələb olunan sertifikatlar"
+  },
+  "duplicatePolicy": {
+    "pending": "HR baxışı gözlənilir",
+    "reviewed": "Namizədlərin cari versiyaları üzrə baxılıb",
+    "renewal_required": "Namizəd məlumatları dəyişib — təkrar HR baxışı tələb olunur",
+    "compare": "İcazəli profilləri müqayisə et",
+    "experience": "Təcrübə (il): {{years}}",
+    "evidenceRecorded": "Sübut və namizəd versiyalarına istinadlar qeydə alınıb",
+    "legacyEvidence": "Əvvəlki qərar: sübut istinadları qeydə alınmayıb",
+    "evidenceReference": "Sübut istinadı: {{id}}",
+    "revisionReference": "Profil {{position}} versiyası: {{revision}}"
   }
 }

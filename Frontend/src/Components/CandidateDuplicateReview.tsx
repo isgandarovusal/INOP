@@ -11,20 +11,21 @@ import {readJson} from '../api/readRequest';
 import api from '../api/axios';
 import HRResourceState from './HRResourceState';
 import {formatDateTime} from '../Utils/dateUtils';
-type Item={id:string;name:string;revision:string;reasons:string[];canReview:boolean;review:{id:string;decision:string;note:string;at:string}|null};
+type Item={id:string;name:string;revision:string;reasons:string[];canReview:boolean;reviewState?:string;comparison?:{id:string;name:string;role:string;status:string;experience:number}[];review:{id:string;decision:string;note:string;at:string}|null};
 type Draft={decision:string;note:string};
 type Result={revision:string;hasMore:boolean;page:number;total:number;automaticMerge:false;items:Item[]};
 const load=(key:string,signal?:AbortSignal,scopeKey?:string)=>{const[id,page]=JSON.parse(key) as [string,number];return readJson<Result>(`/candidates/${id}/duplicates?page=${page}&limit=5`,{signal,scopeKey,suppressErrorToast:true});};
 function ReviewItem({id,revision,item,reload,drafts}:{id:string;revision:string;item:Item;reload:()=>void;drafts:Map<string,Draft>}){
  const{t,i18n}=useTranslation(),action=useAuditAction(id,'candidate','update'),[decision,setDecision]=useState(drafts.get(item.id)?.decision||'uncertain'),[note,setNote]=useState(drafts.get(item.id)?.note||''),command=useRef<{key:string;id:string}|undefined>(undefined);
  return <li><Link to={'/app/recruitment/candidates/'+item.id}>{item.name}</Link><p>{item.reasons.map(r=>t('hrIntake.duplicateReasons.'+r)).join(', ')}</p>
+ <p data-duplicate-review-state>{t('duplicatePolicy.'+(item.reviewState||'pending'))}</p><details data-duplicate-comparison><summary>{t('duplicatePolicy.compare')}</summary>{item.comparison?.map(profile=><p key={profile.id}>{profile.name} · {profile.role} · {t('duplicatePolicy.experience',{years:profile.experience??'—'})}</p>)}</details>
  {item.review&&<p data-duplicate-decision>{t('candidateDuplicates.'+item.review.decision)} · {formatDateTime(item.review.at,i18n.language)}{item.review.note?' · '+item.review.note:''}</p>}
  {item.canReview===true&&action.allowed&&!['unauthenticated','forbidden','not-found'].includes(action.status)&&<form onSubmit={e=>{e.preventDefault();const payload={otherId:item.id,revision,otherRevision:item.revision,decision,note},key=JSON.stringify(payload);if(command.current?.key!==key)command.current={key,id:crypto.randomUUID()};void action.run(async signal=>{try{return await api.post('/candidates/'+id+'/duplicate-reviews',{...payload,commandId:command.current!.id},{signal,suppressErrorToast:true});}catch(error){if(isAxiosError(error)&&[401,403,404,409].includes(error.response?.status||0))reload();throw error;}},reload);}}>
  <label>{t('candidateDuplicates.decision')}<select aria-label={t('candidateDuplicates.decision')} value={decision} onChange={e=>{setDecision(e.target.value);drafts.set(item.id,{decision:e.target.value,note});}}>{['uncertain','same_person','different_people'].map(v=><option key={v} value={v}>{t('candidateDuplicates.'+v)}</option>)}</select></label>
  <label>{t('candidateDuplicates.note')}<textarea aria-label={t('candidateDuplicates.note')} maxLength={1000} value={note} onChange={e=>{setNote(e.target.value);drafts.set(item.id,{decision,note:e.target.value});}}/></label><button type='submit' className='btn-secondary' disabled={action.busy}>{t('candidateDuplicates.save')}</button>
  {action.status!=='ready'&&action.status!=='loading'&&<HRResourceState status={action.status}/>}</form>}
  {['unauthenticated','forbidden','not-found'].includes(action.status)&&<HRResourceState status={action.status}/>}
- <CandidateDuplicateHistory id={id} otherId={item.id}/>
+ <CandidateDuplicateHistory key={item.review?.id||'pending'} id={id} otherId={item.id}/>
  </li>;
 }
 export default function CandidateDuplicateReview({id}:{id:string}){

@@ -2686,5 +2686,16 @@
     "requiredExperience": "Требуемый опыт (лет)",
     "requiredEducation": "Требуемое образование",
     "requiredCertificates": "Требуемые сертификаты"
+  },
+  "duplicatePolicy": {
+    "pending": "Ожидает проверки HR",
+    "reviewed": "Проверено для текущих версий кандидатов",
+    "renewal_required": "Данные кандидата изменились — требуется повторная проверка HR",
+    "compare": "Сравнить доступные профили",
+    "experience": "Опыт (лет): {{years}}",
+    "evidenceRecorded": "Ссылки на доказательства и версии кандидатов записаны",
+    "legacyEvidence": "Ранее принятое решение: ссылки на доказательства не записаны",
+    "evidenceReference": "Ссылка на доказательства: {{id}}",
+    "revisionReference": "Версия профиля {{position}}: {{revision}}"
   }
 }
