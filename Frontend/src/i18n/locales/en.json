@@ -1,4 +1,10 @@
 {
+  "loginFailure": {
+    "credentials": "Email or password is incorrect.",
+    "denied": "This account cannot sign in. Contact your administrator.",
+    "rateLimit": "Too many sign-in attempts. Please wait and try again.",
+    "unavailable": "Unable to sign in right now. Check your connection and try again."
+  },
   "hrFeedback": {
     "title": "Interview feedback (internal)",
     "help": "Optional professional observations for authorized Application readers. Feedback does not decide hiring or change ATS scores.",

@@ -23,11 +23,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // availability (including a cold backend) before showing the login form.
   const [isLoading, setIsLoading] = useState(() => Boolean(getAuthToken()));
   const requestRevision = useRef(0);
+  const explicitLogin = useRef(false);
+  const cancelRestoration = useRef<() => void>(() => {});
   useLayoutEffect(() => { syncClientSession(user); },[user]);
 
   useEffect(() => {
     let mounted = true;
     const controllers = new Set<AbortController>();
+    cancelRestoration.current = () => { for (const controller of controllers) controller.abort(); };
     let lastRefresh: { source: string; token: string | null; started: number; pending: boolean } | undefined;
 
     const handleAuthExpired = () => {
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener("inop:auth-expired", handleAuthExpired);
 
     const refresh = async (initial = false, source = "initial") => {
+      if (explicitLogin.current) return;
       const token = getAuthToken();
       // Focus and visibility often describe the same return to a tab. Share
       // only that pending event pair: a completed read, changed token or a
@@ -85,8 +89,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     requestRevision.current += 1;
-    const loggedInUser = await loginRequest(email, password);
-    setUser(loggedInUser);
+    explicitLogin.current = true;
+    cancelRestoration.current();
+    try {
+      const loggedInUser = await loginRequest(email, password);
+      setUser(loggedInUser);
+    } finally { explicitLogin.current = false; setIsLoading(false); }
   }, []);
 
   const logout = useCallback(async () => {

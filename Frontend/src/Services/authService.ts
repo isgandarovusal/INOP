@@ -37,7 +37,7 @@ export async function login(
   const response = await api.post<LoginResponse>("/auth/login", {
     email: email.trim(),
     password,
-  });
+  }, {suppressErrorToast: true});
 
   setAuthToken(response.data.token);
 
@@ -67,7 +67,7 @@ export async function getCurrentUser(signal?: AbortSignal, scopeKey?: string): P
   }
 
   try {
-    const response = await readJson<MeResponse>("/auth/me", { signal, scopeKey });
+    const response = await readJson<MeResponse>("/auth/me", { signal, scopeKey, suppressErrorToast: true });
     return response.user;
   } catch (error: unknown) {
     // /me403 is a rejected session (for example an inactive account), not a

@@ -1,4 +1,10 @@
 {
+  "loginFailure": {
+    "credentials": "E-poçt və ya şifrə yanlışdır.",
+    "denied": "Bu hesabla daxil olmaq mümkün deyil. Administratorla əlaqə saxlayın.",
+    "rateLimit": "Daxil olmaq üçün çox sayda cəhd edilib. Bir qədər gözləyib yenidən cəhd edin.",
+    "unavailable": "Hazırda daxil olmaq mümkün deyil. Bağlantınızı yoxlayıb yenidən cəhd edin."
+  },
   "hrFeedback": {
     "title": "Müsahibə rəyi (daxili)",
     "help": "İcazəli müraciət oxucuları üçün peşəkar müşahidələr; doldurulması könüllüdür. Rəy işə qəbul qərarı vermir və ATS balını dəyişmir.",

@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import React, { useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
@@ -31,11 +32,14 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (submitLock.current || isLoading) return;
+    if (submitLock.current) return;
     const emailInput = e.currentTarget.querySelector<HTMLInputElement>('#email');
+    const enteredEmail = emailInput?.value || '';
+    const enteredPassword = e.currentTarget.querySelector<HTMLInputElement>('#password')?.value || '';
+    setEmail(enteredEmail); setPassword(enteredPassword);
     const errors: { email?: string; password?: string } = {};
-    if (!email.trim() || !emailInput?.validity.valid) errors.email = 'auth.emailInvalid';
-    if (!password) errors.password = 'auth.passwordRequired';
+    if (!enteredEmail.trim() || !emailInput?.validity.valid) errors.email = 'auth.emailInvalid';
+    if (!enteredPassword) errors.password = 'auth.passwordRequired';
     setFieldErrors(errors);
     if (errors.email || errors.password) {
       document.getElementById(errors.email ? 'email' : 'password')?.focus(); return;
@@ -45,14 +49,11 @@ const Login: React.FC = () => {
     setSubmitting(true);
 
     try {
-      await login(email.trim(), password);
+      await login(enteredEmail.trim(), enteredPassword);
       navigate("/app", { replace: true });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("auth.somethingWentWrong"),
-      );
+      const status = isAxiosError(err) ? err.response?.status : undefined;
+      setError(status === 401 ? 'loginFailure.credentials' : status === 403 ? 'loginFailure.denied' : status === 429 ? 'loginFailure.rateLimit' : 'loginFailure.unavailable');
     } finally {
       submitLock.current = false;
       setSubmitting(false);
@@ -141,13 +142,13 @@ const Login: React.FC = () => {
 
               {error && (
                 <p role="alert" className="form-error form-error--submit">
-                  <AlertCircle size={12} /> {error}
+                  <AlertCircle size={12} /> {t(error)}
                 </p>
               )}
 
               <button
                 type="submit"
-                disabled={submitting || isLoading}
+                disabled={submitting}
                 className="btn-primary auth-submit"
               >
                 {submitting ? (
