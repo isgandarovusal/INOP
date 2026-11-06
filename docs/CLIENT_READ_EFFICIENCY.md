@@ -33,3 +33,10 @@ switching and stale-account boundaries have focused browser/pure-module coverage
 Evidence: /workspace/work/coordinated-efficiency-evidence/ (logs and screenshots).
 Typography/date utilities and ISO API/database semantics are unchanged; existing
 date-format regression evidence remains applicable. No Audit scoring changes.
+
+Session revocation follow-up (2026-11-06): memory preference writer identities
+now include a monotonically increasing document-local generation. Logout and
+reauthentication with the same token/user cannot reactivate an old asynchronous
+writer. Regression: the old writer previously overwrote a new preference; now
+zero stale writes are accepted. No HTTP, persistent storage, UI or cache TTL
+change was needed. Existing cache isolation/refresh tests remain applicable.
