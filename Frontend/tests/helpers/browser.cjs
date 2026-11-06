@@ -12,10 +12,21 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
   const cache=await require('./ownedCache.cjs').create(process.env.INOP_BROWSER_CACHE_DIR);
   const cacheDir=cache.dir;
   let vite, browser;
+  let initial = { user: null, token: '' };
   try {
     vite = await createServer({ root: frontend, configLoader: 'runner', cacheDir, logLevel: 'error', define: { 'import.meta.env.VITE_API_BASE_URL': JSON.stringify('/api') },
       server: { host: '127.0.0.1', port: 0, strictPort: true },
-      plugins: [{ name: 'isolated-browser-test', enforce: 'pre', resolveId(id) { if (id === '/__inop_test.js') return '\0inop-test.js'; }, load(id) {
+      plugins: [{ name: 'isolated-browser-test', enforce: 'pre', configureServer(server) {
+        // Serve documents over real loopback HTTP. Fulfilling them in Playwright
+        // loses the local network address space and Chromium rejects Vite's WS.
+        server.middlewares.use(async (req, res, next) => {
+          if (req.method !== 'GET' || !req.headers.accept?.includes('text/html')) return next();
+          try {
+            const html = await server.transformIndexHtml(req.url, `<html><body><div id="root"></div><script>const fixture=${JSON.stringify(initial).replaceAll('<', '\\u003c')};window.testUser=fixture.user;localStorage.setItem('inop_auth_token',fixture.token);</script><script type="module" src="/__inop_test.js"></script></body></html>`);
+            res.setHeader('Content-Type', 'text/html'); res.end(html);
+          } catch (error) { next(error); }
+        });
+      }, resolveId(id) { if (id === '/__inop_test.js') return '\0inop-test.js'; }, load(id) {
         if (id === '\0inop-test.js') return source;
         if (options.loadSource && id.startsWith(frontend + '/src/')) {
           const overlay = options.loadSource(id); if (overlay !== undefined) return overlay;
@@ -35,7 +46,6 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     page.on('requestfailed', request => failures.push(request.url() + ': ' + request.failure()?.errorText));
     page.on('console', msg => { if (msg.type() === 'error') failures.push(msg.text()); });
     page.on('pageerror', error => pageErrors.push(error.message));
-    let initial = { user: null, token: '' };
     await page.route('**/*', async route => {
       const url = new URL(route.request().url());
       if (!['127.0.0.1', 'localhost'].includes(url.hostname)) return route.abort();
@@ -58,7 +68,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
         }
         return route.fulfill({ status: result.status, contentType: result.headers['content-type'], body: result.buffer });
       }
-      if (route.request().isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: await vite.transformIndexHtml(url.pathname, `<html><body><div id="root"></div><script>const fixture=${JSON.stringify(initial).replaceAll('<', '\\u003c')};window.testUser=fixture.user;localStorage.setItem('inop_auth_token',fixture.token);</script><script type="module" src="/__inop_test.js"></script></body></html>`) });
+      if (route.request().isNavigationRequest()) return route.continue();
       return route.continue();
     });
     const profile = async actor => {
@@ -74,7 +84,7 @@ exports.withBrowserFixture = async (source, callback, options = {}) => withAudit
     }
     await callback({ ...h, page, pageErrors, wire, origin, profile, open });
   } finally {
-    const closed=await Promise.allSettled([browser?.close(),vite?.close()]);
+    const closed=await require('../../../scripts/runQaProcess.cjs').closeWithin([browser?.close(),vite?.close()]);
     if(closed.every(r=>r.status==='fulfilled'))await cache.release();
     else throw Error('Browser/Vite shutdown failed; owned cache retained for investigation.');
   }

@@ -9,12 +9,12 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: audit-qa-${{ github.ref }}
+  group: audit-qa-${{ github.ref }}-${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && 'full' || 'routine' }}
   cancel-in-progress: false
 jobs:
   local-qa:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 55
     defaults:
       run:
         shell: bash
@@ -45,11 +45,13 @@ jobs:
           cat work/audit-ci/qa-scope.json
           node --test Backend/tests/ciScopeSelection.test.cjs
       - name: Reproducible locked installation
+        timeout-minutes: 8
         run: |
           mkdir -p work/audit-ci
           npm ci --prefix Backend 2>&1 | tee work/audit-ci/backend-install.log
           npm ci --prefix Frontend 2>&1 | tee work/audit-ci/frontend-install.log
       - name: Dependency security, full and production graphs
+        timeout-minutes: 5
         run: |
           failed=0
           for package in Backend Frontend; do
@@ -58,11 +60,14 @@ jobs:
           done
           exit "$failed"
       - name: Native test prerequisites; no production credentials
+        timeout-minutes: 8
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr fonts-dejavu-core
           node Backend/scripts/prepareOcrTestModels.cjs
       - name: Start owned replica set
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
           docker run -d --name "$INOP_AUDIT_QA_CONTAINER" --label inop.task=audit-ci -p 127.0.0.1:27018:27017 mongo:7 --replSet inop_audit_ci_qa --bind_ip_all
           for attempt in $(seq 1 30); do
@@ -76,16 +81,27 @@ jobs:
           done
           exit 1
       - name: Every backend file, serial processes, bounded tests
+        timeout-minutes: 15
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: npm test --prefix Backend 2>&1 | tee work/audit-ci/backend.log
+      - name: Routine pure safety regression (full integration is explicit)
+        timeout-minutes: 5
+        run: |
+          node --test Backend/tests/ciScopeSelection.test.cjs Backend/tests/qaProcess.test.cjs Backend/tests/recruitmentEvidenceQuality.test.cjs Backend/tests/hrCvIntakeLease.test.cjs Backend/tests/hrCvOriginalArchiveCapacity.test.cjs Backend/tests/hrCvIntakeProfiles.test.cjs Backend/tests/hrCvIntakeWorker.test.cjs Frontend/tests/clientMemoryPolicy.test.cjs
       - name: Frontend build and lint
+        timeout-minutes: 5
         run: |
           npm run build --prefix Frontend 2>&1 | tee work/audit-ci/build.log
           npm run lint --prefix Frontend 2>&1 | tee work/audit-ci/lint.log
       - name: Browser runtime
+        timeout-minutes: 5
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
           cd Frontend
           npm exec -- playwright install --with-deps chromium
       - name: Browser regression, conservative full or Recruitment selection
+        timeout-minutes: 40
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: node scripts/qaScope.cjs browser 2>&1 | tee work/audit-ci/browser.log
       - name: Cleanup only owned QA container
         if: always()

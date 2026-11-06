@@ -40,3 +40,12 @@ reauthentication with the same token/user cannot reactivate an old asynchronous
 writer. Regression: the old writer previously overwrote a new preference; now
 zero stale writes are accepted. No HTTP, persistent storage, UI or cache TTL
 change was needed. Existing cache isolation/refresh tests remain applicable.
+
+CI execution follows focused local development: automatic push/PR runs keep the
+existing workflow/check identity, locked install, four dependency security graphs,
+pure safety regressions and frontend build/lint. Native replica-set/OCR and broad
+browser/backend integration run only on explicit workflow_dispatch or schedule.
+This changes coverage policy explicitly; it does not certify full release coverage
+from a lightweight push result. Comprehensive runs retain all browser groups and
+fail on timeout. QA processes own detached groups and reap only their descendants;
+per-test5min, browser-group8min, full-browser40min and job55min bounds are enforced.

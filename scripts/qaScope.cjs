@@ -81,17 +81,17 @@ function readPlan(file, cwd = root) {
     return plan;
   } catch { return full('MISSING_PLAN'); }
 }
-function runBrowser(plan, { cwd = root, spawn = spawnSync } = {}) {
+async function runBrowser(plan, { cwd = root, spawn = require('./runQaProcess.cjs').runQaProcess } = {}) {
   if (process.env.INOP_AUDIT_TEST_PORT !== '27018') throw Error('Browser integration requires owned loopback QA port 27018.');
   if (plan?.scope !== 'recruitment-frontend') {
-    const result = spawn(process.execPath, ['Frontend/tests/runAuditBrowserSuite.cjs'], { cwd, env: process.env, stdio: 'inherit' });
+    const result = await spawn(process.execPath, ['Frontend/tests/runAuditBrowserSuite.cjs'], { cwd, env: process.env, stdio: 'inherit', timeoutMs:2400000 });
     return result.error || result.signal ? 1 : result.status ?? 1;
   }
   let failed = false;
   for (const [index, group] of groups.entries()) {
     const started = performance.now();
     console.log(JSON.stringify({ code: 'RECRUITMENT_QA_GROUP_START', group: index + 1, files: group.files }));
-    const result = spawn(process.execPath, ['--test', '--test-isolation=none', ...(group.pattern ? ['--test-name-pattern=' + group.pattern] : []), ...group.files.map(f => 'Frontend/tests/' + f)], { cwd, env: process.env, stdio: 'inherit' });
+    const result = await spawn(process.execPath, ['--test', '--test-timeout=300000', '--test-isolation=none', ...(group.pattern ? ['--test-name-pattern=' + group.pattern] : []), ...group.files.map(f => 'Frontend/tests/' + f)], { cwd, env: process.env, stdio: 'inherit' });
     if (result.status !== 0 || result.error || result.signal) failed = true;
     console.log(JSON.stringify({ code: 'RECRUITMENT_QA_GROUP_RESULT', group: index + 1, status: result.status ?? null, signal: result.signal ?? null, elapsedMs: Math.round(performance.now() - started) }));
   }
@@ -104,6 +104,6 @@ if (require.main === module) {
     try { plan = detect({ eventName: process.env.GITHUB_EVENT_NAME, event: JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')), sha: process.env.GITHUB_SHA }); }
     catch { plan = full('UNREADABLE_EVENT'); }
     console.log(JSON.stringify(plan));
-  } else if (process.argv[2] === 'browser') process.exitCode = runBrowser(readPlan(path.join(root, 'work/audit-ci/qa-scope.json')));
+  } else if (process.argv[2] === 'browser') runBrowser(readPlan(path.join(root, 'work/audit-ci/qa-scope.json'))).then(code=>{process.exitCode=code;}).catch(()=>{process.exitCode=1;});
   else { process.stderr.write('Expected detect or browser.\n'); process.exitCode = 1; }
 }

@@ -98,26 +98,26 @@ test('missing, malformed, stale or incomplete plans choose executable full fallb
   fs.writeFileSync(file, JSON.stringify({ version: 1, scope: 'recruitment-frontend', head: base })); assert.equal(readPlan(file, cwd).scope, 'recruitment-frontend');
 }));
 
-test('selected and full runners propagate every failure and never turn later passes into success', () => {
+test('selected and full runners propagate every failure and never turn later passes into success', async () => {
   const previous = process.env.INOP_AUDIT_TEST_PORT; process.env.INOP_AUDIT_TEST_PORT = '27018';
   try {
     let calls = [];
-    assert.equal(runBrowser({ scope: 'full' }, { spawn: (_exe, args) => { calls.push(args); return { status: 9 }; } }), 9);
+    assert.equal(await runBrowser({ scope: 'full' }, { spawn: (_exe, args) => { calls.push(args); return { status: 9 }; } }), 9);
     assert.deepEqual(calls, [['Frontend/tests/runAuditBrowserSuite.cjs']]);
     calls = [];
-    assert.equal(runBrowser({ scope: 'recruitment-frontend' }, { spawn: (_exe, args) => { calls.push(args); return { status: calls.length === 1 ? 1 : 0 }; } }), 1);
+    assert.equal(await runBrowser({ scope: 'recruitment-frontend' }, { spawn: (_exe, args) => { calls.push(args); return { status: calls.length === 1 ? 1 : 0 }; } }), 1);
     assert.equal(calls.length, groups.length);
     assert.ok(calls.every(args => args.includes('--test-isolation=none')));
-    assert.equal(runBrowser({ scope: 'recruitment-frontend' }, { spawn: () => ({ status: 0 }) }), 0);
-    assert.equal(runBrowser({ scope: 'invalid' }, { spawn: () => ({ status: null, signal: 'SIGTERM' }) }), 1);
-    assert.equal(runBrowser({ scope: 'recruitment-frontend' }, { spawn: () => ({ status: null, error: Error('synthetic') }) }), 1);
+    assert.equal(await runBrowser({ scope: 'recruitment-frontend' }, { spawn: () => ({ status: 0 }) }), 0);
+    assert.equal(await runBrowser({ scope: 'invalid' }, { spawn: () => ({ status: null, signal: 'SIGTERM' }) }), 1);
+    assert.equal(await runBrowser({ scope: 'recruitment-frontend' }, { spawn: () => ({ status: null, error: Error('synthetic') }) }), 1);
   } finally { if (previous === undefined) delete process.env.INOP_AUDIT_TEST_PORT; else process.env.INOP_AUDIT_TEST_PORT = previous; }
 });
 
 test('workflow keeps required identity/security/backend gate and always full manual/schedule capability', () => {
   const workflow = fs.readFileSync(path.resolve(__dirname, '../../.github/workflows/audit-release-gate.yml'), 'utf8');
   assert.match(workflow, /^name: Audit local release gate/m); assert.match(workflow, /^  local-qa:/m);
-  assert.match(workflow, /cancel-in-progress: false/); assert.match(workflow, /timeout-minutes: 60/);
+  assert.match(workflow, /cancel-in-progress: false/); assert.match(workflow, /timeout-minutes: 55/);
   assert.match(workflow, /workflow_dispatch:/); assert.match(workflow, /schedule:/); assert.ok(!workflow.includes('paths-ignore:'));
   assert.match(workflow, /npm test --prefix Backend/); assert.match(workflow, /--omit=dev/); assert.match(workflow, /for package in Backend Frontend/);
   assert.match(workflow, /scope":"full"/); assert.match(workflow, /node scripts\/qaScope\.cjs browser/);
