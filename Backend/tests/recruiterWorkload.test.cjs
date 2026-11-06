@@ -8,5 +8,6 @@ test('Personal workload counts authorized assignments with explicit windows, not
  await Application.create({jobId:job._id,candidateId:candidate._id,...owner,assignedTo:h.actors.own._id,status:'Applied'});
  const r=await h.request('admin','GET','/hr/analytics/operations');assert.equal(r.status,200);assert.ok(r.data.workload,'operations must expose personal workload');
  assert.equal(r.data.workload.assigned,2);assert.equal(r.data.workload.active,1);assert.equal(r.data.workload.pendingReviews,1);assert.equal(r.data.workload.overdue,1);assert.equal(r.data.workload.upcomingInterviews,1);assert.equal(r.data.workload.completed,1);assert.equal(r.data.workload.aging,1);assert.equal(r.data.workload.scope,'assigned-to-me');
+ await Application.updateMany({candidateId:candidate._id,status:'Interview'},{$set:{'nextAction.kind':'none'}});const completed=await h.request('admin','GET','/hr/analytics/operations');assert.equal(completed.data.workload.overdue,0,'Completed/none follow-up must not remain overdue');
  assert.ok(!JSON.stringify(r.data.workload).includes('Synthetic'));assert.equal((await h.request('anonymous','GET','/hr/analytics/operations')).status,401);
 }));

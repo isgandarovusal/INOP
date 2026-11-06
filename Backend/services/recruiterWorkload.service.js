@@ -7,7 +7,7 @@ function facet(actor,at){
  const date=(field,lower,upper)=>({$and:[{$eq:[{$type:field},'date']},...(lower?[{$gte:[field,lower]}]:[]),...(upper?[{$lt:[field,upper]}]:[])]});
  return [{$match:{assignedTo:new mongoose.Types.ObjectId(actor)}},{$group:{_id:null,assigned:{$sum:1},active:count(active),
  pendingReviews:count({$and:[active,{$ne:[{$ifNull:['$candidate._id',null]},null]},{$ne:[{$ifNull:['$candidate.cvReview.version',null]},null]},{$ne:['$candidate.cvReview.reviewStatus','confirmed']}]}),
- overdue:count({$and:[active,date('$nextAction.dueAt',null,at)]}),
+ overdue:count({$and:[active,{$in:['$nextAction.kind',['review','call','interview','offer','follow_up']]},date('$nextAction.dueAt',null,at)]}),
  upcomingInterviews:count({$and:[{$eq:['$status','Interview']},{$eq:['$interview.result','pending']},date('$interview.startsAt',at,new Date(+at+7*DAYS))]}),
  completed:count({$and:[{$in:['$status',['Hired','Rejected']]},date('$stageEnteredAt',new Date(+at-30*DAYS),new Date(+at+1))]}),
  aging:count({$and:[active,date('$stageEnteredAt',null,new Date(+at-14*DAYS))]})}}];
