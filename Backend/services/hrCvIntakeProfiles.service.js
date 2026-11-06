@@ -22,7 +22,7 @@ exports.scanner=()=>{
 };
 exports.profile=()=>{
  const {createIntake}=require('./hrCvIntake.service');
- if(process.env.HR_CV_DURABLE_INTAKE_ENABLED!=='true')return createIntake();
+ if(process.env.HR_CV_DURABLE_INTAKE_ENABLED!=='true'||process.env.HR_CV_SCAN_ENABLED!=='true')return createIntake();
  if(activeProfile)return activeProfile;
  try{
   if(process.env.HR_CV_SCAN_ENABLED!=='true')throw Error('Scanner disabled');
