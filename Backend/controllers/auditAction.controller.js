@@ -5,8 +5,11 @@ const {lockAudit,recordHistory}=require('../services/auditLifecycle.service');
 const fail=(res,error)=>res.status(error.status||(error.name==='ValidationError'?400:500)).json({success:false,message:error.status?error.message:'Corrective action operation failed.'});
 async function writable(req,session){const audit=await lockAudit(req.auditScopeId,session,req.user);if(await require('../models/auditClosure.model').exists({auditId:audit._id}).session(session))throw auditError(409,'Closed audit is immutable.');return audit;}
 exports.createAction=async(req,res)=>{try{
- const row=await transaction(async session=>{
+ const input=req.body;if(!input||Array.isArray(input)||input.commandId!==undefined&&(typeof input.commandId!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(input.commandId)))throw auditError(400,'Invalid corrective action command.');
+ const commandHash=input.commandId?require('node:crypto').createHash('sha256').update(JSON.stringify(Object.fromEntries(['title','description','priority','responsible','dueDate','findingId','executionId','evidenceIds'].filter(k=>input[k]!==undefined).map(k=>[k,input[k]])))).digest('hex'):undefined;
+ const result=await transaction(async session=>{
   const audit=await writable(req,session),body=req.body;
+  if(body.commandId){const previous=await Action.findOne({auditId:audit._id,createdBy:req.user.id,commandId:body.commandId}).select('+commandHash').session(session);if(previous){if(previous.commandHash!==commandHash)throw auditError(409,'Corrective action command changed.');return{row:previous,replayed:true};}}
   if(audit.auditType==='hr'||(audit.templateSnapshot?.hrSource||audit.templateSnapshot?.serviceSource||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)){
    await require('../services/hrAuditPeople.service').requireResponsible(body.responsible,audit._id,session);
    if(typeof body.description!=='undefined'&&(typeof body.description!=='string'||body.description.length>4000))throw auditError(400,'Invalid HR action description.');
@@ -17,9 +20,9 @@ exports.createAction=async(req,res)=>{try{
    if(!mongoose.isObjectIdOrHexString(body[field])||!await require('../models/'+model+'.model').exists({_id:body[field],auditId:audit._id}).session(session))throw auditError(400,'Action reference must belong to this audit.');
   }
   const extra=(audit.templateSnapshot?.hrSource||audit.templateSnapshot?.serviceSource||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)&&body.evidenceIds!==undefined?{evidenceIds:await require('../services/serviceAuditEvidence.service').validate(body.evidenceIds,audit._id,session)}:{};
-  const [created]=await Action.create([{...extra,auditId:audit._id,createdBy:req.user.id,title:body.title.trim(),description:body.description,priority:body.priority,responsible:body.responsible,dueDate:body.dueDate,findingId:body.findingId,executionId:body.executionId,status:'open'}],{session});
-  await recordHistory(audit,req.user,'action-created',session);return created;
- });res.status(201).json({success:true,data:row});
+  const [created]=await Action.create([{...extra,...(body.commandId?{commandId:body.commandId,commandHash}:{}),auditId:audit._id,createdBy:req.user.id,title:body.title.trim(),description:body.description,priority:body.priority,responsible:body.responsible,dueDate:body.dueDate,findingId:body.findingId,executionId:body.executionId,status:'open'}],{session});
+  await recordHistory(audit,req.user,'action-created',session);return{row:created,replayed:false};
+ });const data=result.row.toObject();delete data.commandId;delete data.commandHash;res.status(result.replayed?200:201).json({success:true,data});
 }catch(error){fail(res,error);}};
 exports.getActions=async(req,res)=>{try{
  const window=require('../services/auditActionQuery.service').actionQuery(req);let query=Action.find(window.filter).sort({createdAt:-1,_id:-1}).maxTimeMS(5000);

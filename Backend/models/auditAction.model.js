@@ -18,6 +18,8 @@ const auditActionSchema = new mongoose.Schema(
  },
 
 
+ commandId:{type:String,select:false,immutable:true,maxlength:80},
+ commandHash:{type:String,select:false,immutable:true},
  title:{
   type:String,
   required:true
