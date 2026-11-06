@@ -1,0 +1,70 @@
+[
+  {
+    "run": "expanded.log",
+    "code": "LOGIN_MEASUREMENTS",
+    "validInputToEnabledMs": 30.705298000000766,
+    "submitToBusyMs": 45.61702100000002,
+    "localSubmitToDashboardMs": 590.580672,
+    "pendingAttempts": 1,
+    "remoteColdStartMeasured": false
+  },
+  {
+    "run": "expanded.log",
+    "code": "DASHBOARD_MEASUREMENTS",
+    "initialReads": 4,
+    "freshReturnReads": 0,
+    "focusReads": 0,
+    "expiredSnapshotRevalidationReads": 4,
+    "forcedRefreshReads": 4,
+    "backgroundLoadingFlashes": 0
+  },
+  {
+    "run": "delivery-browser.log",
+    "code": "LOGIN_MEASUREMENTS",
+    "validInputToEnabledMs": 70.27067100000204,
+    "submitToBusyMs": 66.820459999999,
+    "localSubmitToDashboardMs": 1270.4204439999994,
+    "pendingAttempts": 1,
+    "remoteColdStartMeasured": false
+  },
+  {
+    "run": "delivery-browser.log",
+    "code": "DASHBOARD_MEASUREMENTS",
+    "initialReads": 4,
+    "freshReturnReads": 0,
+    "focusReads": 0,
+    "expiredSnapshotRevalidationReads": 4,
+    "forcedRefreshReads": 4,
+    "backgroundLoadingFlashes": 0
+  },
+  {
+    "run": "delivery-browser.log",
+    "code": "MILESTONE_BROWSER_ACCEPTANCE",
+    "initialDashboardReads": 4,
+    "manualRefreshReads": 4,
+    "consoleErrors": 0,
+    "apiFailures": 0,
+    "unexpectedFailedRequests": 0,
+    "expectedNavigationAborts": 0,
+    "websocketErrors": 0,
+    "localOnly": true
+  },
+  {
+    "run": "visual-delivery.log",
+    "code": "LOGIN_MEASUREMENTS",
+    "validInputToEnabledMs": 51.23731399999997,
+    "submitToBusyMs": 34.655588999999964,
+    "localSubmitToDashboardMs": 749.3772829999998,
+    "pendingAttempts": 1,
+    "remoteColdStartMeasured": false
+  },
+  {
+    "run": "autofill-final.log",
+    "code": "LOGIN_MEASUREMENTS",
+    "validInputToEnabledMs": 27.90012899999965,
+    "submitToBusyMs": 23.825902999999926,
+    "localSubmitToDashboardMs": 617.4288919999999,
+    "pendingAttempts": 1,
+    "remoteColdStartMeasured": false
+  }
+]

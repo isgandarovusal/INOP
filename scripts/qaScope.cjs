@@ -13,7 +13,7 @@ const groups = [
   { files: ['loginIntakeReadiness.test.cjs', 'recruitmentWorkspaceUI.test.cjs', 'cvUniversalImportUI.test.cjs', 'recruitmentRoutesRealAuth.test.cjs'] },
   { files: ['cvIntakeUI.test.cjs', 'cvIntakeQueueUI.test.cjs', 'cvIntakeSourceReviewUI.test.cjs', 'cvIntakeRepairUI.test.cjs', 'cvIntakeOcrUI.test.cjs'] },
   { files: ['applicationWorkflowKey.test.cjs', 'applicationLifecycleUI.test.cjs', 'applicationHandoffContextUI.test.cjs'] },
-  { files: ['applicationMatchingUI.test.cjs', 'recruitmentProductUI.test.cjs', 'opensourceCapabilityUI.test.cjs', 'candidateActions.test.cjs', 'hrCandidateArchiveUI.test.cjs', 'hrJobArchiveUI.test.cjs', 'recruitmentCatalogUI.test.cjs', 'hrLifecycle.test.cjs'] },
+  { files: ['applicationMatchingUI.test.cjs', 'recruitmentProductUI.test.cjs', 'opensourceCapabilityUI.test.cjs','productStabilizationUI.test.cjs','dashboardSnapshotProperty.test.cjs', 'candidateActions.test.cjs', 'hrCandidateArchiveUI.test.cjs', 'hrJobArchiveUI.test.cjs', 'recruitmentCatalogUI.test.cjs', 'hrLifecycle.test.cjs'] },
   { files: ['hrPaginationUI.test.cjs', 'hrRankingUI.test.cjs', 'hrAnalyticsUI.test.cjs', 'hrDepartmentAccessUI.test.cjs', 'hrNavigationPerformance.test.cjs'] },
   { files: ['hrContracts.test.cjs', 'hrBoardCode.test.cjs', 'requestLifecycle.test.cjs', 'authRefresh.test.cjs', 'authFocusCoalescing.test.cjs'] },
   // The historical premium screenshot root writes to an operator-owned absolute

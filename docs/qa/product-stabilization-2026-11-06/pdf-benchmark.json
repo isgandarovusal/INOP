@@ -1,0 +1,200 @@
+{
+  "syntheticOnly": true,
+  "semanticInference": false,
+  "outputDirectory": "/tmp/inop-pdf-acceptance-mNvXEa",
+  "results": [
+    {
+      "tool": "INOP parser + native OCR",
+      "results": [
+        {
+          "language": "en",
+          "kind": "vector",
+          "sourceHash": "6c027e63ed5d77e54c105e75fed207d44a507e502a699f7499605c932ffcaa85",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "characters": 49,
+          "latencyMs": 537.36,
+          "structuredTables": false
+        },
+        {
+          "language": "en",
+          "kind": "scan",
+          "sourceHash": "fc16d1094d06c0515441e155f0d6439334e20f72643aec75306b643605fd660c",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "characters": 0,
+          "latencyMs": 166.81,
+          "structuredTables": false,
+          "ocr": {
+            "markers": 4,
+            "latencyMs": 594.11,
+            "pages": 1,
+            "engine": {
+              "provider": "tesseract",
+              "version": "5.5.0",
+              "languages": [
+                "aze",
+                "eng",
+                "rus"
+              ]
+            },
+            "actualNeuralOcr": true
+          }
+        },
+        {
+          "language": "az",
+          "kind": "vector",
+          "sourceHash": "9b4f77f26825593926a5144d59477105a26714b095756b72f901d93e1a7c2c34",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "characters": 52,
+          "latencyMs": 277.83,
+          "structuredTables": false
+        },
+        {
+          "language": "az",
+          "kind": "scan",
+          "sourceHash": "7bb9bd199056b70d1b13679efccb2b783213ad45902c172299e33449227522ec",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "characters": 0,
+          "latencyMs": 170.93,
+          "structuredTables": false,
+          "ocr": {
+            "markers": 4,
+            "latencyMs": 562.77,
+            "pages": 1,
+            "engine": {
+              "provider": "tesseract",
+              "version": "5.5.0",
+              "languages": [
+                "aze",
+                "eng",
+                "rus"
+              ]
+            },
+            "actualNeuralOcr": true
+          }
+        },
+        {
+          "language": "ru",
+          "kind": "vector",
+          "sourceHash": "dcbd863a44ec7b40b38a8ca1b2c668dbdb05dc93ffbd4b23fc57233343e631ad",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "characters": 53,
+          "latencyMs": 289.58,
+          "structuredTables": false
+        },
+        {
+          "language": "ru",
+          "kind": "scan",
+          "sourceHash": "48a2391648bb498a891bed451ffba0ace92b5cfaeccb6a0d949492743b0ce775",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "characters": 0,
+          "latencyMs": 162.62,
+          "structuredTables": false,
+          "ocr": {
+            "markers": 3,
+            "latencyMs": 604.51,
+            "pages": 1,
+            "engine": {
+              "provider": "tesseract",
+              "version": "5.5.0",
+              "languages": [
+                "aze",
+                "eng",
+                "rus"
+              ]
+            },
+            "actualNeuralOcr": true
+          }
+        }
+      ],
+      "peakRssMiB": 146.125,
+      "signatureValidationRejected": false,
+      "invalidPdfParseRejected": true
+    },
+    {
+      "tool": "markitdown-0.1.9",
+      "results": [
+        {
+          "language": "en",
+          "kind": "vector",
+          "sourceHash": "6c027e63ed5d77e54c105e75fed207d44a507e502a699f7499605c932ffcaa85",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "latencyMs": 16.85,
+          "characters": 54,
+          "structuredTables": false,
+          "pageAttribution": false
+        },
+        {
+          "language": "en",
+          "kind": "scan",
+          "sourceHash": "fc16d1094d06c0515441e155f0d6439334e20f72643aec75306b643605fd660c",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "latencyMs": 7.32,
+          "characters": 0,
+          "structuredTables": false,
+          "pageAttribution": false
+        },
+        {
+          "language": "az",
+          "kind": "vector",
+          "sourceHash": "9b4f77f26825593926a5144d59477105a26714b095756b72f901d93e1a7c2c34",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "latencyMs": 12.4,
+          "characters": 57,
+          "structuredTables": false,
+          "pageAttribution": false
+        },
+        {
+          "language": "az",
+          "kind": "scan",
+          "sourceHash": "7bb9bd199056b70d1b13679efccb2b783213ad45902c172299e33449227522ec",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "latencyMs": 27.43,
+          "characters": 0,
+          "structuredTables": false,
+          "pageAttribution": false
+        },
+        {
+          "language": "ru",
+          "kind": "vector",
+          "sourceHash": "dcbd863a44ec7b40b38a8ca1b2c668dbdb05dc93ffbd4b23fc57233343e631ad",
+          "markers": 4,
+          "expectedMarkers": 4,
+          "latencyMs": 14.56,
+          "characters": 58,
+          "structuredTables": false,
+          "pageAttribution": false
+        },
+        {
+          "language": "ru",
+          "kind": "scan",
+          "sourceHash": "48a2391648bb498a891bed451ffba0ace92b5cfaeccb6a0d949492743b0ce775",
+          "markers": 0,
+          "expectedMarkers": 4,
+          "latencyMs": 7.05,
+          "characters": 0,
+          "structuredTables": false,
+          "pageAttribution": false
+        }
+      ],
+      "invalidPdfRejected": false,
+      "initMs": 21.37,
+      "peakRssMiB": 130.05859375,
+      "networkDisabled": true,
+      "semanticInference": false
+    }
+  ],
+  "docling": {
+    "status": "NOT_RUN",
+    "reason": "Reviewed slim DOCX runtime does not include PDF layout/OCR artifacts; no new models downloaded"
+  }
+}
