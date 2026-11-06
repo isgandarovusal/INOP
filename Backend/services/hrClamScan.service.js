@@ -57,6 +57,12 @@ function createNativeScanner({ enabled = false, binary, maxDefinitionAgeHours = 
       if (result?.code === 0 && /^stdin: OK\s*$/.test(result.output)) verdict = 'clean';
       else if (result?.code === 1 && /^stdin: [^\r\n]{1,200} FOUND\s*$/.test(result.output)) verdict = 'infected';
       else throw failure('AV_UNAVAILABLE');
+      // A valid preflight is not authority for a result published after expiry
+      // or a definition reload. Do not silently relabel a scan with newer data.
+      const after = await run(binary, ['--version'], Buffer.alloc(0), controller.signal);
+      if (controller.signal.aborted) throw failure('AV_CANCELLED');
+      const finalAge = now().getTime() - date;
+      if (after?.code !== 0 || after.output?.trim() !== version.output.trim() || !Number.isFinite(finalAge) || finalAge < -300000 || finalAge > maxDefinitionAgeHours * 3600000) throw failure('AV_DEFINITIONS');
       return { verdict, sha256, engine: 'clamav', version: `${info[1]}-db${info[2]}` };
     })();
     // Noncooperative injected/native work retains its slot until actual settlement.

@@ -37,3 +37,13 @@ test('Native subprocess adapter strips inherited secrets and sends original only
     const r = await createScanner({ ...options, binary, timeoutMs: 1000 }).scan(bytes, context()); assert.equal(r.verdict, 'clean'); assert.equal(r.sha256, context().sha256);
   } finally { if (old === undefined) delete process.env.SYNTHETIC_AV_SECRET; else process.env.SYNTHETIC_AV_SECRET = old; }
 });
+test('Native scanner rejects definitions expiring or changing during a scan', async () => {
+ for (const mode of ['expired','changed','missing']) {
+  let scanned=false,calls=0;
+  const scanner=createScanner({...options,now:()=>new Date(scanned&&mode==='expired'?'2026-10-12T09:00:00Z':'2026-10-11T12:00:00Z'),run:async(_,args)=>{
+   if(args[0]==='--version'){calls++;return calls===1?version:mode==='missing'?{code:2,output:''}:mode==='changed'?{code:0,output:version.output.replace('/27950/','/27951/')}:version;}
+   scanned=true;return{code:0,output:'stdin: OK\n'};
+  }});
+  await assert.rejects(scanner.scan(bytes,context()),{code:'AV_DEFINITIONS'});
+ }
+});
