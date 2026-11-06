@@ -67,7 +67,6 @@
   "hrQueue": {
     "my-overdue": "Mənə aid gecikmiş addımlar",
     "my-interviews": "Mənə aid yaxın müsahibələr",
-
     "reportHelp": "Cari icazələriniz daxilində iş növbəsini açın. Hesabatın tarix və brend filtrləri bu keçidlərə tətbiq edilmir.",
     "title": "İş növbəsi",
     "all": "Bütün müraciətlər",
@@ -1240,7 +1239,8 @@
     "phoneRaw": "CV-də telefon",
     "previewUnavailable": "Mətn önizləməsi mümkün olmadı. Orijinal CV-ni yükləyə bilərsiniz.",
     "text_limit": "Çıxarılan mətn həddə çatdı. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın.",
-    "page_limit": "Yalnız ilk 50 səhifə emal edildi. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın."
+    "page_limit": "Yalnız ilk 50 səhifə emal edildi. Təsdiqdən əvvəl tam orijinal CV-ni yoxlayın.",
+    "ocr_acronym_review": "OCR oxşar görünən HACCP/НАССР/ХАССП simvolları aşkar edib. İlkin sənədi və mənfi və ya ziddiyyətli ifadələri yoxlayın; bu, təsdiqlənmiş ixtisas deyil."
   },
   "hrCatalog": {
     "catalogInvalid": "Kod və ad daxil edin. Kod yalnız kiçik hərf, rəqəm və tire ola bilər.",

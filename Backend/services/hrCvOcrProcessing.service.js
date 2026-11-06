@@ -8,9 +8,13 @@ function parseOcrCv(text){
  // Only the exact visual HACCP acronym / established Russian abbreviation.
  // Never normalize names/contact/general prose or infer absent qualifications.
  const token=text.match(/(?<![\p{L}\p{N}])(?:[HНhн][AАaа][CСcс]{2}[PРpр]|[Хх][Аа][Сс]{2}[Пп])(?![\p{L}\p{N}])/u)?.[0];
- if(token&&!parsed.skills.includes('HACCP')){
+ if(token&&token.toUpperCase()!=='HACCP')parsed.extraction.warnings.push('ocr_acronym_review');
+ // Confusable aliases are only draft suggestions. Any adverse literal in the
+ // document makes this narrow mapping ambiguous: leave it for human review.
+ const adverse=require('./hrAdverseLiteral.service').test(text.normalize('NFKC').toLowerCase());
+ if(token&&!adverse&&!parsed.skills.includes('HACCP')){
   parsed.skills.push('HACCP');const field=parsed.extraction.fields.skills||{source:'ocr-text',confidence:null,evidence:[]};
-  field.evidence=[...(field.evidence||[]),token];parsed.extraction.fields.skills=field;parsed.extraction.warnings.push('ocr_acronym_review');
+  field.evidence=[...(field.evidence||[]),token];parsed.extraction.fields.skills=field;
  }
  return parsed;
 }

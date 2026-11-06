@@ -63,7 +63,7 @@ exports.context = value => {
 // Conservative rejection only, not a multilingual entailment model. An
 // ambiguous same-value negation goes back to manual HR review. Never interpret
 // an unmarked quote as proof of a qualification or certificate validity.
-const adverseLiteral = /(?<![\p{L}\p{N}_])(?:no|not|without|lacks|unknown|unverified|(?:doesn|isn|aren|hasn|haven|hadn|wasn|weren|can|couldn|wouldn|shouldn|didn|don|won)['’]t|yox|yoxdur|deyi\u0307?l|нет|не|без|отсутствует|неизвестно|неподтверждено)(?![\p{L}\p{N}_])/u;
+const adverseLiteral = require('./hrAdverseLiteral.service');
 const row = { type: 'object', additionalProperties: false, required: ['field','value','evidenceIds','reason','confidence'], properties: {
   field: { type: 'string', enum: allowed }, value: { type: 'string' }, evidenceIds: { type: 'array', items: { type: 'string' } }, reason: { type: 'string' }, confidence: { anyOf: [{ type: 'number' }, { type: 'null' }] },
 } };

@@ -67,7 +67,6 @@
   "hrQueue": {
     "my-overdue": "My overdue actions",
     "my-interviews": "My upcoming interviews",
-
     "reportHelp": "Open an operational queue within your current permissions. Report date and brand filters do not apply to these links.",
     "title": "Work queue",
     "all": "All applications",
@@ -1223,7 +1222,8 @@
     "phoneRaw": "CV phone",
     "previewUnavailable": "Text preview is unavailable. You can download the original CV.",
     "text_limit": "The extracted text reached its limit. Review the complete original CV before confirming.",
-    "page_limit": "Only the first 50 pages were processed. Review the complete original CV before confirming."
+    "page_limit": "Only the first 50 pages were processed. Review the complete original CV before confirming.",
+    "ocr_acronym_review": "OCR detected visually similar HACCP/НАССР/ХАССП characters. Check the original document and any negative or conflicting statements; this is not a verified qualification."
   },
   "hrCatalog": {
     "catalogInvalid": "Enter a code and name. Use lowercase letters, numbers and hyphens in the code.",
