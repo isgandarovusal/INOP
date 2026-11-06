@@ -5,6 +5,17 @@
     "rateLimit": "Too many sign-in attempts. Please wait and try again.",
     "unavailable": "Unable to sign in right now. Check your connection and try again."
   },
+  "candidateDuplicates": {
+    "title": "Possible duplicate profiles",
+    "help": "Exact shared email or original-file evidence is a review hint, not proof of identity. Record a human review; profiles, CVs, applications and history remain separate. Reviews become outdated when either profile changes.",
+    "decision": "Human review",
+    "uncertain": "Identity not confirmed",
+    "same_person": "Reviewer considers the same person",
+    "different_people": "Reviewer considers different people",
+    "note": "Review note (internal)",
+    "save": "Record review",
+    "more": "Only the first 5 authorized matches are shown."
+  },
   "hrFeedback": {
     "title": "Interview feedback (internal)",
     "help": "Optional professional observations for authorized Application readers. Feedback does not decide hiring or change ATS scores.",

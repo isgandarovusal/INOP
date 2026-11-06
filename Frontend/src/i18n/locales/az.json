@@ -5,6 +5,17 @@
     "rateLimit": "Daxil olmaq üçün çox sayda cəhd edilib. Bir qədər gözləyib yenidən cəhd edin.",
     "unavailable": "Hazırda daxil olmaq mümkün deyil. Bağlantınızı yoxlayıb yenidən cəhd edin."
   },
+  "candidateDuplicates": {
+    "title": "Mümkün təkrar profillər",
+    "help": "Eyni e-poçt və ya orijinal fayl yalnız yoxlama göstəricisidir, şəxsiyyət sübutu deyil. İnsan rəyini qeyd edin; profillər, CV-lər, müraciətlər və tarixçə ayrı saxlanılır. Profillərdən biri dəyişdikdə rəy köhnəlir.",
+    "decision": "İnsan tərəfindən yoxlama",
+    "uncertain": "Şəxsiyyət təsdiqlənməyib",
+    "same_person": "Yoxlayan eyni şəxs hesab edir",
+    "different_people": "Yoxlayan fərqli şəxslər hesab edir",
+    "note": "Yoxlama qeydi (daxili)",
+    "save": "Rəyi qeyd et",
+    "more": "İcazəli uyğunluqlardan yalnız ilk 5-i göstərilir."
+  },
   "hrFeedback": {
     "title": "Müsahibə rəyi (daxili)",
     "help": "İcazəli müraciət oxucuları üçün peşəkar müşahidələr; doldurulması könüllüdür. Rəy işə qəbul qərarı vermir və ATS balını dəyişmir.",

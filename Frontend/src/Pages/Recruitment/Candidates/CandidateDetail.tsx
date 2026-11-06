@@ -1,3 +1,4 @@
+import CandidateDuplicateReview from "../../../Components/CandidateDuplicateReview";
 import { UserRound } from "lucide-react";
 import HRConfirmDialog from '../../../Components/HRConfirmDialog';
 import CandidateArchiveHistory from '../../../Components/CandidateArchiveHistory';
@@ -330,6 +331,7 @@ const CandidateDetail: React.FC = () => {
       <CvReviewEvidence review={candidate.cvReview} />
       {!candidate.archivedAt&&<CvProcessingPanel key={JSON.stringify([context.key, candidate.updatedAt])} candidate={candidate} onAccessDenied={result.reload} />}
       <CandidateArchiveHistory key={JSON.stringify([id,candidate.revision])} id={candidate.id} revision={candidate.revision}/>
+      <CandidateDuplicateReview id={candidate.id}/>
       <CandidateApplicationMatches candidateId={candidate.id} />
       {candidate.phoneRaw && <p>{t("cvReview.phoneRaw")}: {candidate.phoneRaw}</p>}
       {candidate.cvOriginal?.originalName && <p>{candidate.cvOriginal.originalName} · {candidate.cvOriginal.size} bytes</p>}
