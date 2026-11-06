@@ -17,5 +17,13 @@ export function useHRPage<T>(resource: string, filters: HRPageQuery, get: (query
   // not discard a scoped page; mutations and explicit refresh call reload().
   const result = useAuditResource(options.enabled === false ? undefined : queryKey, resource, load, { refreshOnFocus: false, retainOnReload: true });
   const setPage = useCallback((value: number) => setPosition({ key, page: Math.max(1, value) }), [key,setPosition]);
+  // A deletion/archive can shrink the server result while we retain page N.
+  // Recover only from a fresh, same-page result; never from retained/stale data
+  // or cursor navigation. This issues one corrective read for a stable dataset.
+  useEffect(() => {
+    if (result.status !== 'ready' || result.refreshing || !result.data || result.data.page !== page || filters.after) return;
+    const last = Math.max(1, Math.ceil(result.data.total / result.data.pageSize));
+    if (page > last) setPage(last);
+  }, [result.status, result.refreshing, result.data, page, filters.after, setPage]);
   return { ...result, page, setPage };
 }

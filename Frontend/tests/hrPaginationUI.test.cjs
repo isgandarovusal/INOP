@@ -86,3 +86,14 @@ test('HR pages use bounded scoped server pages and cancellable filters', async t
   });
   assert.deepEqual(h.pageErrors,[]);
 }));
+
+test('A shrinking authorized list recovers an out-of-range page after explicit refresh',async()=>withBrowserFixture(harness,async h=>{
+ const p={createdBy:h.actors.admin._id,assignedTo:h.actors.admin._id,departmentId:'dep_A'};
+ const rows=await Job.insertMany(Array.from({length:31},(_,i)=>({title:`Recovery ${String(i).padStart(2,'0')}`,description:'Synthetic paging recovery',department:'HR',...p})));
+ await h.open('admin','/app/recruitment/jobs');await h.page.waitForFunction(()=>document.querySelectorAll('tbody tr').length===30);
+ await h.page.getByRole('button',{name:'Növbəti',exact:true}).click();await h.page.waitForFunction(()=>document.querySelectorAll('tbody tr').length===1);
+ await Job.updateOne({_id:rows[0]._id},{$set:{archivedAt:new Date()}});const count=h.wire.filter(r=>r.path==='/api/hr/v2/jobs').length;
+ const response=h.page.waitForResponse(r=>r.url().includes('/hr/v2/jobs?')&&new URL(r.url()).searchParams.get('page')==='2');await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await response;
+ await h.page.waitForFunction(()=>document.querySelectorAll('tbody tr').length===30);
+ assert.equal(h.wire.filter(r=>r.path==='/api/hr/v2/jobs').length-count,2,'One refresh and one bounded last-page recovery, no polling');assert.equal(await h.page.getByRole('button',{name:'Əvvəlki',exact:true}).isDisabled(),true);assert.deepEqual(h.pageErrors,[]);
+}));
