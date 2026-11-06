@@ -15,14 +15,14 @@ function parseOcrCv(text){
  return parsed;
 }
 function parseOcrOutput(output){
-  if(!output||typeof output.text!=='string'||Buffer.byteLength(output.text)>100000||!Number.isInteger(output.pages)||output.pages<1||output.pages>3||output.engine?.provider!=='tesseract'||!/^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(output.engine.version||'')||!Array.isArray(output.engine.languages)||!output.engine.languages.length||output.engine.languages.some(l=>!['eng','aze','rus'].includes(l)))throw Object.assign(new Error('OCR output is unavailable.'),{code:'PROCESSING_INVALID_RESULT'});
+  if(!output||typeof output.text!=='string'||Buffer.byteLength(output.text)>100000||!Number.isInteger(output.pages)||output.pages<1||output.pages>3||(!output.engine||typeof output.engine!=='object'||Array.isArray(output.engine)||Object.keys(output.engine).some(key=>!['provider','version','languages'].includes(key)))||output.engine?.provider!=='tesseract'||!/^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(output.engine.version||'')||!Array.isArray(output.engine.languages)||!output.engine.languages.length||output.engine.languages.length>3||new Set(output.engine.languages).size!==output.engine.languages.length||output.engine.languages.some(l=>!['eng','aze','rus'].includes(l)))throw Object.assign(new Error('OCR output is unavailable.'),{code:'PROCESSING_INVALID_RESULT'});
   if(!output.text.trim())throw Object.assign(new Error('OCR output is unavailable.'),{code:'OCR_NO_TEXT'});
   const parsed=parseOcrCv(output.text),facts=Object.fromEntries(keys.filter(k=>parsed[k]!==undefined&&parsed[k]!==null&&parsed[k]!==''&&(!Array.isArray(parsed[k])||parsed[k].length>0)).map(k=>[k,parsed[k]]));
   const review={...parsed.extraction,version,provider:'tesseract-rules',confidenceKind:'uncalibrated_ocr',processingStatus:'extracted',reviewStatus:'pending',warnings:['ocr_review_required',...parsed.extraction.warnings]};
   // Pattern confidence is not OCR accuracy. Every recognized field must be
   // checked by HR against the original; absent facts remain absent/unknown.
   for(const row of Object.values(review.fields||{})){row.source='ocr-text';row.confidence=null;}
-  return {parsed:facts,review,parserVersion:version,requiresApproval:true,engine:{...output.engine},pages:output.pages};
+  return {parsed:facts,review,parserVersion:version,requiresApproval:true,engine:{provider:output.engine.provider,version:output.engine.version,languages:[...output.engine.languages]},pages:output.pages};
 }
 
 function createOcrProcessing({enabled=false,engine=createOcrEngine(),...queue}={}){
