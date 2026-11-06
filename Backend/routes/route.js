@@ -337,6 +337,7 @@ router.post(
 
 const duplicateReview=require('../controllers/candidateDuplicate.controller');
 router.get('/candidates/:id/duplicates',...authorize('candidate','read'),duplicateReview.list);
+router.get('/candidates/:id/duplicate-reviews',...authorize('candidate','read'),duplicateReview.history);
 router.post('/candidates/:id/duplicate-reviews',...authorize('candidate','update'),requirePermission('candidate','read'),duplicateReview.create);
 const candidateArchive=require('../controllers/candidateArchive.controller');
 router.post('/candidates/:id/archive', ...authorize('candidate','delete'), candidateArchive.archive);

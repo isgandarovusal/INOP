@@ -1,4 +1,11 @@
 {
+  "integrationAcceptance": {
+    "history": "Duplicate review history",
+    "current": "Recorded against current profile revisions",
+    "historical": "Earlier profile revisions — historical review only",
+    "actor": "Recorded by account {{id}}",
+    "page": "Page {{page}} · {{total}} records"
+  },
   "loginFailure": {
     "credentials": "Email or password is incorrect.",
     "denied": "This account cannot sign in. Contact your administrator.",

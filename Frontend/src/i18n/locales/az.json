@@ -1,4 +1,11 @@
 {
+  "integrationAcceptance": {
+    "history": "Təkrar profil yoxlamasının tarixçəsi",
+    "current": "Profillərin cari versiyaları üzrə qeyd edilib",
+    "historical": "Əvvəlki profil versiyaları — yalnız tarixi rəy",
+    "actor": "Qeyd edən hesab: {{id}}",
+    "page": "Səhifə {{page}} · {{total}} qeyd"
+  },
   "loginFailure": {
     "credentials": "E-poçt və ya şifrə yanlışdır.",
     "denied": "Bu hesabla daxil olmaq mümkün deyil. Administratorla əlaqə saxlayın.",
