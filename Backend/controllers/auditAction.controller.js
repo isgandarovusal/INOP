@@ -2,7 +2,6 @@ const mongoose=require('mongoose');
 const Action=require('../models/auditAction.model');
 const {transaction,auditError}=require('../services/auditTransaction.service');
 const {lockAudit,recordHistory}=require('../services/auditLifecycle.service');
-const {pagination}=require('../services/auditQuery.service');
 const fail=(res,error)=>res.status(error.status||(error.name==='ValidationError'?400:500)).json({success:false,message:error.status?error.message:'Corrective action operation failed.'});
 async function writable(req,session){const audit=await lockAudit(req.auditScopeId,session,req.user);if(await require('../models/auditClosure.model').exists({auditId:audit._id}).session(session))throw auditError(409,'Closed audit is immutable.');return audit;}
 exports.createAction=async(req,res)=>{try{
@@ -22,7 +21,12 @@ exports.createAction=async(req,res)=>{try{
   await recordHistory(audit,req.user,'action-created',session);return created;
  });res.status(201).json({success:true,data:row});
 }catch(error){fail(res,error);}};
-exports.getActions=async(req,res)=>{try{const window=pagination(req);let query=Action.find({auditId:req.auditScopeId}).sort({createdAt:-1,_id:-1}).maxTimeMS(5000);if(req.query.page!==undefined||req.query.limit!==undefined)query=query.skip(window.skip).limit(window.limit);res.json({success:true,data:await query});}catch(error){fail(res,error);}};
+exports.getActions=async(req,res)=>{try{
+ const window=require('../services/auditActionQuery.service').actionQuery(req);let query=Action.find(window.filter).sort({createdAt:-1,_id:-1}).maxTimeMS(5000);
+ if(!window.paged)return res.json({success:true,data:await query});
+ const [data,total]=await Promise.all([query.skip(window.skip).limit(window.limit),Action.countDocuments(window.filter).maxTimeMS(5000)]);
+ res.json({success:true,data,total,page:window.page,limit:window.limit,hasMore:window.skip+data.length<total});
+}catch(error){fail(res,error);}};
 exports.updateActionStatus=async(req,res)=>{try{
  const row=await transaction(async session=>{
   const audit=await writable(req,session),action=await Action.findOne({_id:req.params.id,auditId:audit._id}).session(session);

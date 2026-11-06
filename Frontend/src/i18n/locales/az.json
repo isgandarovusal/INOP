@@ -6,6 +6,16 @@
     "strengths": "Müşahidə olunan güclü tərəflər",
     "concerns": "Narahatlıqlar / növbəti addımlar"
   },
+  "auditActionQueue": {
+    "first": "İlk səhifə",
+    "title": "Düzəldici tədbir filtrləri",
+    "all": "Bütün statuslar",
+    "overdue": "Gecikmiş işlər",
+    "mine": "Mənə təyin edilənlər",
+    "help": "Gecikmiş işlər Bakı tarixi ilə bugündən əvvəl bitməli olan tamamlanmamış tədbirlərdir. Tamamlanan tədbirlər müstəqil yoxlamanı gözləyir.",
+    "pages": "Düzəldici tədbir səhifələri",
+    "page": "Səhifə {{page}} · {{total}} uyğun tədbir"
+  },
   "hrCompare": {
     "title": "Namizədləri müqayisə et",
     "help": "Bu vakansiya səhifəsindən 2–3 namizəd seçin. Ətraflı sübutlar yalnız müqayisəni açdıqda yüklənir.",

@@ -6,6 +6,16 @@
     "strengths": "Observed strengths",
     "concerns": "Concerns / follow-up"
   },
+  "auditActionQueue": {
+    "first": "First page",
+    "title": "Corrective-action work filters",
+    "all": "All statuses",
+    "overdue": "Overdue work",
+    "mine": "Assigned to me",
+    "help": "Overdue means unfinished work due before today in Baku. Completed actions await independent verification.",
+    "pages": "Corrective-action pages",
+    "page": "Page {{page}} · {{total}} matching actions"
+  },
   "hrCompare": {
     "title": "Compare candidates",
     "help": "Select 2–3 candidates from this vacancy page. Full evidence loads only when you compare.",
