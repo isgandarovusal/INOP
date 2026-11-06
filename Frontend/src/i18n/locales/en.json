@@ -4,7 +4,10 @@
     "current": "Recorded against current profile revisions",
     "historical": "Earlier profile revisions — historical review only",
     "actor": "Recorded by account {{id}}",
-    "page": "Page {{page}} · {{total}} records"
+    "page": "Page {{page}} · {{total}} records",
+    "team": "Recruiter team workload",
+    "recruiter": "Recruiter",
+    "teamHelp": "Only readable Applications and Vacancies, grouped by independently readable User accounts. Existing report filters apply. Counts are applications, not unique candidates. Interview window: next 7 days; terminal activity: last 30 days; aging: active stage unchanged for more than 14 days."
   },
   "loginFailure": {
     "credentials": "Email or password is incorrect.",

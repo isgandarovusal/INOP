@@ -51,7 +51,7 @@ function parentLookup(req, model, localField, resource, projection, extra = {}) 
   return [{ $lookup: { from: model.collection.name, localField, foreignField: '_id', as } },
     { $set: { [as]: { $map: { input: { $filter: { input: '$' + as, as: 'parent', cond: { $and: checks } } }, as: 'parent', in: safe } } } }];
 }
-function base(req, criteria, scoring = false, cohortJobs = null, summary = false) {
+function base(req, criteria, scoring = false, cohortJobs = null, summary = false, workload = false) {
   const jobs = scoring ? { title: 1, requiredSkills: 1, preferredSkills: 1, experienceYears: 1, requiredEducation: 1, requiredCertificates: 1, criterionWeights: 1 } : { status: 1, brandId: 1 };
   const candidates = scoring ? { role: 1, skills: 1, experience: 1, education: 1, certificates: 1, reviewedFields: 1, 'cvReview.reviewStatus': 1, 'cvReview.version': 1, employmentHistory: 1 } : { 'cvReview.version': 1, 'cvReview.reviewStatus': 1, 'cvReview.processingStatus': 1, 'cvOriginal.sha256': 1 };
   const groups = new Map();
@@ -60,7 +60,7 @@ function base(req, criteria, scoring = false, cohortJobs = null, summary = false
   // Empty cohorts still need a valid switch expression; the match admits no rows.
   if(cohortJobs && !groups.size)jobStages.splice(0,1,{$set:{job:{brandId:null}}});
   return [{ $match: { $and: [aggregateResourceFilter(req, 'application'), criteria.apps, ...(cohortJobs ? [{jobId:{$in:cohortJobs.map(j=>j._id)}}] : [])] } },
-    { $project: summary ? {jobId:1,status:1,'source.key':1,processingState:1} : scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, assignedTo:1, 'nextAction.dueAt':1, 'nextAction.kind':1, 'interview.startsAt':1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
+    { $project: summary ? {jobId:1,status:1,'source.key':1,processingState:1} : scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, assignedTo:1, 'nextAction.dueAt':1, 'nextAction.kind':1, 'interview.startsAt':1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: workload ? '$$REMOVE' : { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
     ...jobStages,
     ...(summary ? [] : [...parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }])];
 }
@@ -204,3 +204,19 @@ exports.scores = handler('scores');
 exports.operations = handler('operations');
 module.exports.STATUSES = STATUSES;
 module.exports.SOURCES = SOURCES;
+
+// Explicit lazy team report. Existing all-scope grants are required separately;
+// reading Applications does not imply a right to read recruiter identities.
+exports.workload=async(req,res)=>{try{
+ const authority=require('../services/hrCreateRecovery.service'),fresh=await authority.current(req),identity=authority.identity(fresh);
+ if(['application','recruitment','user'].some(resource=>Object.keys(resourceFilter(fresh,resource)).length!==0))return res.status(403).json({message:'Independent all-scope Application, vacancy and User reads are required.'});
+ const q={...req.query};delete q.page;delete q.limit;let criteria;try{criteria=filters(q);}catch{return res.status(400).json({message:'Invalid workload filter.'});}const window=require('../services/auditQuery.service').pagination(req,20);if(window.limit>50)return res.status(400).json({message:'Invalid workload page size.'});
+ const at=new Date(),User=require('../models/user.model'),group=require('../services/recruiterWorkload.service').facet(fresh.user.id,at)[1].$group;
+ const names=[{$lookup:{from:User.collection.name,localField:'_id',foreignField:'_id',as:'owner',pipeline:[{$project:{name:1}}]}},{$unwind:'$owner'}];
+ const [report]=await Application.aggregate([...base(fresh,criteria,false,null,false,true),{$match:{assignedTo:{$type:'objectId'}}},{$facet:{
+ items:[{$group:{...group,_id:'$assignedTo'}},...names,{$sort:{_id:1}},{$skip:window.skip},{$limit:window.limit}],
+ total:[{$group:{_id:'$assignedTo'}},...names,{$count:'count'}]
+ }}]).option({maxTimeMS:10000});
+ if(authority.identity(await authority.current(req))!==identity)return res.status(409).json({message:'Permissions changed. Refresh and retry.'});
+ const total=number(report.total,'count');res.json({version:'hr-team-workload-v1',asOf:at,scope:'authorized-cohort',page:window.page,total,hasMore:window.skip+report.items.length<total,items:report.items.map(row=>({id:String(row._id),name:String(row.owner.name||'').slice(0,200),metrics:{...require('../services/recruiterWorkload.service').dto([row],at),scope:'assigned-to-recruiter'}}))});
+ }catch(e){res.status(e.status|| (e.code===50?503:500)).json({message:'Recruiter workload report is unavailable.'});}};

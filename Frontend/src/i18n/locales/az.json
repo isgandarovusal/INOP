@@ -4,7 +4,10 @@
     "current": "Profillərin cari versiyaları üzrə qeyd edilib",
     "historical": "Əvvəlki profil versiyaları — yalnız tarixi rəy",
     "actor": "Qeyd edən hesab: {{id}}",
-    "page": "Səhifə {{page}} · {{total}} qeyd"
+    "page": "Səhifə {{page}} · {{total}} qeyd",
+    "team": "İşə qəbul komandasının iş yükü",
+    "recruiter": "İşə qəbul üzrə məsul şəxs",
+    "teamHelp": "Yalnız oxumağa icazə verilmiş müraciətlər və vakansiyalar ayrıca oxuma icazəsi olan istifadəçi hesabları üzrə qruplaşdırılır. Hesabatın mövcud filtrləri tətbiq olunur. Saylar unikal namizədləri deyil, müraciətləri göstərir. Müsahibələr: növbəti 7 gün; yekun mərhələyə keçidlər: son 30 gün; köhnəlmə: aktiv mərhələsi 14 gündən çox dəyişməyənlər."
   },
   "loginFailure": {
     "credentials": "E-poçt və ya şifrə yanlışdır.",

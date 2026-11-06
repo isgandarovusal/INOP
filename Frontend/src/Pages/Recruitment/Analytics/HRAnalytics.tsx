@@ -1,3 +1,4 @@
+import RecruiterTeamWorkload from '../../../Components/RecruiterTeamWorkload';
 import {formatDateTime} from '../../../Utils/dateUtils';
 import Badge, { type BadgeTone } from '../../../Components/Badge';
 import HRFilterPanel from '../../../Components/HRFilterPanel';
@@ -14,6 +15,7 @@ import HRResourceState from '../../../Components/HRResourceState';
 import EmptyState from '../../../Components/EmptyState';
 export default function HRAnalyticsPage() {
   const { t, i18n } = useTranslation(); const [filters, setFilters] = useState<HRAnalyticsFilters>({});
+  const [teamRevision,setTeamRevision] = useState(0);
   const [pane, setPane] = useState<'overview' | 'operations'>('overview'), tabId = useId();
   const key = JSON.stringify(filters);
   const result = useAuditResource(key, 'application', getHRAnalyticsOverview, {refreshOnFocus: false, retainOnReload: true}), data = result.data;
@@ -22,7 +24,7 @@ export default function HRAnalyticsPage() {
   const scoreData = scoreResult.data, operationData = operations.data;
   const denied = [scoreResult.status, operations.status].find(status => status === 'forbidden' || status === 'unauthenticated');
   const restricted = scoreData?.scores?.states.restricted ?? 0;
-  const reload = () => { result.reload(); scoreResult.reload(); operations.reload(); };
+  const reload = () => { setTeamRevision(value=>value+1); result.reload(); scoreResult.reload(); operations.reload(); };
   const update = (key: keyof HRAnalyticsFilters, value: string) => setFilters(old => ({ ...old, [key]: value,
     ...(key === 'brandId' ? { branchId: '', jobId: '' } : key === 'branchId' ? { jobId: '' } : {}) }));
   const brands = data?.options.brands || [{ id: 'kfc', name: 'KFC', active: true }, { id: 'pizza-hut', name: 'Pizza Hut', active: true }, { id: 'simit-sarayi', name: 'Simit Sarayı', active: true }];
@@ -91,6 +93,7 @@ export default function HRAnalyticsPage() {
         <section className="hr-panel hr-panel--brands"><h2><BriefcaseBusiness size={18} aria-hidden="true" />{t('hrAnalytics.brands')}</h2><table aria-label={t('hrAnalytics.brands')}><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{data.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications.toLocaleString(i18n.language)}</td><td>{r.activeVacancies.toLocaleString(i18n.language)}</td></tr>)}</tbody></table>{data.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>
         </> : operations.status !== 'ready' || !operationData ? <HRResourceState status={operations.status} retry={operations.reload}/> : <>
         <section><h2>{t('hrAnalytics.brands')}</h2><table><thead><tr><th>{t('hrCatalog.brand')}</th><th>{t('hrAnalytics.kpi.applications')}</th><th>{t('hrAnalytics.kpi.activeVacancies')}</th></tr></thead><tbody>{operationData.byBrand.map(r => <tr key={r.id}><th scope="row">{r.id === 'unset' ? t('hrCatalog.unset') : brands.find(b => b.id === r.id)?.name || brandLabel(r.id)}</th><td>{r.applications}</td><td>{r.activeVacancies}</td></tr>)}</tbody></table>{operationData.byBrandTruncated && <p>{t('hrAnalytics.catalogCap')}</p>}</section>
+        <RecruiterTeamWorkload filters={key} revision={teamRevision}/>
         {operationData.workload?.scope === 'assigned-to-me' && <section data-recruiter-workload><h2>{t('recruiterWorkload.title')}</h2><p>{t('recruiterWorkload.help')}</p><ul>{(['assigned','active','pendingReviews','overdue','upcomingInterviews','completed','aging'] as const).map(key=><li key={key}>{t('recruiterWorkload.'+key)}: {operationData.workload![key]}</li>)}</ul><Link to='/app/recruitment/applications?attention=my-overdue'>{t('hrQueue.title')}</Link></section>}
         <section><h2>{t('hrAnalytics.review')}</h2><p>{t('hrAnalytics.linkedReview')}</p>{operationData.coverage.candidateReadable ? <ul>{Object.entries(operationData.review).map(([key, value]) => <li key={key}>{t(`hrAnalytics.reviewState.${key}`)}: {value}</li>)}<li>{t('hrAnalytics.duplicates')}: {operationData.duplicateAlerts.extraProfiles}</li></ul> : <p>{t('hrStates.restricted')}</p>}</section>
         <section><h2>{t('hrAnalytics.interviews')}</h2>{operationData.interviews.length ? <ul>{operationData.interviews.map(r => <li key={r.result}>{t(r.result === 'unscheduled' ? 'hrAnalytics.unscheduled' : `hrWorkflow.resultState.${r.result}`)}: {r.count}</li>)}</ul> : <p>{t('hrAnalytics.empty')}</p>}</section>

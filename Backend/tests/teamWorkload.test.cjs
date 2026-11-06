@@ -1,0 +1,10 @@
+const test=require('node:test'),assert=require('node:assert/strict');const{withAuditFixture}=require('./helpers/auditFixture.cjs'),Job=require('../models/job.model'),Candidate=require('../models/candidate.model'),Application=require('../models/application.model');
+test('Team workload requires independent all-scope User, Job and Application reads and paginates the same cohort',async()=>withAuditFixture(async h=>{
+ const own={createdBy:h.actors.admin._id,assignedTo:h.actors.admin._id,departmentId:'dep_A'},job=await Job.create({title:'Synthetic team vacancy',department:'HR',description:'Synthetic',brandId:'kfc',...own}),candidate=await Candidate.create({name:'PRIVATE_NOT_IN_REPORT',role:'Cashier',...own});
+ for(const actor of ['admin','own','foreign'])await Application.create({jobId:job._id,candidateId:candidate._id,...own,assignedTo:h.actors[actor]._id,status:'Applied'});
+ const url='/hr/analytics/workload?limit=2&page=';const r=await h.request('admin','GET',url+'1');assert.equal(r.status,200);assert.equal(r.data.total,3);assert.equal(r.data.items.length,2);assert.equal(r.data.hasMore,true);assert.equal((await h.request('admin','GET',url+'2')).data.items.length,1);assert.ok(!JSON.stringify(r.data).includes('PRIVATE_NOT_IN_REPORT'));assert.ok(r.data.items.every(x=>typeof x.name==='string'&&x.metrics.assigned===1&&x.metrics.scope==='assigned-to-recruiter'));
+ await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{$each:['application','candidate','recruitment'].map(resource=>({resource,action:'read',scope:'all'}))}}});
+ assert.equal((await h.request('own','GET',url+'1')).status,403,'Application access alone must not imply User directory access');
+ await h.models.Role.updateOne({key:'test_own'},{$push:{permissions:{resource:'user',action:'read',scope:'department'}}});assert.equal((await h.request('own','GET',url+'1')).status,403);
+ assert.equal((await h.request('admin','GET',url+'0')).status,400);assert.equal((await h.request('admin','GET','/hr/analytics/workload?brandId=pizza-hut')).data.total,0);
+}));
