@@ -1,5 +1,5 @@
 import { onClientSessionReset } from './clientSession';
-export function isAggregateMutation(method = 'get', url = '') { return !['get','head','options'].includes(method) && /^\/(?:jobs|candidates|applications|hr|auth|users|roles|departments|brands|branches)(?:[/?]|$)/.test(url); }
+export function isAggregateMutation(method = 'get', url = '') { return !['get','head','options'].includes(method) && /^\/(?:jobs|candidates|applications|hr|auth|users|roles|departments|brands|branches|audits|audit-[a-z-]+|restaurants)(?:[/?]|$)/.test(url); }
 let epoch = 0;
 const entries = new Map<string, { expires: number; data: unknown }>();
 export function invalidateAggregates() { epoch++; entries.clear(); }

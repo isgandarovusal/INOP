@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,7 +14,9 @@ import {
   PackageOpen,
 } from "lucide-react";
 import { syncClientSession } from "../../api/clientSession";
-import { invalidateAggregates } from "../../api/aggregateCache";
+import api from "../../api/axios";
+import { dashboardSnapshot, keepDashboardSnapshot, clearDashboardSnapshot } from "../../api/dashboardSnapshot";
+import { aggregateEpoch, invalidateAggregates } from "../../api/aggregateCache";
 import PageState from "../../Components/PageState";
 import PageHeader from "../../Components/PageHeader";
 import EmptyState from "../../Components/EmptyState";
@@ -49,7 +51,7 @@ const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  syncClientSession(user);
+  const sessionOwner = syncClientSession(user);
 
   const recruitmentScope = getPermissionScope(user, "recruitment", "read");
   const canJobs = Boolean(recruitmentScope && recruitmentScope !== 'none');
@@ -61,7 +63,7 @@ const Dashboard: React.FC = () => {
   // Translation changes do not change the user's data scope.
   const dataScopeKey = user
     ? JSON.stringify([
-        user.id,
+        user.id, sessionOwner, api.defaults.baseURL,
         user.role,
         user.departmentId,
         user.isActive, user.hrAccess, user.auditDirection, user.auditDirections,
@@ -69,36 +71,40 @@ const Dashboard: React.FC = () => {
       ])
     : null;
 
-  const [loadedScopeKey, setLoadedScopeKey] = useState<string | null>(null);
+  const snapshot = dataScopeKey ? dashboardSnapshot(dataScopeKey) : undefined;
+  const [loadedScopeKey, setLoadedScopeKey] = useState<string | null>(snapshot ? dataScopeKey : null);
+  const [refreshing, setRefreshing] = useState(false);
   const [refreshRevision, setRefreshRevision] = useState(0);
-  const [jobs, setJobs] = useState<CountSummary>({total:0});
-  const [candidates, setCandidates] = useState<CandidateSummary>({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
-  const [applications, setApplications] = useState<ApplicationSummary>({total:0,pipeline:null});
-  const [analytics, setAnalytics] = useState<AuditAnalytics | null>(null);
-  const [jobsLoading, setJobsLoading] = useState(true);
-  const [candidatesLoading, setCandidatesLoading] = useState(true);
-  const [applicationsLoading, setApplicationsLoading] = useState(true);
-  const [auditLoading, setAuditLoading] = useState(true);
+  const [jobs, setJobs] = useState<CountSummary>(snapshot?.value.jobs ?? {total:0});
+  const [candidates, setCandidates] = useState<CandidateSummary>(snapshot?.value.candidates ?? {total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
+  const [applications, setApplications] = useState<ApplicationSummary>(snapshot?.value.applications ?? {total:0,pipeline:null});
+  const [analytics, setAnalytics] = useState<AuditAnalytics | null>(snapshot?.value.analytics ?? null);
+  const [jobsLoading, setJobsLoading] = useState(!snapshot?.value.jobs);
+  const [candidatesLoading, setCandidatesLoading] = useState(!snapshot?.value.candidates);
+  const [applicationsLoading, setApplicationsLoading] = useState(!snapshot?.value.applications);
+  const [auditLoading, setAuditLoading] = useState(!snapshot?.value.analytics);
   const [summaryErrors,setSummaryErrors] = useState({jobs:false,candidates:false,applications:false});
   const [recruitmentError, setRecruitmentError] = useState<string | null>(null);
   const [auditError, setAuditError] = useState<string | null>(null);
 
-  const refreshDashboard = () => { invalidateAggregates(); setRefreshRevision(value=>value+1); };
-  useEffect(() => {
-    let last = 0;
-    // Candidate names and Audit data remain fresh on focus; eligible numeric
-    // summaries alone reuse their short-lived cache. Session checks are separate.
-    const focus = () => { const now=Date.now(); if(document.visibilityState!=='visible'||now-last<1000)return; last=now;setRefreshRevision(value=>value+1); };
-    const visible = () => { if(document.visibilityState==='visible')focus(); };
-    window.addEventListener('focus',focus);document.addEventListener('visibilitychange',visible);
-    return()=>{window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',visible);};
-  },[]);
+  const refreshSnapshot = useRef<{key: string; snapshot: ReturnType<typeof dashboardSnapshot>} | undefined>(undefined);
+  const refreshDashboard = () => { refreshSnapshot.current = dataScopeKey ? {key: dataScopeKey, snapshot: dashboardSnapshot(dataScopeKey)} : undefined; invalidateAggregates(); setRefreshRevision(value=>value+1); };
 
 
   useEffect(() => {
     let mounted = true;
     const controller = new AbortController();
     const requestScopeKey = JSON.stringify([dataScopeKey, refreshRevision]);
+    const epoch = aggregateEpoch();
+    const previous = (dataScopeKey ? dashboardSnapshot(dataScopeKey) : undefined) ?? (refreshRevision && refreshSnapshot.current?.key === dataScopeKey ? refreshSnapshot.current.snapshot : undefined);
+    if (previous?.fresh && (previous.value.jobs !== undefined) === canJobs && (previous.value.candidates !== undefined) === canCandidates && (previous.value.applications !== undefined) === canApplications && (previous.value.analytics !== undefined) === showAudit && refreshRevision === 0) {
+      setJobsLoading(false); setCandidatesLoading(false); setApplicationsLoading(false); setAuditLoading(false);
+      return;
+    }
+    const remember = (patch: Parameters<typeof keepDashboardSnapshot>[2]) => { if (dataScopeKey) keepDashboardSnapshot(dataScopeKey, epoch, patch); };
+    setRefreshing(canJobs || canCandidates || canApplications || showAudit);
+    let remaining = Number(canJobs) + Number(canCandidates) + Number(canApplications) + Number(showAudit);
+    const settled = () => { if (--remaining <= 0 && mounted) setRefreshing(false); };
     const deadline = setTimeout(() => controller.abort(), 15000);
 
     const loadDashboard = () => {
@@ -106,32 +112,30 @@ const Dashboard: React.FC = () => {
       setRecruitmentError(null);
       setSummaryErrors({jobs:false,candidates:false,applications:false});
       setAuditError(null);
-      setJobs({total:0});
-      setCandidates({total:0,shortlistedCount:0,statusBreakdown:[],recentCandidates:[]});
-      setApplications({total:0,pipeline:null});
-      setAnalytics(null);
+
 
       if (showRecruitment) {
-        setJobsLoading(true);
-        setCandidatesLoading(true);
-        setApplicationsLoading(true);
+        setJobsLoading(!previous?.value.jobs);
+        setCandidatesLoading(!previous?.value.candidates);
+        setApplicationsLoading(!previous?.value.applications);
 
         if (canJobs) {
         void getJobsSummary(controller.signal, requestScopeKey, recruitmentScope === 'all' ? dataScopeKey ?? undefined : undefined)
           .then((result) => {
             if (!mounted) return;
-            setJobs(result);
+            setJobs(result); remember({jobs: result});
           })
           .catch((error) => {
             if (!mounted) return;
             console.error("Jobs dashboard load failed.");
-            setSummaryErrors(current=>({...current,jobs:true}));
+            if ([401,403,404].includes(error?.response?.status)) { clearDashboardSnapshot(); setSummaryErrors(current=>({...current,jobs:true})); } else if (!previous?.value.jobs) setSummaryErrors(current=>({...current,jobs:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
             );
           })
           .finally(() => {
+            settled();
             if (mounted) {
               setJobsLoading(false);
             }
@@ -142,18 +146,19 @@ const Dashboard: React.FC = () => {
         void getCandidatesSummary(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
-            setCandidates(result);
+            setCandidates(result); remember({candidates: result});
           })
           .catch((error) => {
             if (!mounted) return;
             console.error("Candidates dashboard load failed.");
-            setSummaryErrors(current=>({...current,candidates:true}));
+            if ([401,403,404].includes(error?.response?.status)) { clearDashboardSnapshot(); setSummaryErrors(current=>({...current,candidates:true})); } else if (!previous?.value.candidates) setSummaryErrors(current=>({...current,candidates:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
             );
           })
           .finally(() => {
+            settled();
             if (mounted) {
               setCandidatesLoading(false);
             }
@@ -164,18 +169,19 @@ const Dashboard: React.FC = () => {
         void getApplicationsSummary(controller.signal, requestScopeKey, applicationScope === 'all' && candidateScope === 'all' && recruitmentScope === 'all' ? dataScopeKey ?? undefined : undefined)
           .then((result) => {
             if (!mounted) return;
-            setApplications(result);
+            setApplications(result); remember({applications: result});
           })
           .catch((error) => {
             if (!mounted) return;
             console.error("Applications dashboard load failed.");
-            setSummaryErrors(current=>({...current,applications:true}));
+            if ([401,403,404].includes(error?.response?.status)) { clearDashboardSnapshot(); setSummaryErrors(current=>({...current,applications:true})); } else if (!previous?.value.applications) setSummaryErrors(current=>({...current,applications:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
             );
           })
           .finally(() => {
+            settled();
             if (mounted) {
               setApplicationsLoading(false);
             }
@@ -188,22 +194,24 @@ const Dashboard: React.FC = () => {
       }
 
       if (showAudit) {
-        setAuditLoading(true);
+        setAuditLoading(!previous?.value.analytics);
 
         void getAuditAnalytics(controller.signal, requestScopeKey)
           .then((result) => {
             if (!mounted) return;
-            setAnalytics(result);
+            setAnalytics(result); remember({analytics: result});
           })
           .catch((error) => {
             if (!mounted) return;
             console.error("Audit dashboard load failed.");
 
+            if ([401,403,404].includes(error?.response?.status)) { clearDashboardSnapshot(); setAnalytics(null); }
             setAuditError(
               error?.response?.data?.message || ""
             );
           })
           .finally(() => {
+            settled();
             if (mounted) {
               setAuditLoading(false);
             }
@@ -230,7 +238,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="main-dashboard hr-workspace">
-      <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} actions={<button type="button" className="btn-secondary" disabled={jobsLoading || candidatesLoading || applicationsLoading || auditLoading} onClick={refreshDashboard}>{t("common.actions.refresh")}</button>} />
+      <PageHeader title={t("dashboard.welcome", { name: user.name.split(" ")[0] })} subtitle={t("dashboard.subtitle")} actions={<button type="button" className="btn-secondary" aria-busy={refreshing} disabled={refreshing || jobsLoading || candidatesLoading || applicationsLoading || auditLoading} onClick={refreshDashboard}>{t("common.actions.refresh")}</button>} />
 
           {showRecruitment && (
             <div className="hr-dashboard-summary">
@@ -315,6 +323,8 @@ const Dashboard: React.FC = () => {
                       {recentCandidates.map((c) => (
                         <div
                           className="recent-row"
+                          role="link" tabIndex={0}
+                          onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); navigate(`/app/recruitment/candidates/${c.id}`); } }}
                           key={c.id}
                           style={{ cursor: "pointer" }}
                           onClick={() => navigate(`/app/recruitment/candidates/${c.id}`)}

@@ -10,9 +10,9 @@ test('Dashboard and shared GET lifecycles preserve authorization under StrictMod
   const count=h.wire.length;await h.page.evaluate(()=>window.i18nTest.changeLanguage('az'));await h.page.waitForTimeout(200);assert.equal(h.wire.length,count);
   assert.deepEqual(h.pageErrors,[]);await Promise.all(pendingDiagnostics);assert.deepEqual(diagnostics,[],'Expected lifecycle cancellation must not log a dashboard failure');
  });
- await t.test('Focus rechecks sensitive summaries; explicit Refresh rechecks every summary',async()=>{
+ await t.test('Focus preserves summary snapshot; explicit Refresh rechecks every summary',async()=>{
   const before=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
-  const focused=Promise.all(['candidates','audits'].map(resource=>h.page.waitForResponse(r=>r.url().endsWith('/'+resource+'/dashboard-summary'))));await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await focused;await h.page.waitForLoadState('networkidle');assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-before,2);const fresh=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
+  await h.page.evaluate(()=>window.dispatchEvent(new Event('focus')));await h.page.waitForLoadState('networkidle');assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-before,0);const fresh=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
   const responses=Promise.all(['jobs','candidates','applications','audits'].map(resource=>h.page.waitForResponse(response=>response.url().endsWith(`/${resource}/dashboard-summary`))));
   await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await responses;await h.page.waitForLoadState('networkidle');
   assert.equal(h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length-fresh,4);
