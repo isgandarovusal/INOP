@@ -3,7 +3,7 @@ const {withBrowserFixture}=require('./helpers/browser.cjs');
 const hr=require('../../Backend/services/serviceAuditAssessment.service');
 const harness=`import React from 'react';import{createRoot}from'react-dom/client';import{createBrowserRouter,RouterProvider}from'react-router-dom';import{AuthContext}from'/src/Context/AuthContext.ts';import'/src/i18n/index.ts';import i18n from '/src/i18n/index.ts';import'/src/App.css';import ROUTES from'/src/Routes/Routes.tsx';import api from'/src/api/axios.ts';api.defaults.baseURL='/api';const router=createBrowserRouter(ROUTES);window.navigateTest=to=>router.navigate(to);window.localeTest=lang=>i18n.changeLanguage(lang);createRoot(document.getElementById('root')).render(React.createElement(AuthContext.Provider,{value:{user:window.testUser,isLoading:false,logout:async()=>{},login:async()=>{}}},React.createElement(React.Suspense,null,React.createElement(RouterProvider,{router}))));`;
 test('Real Service UI/API: source forms, draft resume, immutable submit, analytics, responsive locales and denial',{timeout:240000},async()=>withBrowserFixture(harness,async h=>{
- const output=process.env.INOP_HR_AUDIT_SCREENS||'/tmp/inop-service-audit-p04-screens';fs.mkdirSync(output,{recursive:true});
+ const output=process.env.INOP_SERVICE_AUDIT_SCREENS||'/tmp/inop-service-audit-p04-screens';fs.mkdirSync(output,{recursive:true});
  const Restaurant=require('../../Backend/models/restaurant.model');const executions={};
  for(const source of hr.sources){
   const provision=await h.request('admin','POST',`/audit-service/templates/${source.brandId}`,{});assert.equal(provision.status,201);
@@ -69,7 +69,7 @@ test('Service final evidence UI uploads real bytes, saves version links and disp
   const old=process.env.RENDER;process.env.RENDER='true';const before=await Evidence.countDocuments({auditId:execution.auditId});
   try{const response=page.waitForResponse(r=>r.url().endsWith(`/audit-evidence/${execution.auditId}`)&&r.request().method()==='POST');await page.locator('.audit-hr-final-evidence input[type=file]').nth(1).setInputFiles({name:'blocked.txt',mimeType:'text/plain',buffer:Buffer.from('synthetic')});assert.equal((await response).status(),503);await page.getByRole('alert').filter({hasText:'File was not uploaded'}).waitFor();assert.equal(await Evidence.countDocuments({auditId:execution.auditId}),before);}finally{if(old===undefined)delete process.env.RENDER;else process.env.RENDER=old;}
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);assert.deepEqual(h.pageErrors,[]);
-  const output=process.env.INOP_HR_AUDIT_SCREENS||'/tmp/inop-service-audit-p04-screens';fs.mkdirSync(output,{recursive:true});await page.locator('.audit-hr-final-evidence').screenshot({path:path.join(output,'final-evidence-320.png')});
+  const output=process.env.INOP_SERVICE_AUDIT_SCREENS||'/tmp/inop-service-audit-p04-screens';fs.mkdirSync(output,{recursive:true});await page.locator('.audit-hr-final-evidence').screenshot({path:path.join(output,'final-evidence-320.png')});
  }finally{for(const file of await Evidence.find({auditId:execution.auditId}).lean())await storage.forReference(file.storageReference,execution.auditId).remove(file.storageReference);}
 }));
 

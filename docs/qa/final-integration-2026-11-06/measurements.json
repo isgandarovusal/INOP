@@ -1,0 +1,30 @@
+[
+  {
+    "code": "LOGIN_MEASUREMENTS",
+    "validInputToEnabledMs": 30.363494999999602,
+    "submitToBusyMs": 24.799667999999656,
+    "localSubmitToDashboardMs": 575.6249660000012,
+    "pendingAttempts": 1,
+    "remoteColdStartMeasured": false
+  },
+  {
+    "code": "DASHBOARD_MEASUREMENTS",
+    "initialReads": 4,
+    "freshReturnReads": 0,
+    "focusReads": 0,
+    "expiredSnapshotRevalidationReads": 4,
+    "forcedRefreshReads": 4,
+    "backgroundLoadingFlashes": 0
+  },
+  {
+    "code": "MILESTONE_BROWSER_ACCEPTANCE",
+    "initialDashboardReads": 4,
+    "manualRefreshReads": 4,
+    "consoleErrors": 0,
+    "apiFailures": 0,
+    "unexpectedFailedRequests": 0,
+    "expectedNavigationAborts": 1,
+    "websocketErrors": 0,
+    "localOnly": true
+  }
+]

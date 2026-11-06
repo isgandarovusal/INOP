@@ -1,0 +1,180 @@
+{
+  "backend-final.log": {
+    "tests": 27,
+    "pass": 27,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 15462.110062,
+    "passedTopLevel": [
+      "Duplicate review is scoped, revision-bound, append-only and idempotent without merging profiles",
+      "CAPA creation survives lost acknowledgement and concurrent replay without duplicate actions/history",
+      "CAPA rejects unbounded verification text and unknown mutation inputs before changing history",
+      "Duplicate review history is independently scoped, paginated and marks outdated evidence",
+      "HR analytics uses independent scoped cohorts, bounded DTOs and trusted scores",
+      "Personal workload counts authorized assignments with explicit windows, not other recruiters or hidden parents",
+      "Team workload requires independent all-scope User, Job and Application reads and paginates the same cohort"
+    ]
+  },
+  "security-scoring.log": {
+    "tests": 72,
+    "pass": 72,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 38778.738876,
+    "passedTopLevel": [
+      "Assessment rejects incomplete and spoofed results; N/A and undefined scoring are honest",
+      "Lifecycle uses independent review, complete revision answers, finding closure and archive",
+      "Original HR sources preserve all criteria and Pizza Hut secondary interview worksheet",
+      "HR-only approved scoring excludes N/A from both numerator and denominator",
+      "Historical KFC v1 scoring stays blocked; new approved v2 does not use source divisor",
+      "Validation rejects duplicate, unknown, invalid numeric answers and altered source snapshots",
+      "KFC v2 applicable denominator replaces fixed 47 only for new snapshots",
+      "CV creation failures preserve possibly committed originals and never destructively compensate",
+      "Current intake lease publishes one scanned human-review result",
+      "Expired intake lease cannot publish facts; restart reclaims and rescans same source",
+      "Original archive preparation preserves immutable originals with current scope, quarantine and bounded recovery",
+      "Every stored Candidate task attempt requires a new native-policy hash-bound clean scan",
+      "HSE sources retain 52 restaurant, 19 office, 29 warehouse criteria and separate contracts",
+      "HSE scoring separates simple and source weights; N/A neutral, all N/A and zero denominators null",
+      "Approved restaurant-only 85 percent threshold includes the boundary; office and warehouse never inherit it",
+      "Retained HSE source versions continue validating existing snapshots after a later publication",
+      "Service sources preserve brand sections, criteria, original texts and KFC average reference",
+      "All three Service brands score Yes/Partial/No/N/A including SS Partial and all-N/A null",
+      "Source tampering and invalid answers are rejected without changing legacy Service or HR scoring",
+      "KFC B67 positive conformity is versioned; old negative answers cannot earn conformity or be silently reinterpreted",
+      "All source standards, both worksheets, duplicate codes and missing risk are preserved",
+      "Approved Standard formula, N/A neutrality, unanswered and source risk are independent on all brands",
+      "Retained catalogue versions remain verifiable and new publication cannot reinterpret an older draft"
+    ]
+  },
+  "unit.log": {
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 1671.74361,
+    "passedTopLevel": [
+      "Browser runner keeps all serial groups, flags and guarded environment; success is explicit",
+      "Early child failure survives later passing groups and identifies the exact group",
+      "Signal termination and spawn errors fail closed without logging raw diagnostics",
+      "Browser runner still refuses a missing owned QA port before spawning tests",
+      "Matching authorization and navigation regressions run exactly once in FULL and Recruitment coverage",
+      "Product comparison/work-queue acceptance runs exactly once in each selection",
+      "Feedback/CAPA/axe acceptance runs once in each browser selection",
+      "Generated Dashboard cache traces isolate scopes, revocation, expiry and stale writers",
+      "Partial refresh cannot extend the lifetime of another section",
+      "BAKU_TIMEZONE is Asia/Baku",
+      "formatDateOnly: YYYY-MM-DD \u2192 DD/MM/YYYY for az locale",
+      "formatDateOnly: YYYY-MM-DD \u2192 DD/MM/YYYY for en locale",
+      "formatDateOnly: YYYY-MM-DD \u2192 DD.MM.YYYY for ru locale",
+      "formatDateOnly: leading zeros preserved (month 01)",
+      "formatDateOnly: null returns empty string",
+      "formatDateOnly: undefined returns empty string",
+      "formatDateOnly: empty string returns empty string",
+      "formatAppDate: date-only string never shifts day (critical TZ regression)",
+      "formatAppDate: date-only at year boundary never shifts day",
+      "formatAppDate: UTC ISO-8601 timestamp converts to Baku local date",
+      "formatAppDate: UTC ISO-8601 timestamp midnight stays same day in Baku",
+      "formatAppDate: null returns empty string",
+      "formatDateTime: UTC timestamp shows correct Baku local time",
+      "formatDateTime: ru locale uses dots as separator",
+      "formatDateTime: az locale uses slashes as separator",
+      "formatDateTime: null returns empty string",
+      "formatDateTime: invalid date string returns input string",
+      "formatAppDate: defaults to az locale when locale arg omitted"
+    ]
+  },
+  "final-browser.log": {
+    "tests": 122,
+    "pass": 122,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 226346.59261,
+    "passedTopLevel": [
+      "Application UI persists scoped workflow, handles conflicts and discards stale responses",
+      "Application history explains authorized handoff and next-action snapshots without extra requests",
+      "Notification escalation guidance is read-only, scope-aware and truthful for non-retryable delivery",
+      "Interview timezone guidance preserves scheduling, rescheduling and server validation",
+      "Interview reschedule history explains only authorized snapshot fields without extra reads",
+      "Application substatus History shows stage-valid authorized before and after values",
+      "Interview result History uses authorized snapshots without inferring a hiring decision",
+      "Read-only Application current workflow summary uses current authorized detail without reconstructing History",
+      "Application Job navigation requires independent populated parent authorization",
+      "record eligibility gates controls, revocation, refresh and malformed legacy responses",
+      "Application clear-all replaces search and status atomically on scoped table and board",
+      "Metadata-only workflow edits preserve independent schedule instants, timezone and precision",
+      "Clearing an existing interview date never reports a successful unchanged schedule",
+      "Integrated duplicate history, follow-up completion and independently authorized team workload",
+      "Real interview feedback and CAPA work queues use authorized persistence with scoped axe checks",
+      "Login remains actionable during slow session restoration",
+      "Dashboard navigation and focus preserve useful content without repeat reads",
+      "Login slow request, Enter, autofill, failure recovery and duplicate protection",
+      "Dashboard stale revalidation, forced refresh, errors and session reset",
+      "Human duplicate review and personal workload use real authorized persistence",
+      "Milestone actual auth, Recruitment and Audit navigation with private session isolation",
+      "Recruiter can compare vacancy evidence and open a scoped work queue"
+    ]
+  },
+  "visual-stability.log": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 10007.803284,
+    "passedTopLevel": [
+      "Real interview feedback and CAPA work queues use authorized persistence with scoped axe checks"
+    ]
+  },
+  "team-contract-final.log": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 1236.556707,
+    "passedTopLevel": [
+      "Team workload requires independent all-scope User, Job and Application reads and paginates the same cohort"
+    ]
+  },
+  "team-refresh-final.log": {
+    "tests": 6,
+    "pass": 6,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 16241.37049,
+    "passedTopLevel": [
+      "Integrated duplicate history, follow-up completion and independently authorized team workload"
+    ]
+  },
+  "standard-browser.log": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 135427.613048,
+    "passedTopLevel": [
+      "Standard real API/forms: every brand, AZ/EN/RU, responsive catalog, draft/resume and canonical completion"
+    ]
+  },
+  "audit-browser.log": {
+    "tests": 4,
+    "pass": 3,
+    "fail": 0,
+    "cancelled": 1,
+    "skipped": 0,
+    "duration_ms": 300070.251062,
+    "note": "Combined run reached 300s cap after HR/HSE/Service PASS; Standard separately passed.",
+    "passedTopLevel": [
+      "Real HR UI/API: source forms, draft resume, immutable submit, analytics, responsive locales and denial",
+      "HSE real forms: three object types, AZ/EN/RU, 320/390/768/1440, draft/resume/complete and four analytics views",
+      "Real Service UI/API: source forms, draft resume, immutable submit, analytics, responsive locales and denial"
+    ]
+  }
+}
