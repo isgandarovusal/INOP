@@ -201,7 +201,7 @@ function createUnixScanner({ enabled = false, socketPath, daemonConfigPath, sock
   function health() {
     const {definitionDate,...safe} = observed;
     const signaturesFresh = safe.signaturesFresh && fresh(definitionDate);
-    return {...safe,signaturesFresh,ready:safe.ready && signaturesFresh && active < 2 && !poisoned,enabled,active,transport:'clamd-unix',realScannerVerified:false};
+    return {...safe,code:safe.ready&&!signaturesFresh?'AV_DEFINITIONS':safe.code,signaturesFresh,ready:safe.ready && signaturesFresh && active < 2 && !poisoned,enabled,active,transport:'clamd-unix',realScannerVerified:false};
   }
   async function readiness() {
     if (active >= 2) return {...health(),ready:false,code:'AV_BUSY'};

@@ -107,7 +107,7 @@ test('Readiness never certifies an infected probe or an expired prior observatio
  let clock=new Date('2026-10-29T12:00:00Z');const scanner=createScanner({...s.options,now:()=>clock});
  s.reply='stream: Synthetic-Test FOUND\0';assert.equal((await scanner.readiness()).ready,false);
  s.reply=undefined;assert.equal((await scanner.readiness()).ready,true);const scans=s.scans.length;
- clock=new Date('2026-10-30T12:00:00Z');assert.equal(scanner.health().ready,false);assert.equal(scanner.health().signaturesFresh,false);
+ clock=new Date('2026-10-30T12:00:00Z');assert.equal(scanner.health().ready,false);assert.equal(scanner.health().signaturesFresh,false);assert.equal(scanner.health().code,'AV_DEFINITIONS');
  assert.equal((await scanner.readiness()).ready,false);assert.equal(s.scans.length,scans);
 }));
 test('Protected policy changes during a scan cannot produce a clean verdict',async()=>fixture(async s=>{
