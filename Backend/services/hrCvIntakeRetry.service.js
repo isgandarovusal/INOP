@@ -5,7 +5,7 @@ async function creatorContext(id){const user=await User.findOne({_id:id,isActive
 const fail=(code,status=409)=>Object.assign(new Error('Private source retry is unavailable.'),{code,status});
 const repairable=new Set(['OCR_REQUIRED','INTAKE_SCAN_REQUIRED','INTAKE_RESULT','INTAKE_READBACK','INTAKE_PROVIDER_UNAVAILABLE','INTAKE_TIMEOUT']);
 function createRetry({get,available,ddl,now=()=>new Date()}){return async function retry(req,id,input){
- available();if(!mongoose.isObjectIdOrHexString(id)||!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length!==3||!['expectedHash','expectedUpdatedAt','commandId'].every(k=>Object.hasOwn(input,k))||!/^[a-f0-9]{64}$/.test(input.expectedHash||'')||typeof input.expectedUpdatedAt!=='string'||!Number.isFinite(Date.parse(input.expectedUpdatedAt))||new Date(input.expectedUpdatedAt).toISOString()!==input.expectedUpdatedAt||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(input.commandId||''))throw fail('INTAKE_RETRY_INPUT',400);
+ available();if(!mongoose.isObjectIdOrHexString(id)||!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length!==3||!['expectedHash','expectedUpdatedAt','commandId'].every(k=>Object.hasOwn(input,k))||typeof input.expectedHash!=='string'||!/^[a-f0-9]{64}$/.test(input.expectedHash)||typeof input.expectedUpdatedAt!=='string'||!Number.isFinite(Date.parse(input.expectedUpdatedAt))||new Date(input.expectedUpdatedAt).toISOString()!==input.expectedUpdatedAt||typeof input.commandId!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(input.commandId))throw fail('INTAKE_RETRY_INPUT',400);
  input=Object.freeze({...input});
  id=new mongoose.Types.ObjectId(id).toHexString();
  const initial=await authority.current(req),signature=authority.identity(initial),commandHash=crypto.createHash('sha256').update(JSON.stringify([initial.user.id,id,input.commandId,input.expectedHash,input.expectedUpdatedAt])).digest('hex');
@@ -26,7 +26,7 @@ function createRetry({get,available,ddl,now=()=>new Date()}){return async functi
   row=await current();if(row.retryCommandHash===commandHash)return{...await get(req,id),replayed:true};if(row.approval||row.updatedAt.toISOString()!==input.expectedUpdatedAt)throw fail('INTAKE_SOURCE_CHANGED');
   try{
    const saved=await Source.findOneAndUpdate({_id:id,state:row.state,code:row.code,updatedAt:row.updatedAt,attempts:row.attempts,approval:{$exists:false}},{$set:{state:'queued',code:'MANUAL_RETRY',queueSlot:crypto.randomInt(64),actorSlot:i%4,nextAttemptAt:now(),retryCommandHash:commandHash},$inc:{manualRetries:1},$unset:{scan:1,result:1,leaseToken:1,leaseUntil:1},$push:{events:{state:'queued',code:'MANUAL_RETRY',at:now(),attempt:row.attempts}}},{returnDocument:'after'}).lean();
-   if(!saved)throw fail('INTAKE_SOURCE_CHANGED');await current();return{...await get(req,id),replayed:false};
+   if(!saved){const raced=await current();if(raced.retryCommandHash===commandHash)return{...await get(req,id),replayed:true};throw fail('INTAKE_SOURCE_CHANGED');}await current();return{...await get(req,id),replayed:false};
   }catch(error){if(error.code===11000)continue;throw error;}
  }
  throw fail('INTAKE_QUEUE_FULL',429);
