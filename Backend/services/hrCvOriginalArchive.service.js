@@ -73,7 +73,7 @@ function createArchive({enabled=false,read=readCandidateOriginal,store,scanner,e
   }catch(error){release();throw error;}
   const controller=new AbortController();let timer;
   const finish=async(state,code,extra={})=>{
-   const saved=await Manifest.findOneAndUpdate({_id:row._id,state:'running',leaseToken:lease},{$set:{state,code,...extra},$unset:{slot:1,leaseToken:1,leaseUntil:1}},{returnDocument:'after'}).lean();
+   const saved=await Manifest.findOneAndUpdate({_id:row._id,state:'running',leaseToken:lease,leaseUntil:{$gt:now()}},{$set:{state,code,...extra},$unset:{slot:1,leaseToken:1,leaseUntil:1}},{returnDocument:'after'}).lean();
    if(!saved)throw fail('ARCHIVE_LEASE_LOST',409);return dto(saved);
   };
   const work=async()=>{

@@ -27,3 +27,16 @@ Successful `verified` means a particular archive attempt read back exact bytes. 
 5. Add approved retention/deletion and orphan reconciliation without weakening old private read authorization. Disable new intake during rollback; preserve private authorized reads and manifests, never restore public files or old scope holes.
 
 `hrCvOriginalArchive.test.cjs` uses an owned loopback DB and synthetic in-memory originals/object store/scanner, **not** a hosted provider/malware E2E. It verifies five authorized scopes, denied/mixed scopes, forged grants/input, missing DDL/default disablement, source/hash/MIME/scan gates, reserved key before PUT, uncertain acknowledgement/recreation, attempt/lease/capacity bounds, source/permission races, unchanged Candidate/no deletion and private metadata. Native reader/SigV4 transport remain separately covered by their existing tests. No production DB/backup/migration/env/secret or deployment is touched.
+
+### Lease completion fence (2026-11-06)
+
+Completion updates now require the matching running token **and** an unexpired
+lease at the completion query's timestamp. A final pre-IO guard alone was not
+sufficient: expiry between that guard and finish previously allowed a historical
+owner to publish verified/retry state. Deterministic clock-advance regressions
+now reject both paths with ARCHIVE_LEASE_LOST, keep the expired reservation for
+reclaim, and verify recovery on attempt2. No extra DB read, object deletion,
+Candidate mutation or attachment is introduced. Existing conditional updates
+still fence replaced tokens. This is not a transaction with external object IO
+or a guarantee against arbitrary DB/client clock skew; staging clock/lease and
+real provider recovery checks remain necessary.
