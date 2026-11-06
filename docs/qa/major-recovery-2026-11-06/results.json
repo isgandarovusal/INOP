@@ -1,0 +1,32 @@
+{
+  "finalSmoke": [
+    "{\"code\":\"MILESTONE_BROWSER_ACCEPTANCE\",\"initialDashboardReads\":4,\"manualRefreshReads\":4,\"consoleErrors\":0,\"apiFailures\":0,\"unexpectedFailedRequests\":0,\"expectedNavigationAborts\":1,\"websocketErrors\":0,\"localOnly\":true}",
+    "\u2139 tests 1",
+    "\u2139 pass 1",
+    "\u2139 fail 0"
+  ],
+  "affectedBrowser": [
+    "{\"case\":\"dashboard-return\",\"summaryRequests\":2,\"elapsedLocalMs\":604}",
+    "\u2139 tests 10",
+    "\u2139 pass 10",
+    "\u2139 fail 0"
+  ],
+  "ciRunner": [
+    "\u2139 tests 17",
+    "\u2139 pass 17",
+    "\u2139 fail 0"
+  ],
+  "backendIntegration": [
+    "\u2139 tests 56",
+    "\u2139 pass 56",
+    "\u2139 fail 0"
+  ],
+  "screenshots": {
+    "dashboard-az-320.png": "57c95c596b515a179bd1f4673218a19848bf97a95af61a4290abb220a9b3eb19",
+    "candidate-detail-ru-390.png": "9264c16229d1fafc7cb531ecbd69bdaaf578fe6264b23139ade8e057ffcd68f5",
+    "jobs-en-768.png": "e40cbffc90cf8d8298f002f486d90fce2238108d4725a0bebbfe8b2d798abba9",
+    "candidates-az-1440.png": "16aab732b39883831f1a883b73d24e69419251b6a901ed7f8971e556ed1f5e11"
+  },
+  "build": "PASS: TypeScript and Vite, current independent clone",
+  "lint": "PASS: current independent clone"
+}

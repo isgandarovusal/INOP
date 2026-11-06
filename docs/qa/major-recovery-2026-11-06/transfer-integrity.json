@@ -1,0 +1,27 @@
+{
+  "head": "25dbffc070e22b1fc7befeb8d9a4e153ec301959",
+  "files": {
+    ".github/workflows/audit-release-gate.yml": "7463cc83779592a1120c8de06dbc4413ebffe0057f90dc2249841e1cd4348a00",
+    "Backend/scripts/runBackendTests.cjs": "5ac2c239c002877119b14d9e7690cad8449f5b55c3f392a8bd904a76cec32fa0",
+    "Backend/services/hrCvIntake.service.js": "3c9483ca1ae1632c45bde366d3df60dc0b1c59cdd90239217f3d94444b80f745",
+    "Backend/tests/ciScopeSelection.test.cjs": "b7a527603a78d897bd61f6a4a53df83a7693bb36ff7f9c799e3b422f2e9580af",
+    "Backend/tests/hrCvIntake.test.cjs": "7e42eb45426ee8bc44653d33af4d5c0afac13bd124750c33176e83c3e12c75c4",
+    "Backend/tests/qaProcess.test.cjs": "1eadf8d188a9cf55fa8c6e68f52a2e0f7ce2cf3b7f93fd9058dffc901e948b03",
+    "Frontend/src/Hooks/useHRPage.ts": "e5889389a64a10a82b81ad721fe91e58fda3a9ba96c66e74ad5c3ebeb0d77e9c",
+    "Frontend/tests/helpers/browser.cjs": "5d71253a859b32fded62381007ad41cd13e628768fffdd4e0ddbdf08d49e7e90",
+    "Frontend/tests/hrCvAiProcessingUI.test.cjs": "610cdea4687d539ef4f38560c03ddb1956d1d8aa5b092a2edc76584742f1dae4",
+    "Frontend/tests/hrPaginationUI.test.cjs": "4990894aa6c881f10ec9e1a3f24791730b12e1f7c105ccb96848212ddd3d7b97",
+    "Frontend/tests/recruitmentMilestoneUI.test.cjs": "7d78f895ef006b0c913b80483523578ac6e5d7404d2b5b0dd5cac4eb20a5518b",
+    "Frontend/tests/runAuditBrowserSuite.cjs": "3b329db23a5e0a7ae1eee58b4029408b1166115008f9d63b9a683329fe8e8adb",
+    "docs/CLIENT_READ_EFFICIENCY.md": "ed87d105c27656cec91c9bd2541e9c66ee1cd3ec08ccc690e4303436f27263a9",
+    "scripts/qaScope.cjs": "095fce58524a6034ca7a9e065a6269d406406e2610b61b5d27e772dbcf598385",
+    "scripts/runQaProcess.cjs": "3f5f6d2823e3527c7273c09a31a34561846eaf049ba5b0be9185faa338cb59a5"
+  },
+  "snapshotHashes": {
+    "original-index": "cc5370c416191bac3e9f2edf8ff0a6df1c0a0e4c631fb8e02d19ce081e722866",
+    "combined.patch": "9a4d08ea67bda4c964e54654e575d21dcda646797f2c700f49e723c0637ae92b",
+    "status.txt": "668be0434a283c56d18a30dc5b558a44ebe532901ded6971f694a77e919784fd",
+    "unstaged.patch": "b2af5e09a2b2ae4b73be6fee7d71da61ee99719e066bd4933692dd3f6a11099a",
+    "staged.patch": "00e03a58ff7b354fbc8604b211b94eac63e74123297d8781160e134371232c64"
+  }
+}
