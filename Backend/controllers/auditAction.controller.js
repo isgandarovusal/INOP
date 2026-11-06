@@ -28,6 +28,7 @@ exports.getActions=async(req,res)=>{try{
  res.json({success:true,data,total,page:window.page,limit:window.limit,hasMore:window.skip+data.length<total});
 }catch(error){fail(res,error);}};
 exports.updateActionStatus=async(req,res)=>{try{
+ if(!req.body||Array.isArray(req.body)||Object.keys(req.body).some(k=>!['status','verificationNote','evidenceIds'].includes(k))||typeof req.body.status!=='string'||req.body.verificationNote!==undefined&&(typeof req.body.verificationNote!=='string'||req.body.verificationNote.length>4000))throw auditError(400,'Invalid corrective action update.');
  const row=await transaction(async session=>{
   const audit=await writable(req,session),action=await Action.findOne({_id:req.params.id,auditId:audit._id}).session(session);
   if(!action)throw auditError(404,'Action not found.');
