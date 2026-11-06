@@ -1924,7 +1924,7 @@
   }
 
   .job-detail-page .ranking-row {
-    grid-template-columns: 34px minmax(0, 1fr) auto;
+    grid-template-columns: 34px minmax(0, 1fr);
     gap: 9px;
     padding: 9px;
   }
@@ -1935,9 +1935,16 @@
   }
 
   .job-detail-page .ranking-row__score {
-    min-width: 46px;
+    grid-column: 2;
+    justify-content: flex-start;
+    height: auto;
+    max-width: 100%;
+    min-width: 0;
     padding: 0 7px;
   }
+
+  .job-detail-page .ranking-row__name { white-space: normal; overflow-wrap: anywhere; }
+
 }
 
 
