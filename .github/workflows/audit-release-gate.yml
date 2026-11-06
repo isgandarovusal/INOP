@@ -87,7 +87,7 @@ jobs:
       - name: Routine pure safety regression (full integration is explicit)
         timeout-minutes: 5
         run: |
-          node --test Backend/tests/ciScopeSelection.test.cjs Backend/tests/qaProcess.test.cjs Backend/tests/recruitmentEvidenceQuality.test.cjs Backend/tests/hrCvIntakeLease.test.cjs Backend/tests/hrCvOriginalArchiveCapacity.test.cjs Backend/tests/hrCvIntakeProfiles.test.cjs Backend/tests/hrCvIntakeWorker.test.cjs Frontend/tests/clientMemoryPolicy.test.cjs
+          node --test Backend/tests/ciScopeSelection.test.cjs Backend/tests/browserSuiteRunner.test.cjs Backend/tests/qaProcess.test.cjs Backend/tests/recruitmentEvidenceQuality.test.cjs Backend/tests/hrCvIntakeLease.test.cjs Backend/tests/hrCvOriginalArchiveCapacity.test.cjs Backend/tests/hrCvIntakeProfiles.test.cjs Backend/tests/hrCvIntakeWorker.test.cjs Frontend/tests/clientMemoryPolicy.test.cjs
       - name: Frontend build and lint
         timeout-minutes: 5
         run: |
