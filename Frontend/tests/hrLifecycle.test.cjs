@@ -27,19 +27,19 @@ test('HR pages isolate data, drafts, errors and permission contexts', async t =>
   await Application.create({ jobId: first._id, candidateId: other._id, score: 72, ...provenance });
   const jobPath = id => `/app/recruitment/jobs/${id}`;
   await t.test('JobDetail shows applications and excludes already-applied Candidate from selection', async () => {
-    await h.open('admin', jobPath(first._id)); await h.page.getByText('Ranked applicant', { exact: true }).waitFor();
+    await h.open('admin', jobPath(first._id)); await h.page.getByRole('button', { name: 'Ranked applicant', exact: true }).waitFor();
     assert.equal(await h.page.locator('select option').filter({ hasText: 'Ranked applicant' }).count(), 0);
     assert.deepEqual(await h.page.locator('.ranking-row__name').allTextContents(), ['Other profile', 'Ranked applicant']);
   });
   await t.test('failed supporting request keeps primary Job and ranked applications visible', async () => {
     await h.page.route('**/api/hr/v2/candidates?*', r => r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Synthetic auxiliary outage"}' }));
     await h.open('admin', jobPath(first._id)); await h.page.getByText('First description', { exact: true }).waitFor();
-    await h.page.getByText('Ranked applicant', { exact: true }).waitFor(); assert.ok(await h.page.locator('[role=alert]').count());
+    await h.page.getByRole('button', { name: 'Ranked applicant', exact: true }).waitFor(); assert.ok(await h.page.locator('[role=alert]').count());
     await h.page.unroute('**/api/hr/v2/candidates?*');
   });
   await t.test('Application list uses one request and normalized parent links', async () => {
     h.wire.length = 0;
-    await h.open('admin', '/app/recruitment/applications'); await h.page.getByText('Ranked applicant', { exact: true }).waitFor();
+    await h.open('admin', '/app/recruitment/applications'); await h.page.getByRole('button', { name: 'Ranked applicant', exact: true }).waitFor();
     assert.equal(h.wire.filter(r => r.path === '/api/hr/v2/applications').length, 1);
     assert.equal(h.wire.filter(r => r.path === '/api/jobs').length, 0);
     await h.page.getByText('Ranked applicant', { exact: true }).click();

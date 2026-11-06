@@ -1,0 +1,63 @@
+# Recruitment 360 product acceptance — 2026-11-06
+
+Base:86a24209f6e17b91934f91bbf77d96b9f9e5d5e1. Single main agent, existing independent /tmp clone. Original full workspace, index, prior commits and evidence retained. Synthetic local records only. No production access, new dependencies, schemas, permissions, scanner activation or deployment settings.
+
+## Bounded discovery and delivered user workflows
+
+Existing code already implements Draft/Open/Closed/archive vacancies, Candidate CRUD/intake/review, scoped ranking, an accessible pipeline board, versioned stage commands, assignment, interview scheduling/rescheduling/outcomes, next actions, History, notification delivery/escalation and scoped analytics. These were reused, not rebuilt. No Paused state or external invitation semantics were invented.
+
+1. Vacancy comparison: select2–3 independently readable candidates on the current ranked vacancy page; explicitly load current Application detail for each; compare deterministic ATS skills, required experience, certificates, missing/unknown evidence and stage. Existing MatchScoreBadge exposes criterion sources/calculation explanations. Open the Application for human decisions. Certificate-name matching explicitly does not verify issuer/validity. No score/ranking override, inferred qualification or AI decision. Selection alone adds0 detail reads; comparing2 adds exactly2 GETs. A new selection hides the previous comparison; focus reauthorizes, denial hides old cards, explicit retry recovers. Any failed/mismatched parent invalidates the comparison. Handoff is never promoted to parent access, and comparison is hidden if fewer than2 independently readable Candidate parents exist.
+2. Operational work queues: Applications can show overdue next actions and pending internal interviews in the next7days. Hired/Rejected are excluded; nextAction.kind=none is completed, not overdue. Existing status/text/brand/location/scope predicates still combine before pagination and counts. Follow-up completion uses existing Application workflow: set next action None and save; notes and audit History remain intact. No new task model or automatic messages.
+3. Personal queues: My overdue actions/My upcoming interviews use existing assignedTo ownership. New optional assignee=me binds exclusively to the authenticated user. Arbitrary actor IDs, operators and wrong-resource parameters return400. Scope still intersects the original read grant; a personal filter never creates visibility.
+4. Analytics drill-through opens the live work queues without loading the lazy operations aggregation. UI states explicitly explain that report date/brand filters do not apply to those links.
+5. Real 320px visual defect repaired: wide ATS controls previously collapsed the ranking name column to near-zero and split metadata into vertical characters. Only the existing narrow-screen grid/wrapping rule changes; colors, typography, spacing, animation and desktop composition stay unchanged. Before/after screenshots and a minimum readable column regression are preserved.
+
+Backend additions are bounded optional filters on the existing GET /hr/v2/applications: attention=overdue|interviews and assignee=me. No new endpoint, index, collection or permission. UI URL enum my-overdue/my-interviews maps to those server parameters, stays in table mode and clears normally. Dates use the existing Baku display formatter; API/database UTC/date semantics and DST validation are unchanged. Old frontend/new backend remains compatible. New queue parameters against an old backend are rejected and shown as an error, never silently rendered as an unfiltered queue: backend rollout is required before using queues in production.
+
+## QA, measurements and actual failures
+
+- Feature absence reproduced before implementation: comparison checkboxes absent; attention query rejected. Personal-filter regression separately failed400 before implementation. Narrow ranking readability failed in a real styled browser before its scoped repair.
+- Backend workflow/pagination/ranking/selector/runner integration89/89 PASS. Final personal-filter and pagination rerun41/41 PASS (overlapping coverage). Real isolated native MongoDB replica set, no new Docker volumes; database operations/scopes/counts are real.
+- Initial integrated browser pass used6 relevant files:136 tests,133 passed;2 obsolete broad text locators plus their parent failed because new comparison labels legitimately duplicate a ranking name. Assertions were preserved and locators corrected to the existing Candidate button role. Affected CRUD/product rerun27/27 PASS. Analytics/product rerun26/26 PASS. Final extended product acceptance9/9 PASS. Counts overlap and are not a unique combined total. No unresolved failure is concealed.
+- Final browser tests use the actual App/auth/router/styles and corrected loopback HTTP harness. Early unstyled component screenshots were rejected as visual acceptance; final screenshots use the real premium shell. Canonical Employee role/dep_hr and matching parent departments are used for handoff, with no policy relaxation.
+- Real UI: login/logout/reauthentication, Dashboard refresh, Job edit, draft creation/publication with0.5years preserved, Candidates/profile/intake/association, stage keyboard moves, interviews/DST/rescheduling, next actions/notes/History, CV/OCR/AI review, analytics and Audit smoke were executed in the selected suites. Synthetic scanner/storage/AI adapters remain distinguished from real MongoDB and real browser execution. AI review tests use a mock provider; no real contextual inference is claimed.
+- Final build/lint PASS. Changed JS/CJS syntax and diff checks PASS. Existing large-chunk Vite warning remains.
+- Main actual-App smoke: initial Dashboard total summary reads4; manual Refresh adds4; unexpected console/API/request/websocket errors0. Explicit negative tests intentionally inject HTTP failures. The legacy analytics held-request test emits development proxy ECONNREFUSED warnings while deliberately continuing an intercepted request; it passes and does not certify production connectivity.
+- Comparison viewport/locale changes add0 API requests. Work queue/personal filtering replaces the existing scoped list request; it adds predicates, not database round trips. No production latency or remote cold-start improvement is claimed. No persistent PII cache or offline synchronization.
+
+## Visual and accessibility acceptance
+
+New screenshots were captured and actually opened at1440EN/768AZ/390RU/320AZ, plus the work queue mobile state and current-milestone Audit smoke. Text/controls wrap; no observed page overflow or overlapping new controls. Tables retain their existing keyboard-focusable horizontal scroll region. Existing native select-label truncation is not advertised as resolved globally. Before/after narrow ranking evidence is included. Checkbox names, checked/disabled states, Space keyboard activation, named regions/articles and source links are checked through real Playwright accessibility-tree snapshots. This is targeted accessibility acceptance, not axe/WCAG certification.
+
+## Practical reviewed open-source integration
+
+Official https://github.com/microsoft/playwright: maintainer Microsoft, non-archived, GitHub metadata updated2026-11-06T10:27:48Z; installed version1.62.1, Apache-2.0 (commercial use allowed subject to license/notice obligations). Existing lockfile installation was reused. Its ariaSnapshot API, role locators, explicit response readiness and real-App browser verification are now applied to the new product acceptance, rather than adding a second test framework. The old ambiguous text locators were corrected using that same technique. New acceptance is registered exactly once in both existing selections: FULL16groups/39files and Recruitment7groups/30files; conservative fallback and required checks are preserved. No workflow trigger was changed and no comprehensive run started.
+
+Existing official Playwright CLI skill review is referenced in docs/HR_RECRUITMENT_TOOLING_ASSESSMENT.md (previously pinned f50f57905b9fd3dd355330719ddf0687000c9437). No skill/script was installed or treated as executable authority. Agent instructions, test libraries, model runtimes and weights remain separate. Adding axe/Testing Library/Zod/another workflow engine was not justified for these specific gaps; existing integrated HTTP/Mongo/browser contracts addressed them without dependency footprint. No free hosted AI service received CV data.
+
+## Product readiness matrix
+
+Statuses describe declared local functionality, not production certification. Prior passing evidence is reused where source is unchanged.
+
+| Area | Status | Working interactions and exact remaining scope |
+|---|---|---|
+| Vacancy management | COMPLETE AND VERIFIED | Supported Draft/Open/Closed/archive, requirements,0/fractional experience, edit, ranking and association. Paused/Job-owner reassignment are not implemented contracts; do not infer them from Closed. |
+| Candidate management | PARTIALLY IMPLEMENTED | Profile CRUD, CV review, association and Application-scoped recruiter notes work. Duplicate hints/review exist; a dedicated audited merge/resolution workflow is not implemented and needs explicit retention/link invariants. |
+| Application lifecycle | COMPLETE AND VERIFIED | Revisioned human commands, assignment, notes, allowed transitions and History; positive/denied/conflict cases tested. |
+| Pipeline/stages | COMPLETE AND VERIFIED | Existing scoped board/table and keyboard-accessible progression persist through API/Mongo; no competing stage model. |
+| Interviews/follow-ups | COMPLETE AND VERIFIED | Internal scheduling, timezone/DST, outcome, next-action ownership, due work queues and completion. No claim of calendar invitations or external messaging. |
+| Candidate comparison | COMPLETE AND VERIFIED | Current vacancy page,2–3 selected records, current independent parent grants, deterministic criteria/source explanation and Application navigation. Cross-page comparison basket is not implemented. |
+| CV/scanner/OCR | BLOCKED BY VERIFIED EXTERNAL DEPENDENCY | Local intake/recovery/review works; actual scanner signatures, approved private-storage restore and source-owner/staging acceptance remain unverified. |
+| ATS/evidence review | COMPLETE AND VERIFIED | Existing deterministic evidence/unknown/stale handling, authoritative protections and manual review preserved. No new inference/scoring policy. |
+| AI assistance | PARTIALLY IMPLEMENTED | Gated provider/review/evaluation infrastructure exists; no validated AZ/EN/RU contextual inference. Previous official model-host403 and missing accessible verified artifact remain unresolved; no repeated download. |
+| Reporting | PARTIALLY IMPLEMENTED | Scoped funnel, cohorts, score/operations panes and new live queue drill-through work. Dedicated per-recruiter workload aggregates are not implemented. |
+| Search/navigation/performance | COMPLETE AND VERIFIED | Existing bounded queries, pagination/counts, state retention, cancellation, Refresh and session isolation preserved; new filters remain server-side. |
+| Security/auditability | COMPLETE AND VERIFIED | Modified paths enforce existing current scope, parent isolation, denied/revoked access and human workflow History. This is not an exhaustive security certification. |
+| Localization/accessibility | PARTIALLY IMPLEMENTED | AZ/EN/RU and4widths, real keyboard/ARIA checks; full assistive-technology/WCAG audit remains unverified. |
+| GitHub skills/open-source integration | COMPLETE AND VERIFIED | Maintained Apache-2.0 Playwright applied in code, real accessibility snapshots, explicit readiness and both browser manifests. No unreviewed installation. |
+
+## Next actions and operational limits
+
+Recruitment is not declared complete or production-ready. Next functional blocks are explicit duplicate-resolution safeguards and workload reporting; Paused/owner reassignment need a domain contract rather than an invented policy. Operational acceptance still needs real fresh signatures, private-storage restore/checksum proof, staging recovery/load and source-owner approvals. Genuine multilingual model artifact access/license/revision/hash and meaningful AZ/EN/RU quality, attribution, latency and memory gates are outstanding. Semantic AI remains disabled for hiring; deterministic ATS and humans retain authority. Audit HR/Service, Standard and HSE scoring contracts were untouched.
+
+Sanitized screenshots and hashes are durable in this directory. Full raw temporary logs/screens under /tmp/inop-approved-recovery/product360-evidence remain ephemeral and are not committed. No secrets, real candidate data, raw CVs or large caches are included.
