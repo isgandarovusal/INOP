@@ -1,3 +1,4 @@
+import VacancyComparison from '../../../Components/VacancyComparison';
 import { BriefcaseBusiness } from "lucide-react";
 import JobArchiveHistory from "../../../Components/JobArchiveHistory";
 import MatchScoreBadge from "../../../Components/MatchScoreBadge";
@@ -191,6 +192,7 @@ const JobDetail: React.FC = () => {
                 ))}
               </div>
             )}
+            {canReadApps && apps.status === 'ready' && !apps.refreshing && applications.filter(a => a.candidateId && typeof a.candidateId === 'object').length >= 2 && <VacancyComparison jobId={job.id} applications={applications} />}
             {canReadApps && <HRPageControls data={apps.data} page={apps.page} onPage={apps.setPage} disabled={apps.status !== "ready"} />}
           </div>
         </div>

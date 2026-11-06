@@ -1,4 +1,14 @@
 {
+  "hrCompare": {
+    "title": "Namizədləri müqayisə et",
+    "help": "Bu vakansiya səhifəsindən 2–3 namizəd seçin. Ətraflı sübutlar yalnız müqayisəni açdıqda yüklənir.",
+    "select": "Müqayisə ediləcək namizədlər",
+    "open": "Seçilənləri müqayisə et",
+    "human": "Bu, deterministik ATS müqayisəsidir, AI işə qəbul tövsiyəsi deyil. Naməlum sübut ixtisasın olmadığını göstərmir. Mənbələr üçün uyğunluğun izahını açın.",
+    "results": "Namizədlərin müqayisə nəticələri",
+    "unavailable": "Mərhələ məlum deyil",
+    "matched": "Uyğun sübutlar"
+  },
   "hrCandidateUI": {
     "metrics": "Namizəd göstəriciləri",
     "matchingTotal": "Filtrə uyğun namizədlər",

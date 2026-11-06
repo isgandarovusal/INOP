@@ -1,4 +1,14 @@
 {
+  "hrCompare": {
+    "title": "Compare candidates",
+    "help": "Select 2–3 candidates from this vacancy page. Full evidence loads only when you compare.",
+    "select": "Candidates to compare",
+    "open": "Compare selected",
+    "human": "Deterministic ATS comparison, not an AI hiring recommendation. Unknown evidence is not proof of missing qualifications. Open the explanation for source details.",
+    "results": "Candidate comparison results",
+    "unavailable": "Stage unavailable",
+    "matched": "Matching evidence"
+  },
   "hrCandidateUI": {
     "metrics": "Candidate metrics",
     "matchingTotal": "Matching candidates",
