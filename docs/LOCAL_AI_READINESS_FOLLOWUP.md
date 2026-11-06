@@ -67,3 +67,44 @@ Next priority remains a pinned, legitimately licensed small contextual verifier
 with actual AZ/EN/RU execution, grounded citations, negation/conflict/experience
 checks and measured RSS/latency. Free APIs remain quota/privacy dependencies,
 not a substitute for local evidence. Production semantic decisions remain NO-GO.
+
+## Contextual experiment selection and failure localization, 2026-11-06
+
+Bounded continuation considered two architectures, not three speculative model
+installs. MiniLM multilingual NLI (the official model URL above) is the preferred
+small classification experiment if its pinned artifact/license becomes accessible.
+AZ competence and contradictions/certifications require our actual42-case eval;
+XNLI marketing or a multilingual vocabulary is not evidence of AZ qualification
+accuracy. Per-model artifact size, safe format and integrity remain unverified.
+A supported CPU ONNX Runtime/Transformers.js path could avoid a full PyTorch
+install, but a converted model needs provenance and license review too.
+
+Second candidate: Qwen3-0.6B, documented in the official project:
+https://github.com/QwenLM/Qwen3
+The README documents the0.6B option and states open-weight models use Apache2.0,
+with license files in their respective Hugging Face repositories. GitHub metadata
+reports archived=false and pushed_at2026-01-09 (not evidence of recent maintenance
+for every artifact); GitHub's detected repository license was null. This is a
+publisher statement, not verification of a particular weight revision, digest or
+quantization. The exact model card/license must be reviewed before execution.
+0.6B FP16 weights alone are approximately1.2GB by arithmetic, excluding runtime,
+KV cache and tokenizer;4-bit raw weights would be approximately0.3GB excluding
+scales/metadata, but no trusted quantized artifact was established here. Current
+~1.5GiB workspace free disk makes unbounded runtime+FP16 installation unsuitable.
+RAM availability (~9GiB) does not establish latency or operational feasibility.
+No checkpoint, conversion script, dependency or new skill was installed.
+
+Qwen prompting is not a validated verifier; generation can hallucinate citations,
+follow injected CV instructions or miss negation. Require exact source binding,
+strict labels/citations, abstention/conflict support and real AZ/EN/RU evaluation
+before considering integration. Official model distribution remains the existing
+CONNECT403 dependency; no mirror or network-policy bypass is authorized.
+
+The offline evaluator now additionally reports14 scenario slices over the
+unchanged42 cases (three languages each), separating explicit/paraphrase skills,
+negation, missing/below-minimum experience, expired/unverified/conflicting
+certificates and instruction injection. A synthetic three-negation-error fixture
+produces slice FP3/3 while other positive slices remain correct. This is validator
+coverage, not inference, latency or model accuracy. Real inference remains NOT RUN
+and semantic production decisions remain NO-GO. Reuse existing English spaCy
+results; do not download a base encoder or repeat cosine experiments.
