@@ -30,6 +30,8 @@ const jobStatusValues = [
   "Draft",
 ];
 
+const invalidText = body => ['title','department','location','type','description','status'].some(key => body[key] != null && typeof body[key] !== 'string');
+
 function normalizeString(value) {
   if (value === undefined || value === null) {
     return "";
@@ -44,6 +46,7 @@ function normalizeSkills(value) {
   }
 
   if (Array.isArray(value)) {
+    if (value.some(item => typeof item !== 'string')) return null;
     return value
       .map((item) => normalizeString(item))
       .filter(Boolean);
@@ -64,6 +67,7 @@ function parseExperienceYears(value) {
     return 0;
   }
 
+  if (typeof value !== 'number' && typeof value !== 'string') return null;
   const experience = Number(value);
 
   if (!Number.isFinite(experience) || experience < 0) {
@@ -220,6 +224,7 @@ exports.getJobById = async (req, res) => {
 
 exports.createJob = async (req, res) => {
   try {
+    if (invalidText(req.body)) return res.status(400).json({ message: 'Vacancy text fields must be strings.' });
     const payload = buildJobPayload(req);
 
     const validationError = validateJobPayload(payload);
@@ -277,6 +282,7 @@ exports.updateJob = async (req, res) => {
       });
     }
 
+    if (invalidText(req.body)) return res.status(400).json({ message: 'Vacancy text fields must be strings.' });
     const current = await Job.findOne(buildScopedQuery(req, { _id: req.params.id })).select('archivedAt');
     if (current?.archivedAt) return res.status(409).json({ code: 'JOB_ARCHIVED', message: 'Restore the vacancy before editing.' });
 
