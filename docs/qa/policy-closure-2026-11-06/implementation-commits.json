@@ -1,0 +1,22 @@
+[
+  {
+    "sha": "a87c0949f3ba09b1a0e5e1618994a82656cdaa54",
+    "subject": "fix(scanner): revalidate definitions before accepting native scan results"
+  },
+  {
+    "sha": "baf33cc640724ea121de9f63146feee759b1bcfa",
+    "subject": "fix(ocr): abstain on adverse acronym evidence and expose review warnings"
+  },
+  {
+    "sha": "315382457d44856f459cf2fbb4cb7a75e8267189",
+    "subject": "feat(recruitment): complete revision-bound HR duplicate review policy"
+  },
+  {
+    "sha": "90124eb0ae7868c09dc447dd701ba27494dbf1c6",
+    "subject": "feat(recruitment): add conflict-safe reversible duplicate journal index rollout"
+  },
+  {
+    "sha": "8a3d1a5a34a35c0cf33a9bf55083e9a683d35e9a",
+    "subject": "feat(audit): create linked reinspections while preserving finalized inspection content"
+  }
+]

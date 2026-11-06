@@ -1,0 +1,81 @@
+{
+  "scanner.log": {
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "logSha256": "825e60b95526d14675ab98f4e6238519f2c15e8471bf61e81aa01a272cfa8e12"
+  },
+  "ocr-real.log": {
+    "tests": 53,
+    "pass": 53,
+    "fail": 0,
+    "logSha256": "28a2636de31f2377ba55cd460d2c9c65d09bacc0d30448627ea99dece9e86e76"
+  },
+  "worker-process.log": {
+    "tests": 6,
+    "pass": 6,
+    "fail": 0,
+    "logSha256": "1b47b795f676f4a0a30e8c2c00ea517d7fba43cd8a4edd59747693f88a0eebd4"
+  },
+  "affected-backend-final.log": {
+    "tests": 27,
+    "pass": 27,
+    "fail": 0,
+    "logSha256": "ceba49b432b2562863452760dbcb934c19f343760cd41adb6b6feafea849ba1a"
+  },
+  "policy-backend-final.log": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "logSha256": "87e041b14b865709c851bb6eb449c70fc96cd0b8a4411eb41d02772c0bf90c6f"
+  },
+  "reinspection.log": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "logSha256": "ef5a870cd52aa7a1c25744d677451dd83ea36492ed990fc0f9b2147d60208bbe"
+  },
+  "audit-boundaries-final.log": {
+    "tests": 5,
+    "pass": 5,
+    "fail": 0,
+    "logSha256": "75f477c7ce6d0b996452e5343339152b3813ebadbfc33646cb978a408e757696"
+  },
+  "manifest-final.log": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "logSha256": "a16e70eacd71b3569d8188f59857ff02f0cab0d2db85997a7d4100b265618a82"
+  },
+  "final-browser.log": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "logSha256": "53b6feaa460aa98127ef8896814cfa3610c64e2ce10f7769f175bc723c1146ff"
+  },
+  "policy-browser-delivery.log": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "logSha256": "50eac72e56f6c175b6a100246716278384ff3a0c49658cd374c16ee2222406c1"
+  },
+  "broader-targeted-run": {
+    "tests": 137,
+    "pass": 135,
+    "fail": 2,
+    "resolution": "One obsolete native version-probe count plus its parent suite failed. Post-scan revalidation requires three version probes across first attempt + expired retry; affected scan suite subsequently passed (19 tests within affected-backend-final.log). Unaffected passing scopes were not rerun."
+  },
+  "coverage": "Counts overlap; do not sum as unique tests. Original finalized Audit seeds in the new policy fixture are synthetic; subsequent API/Mongo/browser operations are real. Existing independent four-direction workflow acceptance is preserved.",
+  "build.log": {
+    "status": "PASS",
+    "sha256": "e97bab0a10316304225857f84537321909a1c9aaf435a56df0b0967f1d8101f9"
+  },
+  "lint.log": {
+    "status": "PASS",
+    "sha256": "ccfcc0d8c77414041e128c500248a8625825d850b9c1c66cefb8dbdd1b8f44fa"
+  },
+  "syntax": {
+    "status": "PASS",
+    "changedJsCjsFiles": 36
+  }
+}

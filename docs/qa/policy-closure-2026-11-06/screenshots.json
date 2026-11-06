@@ -1,0 +1,86 @@
+[
+  {
+    "file": "screens/reinspection-az-1440.png",
+    "width": 1440,
+    "height": 3427,
+    "sha256": "f9c05e15bf32faf332e6d1655a211536705e933f5aa3887ab8935d682e095a17"
+  },
+  {
+    "file": "screens/reinspection-en-768.png",
+    "width": 768,
+    "height": 3937,
+    "sha256": "0bf7928297ee92b2d9610aad9d310472b71dfd4bc70cd6d81e014496f8360e16"
+  },
+  {
+    "file": "screens/reinspection-ru-390.png",
+    "width": 390,
+    "height": 4838,
+    "sha256": "8205b1065bc96befcd529b1b38bf9266f6c21dc5d4fb2730815b7bbcb756a89b"
+  },
+  {
+    "file": "screens/reinspection-ru-320.png",
+    "width": 320,
+    "height": 5387,
+    "sha256": "f8dd2626061d75a9df1b5a407d956dbc620722e403e7587cb8c5e1b0c8ad03e9"
+  },
+  {
+    "file": "screens/duplicate-policy-en-1440.png",
+    "width": 1440,
+    "height": 2386,
+    "sha256": "d73b7c0e2c2e7df3129c4193f2f696552985ff40706387be21b5c8e345691e8e"
+  },
+  {
+    "file": "screens/duplicate-policy-ru-768.png",
+    "width": 768,
+    "height": 2673,
+    "sha256": "d77c2f051a2b9feed7ed2ff31568f05fc3e490c2a81f9df293aa6e2ca5735a15"
+  },
+  {
+    "file": "screens/duplicate-policy-az-390.png",
+    "width": 390,
+    "height": 3194,
+    "sha256": "b11b441e95fe7fcc0f73e8c55723c144eafb562b6f8612ec43b19ec2e618466a"
+  },
+  {
+    "file": "screens/duplicate-policy-ru-320.png",
+    "width": 320,
+    "height": 3538,
+    "sha256": "fe6fc78a731dd111465497926060a58adc2f6f9b88286d172d38c6eacc2eeff0"
+  },
+  {
+    "file": "screens/ocr-warning-ru-1440.png",
+    "width": 1440,
+    "height": 950,
+    "sha256": "45316f3a724b9f9825026affdba558cf5da398d7ff8c6c21c99af73c965c4895"
+  },
+  {
+    "file": "screens/ocr-warning-az-768.png",
+    "width": 768,
+    "height": 950,
+    "sha256": "fc93a133cb3f5c1cd8d1a3752b7ac0f0ad71384a3b83eb35f41e8ce71cc79406"
+  },
+  {
+    "file": "screens/ocr-warning-en-390.png",
+    "width": 390,
+    "height": 950,
+    "sha256": "614b1464531d1876f8e67be3c078a84d257690295dc4665b6973c6b20ae0f815"
+  },
+  {
+    "file": "screens/ocr-warning-az-320.png",
+    "width": 320,
+    "height": 950,
+    "sha256": "3a7a5b159c4c927135d67230be902be2ef74fd43eca623b2e95ceb9d50bf5443"
+  },
+  {
+    "file": "screens/login-az-1440.png",
+    "width": 1440,
+    "height": 950,
+    "sha256": "f880c87e78ad409a71801f30902a0a6480842ebc54790e2c1877e6a2af602f0a"
+  },
+  {
+    "file": "screens/dashboard-az-320.png",
+    "width": 320,
+    "height": 2086,
+    "sha256": "57c95c596b515a179bd1f4673218a19848bf97a95af61a4290abb220a9b3eb19"
+  }
+]
