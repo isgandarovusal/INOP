@@ -1,3 +1,4 @@
+import AuditReinspections from '../../../Components/AuditReinspections';
 import AuditFinalReport from '../../../Components/AuditFinalReport';
 import HseCover from '../HSESource/HseCover';
 import StandardCover from '../StandardSource/StandardCover';
@@ -205,6 +206,7 @@ const AuditDetail: React.FC = () => {
 
   return (
     <div>
+      <AuditReinspections key={'reinspections:'+audit.id} id={audit.id} direction={audit.auditType}/>
       <PageHeader
         title={audit.hseObjectSnapshot?.name ?? restaurant?.name ?? t("auditFoundation.audit")}
         subtitle={`${t(`auditFoundation.directions.${audit.auditType}`, { defaultValue: audit.auditType })} · ${audit.date} · ${t("auditPresentation.by")} ${audit.hseSubmission?.name ?? audit.standardSubmission?.name ?? auditor?.name ?? t("auditPresentation.unknown")}`}
@@ -214,7 +216,7 @@ const AuditDetail: React.FC = () => {
               <ArrowLeft size={15} /> {t("auditPresentation.back")}
             </button>
 
-            {canManage && !audit.hrAssessment && !audit.serviceAssessment && !audit.standardAssessment && !audit.hseAssessment && (
+            {canManage && audit.status!=='completed' && !audit.hrAssessment && !audit.serviceAssessment && !audit.standardAssessment && !audit.hseAssessment && (
               <button
                 className="btn-secondary"
                 onClick={() => navigate(`/app/audit/audits/${audit.id}/edit`)}
@@ -226,8 +228,8 @@ const AuditDetail: React.FC = () => {
         }
       />
 
-      <AuditExecutionTools auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
-      <AuditEvidencePanel auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
+      <AuditExecutionTools immutable={audit.status==='completed'} auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} versioned={Boolean((audit as typeof audit & { templateRevisionId?: string }).templateRevisionId)} />
+      <AuditEvidencePanel immutable={audit.status==='completed'} auditId={String((audit as typeof audit & { _id?: string })._id || audit.id)} />
       {audit.templateSnapshot?.hseSource&&<><HseCover assessment={audit.hseAssessment}/><ServiceFollowUp direction="hse" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.templateSnapshot?.standardSource&&<><StandardCover assessment={audit.standardAssessment}/><ServiceFollowUp direction="standard" auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/></>}
       {audit.auditType==='service'&&audit.templateSnapshot?.serviceSource&&<ServiceFollowUp auditId={String((audit as typeof audit & {_id?:string})._id||audit.id)}/>}

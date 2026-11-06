@@ -45,6 +45,7 @@ exports.createExecution = async (req, res) => {
     }
     const execution = await require('../services/auditTransaction.service').transaction(async session => {
       const parent=await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
+      if(parent.status==='completed')throw Object.assign(new Error('Finalized audit is immutable.'),{status:409});
       if((parent.auditType==='hr'||parent.templateSnapshot?.serviceSource||parent.templateSnapshot?.standardSource||parent.templateSnapshot?.hseSource)&&await require('../models/auditClosure.model').exists({auditId:parent._id}).session(session))throw Object.assign(new Error('Closed HR audit is immutable.'),{status:409});
       const existing = await Execution.findOne({ auditId:req.auditScopeId, templateRevisionId:bound.templateRevisionId || null }).session(session);
       if(existing)return existing;
@@ -77,7 +78,7 @@ exports.submitExecution = async (req, res) => {
     if (!validAnswers(answers)) return res.status(400).json({ success: false, message: 'Invalid answers.' });
     const execution = await require('../services/auditTransaction.service').transaction(async session => {
       const audit = await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId, session, req.user);
-      if (await require('../models/auditClosure.model').exists({ auditId: audit._id }).session(session)) throw Object.assign(new Error('Closed audit is immutable.'), { status: 409 });
+      if (audit.status==='completed'||await require('../models/auditClosure.model').exists({ auditId: audit._id }).session(session)) throw Object.assign(new Error('Closed audit is immutable.'), { status: 409 });
       const existing = await Execution.findOne({ _id: req.executionId, auditId: req.auditScopeId }).session(session);
       if (!existing) return null;
       if (!existing.templateRevisionId) throw Object.assign(new Error('Legacy execution has no certified scoring contract.'), { status: 409 });

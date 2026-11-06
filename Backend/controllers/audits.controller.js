@@ -193,7 +193,8 @@ async function updateAudit(req, res) {
       const existing = await Audit.findOne(filter).session(session);
       if (!existing) return null;
       await require('../services/auditLifecycle.service').lockAudit(existing._id, session, req.user);
-      if((existing.templateSnapshot?.standardSource||existing.templateSnapshot?.hseSource)&&await require('../models/auditExecution.model').exists({auditId:existing._id,status:'completed'}).session(session))throw Object.assign(new Error('Completed Standard audit metadata is immutable.'),{status:409});
+      if(existing.status==='completed')throw Object.assign(new Error('Finalized audit is immutable; create a linked reinspection.'),{status:409});
+      if((existing.templateSnapshot?.hrSource||existing.templateSnapshot?.serviceSource||existing.templateSnapshot?.standardSource||existing.templateSnapshot?.hseSource)&&await require('../models/auditExecution.model').exists({auditId:existing._id,status:'completed'}).session(session))throw Object.assign(new Error('Completed Standard audit metadata is immutable.'),{status:409});
       if (await require('../models/auditClosure.model').exists({ auditId: existing._id }).session(session)) throw Object.assign(new Error('Closed audit is immutable.'), { status: 409 });
       return Audit.findOneAndUpdate(filter, { $set: payload }, { returnDocument: 'after', runValidators: true, session });
     });

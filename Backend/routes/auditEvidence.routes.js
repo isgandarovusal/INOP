@@ -10,8 +10,8 @@ async function freshAccess(req,res,action){
  delete req.auditorProfile;await require('../middleware/auditDirection.middleware').requireAuditDirection(req,res,()=>{});if(res.headersSent)return false;
  const filter=await getAuditScopeFilter(req);if(!filter||!await require('../models/audit.model').exists({$and:[{_id:req.auditScopeId},filter]})){res.status(403).json({message:'Evidence access changed.'});return false;}return true;
 }
-router.post('/:auditId',...authorize('audit','update'),requireAuditParentAccess,(req,res,next)=>{
- try{req.evidenceStore=storage.fromEnvironment();next();}catch{res.status(503).json({message:'Durable private Audit evidence storage is not configured.'});}
+router.post('/:auditId',...authorize('audit','update'),requireAuditParentAccess,async(req,res,next)=>{
+ try{const audit=await require('../models/audit.model').findById(req.auditScopeId).select('status').lean();if(!audit)return res.status(404).json({message:'Audit unavailable.'});if(audit.status==='completed')return res.status(409).json({message:'Finalized audit evidence is immutable.'});req.evidenceStore=storage.fromEnvironment();next();}catch{res.status(503).json({message:'Durable private Audit evidence storage is not configured.'});}
 },privateUpload('file',Object.keys(types),false),async(req,res)=>{
  if(!req.file)return res.status(400).json({message:'File is required.'});
  let ref,dbAttempted=false;
@@ -24,7 +24,7 @@ router.post('/:auditId',...authorize('audit','update'),requireAuditParentAccess,
   dbAttempted=true;
   const data=await require('../services/auditTransaction.service').transaction(async session=>{
    const audit=await require('../services/auditLifecycle.service').lockAudit(req.auditScopeId,session,req.user);
-   if(await require('../models/auditClosure.model').exists({auditId:audit._id}).session(session))throw Object.assign(Error('Closed audit is immutable.'),{status:409});
+   if(audit.status==='completed'||await require('../models/auditClosure.model').exists({auditId:audit._id}).session(session))throw Object.assign(Error('Closed audit is immutable.'),{status:409});
    const [evidence]=await Evidence.create([{auditId:audit._id,storageKey:ref.key,storageReference:ref,name:req.file.originalname,size:ref.size,mimeType:ref.mimeType,uploadedBy:req.user.id}],{session});
    audit.attachments.push({name:evidence.name,size:evidence.size,blobUrl:`/api/audit-evidence/${evidence._id}/file`});await audit.save({session});
    await require('../services/auditLifecycle.service').recordHistory(audit,req.user,'evidence-uploaded',session);return evidence;

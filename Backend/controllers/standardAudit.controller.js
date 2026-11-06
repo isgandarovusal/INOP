@@ -58,7 +58,7 @@ exports.create=async(req,res)=>{
   if(!restaurant)throw auditError(403,'Restaurant is outside your Standard audit access.');
   const binding=await Binding.findById(standard.bindingKey(source)).lean();if(!binding)throw auditError(409,'An audit manager must provision the reviewed source template first.');
   const revision=await Revision.findById(binding.revisionId).lean();if(!revision)throw auditError(409,'Source revision is unavailable.');standard.verifiedSource(revision.content);
-  const row=await require('../services/auditCreation.service').createAuditWithDepartmentSnapshot({id:`standard-${require('node:crypto').randomUUID()}`,auditType:'standard',restaurantId,date,templateId:String(binding.templateId)},req.user);
+  const row=await require('../services/auditCreation.service').createAuditWithDepartmentSnapshot({id:`standard-${require('node:crypto').randomUUID()}`,auditType:'standard',restaurantId,date,templateId:String(binding.templateId)},req.user,{session:req[require('../services/auditCreationSession.service').key]});
   res.status(201).json({data:row});
  }catch(e){fail(res,e);}
 };

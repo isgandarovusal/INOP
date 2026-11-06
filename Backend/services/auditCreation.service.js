@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Audit = require('../models/audit.model');
 const Snapshot = require('../models/auditDepartmentSnapshot.model');
 
-exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
+exports.createAuditWithDepartmentSnapshot = async (payload, user, options = {}) => {
   if (!user?.id) throw new Error('Authenticated audit author is required');
   const direction = require('./auditDirection.service').canonicalDirection(payload.auditType);
   const restaurant = await require('../models/restaurant.model').findOne({ id: payload.restaurantId }).lean();
@@ -20,7 +20,7 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
   delete payload.direction;
   // Public id remains unchanged; internal identity and provenance are server-owned.
   const auditId = new mongoose.Types.ObjectId();
-  return require('./auditTransaction.service').transaction(async session => {
+  return require('./auditCreationSession.service').run(async session => {
     if (profile) {
       const current = await require('./auditorProfile.service').lockProfile(user.id, session);
       if(!await require('./auditAudience.service').mayCreateAt(user,current,restaurant,direction))throw Object.assign(new Error('Restaurant assignment changed; retry.'),{status:403});
@@ -34,5 +34,5 @@ exports.createAuditWithDepartmentSnapshot = async (payload, user) => {
     const [audit] = await Audit.create([{ ...payload, _id: auditId, auditorId: user.id }], { session });
     if (direction && linked) await require('../models/auditContext.model').create([{ _id: auditId, organizationId: 'gfc', brandId: restaurant.brandId, direction, templateRevisionId: payload.templateRevisionId, restaurantId: restaurant.id, actorId: user.id }], { session });
     return audit;
-  });
+  }, options.session);
 };

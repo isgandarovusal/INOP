@@ -2701,5 +2701,20 @@
     "legacyEvidence": "Legacy decision: evidence references were not recorded",
     "evidenceReference": "Evidence reference: {{id}}",
     "revisionReference": "Profile {{position}} revision: {{revision}}"
+  },
+  "reinspection": {
+    "title": "Reinspections",
+    "policy": "Finalized inspection results remain unchanged. A reinspection is a separate inspection with unanswered questions.",
+    "date": "Reinspection date",
+    "creating": "Creating…",
+    "create": "Create linked reinspection",
+    "notEligible": "Reinspection is available only for finalized inspections with a verified checklist revision.",
+    "original": "Original inspection",
+    "child": "Reinspection",
+    "recorded": "Recorded by {{actor}}",
+    "conflict": "The inspection context changed. Refresh and review before trying again.",
+    "denied": "You no longer have permission to perform this action.",
+    "failed": "Reinspection could not be created. Your selected date is preserved.",
+    "createdHistory": "Linked reinspection created"
   }
 }

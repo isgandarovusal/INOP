@@ -101,7 +101,7 @@ async function closeAudit(req) {
   });
 }
 async function transition(req) {
-  const allowed = { draft: ['scheduled','in-progress','cancelled'], scheduled: ['in-progress','cancelled'], 'in-progress': ['completed','cancelled'], completed: ['in-progress'], failed: ['in-progress'], cancelled: ['draft'] };
+  const allowed = { draft: ['scheduled','in-progress','cancelled'], scheduled: ['in-progress','cancelled'], 'in-progress': ['completed','cancelled'], completed: [], failed: ['in-progress'], cancelled: ['draft'] };
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     const next = req.body.status;

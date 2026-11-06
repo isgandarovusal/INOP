@@ -2718,5 +2718,20 @@
     "legacyEvidence": "Əvvəlki qərar: sübut istinadları qeydə alınmayıb",
     "evidenceReference": "Sübut istinadı: {{id}}",
     "revisionReference": "Profil {{position}} versiyası: {{revision}}"
+  },
+  "reinspection": {
+    "title": "Təkrar yoxlamalar",
+    "policy": "Yekunlaşdırılmış yoxlamanın nəticələri dəyişmir. Təkrar yoxlama cavablandırılmamış sualları olan ayrıca yoxlamadır.",
+    "date": "Təkrar yoxlama tarixi",
+    "creating": "Yaradılır…",
+    "create": "Əlaqəli təkrar yoxlama yarat",
+    "notEligible": "Təkrar yoxlama yalnız yoxlanmış siyahı versiyası olan yekunlaşdırılmış yoxlamalar üçün mümkündür.",
+    "original": "İlkin yoxlama",
+    "child": "Təkrar yoxlama",
+    "recorded": "Qeydə alan: {{actor}}",
+    "conflict": "Yoxlamanın konteksti dəyişib. Yeniləyin və təkrar cəhddən əvvəl nəzərdən keçirin.",
+    "denied": "Bu əməliyyat üçün icazəniz artıq yoxdur.",
+    "failed": "Təkrar yoxlama yaradıla bilmədi. Seçilmiş tarix saxlanılıb.",
+    "createdHistory": "Əlaqəli təkrar yoxlama yaradıldı"
   }
 }

@@ -20,13 +20,14 @@ test('Private adapter enforces bounded immutable references, identity, custody a
  const slow=adapter();slow.get=async({signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(Error('cancelled')),{once:true}));await assert.rejects(()=>storage.createPrivateStore(slow,{timeoutMs:10}).get(ref),{code:'AUDIT_STORAGE_TIMEOUT'});
 });
 test('Evidence routes preserve permissions, local private bytes, metadata and production 503',async()=>withAuditFixture(async h=>{
- const audit=await h.audit('auditor','service');const Evidence=require('../models/auditEvidence.model');
+ const audit=await h.audit('auditor','service',{status:'in-progress'});const Evidence=require('../models/auditEvidence.model');
  const upload=async(actor,payload=bytes,mime='application/pdf',name='synthetic.pdf')=>{const form=new FormData();form.set('file',new Blob([payload],{type:mime}),name);form.set('uploadedBy','forged');form.set('storageKey','../../secret');const response=await fetch(h.apiBase+'/audit-evidence/'+audit.id,{method:'POST',headers:{Authorization:'Bearer '+h.tokens[actor]},body:form});return{status:response.status,data:await response.json()};};
  const count=await Evidence.countDocuments();assert.equal((await upload('hr')).status,403);assert.equal((await upload('admin',Buffer.from('not PDF'))).status,400);assert.equal((await upload('admin',Buffer.alloc(storage.MAX_BYTES+1))).status,413);assert.equal(await Evidence.countDocuments(),count);
  const old=process.env.RENDER;process.env.RENDER='true';try{assert.equal((await upload('admin')).status,503);}finally{if(old===undefined)delete process.env.RENDER;else process.env.RENDER=old;}
  const created=await upload('admin');assert.equal(created.status,201);const row=await Evidence.findById(created.data.data.id).lean();
  try{
   assert.equal(row.uploadedBy,String(h.actors.admin._id));assert.equal(row.storageReference.provider,'local');assert.equal(row.storageReference.sha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(created.data.data.storageReference,undefined);
+  await h.models.Audit.updateOne({_id:audit._id},{$set:{status:'completed'}});const finalized=await h.models.Audit.findById(audit._id).lean();assert.equal((await upload('admin')).status,409);assert.deepEqual(await h.models.Audit.findById(audit._id).lean(),finalized);
   const read=await h.request('admin','GET',`/audit-evidence/${row._id}/file`);assert.equal(read.status,200);assert.deepEqual(read.buffer,bytes);assert.equal(read.headers['cache-control'],'private, no-store');
   assert.equal((await h.request('hr','GET',`/audit-evidence/${row._id}/file`)).status,403);
   const files=require('../controllers/privateFiles.controller'),originalRead=files.readBoundedPrivateFile;files.readBoundedPrivateFile=async key=>{const result=await originalRead(key);await h.models.User.updateOne({_id:h.actors.admin._id},{$set:{role:'hr_manager'}});return result;};
