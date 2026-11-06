@@ -16,6 +16,17 @@
     "save": "Rəyi qeyd et",
     "more": "İcazəli uyğunluqlardan yalnız ilk 5-i göstərilir."
   },
+  "recruiterWorkload": {
+    "title": "İşə qəbul üzrə şəxsi iş yüküm",
+    "help": "Seçilmiş analitika qrupu daxilində sizə təyin edilmiş, oxumağa icazəniz olan cari müraciətlər. Gözləyən rəylər üçün CV rəy məlumatı əlçatan olmalıdır; naməlum məlumatlar sayılmır. Müsahibələr: növbəti 7 gün. Tamamlanmış say hazırda İşə qəbul edilib və ya İmtina edilib mərhələsində olan və son 30 gündə həmin mərhələyə keçən müraciətlərdir; məhsuldarlıq göstəricisi deyil.",
+    "assigned": "Təyin edilmiş müraciətlər",
+    "active": "Aktiv müraciətlər",
+    "pendingReviews": "Gözləyən CV rəyləri",
+    "overdue": "Vaxtı keçmiş növbəti addımlar",
+    "upcomingInterviews": "7 gün ərzində gözləyən müsahibələr",
+    "completed": "Son 30 gündə yekun mərhələyə keçənlər",
+    "aging": "Aktiv mərhələsi 14 gündən çox dəyişməyənlər"
+  },
   "hrFeedback": {
     "title": "Müsahibə rəyi (daxili)",
     "help": "İcazəli müraciət oxucuları üçün peşəkar müşahidələr; doldurulması könüllüdür. Rəy işə qəbul qərarı vermir və ATS balını dəyişmir.",

@@ -16,6 +16,17 @@
     "save": "Record review",
     "more": "Only the first 5 authorized matches are shown."
   },
+  "recruiterWorkload": {
+    "title": "My recruiter workload",
+    "help": "Current authorized applications assigned to you, within the selected analytics cohort. Pending reviews require readable CV review data; unknown data is excluded. Upcoming interviews: next 7 days. Completed means currently Hired or Rejected with a stage change in the last 30 days; it is not recruiter productivity.",
+    "assigned": "Assigned applications",
+    "active": "Active applications",
+    "pendingReviews": "Pending CV reviews",
+    "overdue": "Overdue next actions",
+    "upcomingInterviews": "Pending interviews within 7 days",
+    "completed": "Terminal stage entered within 30 days",
+    "aging": "Active stage unchanged for more than 14 days"
+  },
   "hrFeedback": {
     "title": "Interview feedback (internal)",
     "help": "Optional professional observations for authorized Application readers. Feedback does not decide hiring or change ATS scores.",

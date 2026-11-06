@@ -11,6 +11,7 @@ export interface HRAnalytics {
   byBrand: { id: string; applications: number; activeVacancies: number }[];
   byBrandTruncated: boolean;
   review: { pending: number; failed: number; ocrRequired: number };
+  workload?: {scope:'assigned-to-me';asOf:string;interviewWindowEnds:string;completedWindowStarts:string;agingDays:number;assigned:number;active:number;pendingReviews:number;overdue:number;upcomingInterviews:number;completed:number;aging:number};
   duplicateAlerts: { groups: number; extraProfiles: number };
   interviews: { result: string; count: number }[];
   timeInStage: { status: string; samples: number; averageDays: number | null }[];

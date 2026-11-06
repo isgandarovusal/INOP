@@ -60,7 +60,7 @@ function base(req, criteria, scoring = false, cohortJobs = null, summary = false
   // Empty cohorts still need a valid switch expression; the match admits no rows.
   if(cohortJobs && !groups.size)jobStages.splice(0,1,{$set:{job:{brandId:null}}});
   return [{ $match: { $and: [aggregateResourceFilter(req, 'application'), criteria.apps, ...(cohortJobs ? [{jobId:{$in:cohortJobs.map(j=>j._id)}}] : [])] } },
-    { $project: summary ? {jobId:1,status:1,'source.key':1,processingState:1} : scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
+    { $project: summary ? {jobId:1,status:1,'source.key':1,processingState:1} : scoring ? { jobId: 1, candidateId: 1, scoreStatus: 1, 'matching.version': 1, 'matching.jobHash': 1, 'matching.candidateHash': 1, 'matching.score': 1, 'matching.scoreStatus': 1 } : { jobId: 1, candidateId: 1, assignedTo:1, 'nextAction.dueAt':1, 'interview.startsAt':1, status: 1, 'source.key': 1, createdAt: 1, stageEnteredAt: 1, processingState: 1, 'interview.result': 1, events: { $map: { input: { $ifNull: ['$events', []] }, as: 'e', in: { type: '$$e.type', at: '$$e.at', after: { status: '$$e.after.status' }, delivery: { state: '$$e.delivery.state' } } } } } },
     ...jobStages,
     ...(summary ? [] : [...parentLookup(req, Candidate, 'candidateId', 'candidate', candidates), { $set: { candidate: { $arrayElemAt: ['$candidate', 0] } } }])];
 }
@@ -122,6 +122,7 @@ function handler(mode) { return async (req, res, next) => {
       funnel: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
       sources: [{ $group: { _id: '$sourceKey', count: { $sum: 1 } } }],
       brands: [{ $group: { _id: { $ifNull: ['$job.brandId', 'unset'] }, count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 51 }],
+      workload: require('../services/recruiterWorkload.service').facet(req.user.id,at),
       interviews: [{ $match: { status: 'Interview' } }, { $group: { _id: { $cond: [{ $in: ['$interview.result', ['pending', 'passed', 'failed', 'no_show', 'cancelled']] }, '$interview.result', 'unscheduled'] }, count: { $sum: 1 } } }],
       stageTimes: [{ $match: { $expr: { $and: [{ $eq: [{ $type: '$stageEnteredAt' }, 'date'] }, { $lte: ['$stageEnteredAt', at] }] } } }, { $group: { _id: '$status', count: { $sum: 1 }, sumMs: { $sum: { $subtract: [at, '$stageEnteredAt'] } } } }],
       hireTimes: [{ $match: { status: 'Hired', $expr: { $and: [{ $eq: [{ $type: '$hireAt' }, 'date'] }, { $eq: [{ $type: '$createdAt' }, 'date'] }, { $gte: ['$hireAt', '$createdAt'] }, { $lte: ['$hireAt', at] }] } } }, { $group: { _id: null, count: { $sum: 1 }, sumMs: { $sum: { $subtract: ['$hireAt', '$createdAt'] } } } }],
@@ -182,6 +183,7 @@ function handler(mode) { return async (req, res, next) => {
       byBrand: [...new Set([...metrics.brands, ...activeByBrand].map(r => r._id))].slice(0, 50).map(id => ({ id, applications: metrics.brands.find(r => r._id === id)?.count || 0, activeVacancies: activeByBrand.find(r => r._id === id)?.count || 0 })),
       byBrandTruncated: new Set([...metrics.brands, ...activeByBrand].map(r => r._id)).size > 50,
       review: { pending: number(metrics.review, 'pending'), failed: number(metrics.review, 'failed'), ocrRequired: number(metrics.review, 'ocrRequired') },
+      workload: require('../services/recruiterWorkload.service').dto(metrics.workload,at),
       duplicateAlerts: { groups: number(metrics.duplicates, 'groups'), extraProfiles: number(metrics.duplicates, 'extraProfiles') },
       interviews: (metrics.interviews || []).map(r => ({ result: r._id, count: r.count })),
       timeInStage: STATUSES.map(status => { const r = (metrics.stageTimes || []).find(r => r._id === status); return { status, samples: r?.count || 0, averageDays: dailyAverage(r?.sumMs, r?.count) }; }),
@@ -192,7 +194,7 @@ function handler(mode) { return async (req, res, next) => {
       options: { brands: brands.slice(0, 50), jobs: optionJobs.slice(0, 50).map(j => ({ id: String(j._id), title: String(j.title).slice(0, 200), brandId: j.brandId || null, branchId: j.branchId ? String(j.branchId) : null })), branches: branches.map(b => ({ id: String(b._id), name: b.name, brandId: b.brandId })), jobsTruncated: optionJobs.length > 50, brandsTruncated: brands.length > 50 },
     };
     if(mode==='overview') { delete response.coverage.restrictedCandidateApplications; delete response.coverage.scoreScanConsistent; }
-    if(mode==='overview') for(const key of ['review','duplicateAlerts','interviews','timeInStage','timeToHire','scores','deliveryQueue','integrations']) delete response[key];
+    if(mode==='overview') for(const key of ['review','workload','duplicateAlerts','interviews','timeInStage','timeToHire','scores','deliveryQueue','integrations']) delete response[key];
     res.json(response);
   } catch (e) { if (res.destroyed) return; if (e.code === 50) return res.status(503).json({ code: 'ANALYTICS_TIMEOUT', message: 'Analytics timed out. Narrow the filters and retry.' }); next(e); }
 }; }
