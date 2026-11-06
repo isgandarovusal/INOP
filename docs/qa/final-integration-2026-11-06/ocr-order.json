@@ -1,0 +1,167 @@
+{
+  "syntheticOnly": true,
+  "actualNeuralOcr": true,
+  "contextualHiringInference": false,
+  "peakRssMiB": 146.23828125,
+  "results": [
+    {
+      "languages": [
+        "aze",
+        "eng",
+        "rus"
+      ],
+      "language": "en",
+      "sourceHash": "b092a8919914b8a2dbdf8eaf64703a01527a480a55f791f2881529f918a9b74a",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 1006.65
+    },
+    {
+      "languages": [
+        "aze",
+        "eng",
+        "rus"
+      ],
+      "language": "az",
+      "sourceHash": "31890a15064140b7d82b689cabb9fa4108d29c32eaea583cc9cbb24947cee232",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 605.08
+    },
+    {
+      "languages": [
+        "aze",
+        "eng",
+        "rus"
+      ],
+      "language": "ru",
+      "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+      "markers": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "missingMarkerIndices": [
+        3
+      ],
+      "latencyMs": 650.18
+    },
+    {
+      "languages": [
+        "eng",
+        "aze",
+        "rus"
+      ],
+      "language": "en",
+      "sourceHash": "b092a8919914b8a2dbdf8eaf64703a01527a480a55f791f2881529f918a9b74a",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 526.49
+    },
+    {
+      "languages": [
+        "eng",
+        "aze",
+        "rus"
+      ],
+      "language": "az",
+      "sourceHash": "31890a15064140b7d82b689cabb9fa4108d29c32eaea583cc9cbb24947cee232",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 607.89
+    },
+    {
+      "languages": [
+        "eng",
+        "aze",
+        "rus"
+      ],
+      "language": "ru",
+      "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+      "markers": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "missingMarkerIndices": [
+        3
+      ],
+      "latencyMs": 661.89
+    },
+    {
+      "languages": [
+        "rus",
+        "eng",
+        "aze"
+      ],
+      "language": "en",
+      "sourceHash": "b092a8919914b8a2dbdf8eaf64703a01527a480a55f791f2881529f918a9b74a",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 588.49
+    },
+    {
+      "languages": [
+        "rus",
+        "eng",
+        "aze"
+      ],
+      "language": "az",
+      "sourceHash": "31890a15064140b7d82b689cabb9fa4108d29c32eaea583cc9cbb24947cee232",
+      "markers": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "missingMarkerIndices": [],
+      "latencyMs": 610.45
+    },
+    {
+      "languages": [
+        "rus",
+        "eng",
+        "aze"
+      ],
+      "language": "ru",
+      "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+      "markers": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "missingMarkerIndices": [
+        3
+      ],
+      "latencyMs": 671.9
+    }
+  ]
+}

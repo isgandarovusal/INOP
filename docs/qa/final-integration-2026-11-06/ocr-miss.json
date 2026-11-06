@@ -1,0 +1,20 @@
+{
+  "syntheticOnly": true,
+  "sourceHash": "7839281da21aab3ba25bb6728bde5d1dc02259f09b65c6ae8fec40bcaaa06023",
+  "expectedMarkerIndex": 3,
+  "expectedCodePoints": [
+    "48",
+    "41",
+    "43",
+    "43",
+    "50"
+  ],
+  "observedLastLineCodePoints": [
+    "41d",
+    "410",
+    "421",
+    "421",
+    "420"
+  ],
+  "automaticConfusableReplacement": false
+}

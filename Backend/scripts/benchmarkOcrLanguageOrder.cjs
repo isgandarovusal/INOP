@@ -1,0 +1,9 @@
+// Offline synthetic-only comparison; never changes production OCR configuration.
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+async function main(){const root=process.argv[2];if(!root||!path.resolve(root).startsWith('/tmp/inop-pdf-acceptance-'))throw Error('Expected existing synthetic PDF benchmark directory');
+ const {directory,versions}=require('./prepareOcrTestModels.cjs');for(const[lang,hash]of Object.entries(versions))if(crypto.createHash('sha256').update(fs.readFileSync(path.join(directory,lang+'.traineddata'))).digest('hex')!==hash)throw Error('OCR artifact mismatch');
+ const rows=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'))).filter(r=>r.kind==='scan'),results=[];
+ for(const languages of [['aze','eng','rus'],['eng','aze','rus'],['rus','eng','aze']]){const engine=require('../services/hrCvOcrEngine.service').createOcrEngine({enabled:true,languages,dataDirectory:directory});
+ for(const row of rows){const file=path.resolve(row.file);if(path.dirname(file)!==path.resolve(root))throw Error('Synthetic path mismatch');const bytes=fs.readFileSync(file);if(crypto.createHash('sha256').update(bytes).digest('hex')!==row.sha256)throw Error('Synthetic identity mismatch');const at=performance.now(),actual=await engine.extract(bytes);results.push({languages,language:row.language,sourceHash:row.sha256,markers:row.expected.map(text=>actual.text.includes(text)),missingMarkerIndices:row.expected.map((text,index)=>actual.text.includes(text)?-1:index).filter(i=>i>=0),latencyMs:Math.round((performance.now()-at)*100)/100});}}
+ console.log(JSON.stringify({syntheticOnly:true,actualNeuralOcr:true,contextualHiringInference:false,peakRssMiB:process.resourceUsage().maxRSS/1024,results},null,2));}
+if(require.main===module)main().catch(()=>{console.error('Synthetic OCR comparison unavailable.');process.exitCode=1;});module.exports={main};
