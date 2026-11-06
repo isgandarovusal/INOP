@@ -13,3 +13,36 @@ Owned loopback Mongo synthetic benchmark: 0 / 5,000 / 50,000 records with a priv
 UI final22/22; backend target final count recorded in tracker after execution. TS/build PASS, lint0/9, smoke13, authorization632. Initial UI harness expected an HTTP500 state for local malformed-DTO validation; corrected to existing generic `error`, still asserts no personal data rendered. All old audits/HR scopes and feature-off behavior preserved.
 
 Real storage durability/recovery/approved malware scanner/worker activation, legal retention and hosted provider E2E remain separate gates. No public ingestion, automatic HR approval, env/secret/DDL/hosting/push/deploy operation.
+
+### Lifecycle hardening (2026-11-06)
+
+Worker completion now includes an unexpired-lease predicate alongside the current
+running token. Synthetic regression advances the clock after the last guard:
+previously stale parsed facts became ready; now no result/scan is committed by
+the expired owner. Restart reclaims the same source, increments attempts and
+rescans before publishing a valid review result. No extra query or HTTP call is
+added to an ordinary successful attempt; scanner calls remain one per attempt.
+The regression uses synthetic collaborators, not a real Mongo/provider/scanner
+capacity or authorization acceptance result.
+
+The server profile checks both durable-intake and scanner enabled gates before
+returning a cached active profile. Closing the scanner gate therefore gives new
+profile callers a disabled service while authorized metadata remains available.
+This does not promise cancellation of a previously acquired in-flight service;
+operator shutdown/drain and restart procedures remain required. No gate or
+production environment was activated or edited by this change.
+
+### Operational acceptance boundary
+
+| Area | Evidence in this increment | Still required |
+| --- | --- | --- |
+| Lease/restart and metadata gates | Local deterministic regression | Staging real Mongo concurrent/restart acceptance; hosted CI for this SHA |
+| Scanner | Injected clean/unavailable lifecycle tests; existing adapter reused | Actual daemon, official signatures <=24h,10s deadline/two-scan budget under combined load |
+| Private storage/archive | Synthetic immutable readback, capacity and expiry tests | Owner-approved private configuration, real lost-ack/restart/restore, retention and deletion policy |
+| Source integrations | Existing signed relay/brand contract unchanged | KFC/Pizza Hut site-owner contracts, consent/version, secret ownership and outbox acceptance |
+| AI proposal | Source/evidence guards and offline42-case validator | Verified contextual model artifacts plus real AZ/EN/RU quality, attribution, latency and RSS |
+| Production release | None performed; no configuration inspected/changed | Separate operator release/activation decision and approved synthetic smoke resources |
+
+No new preflight endpoint is needed: existing profile availability, exact-index
+checks and source/scanner guards remain the runtime checks. Passing configuration
+or mocked tests does not establish external service availability or readiness.
