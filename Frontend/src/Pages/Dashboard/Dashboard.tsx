@@ -123,10 +123,9 @@ const Dashboard: React.FC = () => {
             setJobs(result);
           })
           .catch((error) => {
-            console.error("Jobs dashboard load error:", error);
-            if (mounted) setSummaryErrors(current=>({...current,jobs:true}));
-
             if (!mounted) return;
+            console.error("Jobs dashboard load failed.");
+            setSummaryErrors(current=>({...current,jobs:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
@@ -146,10 +145,9 @@ const Dashboard: React.FC = () => {
             setCandidates(result);
           })
           .catch((error) => {
-            console.error("Candidates dashboard load error:", error);
-            if (mounted) setSummaryErrors(current=>({...current,candidates:true}));
-
             if (!mounted) return;
+            console.error("Candidates dashboard load failed.");
+            setSummaryErrors(current=>({...current,candidates:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
@@ -169,10 +167,9 @@ const Dashboard: React.FC = () => {
             setApplications(result);
           })
           .catch((error) => {
-            console.error("Applications dashboard load error:", error);
-            if (mounted) setSummaryErrors(current=>({...current,applications:true}));
-
             if (!mounted) return;
+            console.error("Applications dashboard load failed.");
+            setSummaryErrors(current=>({...current,applications:true}));
 
             setRecruitmentError(
               error?.response?.data?.message || ""
@@ -199,9 +196,8 @@ const Dashboard: React.FC = () => {
             setAnalytics(result);
           })
           .catch((error) => {
-            console.error("Audit dashboard load error:", error);
-
             if (!mounted) return;
+            console.error("Audit dashboard load failed.");
 
             setAuditError(
               error?.response?.data?.message || ""

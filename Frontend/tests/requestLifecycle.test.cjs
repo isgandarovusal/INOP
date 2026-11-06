@@ -2,12 +2,13 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {withBrowserFixture}=require('./helpers/browser.cjs');
 const harness=`import React from'react';import{createRoot}from'react-dom/client';import{BrowserRouter,useNavigate}from'react-router-dom';import{AuthContext}from'/src/Context/AuthContext.ts';import Dashboard from'/src/Pages/Dashboard/Dashboard.tsx';import i18n from'/src/i18n/index.ts';import api from'/src/api/axios.ts';api.defaults.baseURL='/api';window.i18nTest=i18n;function App(){const[user,setUser]=React.useState(window.testUser);window.setTestUser=setUser;window.navigateTest=useNavigate();return React.createElement(AuthContext.Provider,{value:{user,isLoading:false}},React.createElement(Dashboard));}createRoot(document.getElementById('root')).render(React.createElement(React.StrictMode,null,React.createElement(BrowserRouter,null,React.createElement(App))));`;
 test('Dashboard and shared GET lifecycles preserve authorization under StrictMode',async t=>withBrowserFixture(harness,async h=>{
+ const diagnostics=[],pendingDiagnostics=[];h.page.on('console',message=>{if(message.type()==='error'&&message.text().includes('dashboard load'))pendingDiagnostics.push(Promise.all(message.args().map(arg=>arg.jsonValue().catch(()=>null))).then(args=>diagnostics.push(args)));});
  for(const scope of ['own','department','assigned'])await h.models.Role.updateOne({key:`test_${scope}`},{$push:{permissions:{$each:['recruitment','candidate','application'].map(resource=>({resource,action:'read',scope}))}}});
  await t.test('StrictMode emits one server request per summary; translation emits none',async()=>{
   await h.open('admin','/dashboard');await h.page.waitForLoadState('networkidle');
   const reads=h.wire.filter(item=>item.path.endsWith('/dashboard-summary'));assert.equal(reads.length,4);
   const count=h.wire.length;await h.page.evaluate(()=>window.i18nTest.changeLanguage('az'));await h.page.waitForTimeout(200);assert.equal(h.wire.length,count);
-  assert.deepEqual(h.pageErrors,[]);
+  assert.deepEqual(h.pageErrors,[]);await Promise.all(pendingDiagnostics);assert.deepEqual(diagnostics,[],'Expected lifecycle cancellation must not log a dashboard failure');
  });
  await t.test('Focus rechecks sensitive summaries; explicit Refresh rechecks every summary',async()=>{
   const before=h.wire.filter(item=>item.path.endsWith('/dashboard-summary')).length;
@@ -62,5 +63,10 @@ test('Dashboard and shared GET lifecycles preserve authorization under StrictMod
   await h.page.route('**/api/auth/me',async route=>{authorization=route.request().headers().authorization;await new Promise(r=>setTimeout(r,100));await route.fulfill({status:401,contentType:'application/json',body:'{}'});});
   const meToken=await h.page.evaluate(async({oldToken,newToken})=>{const{getCurrentUser}=await import('/src/Services/authService.ts');localStorage.setItem('inop_auth_token',oldToken);const pending=getCurrentUser();localStorage.setItem('inop_auth_token',newToken);await pending;return localStorage.getItem('inop_auth_token');},{oldToken:h.tokens.admin,newToken:h.tokens.own});
   assert.equal(authorization,`Bearer ${h.tokens.admin}`);assert.equal(meToken,h.tokens.own);await h.page.unroute('**/api/auth/me');
+ });
+ await t.test('genuine Dashboard failure remains visible but logs only fixed diagnostic text',async()=>{
+  await h.open('admin','/dashboard');await h.page.waitForLoadState('networkidle');await Promise.all(pendingDiagnostics);diagnostics.length=0;
+  await h.page.evaluate(async()=>{const api=(await import('/src/api/axios.ts')).default,original=api.get;window.restoreSummaryGet=()=>{api.get=original;};api.get=function(url,...args){if(url==='/jobs/dashboard-summary')return Promise.reject({private:'DO_NOT_LOG_PRIVATE_DIAGNOSTIC',response:{data:{message:'Synthetic visible summary failure'}}});return original.call(this,url,...args);};});
+  try{await h.page.getByRole('button',{name:'Yenilə',exact:true}).click();await h.page.getByText('Synthetic visible summary failure',{exact:true}).waitFor();await Promise.all(pendingDiagnostics);assert.deepEqual(diagnostics,[['Jobs dashboard load failed.']]);assert.equal(await h.page.getByRole('button',{name:'Yenilə',exact:true}).count(),1);}finally{await h.page.evaluate(()=>window.restoreSummaryGet());}
  });
 }));
