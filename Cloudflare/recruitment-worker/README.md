@@ -12,7 +12,7 @@ A `workers.dev` address could not be activated by API: this account has no initi
 2. Provision a dedicated private service secret in Worker and INOP backend secret stores; no secret in GitHub. Verify 401/503 and allowed status on real endpoint, with no CORS/client-side token.
 3. Define retention, consent, R2 backup/restore, upload quarantine and separately validated maintained **PDF/DOCX malware scanning**. Never mark CV clean based on MIME, SHA or AI output. Cloudflare WAF upload detection is a paid Enterprise add-on, not a Free-plan substitute.
 4. With scanner proof, add private upload, CV source lifecycle/queue, bounded parsing and human-reviewed extraction. Record only metadata and safe digests in D1; actual CV bytes stay private in R2.
-5. Run one bounded fictional Workers AI canary; then measured AZ/EN/RU evaluation and human-approved relevance explanations. Never make autonomous hire/reject decisions.
+5. Do not adopt the existing @cf/qwen/qwen3-30b-a3b-fp8 production model unchanged: Cloudflare lists planned deprecation on 2026-11-20. Compare maintained multilingual alternatives using synthetic AZ/EN/RU evaluation; run one bounded fictional Workers AI canary only after explicit budget/authorization approval; then measured AZ/EN/RU evaluation and human-approved relevance explanations. Never make autonomous hire/reject decisions.
 6. Integrate explicit service-to-service API from INOP Render; preserve existing authorization, Candidate provenance and default-off feature gates. Do not change the production database/roles or promote a scanner-less CV acceptance.
 
 ## GitHub inspiration
