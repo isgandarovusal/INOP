@@ -94,6 +94,13 @@ async function closeAudit(req) {
     // Source Service completion was validated when submitted. Preserve its immutable result,
     // including historical versions; closure must not reinterpret answers under new wording.
     if(!((audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
+    if (req.body.executionId != null) {
+      const mongoose = require('mongoose');
+      if (!mongoose.isObjectIdOrHexString(req.body.executionId) ||
+          !await require('../models/auditExecution.model').exists({ _id: req.body.executionId, auditId: audit._id }).session(session)) {
+        throw auditError(400, 'Closure execution must belong to this audit.');
+      }
+    }
     const [closure] = await Closure.create([{ auditId: audit._id, executionId: req.body.executionId, approvalStatus: 'approved', finalStatus: 'completed', closedBy: req.user.id, comment: req.body.comment }], { session });
     audit.status = 'completed'; await audit.save({ session });
     await Assignment.updateMany({ auditId: audit._id }, { $set: { status: 'completed' } }, { session });
