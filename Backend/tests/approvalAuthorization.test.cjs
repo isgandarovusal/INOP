@@ -51,7 +51,7 @@ test('Approval parent authorization', async t => withAuditFixture(async h => {
     const parent = await h.audit('own');
     const first = await h.models.Finding.create({ auditId: parent._id, title: 'Synthetic first finding' });
     const second = await h.models.Finding.create({ auditId: parent._id, title: 'Synthetic second finding' });
-    const payload = { auditId: String(parent._id), reviewer: String(h.actors.peer._id), findingId: String(first._id) };
+    const payload = { auditId: String(parent._id), reviewer: String(h.actors.own._id), findingId: String(first._id) };
     const original = await h.request('admin','POST','/audit-approval',payload);
     assert.equal(original.status, 201);
     const repeated = await h.request('admin','POST','/audit-approval',payload);
