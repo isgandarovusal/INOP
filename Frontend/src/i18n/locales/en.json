@@ -1699,6 +1699,16 @@
       "certificates": "Certificates"
     }
   },
+  "hrCloud": {
+    "title": "Recruitment Cloud",
+    "description": "Secure connection to independent CV and AI services. Check only on demand; no CV is sent.",
+    "check": "Check Cloudflare connection",
+    "notConnected": "The protected Cloudflare connection is not configured yet. Existing Recruitment records remain accessible; new CV/AI service is disabled.",
+    "connected": "Cloudflare service responded",
+    "uploadDisabled": "CV intake disabled",
+    "quarantineOnly": "Quarantine intake only",
+    "aiDisabled": "AI analysis remains disabled"
+  },
   "hrIntake": {
     "view": "View source",
     "retryProcessing": "Retry processing",
