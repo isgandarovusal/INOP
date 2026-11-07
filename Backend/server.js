@@ -50,7 +50,9 @@ app.use(globalErrorHandler);
 
 // MongoDB Connection
 const MONGO_URI = runtime.mongoUri;
-mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false })
+// Explicit deployment namespace overrides URI path and driver defaults; never log the URI.
+const selectedDatabase = process.env.INOP_PRIMARY_DATABASE;
+mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false, ...(selectedDatabase ? { dbName: selectedDatabase } : {}) })
   .then(() => {
     console.log('db connected');
     if (process.env.HR_CV_INTAKE_WORKER_ENABLED === 'true' && process.env.HR_CV_DURABLE_INTAKE_ENABLED === 'true') {
