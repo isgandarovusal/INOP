@@ -1695,6 +1695,16 @@
       "certificates": "Сертификаты"
     }
   },
+  "hrCloud": {
+    "title": "Recruitment Cloud",
+    "description": "Защищённое подключение к отдельным сервисам CV и ИИ. Проверка только по нажатию, CV не отправляется.",
+    "check": "Проверить соединение с Cloudflare",
+    "notConnected": "Защищённое соединение с Cloudflare ещё не настроено. Существующие данные Recruitment доступны, новый сервис CV/ИИ отключён.",
+    "connected": "Сервис Cloudflare отвечает",
+    "uploadDisabled": "Приём CV отключён",
+    "quarantineOnly": "Только приём в карантин",
+    "aiDisabled": "Анализ ИИ пока отключён"
+  },
   "hrIntake": {
     "view": "Открыть источник",
     "retryProcessing": "Повторить обработку",
