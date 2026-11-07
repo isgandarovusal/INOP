@@ -1,0 +1,28 @@
+{
+  "status": "PASS_ISOLATED_STAGING",
+  "environment": "ISOLATED_LOOPBACK_REAL_S3",
+  "version": "SeaweedFS 4.52",
+  "binarySha256": "ce138fc99edc946ebd4d38589543f717e388bfe0b45186c06cff6ee6734ee8df",
+  "tests": [
+    "pdf_conditional_private_read",
+    "pdf_real_delete_backup_restore",
+    "docx_conditional_private_read",
+    "docx_real_delete_backup_restore",
+    "real_api_owner_read_and_cross_department_denial",
+    "real_api_restore_same_bytes_revision_and_linkage",
+    "real_api_owner_read_and_cross_department_denial",
+    "real_api_restore_same_bytes_revision_and_linkage",
+    "revoked_user_denial",
+    "revocation_during_real_provider_read",
+    "real_corrupt_object_rejected_then_restored",
+    "real_provider_outage_restart_recovery"
+  ],
+  "restoredObjects": 2,
+  "originalLinkageUnchanged": true,
+  "networkBoundary": "Owned loopback TLS transport only; production DNS policy unchanged",
+  "applicationAuthorization": "REAL_LOOPBACK_HTTP_AND_MONGO",
+  "scanner": "NOT_USED_STORAGE_FIXTURES_ONLY",
+  "productionReady": false,
+  "mongoVersion": "7.0.45",
+  "mongoVersionEvidence": "Independent mongosh db.version() on the same owned replica set after acceptance"
+}

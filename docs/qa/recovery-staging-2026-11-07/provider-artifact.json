@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/seaweedfs/seaweedfs",
+  "license": "Apache-2.0",
+  "licenseBlobSha": "c9c58bb50326065bd516d433f284cc865b97362a",
+  "release": "4.52",
+  "archiveUrl": "https://github.com/seaweedfs/seaweedfs/releases/download/4.52/linux_amd64.tar.gz",
+  "archiveSha256": "8b538c22d47d0c3fb6792adaa6b0c735a967401270a53427d5a476dcaca9b7ae",
+  "binarySha256": "ce138fc99edc946ebd4d38589543f717e388bfe0b45186c06cff6ee6734ee8df",
+  "mongoImage": "mongo:7",
+  "mongoImageDigest": "sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4"
+}
