@@ -129,8 +129,10 @@ async function transition(req) {
     }else if(next==='completed'&&audit.auditType==='service'&&audit.templateSnapshot?.serviceSource){
       const submitted=await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
       Object.assign(audit,{assessmentStatus:submitted.assessmentStatus,overallPercentage:submitted.overallPercentage,passed:submitted.passed,serviceAssessment:submitted.serviceAssessment});
+    }else if(next==='completed'&&audit.auditType==='hr'&&audit.templateSnapshot?.hrSource){
+      const submitted=await require('./hrAuditExecution.service').requireSubmitted(audit,session);
+      Object.assign(audit,{assessmentStatus:submitted.assessmentStatus,overallPercentage:submitted.overallPercentage,passed:submitted.passed,hrAssessment:submitted.hrAssessment});
     }else if(next==='completed')Object.assign(audit,require('./auditAssessment.service').assess(audit.templateSnapshot,audit.checks||[],true));
-    if(next==='completed'&&audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
     if(next==='completed'){const context=await require('../models/auditContext.model').findById(audit._id).session(session);if(!audit.templateRevisionId||String(context?.templateRevisionId)!==String(audit.templateRevisionId))throw auditError(409,'Unversioned audit cannot be certified complete.');}
     audit.status = next; await audit.save({ session }); await history(audit, req.user, 'status-' + next, session); return audit;
   });
