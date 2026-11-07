@@ -15,7 +15,7 @@ async function status({environment=process.env,request=globalThis.fetch}={}) {
   const body=await result.text();
   if(body.length>2048)throw unavailable();
   const data=JSON.parse(body);
-  if(data?.ok!==true||data.schemaVersion!==1||data.cvIntake!=='disabled'||data.aiInference!=='disabled')throw unavailable();
+  if(data?.ok!==true||data.schemaVersion!==2||data.cvIntake!=='disabled'||data.aiInference!=='disabled')throw unavailable();
   return Object.fromEntries(STATUS_FIELDS.map(field=>[field,data[field]]));
  }catch {throw unavailable();}
  finally {clearTimeout(timer);}
