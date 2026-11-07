@@ -1867,6 +1867,8 @@
     "submitting": "Отправка…",
     "submit": "Отправить аудит",
     "closure": "Закрытие аудита",
+    "closureComment": "Комментарий при закрытии",
+    "alreadyClosed": "Аудит уже закрыт.",
     "closeAudit": "Закрыть аудит",
     "answers": {
       "yes": "Да",
