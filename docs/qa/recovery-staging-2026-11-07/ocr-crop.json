@@ -1,0 +1,61 @@
+{
+  "syntheticOnly": true,
+  "semanticInference": false,
+  "originalPinnedScanRecovered": false,
+  "engine": "tesseract 5.5.0",
+  "models": {
+    "aze": "a365310848aecb739f19369cb3831d4660fcd9345d798e91a3042455f9ccc9f0",
+    "rus": "e16e5e036cce1d9ec2b00063cf8b54472625b9e14d893a169e2b0dedeb4df225",
+    "eng": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+  },
+  "results": [
+    {
+      "language": "en",
+      "sourceImageSha256": "75547b409c4c6ab40e23b984a90c07691f6ab3b7c0ce693490b8320515b279f7",
+      "regeneratedPdfSha256": "469488323bbec28df79b7e9b4bd22e26d3440df116f2095391788e1d0ce4f3d3",
+      "markers": 4,
+      "expectedMarkers": 4,
+      "primaryUnchanged": true,
+      "alternatives": []
+    },
+    {
+      "language": "az",
+      "sourceImageSha256": "ff8f15189ba63744247f46ee22767d524af10b9a412bc271b3df5070834265ec",
+      "regeneratedPdfSha256": "3c8e30319f0d6b3c792c1d1f59eea389c05d428437244d6a8a3210515a282f3d",
+      "markers": 4,
+      "expectedMarkers": 4,
+      "primaryUnchanged": true,
+      "alternatives": []
+    },
+    {
+      "language": "ru",
+      "sourceImageSha256": "d414be1557792d704bf6cdfdfd8a2bd260a8986e350e5e1480cf63463726ab9c",
+      "regeneratedPdfSha256": "1dbe7054b66a11f4999d9d79ba4cfe9a299e8da6adae0219227e48da639be049",
+      "markers": 3,
+      "expectedMarkers": 4,
+      "primaryUnchanged": true,
+      "alternatives": [
+        {
+          "primaryToken": "НАССР",
+          "alternative": "HACCP",
+          "confidence": 92.278938,
+          "box": [
+            86,
+            413,
+            98,
+            22
+          ],
+          "latencyMs": 108,
+          "authoritative": false,
+          "requiresHumanReview": true
+        }
+      ]
+    }
+  ],
+  "adverseStatementsPreserved": true,
+  "automaticQualification": false,
+  "primaryTranscriptionCorrected": false,
+  "elapsedMs": 1671,
+  "pythonPeakRssMiB": 23.63,
+  "childPeakRssMiB": 57.77
+}
