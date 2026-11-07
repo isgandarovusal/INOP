@@ -47,7 +47,12 @@ async function createApproval(req) {
       if(execution[kind+'Submission'].actorId===String(reviewer._id)||contributors.includes(String(reviewer._id)))throw auditError(403,'An independent auditor must review applicability.');
     }
     const existing = await Approval.findOne({ auditId: audit._id, requestedBy: req.user.id, reviewer: reviewer._id, status: 'pending' }).session(session);
-    if (existing) return existing;
+    if (existing) {
+      if (['findingId', 'actionId'].some(field => String(existing[field] || '') !== String(req.body[field] || ''))) {
+        throw auditError(409, 'Pending approval already targets a different resource.');
+      }
+      return existing;
+    }
     const [approval] = await Approval.create([{ auditId: audit._id, reviewer: reviewer._id, requestedBy: req.user.id, status: 'pending', findingId: req.body.findingId, actionId: req.body.actionId, comment: req.body.comment }], { session });
     await history(audit, req.user, 'approval-requested', session); return approval;
   });
