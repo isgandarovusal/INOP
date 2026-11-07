@@ -51,6 +51,10 @@ test('HR source provisioning, draft concurrency, evidence isolation, scoring, an
  const approvalId=approval.data.data?._id||approval.data._id;
  const decision=await call('reviewer','PATCH',`/audit-approval/${approvalId}`,{status:'approved'});assert.equal(decision.status,200,JSON.stringify(decision.data));
  const assessmentBeforeClosure=(await models.Audit.findById(audit._id).lean()).hrAssessment;
+ const finalized=await call('admin','PATCH',`/audit-workflow/${audit._id}/status`,{status:'completed'});
+ assert.equal(finalized.status,200,JSON.stringify(finalized.data));
+ assert.equal((await models.Audit.findById(audit._id).lean()).overallPercentage,50);
+ assert.deepEqual((await models.Audit.findById(audit._id).lean()).hrAssessment,assessmentBeforeClosure);
  const closed=await call('admin','POST','/audit-closure',{auditId:audit._id});assert.equal(closed.status,201,JSON.stringify(closed.data));
  assert.deepEqual((await models.Audit.findById(audit._id).lean()).hrAssessment,assessmentBeforeClosure);
  assert.equal((await call('admin','PUT',`/audit-execution/${execution._id}/draft`,{...body,expectedVersion:2})).status,409);
