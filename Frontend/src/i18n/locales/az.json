@@ -1888,6 +1888,8 @@
     "submitting": "Göndərilir…",
     "submit": "Auditi göndər",
     "closure": "Audit bağlanması",
+    "closureComment": "Bağlanma qeydi",
+    "alreadyClosed": "Audit artıq bağlanıb.",
     "closeAudit": "Auditi bağla",
     "answers": {
       "yes": "Bəli",
