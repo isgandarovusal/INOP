@@ -1871,6 +1871,8 @@
     "submitting": "Submitting…",
     "submit": "Submit audit",
     "closure": "Audit closure",
+    "closureComment": "Closure note",
+    "alreadyClosed": "Audit is already closed.",
     "closeAudit": "Close audit",
     "answers": {
       "yes": "Yes",
