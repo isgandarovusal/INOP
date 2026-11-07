@@ -10,6 +10,7 @@ test('CAPA rejects unbounded verification text and unknown mutation inputs befor
  assert.equal((await h.request('admin','PUT',url,{status:'rejected',verificationNote:'Synthetic rework required'})).status,200);
  assert.equal((await h.request('admin','PUT',url,{status:'in-progress'})).status,200);
  assert.equal((await h.request('admin','PUT',url,{status:'completed'})).status,200);
+ assert.equal((await Action.findById(action._id)).completedBy,String(h.actors.admin._id));
  assert.equal((await h.request('admin','PUT',url,{status:'verified',verificationNote:'Self review forbidden'})).status,403);
  assert.equal((await Action.findById(action._id)).status,'completed');
  assert.equal((await h.request('peer','PUT',url,{status:'verified',verificationNote:'Synthetic independent verification'})).status,200);
