@@ -12,6 +12,7 @@ import HRResourceState from '../../../Components/HRResourceState';
 import HRPageControls from '../../../Components/HRPageControls';
 import CvImportPanel from '../../../Components/CvImportPanel';
 import PageHeader from '../../../Components/PageHeader';
+import RecruitmentCloudStatus from '../../../Components/RecruitmentCloudStatus';
 export default function CvIntakeQueue(){
  const {t}=useTranslation(),{user}=useAuth(),navigate=useNavigate();
  const enabled=import.meta.env.VITE_HR_DURABLE_INTAKE_ENABLED==='true';
@@ -29,6 +30,7 @@ export default function CvIntakeQueue(){
  if(!hasPermission(user,'candidate','read'))return <HRResourceState status='forbidden'/>;
 
  return <main className='hr-workspace hr-page' data-cv-intake-queue><PageHeader title={t('hrIntake.queue')} subtitle={t('hrIntake.queueNotice')}/>
+  <RecruitmentCloudStatus/>
   {!enabled&&<p className='hr-notice' role='status' data-intake-processing-disabled>{t('hrIntake.processingDisabled')}</p>}
   {enabled&&<CvImportPanel writable={hasPermission(user,'candidate','create')} onAccepted={result.reload}/>}
   <div className='hr-list-controls'><label>{t('hrIntake.source')}<select value={sourceType} onChange={e=>setSourceType(e.target.value)}><option value=''>{t('hrUniversal.allSources')}</option>{[...intakeSourceTypes,'unknown'].map(key=><option key={key} value={key}>{t('hrUniversal.sources.'+key)}</option>)}</select></label>{catalogEnabled&&<><label>{t('hrUniversal.brand')}<select value={brandId} disabled={brands.status!=='ready'} onChange={e=>{setBrandId(e.target.value);setSelectedJob(null);}}><option value=''>{t('hrImport.allBrands')}</option>{brands.data?.items.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select></label><label>{t('hrImport.vacancy')}<select data-intake-job-select value={jobId} disabled={jobs.status!=='ready'} onChange={e=>{const job=jobs.data?.items.find(j=>j.id===e.target.value);setSelectedJob(job?{key:context.key,id:job.id,title:job.title}:null);}}><option value=''>{t('hrImport.allVacancies')}</option>{jobId&&!jobs.data?.items.some(j=>j.id===jobId)&&<option value={jobId}>{['forbidden','unauthenticated'].includes(jobs.status)?t('hrStates.restricted'):selectedJob?.title}</option>}{jobs.data?.items.map(j=><option key={j.id} value={j.id}>{j.title}</option>)}</select></label></>}<label>{t('common.actions.search')}<input type='search' value={search} maxLength={80} onChange={e=>setSearch(e.target.value)}/></label><label>{t('hrIntake.state')}<select value={status} onChange={e=>setStatus(e.target.value)}><option value=''>{t('hrIntake.allStates')}</option>{['reserved','queued','running','retry','ready','blocked','quarantined','failed','cancelled'].map(state=><option key={state} value={state}>{t('hrIntake.states.'+state)}</option>)}</select></label></div>
