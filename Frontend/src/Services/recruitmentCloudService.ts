@@ -7,6 +7,7 @@ export type RecruitmentCloudStatus = {
  aiInference: 'disabled';
  scanner: string;
  humanReview: 'mandatory';
+ connectionMode?: 'public-health-only';
 };
 const valid = (data:unknown):data is RecruitmentCloudStatus => {
  if(!data||typeof data!=='object'||Array.isArray(data))return false;
@@ -14,7 +15,7 @@ const valid = (data:unknown):data is RecruitmentCloudStatus => {
  return x.service==='inop-recruitment'&&Number.isInteger(x.schemaVersion)&&x.schemaVersion===3&&
  (x.cvIntake==='disabled'||x.cvIntake==='quarantine-only')&&
  x.aiInference==='disabled'&&typeof x.scanner==='string'&&x.scanner.length<=64&&
- x.humanReview==='mandatory';
+ x.humanReview==='mandatory'&& (x.connectionMode===undefined||x.connectionMode==='public-health-only');
 };
 // Explicitly triggered, no background polling or browser-to-Cloudflare token.
 export async function getRecruitmentCloudStatus(signal?:AbortSignal):Promise<RecruitmentCloudStatus>{
