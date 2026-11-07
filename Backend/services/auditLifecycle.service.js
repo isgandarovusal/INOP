@@ -96,9 +96,9 @@ async function closeAudit(req) {
     if(audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource){const kind=audit.templateSnapshot.hseSource?'hse':'standard';const execution=await require(`./${kind}AuditExecution.service`).requireSubmitted(audit,session);if(approval.applicabilityReview?.answerDigest!==require('./standardAuditAssessment.service').digest(execution.answers))throw auditError(409,'Independent Standard applicability review is required.');}
     if(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)await require('./serviceAuditExecution.service').requireSubmitted(audit,session);
     if(audit.auditType==='hr'&&audit.templateSnapshot?.hrSource) await require('./hrAuditExecution.service').requireSubmitted(audit,session);
-    // Source Service completion was validated when submitted. Preserve its immutable result,
-    // including historical versions; closure must not reinterpret answers under new wording.
-    if(!((audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
+    // Source-bound HR/Service/Standard/HSE results are immutable after submission.
+    // Closure must not validate them again against the generic legacy questionnaire.
+    if(!((audit.auditType==='hr'&&audit.templateSnapshot?.hrSource)||(audit.auditType==='service'&&audit.templateSnapshot?.serviceSource)||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource))require('./auditAssessment.service').assess(audit.templateSnapshot, audit.checks || [], true);
     if (req.body.executionId != null) {
       const mongoose = require('mongoose');
       if (!mongoose.isObjectIdOrHexString(req.body.executionId) ||
