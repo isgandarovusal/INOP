@@ -1716,6 +1716,16 @@
       "certificates": "Sertifikatlar"
     }
   },
+  "hrCloud": {
+    "title": "Recruitment Cloud",
+    "description": "Müstəqil CV və AI xidmətinin təhlükəsiz bağlantısı. Status yalnız düymə ilə yoxlanılır; bu yoxlama CV göndərmir.",
+    "check": "Cloudflare bağlantısını yoxla",
+    "notConnected": "Cloudflare ilə qorunan bağlantı hələ qurulmayıb. Mövcud Recruitment məlumatlarına baxa bilərsiniz; yeni CV/AI xidməti bağlıdır.",
+    "connected": "Cloudflare servisi cavab verir",
+    "uploadDisabled": "CV qəbulu bağlıdır",
+    "quarantineOnly": "Yalnız karantin qəbulu",
+    "aiDisabled": "AI analizi hələ bağlıdır"
+  },
   "hrIntake": {
     "view": "Mənbəyə bax",
     "retryProcessing": "Emalı yenidən başlat",
