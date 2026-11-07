@@ -128,3 +128,28 @@ test('Intake vacancy lookup searches and pages one authorized catalog without lo
  assert.ok(requests.filter(u=>u.pathname.endsWith('/jobs')).every(u=>u.searchParams.get('pageSize')==='30'&&u.searchParams.get('status')==='Open'));
  assert.deepEqual(h.pageErrors,[]);
 }));
+
+
+test('Recruitment Cloud panel makes no background calls, shows unavailable and explicit service readiness',async()=>withBrowserFixture(harness,async h=>{
+ let calls=0,replyStatus=503;
+ await h.page.route('**/api/hr/cv-intake?*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload([]))}));
+ await h.page.route('**/api/hr/recruitment-cloud/status',route=>{
+  calls++;
+  return route.fulfill({status:replyStatus,contentType:'application/json',body:JSON.stringify(
+   replyStatus===200?{success:true,data:{service:'inop-recruitment',schemaVersion:3,cvIntake:'disabled',aiInference:'disabled',scanner:'not-verified',humanReview:'mandatory'}}:{success:false,code:'RECRUITMENT_CLOUD_UNAVAILABLE'}
+  )});
+ });
+ await h.open('admin','/queue');
+ await h.page.locator('[data-recruitment-cloud]').waitFor();
+ await h.page.waitForLoadState('networkidle');
+ assert.equal(calls,0,'Cloudflare readiness must never poll on mount');
+ await h.page.locator('[data-cloud-check]').click();
+ await h.page.locator('[data-cloud-unavailable]').waitFor();
+ assert.equal(calls,1);
+ replyStatus=200;
+ await h.page.locator('[data-cloud-check]').click();
+ await h.page.locator('[data-cloud-ready]').waitFor();
+ assert.equal(calls,2);
+ assert.ok(!(await h.page.locator('[data-cloud-ready]').textContent()).includes('secret'));
+ assert.deepEqual(h.pageErrors,[]);
+}));
