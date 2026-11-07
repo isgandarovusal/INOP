@@ -1,0 +1,51 @@
+✖ failed configuration does not create a misleading receipt (187.415292ms)
+▶ real Mongo scalar identity validation and bounded CLI lifecycle
+  ✖ array identities are malformed and cannot produce a rollout receipt (232.655734ms)
+  ✔ conflict-free apply verify rollback preserves every document (1207.452308ms)
+Removed only the owned local audit test database.
+✖ real Mongo scalar identity validation and bounded CLI lifecycle (1942.553894ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2439.222455
+
+✖ failing tests:
+
+test at Backend/tests/journalRolloutRecovery.test.cjs:5:1
+✖ failed configuration does not create a misleading receipt (187.415292ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (/tmp/inop-approved-recovery/Backend/tests/journalRolloutRecovery.test.cjs:5:258)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'ENOENT' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at Backend/tests/journalRolloutRecovery.test.cjs:9:10
+✖ array identities are malformed and cannot produce a rollout receipt (232.655734ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 2
+
+      at TestContext.<anonymous> (/tmp/inop-approved-recovery/Backend/tests/journalRolloutRecovery.test.cjs:11:94)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async /tmp/inop-approved-recovery/Backend/tests/journalRolloutRecovery.test.cjs:9:2
+      at async exports.withAuditFixture (/tmp/inop-approved-recovery/Backend/tests/helpers/auditFixture.cjs:75:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -45,3 +45,17 @@ Rollback refuses a pre-existing-index receipt, wrong namespace, changed key defi
 `INOP_AUDIT_TEST_PORT=27018 node --test Backend/tests/duplicateJournalIndex.test.cjs`
 
 Real isolated MongoDB: conflict refusal preserves both entries; clean rollout enforces concurrent uniqueness; wrong-namespace rollback is denied; valid rollback preserves every document; a same-named nonunique index blocks rollout. Application regression additionally proves that such an index cannot authorize review writes. These are local acceptance results, not production migration evidence.
+
+## Recovery regression — 7 November 2026
+
+The CLI now validates connection/data/index prerequisites before reserving a receipt.
+If a later failure leaves its own receipt empty, it removes only that exact file
+(device/inode checked); partial or replaced artifacts remain for operator review.
+A failed run is never a rollback authorization: inspect the actual index after any
+interruption. Existing receipts are never overwritten. The scalar BSON type check
+uses aggregation `$type`; array elements cannot masquerade as scalar actor/command
+identities. Arrays block rollout rather than being rewritten or deleted.
+
+Fresh real-Mongo CLI acceptance:
+`INOP_AUDIT_TEST_PORT=27018 node --test Backend/tests/journalRolloutRecovery.test.cjs`.
+See [recovery evidence](qa/recovery-staging-2026-11-07/journal-after.txt).

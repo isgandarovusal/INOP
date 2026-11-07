@@ -9,7 +9,7 @@ async function inspect(collection) {
     { $group: { _id: { actor: '$actor', commandId: '$commandId' }, count: { $sum: 1 } } },
     { $match: { count: { $gt: 1 } } }, { $limit: 101 }
   ], { maxTimeMS: 10000, allowDiskUse: false }).toArray();
-  const malformed = await collection.countDocuments({ $or: [{ actor: { $not: { $type: 'objectId' } } }, { commandId: { $not: { $type: 'string' } } }, { commandId: '' }] }, { maxTimeMS: 10000 });
+  const malformed = await collection.countDocuments({ $or: [{ $expr: { $ne: [{ $type: '$actor' }, 'objectId'] } }, { $expr: { $ne: [{ $type: '$commandId' }, 'string'] } }, { commandId: '' }] }, { maxTimeMS: 10000 });
   return { ready: indexes.some(valid), incompatible: indexes.some(i => (i.name === NAME || JSON.stringify(i.key) === JSON.stringify(KEY)) && !valid(i)), malformed,
     conflicts: conflicts.slice(0, 100).map(v => ({ groupDigest: digest(v._id), count: v.count })), truncated: conflicts.length > 100 };
 }

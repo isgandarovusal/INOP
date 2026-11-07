@@ -1,0 +1,14 @@
+✔ failed configuration does not create a misleading receipt (178.906745ms)
+▶ real Mongo scalar identity validation and bounded CLI lifecycle
+  ✔ array identities are malformed and cannot produce a rollout receipt (475.992887ms)
+  ✔ conflict-free apply verify rollback preserves every document (1637.647854ms)
+Removed only the owned local audit test database.
+✔ real Mongo scalar identity validation and bounded CLI lifecycle (2667.055876ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3101.090393
