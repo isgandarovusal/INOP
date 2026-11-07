@@ -1,0 +1,2 @@
+const test=require('node:test'),assert=require('node:assert/strict'),{guard}=require('../scripts/verifyScannerTarget.cjs');
+test('native target acceptance never implies approval or enables intake',()=>{assert.throws(()=>guard({}));const safe={INOP_SCANNER_TARGET_APPROVED:'isolated-staging'};assert.doesNotThrow(()=>guard(safe));for(const extra of[{NODE_ENV:'production'},{RENDER:'true'},{HR_CV_SCAN_ENABLED:'true'},{HR_CV_INTAKE_WORKER_ENABLED:'true'}])assert.throws(()=>guard({...safe,...extra}));});

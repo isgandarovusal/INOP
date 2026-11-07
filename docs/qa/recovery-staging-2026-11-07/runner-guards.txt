@@ -1,0 +1,11 @@
+✔ native target acceptance never implies approval or enables intake (0.817275ms)
+✔ isolated acceptance refuses external bindings, production and enabled processing gates (0.991977ms)
+✔ provider requires a pinned regular binary; no fallback provider (2.671224ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 104.196458
