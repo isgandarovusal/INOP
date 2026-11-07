@@ -1,11 +1,15 @@
 import {useEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {Link} from 'react-router-dom';
+import {useAuth} from '../Context/useAuth';
+import {hasPermission} from '../Utils/permissions';
 import {getRecruitmentCloudStatus} from '../Services/recruitmentCloudService';
 import type {RecruitmentCloudStatus as CloudStatus} from '../Services/recruitmentCloudService';
 
 // Explicit opt-in read only: no API calls until HR clicks; never contacts Cloudflare from browser.
 export default function RecruitmentCloudStatus(){
  const {t}=useTranslation();
+ const {user}=useAuth();
  const [state,setState]=useState<'idle'|'loading'|'ready'|'unavailable'>('idle');
  const [status,setStatus]=useState<CloudStatus|null>(null);
  const active=useRef<AbortController|null>(null);
@@ -24,12 +28,14 @@ export default function RecruitmentCloudStatus(){
  return <section data-recruitment-cloud aria-label={t('hrCloud.title')}>
   <h3>{t('hrCloud.title')}</h3>
   <p>{t('hrCloud.description')}</p>
+  <p data-manual-cv-alternative>{t('hrCloud.manualAlternative')}</p>
+  {hasPermission(user,'candidate','create')&&<Link to='/app/recruitment/candidates/new' className='btn-secondary' data-manual-candidate-link>{t('hrCloud.manualCreate')}</Link>}
   <button type="button" className="btn-secondary" data-cloud-check disabled={state==='loading'} onClick={()=>void check()}>
    {t(state==='loading'?'common.actions.loading':'hrCloud.check')}
   </button>
   {state==='unavailable'&&<p role="status" data-cloud-unavailable>{t('hrCloud.notConnected')}</p>}
   {state==='ready'&&status&&<p role="status" data-cloud-ready>
-   {t('hrCloud.connected')} · {t(status.cvIntake==='disabled'?'hrCloud.uploadDisabled':'hrCloud.quarantineOnly')} · {t('hrCloud.aiDisabled')}
+   {t(status.connectionMode==='public-health-only'?'hrCloud.healthOnly':'hrCloud.connected')} · {t(status.cvIntake==='disabled'?'hrCloud.uploadDisabled':'hrCloud.quarantineOnly')} · {t('hrCloud.aiDisabled')}
   </p>}
  </section>;
 }
