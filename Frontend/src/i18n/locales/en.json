@@ -1707,7 +1707,10 @@
     "connected": "Cloudflare service responded",
     "uploadDisabled": "CV intake disabled",
     "quarantineOnly": "Quarantine intake only",
-    "aiDisabled": "AI analysis remains disabled"
+    "aiDisabled": "AI analysis remains disabled",
+    "healthOnly": "Cloudflare is reachable; protected CV/AI integration is not enabled",
+    "manualAlternative": "Until antivirus is ready, enter candidate details manually without uploading a PDF/DOCX. This is not automatic AI CV analysis.",
+    "manualCreate": "Create candidate without file"
   },
   "hrIntake": {
     "view": "View source",
@@ -2124,9 +2127,9 @@
     "reference": "Source reference (not scored)",
     "sourceAverage": "Average indicator: no formula in source",
     "answers": {
+      "0": "No",
       "1": "Yes",
       "0_5": "Partial",
-      "0": "No",
       "na": "N/A"
     },
     "addFinding": "Add finding",
