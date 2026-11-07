@@ -26,5 +26,5 @@ export default function AuditClosurePanel({ auditId }: { auditId: string }) {
    </button>
   </>}
   {mutation.status !== 'ready' && <AuditResourceState status={mutation.status}/>}
- </Section>;
+ </SectionCard>;
 }
