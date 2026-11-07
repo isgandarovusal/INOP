@@ -82,6 +82,11 @@ async function resolveApproval(req) {
   });
 }
 async function closeAudit(req) {
+  if (!req.body || Array.isArray(req.body) ||
+      Object.keys(req.body).some(field => !['auditId', 'executionId', 'comment'].includes(field)) ||
+      (req.body.comment !== undefined && (typeof req.body.comment !== 'string' || req.body.comment.length > 4000))) {
+    throw auditError(400, 'Invalid audit closure input.');
+  }
   return transaction(async session => {
     const audit = await lockAudit(req.auditScopeId, session, req.user);
     const existing = await Closure.findOne({ auditId: audit._id, finalStatus: 'completed' }).session(session);
