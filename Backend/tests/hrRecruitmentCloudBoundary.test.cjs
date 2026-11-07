@@ -30,3 +30,35 @@ test('Bad upstream replies fail closed without revealing error body',async()=>{
  }
  await assert.rejects(status({environment:env,request:async()=>{throw new Error('SECRET_UPSTREAM_LOG')}}),e=>e.status===503&&!e.message.includes('SECRET_'));
 });
+
+test('Public health fallback is default-off and exposes only safe fixed metadata',async()=>{
+ const {publicHealth}=require('../services/hrRecruitmentCloud.service');
+ let calls=0;
+ const get=async(url,opts)=>{
+  calls++;
+  assert.equal(url,'https://inop-recruitment-api.isgandarovusal.workers.dev/health');
+  assert.equal(opts.method,'GET');assert.equal(opts.redirect,'manual');
+  assert.equal(opts.headers.authorization,undefined);
+  return reply({service:'inop-recruitment',status:'bootstrap',cvIntake:'disabled',aiInference:'disabled',privateDetails:'NOT_EXPOSED'});
+ };
+ await assert.rejects(publicHealth({environment:{},request:get}),{status:503});
+ assert.equal(calls,0);
+ const data=await publicHealth({environment:{RECRUITMENT_CLOUD_PUBLIC_HEALTH_ENABLED:'true'},request:get});
+ assert.equal(data.connectionMode,'public-health-only');
+ assert.equal(data.aiInference,'disabled');
+ assert.equal(data.cvIntake,'disabled');
+ assert.equal(JSON.stringify(data).includes('NOT_EXPOSED'),false);
+ assert.equal(calls,1);
+});
+test('Health fallback refuses altered or redirected upstream',async()=>{
+ const {publicHealth}=require('../services/hrRecruitmentCloud.service');
+ const env={RECRUITMENT_CLOUD_PUBLIC_HEALTH_ENABLED:'true'};
+ for(const result of [
+  reply({service:'other',status:'bootstrap',cvIntake:'disabled',aiInference:'disabled'}),
+  reply({service:'inop-recruitment',status:'bootstrap',cvIntake:'enabled',aiInference:'disabled'}),
+  reply({service:'inop-recruitment',status:'bootstrap',cvIntake:'disabled',aiInference:'disabled'},302),
+  reply({service:'inop-recruitment',status:'bootstrap',cvIntake:'disabled',aiInference:'disabled'},200,'text/html')
+ ]){
+  await assert.rejects(publicHealth({environment:env,request:async()=>result}),{status:503});
+ }
+});
