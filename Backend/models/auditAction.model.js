@@ -61,7 +61,7 @@ const auditActionSchema = new mongoose.Schema(
 
 
  completedAt:Date,
- completedBy:{type:String,immutable:true},
+ completedBy:String,
 
 
  verifiedBy:String,
