@@ -48,6 +48,12 @@ app.use('/api', routes);
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
+// Bind promptly on Render Free. /health returns 503 until Mongo connects.
+// An unavailable database never makes the application healthy.
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Port is listening in ${PORT}`);
+});
+
 // MongoDB Connection
 const MONGO_URI = runtime.mongoUri;
 // Explicit deployment namespace overrides URI path and driver defaults; never log the URI.
@@ -71,10 +77,7 @@ mongoose.connect(MONGO_URI, { autoIndex: false, autoCreate: false, ...(selectedD
     if (process.env.HR_CV_AI_PROCESSING_ENABLED === 'true') {
       require('./services/hrCvTaskProfiles.service').profile('ai-review').start();
     }
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Port is listening in ${PORT}`);
-      // One optional read-only HEAD; never delays readiness or enables intake.
-      void require('./services/hrR2StartupVerification.service').createVerification().run();
-    });
+    // One optional read-only HEAD; never delays readiness or enables intake.
+    void require('./services/hrR2StartupVerification.service').createVerification().run();
   })
   .catch((err) => { require('./services/safeErrorLog.service').logFailure(err);process.exitCode=1; });
