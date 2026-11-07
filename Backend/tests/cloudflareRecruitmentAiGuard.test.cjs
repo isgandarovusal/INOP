@@ -18,12 +18,20 @@ function state({clean=true,quota=true}={}){
  };}};}};
  return {calls:()=>({commands,model}),env:{RECRUITMENT_SERVICE_TOKEN:token,RECRUITMENT_DB:db,
   RECRUITMENT_CLOUD_AI_ENABLED:'true',RECRUITMENT_PII_TRANSFER_APPROVED:'true',
+  RECRUITMENT_VERIFIED_SCANNER_ENABLED:'true',
   AI:{run:async(name,options)=>{model.push({name,options});return {response:JSON.stringify({matches:[{requirement:0,evidence:0}],unknown:[1]})};}}}};
 }
 test('Recruitment AI stays off and never uses models without explicit activation',async()=>{
  const worker=(await import(uri)).default;const s=state();
  delete s.env.RECRUITMENT_CLOUD_AI_ENABLED;
  assert.equal((await worker.fetch(request(),s.env)).status,423);assert.equal(s.calls().model.length,0);
+});
+test('Scanner activation cannot be replaced by a manually marked clean DB row',async()=>{
+ const worker=(await import(uri)).default;const s=state();
+ delete s.env.RECRUITMENT_VERIFIED_SCANNER_ENABLED;
+ assert.equal((await worker.fetch(request(),s.env)).status,423);
+ assert.equal(s.calls().model.length,0);
+ assert.equal(s.calls().commands.length,0);
 });
 test('Unscanned CV source cannot trigger Workers AI or reserve free quota',async()=>{
  const worker=(await import(uri)).default;const s=state({clean:false});
