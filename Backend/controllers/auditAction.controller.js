@@ -43,10 +43,10 @@ exports.updateActionStatus=async(req,res)=>{try{
    const reviewFilter=await require('../middleware/auditScope.middleware').getAuditScopeFilter({...req,permission:{scope}});
    if(!reviewFilter||!await require('../models/audit.model').exists({$and:[{_id:audit._id},reviewFilter]}).session(session))throw auditError(403,'Independent review permission required.');
    if(!action.createdBy)throw auditError(409,'Legacy action needs reviewed provenance.');
-   if(action.createdBy===req.user.id||action.responsible===req.user.id)throw auditError(403,'Self-verification is forbidden.');
+   if([action.createdBy,action.responsible,action.completedBy].some(id=>id&&String(id)===String(req.user.id)))throw auditError(403,'Self-verification is forbidden.');
    action.verifiedBy=req.user.id;action.verificationNote=req.body.verificationNote||'';
   }
   if((audit.templateSnapshot?.hrSource||audit.templateSnapshot?.serviceSource||audit.templateSnapshot?.standardSource||audit.templateSnapshot?.hseSource)&&req.body.evidenceIds!==undefined)action.evidenceIds=await require('../services/serviceAuditEvidence.service').validate(req.body.evidenceIds,audit._id,session);
-  if(next==='completed')action.completedAt=new Date();action.status=next;await action.save({session});await recordHistory(audit,req.user,'action-'+next,session);return action;
+  if(next==='completed'){action.completedAt=new Date();action.completedBy=req.user.id;}action.status=next;await action.save({session});await recordHistory(audit,req.user,'action-'+next,session);return action;
  });res.json({success:true,data:row});
 }catch(error){fail(res,error);}};
