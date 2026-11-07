@@ -2,7 +2,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const {status}=require('../services/hrRecruitmentCloud.service');
 const token='synthetic-unit-test-token-with-more-than-32-chars';
-const ok={ok:true,service:'inop-recruitment',schemaVersion:2,cvIntake:'disabled',aiInference:'disabled',scanner:'not-verified',humanReview:'mandatory'};
+const ok={ok:true,service:'inop-recruitment',schemaVersion:3,cvIntake:'disabled',aiInference:'disabled',scanner:'not-verified',humanReview:'mandatory'};
 function reply(body=ok,code=200,type='application/json'){return {status:code,headers:{get:()=>type},text:async()=>JSON.stringify(body)};}
 test('Recruitment Cloud remains off and cannot call Cloudflare without explicit opt-in and secret',async()=>{
  let calls=0;
