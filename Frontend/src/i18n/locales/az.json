@@ -1724,7 +1724,10 @@
     "connected": "Cloudflare servisi cavab verir",
     "uploadDisabled": "CV qəbulu bağlıdır",
     "quarantineOnly": "Yalnız karantin qəbulu",
-    "aiDisabled": "AI analizi hələ bağlıdır"
+    "aiDisabled": "AI analizi hələ bağlıdır",
+    "healthOnly": "Cloudflare cavab verir; qorunan CV/AI bağlantısı hələ aktiv deyil",
+    "manualAlternative": "Antivirus hazır olana qədər namizəd məlumatlarını PDF/DOCX əlavə etmədən əl ilə daxil edə bilərsiniz. Bu, faylın avtomatik AI təhlili deyil.",
+    "manualCreate": "Faylsız namizəd yarat"
   },
   "hrIntake": {
     "view": "Mənbəyə bax",
@@ -2141,9 +2144,9 @@
     "reference": "Mənbədəki əlavə göstərici (bal verilmir)",
     "sourceAverage": "Orta göstərici: mənbədə hesablama düsturu yoxdur",
     "answers": {
+      "0": "Xeyr",
       "1": "Bəli",
       "0_5": "Orta",
-      "0": "Xeyr",
       "na": "N/A"
     },
     "addFinding": "Uyğunsuzluq əlavə et",
