@@ -40,6 +40,9 @@ test('Lifecycle uses independent review, complete revision answers, finding clos
  assert.equal((await h.request('admin','PATCH',`/audit-workflow/${id}/status`,{status:'in-progress'})).status,200);
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id})).status,409);
  assert.equal((await h.request('admin','PATCH',`/audit-findings/${finding.data.data._id}/status`,{status:'closed'})).status,200);
+ assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,comment:{bad:true}})).status,400);
+ assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,comment:'x'.repeat(4001)})).status,400);
+ assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,unknown:true})).status,400);
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,executionId:'not-an-object-id'})).status,400);
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,executionId:String(new (require('mongoose').Types.ObjectId)())})).status,400);
  assert.equal((await h.request('admin','POST','/audit-closure',{auditId:id,executionId:String(execution._id)})).status,201);
