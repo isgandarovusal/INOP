@@ -50,7 +50,9 @@ test('HR source provisioning, draft concurrency, evidence isolation, scoring, an
  h.tokens.reviewer=require('jsonwebtoken').sign({id:String(Reviewer._id),role:'admin'},process.env.JWT_SECRET,{expiresIn:'1h'});
  const approvalId=approval.data.data?._id||approval.data._id;
  const decision=await call('reviewer','PATCH',`/audit-approval/${approvalId}`,{status:'approved'});assert.equal(decision.status,200,JSON.stringify(decision.data));
+ const assessmentBeforeClosure=(await models.Audit.findById(audit._id).lean()).hrAssessment;
  const closed=await call('admin','POST','/audit-closure',{auditId:audit._id});assert.equal(closed.status,201,JSON.stringify(closed.data));
+ assert.deepEqual((await models.Audit.findById(audit._id).lean()).hrAssessment,assessmentBeforeClosure);
  assert.equal((await call('admin','PUT',`/audit-execution/${execution._id}/draft`,{...body,expectedVersion:2})).status,409);
  await assert.rejects(()=>require('../models/hrAuditSave.model').updateOne({executionId:execution._id},{$set:{actor:'forged'}}));
 }));
