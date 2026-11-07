@@ -32,6 +32,19 @@ Cloudflare WAF malicious-uploads detection requires Enterprise + paid add-on. Th
 
 The previous `@cf/qwen/qwen3-30b-a3b-fp8` model is scheduled to stop responding **2026-11-20**. Cloudflare recommends the newer `@cf/qwen/qwen3.8-27b`, present in our account catalog. It is a possible bounded AZ/EN/RU test candidate, **not** yet a confirmed accurate recruitment model. Production inference stays disabled until privacy consent, benchmark and budget controls are approved.
 
+## Free and low-memory alternative review (2026-11-07)
+
+No new runtime dependency, model weight, signature download, R2 test object, Mongo collection, storage directory, or paid service was installed for this selection.
+
+- **Preferred: existing INOP ClamAV adapter** (`Backend/services/hrClamScan.service.js`): private stdin-based scan; strict hash and signature age; no shell, temp CV, or package installation. It still requires a separately available, adequately sized trusted native host with current full definitions. Not runnable on Workers Free or Render Free reliably.
+- [pompelmi/pompelmi](https://github.com/pompelmi/pompelmi) is a zero-runtime-dependency Node ClamAV wrapper. It **still requires** ClamAV native engine/daemon, so it would duplicate the existing more restrictive adapter and not solve RAM/hosting. Not installed.
+- [sylvinus/exav](https://github.com/sylvinus/exav) aims for a bounded, memory-safe ClamAV-compatible scanner, but is explicitly **beta** and has no demonstrated production signature/corpus acceptance on Workers Free. Not installed.
+- [gleicon/spotter](https://github.com/gleicon/spotter) does structural and threat-intelligence checks of PDFs/Office files but uses additional feeds, and ClamAV is optional; this is defense in depth, not an independent certified clean verdict. Not installed.
+- [Cloudflare Queues Free](https://developers.cloudflare.com/changelog/post/2026-02-04-queues-free-plan/) permits up to 10,000 operations/day and 24h retention. **Do not create a queue yet**: the private scanner consumer does not exist, and unattended messages cannot turn pending files clean.
+- Existing INOP `mammoth` and `pdf-parse` dependencies handle source extraction in the separate Node runtime once bytes are verified clean. No second parsing runtime is installed; Workers Free's 10 ms CPU budget is not used for DOCX/PDF extraction.
+
+An additional independent Worker activation gate `RECRUITMENT_VERIFIED_SCANNER_ENABLED=true` now guards `/v1/ai/review`, **in addition to** existing AI and transfer opt-ins and the exact source's clean status. It is intentionally unset. Merely modifying D1 `scan_status` cannot activate AI. A future reviewer must verify actual scanner service, hash-bound fresh receipts, tenant consent, and private transport before enabling it. A flag on its own is not scanner proof.
+
 ## Operational QA and release
 
 The pure HTTP boundary tests are `Backend/tests/cloudflareRecruitmentBoundary.test.cjs` and `Backend/tests/cloudflareRecruitmentIntake.test.cjs`, plus `Backend/tests/cloudflareRecruitmentAiGuard.test.cjs`. They check default disabled, tenant and MIME restrictions, private SHA receipt, D1 quota failure, no AI on unscanned bytes and sanitized storage failures. They make **zero** real R2 writes or Workers AI calls. All three tests are now in the routine GitHub CI security gate.
