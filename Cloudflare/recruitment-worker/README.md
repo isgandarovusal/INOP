@@ -1,25 +1,46 @@
-# INOP Recruitment on Cloudflare — independent foundation
+# INOP Recruitment Cloud — Free-tier operational boundary
 
-This directory contains the standalone Cloudflare Recruitment Worker. It is deliberately separate from INOP's MongoDB `test` and Render backend. The existing Candidate/ATS records and hiring decisions remain owned by INOP; no records were copied. New Cloudflare D1 database: `inop-recruitment-db` (EU jurisdiction, region EEUR; UUID `fcf33ba3-5698-4690-b6b4-6d43ee6204cb`). Its schema is versioned in `migrations/0001_init.sql`.
+**Current actual state (2026-11-07):** Cloudflare Worker `inop-recruitment-api` is routed at `inop-recruitment-api.isgandarovusal.workers.dev`. Cloudflare D1 `inop-recruitment-db`, EU jurisdiction / EEUR, has migrations `0001_init.sql` and `0002_quarantine_quota.sql` applied (schema **2**). Worker bindings: `RECRUITMENT_DB`, `PRIVATE_CV_BUCKET` (existing private R2 `inop-private-cv`), `AI`, and secret `RECRUITMENT_SERVICE_TOKEN`. The shared Render-side token was **not** installed; automatic secret exchange was blocked by a safety check. The main MongoDB `test` remains the authoritative source for hiring records.
 
-Cloudflare Worker `inop-recruitment-api` uses `RECRUITMENT_DB` (D1), `PRIVATE_CV_BUCKET` (existing private R2 bucket `inop-private-cv`) and `AI` (Workers AI). Bindings are present but **CV intake, AI calls, storage writes, and ATS changes are disabled**. Only `GET /health` is publicly safe. All `/v1/` requests require a 32+-character server-to-server Bearer secret `RECRUITMENT_SERVICE_TOKEN`; without it, the service returns 503 rather than granting access. `GET /v1/status` validates D1 schema version, while `GET /v1/sources?tenant=gfc` returns at most 30 metadata-only rows. All mutations return HTTP 423.
+## Behavior that is actually deployed
 
-A `workers.dev` address could not be activated by API: this account has no initialized Workers subdomain, and the create request returned Cloudflare error 10013 (HTTP 500). It is therefore **deployed but not publicly routed**. Do not report an endpoint as LIVE until a subdomain/domain is configured and authenticated HTTP checks pass.
+- Public `GET /health` reports disabled intake and disabled AI. Never treat this as malware/readiness certification.
+- All `/v1/` endpoints require a private bearer token and have no permissive CORS. Absent secret returns 503; invalid token 401.
+- `GET /v1/status` checks D1 schema 2 and reports scanner not verified, mandatory human review, 20/day upload-attempt cap and feature states.
+- `GET /v1/sources?tenant=gfc` returns at most 30 metadata-only rows; no names, CV bytes, raw extracted text, object keys or AI output.
+- `POST /v1/intakes` is **disabled by default** unless `RECRUITMENT_QUARANTINE_INTAKE_ENABLED=true`. The gate is currently NOT configured. If expressly activated after retention and consent reviews, it accepts only a server-to-server body up to **1 MiB**, PDF/DOCX signature and MIME, tenant gfc, current Mongo Candidate reference and a consent reference. A durable atomic D1 counter limits each UTC day's attempts to 20. Only a new random private R2 key is written; SHA-256 metadata, D1 pending/quarantine status and receipt are preserved. Unknown provider results do not count as success, never delete the object automatically or retry blindly. Nothing is declared virus-free.
+- `POST /v1/ai-review`, any real AI inference, OCR, parsing, scanner approval, CV download, and automated hiring decisions are **not enabled**. There is no exposure of quarantined CVs to Workers AI.
+- Existing `inop-private-cv` has no public r2.dev or custom-domain access. A previously retained 64-byte synthetic object was left untouched. New upload tests use mocks only; they did not create real CV objects.
 
-## Roadmap and blocking gates
+## Free usage bounds and unavoidable blocker
 
-1. Account owner opens Cloudflare dashboard's Workers & Pages entry for the first time to initialize workers.dev; then bind a verified route to the script.
-2. Provision a dedicated private service secret in Worker and INOP backend secret stores; no secret in GitHub. Verify 401/503 and allowed status on real endpoint, with no CORS/client-side token.
-3. Define retention, consent, R2 backup/restore, upload quarantine and separately validated maintained **PDF/DOCX malware scanning**. Never mark CV clean based on MIME, SHA or AI output. Cloudflare WAF upload detection is a paid Enterprise add-on, not a Free-plan substitute.
-4. With scanner proof, add private upload, CV source lifecycle/queue, bounded parsing and human-reviewed extraction. Record only metadata and safe digests in D1; actual CV bytes stay private in R2.
-5. Do not adopt the existing @cf/qwen/qwen3-30b-a3b-fp8 production model unchanged: Cloudflare lists planned deprecation on 2026-11-20. Compare maintained multilingual alternatives using synthetic AZ/EN/RU evaluation; run one bounded fictional Workers AI canary only after explicit budget/authorization approval; then measured AZ/EN/RU evaluation and human-approved relevance explanations. Never make autonomous hire/reject decisions.
-6. Integrate explicit service-to-service API from INOP Render; preserve existing authorization, Candidate provenance and default-off feature gates. Do not change the production database/roles or promote a scanner-less CV acceptance.
+Cloudflare Workers Free permits 100,000 requests/day but only **10 ms CPU** per request and 128 MiB memory; PDF/DOCX extraction and signature-scanning cannot be assumed to finish in this budget. D1 Free currently includes 5M rows read/day, 100k written/day and 5 GiB; R2 Standard currently includes 10 GB-month, 1M Class A and 10M Class B operations/month. Workers AI Free provides 10,000 neurons/day, but actual quota/payment settings were not readable from our token, and **no model inference was sent**. All quotas are shared with other account use: none is a guaranteed billing cap.
 
-## GitHub inspiration
+Cloudflare WAF malicious-uploads detection requires Enterprise + paid add-on. The open-source Cisco ClamAV scanner uses a native daemon/engine with maintained signatures and enough RAM/CPU; it is **not a service that Free Workers can host**. A free scanner is possible on an existing persistent owner-controlled machine with maintained ClamAV; a separate scanner host/credential/recovery and actual malware test are required to connect it. We will not upload private CVs to public malware APIs or use browser-only/unverified scans as a clean verdict. Do not change `scan_status` from pending without a verified scanner receipt for the exact immutable SHA.
 
-- [cloudflare/cloudflare-retrieval-augmented-generation-example](https://github.com/cloudflare/cloudflare-retrieval-augmented-generation-example) shows Workers AI + D1/Vectorize patterns, **not** a secure CV intake implementation.
-- [cloudflare/workers-sdk](https://github.com/cloudflare/workers-sdk) is the maintained Workers toolchain; use only relevant components rather than a second ATS.
-- [microsoft/markitdown](https://github.com/microsoft/markitdown) and [docling-project/docling](https://github.com/docling-project/docling) are document extraction research references; running their full native stacks inside a Worker is not a supported assumption.
-- [j-256/d1-r2-starter-wrangler](https://github.com/j-256/d1-r2-starter-wrangler) offers a D1/R2 integration pattern, but its example upload/delete endpoints and auth must **not** be copied to a private CV system without scanning and tenant-specific authorization.
+## Source reviews and exact choices
 
-The first test is `Backend/tests/cloudflareRecruitmentBoundary.test.cjs`, using only synthetic in-memory data, no external requests or candidate records. The Worker must remain fail-closed pending external acceptance.
+- [Cloudflare Workers SDK](https://github.com/cloudflare/workers-sdk) — official deployment tooling; existing Cloudflare API update was used instead of installing tooling.
+- [Mozilla PDF.js](https://github.com/mozilla/pdf.js) — licensed JavaScript PDF parsing, but processing untrusted input within 10 ms Free Worker is not established. Adopt only in a separate approved worker process after scanning.
+- [mwilliamson/mammoth.js](https://github.com/mwilliamson/mammoth.js) — BSD-2-Clause, existing INOP Node stack already uses Mammoth for DOCX extraction; reuse rather than introduce Python services.
+- [Microsoft MarkItDown](https://github.com/microsoft/markitdown) — optional Python conversion pipeline; unsuitable as a drop-in Worker runtime.
+- [Cisco-Talos/clamav](https://github.com/Cisco-Talos/clamav) — GPLv2 engine appropriate for a private trusted scanning host, subject to definitions, resources and operator health checks.
+- [cloudflare-pdf-rag](https://github.com/jcampod/cloudflare-pdf-rag) — MIT example for AI/evidence retrieval, but extracts files with **external Python** and is NOT a real on-Worker CV scanner.
+- [attachmentAV R2 example](https://github.com/widdix/attachmentav-example-cloudflare-r2-virus-malware-scan) — uses a separate commercial attachmentAV API and sends customer files outside our approved boundary. Reject for INOP Free/private CVs.
+- [exav](https://www.exav.org/) — interesting Rust/WASM scanner, but still beta; not audited or verified to fit Free Worker CPU/memory and signature updates. Do not certify as malware defense.
+
+The previous `@cf/qwen/qwen3-30b-a3b-fp8` model is scheduled to stop responding **2026-11-20**. Cloudflare recommends the newer `@cf/qwen/qwen3.8-27b`, present in our account catalog. It is a possible bounded AZ/EN/RU test candidate, **not** yet a confirmed accurate recruitment model. Production inference stays disabled until privacy consent, benchmark and budget controls are approved.
+
+## Operational QA and release
+
+The pure HTTP boundary tests are `Backend/tests/cloudflareRecruitmentBoundary.test.cjs` and `Backend/tests/cloudflareRecruitmentIntake.test.cjs`. They check default disabled, tenant and MIME restrictions, private SHA receipt, D1 quota failure, no AI on unscanned bytes and sanitized storage failures. They make **zero** real R2 writes or Workers AI calls.
+
+Before real CV intake:
+1. Provision and verify a persistent **private ClamAV scanner**, updated signatures, encrypted transport, malware test, and exact-byte/hash scan receipt.
+2. Define consent/retention/erasure and backup/restore; verify R2 private IAM + D1 migration recovery; prove end-to-end object reconciliation when R2/D1 acknowledgement fails.
+3. Bind a controlled service credential in the Render server secret store by authorized operator, never browser/GitHub; default-off bridge code already exists.
+4. Implement current-authority Candidate ownership and signed consent verification; metadata-only Candidate refs from an authenticated backend are not themselves proof of lawful intake.
+5. Provide bounded scanner-verified extraction (PDF.js/Mammoth), AI proposal evaluation on synthetic AZ/EN/RU examples, human-approved review in INOP with fairness, provenance, no autonomous decisions.
+6. Only then activate limited real CV intake and verify hosted HTTP authentication, scanner, R2 receipt, recovery, AI candidate retrieval and explicit human decision. No background polling or paid resources are required for the current disabled foundation.
+
+Current designation: **isolated Cloudflare foundation deployed, safe quarantine intake coded but disabled, full production CV/AI not certified**.
