@@ -73,7 +73,7 @@ const isRef=value=>typeof value==='string'&&/^[a-f0-9-]{36}$/i.test(value);
 const safeEvidence=value=>typeof value==='string'&&value.length>=2&&value.length<=100
  &&!/[\r\n<>@]/.test(value)&&!/(?:\+?\d[\d\s().-]{7,}\d)/.test(value);
 async function aiReview(request,env){
- if(env.RECRUITMENT_CLOUD_AI_ENABLED!=='true'||env.RECRUITMENT_PII_TRANSFER_APPROVED!=='true')return reject('AI_NOT_ENABLED',423);
+ if(env.RECRUITMENT_CLOUD_AI_ENABLED!=='true'||env.RECRUITMENT_PII_TRANSFER_APPROVED!=='true'||env.RECRUITMENT_VERIFIED_SCANNER_ENABLED!=='true')return reject('AI_NOT_ENABLED',423);
  if(!env.AI)return reject('AI_UNAVAILABLE',503);
  const len=Number(request.headers.get('content-length'));
  if(!Number.isSafeInteger(len)||len<10||len>4096)return reject('INVALID_REVIEW',400);
