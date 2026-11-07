@@ -47,6 +47,21 @@ test('Approval parent authorization', async t => withAuditFixture(async h => {
     const response = await h.request('admin', 'POST', '/audit-approval', { auditId: String(foreign._id), findingId: String(finding._id), actionId: String(action._id),reviewer:String(h.actors.foreign._id) });
     assert.equal(response.status, 201); assert.equal(response.data.data.auditId, String(foreign._id));
   });
+  await t.test('Pending approval cannot be reused for a different finding or action', async () => {
+    const parent = await h.audit('own');
+    const first = await h.models.Finding.create({ auditId: parent._id, title: 'Synthetic first finding' });
+    const second = await h.models.Finding.create({ auditId: parent._id, title: 'Synthetic second finding' });
+    const payload = { auditId: String(parent._id), reviewer: String(h.actors.peer._id), findingId: String(first._id) };
+    const original = await h.request('admin','POST','/audit-approval',payload);
+    assert.equal(original.status, 201);
+    const repeated = await h.request('admin','POST','/audit-approval',payload);
+    assert.equal(repeated.status, 201);
+    assert.equal(repeated.data.data._id, original.data.data._id);
+    assert.equal((await h.request('admin','POST','/audit-approval',{...payload,findingId:String(second._id)})).status,409);
+    assert.equal((await h.request('admin','POST','/audit-approval',{...payload,findingId:undefined})).status,409);
+    const pending = await h.models.Approval.findById(original.data.data._id);
+    assert.equal(String(pending.findingId),String(first._id));
+  });
   await t.test('Own scope permits own approval and denies foreign parent', async () => {
     const parent = await h.audit('own');
     const approval = await h.models.Approval.create({ auditId: parent._id,requestedBy:h.actors.admin._id,reviewer:h.actors.own._id,status:'pending' });
